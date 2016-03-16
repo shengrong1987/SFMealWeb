@@ -1,0 +1,61 @@
+
+<div id="addressDetailView" class="address">
+  <div class="alert alert-danger hide">
+    <strong>错误！</strong> 地址更新失败，请稍后再试。
+  </div>
+  <div class="popup box middle" style="width: 350px;">
+
+    <form class="text-center" id="address-form" role="form">
+
+      <h4 id="new_title" class="hide text-left text-red"><strong>新建收餐地址...</strong></h4>
+      <h4 id="exist_title" class="hide text-left text-red"><strong>修改收餐地址</strong></h4>
+
+      <fieldset>
+        <div class="form-group" role="form">
+          <label class="sr-only" for="streetInput">地址</label>
+          <input type="text" class="form-control" id="streetInput" placeholder="No., Street name" required data-error="不能为空">
+          <div class="help-block with-errors"></div>
+        </div>
+
+        <div class="form-group" role="form">
+          <label class="sr-only" for="cityInput">城市</label>
+          <input type="text" class="form-control" id="cityInput" placeholder="(San Francisco)" required data-error="不能为空">
+          <div class="help-block with-errors"></div>
+        </div>
+
+        <div class="form-group" role="form">
+          <label class="sr-only" for="zipcodeInput">邮编</label>
+          <input type="text" class="form-control" id="zipcodeInput" placeholder="(zip-code)" required data-error="邮编格式不对" minLength="5" maxlength="10">
+          <div class="help-block with-errors"></div>
+        </div>
+
+        <div class="form-group" role="form">
+          <label class="sr-only" for="phoneInput">电话</label>
+          <input type="text" class="form-control" id="phoneInput" placeholder="＋1(415)888-8888" required data-error="电话格式不对" minLength="10" maxlength="11">
+          <div class="help-block with-errors"></div>
+        </div>
+
+        <div class="form-group text-left" role="form">
+          <input id="isDefault" type="checkbox" checked="checked" aria-label="...">
+          <label aria-label="...">设置为默认收餐地址</label>
+        </div>
+
+        <div class="alert alert-danger hide"></div>
+
+        <div class="col-xs-12 form-group">
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-danger red round disabled">保存</button>
+              <button type="button" name="cancel" class="btn btn-disable round">取消</button>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>
+
+<script>
+  $("#address-form").validator({});
+</script>
+<script src="../../js/bootstrap/bootstrap-formhelpers-min.js"></script>

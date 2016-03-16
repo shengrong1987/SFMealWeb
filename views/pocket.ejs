@@ -1,0 +1,73 @@
+
+<div class="container-fluid text-center" style="margin-top:-20px;">
+  <div class="row">
+    <div class="pure-banner vertical-align blue">
+      <div style="width: 600px;" class="middle banner-text">
+        <div class="row vertical-align" style="margin-bottom: 5px;">
+          <div class="col-sm-3 cursor-pointer" onclick="location.href='/'">
+            <h3 class="text-white logo-text"><strong>私房Meal</strong><br><small class="text-white text-center">SFMeal.com</small></h3>
+          </div>
+          <div class="col-sm-9">
+            <h2 class="text-white text-left"><strong>我的钱包</strong></h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="default-container">
+      <ul class="nav nav-tab-blue nav-justified" style="padding: 20px;">
+        <li class="active"><a data-toggle="tab" href="#mydetail"><h4><strong>收支明细</strong></h4></a></li>
+        <li><a data-toggle="tab" role="tab" href="#mypurse"><h4><strong>钱包存款</strong></h4></a></li>
+        <li><a data-toggle="tab" role="tab" href="#mypayment"><h4><strong>支付方式</strong></h4></a></li>
+      </ul>
+
+      <div class="tab-content" style="padding-top: 20px;padding-bottom: 60px;min-height: 500px;">
+        <div id="mydetail" style="width: 90%;" class="tab-pane middle active">
+
+        </div>
+        <!-- mypurse end -->
+
+        <div id="mypurse" style="width: 90%;" class="tab-pane middle">
+          <div class="box box-shadow white">
+            <% if(user.host){%>
+            <h4 class="text-left">我的银行账号: <small class="bank_name"></small>
+            <% if (user.host.bankId){%>
+            <small><a toggle="modal" data-updating="true" data-host="<%=user.host.id%>" data-target="#myModal" data-href="/templates/user/bank.html" href="javascript:void(0)" onclick="toggleModal(event,enterHostInfo)">  更新银行信息 </a></small><i class="fa fa-question-circle text-grey cursor-pointer"></i>
+            <%}else{%>
+            <small><a toggle="modal" data-updating="false" data-host="<%=user.host.id%>" data-target="#myModal" data-href="/templates/user/bank.html" href="javascript:void(0)" onclick="toggleModal(event,enterHostInfo)">  您尚未创建银行信息，请点击创建 </a></small><i class="fa fa-question-circle text-grey cursor-pointer"></i>
+            <%}%>
+            </h4>
+            <h4 class="text-left">我的钱包存款为:</h4>
+            <div class="jumbotron">
+              <h1 class="text-blue">$<%= user.pocket.balance%></h1>
+            </div>
+            <button class="btn btn-primary btn-lg round blue">申请提款</button>
+            <%}%>
+          </div>
+        </div>
+
+        <div id="mypayment" style="width: 90%;" class="tab-pane middle" data-id="<%= user.id %>">
+          <div class="box box-shadow white">
+            <%
+            var cards = user.payment;
+            for(var j=0; j < cards.length; j++){
+              var card = cards[j];
+              var last4 = card.cardNumber.slice(-4);
+              if(card.isDefaultPayment){
+            %>
+            <button class="btn btn-disable blue btn-fat btn-lg active" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
+            <%}else{%>
+            <button class="btn btn-disable btn-fat btn-lg<%if(card.isDefaultPayment){%> active<%}%>" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
+            <%}}%>
+            <button class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/>增加新的<br/>支付方式</button>
+          </div>
+        </div>
+        <!-- payment end -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

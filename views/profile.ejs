@@ -1,0 +1,166 @@
+<div class="container-fluid text-center relative" style="margin-top:-20px;">
+
+  <div class="row">
+    <div class="pure-banner vertical-align red">
+      <div style="width: 600px;" class="middle banner-text">
+        <div class="row vertical-align" style="margin-bottom: 5px;">
+          <div class="col-sm-3">
+            <h3 class="text-white logo-text" onclick="location.href='/'"><strong>私房Meal</strong><br><small class="text-white text-center">SFMeal.com</small></h3>
+          </div>
+          <div class="col-sm-9">
+            <h4 class="text-white"><strong>欢迎加入我们,一起享受私房菜吧！</strong></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="host-profile" class="default-container" style="padding: 30px 20px 30px 20px;">
+
+    <div class="row">
+      <div class="col-md-5">
+        <div class="box white">
+          <div class="row">
+            <div class="col-xs-12 text-center">
+              <img src="<%= host.picture|| "/images/profile_man.png"%>" class="round_thumb" style="max-width: 150px;">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              <h4 class="text-dark"><strong><%= host.shopName %></strong><br/><br/><small><%= host.shortIntro %></small></h4>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              <h4 class="text-left text-red"><strong>我的主打菜</strong></h4>
+              <div class="divider red none-margin" style="height: 8px;"></div>
+            </div>
+          </div>
+          <div class="row">
+            <%
+              var i = 1;
+              if(host.feature_dishes){
+                  host.feature_dishes.forEach(function(dishObj){
+                    dishObj = dishObj["dish"+i];
+                    var dish = host.dishes.forEach(function(dish){
+                    if(dish.id == dishObj.id){
+
+            %>
+            <div class="feature-dish col-lg-6 col-md-12 col-xs-6" style="margin-top: 15px;">
+              <div class="white border-round" style="overflow: hidden;">
+                <div class="row">
+                  <div class="col-xs-12">
+                    <img class="photo" src= "<%= dish.photos[0].v %>" data-dish="<%= dish.id %>" onclick="javascript:location.href='/dish/' + $(this).data('dish')">
+                  </div>
+                </div>
+                <div class="col-md-12 basic-info">
+                  <h4 class="text-red text-left">$<%= dish.price.toFixed(2) %><br>
+                    <small class="text-black"><strong><%= dish.title %></strong></small>
+                  </h4>
+                </div>
+                <div class="text-left" style="margin: 0 0 10px 10px;" data-toggle="tooltip" data-placement="bottom" title="<%= dish.score.toFixed(2)%>">
+                  <div class="rating text-left" data-toggle="star-set" data-rate="<%= dish.score.toFixed(2)%>">
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <%}});i++;})};%>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-7">
+        <div class="box white">
+          <div class="row">
+            <div class="col-xs-12">
+              <h4 class="text-left text-red"><strong>我的故事</strong></h4>
+              <div class="divider red none-margin" style="height: 8px;"></div>
+              <p style="margin-top: 10px;min-height: 50px;" class="text-left"><%= host.intro%></p>
+            </div>
+            <div class="col-xs-12">
+              <h4 class="text-left text-red">我的菜单</h4>
+              <div class="divider red none-margin" style="height: 8px;"></div>
+              <h4 class="none-margin text-left"><small>现点</small></h4>
+              <div class="divider none-margin"></div>
+              <div class="row">
+                <%
+                  host.meals.forEach(function(meal){
+                    host.dishes.forEach(function(dish){
+                      if(dish.id == meal.cover){
+                %>
+                <div class="feature-dish col-lg-4 col-md-6 col-xs-4" style="margin-top: 5px;">
+                  <div class="white border-round" style="overflow: hidden;">
+                    <div class="row">
+                      <div class="col-xs-12">
+                        <img class="photo" src= "<%= meal.coverString %>" data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
+                      </div>
+                    </div>
+                    <div class="col-md-6 basic-info">
+                      <h4 class="text-red text-left">$<%= dish.price.toFixed(2) %><br>
+                        <small class="text-black"><strong><%= meal.title %></strong></small>
+                      </h4>
+                    </div>
+                    <div class="col-md-6">
+                      <h4><small>剩余<%= meal.leftQty[dish.id] %>份<br>自取/送餐</small></h4>
+                    </div>
+                  </div>
+                </div>
+                <%}})});%>
+              </div>
+              <h4 class="none-margin text-left"><small>预定</small></h4>
+              <div class="divider none-margin"></div>
+              <div class="row">
+
+              </div>
+            </div>
+            <div class="col-xs-12">
+              <h4 class="text-left text-red"><strong>评论我的</strong></h4>
+              <div class="divider red none-margin" style="height: 8px;"></div>
+              <div id="host-reviews">
+              <%
+                host.reviews.forEach(function(review){
+              %>
+              <div class="item">
+                <div class="row">
+                  <div class="col-sm-9 text-left">
+                    <div data-toggle="tooltip" data-placement="bottom" title="<%= review.score.toFixed(2)%>" style="margin-top: 5px;">
+                      <div class="rating" data-toggle="star-set" data-rate="<%= review.score.toFixed(2)%>">
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                      </div>
+                    </div>
+                    <h4 style="display: inline-block;"><small style="font-size: 16px;" class="text-lightgrey" data-id=<%= review.user %>><%= review.username %></small></h4>
+                  </div>
+                  <div class="col-sm-3">
+                    <h3 class="text-right"><small><%= review.get_formatted_time() %></small></h3>
+                  </div>
+                </div>
+                <h4 class="text-left"><small class="text-black"><%= review.review %></small></h4>
+                <div class="divider"></div>
+              </div>
+              <%
+                });
+              %>
+              </div>
+              <nav class="pull-right">
+                <ul class="pagination pagination-red pagination-sm" data-trigger="pagination" data-target="#host-reviews">
+                  <li class="active"><a href="javascript:void(0)">1</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

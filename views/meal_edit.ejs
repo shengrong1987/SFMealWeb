@@ -1,0 +1,380 @@
+
+<div class="container-fluid text-center" style="margin-top:-20px;">
+  <div class="row">
+    <div class="pure-banner vertical-align green">
+      <div style="width: 600px;" class="middle banner-text">
+        <div class="row vertical-align" style="margin-bottom: 5px;">
+          <div class="col-sm-3">
+            <h3 class="text-white logo-text"><strong>私房Meal</strong><br><small class="text-white text-center">SFMeal.com</small></h3>
+          </div>
+          <div class="col-sm-9">
+            <h4 class="text-white"><strong>欢迎加入我们,一起享受私房菜吧！</strong></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="default-container">
+      <ul class="nav nav-tab-green nav-justified" style="padding: 20px;">
+        <li><a href="/host/me#myorder"><h4><strong>厨房订单</strong></h4></a></li>
+        <li class="active"><a href="/host/me#mymeal"><h4><strong>我的Meal</strong></h4></a></li>
+        <li><a href="/host/me#mydish"><h4><strong>我的菜</strong></h4></a></li>
+        <li><a href="/host/me#myinfo"><h4><strong>编辑厨房资料</strong></h4></a></li>
+      </ul>
+
+      <div id="mealEditingView" style="padding: 5px 20px 50px 20px;">
+        <div class="box box-shadow box-primary white text-left">
+          <form class="form-horizontal" data-meal-id="<%= meal.id%>" data-id="<%= meal.userId%>" data-err-container=".submit">
+
+            <div class="form-group">
+              <div id="dish-selector" class="row">
+                <div class="col-md-5">
+                  <label for="dishList">1.从<span class="text-green">我的菜</span>加入Meal <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                  <ul id="dishList" class="border-lightgrey selectable-list">
+                    <% meal.allDishes.forEach(function(dish){
+                        var dishes = meal.dishes;
+                        var hasDish = false;
+                        dishes.forEach(function(existDish){
+                          if(dish.id == existDish.id){
+                            hasDish = true;
+                          }
+                        });
+                        if(hasDish){%>
+                          <li class="select" data-id="<%= dish.id%>"><a class="text-white" name="title"><%= dish.title%><i class="fa fa-ticket"></i></a></li>
+                        <%}else{%>
+                          <li data-id="<%= dish.id%>"><a class="text-green" name="title"><%= dish.title%><i class="fa fa-ticket"></i></a></li>
+                        <%}});%>
+                  </ul>
+                </div>
+
+                <div class="col-md-7">
+                  <div class="col-xs-2 vertical-align" style="height: 120px;">
+                    <i class="fa fa-arrow-circle-o-right fa-4x"></i>
+                  </div>
+                  <div class="col-xs-10">
+                    <label for="dishSelected">已添加，从以下Logo点击选取主打和封面菜：<i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                    <div>
+                      <label>Meal的菜，<i class="fa fa-star fa-2x text-yellow"></i> 为主打，<i class="fa fa-camera fa-2x text-yellow"></i> 为封面(限一款)。     <br/>供应量:</label>
+                    </div>
+                    <ul id="dishSelected" class="border-lightgrey handle-list" data-error="请先至少选择一款菜式">
+                      <%
+                        var dishes = meal.dishes;
+                        var cover = meal.cover;
+                        var features = meal.features;
+                        var total = meal.totalQty;
+                        dishes.forEach(function(dish){
+                          var hasCover = false;
+                          var hasFeatures = false;
+                          var quantity = total[dish.id] ? total[dish.id] : 1;
+                          if(dish.id == cover){ hasCover = true;}
+                          if(features.indexOf(dish.id)>-1){ hasFeatures = true;}
+                      %>
+                      <li class="row" data-toggle="manipulate-item" data-id="<%= dish.id%>" data-cover="<%= hasCover%>" data-feature="<%= hasFeatures%>">
+                        <div class="col-xs-5">
+                          &nbsp;<i class="manipulate-button fa fa-star <%= (features && features.indexOf(dish.id)!=-1)?'text-yellow':'text-grey'%> cursor-pointer" data-type="feature"></i>&nbsp;<i class="manipulate-button fa fa-camera <%= (cover && cover==dish.id)?'text-yellow' : 'text-grey'%>  cursor-pointer" data-type="cover"></i><label name="title"><%= dish.title%></label>
+                        </div>
+                        <div class="col-xs-1">
+                          <i class="fa fa-close cursor-pointer" style="margin-left:10px;" onclick="javascript:dishListHandler(false,$(this).parent().parent(),true)"></i>
+                        </div>
+                        <div class="col-xs-5 vertical-align" style="height:52px;padding-top: -10px;">
+                          <div class="input-group amount-input" data-toggle="amount-input">
+                            <div class="input-group-addon minus">-</div>
+                            <input class="form-control" type="number" value="<%= quantity%>" style="min-width: 75px;">
+                            <div class="input-group-addon add">+</div>
+                          </div>
+                        </div>
+                        <div class="col-xs-3"></div>
+                      </li>
+                      <%}); %>
+                    </ul>
+                    <div class="alert alert-danger" data-toggle="alert"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label style="display: block;" for="">2.即点即做还是预定呢？<i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+              <div class="row">
+                <div class="col-xs-12">
+                  <label class="btn btn-default fixed-label vertical-align" data-href="#order" style="width: 120px;" onclick="javascript:$($(this).data('href')).parent().find('.tab-pane').hide();$($(this).data('href')).show();">
+                    <input type="radio" id="radio-order-now" name="radio-set-1" class="regular-radio" <% if(meal.type == "order"){%> checked=""<%}%>><label for="radio-order-now"></label><span style="margin-left: 10px;">即点即做</span>
+                  </label>
+                  <label class="btn btn-default fixed-label vertical-align" data-href="#preorder" style="width: 120px;" onclick="javascript:$($(this).data('href')).parent().find('.tab-pane').hide();$($(this).data('href')).show();">
+                    <input type="radio" id="radio-preorder" name="radio-set-1" class="regular-radio" <% if(meal.type == "preorder"){%> checked=""<%}%>><label for="radio-preorder"></label><span style="margin-left: 10px;">预定</span>
+                  </label>
+                </div>
+                <div clasf="col-xs-12 tab-content">
+                  <div id="order" style="display: block;padding:15px 0 15px 15px;" class="tab-pane middle">
+                    <div class="row">
+                      <div class="col-xs-12" style="margin-top: 10px;">
+                        <p>营业时间 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></p>
+                        <div data-toggle="date-picker" class="date-picker">
+                          <div class="dropdown date" data-date-format="hour">
+                            <a id="start-hour" class="btn btn-outline dropdown-toggle value" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= meal.provideFromTime ? meal.provideFromTime.getHours() : ''%>">
+                              <%= meal.provideFromTime.getHours()%>:00
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            </ul>
+                          </div>
+                          <div class="date">到</div>
+                          <div class="dropdown date" data-date-format="hour">
+                            <a id="end-hour" class="btn btn-outline dropdown-toggle value" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= meal.provideTillTime ? meal.provideTillTime.getHours() : ''%>">
+                              <%= meal.provideTillTime.getHours()%>:00
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="alert alert-danger" data-toggle="alert"></div>
+                  </div>
+                  <div id="preorder" style="display: none;padding-left:15px;" class="tab-pane middle">
+                    <div class="row">
+                      <div class="col-xs-2" style="padding-top: 15px;">
+                        <p>开始接受预定时间 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></p>
+                        <label class="btn btn-default fixed-label vertical-align" style="width: 120px;">
+                          <input type="radio" id="radio-preorder-now" name="radio-set-2" class="regular-radio" checked=""><label for="radio-preorder-now"></label><span style="margin-left: 10px;">马上开始</span>
+                        </label>
+                        <label class="btn btn-default fixed-label vertical-align" style="width: 120px;float: left;">
+                          <input type="radio" id="radio-preorder-future" name="radio-set-2" class="regular-radio"><label for="radio-preorder-future"></label><span style="margin-left: 10px;">预设</span>
+                        </label>
+                      </div>
+                      <div class="col-xs-10 vertical-align" style="height: 130px;">
+                        <div data-toggle="date-picker" class="date-picker">
+                          <div class="dropdown date" data-date-format="month">
+                            <a id="provideFrom-month" class="btn btn-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= meal.provideFromTime ? parseInt(meal.provideFromTime.getMonth())+1 : ''%>">
+                              <% if(meal.provideFromTime){ %>
+                              <%= parseInt(meal.provideFromTime.getMonth())+1 %>月
+                              <%}else{%>
+                                <span>Month</span>
+                                <span class="caret"></span>
+                              <%}%>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            </ul>
+                          </div>
+                          <div class="dropdown date" data-date-format="day">
+                            <a id="provideFrom-day" class="btn btn-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= meal.provideFromTime ? meal.provideFromTime.getDate() : ''%>">
+                              <% if(meal.provideFromTime){ %>
+                              <%= meal.provideFromTime.getDate()%>日
+                              <%}else{%>
+                              <span>Day</span>
+                              <span class="caret"></span>
+                              <%}%>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            </ul>
+                          </div>
+                          <div class="dropdown date" data-date-format="year">
+                            <a id="provideFrom-year" class="btn btn-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= meal.provideFromTime ? meal.provideFromTime.getUTCFullYear() : ''%>">
+                              <% if(meal.provideFromTime){ %>
+                              <%= meal.provideFromTime.getUTCFullYear()%>年
+                              <%}else{%>
+                              <span>Year</span>
+                              <span class="caret"></span>
+                              <%}%>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-xs-2" style="padding-top: 15px;">
+                        <p>结束预定时间 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></p>
+                      </div>
+                      <div class="col-xs-10">
+                        <div>
+                          <div data-toggle="date-picker" class="date-picker">
+                            <div class="dropdown date" data-date-format="month">
+                              <a id="provideTill-month" class="btn btn-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= meal.provideTillTime ? parseInt(meal.provideTillTime.getMonth())+1 : ''%>">
+                                <% if(meal.provideTillTime){ %>
+                                <%= parseInt(meal.provideTillTime.getMonth())+1 %>月
+                                <%}else{%>
+                                <span>Month</span>
+                                <span class="caret"></span>
+                                <%}%>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                              </ul>
+                            </div>
+                            <div class="dropdown date" data-date-format="day">
+                              <a id="provideTill-day" class="btn btn-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= meal.provideTillTime ? meal.provideTillTime.getDate() : ''%>">
+                                <% if(meal.provideTillTime){ %>
+                                <%= meal.provideTillTime.getDate()%>日
+                                <%}else{%>
+                                <span>Day</span>
+                                <span class="caret"></span>
+                                <%}%>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                              </ul>
+                            </div>
+                            <div class="dropdown date" data-date-format="year">
+                              <a id="provideTill-year" class="btn btn-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= meal.provideTillTime ? meal.provideTillTime.getUTCFullYear() : ''%>">
+                                <% if(meal.provideTillTime){ %>
+                                <%= meal.provideTillTime.getUTCFullYear()%>年
+                                <%}else{%>
+                                <span>Year</span>
+                                <span class="caret"></span>
+                                <%}%>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-xs-2" style="padding-top: 15px;">
+                        <p>可取餐时间 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></p>
+                      </div>
+                      <div class="col-xs-10">
+                        <div>
+                          <div data-toggle="date-picker" class="date-picker">
+                            <div class="dropdown date" data-date-format="month">
+                              <a id="pickup-month" class="btn btn-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= meal.pickupFromTime ? parseInt(meal.pickupFromTime.getMonth())+1 : ''%>">
+                                <% if(meal.pickupFromTime){ %>
+                                <%= parseInt(meal.pickupFromTime.getMonth())+1 %>月
+                                <%}else{%>
+                                <span>Month</span>
+                                <span class="caret"></span>
+                                <%}%>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                              </ul>
+                            </div>
+                            <div class="dropdown date" data-date-format="day">
+                              <a id="pickup-day" class="btn btn-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= meal.pickupFromTime ? meal.pickupFromTime.getDate() : ''%>">
+                                <% if(meal.pickupFromTime){ %>
+                                <%= meal.pickupFromTime.getDate()%>日
+                                <%}else{%>
+                                <span>Day</span>
+                                <span class="caret"></span>
+                                <%}%>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                              </ul>
+                            </div>
+                            <div class="dropdown date" data-date-format="year">
+                              <a id="pickup-year" class="btn btn-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= meal.pickupFromTime ? meal.pickupFromTime.getUTCFullYear() : ''%>">
+                                <% if(meal.pickupFromTime){ %>
+                                <%= meal.pickupFromTime.getUTCFullYear()%>年
+                                <%}else{%>
+                                <span>Year</span>
+                                <span class="caret"></span>
+                                <%}%>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                              </ul>
+                            </div>
+                            <div class="dropdown date" data-date-format="hour">
+                              <a id="pickup-from-hour" class="btn btn-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= meal.pickupFromTime ? meal.pickupFromTime.getHours() : ''%>">
+                                <% if(meal.pickupFromTime){ %>
+                                <%= meal.pickupFromTime.getHours()%>:00
+                                <%}else{%>
+                                <span>From</span>
+                                <span class="caret"></span>
+                                <%}%>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                              </ul>
+                            </div>
+                            <div class="date">-</div>
+                            <div class="dropdown date" data-date-format="hour">
+                              <a id="pickup-till-hour" class="btn btn-outline dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= meal.pickupTillTime ? meal.pickupTillTime.getHours() : ''%>">
+                                <% if(meal.pickupTillTime){ %>
+                                <%= meal.pickupTillTime.getHours()%>:00
+                                <%}else{%>
+                                <span>Till</span>
+                                <span class="caret"></span>
+                                <%}%>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <script>
+                    if($("#radio-order-now").prop('checked')){
+                      $("#order").show();
+                      $("#preorder").hide();
+                    }else{
+                      $("#order").hide();
+                      $("#preorder").show();
+                    }
+                  </script>
+                  </div>
+                </div>
+                <div id="scheduleAlert" class="alert alert-danger" data-toggle="alert" style="margin-top:10px;"></div>
+              </div>
+
+            <div class="form-group" style="margin-top: 30px;">
+              <label style="display: block;">3.几份order或达到多少钱预售成功？ <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+              <div class="row">
+                <div class="order-require">
+                  <div class="col-xs-12" data-toggle="exclusive-input" style="padding-top: 5px;">
+                    <div class="row">
+                      <div class="col-xs-4">
+                        <div class="input-group" name="1">
+                          <input id="min-order" class="form-control" type="number" min="1" max="999" style="min-width: 100px;" data-error="最少份数或最少金额须填写一项" value="<%= meal.minimalOrder%>">
+                          <div class="input-group-addon">份</div>
+                        </div>
+                      </div>
+                      <div class="col-xs-1 vertical-align" style="height: 35px;"><label class="middle">或</label></div>
+                      <div class="col-xs-4">
+                        <div class="input-group" name="2">
+                          <input id="min-total" class="form-control" type="number" min="1" max="9999" style="min-width: 100px;" data-error="最少份数或最少金额须填写一项" value="<%= meal.minimalTotal%>">
+                          <div class="input-group-addon">.00美元</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-xs-12">
+                    <div class="alert alert-danger" style="margin-top: 10px;" data-toggle="alert"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 30px;">
+              <label style="display: block;" >4.为你的Meal起个响亮的名字吧！</label>
+              <div class="row">
+                <div class="col-xs-12">
+                  <input id="meal_title" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="7" placeholder="名字最多七个字" data-error="必须填写名字" required value="<%= meal.title%>"><small>  Ex.艾米私房羊肉</small>
+                  <div class="help-block with-errors"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group text-center submit">
+              <button type="submit" class="btn btn-green btn-lg round" style="margin-right: 20px;">发布并保存到线上</button>
+              <button name="save" type="button" class="btn btn-disable btn-lg round text-grey">发布预览但不发布</button>
+              <div class="alert alert-danger" data-toggle="alert" style="margin-top: 20px;"></div>
+            </div>
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  $("#mealEditingView form").validator({});
+  new MealView({ el : "#mealEditingView", model : new Meal()});
+</script>

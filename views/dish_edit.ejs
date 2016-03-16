@@ -1,0 +1,136 @@
+
+<div class="container-fluid text-center" style="margin-top:-20px;">
+  <div class="row">
+    <div class="pure-banner vertical-align green">
+      <div style="width: 600px;" class="middle banner-text">
+        <div class="row vertical-align" style="margin-bottom: 5px;">
+          <div class="col-sm-3">
+            <h3 class="text-white logo-text"><strong>私房Meal</strong><br><small class="text-white text-center">SFMeal.com</small></h3>
+          </div>
+          <div class="col-sm-9">
+            <h4 class="text-white"><strong>欢迎加入我们,一起享受私房菜吧！</strong></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="default-container">
+      <ul class="nav nav-tab-green nav-justified" style="padding: 20px;">
+        <li><a href="/host/me#myorder"><h4><strong>厨房订单</strong></h4></a></li>
+        <li><a href="/host/me#mymeal"><h4><strong>我的Meal</strong></h4></a></li>
+        <li class="active"><a href="/host/me#mydish"><h4><strong>我的菜</strong></h4></a></li>
+        <li><a href="/host/me#myinfo"><h4><strong>编辑厨房资料</strong></h4></a></li>
+      </ul>
+
+      <div id="dishEditView" style="padding: 5px 20px 50px 20px;">
+        <div class="box box-shadow box-primary white text-left">
+          <h1></h1>
+          <form data-id="<%= dish.userId%>" data-dish-id="<%= dish.id%>" data-err-container=".submit">
+            <div class="form-group">
+              <label for="mealTitleInput">1.菜名</label>
+              <input id="mealTitleInput" class="form-control" type="text" placeholder="名字最多七个字" maxlength="7" data-error="名字最多七个字" required value="<%= dish.title%>">
+              <div class="help-block with-errors"></div>
+            </div>
+
+            <div class="form-group">
+              <label style="display: block;" for="">2.照片</label>
+              <%
+                var photos = dish.photos;
+                for(var i = 1; i <= 3; i++){
+                  var photo = photos[i-1];
+                  if(photo && photo.v != ""){
+              %>
+                <div class="fileinput fileinput-exists form-group" data-provides="fileinput" data-index="<%= i%>">
+                  <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                  </div>
+                  <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;" data-src="<%= photo.v%>">
+                    <img src="<%= photo.v%>">
+                  </div>
+                  <div>
+                    <div class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span>
+                      <input id="photoInput-<%= i%>" class="form-control" type="file" data-error="必须上传封面相片">
+                    </div>
+                    <a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput">Remove</a>
+                    <script>
+                      $(".fileinput").on("clear.bs.fileinput",function(){
+                        var index = $(this).data("index");
+                        $("#photoInput-" + index).data("isDelete",true);
+                      });
+                    </script>
+                  </div>
+                </div>
+              <%}else{%>
+                <div class="fileinput fileinput-new" data-provides="fileinput">
+                  <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                  </div>
+                  <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;">
+
+                  </div>
+                  <div>
+                    <div class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span>
+                      <input id="photoInput-<%= i%>" type="file" data-error="必须上传封面相片">
+                    </div>
+                    <a href="javascript:$(this).prev().find('input').data('delete',true);" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                  </div>
+                </div>
+              <%}}%>
+              <div id="photoError" class="help-block with-errors text-red"></div>
+              <div class="alert alert-info">(最好拍三张不同角度的照片)</div>
+            </div>
+
+            <div class="form-group">
+              <label for="priceInput">3.一份卖多少钱？</label>
+              <div class="input-group" style="width: 250px;">
+                <div class="input-group-addon">$</div>
+                <input type="text" class="form-control" id="priceInput" placeholder="美元" min="1" max="100" data-error="价格格式不正确（最多$100, 最少$1）" required value="<%= dish.price%>">
+                <div class="input-group-addon">.00</div>
+              </div>
+              <div class="help-block with-errors"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="categoryInput">4.属于什么类？</label>
+              <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle btn-outline" type="button" id="categoryInput" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= dish.type%>">
+                  <% switch(dish.type){
+                    case "appetizer": %>
+                      前菜
+                  <%break;
+                    case "entree": %>
+                      主食
+                  <%break;
+                    case "dessert": %>
+                      甜品
+                  <%}%>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  <li class="active"><a value="entree">主食</a></li>
+                  <li><a value="appetizer">前菜</a></li>
+                  <li><a value="dessert">甜品</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="form-group text-center submit">
+              <button type="submit" class="btn btn-green btn-lg round">保存并提交审核</button>
+              <div class="help-block with-errors">将在24小时内审核完毕</div>
+              <div class="alert alert-danger" data-toggle="alert"></div>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  $("#dishEditView form").validator({});
+  new DishView({ el : $("#dishEditView"), model : new Dish()})
+</script>

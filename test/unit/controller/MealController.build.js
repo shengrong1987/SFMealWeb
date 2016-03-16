@@ -1,0 +1,447 @@
+/**
+ * Created by shengrong on 11/19/15.
+ */
+
+var assert = require('assert'),
+    sinon = require('sinon');
+var config = require('../../../config/stripe.js'),
+    stripe = require('stripe')(config.StripeKeys.secretKey);
+request = require('supertest');
+var agent;
+
+before(function(done) {
+  agent = request.agent(sails.hooks.http.app);
+  done();
+})
+
+describe('MealController', function() {
+
+  this.timeout(5000);
+
+  describe('build a meal with dishes', function() {
+
+    var hostId;
+    var email = 'auth@gmail.com';
+    var password = 'Rs89030659';
+    var picture = "/images/thumbnail.jpg";
+    var address1 = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853};
+    var address2 = {"street":"1455 Market St","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853, "isDefault" : true};
+    var userId = "";
+
+    it('should login or register an account', function (done) {
+      agent
+          .post('/auth/login?type=local')
+          .send({email : email, password: password,picture:picture})
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.auth.email != email){
+              return done(Error("not login with the same account(email not the same)"))
+            }
+            hostId = res.body.host;
+            userId = res.body.id;
+            done();
+          })
+    });
+
+    it('should update address info (not default)', function (done) {
+      agent
+          .put('/user/' + userId)
+          .send({address : address1})
+          .expect(200)
+          .end(function(err,res){
+            if(err){
+              return done(err);
+            }
+            if(Object.keys(res.body.address_list).length == 0){
+              return done(Error("error geocoding and updating the address"))
+            }
+            done();
+          })
+    });
+
+    it('should update address info (default)', function (done) {
+      agent
+          .put('/user/' + userId)
+          .send({address : address2})
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.city != 'San Francisco'){
+              return done(Error("error geocoding and updating the address"))
+            }
+            done();
+          })
+    });
+
+    it('should become a host if isnt one', function (done) {
+      if(!hostId){
+        agent
+            .post('/user/becomeHost')
+            .send({shopName: "山东健康面馆", intro: "从小吃了奶奶做的山东包子长大的我希望能分享家乡美食到湾区"})
+            .expect(200)
+            .end(function(err,res){
+              if(res.body.user.host == undefined){
+                return done(Error("become host for a logged user doesn't work"));
+              }
+              hostId = res.body.user.host;
+              done();
+            })
+      }else{
+        done();
+      }
+    });
+
+    it('should create bank info for host', function (done) {
+      stripe.tokens.create({
+        bank_account: {
+          country: 'US',
+          currency: 'usd',
+          //account_holder_name: 'Sheng Rong',
+          //account_holder_type: 'individual',
+          routing_number: '110000000',
+          account_number: '000123456789'
+        }
+      }, function(err, token) {
+        agent
+            .post("/bank")
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .send({
+              token : token.id
+            })
+            .expect(200)
+            .end(function(err, res){
+              console.log(res.body);
+              if(res.body.bank_name != "STRIPE TEST BANK"){
+                return done(Error("error creating bank, bank name doesen't match(STRIPE TEST BANK)"));
+              }
+              done();
+            })
+      });
+    });
+
+    it('should update address info for host', function (done) {
+        agent
+          .put('/host/' + hostId)
+          .send({address:address1})
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.city != "San Francisco"){
+              return done(Error("error geocoding or updating address"));
+            }
+            done();
+          })
+    });
+
+    var dish1;
+    var dish2;
+    var dish3;
+    var dish4;
+
+    it('should create couple dishes', function (done) {
+      agent
+          .post('/dish')
+          .send({title : '韭菜盒子',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId, description : "韭菜盒子是中国北方地区陕西、山西等地非常流行的汉族小吃，在有些地区也是节日食品。一般选春季头刀韭菜和鸡蛋为主要原料加工制作而成的食品，适宜于春季食用。该制品表皮金黄酥脆。馅心韭香脆嫩，滋味优美，是适时佳点。"})
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.id == undefined){
+              return done(Error("error creating dish"))
+            }
+            dish1 = res.body.id;
+          })
+
+      agent
+          .post('/dish')
+          .send({title : '猪肉馅饼',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.id == undefined){
+              return done(Error("error creating dish"))
+            }
+            dish2 = res.body.id;
+          })
+
+      agent
+          .post('/dish')
+          .send({title : '五彩面',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'entree', chef : hostId})
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.id == undefined){
+              return done(Error("error creating dish"))
+            }
+            dish3 = res.body.id;
+          })
+
+      agent
+          .post('/dish')
+          .send({title : '糖水',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'dessert', chef : hostId})
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.id == undefined){
+              return done(Error("error creating dish"))
+            }
+            dish4 = res.body.id;
+            done();
+          })
+    });
+
+    var mealId;
+    var leftQty = {};
+    var totalQty = {};
+
+    it('should create an order type meal ', function (done) {
+      var now = new Date();
+      var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
+      for(var i=1; i<=4; i++){
+        switch(i){
+          case 1:
+            leftQty[dish1] = i;
+            totalQty[dish1] = 5;
+            break;
+          case 2:
+            leftQty[dish2] = i;
+            totalQty[dish2] = 5;
+            break;
+          case 3:
+            leftQty[dish3] = i;
+            totalQty[dish3] = 5;
+            break;
+          case 4:
+            leftQty[dish4] = i;
+            totalQty[dish4] = 5;
+            break;
+        }
+      }
+      agent
+          .post('/meal')
+          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 3600 * 600 * 5), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, status : "on",cover : dish1})
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.chef != hostId){
+              return done(Error("error creating meal"));
+            }
+            mealId = res.body.id;
+            done();
+          })
+    })
+
+    it('should create an preorder type meal ', function (done) {
+      var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
+      var now = new Date();
+      agent
+          .post('/meal')
+          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 3600 * 60 * 5), pickupFromTime : new Date(now.getTime() + 3600 * 60 * 5), pickupTillTime : new Date(now.getTime() + 3600 * 60 * 7),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "on", cover : dish1})
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.chef != hostId){
+              return done(Error("error creating meal"));
+            }
+            done();
+          })
+    })
+
+    var guestId = "";
+    var guestEmail = 'guest@gmail.com';
+
+    it('should login or register an account for guest', function (done) {
+      agent
+          .post('/auth/login?type=local')
+          .send({email : guestEmail, password: password})
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.auth.email != guestEmail){
+              return done(Error("not login with the same account(email not the same)"))
+            }
+            guestId = res.body.id;
+            done();
+          })
+    });
+
+    it('should create a new card', function (done) {
+      var number = "4242424242424242";
+      var street = "1974 palou ave";
+      var city = "San Francisco";
+      var state = "CA";
+      var postal = "94124";
+      var country = "US";
+      var cardHolderName = "sheng rong";
+      var expMonth = 2;
+      var expYear = 2020;
+      var cvv = 123;
+      stripe.tokens.create({
+        card:{
+          number: number,
+          cvc: cvv,
+          exp_month: expMonth,
+          exp_year: expYear,
+          name: cardHolderName,
+          address_line1: street,
+          address_city: city,
+          address_zip: postal,
+          address_state: state,
+          address_country: country
+        }
+      }, function(err, token){
+        agent
+            .post('/payment')
+            .send({
+              stripeToken : token.id,
+              brand : token.card.brand,
+              user : guestId,
+              street : street,
+              city : city,
+              state : state,
+              postal : postal,
+              country : country,
+              cardholder : cardHolderName,
+              cardNumber : number,
+              expMonth : expMonth,
+              expYear : expYear,
+              CVV : cvv,
+              isDefaultPayment : true
+            })
+            .expect(200)
+            .end(function(err,res){
+              if(err){
+                return done(err);
+              }
+              if(res.body.user!= guestId){
+                return done(Error("error create new payment card"))
+              }
+              done();
+            })
+      });
+    });
+
+    var orders = {};
+    var subtotal = 12;
+
+    it('should order a meal as a user', function(done){
+      orders[dish1] = 0;
+      orders[dish2] = 1;
+      orders[dish3] = 1;
+      orders[dish4] = 0;
+      agent
+          .post('/order')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .send({
+            orders : orders,
+            subtotal : subtotal,
+            address : address1.street + address1.city + "CA" + address1.zip,
+            method : "pickup",
+            mealId : mealId,
+            phone : address1.phone,
+            delivery_fee : 0,
+            eta : new Date()
+          })
+          .expect(200)
+          .end(function(err,res){
+            done();
+          })
+    })
+
+    var preparingOrderId;
+    it('should order a meal as a user', function(done){
+      agent
+          .post('/order')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .send({
+            orders : orders,
+            subtotal : subtotal,
+            address : address1.street + address1.city + "CA" + address1.zip,
+            method : "pickup",
+            mealId : mealId,
+            phone : address1.phone,
+            delivery_fee : 0,
+            eta : new Date()
+          })
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.meal != mealId){
+              return done(Error("error creating order"));
+            }
+            preparingOrderId = res.body.id;
+            done();
+          })
+    })
+
+    it('should change an order to preparing', function(done){
+      agent
+          .put('/order/' + preparingOrderId)
+          .send({
+            status : 'preparing'
+          })
+          .expect(200)
+          .end(function(err,res){
+            done();
+          })
+    })
+
+    it('should login an chef account', function (done) {
+      agent
+          .post('/auth/login?type=local')
+          .send({email : email, password: password,picture:picture})
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.auth.email != email){
+              return done(Error("not login with the same account(email not the same)"))
+            }
+            hostId = res.body.host;
+            userId = res.body.id;
+            done();
+          })
+    });
+
+    it('should ready an order', function(done){
+      agent
+          .put('/order/' + preparingOrderId + "/ready")
+          .expect(200)
+          .end(function(err,res){
+            done();
+          })
+    })
+
+    it('should confirm an pickup or delivery for an order', function(done){
+      agent
+          .put('/order/' + preparingOrderId + "/receive")
+          .expect(200)
+          .end(function(err,res){
+            done();
+          })
+    })
+
+    it('should login or register an account for guest', function (done) {
+      agent
+          .post('/auth/login?type=local')
+          .send({email : guestEmail, password: password})
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.auth.email != guestEmail){
+              return done(Error("not login with the same account(email not the same)"))
+            }
+            guestId = res.body.id;
+            done();
+          })
+    });
+
+    it('should leave a review for the dish of the meal', function (done) {
+      agent
+          .post('/review')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .send({meal : mealId, dish : dish2, host: hostId, score : 4.0, review : "Very delicious could be more"})
+          .expect(200)
+          .end(function(err,res){
+            //if(res.body.meal != mealId || res.body.dish != dish2){
+            //  return done(Error("error creating review"));
+            //}
+            done();
+          })
+    })
+
+
+
+  });
+
+});

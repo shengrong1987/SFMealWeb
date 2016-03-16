@@ -1,0 +1,45 @@
+
+<div id="bankView" class="bank">
+  <div class="alert alert-danger hide">
+    <strong>错误！</strong> 银行信息输入有误，请重新再试。
+  </div>
+  <div class="popup box middle" style="width: 350px;">
+
+    <form class="text-center" role="form">
+
+      <h3 class="text-left text-red"><strong>收款银行</strong></h3>
+
+      <fieldset>
+
+        <div class="form-group" role="form">
+          <h4 for="bankAccountNumber" class="text-left">银行账号 <small>Account Number</small></h4>
+          <input type="text" class="form-control" id="bankAccountNumber" required data-error="账号不能为空">
+          <div class="help-block with-errors"></div>
+        </div>
+
+        <div class="form-group" role="form">
+          <h4 for="bankRoutingNumber" class="text-left">银行路由 <small>Rounting Number</small></h4>
+          <input type="text" class="form-control" id="bankRoutingNumber" required data-error="路由不能为空">
+          <div class="help-block with-errors"></div>
+        </div>
+
+        <div class="alert alert-danger hide"></div>
+
+        <div class="col-xs-12 form-group">
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn btn-danger red round disabled">保存</button>
+              <button type="button" name="cancel" class="btn btn-disable round">取消</button>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>
+
+<script>
+  $("#bankView form").validator({});
+  new BankView({ el : $("#bankView"), model : new Bank()})
+</script>
+<script src="../../js/bootstrap/bootstrap-formhelpers-min.js"></script>

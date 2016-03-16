@@ -1,0 +1,334 @@
+<div class="container default-container text-center relative" style="margin-top:-20px;background-color: #f2f2f2;">
+
+  <div class="compact-banner">
+    <div class="img-wrapper row">
+      <img src="/images/homecover-1.jpg" class="relative middle">
+    </div>
+
+    <div class="row absolute" style="width: 100%;top:0;">
+
+      <div class="relative text-left cursor-pointer logo col-xs-4" style="" onclick="location.href='/'">
+        <h1 class="text-white">私房Meal</h1>
+        <p class="text-white text-left">SFMeal.com</p>
+      </div>
+
+      <div class="relative text-left col-xs-8 content" style="">
+        <h4 class="text-white"><strong>今天吃什么好呢？</strong></h4>
+        <div class="btn-group">
+          <input class="input btn btn-default round light text-grey" placeholder="输入牛排看看">
+          <button class="btn btn-warning round orange text-white" onclick="javascript:search(this)">
+            <i class="fa fa-search"></i>
+            搜索
+          </button>
+        </div>
+        <button class="btn btn-red round" onclick="location.href='/meal'">查看菜单</button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div id="meal-detail-container" class="container-fluid padding-clear">
+
+    <div class="row">
+      <div class="col-md-8">
+        <div class="box white">
+          <div class="row">
+            <div class="col-xs-6">
+              <div class="row vertical-align-base">
+                <div class="col-xs-9">
+                  <h2 class="text-left"><%= meal.title %>  <small class="text-orange"><% if(meal.type=='order'){ %> 即点 <% }else if(meal.type=='preorder'){ %> 预定 <% } %> <i class="fa fa-question-circle text-lightgrey"></i><%= meal.isFull()?"（已满）":"" %></small></h2>
+                </div>
+                <div class="col-xs-3 text-left">
+                  <button type="button" class="btn btn-default">
+                    <i class="fa fa-heart fa-2x text-grey cursor-pointer"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="row vertical-align-base">
+                <div class="col-xs-12 text-left">
+                  <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(2)%>">
+                    <div class="rating" data-toggle="star-set" data-rate="<%= meal.score.toFixed(2)%>">
+                      <i class="fa fa-star"></i>
+                      <i class="fa fa-star"></i>
+                      <i class="fa fa-star"></i>
+                      <i class="fa fa-star"></i>
+                      <i class="fa fa-star"></i>
+                    </div>
+                  </div>
+                  <small style="font-size: 20px;" class="text-lightgrey">(<%= meal.numberOfReviews %>)</small>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xs-12">
+                  <% if(meal.type=="order"){%>
+                    <h3 class="text-left"><small>供应时间 <span class="text-red"> <%= meal.provideDate()%></span></small></h3>
+                  <%}else{%>
+                    <h3 class="text-left"><small>预定时间 <span class="text-red"> <%= meal.provideDate()%></span></small></h3>
+                    <h3 class="text-left"><small>取货时间 <span class="text-red"> <%= meal.dispatchingHour()%></span></small></h3>
+                  <%}%>
+                </div>
+              </div>
+
+              <div class="row chef-cell vertical-align text-left">
+                <div class="col-md-2 col-xs-3">
+                  <img class="round_thumb size-small text-center" src=<%= meal.chef.picture || "/images/thumbnail.jpg" %>>
+                </div>
+                <div class="col-md-8 col-xs-8">
+                  <h4 class="text-left text-dark" style="margin: 0 0 0 10px;"><%= meal.chef.shopName %><br><small><%= meal.chef.intro %></small></h4>
+                </div>
+                <div class="col-md-2">
+                  <i class="fa fa-question-circle fa-2x text-lightgrey cursor-pointer" style="position: relative;right: -10px;"></i>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="box-simple text-left">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox"><small class="font-small"><span class="text-black">上门自取</span>  免费，时间根据点餐内容变动</small>
+                    </label>
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <div class="box-simple text-left">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox"><small class="font-small"><span class="text-black">集合点自取</span>  地点：Coscto, San Francisco，时间6:00PM-7:00PM</small>
+                    </label>
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <div class="box-simple text-left">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox"><small class="font-small"><span class="text-black">送餐</span>  送餐费及时间：<a class="text-red" href="#">点我算一下</a> </small>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xs-6">
+              <div class="vertical-align">
+                <h4><small>分享给大家：</small></h4>
+                <ul class="nav navbar-nav" style="width: 185px;float: none;">
+                  <li><a href="#"><i class="fa fa-facebook-f fa-lg"></i></a></li>
+                  <li><a href="#"><i class="fa fa-instagram fa-lg"></i></a></li>
+                  <li><a href="#"><i class="fa fa-pinterest-p fa-lg"></i></a></li>
+                  <li><a href="#"><i class="fa fa-twitter fa-lg"></i></a></li>
+                </ul>
+              </div>
+
+              <h4 class="text-left"><small>取餐地点：（付款后就可以看到具体地址）</small></h4>
+
+              <iframe height="440" frameborder="0" style="border:0;width: 100%;" src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJIQBpAG2ahYAR_6128GcTUEo&key=AIzaSyAqQq-WgRUTFO9UtYyNvrJAlBcCZ_67P_U" allowfullscreen></iframe>
+            </div>
+          </div>
+
+          <%
+            var dishes = meal.dishes;
+            var typeName = {"appetizer" : "小吃", "entree" : "主食", "dessert" : "甜品"};
+            var header = {"appetizer" : false, "entree" : false, "dessert" : false};
+            for(var i=0; i < dishes.length; i++){
+              var dish = dishes[i];
+              if(!header[dish.type]){
+                header[dish.type] = true;
+          %>
+
+          <div class="dark category-cell">
+            <h4 class="text-white"><%= typeName[dish.type] %></h4>
+          </div>
+
+          <% }%>
+
+          <h2></h2>
+
+          <div class="row">
+            <div class="col-xs-12">
+              <div class="round-container dish" data-id=<%= dish.id %>>
+                <img src="<%= dish.photos[0].v %>" style="width: 100%;">
+                <div class="box-float-top-right red"><h3 class="text-white" style="margin-top: 10px;">$<%= dish.price.toFixed(2) %></h3></div>
+                <div class="row">
+                  <div class="col-sm-8">
+                    <h3></h3>
+                    <div>
+                      <div class="col-sm-3">
+                        <h4 class="text-black"><%= dish.title %></h4>
+                      </div>
+                      <div class="col-sm-6">
+                        <div data-toggle="tooltip" data-placement="bottom" title="<%= dish.score.toFixed(2)%>">
+                          <div class="rating" data-toggle="star-set" data-rate="<%= dish.score.toFixed(2)%>">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                          </div>
+                        </div>
+                        <small style="font-size: 20px;" class="text-lightgrey"> <%= dish.numberOfReviews %></small>
+                      </div>
+                      <div class="col-sm-3">
+                        <h4><small class="left-amount">剩余<span class="text-red" value=<%= meal.leftQty[dish.id] %>><%= meal.leftQty[dish.id] %></span>份</small></h4>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <h3 style="padding: 5px;" class="none-margin"><small><%= dish.description %></small></h3>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-4" style="padding-top: 25px;">
+                    <button class="btn btn-red round take-order" onclick="javascript:orderFood('<%= dish.id %>',1)">点一份</button>
+                    <button class="btn btn-red round untake-order" onclick="javascript:orderFood('<%= dish.id %>',-1)" style="width: 50px;display: none;">-</button>
+                  </div>
+                </div>
+
+                <h1></h1>
+              </div>
+              <h1></h1>
+
+              <h1></h1>
+
+              <ul class="nav nav-tabs" data-toggle="tabs">
+                <li class="active"><a href="#review<%= i%>" data-toggle="tab" class="text-red">吃货评价</a></li>
+                <li><a href="#host<%= i%>" data-toggle="tab" class="text-red">卖家点评</a></li>
+              </ul>
+
+              <div class="tab-content">
+                <div id="review<%= i%>" class="tab-pane active">
+                  <%
+                    var reviews = meal.reviews;
+                    var number = 0;
+                    var perPage = 3;
+                    var curPage = 1;
+                    for(var j=0; j < reviews.length; j++){
+                      var review = reviews[j];
+                      if(review.dish == dish.id){
+                        number++;
+                  %>
+                  <div class="item">
+                    <div class="row">
+                      <div class="col-sm-9 text-left">
+                        <div data-toggle="tooltip" data-placement="bottom" title="<%= review.score.toFixed(2)%>" style="margin-top: 5px;">
+                          <div class="rating" data-toggle="star-set" data-rate="<%= review.score.toFixed(2)%>">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                          </div>
+                        </div>
+                        <h4 style="display: inline-block;"><small style="font-size: 16px;" class="text-lightgrey" data-id=<%= review.user %>><%= review.username %></small></h4>
+                      </div>
+                      <div class="col-sm-3">
+                        <h3 class="text-right"><small><%= review.get_formatted_time() %></small></h3>
+                      </div>
+                    </div>
+                    <h4 class="text-left"><small class="text-black"><%= review.review %></small></h4>
+                    <div class="divider"></div>
+                  </div>
+                  <% }} %>
+
+                  <nav class="pull-right">
+                    <ul class="pagination pagination-sm" data-trigger="pagination" data-target="#review<%= i%>" data-npp="3">
+                      <li class="active"><a href="javascript:void(0)">1</a></li>
+                    </ul>
+                  </nav>
+
+                </div>
+
+                <div id="host<%= i%>" class="tab-pane">
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+          <%} %>
+
+      <h1></h1>
+      </div>
+    </div>
+
+      <div class="col-md-4">
+        <div class="box white floater" style="position: fixed;bottom: 10px;">
+          <div id="order-alert" class="alert alert-danger hide" role="alert">
+            这个菜已经被订完了，请选择其他。
+          </div>
+          <% if(meal.isFull()){%>
+          <div class="alert alert-danger" role="alert">
+            这个Meal已经被订完了，请选择其他或稍后再试。
+          </div>
+          <%}%>
+          <table id="order" class="table" data-err-container="#order-alert">
+            <thead>
+            <tr>
+              <th>餐费</th>
+            </tr>
+            <tr>
+              <th>名称</th>
+              <td>单价</td>
+              <td>数量</td>
+            </tr>
+            </thead>
+            <tbody>
+            <%
+              var dishes = meal.dishes;
+              for(var i=0; i < dishes.length; i++){
+                var dish = dishes[i];
+            %>
+            <tr class="success item" data-id=<%= dish.id %> data-left-amount=<%= meal.leftQty[dish.id] %>>
+              <td><%= dish.title %></td>
+              <td class="price" value=<%= dish.price %>>$<%= dish.price %></td>
+              <td>
+                <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1)">-</button>
+                <span class="amount" style="padding: 5px;">  0  </span>
+                <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',1)">+</button>
+              </td>
+            </tr>
+            <% }%>
+            <tr></tr>
+            <tr>
+              <th></th>
+              <td></td>
+              <th class="text-right subtotal">餐费小计: $0.00</th>
+            </tr>
+            <tr></tr>
+            <tr>
+              <th>取餐方式</th>
+              <td>预计时间</td>
+              <td>送餐费</td>
+            </tr>
+            <tr></tr>
+            <tr class="info">
+              <td>自取</td>
+              <td>30分钟</td>
+              <td>免</td>
+            </tr>
+            <tr>
+              <th></th>
+              <td></td>
+              <th class="text-right delivery" data-value="0">送餐费小计: $0.00</th>
+            </tr>
+            <tr></tr>
+            <tr></tr>
+            <tr>
+              <th></th>
+              <td></td>
+              <th class="text-right total">合计: $0.00</th>
+            </tr>
+            </tbody>
+          </table>
+
+          <button type="button" class="btn btn-red" onclick="location.href += '/confirm'">下一步</button>
+        </div>
+      </div>
+
+    </div>
+    <h1></h1>
+  </div>
+</div>
