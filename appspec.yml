@@ -11,10 +11,6 @@ files:
 #   group: ec2-user
 
 hooks:
-  BeforeInstall:
-    - location: scripts/install_dependencies
-      timeout: 300
-      runas: ec2-user
   ApplicationStart:
     - location: scripts/start_server
       timeout: 300
