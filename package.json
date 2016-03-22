@@ -27,7 +27,7 @@
     "bcrypt" : "~0.8.5",
     "aws-sdk" : "~2.2.41",
     "stripe" : "~4.5.0",
-    "water-lock" : "~v0.1.2-rc1"
+    "waterlock" : "~v0.1.2-rc1"
   },
   "scripts": {
     "debug": "node debug app.js",
