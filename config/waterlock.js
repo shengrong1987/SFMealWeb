@@ -13,9 +13,9 @@ module.exports.waterlock = {
   //
   // used by auth methods for callback URI's using oauth and for password
   // reset links.
-  baseUrl: 'http://localhost:1337',
+  baseUrl:  process.env.NODE_ENV === 'production' ? 'http://52.38.10.129:1337' : 'http://localhost:1337',
 
-  pluralizeEndpoints: true,
+  pluralizeEndpoints: false,
 
   // Auth Method(s)
   //
@@ -26,8 +26,8 @@ module.exports.waterlock = {
   authMethod: [
     {
       name: "waterlock-facebook-auth",
-      appId: "556466254501032",
-      appSecret: "02f7b4b026d9d2029c2f372f84cbc9ed",
+      appId: process.env.NODE_ENV === 'production' ? "556466254501032" : "602141733266817",
+      appSecret: process.env.NODE_ENV === 'production' ? "02f7b4b026d9d2029c2f372f84cbc9ed" : "d0bda6a62210efa8483e9a8b10ce3aa8",
       fieldMap : {
         'email' : 'email',
         'username' : 'name'
@@ -37,7 +37,7 @@ module.exports.waterlock = {
       name: 'waterlock-google-auth',
       clientId: '504050617477-f1ok77fo8dhogc9k5gososaovjqnk4u6.apps.googleusercontent.com',
       clientSecret: 'JbMmSyFjyHKMoKlox2VoXeJT',
-      redirectUri : 'http://localhost:1337/auth/google_oauth2',
+      //redirectUri : 'http://localhost:1337/auth/google_oauth2',
       allow: ['*'],
       fieldMap : {
       }
@@ -56,8 +56,8 @@ module.exports.waterlock = {
             }
           },
           from: 'no-reply@domain.com',
-          subject: 'Your password reset!',
-          forwardUrl: 'http://localhost:1337/auth/resetForm'
+          subject: 'Your password reset!'
+          //forwardUrl: 'http://localhost:1337/auth/resetForm'
         },
         template:{
           file: '../views/email.jade',

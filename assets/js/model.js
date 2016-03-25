@@ -166,17 +166,7 @@ var RegisterView = Backbone.View.extend({
 });
 
 var Host = Backbone.Model.extend({
-  urlRoot : "/host",
-  applyForHost : function(){
-    this.url = "/user/becomeHost";
-    this.fetch({
-      success : function(){
-        location.reload();
-      },error : function(err){
-        alert(err.responseText);
-      }
-    })
-  }
+  urlRoot : "/host"
 });
 
 var UserBarView = Backbone.View.extend({
@@ -187,7 +177,14 @@ var UserBarView = Backbone.View.extend({
   },
   applyForHost : function(e){
     e.preventDefault();
-    this.model.applyForHost();
+    this.model.url = "/user/becomeHost";
+    this.model.fetch({
+      success : function(){
+        location.reload();
+      },error : function(model,err){
+        alert(err.responseText);
+      }
+    });
   }
 });
 

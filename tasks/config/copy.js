@@ -30,6 +30,8 @@ module.exports = function(grunt) {
 				cwd: '.tmp/public',
 				src: ['**/*'],
 				dest: 'www'
+			},{
+
 			}]
 		}
 	});
