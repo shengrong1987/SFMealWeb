@@ -30,7 +30,8 @@
     "waterlock" : "~v0.1.2-rc1",
     "waterlock-facebook-auth" : "~v0.1.2-rc1",
     "waterlock-google-auth" : "~v0.1.2-rc1",
-    "waterlock-local-auth" : "~v0.1.2-rc1"
+    "waterlock-local-auth" : "~v0.1.2-rc1",
+    "node-geocoder" : "~3.9.1"
   },
   "scripts": {
     "debug": "node debug app.js",
