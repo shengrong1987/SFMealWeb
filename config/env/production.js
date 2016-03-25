@@ -35,7 +35,7 @@ module.exports = {
   //   level: "silent"
   // }
 
-  explicitHost : "http://52.38.10.129:1337"
+  explicitHost : "http://52.38.10.129"
 
 
 
