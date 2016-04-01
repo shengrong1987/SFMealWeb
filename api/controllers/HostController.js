@@ -6,6 +6,7 @@
  */
 
 var stripe = require("../services/stripe.js");
+var async = require('async');
 module.exports = {
 
   me : function(req, res){
@@ -19,10 +20,24 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        h.host_orders = h.orders;
-        h.host_dishes = h.dishes;
-        found.host = h;
-        return res.view('host',{user: found});
+        async.each(h.orders,function(order, next){
+          Order.findOne(order.id).populate("meal").exec(function(err, o){
+            if(err){
+              return next(err);
+            }
+            order = o;
+            next();
+          });
+        },function(err){
+          if(err){
+            return res.badRequest(err);
+          }
+          h.host_orders = h.orders;
+          h.adjusting_orders = h.adjusting_orders;
+          h.host_dishes = h.dishes;
+          found.host = h;
+          return res.view('host',{user: found});
+        });
       });
     });
   },

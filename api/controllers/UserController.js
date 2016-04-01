@@ -12,6 +12,7 @@ var AWS = require('aws-sdk');
 AWS.config.accessKeyId = sails.config.aws.id;
 AWS.config.secretAccessKey = sails.config.aws.key;
 var stripe = require("../services/stripe.js");
+var crypto = require("crypto");
 
 module.exports = require('waterlock').actions.user({
   /* e.g.
@@ -29,6 +30,9 @@ module.exports = require('waterlock').actions.user({
     var params = {};
     params.user = userId;
     params.email = email;
+    if(req.session.user.host){
+      return res.badRequest("您已经是Host了。");
+    }
     Host.create(params).exec(function(err, host){
       if(err){
         return res.badRequest(err);
@@ -172,9 +176,10 @@ module.exports = require('waterlock').actions.user({
         return res.badRequest(err);
       }
       found.featureDishes = [];
-      if(found.orders.length == 0) {
+      if(found.orders.length == 0 && found.collects.length == 0) {
         return res.view('user', {user: found});
       }
+
       async.each(found.orders, function(order,next){
         Order.findOne(order.id).populate("dishes").populate("host").populate("meal").exec(function (err, result) {
           if(err){
@@ -189,6 +194,7 @@ module.exports = require('waterlock').actions.user({
                   order.dishes.forEach(function(dish){
                     if(dish.id == dishId){
                       if(dish.isFeature()){
+                        dish.meal = order.meal;
                         if(found.featureDishes.indexOf(dishId) == -1){
                           found.featureDishes.push(dish);
                         }
@@ -205,8 +211,22 @@ module.exports = require('waterlock').actions.user({
         if(err){
           return res.badRequest(err);
         }
-        req.session.user = found;
-        return res.view('user',{user: found});
+        async.each(found.collects, function(collect,next){
+          Meal.findOne(collect.id).populate("chef").exec(function(err, meal){
+            if(err){
+              next(err);
+            }else{
+              collect.chef = meal.chef;
+              next();
+            }
+          });
+        },function(err){
+          if(err){
+            return res.badRequest(err);
+          }
+          req.session.user = found;
+          return res.view('user',{user: found});
+        });
       });
     });
   },
@@ -214,12 +234,53 @@ module.exports = require('waterlock').actions.user({
   getSignedUrl : function(req, res){
     var bucket = sails.config.aws.bucket;
     var userId = req.session.user.id;
-    var name = req.body.name;
-    var type = req.body.type;
-    var index = req.body.index;
     var params = {Key : "users/" + userId + "/" + name, Bucket : bucket, ContentType : type, Body : "", ACL : "public-read"};
     var s3 = new AWS.S3({Bucket : sails.config.aws.bucket});
     this.signedUrl(req,res,params,s3);
+  },
+
+  calculateSignature : function(req, res){
+    var name = req.body.name;
+    var userId = req.session.user.id;
+    var s3 = sails.config.aws;
+    var bucket = s3.bucket;
+    var key = s3.key;
+    var filename = "users/" + userId + "/" + name
+    var expDate = new Date();
+    expDate.setMinutes(expDate.getMinutes() + 5);
+    expDate = expDate.toISOString();
+    //var date = new Date().toISOString().replace(/-|\:|\./g, '');
+    var date = "20151229T000000Z";
+    var credential = s3.id + "/" + date + "/" + s3.region + "/s3/aws4_request";
+    var url = "http://" + bucket + ".s3.amazonaws.com/";
+    var aws4 = require('aws4');
+    var signatureJSON = { "expiration": "2016-12-30T12:00:00.000Z",
+      "conditions": [
+        {"bucket": "sfmeal"},
+        ["starts-with", "$key", "users/" + userId + "/"],
+        {"acl": "public-read"},
+        {"success_action_status": "201"},
+        ["content-length-range","0",s3.maxSize],
+        ["starts-with", "$Content-Type", "image/"]
+        //{"x-amz-meta-uuid": "14365123651274"},
+        //{"x-amz-server-side-encryption": "AES256"},
+        //{"x-amz-credential": credential},
+        //{"x-amz-algorithm": "AWS4-HMAC-SHA256"},
+        //{"x-amz-date": date }
+      ]
+    };
+    var policyInUnicode = new Buffer(JSON.stringify(signatureJSON));
+    var policy = policyInUnicode.toString('base64').replace(/\n|\r/, '');
+    //var opts = {service : 's3', region : 'us-east-1', host : 'sfmeal.s3.amazonaws.com', path : '/sfmeal?X-Amz-Date=' + date, signQuery : true };
+    //var v4 = aws4.sign(opts, {
+    //  secretAccessKey: s3.key,
+    //  accessKeyId: s3.id
+    //})
+    //console.log(opts);
+    var hmac = crypto.createHmac("sha1", s3.key);
+    var hash2 = hmac.update(policy);
+    var signature = hmac.digest("base64");
+    res.ok({url : encodeURI(url), policy : policy, signature : signature, key : encodeURI(filename), credential : encodeURI(credential), date : date, AWSAccessKeyId : s3.id});
   },
 
   deleteObject : function(req,res) {
@@ -335,7 +396,7 @@ module.exports = require('waterlock').actions.user({
   pocket : function(req, res){
     var userId = req.session.user.id;
     User.findOne(userId).populate("payment").populate("pocket").populate("host").populate("orders").exec(function(err,user){
-      if(err){
+        if(err){
         return res.badRequest(err);
       }
       //lazy intiallize pocket

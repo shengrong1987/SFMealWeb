@@ -73,6 +73,7 @@ describe('UsersController', function() {
           .send({email : email, password: password})
           .expect(200)
           .end(function(err,res){
+            console.log(res.body);
             if(res.body.auth.email != email){
               return done(Error("not login with the same account(email not the same)"))
             }

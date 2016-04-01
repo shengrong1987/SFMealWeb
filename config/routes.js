@@ -36,7 +36,7 @@ module.exports.routes = {
   '/meal/:id/confirm' : 'MealController.confirm',
   '/payment/new' : 'PaymentController.newForm',
   '/user/me' : 'UserController.me',
-  '/user/getSignedUrl' : 'UserController.getSignedUrl',
+  '/user/getSignedUrl' : 'UserController.calculateSignature',
   '/user/delete' : 'UserController.deleteObject',
   '/user/pocket' : 'UserController.pocket',
   'POST /bank' : 'HostController.createBank',

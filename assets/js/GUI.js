@@ -163,17 +163,17 @@ function search(target){
 * Order GUI
 *
 */
-var locateOrders = {};
+var localOrders = {};
 //load previous order from cookies
 function loadOrder(fromCahce){
   $("#order .item").each(function(){
     var dishId = $(this).data("id");
     if(fromCahce){
-      locateOrders[dishId] = parseInt(readCookie(dishId)) || 0;
-      $(this).data("left-amount",$(this).data("left-amount") - locateOrders[dishId]);
+      localOrders[dishId] = parseInt(readCookie(dishId)) || 0;
+      $(this).data("left-amount",$(this).data("left-amount") - localOrders[dishId]);
       refreshOrder(dishId);
     }else{
-      locateOrders[dishId] = $(this).find(".amount").data("value");
+      localOrders[dishId] = $(this).find(".amount").data("value");
     }
   });
   refreshMenu();
@@ -185,33 +185,33 @@ function orderFood(id,number){
   var alertView = $($("#order").data("err-container"));
   alertView.removeClass("hide");
   alertView.hide();
-  locateOrders[id] = locateOrders[id]?locateOrders[id]:0;
-  locateOrders[id] += number;
+  localOrders[id] = localOrders[id]?localOrders[id]:0;
+  localOrders[id] += number;
   if(number < 0){
-    if(locateOrders[id]<0){
-      locateOrders[id]=0;
+    if(localOrders[id]<0){
+      localOrders[id]=0;
       return;
     }
     item.data("left-amount", item.data("left-amount") + 1);
   }else{
     var left = item.data("left-amount");
     if(left<=0 && number > 0){
-      locateOrders[id] -= number;
+      localOrders[id] -= number;
       alertView.show();
       return;
     }
     left -= number;
     item.data("left-amount",left);
   }
-  createCookie(id,locateOrders[id],1);
+  createCookie(id,localOrders[id],1);
   refreshOrder(id);
   refreshMenu();
 }
 
 //render menu view
 var refreshMenu = function(){
-  for(var key in locateOrders){
-    if(locateOrders[key]==0){
+  for(var key in localOrders){
+    if(localOrders[key]==0){
       $("#meal-detail-container .dish[data-id=" + key + "]").find(".take-order").html('点一份');
       $("#meal-detail-container .dish[data-id=" + key + "]").find(".untake-order").hide('slow');
     }else{
@@ -235,7 +235,7 @@ var refreshMenu = function(){
 function refreshOrder(id){
   var item = $("#order .item[data-id=" + id + "]");
   var left = item.data("left-amount");
-  item.find(".amount").html(locateOrders[id]);
+  item.find(".amount").html(localOrders[id]);
   $("#meal-detail-container .dish[data-id=" + id + "]").find(".left-amount span").attr("value",left);
   $("#meal-detail-container .dish[data-id=" + id + "]").find(".left-amount span").html(left);
 }
@@ -377,7 +377,7 @@ function adjustLayout(){
   var dishes = $("#myinfo .dishes .signatureDish li");
   if(dishes){
     var count = dishes.length;
-    var height = count * 50;
+    var height = count * 50 < 50 ? 50 : count * 50;
     $("#myinfo .dishes").css("height",height);
   }
 }

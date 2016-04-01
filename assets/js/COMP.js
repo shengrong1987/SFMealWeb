@@ -582,6 +582,13 @@
   var CollectItem = function(element, options){
     this.element = $(element);
     this.options = options;
+    if(this.options.select){
+      if(this.options["heart"]){
+        this.element.addClass("text-red");
+      }
+    }else{
+
+    }
     this.element.on("click",clickHandler);
   }
 
@@ -597,20 +604,25 @@
     if(!userId || userId == "undefined"){
       return;
     }
-    if(ele.hasClass('text-red')){
+    if(this.options.select){
       var method = "DELETE";
       ele.removeClass('text-red');
     }else{
       method = "POST";
       ele.addClass('text-red');
     }
+    var $this = this;
     $.ajax({
       url : "/user/" + userId + "/collects/" + mealId,
       data : {
 
       },
       method : method,
-      success : function(){},error : function(err){}
+      success : function(){
+        if($this.options.cb){
+          eval($this.options.cb);
+        }
+      },error : function(err){}
     });
   }
 
@@ -665,7 +677,7 @@
   $.fn.alertButton.Constructor  = AlertButton
 
   var template = function(title,content,actionFn,arg1){
-    var popover = '<div class="popover" role="tooltip"><div class="arrow"></div> <div class="text-center"><h3 class="popover-title">$title</h3> <div style="width: 200px;padding: 5px;"> <input id="popover_msg" class="form-control" type="text" name="msg" maxlength="20"></div> <button class="btn btn-info middle" data-target="#popover_msg" style="margin-bottom: 5px;" onclick="$actionFn()">确认</button></div></div>';
+    var popover = '<div class="popover" role="tooltip"><div class="arrow"></div> <div class="text-center"><h3 class="popover-title">$title</h3> <div style="width: 200px;padding: 5px;"> <input id="popover_msg" class="form-control" type="text" name="msg" maxlength="20"></div> <button class="btn btn-info middle" data-target="#popover_msg" style="margin-bottom: 5px;" onclick="$actionFn(event)" data-order=$argument">确认</button></div></div>';
     popover = popover.replace("$title",title).replace("$content",content).replace("$actionFn",actionFn).replace("$argument","'" + arg1 + "'");
     return popover;
   }

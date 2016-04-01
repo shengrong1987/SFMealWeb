@@ -58,7 +58,7 @@ module.exports = {
       }else{
         var score = req.body.score;
         var review = req.body.review;
-        $this.reviewForDish(dishId, null, userId, hostId, orders, score, review, function(err, review){
+        $this.reviewForDish(dishId, mealId, userId, hostId, orders, score, review, function(err, review){
           async.each(orders, function(order,next){
             order.save(function(err,o){
               if(err){

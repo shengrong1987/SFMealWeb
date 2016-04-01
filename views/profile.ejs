@@ -88,10 +88,39 @@
               <h4 class="none-margin text-left"><small>现点</small></h4>
               <div class="divider none-margin"></div>
               <div class="row">
+              <%
+              host.meals.forEach(function(meal){
+              if(meal.type == "order"){
+                  host.dishes.forEach(function(dish){
+              if(dish.id == meal.cover){
+              %>
+                <div class="feature-dish col-lg-4 col-md-6 col-xs-4" style="margin-top: 5px;">
+                  <div class="white border-round" style="overflow: hidden;">
+                    <div class="row">
+                      <div class="col-xs-12">
+                        <img class="photo" src= "<%= meal.coverString %>" data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
+                      </div>
+                    </div>
+                    <div class="col-md-6 basic-info">
+                      <h4 class="text-red text-left">$<%= dish.price.toFixed(2) %><br>
+                        <small class="text-black"><strong><%= meal.title %></strong></small>
+                      </h4>
+                    </div>
+                    <div class="col-md-6">
+                      <h4><small>剩余<%= meal.leftQty[dish.id] %>份<br>自取/送餐</small></h4>
+                    </div>
+                  </div>
+                </div>
+                <%}})}});%>
+              </div>
+              <h4 class="none-margin text-left"><small>预定</small></h4>
+              <div class="divider none-margin"></div>
+              <div class="row">
                 <%
-                  host.meals.forEach(function(meal){
+                host.meals.forEach(function(meal){
+                if(meal.type == "preorder"){
                     host.dishes.forEach(function(dish){
-                      if(dish.id == meal.cover){
+                if(dish.id == meal.cover){
                 %>
                 <div class="feature-dish col-lg-4 col-md-6 col-xs-4" style="margin-top: 5px;">
                   <div class="white border-round" style="overflow: hidden;">
@@ -110,12 +139,7 @@
                     </div>
                   </div>
                 </div>
-                <%}})});%>
-              </div>
-              <h4 class="none-margin text-left"><small>预定</small></h4>
-              <div class="divider none-margin"></div>
-              <div class="row">
-
+                <%}})}});%>
               </div>
             </div>
             <div class="col-xs-12">

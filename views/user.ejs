@@ -99,7 +99,7 @@
                           <a href="#">查看外卖</a>
                           <%}%>
                           <%}else if(order.status == "review"){%>
-                          <a href="#">评价</a>
+                          <a href="#myreview">评价</a>
                           <%}%>
                         </td>
                       </tr>
@@ -155,7 +155,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="javascript:cancelOrder('<%= order.id%>')">取消</a><br/>
+                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a><br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
                           <a href="#">联系厨师</a>
                         </td>
@@ -212,7 +212,7 @@
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                            <a href="javascript:cancelOrder('<%= order.id%>')">取消</a><br/>
+                            <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a><br/>
                             <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
                             <a href="#">联系厨师</a>
                           </td>
@@ -329,7 +329,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="#">评价</a>
+                          <a href="#myreview">评价</a>
                         </td>
                       </tr>
                       <%}}})})%>
@@ -396,11 +396,11 @@
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                             <% if(order.status == "schedule"){ %>
-                            <a href="javascript:cancelOrder('<%= order.id%>')">取消</a><br/>
+                            <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a><br/>
                             <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
                             <a href="#">联系厨师</a>
                             <%}else if(order.status == "preparing"){%>
-                            <a href="javascript:cancelOrder('<%= order.id%>')">取消</a>
+                            <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a>
                             <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
                             <a href="#">联系厨师</a>
                             <%}else if(order.status == "ready"){
@@ -410,7 +410,7 @@
                             <a href="#">查看外卖</a>
                             <%}%>
                             <%}else if(order.status == "review"){%>
-                            <a href="#">评价</a>
+                            <a href="#myreview">评价</a>
                             <%}%>
                           </td>
                       </tr>
@@ -465,7 +465,7 @@
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                            <a href="javascript:cancelOrder('<%= order.id%>')">取消</a><br/>
+                            <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a><br/>
                             <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
                             <a href="#">联系厨师</a>
                           </td>
@@ -638,7 +638,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="#">评价</a>
+                          <a href="#myreview">评价</a>
                         </td>
                       </tr>
                       <%}}})})%>
@@ -659,9 +659,10 @@
 
         <div id="mycollect" style="width: 90%;" class="tab-pane middle">
           <div class="box box-shadow white">
-            <%
-              user.collects.forEach(function(meal){
-            %>
+            <%if(!user.collects || user.collects.length == 0){ %>
+            <h3><small>您尚未有任何收藏菜式，四处看看吧。<br/><a href="/meal">立即浏览</a></small></h3>
+            <%}user.collects.forEach(function(meal){
+              var host = meal.chef;%>
             <div class="row vertical-align item">
               <div class="col-xs-3">
                 <img src="/images/dumplings.jpg" style="width: 100%;">
@@ -693,25 +694,25 @@
               <div class="col-xs-5">
                 <div class="row vertical-align">
                   <div class="col-md-2">
-                    <img src="<%= user.picture || '/images/thumbnail.jpg'%>" class="round_thumb size-small text-center">
+                    <img src="<%= host.picture || '/images/thumbnail.jpg'%>" class="round_thumb size-small text-center">
                   </div>
                   <div class="col-md-10">
-                    <h4 class="text-left text-lightgrey" style="margin-top: 15px;">Aimee Sweet<br><small>生在广州，喜欢地道粤菜。</small></h4>
+                    <h4 class="text-left" style="margin-top: 15px;"><%= host.shopName%><br><small><%= host.shortIntro()%></small></h4>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-sm-6">
-                    <button class="btn btn-red round" style="width: 100%;margin-top: 10px;">进入</button>
+                    <button class="btn btn-red round" style="width: 100%;margin-top: 10px;" onclick="javascript:location.href='/host/<%= host.id%>'">进入</button>
                   </div>
                   <div class="col-sm-6">
-                    <button class="btn btn-default round" style="width: 100%;margin-top: 10px;">取消收藏</button>
+                    <button class="btn btn-disable round" data-heart="false" data-select="true" style="width: 100%;margin-top: 10px;" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-cb="reloadUrl('/user/me','#mycollect')">取消收藏</button>
                   </div>
                 </div>
               </div>
             </div>
+            <%});%>
 
             <div class="divider"></div>
-            <%});%>
 
             <nav class="pull-right">
               <ul class="pagination pagination-sm" data-trigger="pagination" data-target="#mycollect">
@@ -744,7 +745,7 @@
                   </script>
                 </div>
                 <button class="btn btn-red round" onclick="uploadThumbnail()">本地上传</button>
-                <small>可以选jpg,png,gif</small>
+                <small>可以选jpg,png,gif,图片最大不超过5M</small>
                 <div class="alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
               </div>
 
@@ -802,7 +803,7 @@
             </div>
 
             <div class="col-xs-12">
-              <div class="alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
+              <div class="alert form-alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
             </div>
 
 
@@ -868,48 +869,51 @@
                 if(!user.featureDishes || user.featureDishes.length == 0){
               %>
               <h3><small>您尚未有任何待评价菜，需要点餐吗？<br/><a href="/meal">立即点餐</a></small></h3>
-              <%}
+              <%}else{
                 var i = 0;
-                user.featureDishes.forEach(function(featureDish){
-              %>
-              <div id="rating<%= i%>" class="box-item">
-                <div class="row vertical-align">
-                  <div class="col-xs-4"><h3><%= featureDish.title%></h3></div>
-                  <div class="col-xs-6 text-left">
-                    <div data-toggle="tooltip" data-placement="bottom">
-                      <div class="rating" data-toggle="star-set">
-                        <i class="fa fa-star fa-2x"></i>
-                        <i class="fa fa-star fa-2x"></i>
-                        <i class="fa fa-star fa-2x"></i>
-                        <i class="fa fa-star fa-2x"></i>
-                        <i class="fa fa-star fa-2x"></i>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-xs-2">给我打个星吧！</div>
-                </div>
+                user.featureDishes.forEach(function(featureDish) {
+                  user.orders.forEach(function(order){
+                    if(order.status == "review"){
+                      order.reviewing_orders.forEach(function(dish){
+                        if(dish == featureDish.id){%>
+                          <div id="rating<%= i%>" class="box-item">
+                            <div class="row vertical-align">
+                              <div class="col-xs-4"><h3><%= featureDish.title%></h3></div>
+                              <div class="col-xs-6 text-left">
+                                <div data-toggle="tooltip" data-placement="bottom">
+                                  <div class="rating" data-toggle="star-set">
+                                    <i class="fa fa-star fa-2x"></i>
+                                    <i class="fa fa-star fa-2x"></i>
+                                    <i class="fa fa-star fa-2x"></i>
+                                    <i class="fa fa-star fa-2x"></i>
+                                    <i class="fa fa-star fa-2x"></i>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-xs-2">给我打个星吧！</div>
+                            </div>
 
-                <div class="row" style="margin-top:20px;">
-                  <div class="col-xs-6">
-                    <img src="<%= featureDish.photos[0].v%>" style="width:100%;">
-                  </div>
-                  <div class="col-xs-6">
-                    <textarea class="form-control review" placeholder="我好看吗？我好吃吗？我分量够吗？点这里评论一下。" style="height: 177px;"></textarea>
-                  </div>
-                </div>
+                            <div class="row" style="margin-top:20px;">
+                              <div class="col-xs-6">
+                                <img src="<%= featureDish.photos[0].v%>" style="width:100%;">
+                              </div>
+                              <div class="col-xs-6">
+                                <textarea class="form-control review" placeholder="我好看吗？我好吃吗？我分量够吗？点这里评论一下。" style="height: 177px;"></textarea>
+                              </div>
+                            </div>
 
-                <div class="row">
-                  <div class="col-xs-12">
-                    <div id="feature-review-error-<%= i%>" class="alert alert-danger hide" style="margin-top:15px;">您尚未给菜品评分。</div>
-                  </div>
-                </div>
+                            <div class="row">
+                              <div class="col-xs-12">
+                                <div id="feature-review-error-<%= i%>" class="alert alert-danger hide" style="margin-top:15px;">您尚未给菜品评分。</div>
+                              </div>
+                            </div>
 
-                <div class="row text-center" style="margin-top: 15px;">
-                  <button class="btn btn-red round switch-button" style="width:120px;margin-right:10px;"><strong>换一款</strong></button>
-                  <button class="btn btn-red round leaveReview" style="width:120px;margin-left:10px;" data-host="<%= featureDish.chef%>" data-err-container="#feature-review-error-<%= i%>" data-dish="<%= featureDish.id%>" data-target="#rating<%= i%>"><strong>评好了!</strong></button>
-                </div>
-              </div>
-              <% i++;}); %>
+                            <div class="row text-center" style="margin-top: 15px;">
+                              <button class="btn btn-red round switch-button" style="width:120px;margin-right:10px;"><strong>换一款</strong></button>
+                              <button class="btn btn-red round leaveReview" style="width:120px;margin-left:10px;" data-host="<%= featureDish.chef%>" data-err-container="#feature-review-error-<%= i%>" data-meal="<%= featureDish.meal.id%>" data-dish="<%= featureDish.id%>" data-target="#rating<%= i%>"><strong>评好了!</strong></button>
+                            </div>
+                          </div>
+              <%}})}})})}%>
             </div>
 
 

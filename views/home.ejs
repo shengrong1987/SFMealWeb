@@ -64,8 +64,8 @@
         <div class="meal col-md-6 col-lg-4 appetizer">
           <div class="box-grid white" style="overflow: hidden;">
             <div>
-              <i class="fa fa-heart fa-2x fav text-white <% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
-                text-red
+              <i class="fa fa-heart fa-2x fav text-white" data-select="<% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
+                true
                 <%}})%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>"></i>
               <img class="photo" src= "<%= mainDish.photos[0].v %>" data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
               <h1 class="desc absolute text-white middle text-shadow"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
@@ -81,7 +81,7 @@
             <div class="divider none-margin"></div>
             <div class="row vertical-align chef-cell">
               <div class="col-sm-3">
-                <img class="round_thumb size-small" src=<%= meal.chef.picture || "/images/thumbnail.jpg" %>>
+                <img class="round_thumb size-small" src=<%= meal.chef.picture || "/images/thumbnail.jpg" %> onclick="javascript:location.href='/host/<%= meal.chef.id%>'">
               </div>
               <div class="col-sm-9">
                 <h4 class="text-left text-dark"><%= meal.chef.shopName %><br><small><%= meal.chef.intro %></small></h4>
@@ -111,7 +111,7 @@
       <div class="preorder-box meal preorder">
         <div class="row vertical-align chef-cell">
           <div class="col-md-1 text-left">
-            <img class="round_thumb size-small" src=<%= meal.chef.picture || "/images/thumbnail.jpg" %>>
+            <img class="round_thumb size-small" src=<%= meal.chef.picture || "/images/thumbnail.jpg" %> onclick="javascript:location.href='/host/<%= meal.chef.id%>'">
           </div>
           <div class="col-md-11">
             <h4 class="text-left text-dark"><%= meal.chef.shopName %><br><small><%= meal.chef.intro %></small></h4>
@@ -120,8 +120,8 @@
 
         <div class="row box-grid white">
           <div class="col-sm-4 overflow-hidden none-padding">
-            <i class="fa fa-heart fa-2x fav text-white <% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
-                text-red
+            <i class="fa fa-heart fa-2x fav text-white" data-select="<% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
+                true
                 <%}})%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>"></i>
             <img class="photo" src=<%= mainDish.photos[0].v %> data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
             <h1 class="desc absolute text-white middle"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>

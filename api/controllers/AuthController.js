@@ -29,8 +29,9 @@ module.exports = require('waterlock').waterlocked({
         return res.badRequest({code : -1, text : "User already exists"});
       }else{
         waterlock.engine.findOrCreateAuth(criteria, attr, function(err, user) {
-          if (err)
+          if(err){
             return res.serverError(err);
+          }
           User.cloneToUser(user,params,function(err,s){
             if(err){
               return res.badRequest(err);

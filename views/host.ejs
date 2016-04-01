@@ -80,7 +80,15 @@
                           <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                           <td><%= dish.title%></td>
                           <td>$<%= dish.price.toFixed(2)%></td>
-                          <td><%= number%></td>
+                          <td><% if(order.status=="adjust"){
+                              var adjustingNumber = order.adjusting_orders[key];
+                              if(adjustingNumber != number){%>
+                            <%= number%> to <strong><%= adjustingNumber%></strong>
+                            <%}else{%>
+                            <%= number%>
+                            <%}}else{%>
+                            <%= number%>
+                            <%}%></td>
                           <%if(index==0){%>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -91,19 +99,19 @@
                             <a href="#">联系吃货</a>
                             <%}else if(order.status == "adjust" || order.status == "canceling") {%>
                             <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>">确认</a><br/>
-                            <a data-toggle="alert-button" data-title="拒绝原因" data-content="原因" data-actionFn="javascript:orderView.reject" data-order="<%= order.id%>">拒绝</a><br/>
+                            <a data-toggle="alert-button" data-title="拒绝原因" data-content="原因" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>">拒绝</a><br/>
                             <a href="#">联系吃货</a>
                             <%}else if(order.status == "preparing"){%>
                             <a href="javascript:void(0)" data-action="ready" data-order="<%= order.id%>">完成</a><br/>
                             <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
                             <a href="#">联系吃货</a>
                             <%}else if(order.status == "ready"){%>
-                            <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>">确认取货</a><br/>
+                            <a href="javascript:void(0)" data-action="receive" data-order="<%= order.id%>">确认取货</a><br/>
                             <a href="#">联系吃货</a>
                             <%}else if(order.status == "review"){%>
 
                             <%}else if(order.status == "complete"){%>
-                            <a href="#">查看评价</a>
+                            <a href="/meal/<%= order.meal%>">查看评价</a>
                             <%}%>
                           </td>
                         </tr>
@@ -160,7 +168,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          a href="javascript:confirmOrder('<%= order.id%>')">确认</a><br/>
+                          <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>">确认</a><br/>
                           <a data-toggle="alert-button" data-title="拒绝原因" data-content="原因" data-actionFn="rejectOrder" data-argument="<%= order.id%>">拒绝</a><br/>
                           <a href="#">联系吃货</a>
                         </td>
@@ -218,7 +226,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="javascript:cancelOrder('<%= order.id%>')">取消</a><br/>
+                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a><br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
                           <a href="#">联系吃货</a>
                         </td>
@@ -276,7 +284,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="javascript:readyOrder('<%= order.id%>')">完成</a><br/>
+                          <a href="javascript:void(0)" data-action="ready" data-order="<%= order.id%>">完成</a><br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
                           <a href="#">联系吃货</a>
                         </td>
@@ -334,7 +342,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="javascript:receiveOrder('<%= order.id%>')">确认取货</a><br/>
+                          <a href="javascript:void(0)" data-action="receive" data-order="<%= order.id%>">确认取货</a><br/>
                       </tr>
                       <%}%>
                       <%}})})%>
@@ -445,7 +453,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="javascript:void(0)">查看评价</a>
+                          <a href="/meal/<%= order.meal%>">查看评价</a>
                         </td>
                       </tr>
                       <%}%>
@@ -516,23 +524,23 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.status == "schedule"){ %>
-                          <a href="javascript:cancelOrder('<%= order.id%>')">取消</a><br/>
+                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a><br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
                           <a href="#">联系吃货</a>
                           <%}else if(order.status == "adjust" || order.status == "canceling") {%>
-                          <a href="javascript:confirmOrder('<%= order.id%>')">确认</a><br/>
+                          <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>">确认</a><br/>
                           <a data-toggle="alert-button" data-title="拒绝原因" data-content="原因" data-actionFn="rejectOrder" data-argument="<%= order.id%>">拒绝</a><br/>
                           <a href="#">联系吃货</a>
                           <%}else if(order.status == "preparing"){%>
-                          <a href="javascript:readyOrder('<%= order.id%>')">完成</a>
+                          <a href="javascript:void(0)" data-action="ready" data-order="<%= order.id%>">完成</a>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
                           <a href="#">联系吃货</a>
                           <%}else if(order.status == "ready"){%>
-                          <a href="javascript:receiveOrder('<%= order.id%>')">确认取货</a><br/>
+                          <a href="javascript:void(0)" data-action="receive" data-order="<%= order.id%>">确认取货</a><br/>
                           <a href="#">联系吃货</a>
                           <%}else if(order.status == "review"){%>
                           <%}else if(order.status == "complete"){%>
-                          <a href="#">查看评价</a>
+                          <a href="/meal/<%= order.meal%>">查看评价</a>
                           <%}%>
                         </td>
                       </tr>
@@ -588,7 +596,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="javascript:confirmOrder('<%= order.id%>')">确认</a><br/>
+                          <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>">确认</a><br/>
                           <a data-toggle="alert-button" data-title="拒绝原因" data-content="原因" data-actionFn="rejectOrder" data-argument="<%= order.id%>">拒绝</a><br/>
                           <a href="#">联系吃货</a>
                         </td>
@@ -646,7 +654,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="javascript:cancelOrder('<%= order.id%>')">取消</a><br/>
+                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a><br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
                           <a href="#">联系吃货</a>
                         </td>
@@ -704,7 +712,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="javascript:readyOrder('<%= order.id%>')">完成</a>
+                          <a href="javascript:void(0)" data-action="ready" data-order="<%= order.id%>">完成</a>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
                           <a href="#">联系吃货</a>
                         </td>
@@ -762,7 +770,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="javascript:receiveOrder('<%= order.id%>')">确认取货</a><br/>
+                          <a href="javascript:void(0)" data-action="receive" data-order="<%= order.id%>">确认取货</a><br/>
                           <a href="#">联系吃货</a>
                         </td>
                       </tr>
@@ -874,7 +882,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="javascript:void(0)">查看评价</a>
+                          <a href="/meal/<%= order.meal%>">查看评价</a>
                         </td>
                       </tr>
                       <%}%>
@@ -1266,9 +1274,7 @@
             <div class="col-md-4">
               <div class="box box-shadow white">
                 <div class="col-xs-12" style="margin-bottom: 15px;">
-                  <a class="round_thumb size-large middle">
-                    <img class="cursor-pointer" src="<% if(user.picture){%><%= user.picture%><%}else{%>/images/profile_man.png<%}%>" onclick="location.href='/user/me#info'">
-                  </a>
+                  <img class="cursor-pointer round_thumb size-large" src="<% if(user.picture){%><%= user.picture%><%}else{%>/images/profile_man.png<%}%>" onclick="location.href='/user/me#info'">
                 </div>
                 <h4>
                   <%= user.firstname %>&nbsp;<%=user.lastname%> <i class="fa fa-edit text-lightgrey cursor-pointer" onclick="location.href='/user/me#myinfo'"></i>
@@ -1289,7 +1295,7 @@
 
         <div id="myinfo" style="width: 90%;" class="tab-pane middle">
           <div class="box box-shadow white">
-            <form class="form-horizontal" data-id="<%= user.host.id%>">
+            <form class="form-horizontal" data-id="<%= user.host.id%>" data-err-container="#formAlert">
 
               <div class="license">
                 <h4 class="text-left"><strong>1. 私房厨师执照 </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></h4>
@@ -1454,7 +1460,9 @@
                 </div>
               </div>
 
-              <div class="form alert alert-danger" data-toggle="alert"></div>
+              <div class="row">
+                <div id="formAlert" class="alert alert-danger" data-toggle="alert"></div>
+              </div>
 
               <div class="row text-center" style="margin-top: 20px;">
                 <button type="button" class="btn btn-green round" style="width: 150px;margin-right: 10px;">预览</button>
@@ -1473,5 +1481,5 @@
   $("#myinfo form").validator({});
   new HostProfileView( { el : $("#myinfo"), model : new Host()})
   new AddressView({ el : $("#hostAddressView"), model : new Host()})
-  new OrderView({ el : $("#myorder"), model : new Order()})
+  var orderView = new OrderView({ el : $("#myorder"), model : new Order()})
 </script>

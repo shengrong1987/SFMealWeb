@@ -7,6 +7,7 @@
 
 var stripe = require("../services/stripe.js");
 var extend = require('util')._extend;
+var async = require('async');
 
 //-1 : quantity now enough
 //-2 : dish not valid
@@ -120,7 +121,8 @@ module.exports = {
           stripe.charge({
             amount : (subtotal + delivery_fee) * 100,
             email : email,
-            customerId : found.payment[0].customerId
+            customerId : found.payment[0].customerId,
+            destination : m.chef.accountId
           },function(err, charge){
             if (err) {
               return res.badRequest(err);
@@ -168,22 +170,20 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(order.customer.id == userId){
-        return res.view("order_adjust",{layout:false,order : order});
-      }
-      return res.forbidden();
+      return res.view("order_adjust",{layout:false,order : order});
     });
   },
 
   adjust : function(req, res){
     var userId = req.session.user.id;
+    var hostId = req.session.user.host;
     var email = req.session.user.auth.email;
     var orderId = req.params.id;
     var params = req.body;
     var subtotal = parseFloat(params.subtotal);
     var delivery_fee = parseFloat(params.delivery_fee);
     var $this = this;
-    Order.findOne(orderId).populate("meal").populate("dishes").exec(function(err,order){
+    Order.findOne(orderId).populate("meal").populate("dishes").populate("host").exec(function(err,order){
       if(err){
         return res.badRequest(err)
       }
@@ -197,8 +197,8 @@ module.exports = {
 
         console.log("pass meal validation");
 
-        if(order.status == "schedule"){
-          //can update without permission of host
+        if(order.status == "schedule" || hostId == order.host.id){
+          //can update without permission of host or adjust by host
           var diff = (subtotal - order.subtotal).toFixed(2);
           if(diff != 0){
             User.findOne(order.customer).populate('payment').exec(function (err, found) {
@@ -213,7 +213,8 @@ module.exports = {
                 stripe.charge({
                   amount : diff * 100,
                   email : email,
-                  customerId : found.payment[0].customerId
+                  customerId : found.payment[0].customerId,
+                  destination : order.host.accountId
                 },function(err, charge){
                   if (err) {
                     console.log(err);
@@ -234,12 +235,13 @@ module.exports = {
                           return res.badRequest(err);
                         }
                         //send notification
-                        return res.ok({responseText : "订单调整完成,已从您的账户中扣除$" +  charge.amount/100});
+                        return res.ok({responseText : "订单调整完成,已从用户账户中扣除$" +  charge.amount/100});
                       })
                     });
                   }
                 });
               }else{
+                var totalRefund = Math.abs(diff);
                 diff = - diff;
                 var chargeIds = Object.keys(order.charges);
                 var refundCharges = [];
@@ -257,34 +259,37 @@ module.exports = {
                     }
                   }
                 });
-                for(var i=0; i<refundCharges.length;i++){
-                  var charge = refundCharges[i];
+
+                async.each(refundCharges,function(charge, next){
                   stripe.refund({
                     id : charge.id,
                     amount : charge.amount * 100
                   },function(err, refund){
-                    if(i==refundCharges.length){
+                    if(err){
+                      return next(err);
+                    }
+                    next();
+                  })
+                },function(err){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  $this.updateMealLeftQty(order.meal, order.orders, params.orders, function(err, m){
+                    if(err){
+                      return res.badRequest(err);
+                    }
+                    order.orders = params.orders;
+                    order.subtotal = params.subtotal;
+                    order.meal = m.id;
+                    order.save(function(err,result){
                       if(err){
                         return res.badRequest(err);
                       }
-                      $this.updateMealLeftQty(order.meal, order.orders, params.orders, function(err, m){
-                        if(err){
-                          return res.badRequest(err);
-                        }
-                        order.orders = params.orders;
-                        order.subtotal = params.subtotal;
-                        order.meal = m.id;
-                        order.save(function(err,result){
-                          if(err){
-                            return res.badRequest(err);
-                          }
-                          //send notification
-                          return res.ok({responseText : "订单调整完成,已返回$" +  charge.amount/100 + "到您的账户中"});
-                        })
-                      });
-                    }
+                      //send notification
+                      return res.ok({responseText : "订单调整完成,已返回$" +  totalRefund + "到用户账户中"});
+                    })
                   });
-                }
+                });
               }
             });
           }else{
@@ -297,6 +302,13 @@ module.exports = {
               }
               return res.ok({responseText :"订单调整完成,订单金额不变"});
             })
+          }
+          if(hostId == order.host.id){
+            //send notification to user
+            console.log("sending notification to user about adjust order")
+          }else{
+            //send notification to host
+            console.log("sending notification to host about adjust order")
           }
         }else if(order.status == "preparing"){
           order.lastStatus = order.status;
@@ -406,7 +418,7 @@ module.exports = {
     var orderId = req.params.id;
     var params = req.body;
     var $this = this;
-    Order.findOne(orderId).populate("meal").exec(function(err,order){
+    Order.findOne(orderId).populate("meal").populate("host").exec(function(err,order){
       if(err){
         return res.badRequest(err);
       }
@@ -425,7 +437,8 @@ module.exports = {
               stripe.charge({
                 amount : diff * 100,
                 email : email,
-                customerId : found.payment[0].customerId
+                customerId : found.payment[0].customerId,
+                destination : order.host.accountId
               },function(err, charge){
                 if (err) {
                   return res.badRequest(err);
@@ -488,7 +501,7 @@ module.exports = {
                       order.adjusting_orders = {};
                       order.adjusting_subtotal = 0;
                       order.status = order.lastStatus;
-                      order.charges[result.id] = result.amount/100;
+                      //order.charges[result.id] = result.amount/100;
                       order.meal = order.meal.id;
                       order.save(function(err,result){
                         if(err){

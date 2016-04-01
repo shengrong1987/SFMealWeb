@@ -56,8 +56,8 @@ module.exports.waterlock = {
             }
           },
           from: 'no-reply@domain.com',
-          subject: 'Your password reset!'
-          //forwardUrl: 'http://localhost:1337/auth/resetForm'
+          subject: 'Your password reset!',
+          forwardUrl: '/auth/resetForm'
         },
         template:{
           file: '../views/email.jade',
@@ -123,7 +123,7 @@ module.exports.waterlock = {
       // obj - {controller: 'blog', action: 'post'}
       // string - 'custom json response string'
       // default - 'default'
-      success: '/',
+      success: process.env.NODE_ENV === 'production' ? '/' : 'default',
 
       // This can be any one of the following
       //

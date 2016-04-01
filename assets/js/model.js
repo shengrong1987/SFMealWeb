@@ -93,11 +93,15 @@ var LoginView = Backbone.View.extend({
     $this = this;
     this.model.save({},{
       success : function(model, result){
-        $this.successView.html("密码重置成功，请点击链接使用新密码登陆<a href='/'>www.sfmeal.com</a>");
-        $this.successView.show();
+        if(result=="200"){
+          $this.successView.html("密码重置成功，请点击链接使用新密码登陆<a href='/'>www.sfmeal.com</a>");
+          $this.successView.show();
+        }else{
+          $this.errorView.html(result.responseText);
+          $this.errorView.show();
+        }
       },error : function(model, err){
-        $this.errorView.html(err.responseText);
-        $this.errorView.show();
+
       }
     })
   }
@@ -145,7 +149,7 @@ var RegisterView = Backbone.View.extend({
     this.model.save({},{
       success : function(){
         location.reload();
-      },error : function(err){
+      },error : function(model,err){
         alertView.html(err.responseText);
         alertView.show();
       }
@@ -581,7 +585,7 @@ var MealView = Backbone.View.extend({
       }
     }
 
-    var status = this.isActivate? "on" : "off";
+    var status = this.isActivate? "ongoing" : "off";
     var title = form.find("#meal_title").val();
     if(mealId){
       this.model.set({id : mealId});
@@ -877,7 +881,7 @@ var UserProfileView = Backbone.View.extend({
     "click .save" : "saveProfile"
   },
   initialize : function(){
-    var alertView = this.$el.find(".alert");
+    var alertView = this.$el.find(".form-alert");
     alertView.removeClass("hide");
     alertView.hide();
     this.alertView = alertView;
@@ -890,12 +894,14 @@ var UserProfileView = Backbone.View.extend({
     var firstname = this.$el.find("input[name='firstname']").val();
     var color = this.$el.find("div[name='template_color']").data('color');
     var desc = this.$el.find("textarea[name='desc']").val();
+    var picture = this.$el.find(".fileinput-preview").data("src");
     this.model.set({
       id : this.$el.data("id"),
       firstname : firstname,
       lastname : lastname,
       desc : desc,
-      color : color
+      color : color,
+      picture : picture
     });
     var $this = this;
     this.model.save({},{
@@ -914,7 +920,7 @@ var HostProfileView = Backbone.View.extend({
   },
   initialize : function(){
     var form = this.$el.find("form");
-    var alertView = form.find(".form.alert");
+    var alertView = form.find(form.data("err-container"));
     alertView.removeClass("hide");
     alertView.hide();
     this.alertView = alertView;
@@ -924,6 +930,8 @@ var HostProfileView = Backbone.View.extend({
     var form = this.$el.find("form");
     var title = this.$el.find("input[name='story-title']").val();
     var intro = this.$el.find("textarea[name='story-intro']").val();
+    var license = this.$el.find(".license .fileinput-preview").data("src");
+    var shopPhoto = this.$el.find(".story .fileinput-preview").data("src");
     var feature_dishes = [];
     this.$el.find(".dishes a[data-toggle='dropdown']").each(function(index){
       var feature_dish_obj = {};
@@ -937,7 +945,9 @@ var HostProfileView = Backbone.View.extend({
       id : form.data("id"),
       shopName : title,
       intro : intro,
-      feature_dishes : feature_dishes
+      feature_dishes : feature_dishes,
+      license : license,
+      picture : shopPhoto
     });
     var $this = this;
     this.model.save({},{
@@ -1037,6 +1047,7 @@ var OrderView = Backbone.View.extend({
     "click [data-action='reject']" : "reject",
     "click [data-action='confirm']" : "confirm",
     "click [data-action='cancel']" : "cancel",
+    "click [data-action='adjust']" : "adjust",
     "click [data-action='takeOrder']" : "takeOrder"
   },
   initialize : function(){
@@ -1048,6 +1059,10 @@ var OrderView = Backbone.View.extend({
     paymentAlert.removeClass("hide");
     paymentAlert.hide();
     this.paymentAlert = paymentAlert;
+    var formAlert = this.$el.find(".form.alert");
+    formAlert.removeClass("hide");
+    formAlert.hide();
+    this.formAlert = formAlert;
   },
   receive : function(e){
     e.preventDefault();
@@ -1057,7 +1072,7 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         alert(result.responseText);
-        reloadUrl("/user/me", "#myorder");
+        reloadUrl("/host/me", "#myorder");
       },error : function(model, err){
         alert(err.responseText);
       }
@@ -1071,7 +1086,7 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         alert(result.responseText);
-        reloadUrl("/user/me", "#myorder");
+        reloadUrl("/host/me", "#myorder");
       },error : function(model, err){
         alert(err.responseText);
       }
@@ -1085,7 +1100,7 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         alert(result.responseText);
-        reloadUrl("/user/me", "#myorder");
+        reloadUrl("/host/me", "#myorder");
       },error : function(model, err){
         alert(err.responseText);
       }
@@ -1099,7 +1114,7 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         alert(result.responseText);
-        reloadUrl("/user/me", "#myorder");
+        reloadUrl("/host/me", "#myorder");
       },error : function(model, err){
         alert(err.responseText);
       }
@@ -1113,7 +1128,11 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         alert(result.responseText);
-        reloadUrl("/user/me", "#myorder");
+        if(location.href.indexOf("host")==-1){
+          reloadUrl("/user/me", "#myorder");
+        }else{
+          reloadUrl("/host/me","#myorder");
+        }
       },error : function(model, err){
         alert(err.responseText);
       }
@@ -1133,20 +1152,20 @@ var OrderView = Backbone.View.extend({
     var params = {};
     var method = this.$el.find("#method .active").attr("value");
     var contacts = this.$el.find("#contact .regular-radio:checked + label + span").text().split("+");
-    if(contacts.length < 2){
+    if(method && contacts.length < 2){
       this.contactAlert.html("联系方式不能为空。");
       this.contactAlert.show();
       return;
     }
     var cards = this.$el.find("#payment-cards button");
-    if(cards.length == 1){
+    if(cards && cards.length == 1){
       this.paymentAlert.html("支付方式不能为空。");
       this.paymentAlert.show();
       return;
     }
     var address = contacts[0];
     var phone = contacts[1].replace(" ","");
-    var currentOrder = locateOrders;
+    var currentOrder = localOrders;
     var mealId = form.data("meal");
     var delivery_fee = this.$el.find("#order .delivery").data("value");
     var subtotal = form.find(".subtotal").data("value");
@@ -1168,12 +1187,42 @@ var OrderView = Backbone.View.extend({
 
     this.model.save({},{
       success : function(model, result){
-        Object.keys(locateOrders).forEach(function(dishId){
+        Object.keys(localOrders).forEach(function(dishId){
           eraseCookie(dishId);
         });
-        locateOrders = {};
+        localOrders = {};
         alert(result.responseText);
         reloadUrl("/user/me","#myorder");
+      },error : function(model, err){
+        alert(err.responseText);
+      }
+    })
+  },
+  adjust : function(e){
+    var form = this.$el.find("#order");
+    var orderId = form.data("order");
+    var delivery_fee = this.$el.find("#order .delivery").data("value");
+    var subtotal = form.find(".subtotal").data("value");
+    if(subtotal == 0){
+      this.formAlert.html("调整订单金额不能为零，您想取消订单吗？请在订单页选取消");
+      this.formAlert.show();
+      return;
+    }
+    this.model.set({
+      id : orderId,
+      orders : localOrders,
+      subtotal : subtotal,
+      delivery_fee : delivery_fee
+    });
+    this.model.action = "adjust";
+    this.model.save({},{
+      success : function(model,result){
+        alert(result.responseText);
+        if(location.href.indexOf("host")==-1){
+          reloadUrl("/user/me", "#myorder");
+        }else{
+          reloadUrl("/host/me","#myorder");
+        }
       },error : function(model, err){
         alert(err.responseText);
       }
@@ -1189,10 +1238,10 @@ function imageHandler(modual,file,cb,error,index,name,isDelete){
       return error();
     });
   }else{
-    uploadImage(modual,file,function(){
-      cb();
-    },function(){
-      error();
+    uploadImage(modual,file,function(url){
+      cb(url);
+    },function(err){
+      error(err);
     },index,name);
   }
 }
@@ -1243,28 +1292,55 @@ function uploadImage(modual,file,cb,error,index,name){
     data : {
       name : filename,
       type : file.type,
-      modual : modual,
-      index : index,
+      modual : modual
     },
     type : 'POST',
     success : function(result){
+      var opts = result.opts;
+      var fd = new FormData();
+      fd.append('key', result.key);
+      fd.append('acl', 'public-read');
+      fd.append('content-type', file.type);
+      fd.append('policy', result.policy);
+      fd.append('AWSAccessKeyId',result.AWSAccessKeyId);
+      fd.append('success_action_status','201');
+      fd.append('signature', result.signature);
+      //fd.append('x-amz-signature', result.signature);
+      //fd.append('x-amz-date',result.date);
+      //fd.append('x-amz-algorithm', 'AWS4-HMAC-SHA256');
+      //fd.append('x-amz-credential', result.credential);
+      //fd.append('x-amz-meta-uuid', '14365123651274');
+      fd.append("file", file);
       $.ajax({
-        url : result.S3URL,
-        data : file,
-        type : 'PUT',
-        dataType : 'text',
-        cache : false,
-        processData : false,
+        type : 'POST',
+        url : result.url,
+        data : fd,
+        processData: false,
+        contentType: false,
         beforeSend: function (request)
         {
-          request.setRequestHeader('Content-Type', file.type);
-          request.setRequestHeader('x-amz-acl', 'public-read');
+          //request.setRequestHeader('Authorization', result.opts.headers.Authorization);
+          //request.setRequestHeader('Host', result.opts.headers.Host);
+          //request.setRequestHeader('X-Amz-Date', result.opts.headers["X-Amz-Date"]);
+          //request.setRequestHeader('Content-Type', result.opts.headers["Content-Type"]);
+          //request.setRequestHeader('Content-Length', result.opts.headers["Content-Length"]);
+          //request.setRequestHeader('X-Amz-Content-Sha256', result.opts.headers["X-Amz-Content-Sha256"]);
+          //request.setRequestHeader('Content-Type', file.type);
+          //request.setRequestHeader('x-amz-acl', 'public-read');
+          ////request.setRequestHeader('x-amz-meta-uuid','14365123651274');
+          //request.setRequestHeader('X-Amz-Credential',result.credential);
+          //request.setRequestHeader('X-Amz-Algorithm','AWS4-HMAC-SHA256');
+          //request.setRequestHeader('X-Amz-Date',result.date);
+          ////request.setRequestHeader('Policy',result.policy);
+          //request.setRequestHeader('X-Amz-Signature',result.signature);
         },
         success : function(){
-          cb();
+          cb(result.url + result.key);
         },
         error : function(err){
-          error();
+          var xmlResult = $($.parseXML(err.responseText));
+          var message = xmlResult.find('Message');
+          error(message);
         }
       })
     },
@@ -1286,11 +1362,12 @@ function uploadHostPhoto(e){
     alert.show();
     return;
   }
-  uploadImage("story",file,function(){
+  uploadImage("story",file,function(url){
+    $("#myinfo .story .fileinput-preview").data("src", url);
     alert.html("厨师照片更新完成");
     alert.show();
   },function(err){
-    alert.html("upload server is currently unavailable, please try later");
+    alert.html(err);
     alert.show();
   });
 }
@@ -1307,11 +1384,12 @@ function uploadLicense(e){
     alert.show();
     return;
   }
-  uploadImage("license",file,function(){
+  uploadImage("license",file,function(url){
+    $("#myinfo .license .fileinput-preview").data("src",url);
     alert.html("执照更新完成");
     alert.show();
   },function(err){
-    alert.html("upload server is currently unavailable, please try later");
+    alert.html(err);
     alert.show();
   });
 }
@@ -1327,19 +1405,21 @@ function uploadThumbnail(){
     return;
   }
   var isDelete = $("#myinfo input[type='file']").data("isDelete");
-  imageHandler("thumbnail",file,function(){
+  imageHandler("thumbnail",file,function(url){
     if(!isDelete){
+      $("#myinfo .fileinput-preview").data("src", url);
       alert_block.removeClass('hide');
       alert_block.html("upload complete!");
       alert_block.show();
     }else{
+      $("#myinfo .fileinput-preview").data("src", '');
       alert_block.removeClass('hide');
       alert_block.html("profile clear!");
       alert_block.show();
     }
   },function(err){
     alert_block.removeClass('hide');
-    alert_block.html("upload server is currently unavailable, please try later");
+    alert_block.html(err);
     alert_block.show();
   },0,"thumbnail",isDelete);
 }

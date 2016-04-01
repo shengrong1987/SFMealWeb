@@ -74,7 +74,7 @@
 
               <div class="row chef-cell vertical-align text-left">
                 <div class="col-md-2 col-xs-3">
-                  <img class="round_thumb size-small text-center" src=<%= meal.chef.picture || "/images/thumbnail.jpg" %>>
+                  <img class="round_thumb size-small text-center cursor-pointer" onclick="javascript:location.href='/host/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/thumbnail.jpg" %>>
                 </div>
                 <div class="col-md-8 col-xs-8">
                   <h4 class="text-left text-dark" style="margin: 0 0 0 10px;"><%= meal.chef.shopName %><br><small><%= meal.chef.intro %></small></h4>

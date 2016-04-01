@@ -6,6 +6,8 @@
  * @docs        :: http://waterlock.ninja/documentation
  */
 
+var async = require('async');
+
 module.exports = {
 
   attributes: require('waterlock').models.user.attributes({
@@ -101,6 +103,7 @@ module.exports = {
   }),
 
   cloneToUser : function(user,data,cb){
+    delete user.auth.password;
     user.firstname = data.firstname;
     user.lastname = data.lastname;
     if(data.phone){
@@ -119,8 +122,9 @@ module.exports = {
       user.receivedEmail = data.receivedEmail;
     }
     user.save(cb);
-  },
+    //cb(null, user);
+  }
 
-  beforeCreate: require('waterlock').models.user.beforeCreate,
-  beforeUpdate: require('waterlock').models.user.beforeUpdate
+  //beforeCreate: require('waterlock').models.user.beforeCreate,
+  //beforeUpdate: require('waterlock').models.user.beforeUpdate
 };

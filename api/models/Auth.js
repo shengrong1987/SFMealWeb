@@ -13,7 +13,7 @@ module.exports = {
     /* e.g.
     nickname: 'string'
     */
-    fbId : {
+    facebookId : {
       type : 'string',
       unique : true
     },

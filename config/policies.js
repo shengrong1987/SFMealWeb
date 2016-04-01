@@ -41,7 +41,7 @@ module.exports.policies = {
     'update' : ['sessionAuth','sessionSelf'],
     'find' : ['sessionAuth','sessionSelf'],
     'me' : ['sessionAuth'],
-    'getSignedUrl' : ['sessionAuth'],
+    'calculateSignature' : ['sessionAuth'],
     'deleteObject' : ['sessionAuth'],
     'pocket' : ['sessionAuth']
   },
@@ -72,11 +72,11 @@ module.exports.policies = {
 
   OrderController :{
     'create' : ['sessionAuth','isNotOwnerOfMeal'],
-    'adjust_order_form' : ['sessionAuth'],
-    'adjust' : ['sessionAuth'],
-    'cancel' : ['sessionAuth'],
-    'ready' : ['sessionAuth'],
-    'receive' : ['sessionAuth']
+    'adjust_order_form' : ['sessionAuth','isBelongToOrder'],
+    'adjust' : ['sessionAuth','isBelongToOrder'],
+    'cancel' : ['sessionAuth','isBelongToOrder'],
+    'ready' : ['sessionAuth','isBelongToOrder'],
+    'receive' : ['sessionAuth','isBelongToOrder']
   },
 
   DishController : {

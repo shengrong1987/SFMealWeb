@@ -9,7 +9,11 @@ module.exports = {
     stripe.accounts.create({
       managed : true,
       country : 'US',
-      email : attr.email
+      email : attr.email,
+      transfer_schedule : {
+        interval : "weekly",
+        weekly_anchor : "monday"
+      }
     },function(err, account) {
       if (err) {
         return cb(err);
@@ -68,7 +72,8 @@ module.exports = {
       amount: attr.amount,
       currency: "usd",
       receipt_email: attr.email,
-      customer: attr.customerId
+      customer: attr.customerId,
+      destination : attr.destination
     }, function (err, charge) {
       if(err){
         return cb(err);

@@ -1,0 +1,34 @@
+<html>
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+</head>
+<body>
+
+<form action="http://sfmeal.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
+  Key to upload:
+  <input type="input"  name="key" value="users/56f8ac0d192d64b00269ad2d/thumbnail" /><br />
+  <input type="hidden" name="acl" value="public-read" />
+  <input type="hidden" name="AWSAccessKeyId" value="AKIAIH52X3XDSHQSZVJA"/>
+  <input type="hidden" name="success_action_status" value="201"/>
+  <!--Content-Type:-->
+  <input type="input"  name="content-type" value="image/jpeg" /><br />
+  <!--<input type="hidden" name="x-amz-meta-uuid" value="14365123651274" />-->
+  <!--<input type="hidden" name="x-amz-server-side-encryption" value="AES256" />-->
+  <!--<input type="text"   name="X-Amz-Credential" value="AKIAIH52X3XDSHQSZVJA/20151229T000000Z/us-east-1/s3/aws4_request" />-->
+  <!--<input type="text"   name="X-Amz-Algorithm" value="AWS4-HMAC-SHA256" />-->
+  <!--<input type="text"   name="X-Amz-Date" value="20151229T000000Z" />-->
+
+  Tags for File:
+  <!--<input type="input"  name="x-amz-meta-tag" value="" /><br />-->
+  <input type="hidden" name="Policy" value='eyJleHBpcmF0aW9uIjoiMjAxNi0xMi0zMFQxMjowMDowMC4wMDBaIiwiY29uZGl0aW9ucyI6W3siYnVja2V0Ijoic2ZtZWFsIn0sWyJzdGFydHMtd2l0aCIsIiRrZXkiLCJ1c2Vycy81NmY4YWMwZDE5MmQ2NGIwMDI2OWFkMmQvIl0seyJhY2wiOiJwdWJsaWMtcmVhZCJ9LHsic3VjY2Vzc19hY3Rpb25fc3RhdHVzIjoiMjAxIn0sWyJjb250ZW50LWxlbmd0aC1yYW5nZSIsIjAiLCI1MjQyODgwIl0sWyJzdGFydHMtd2l0aCIsIiRDb250ZW50LVR5cGUiLCJpbWFnZS8iXV19' />
+  <!--<input type="hidden" name="X-Amz-Signature" value="b4321b4ff60a8a3d5c64211af29aac10044cd9ad79415d7c138dd4adad364f01" />-->
+  <input type="hidden" name="signature" value="POtA9YOrXBSGRJrI5lOFNkMPqMI=" />
+  File:
+  <input type="file"   name="file" /> <br />
+  <!-- The elements after this will be ignored -->
+  <input type="submit" name="submit" value="Upload to Amazon S3" />
+</form>
+
+</html>
