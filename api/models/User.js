@@ -104,6 +104,7 @@ module.exports = {
 
   cloneToUser : function(user,data,cb){
     delete user.auth.password;
+    console.log(user.auth);
     user.firstname = data.firstname;
     user.lastname = data.lastname;
     if(data.phone){
