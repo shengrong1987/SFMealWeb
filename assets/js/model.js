@@ -49,10 +49,7 @@ var LoginView = Backbone.View.extend({
       success : function(){
         location.reload();
       },error : function(model,err){
-        if(err.status=="302"){
-          return location.reload();
-        }
-        $this.errorView.html(err.responseText);
+        $this.errorView.html(err.responseText || "用户名或密码不正确，请重试。");
         $this.errorView.show();
       }
     });
@@ -69,6 +66,7 @@ var LoginView = Backbone.View.extend({
     this.errorView.hide();
     this.model.type = "login";
     this.model.method = "google";
+    var $this = this;
     location.href = this.model.url();
   },
   sendEmail : function(e){

@@ -39,8 +39,11 @@ function toggleModal(event,cb){
 }
 
 //Modal dismiss
-function dismissModal(){
+function dismissModal(cb){
   var modal = $("#myModal");
+  if(cb){
+    modal.on('hidden.bs.modal',cb);
+  }
   modal.modal('hide');
   modal.removeData('bs.modal');
 }

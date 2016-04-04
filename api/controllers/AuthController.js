@@ -38,88 +38,26 @@ module.exports = require('waterlock').waterlocked({
             }
             req.session.user = s;
             req.session.authenticated = true;
-            if(req.wantsJSON){
-              return res.ok(user);
-            }else{
-              return res.view("home");
-            }
+            return res.ok(user);
+            //if(req.wantsJSON){
+            //  return res.ok(user);
+            //}else{
+            //  return res.view("home");
+            //}
           });
         });
       }
     });
   },
 
-  facebookLogin : function(req, res){
-    var Facebook = require('machinepack-facebook');
-
-    var FBCode = req.param('code');
-    if(FBCode){
-      // Get the URL on facebook.com that a user should visit to allow/deny the specified Facebook Developer app (i.e. your app).
-      Facebook.getAccessToken({
-        appId: '556466254501032',
-        appSecret: '02f7b4b026d9d2029c2f372f84cbc9ed',
-        code: FBCode,
-        callbackUrl: 'http://localhost:1337/auth/facebookLogin',
-      }).exec({
-        error: function (err){
-          res.json(err);
-        },
-        success: function (result){
-          Facebook.getUserByAccessToken({
-            accessToken: result.token,
-            fields : 'email,name,gender,first_name,last_name,locale'
-          }).exec({
-            error: function (err){
-
-            },
-            success: function (result){
-              //successfully get user info
-              console.log(result);
-
-              result.username = result.name;
-              result.fbId = result.id;
-              delete result.id;
-
-              var criteria = {};
-              criteria.fbId = result.id;
-
-              if(req.session.authenticated){
-                result['user'] = req.session.user.id;
-                waterlock.engine.attachAuthToUser(criteria, req.session.user, userFound);
-              }else{
-                waterlock.engine.findOrCreateAuth(criteria, result, userFound);
-              }
-
-              function userFound(err, user){
-                if(err){
-                  waterlock.logger.debug(err);
-                  waterlock.cycle.loginFailure(req, res, null, {error: 'trouble creating model'});
-                }
-                User.cloneToUser(user,user.auth,function(err,newUser){
-                  req.session.user = newUser;
-                  req.session.authenticated = true;
-                  res.redirect("");
-                });
-              }
-            },
-          });
-        }
-      });
+  loginSuccess : function(req, res){
+    var auth = req.session.user.auth;
+    if(auth.facebookId){
+      res.redirect("/");
+    }else if(auth.googleEmail){
+      res.redirect("/");
     }else{
-      Facebook.getLoginUrl({
-        appId: '556466254501032',
-        callbackUrl: 'http://localhost:1337/auth/facebookLogin',
-        permissions: [ 'email' ]
-      }).exec({
-        // An unexpected error occurred.
-        error: function (err){
-          return res.badRequest(err);
-        },
-        // OK.
-        success: function (result){
-          return res.ok(result);
-        }
-      });
+      res.ok({});
     }
   },
 
