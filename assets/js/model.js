@@ -48,7 +48,10 @@ var LoginView = Backbone.View.extend({
     this.model.save({},{
       success : function(){
         location.reload();
-      },error : function(err){
+      },error : function(model,err){
+        if(err.status=="302"){
+          return location.reload();
+        }
         $this.errorView.html(err.responseText);
         $this.errorView.show();
       }
