@@ -253,7 +253,7 @@ module.exports = require('waterlock').actions.user({
     var date = "20151229T000000Z";
     var credential = s3.id + "/" + date + "/" + s3.region + "/s3/aws4_request";
     var url = "http://" + bucket + ".s3.amazonaws.com/";
-    var aws4 = require('aws4');
+    //var aws4 = require('aws4');
     var signatureJSON = { "expiration": "2016-12-30T12:00:00.000Z",
       "conditions": [
         {"bucket": "sfmeal"},

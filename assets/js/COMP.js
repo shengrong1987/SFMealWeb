@@ -809,3 +809,34 @@
     })
   });
 }(jQuery);
+
++function($){
+  'user strict'
+  $(window).on('load',function(){
+    $('[data-toggle="dateTimePicker"]').each(function(){
+      var dateString = $(this).data("date");
+      if(typeof dateString != "undefined"){
+        var date = new Date(dateString);
+        var mDate = moment(date.toISOString());
+        if(mDate.isBefore(moment())){
+          mDate = "now";
+        }
+      }
+      $(this).datetimepicker({
+        icons:{
+          time: "fa fa-clock-o",
+          date: "fa fa-calendar",
+          up: "fa fa-arrow-up",
+          down: "fa fa-arrow-down",
+          previous : "fa fa-arrow-left",
+          next : "fa fa-arrow-right",
+          today : "fa fa-calendar-times-o"
+        },
+        stepping : 30,
+        showTodayButton : true,
+        defaultDate : mDate,
+        minDate : "now"
+      });
+    })
+  });
+}(jQuery);

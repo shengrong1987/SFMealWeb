@@ -476,7 +476,7 @@ var MealView = Backbone.View.extend({
   saveMeal : function(e){
     e.preventDefault();
     this.isActivate = false;
-    this.$el.find("form").validate({}).submit();
+    this.$el.find("form").validator({}).submit();
   },
   publishMeal : function(e){
     e.preventDefault();
@@ -528,49 +528,59 @@ var MealView = Backbone.View.extend({
     var isOrderNow = form.find("#radio-order-now:checked").length > 0;
     var type = "order";
     if(!isOrderNow){
-      var month = parseInt(form.find("#provideFrom-month").attr("value")) - 1;
-      var year = form.find("#provideFrom-year").attr("value");
-      var day = form.find("#provideFrom-day").attr("value");
-      if((month || month == 0)&& year && day){
-        var from = new Date(year,month,day);
-      }
-      month = parseInt(form.find("#provideTill-month").attr("value")) - 1;
-      year = form.find("#provideTill-year").attr("value");
-      day = form.find("#provideTill-day").attr("value");
-      if((month || month == 0)&& year && day){
-        var till = new Date(year,month,day);
-      }
-      month = parseInt(form.find("#pickup-month").attr("value")) - 1;
-      year = form.find("#pickup-year").attr("value");
-      day = form.find("#pickup-day").attr("value");
-      var hour = form.find("#pickup-from-hour").attr("value");
-      if((month || month == 0)&& year && day && (hour || hour == 0)){
-        var pickupFrom = new Date(year,month,day,hour,0,0);
-      }
-      hour = form.find("#pickup-till-hour").attr("value");
-      if((month || month == 0)&& year && day && (hour || hour == 0)){
-        var pickupTill = new Date(year,month,day,hour,0,0);
-      }
+      var startBookingDatePicker = form.find("#preorder .start-booking [data-toggle='dateTimePicker']");
+      var startBookingDate = startBookingDatePicker.data("DateTimePicker").date();
+
+      var endBookingDatePicker = form.find("#preorder .end-booking [data-toggle='dateTimePicker']");
+      var endBookingDate = endBookingDatePicker.data("DateTimePicker").date();
+
+      var startPickupTimeDatePicker = form.find("#preorder .start-pickup [data-toggle='dateTimePicker']");
+      var startPickupDate = startPickupTimeDatePicker.data("DateTimePicker").date();
+
+      var endPickupTimeDatePicker = form.find("#preorder .end-pickup [data-toggle='dateTimePicker']");
+      var endPickupDate = endPickupTimeDatePicker.data("DateTimePicker").date();
+
       type = "preorder";
-      if(!from || !till || !pickupFrom || !pickupTill){
+
+      if(!startBookingDate._d || !endBookingDate._d || !startPickupDate._d || !endPickupDate._d){
         this.scheduleAlert.show();
         this.scheduleAlert.html("接受/结束预定或提货时间必须填");
-        return
+        return;
+      }else if(startBookingDate.isSame(endBookingDate)){
+        this.scheduleAlert.show();
+        this.scheduleAlert.html("接受/结束预定时间不能一样");
+        return;
+      }else if(startPickupDate.isSame(endPickupDate)){
+        this.scheduleAlert.show();
+        this.scheduleAlert.html("开始/结束取货时间不能一样");
+        return;
+      }else if(moment.duration(endBookingDate.diff(startBookingDate)).asMinutes() < 60){
+        this.scheduleAlert.show();
+        this.scheduleAlert.html("开始到结束预定时间不能短于1小时");
+        return;
       }
     }else{
-      var from = new Date();
-      var startHour = parseInt(form.find("#start-hour").attr("value"));
-      var endHour = parseInt(form.find("#end-hour").attr("value"));
-      var till = new Date();
-      from.setHours(startHour,0,0);
-      till.setHours(endHour,0,0);
-      if((!startHour && startHour != 0) || (!endHour && endHour != 0)){
+      var startBookingDatePicker = form.find("#order .start-booking [data-toggle='dateTimePicker']");
+      var startBookingDate = startBookingDatePicker.data("DateTimePicker").date();
+
+      var endBookingDatePicker = form.find("#order .end-booking [data-toggle='dateTimePicker']");
+      var endBookingDate = endBookingDatePicker.data("DateTimePicker").date();
+
+      if(!startBookingDate._d || !endBookingDate._d){
         this.scheduleAlert.show();
         this.scheduleAlert.html("营业时间必须填");
         return
-      }else if(startHour == endHour){
+      }else if(startBookingDate.isSame(endBookingDate)){
         this.scheduleAlert.show();
         this.scheduleAlert.html("开始时间不能和结束时间一样");
+        return;
+      }else if(startBookingDate.isAfter(endBookingDate)){
+        this.scheduleAlert.show();
+        this.scheduleAlert.html("开始时间不能晚于结束时间");
+        return;
+      }else if(moment.duration(endBookingDate.diff(startBookingDate)).asMinutes() < 60){
+        this.scheduleAlert.show();
+        this.scheduleAlert.html("开始时间到结束时间不能短于1小时");
         return;
       }
     }
@@ -595,12 +605,13 @@ var MealView = Backbone.View.extend({
 
     this.formAlert.show();
     this.formAlert.html("保存中...");
+    this.model.unset("chef");
     this.model.set({
       dishes : dishes,
-      provideFromTime : from,
-      provideTillTime : till,
-      pickupFromTime : pickupFrom,
-      pickupTillTime : pickupTill,
+      provideFromTime : startBookingDate ? startBookingDate._d : undefined,
+      provideTillTime : endBookingDate ? endBookingDate._d : undefined,
+      pickupFromTime : startPickupDate ? startPickupDate._d : undefined,
+      pickupTillTime : endPickupDate ? endPickupDate._d : undefined,
       totalQty : totalQty,
       leftQty : totalQty,
       type : type,
@@ -618,7 +629,7 @@ var MealView = Backbone.View.extend({
           $this.formAlert.html("Meal更新完成");
         }else{
           alert("Meal新建完成!")
-          reloadUrl("/host/me","#mymeal");
+          reloadUrl("/host/me#","mymeal");
         }
       },error : function(model, err){
         $this.formAlert.html(err.responseText);
@@ -792,7 +803,7 @@ var DishView = Backbone.View.extend({
                 $this.formAlert.show();
               }else{
                 alert("菜品新建完成");
-                reloadUrl("/host/me","#mydish");
+                reloadUrl("/host/me#","mydish");
               }
             },error : function(model, err){
               $this.formAlert.html(err.responseText);

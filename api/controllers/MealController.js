@@ -211,13 +211,38 @@ module.exports = {
     var hostId = req.session.user.host.id? req.session.user.host.id : req.session.user.host;
     req.body.chef = hostId;
     if(this.dateIsValid(req.body)){
-      Meal.create(req.body).exec(function(err,meal){
-        if(err){
-          console.log("ddd");
-          return res.badRequest(err);
-        }
-        return res.ok(meal);
-      });
+      if(this.requirementIsValid(req.body)){
+        Meal.create(req.body).exec(function(err,meal){
+          if(err){
+            console.log("ddd");
+            return res.badRequest(err);
+          }
+          return res.ok(meal);
+        });
+      }else{
+        console.log("meal minimal requirement are not valid");
+        return res.badRequest("meal minimal requirement are not valid");
+      }
+    }else{
+      console.log("Date format of meal is not valid");
+      return res.badRequest("Date format of meal is not valid");
+    }
+  },
+
+  update : function(req, res){
+    var mealId = req.param("id");
+    if(this.dateIsValid(req.body)){
+      if(this.requirementIsValid(req.body)){
+        Meal.update(mealId,req.body).exec(function(err, meal){
+          if(err){
+            return res.badRequest(err);
+          }
+          res.ok(meal);
+        });
+      }else{
+        console.log("meal minimal requirement are not valid");
+        return res.badRequest("meal minimal requirement are not valid");
+      }
     }else{
       console.log("Date format of meal is not valid");
       return res.badRequest("Date format of meal is not valid");
@@ -259,6 +284,16 @@ module.exports = {
       if(provideFromTime > now){
         return false;
       }
+    }
+    return true;
+  },
+
+  requirementIsValid : function(params){
+    var minOrderNumber = parseInt(params.minimalOrder);
+    var minOrderTotal = parseFloat(params.minimalTotal);
+    if(!minOrderNumber && !minOrderTotal){
+      console.log("minimal order number and minimal order bill amount are required(one of them)");
+      return false;
     }
     return true;
   }

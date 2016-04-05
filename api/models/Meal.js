@@ -52,10 +52,10 @@ module.exports = {
       type : 'json'
     },
     minimalOrder : {
-      type : 'string'
+      type : 'integer'
     },
     minimalTotal : {
-      type : 'string'
+      type : 'float'
     },
     delivery_min : {
       type : 'float'
