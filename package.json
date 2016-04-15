@@ -37,8 +37,9 @@
   },
   "scripts": {
     "debug": "node debug app.js",
-    "start": "node app.js",
-    "install" : "./bin/install.sh"
+    "start": "NODE_ENV=production node app.js",
+    "install" : "./bin/install.sh",
+    "uninstall" : "./bin/uninstall.sh"
   },
   "main": "app.js",
   "repository": {
