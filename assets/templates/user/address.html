@@ -3,34 +3,35 @@
   <div class="alert alert-danger hide">
     <strong>错误！</strong> 地址更新失败，请稍后再试。
   </div>
-  <div class="popup box middle" style="width: 350px;">
+  <div class="popup box middle" style="width: 400px;">
 
     <form class="text-center" id="address-form" role="form">
 
-      <h4 id="new_title" class="hide text-left text-red"><strong>新建收餐地址...</strong></h4>
-      <h4 id="exist_title" class="hide text-left text-red"><strong>修改收餐地址</strong></h4>
+      <h4 id="new_title" class="user hide text-left text-red"><strong>新建收餐地址...</strong></h4>
+      <h4 id="exist_title" class="user hide text-left text-red"><strong>修改收餐地址</strong></h4>
+      <h4 class="host text-left text-green"><strong>填写准确的厨房地址</strong></h4>
 
       <fieldset>
         <div class="form-group" role="form">
-          <label class="sr-only" for="streetInput">地址</label>
+          <label for="streetInput" class="input-group">地址<span class="host text-green"> *</span><span class="user text-red"> *</span></label>
           <input type="text" class="form-control" id="streetInput" placeholder="No., Street name" required data-error="不能为空">
           <div class="help-block with-errors"></div>
         </div>
 
         <div class="form-group" role="form">
-          <label class="sr-only" for="cityInput">城市</label>
+          <label for="cityInput" class="input-group">城市<span class="host text-green"> *</span><span class="user text-red"> *</span></label>
           <input type="text" class="form-control" id="cityInput" placeholder="(San Francisco)" required data-error="不能为空">
           <div class="help-block with-errors"></div>
         </div>
 
         <div class="form-group" role="form">
-          <label class="sr-only" for="zipcodeInput">邮编</label>
+          <label for="zipcodeInput" class="input-group">邮编<span class="host text-green"> *</span><span class="user text-red"> *</span></label>
           <input type="text" class="form-control" id="zipcodeInput" placeholder="(zip-code)" required data-error="邮编格式不对" minLength="5" maxlength="10">
           <div class="help-block with-errors"></div>
         </div>
 
         <div class="form-group" role="form">
-          <label class="sr-only" for="phoneInput">电话</label>
+          <label for="phoneInput" class="input-group">电话<span class="host text-green"> *</span><span class="user text-red"> *</span></label>
           <input type="text" class="form-control" id="phoneInput" placeholder="＋1(415)888-8888" required data-error="电话格式不对" minLength="10" maxlength="11">
           <div class="help-block with-errors"></div>
         </div>

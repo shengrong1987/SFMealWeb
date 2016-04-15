@@ -5,7 +5,7 @@
       <div style="width: 600px;" class="middle banner-text">
         <div class="row vertical-align" style="margin-bottom: 5px;">
           <div class="col-sm-3">
-            <h3 class="text-white logo-text"><strong>私房Meal</strong><br><small class="text-white text-center">SFMeal.com</small></h3>
+            <a href="/" class="logo logo-sm"></a>
           </div>
           <div class="col-sm-9">
             <h4 class="text-white"><strong>欢迎加入我们,一起享受私房菜吧！</strong></h4>
@@ -64,7 +64,7 @@
                       %>
                       <tbody class="item">
                         <tr class="active">
-                          <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                          <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                         </tr>
                       <%
                           var list = Object.keys(order.orders);
@@ -147,7 +147,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -205,7 +205,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -263,7 +263,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -321,7 +321,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -377,7 +377,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -432,7 +432,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -502,7 +502,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -575,7 +575,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -633,7 +633,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -691,7 +691,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -749,7 +749,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -806,7 +806,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -861,7 +861,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="#"><%= user.firstname%>&nbsp<%= user.lastname%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨师: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -977,7 +977,7 @@
                       <td style="vertical-align: middle;">
                         <!--<a class="text-grey" href="/meal/<%= meal.id%>?edit=true">更新</a><br>-->
                         <a class="text-grey" href="/meal/<%= meal.id%>?edit=true">编辑</a><br>
-                        <a class="text-grey" href="/meal/destroy/<%= meal.id%>">删除</a></td>
+                        <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-title="确认删除?" data-content="" data-actionFn="javascript:deleteMeal" data-argument="<%= meal.id%>">删除</a><br/>
                       <td style="vertical-align: middle;">
                         <% if(meal.status == "on"){%>
                         <a class="text-red" href="/meal/<%= meal.id%>/off">下架</a>
@@ -1054,7 +1054,7 @@
                     <td style="vertical-align: middle;">
                       <!--<a class="text-grey" href="/meal/<%= meal.id%>?edit=true">更新</a><br>-->
                       <a class="text-grey" href="/meal/<%= meal.id%>?edit=true">编辑</a><br>
-                      <a class="text-grey" href="/meal/destroy/<%= meal.id%>">删除</a></td>
+                      <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-title="确认删除?" data-content="" data-actionFn="javascript:deleteMeal" data-argument="<%= meal.id%>">删除</a><br/>
                     <td style="vertical-align: middle;"><a class="text-red" href="/meal/<%= meal.id%>/off">下架</a></td>
                   </tr>
                   </tbody>
@@ -1127,7 +1127,7 @@
                     <td style="vertical-align: middle;">
                       <!--<a class="text-grey" href="/meal/<%= meal.id%>?edit=true">更新</a><br>-->
                       <a class="text-grey" href="/meal/<%= meal.id%>?edit=true">编辑</a><br>
-                      <a class="text-grey" href="/meal/destroy/<%= meal.id%>">删除</a></td>
+                      <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-title="确认删除?" data-content="" data-actionFn="javascript:deleteMeal" data-argument="<%= meal.id%>">删除</a><br/>
                   </tr>
                   </tbody>
                   <%}}}%>
@@ -1199,7 +1199,7 @@
                     <td style="vertical-align: middle;">
                       <!--<a class="text-grey" href="/meal/<%= meal.id%>?edit=true">更新</a><br>-->
                       <a class="text-grey" href="/meal/<%= meal.id%>?edit=true">编辑</a><br>
-                      <a class="text-grey" href="/meal/destroy/<%= meal.id%>">删除</a></td>
+                      <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-title="确认删除?" data-content="" data-actionFn="javascript:deleteMeal" data-argument="<%= meal.id%>">删除</a></td>
                     <td style="vertical-align: middle;"><a class="text-grey" href="/meal/<%= meal.id%>/on">上架</a></td>
                   </tr>
                   </tbody>
@@ -1256,7 +1256,7 @@
                       <td style="vertical-align: middle;">
                         <!--<a href="#">加数量</a><br/>-->
                         <a href="/dish/<%= dish.id%>?edit=true">修改</a><br/>
-                        <a href="/dish/destroy/<%= dish.id%>">删除</a>
+                        <a href="javascript:void(0)" data-toggle="alert-button" data-title="确认删除?" data-content="" data-actionFn="javascript:deleteDish" data-argument="<%= dish.id%>">删除</a><br/>
                       </td>
                     </tr>
                     </tbody>
@@ -1330,9 +1330,9 @@
               <h4 class="text-left"><strong>2. 厨房地址 </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></h4>
               <h5 class="text-left">你当前的厨房地址为：</h5>
               <div id="hostAddressView" class="text-left">
-                <div class="address_block" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street%>" data-city="<%= user.host.city%>" data-zip="<%= user.host.zip%>" data-phone="<%=user.phone%>">
+                <div class="address_block" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street || ""%>" data-city="<%= user.host.city || ""%>" data-zip="<%= user.host.zip || ""%>" data-phone="<%=user.phone || ""%>">
                   <label class="text-green">［厨房］</label>
-                  <label><%= user.host.full_address %><br/> <%= user.phone %></label>
+                  <label><%= user.host.full_address || "请输入地址" %><br/> <%= user.phone %></label>
                   <a class="text-green cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">修改</a>
                 </div>
               </div>
@@ -1479,7 +1479,7 @@
 
 <script>
   $("#myinfo form").validator({});
-  new HostProfileView( { el : $("#myinfo"), model : new Host()})
+  var hostProfileView = new HostProfileView( { el : $("#myinfo"), model : new Host()})
   new AddressView({ el : $("#hostAddressView"), model : new Host()})
   var orderView = new OrderView({ el : $("#myorder"), model : new Order()})
 </script>

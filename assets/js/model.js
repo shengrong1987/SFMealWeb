@@ -47,7 +47,7 @@ var LoginView = Backbone.View.extend({
     var $this = this;
     this.model.save({},{
       success : function(){
-        location.reload();
+        location.href='/meal';
       },error : function(model,err){
         $this.errorView.html(err.responseText || "用户名或密码不正确，请重试。");
         $this.errorView.show();
@@ -149,7 +149,7 @@ var RegisterView = Backbone.View.extend({
     });
     this.model.save({},{
       success : function(){
-        location.reload();
+        location.href='/meal';
       },error : function(model,err){
         alertView.html(err.responseText);
         alertView.show();
@@ -374,6 +374,8 @@ var AddressView = Backbone.View.extend({
     var id = target.data("id");
     var address_form = $("#address-form");
     address_form.attr("data-id",id);
+    address_form.find(".user").show();
+    address_form.find(".host").hide();
     address_form.find("#new_title").removeClass("hide");
     address_form.off("submit");
     address_form.on("submit",{ mt : event.data.mt}, event.data.mt.saveAddress);
@@ -384,7 +386,7 @@ var AddressView = Backbone.View.extend({
     var target = $(event.target).parent();
     var address_id = target.data("address-id");
     var id = target.data("id");
-    var street = target.data("street");
+    var street = target.data("street") || "";
     var city = target.data("city");
     var zip = target.data("zip");
     var phone = target.data("phone");
@@ -393,16 +395,21 @@ var AddressView = Backbone.View.extend({
     address_form.on("submit",{ mt : event.data.mt}, event.data.mt.saveAddress);
     address_form.find("button[name='cancel']").off("click");
     address_form.find("button[name='cancel']").on("click",dismissModal);
-    var isHost = target.data("host");
-    if(isHost){
-      address_form.attr("data-host",true);
-    }
     address_form.attr("data-id",id);
     address_form.attr("data-address-id",address_id);
     if(street){
       address_form.find("#exist_title").removeClass("hide");
     }else{
       address_form.find("#new_title").removeClass("hide");
+    }
+    var isHost = target.data("host");
+    if(isHost){
+      address_form.attr("data-host",true);
+      address_form.find(".host").show();
+      address_form.find(".user").hide();
+    }else{
+      address_form.find(".user").show();
+      address_form.find(".host").hide();
     }
     address_form.find("#streetInput").val(street);
     address_form.find("#cityInput").val(city);
@@ -890,7 +897,7 @@ var BankView = Backbone.View.extend({
 
 var UserProfileView = Backbone.View.extend({
   events : {
-    "click .save" : "saveProfile"
+    "submit form" : "saveProfile"
   },
   initialize : function(){
     var alertView = this.$el.find(".form-alert");
@@ -907,13 +914,17 @@ var UserProfileView = Backbone.View.extend({
     var color = this.$el.find("div[name='template_color']").data('color');
     var desc = this.$el.find("textarea[name='desc']").val();
     var picture = this.$el.find(".fileinput-preview").data("src");
+    var zip = this.$el.find("input[name='zipcode']").val();
+    var phone = this.$el.find("input[name='phone']").val();
     this.model.set({
       id : this.$el.data("id"),
       firstname : firstname,
       lastname : lastname,
       desc : desc,
       color : color,
-      picture : picture
+      picture : picture,
+      phone : phone,
+      zip : zip
     });
     var $this = this;
     this.model.save({},{
@@ -1242,6 +1253,18 @@ var OrderView = Backbone.View.extend({
   }
 });
 
+function deleteMeal(event){
+  deleteHandler($(event.target).data("order"), "meal");
+}
+
+function deleteDish(event){
+  deleteHandler($(event.target).data("order"), "dish");
+}
+
+function deleteHandler(id, module){
+  location.href = "/" + module + "/destroy/" + id;
+}
+
 function imageHandler(modual,file,cb,error,index,name,isDelete){
   if(isDelete){
     deleteImage(name,modual,function(){
@@ -1370,7 +1393,7 @@ function uploadHostPhoto(e){
   var files = $("#myinfo input[name='story-pic']")[0].files;
   var file = files[0];
   if(!files || files.length==0){
-    alert.html("please upload a file first");
+    alert.html("文件不存在或没有改变");
     alert.show();
     return;
   }
@@ -1378,6 +1401,7 @@ function uploadHostPhoto(e){
     $("#myinfo .story .fileinput-preview").data("src", url);
     alert.html("厨师照片更新完成");
     alert.show();
+    hostProfileView.saveHostProfile(new Event("click"));
   },function(err){
     alert.html(err);
     alert.show();
@@ -1392,12 +1416,13 @@ function uploadLicense(e){
   var files = $("#myinfo .license input[type='file']")[0].files;
   var file = files[0];
   if(!files || files.length==0){
-    alert.html("please upload a file first");
+    alert.html("文件不存在或没有改变");
     alert.show();
     return;
   }
   uploadImage("license",file,function(url){
     $("#myinfo .license .fileinput-preview").data("src",url);
+    hostProfileView.saveHostProfile(new Event("click"));
     alert.html("执照更新完成");
     alert.show();
   },function(err){
@@ -1420,6 +1445,7 @@ function uploadThumbnail(){
   imageHandler("thumbnail",file,function(url){
     if(!isDelete){
       $("#myinfo .fileinput-preview").data("src", url);
+      userProfileView.saveProfile(new Event("click"));
       alert_block.removeClass('hide');
       alert_block.html("upload complete!");
       alert_block.show();

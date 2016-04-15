@@ -13,6 +13,8 @@ AWS.config.accessKeyId = sails.config.aws.id;
 AWS.config.secretAccessKey = sails.config.aws.key;
 var stripe = require("../services/stripe.js");
 var crypto = require("crypto");
+var moment = require("moment");
+var async = require('async');
 
 module.exports = require('waterlock').actions.user({
   /* e.g.
@@ -169,7 +171,6 @@ module.exports = require('waterlock').actions.user({
   },
 
   me : function(req, res){
-    var async = require('async');
     var userId = req.session.user.id;
     User.findOne(userId).populate("host").populate("orders").populate("collects").exec(function(err,found){
       if(err){
@@ -395,6 +396,7 @@ module.exports = require('waterlock').actions.user({
 
   pocket : function(req, res){
     var userId = req.session.user.id;
+    var _this = this;
     User.findOne(userId).populate("payment").populate("pocket").populate("host").populate("orders").exec(function(err,user){
         if(err){
         return res.badRequest(err);
@@ -407,85 +409,204 @@ module.exports = require('waterlock').actions.user({
           }
           user.pocket = pocket;
           user.save(function(err,u){
-            if(u.host){
-              var hostId = u.host.id;
-              Host.findOne(hostId).exec(function(err,host){
+            if(err){
+              return res.badRequest(err);
+            }
+            user.pocket.transactions_history = [];
+            if(user.host){
+              _this.getHostBalance(user, function(err, newPocket){
                 if(err){
                   return res.badRequest(err);
                 }
-                var accountId = host.accountId;
-                //fetching account info
-                stripe.getBalance({id : accountId}, function(err, balance){
+                _this.getUserBalance(user, function(err, finalPocket){
                   if(err){
                     return res.badRequest(err);
                   }
-                  var totalBalance = 0;
-                  balance.available.forEach(function(balanceObj){
-                    totalBalance += (balanceObj.amount / 100).toFixed(2);
-                  });
-                  u.pocket.balance = totalBalance;
-                  u.pocket.available_balances = balance.available;
-                  u.pocket.pending_balances = balance.pending;
-                  stripe.listTransactions({id : accountId}, function(err, transactions){
+                  finalPocket.save(function(err, p){
                     if(err){
                       return res.badRequest(err);
                     }
-                    u.pocket.transaction_history = transactions.data;
-                    u.pocket.save(function(err,result){
-                      if(err){
-                        return res.badRequest(err);
-                      }
-                      res.view('pocket',{user : user});
-                    })
-                  });
+                    return res.view('pocket', {user : user});
+                  })
                 });
               });
             }else{
-              res.view('pocket',{user : user});
+              _this.getUserBalance(user, function(err, finalPocket){
+                if(err){
+                  return res.badRequest(err);
+                }
+                finalPocket.save(function(err, p){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  return res.view('pocket', {user : user});
+                })
+              });
             }
           })
         });
       }else{
+        user.pocket.transactions_history = [];
         if(user.host){
-          var hostId = user.host.id;
-          var pocket = user.pocket;
-          Host.findOne(hostId).exec(function(err,host){
+          _this.getHostBalance(user, function(err, newPocket){
             if(err){
               return res.badRequest(err);
             }
-            var accountId = host.accountId;
-            //fetching account info
-            stripe.getBalance({id : accountId}, function(err, balance){
+            _this.getUserBalance(user, function(err, finalPocket){
               if(err){
                 return res.badRequest(err);
               }
-              var totalBalance = 0;
-              balance.available.forEach(function(balanceObj){
-                totalBalance += (balanceObj.amount / 100).toFixed(2);
-              });
-              pocket.balance = totalBalance;
-              pocket.available_balances = balance.available;
-              pocket.pending_balances = balance.pending;
-              stripe.listTransactions({id : accountId}, function(err, transactions){
+              finalPocket.save(function(err, p){
                 if(err){
                   return res.badRequest(err);
                 }
-                pocket.transaction_history = transactions.data;
-                pocket.save(function(err,result){
-                  if(err){
-                    return res.badRequest(err);
-                  }
-                  res.view('pocket',{user : user});
-                })
-              });
+                return res.view('pocket', {user : user});
+              })
             });
           });
         }else{
-          return res.view('pocket',{user: user});
+          _this.getUserBalance(user, function(err, finalPocket){
+            if(err){
+              return res.badRequest(err);
+            }
+            finalPocket.save(function(err, p){
+              if(err){
+                return res.badRequest(err);
+              }
+              return res.view('pocket', {user : user});
+            })
+          });
         }
       }
-      //get account info such as balance, balance history and transaction detail
+    });
+  },
+
+  getHostBalance : function(user, cb){
+    var hostId = user.host.id;
+    var pocket = user.pocket;
+    Host.findOne(hostId).populate("orders").exec(function (err, host) {
+      if (err) {
+        return res.badRequest(err);
+      }
+      var accountId = host.accountId;
+      //fetching account info
+      stripe.getBalance({id: accountId}, function (err, balance) {
+        if (err) {
+          return cb(err);
+        }
+        var totalBalance = 0;
+        balance.available.forEach(function (balanceObj) {
+          totalBalance += (balanceObj.amount / 100).toFixed(2);
+        });
+        pocket.balance = totalBalance;
+        pocket.available_balances = balance.available;
+        pocket.pending_balances = balance.pending;
+        async.each(host.orders, function (order, next) {
+          var charges = order.charges;
+          async.each(Object.keys(charges), function(chargeId , next){
+            stripe.retrieveCharge(chargeId, function(err, charge){
+              if(err){
+                return next(err);
+              }
+              var hostId = charge.metadata.hostId;
+              Host.findOne(hostId).exec(function (err, host) {
+                if (err) {
+                  return next(err);
+                }
+                charge.host = host;
+                var date = moment(charge.created * 1000);
+                charge.month = moment.months()[date.month()];
+                charge.day = date.date();
+                charge.type = "payment";
+                //console.log("adding new transaction");
+                pocket.transactions_history.push(charge);
+                next();
+              })
+            });
+          },function(err){
+            if(err){
+              return next(err);
+            }
+            next();
+          });
+        },function(err){
+          if(err){
+            return cb(err);
+          }
+          cb(null, pocket);
+        });
+      });
+    });
+  },
+
+  getUserBalance : function(user, cb){
+    var pocket = user.pocket;
+    async.each(user.orders, function (order, next) {
+      var charges = Object.keys(order.charges);
+      async.each(charges, function (chargeId, next) {
+        stripe.retrieveCharge(chargeId, function(err, charge){
+          if(err){
+            return next(err);
+          }
+          Host.findOne(charge.metadata.hostId).exec(function(err, host){
+            if(err){
+              return next(err);
+            }
+            charge.host = host;
+            charge.type = "charge";
+            var date = moment(charge.created * 1000);
+            charge.month = moment.months()[date.month()];
+            charge.day = date.date();
+            pocket.transactions_history.push(charge);
+            next();
+          });
+        });
+      }, function (err) {
+        if(err){
+          return next(err);
+        }
+        next();
+      });
+    }, function (err) {
+      if(err){
+        return cb(err);
+      }
+      cb(null, pocket);
+    });
+  },
+
+  getBalanceHistory : function(user, res){
+    Host.findOne(user.host.id).exec(function (err, host) {
+      if (err) {
+        return res.badRequest(err);
+      }
+      stripe.getBalance({id: host.accountId}, function (err, balance) {
+        if (err) {
+          return res.badRequest(err);
+        }
+        var pocket = user.pocket;
+        var totalBalance = 0;
+        balance.available.forEach(function (balanceObj) {
+          totalBalance += (balanceObj.amount / 100).toFixed(2);
+        });
+        pocket.balance = totalBalance;
+        pocket.available_balances = balance.available;
+        pocket.pending_balances = balance.pending;
+        stripe.listTransactions({
+          id : host.accountId
+        },function(err, transactions){
+          if(err){
+            return res.badRequest(err);
+          }
+          pocket.transactions_history = transactions.data;
+          pocket.save(function(err, p){
+            if(err){
+              return res.badRequest(err);
+            }
+            return res.view('pocket', {user : user});
+          })
+        });
+      });
     });
   }
-
 });

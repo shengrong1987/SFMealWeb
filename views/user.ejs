@@ -5,7 +5,7 @@
       <div style="width: 600px;" class="middle banner-text">
         <div class="row vertical-align" style="margin-bottom: 5px;">
           <div class="col-sm-3 cursor-pointer" onclick="location.href='/'">
-            <h3 class="text-white logo-text"><strong>私房Meal</strong><br><small class="text-white text-center">SFMeal.com</small></h3>
+            <a href="/" class="logo logo-sm"></a>
           </div>
           <div class="col-sm-9">
             <h4 class="text-white"><strong>欢迎加入我们,一起享受私房菜吧！</strong></h4>
@@ -44,7 +44,7 @@
                 </ul>
                 <div class="tab-content">
                   <div id="order-all" style="width: 90%;" class="tab-pane middle active">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr>
                         <td>照片</td>
@@ -61,7 +61,7 @@
                           orders.forEach(function(order){
                       if(order.type == "order"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                         <tr class="active">
                           <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                         </tr>
@@ -115,7 +115,7 @@
                     </nav>
                   </div>
                   <div id="order-schedule" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -172,7 +172,7 @@
                   </div>
 
                   <div id="order-preparing" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -230,7 +230,7 @@
 
 
                   <div id="order-ready" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -247,7 +247,7 @@
                           orders.forEach(function(order){
                       if(order.type == "order" && order.status == "ready"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                       </tr>
@@ -289,7 +289,7 @@
                   </div>
 
                   <div id="order-review" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -355,7 +355,7 @@
                 </ul>
                 <div class="tab-content">
                   <div id="preorder-all" style="width: 90%;" class="tab-pane middle active">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -372,7 +372,7 @@
                           orders.forEach(function(order){
                       if(order.type == "preorder"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                       </tr>
@@ -425,7 +425,7 @@
                     </nav>
                   </div>
                   <div id="preorder-schedule" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -442,7 +442,7 @@
                           orders.forEach(function(order){
                       if(order.type == "preorder" && order.status == "schedule"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                       </tr>
@@ -482,7 +482,7 @@
                   </div>
 
                   <div id="preorder-preparing" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -499,7 +499,7 @@
                           orders.forEach(function(order){
                       if(order.type == "preorder" && order.status == "preparing"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                       </tr>
@@ -538,7 +538,7 @@
                   </div>
 
                   <div id="preorder-ready" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -555,7 +555,7 @@
                           orders.forEach(function(order){
                       if(order.type == "preorder" && order.status == "ready"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                       </tr>
@@ -597,7 +597,7 @@
                   </div>
 
                   <div id="preorder-review" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -614,7 +614,7 @@
                           orders.forEach(function(order){
                       if(order.type == "preorder" && order.status == "review"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                       </tr>
@@ -702,7 +702,7 @@
                 </div>
                 <div class="row">
                   <div class="col-sm-6">
-                    <button class="btn btn-red round" style="width: 100%;margin-top: 10px;" onclick="javascript:location.href='/host/<%= host.id%>'">进入</button>
+                    <button class="btn btn-red round" style="width: 100%;margin-top: 10px;" onclick="javascript:location.href='/meal/<%= meal.id%>'">进入</button>
                   </div>
                   <div class="col-sm-6">
                     <button class="btn btn-disable round" data-heart="false" data-select="true" style="width: 100%;margin-top: 10px;" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-cb="reloadUrl('/user/me','#mycollect')">取消收藏</button>
@@ -725,92 +725,118 @@
         <!-- collect end -->
         <div id="myinfo" style="width: 90%;" class="tab-pane middle" data-id="<%= user.id %>">
           <div class="box box-shadow white">
-            <div class="col-md-6 text-left">
-              <h4><strong>1. 上传个人头像</strong>  <i class="fa fa-question-circle text-lightgrey"></i></h4>
-              <div class="fileinput fileinput-exists" data-provides="fileinput">
-                <div class="fileinput-new thumbnail size-large">
-                </div>
-                <div class="fileinput-preview fileinput-exists size-large round_thumb" data-src="<%= user.picture%>">
-                  <img src=<%= user.picture || "/images/profile_man.png"%>>
-                </div>
-                <div>
+            <form class="form-horizontal">
+              <div class="row">
+                <div class="col-md-6 text-left">
+                  <h4><strong>1. 上传个人头像</strong>  <i class="fa fa-question-circle text-lightgrey"></i></h4>
+                  <div class="fileinput fileinput-exists" data-provides="fileinput">
+                    <div class="fileinput-new thumbnail size-large" onclick="javascript:$('#thumbUpload').trigger('click')">
+                    </div>
+                    <div class="fileinput-preview fileinput-exists size-large round_thumb" data-src="<%= user.picture%>">
+                      <img src="<%= user.picture || '/images/profile_man.png'%>" onclick="javascript:$('#thumbUpload').trigger('click')">
+                    </div>
+                    <div>
                     <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span>
-                      <input type="file">
+                      <input id="thumbUpload" type="file">
                     </span>
-                  <!--<a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput">Remove</a>-->
-                  <script>
-                    $(".fileinput").on("clear.bs.fileinput",function(){
-                      $("input[type='file']").data("isDelete",true);
-                    });
-                  </script>
-                </div>
-                <button class="btn btn-red round" onclick="uploadThumbnail()">本地上传</button>
-                <small>可以选jpg,png,gif,图片最大不超过5M</small>
-                <div class="alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
-              </div>
+                      <!--<a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput">Remove</a>-->
+                      <script>
+                        $(".fileinput").on("clear.bs.fileinput",function(){
+                          $("input[type='file']").data("isDelete",true);
+                        });
+                      </script>
+                    </div>
+                    <button class="btn btn-red round" onclick="uploadThumbnail()">本地上传</button>
+                    <h4><small>可以选jpg,png,gif,图片最大不超过5M</small></h4>
+                    <div class="alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
+                  </div>
 
-              <div style="margin-top:20px;">
-                <h4><strong>2. 姓名  </strong><i class="fa fa-question-circle text-lightgrey"></i></h4>
-                <div class="block">
-                  <div class="input-group">
-                    <span class="input-group-addon" id="basic-addon1">姓</span>
-                    <input name="lastname" type="text" class="form-control" placeholder="<% if(!user.lastname){ %> lastname  <% } %>" value="<%= user.lastname? user.lastname : ""%>" aria-describedby="basic-addon1" style="margin-right: 20px;">
-                    <span class="input-group-addon" id="basic-addon2">名</span>
-                    <input name="firstname" type="text" class="form-control" placeholder="<% if(!user.firstname){ %> firstname  <% } %>" value="<%= user.firstname?user.firstname : ""%>" aria-describedby="basic-addon2">
+                  <div style="margin-top:20px;">
+                    <h4><strong>2. 姓名  </strong><i class="fa fa-question-circle text-lightgrey"></i></h4>
+                    <div class="block">
+                      <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon2">名字</span>
+                        <input name="firstname" type="text" class="form-control" placeholder="<% if(!user.firstname){ %> firstname  <% } %>" value="<%= user.firstname?user.firstname : ""%>" aria-describedby="basic-addon2">
+                        <span class="input-group-addon" id="basic-addon1">姓</span>
+                        <input name="lastname" type="text" class="form-control" placeholder="<% if(!user.lastname){ %> lastname  <% } %>" value="<%= user.lastname? user.lastname : ""%>" aria-describedby="basic-addon1" style="margin-right: 20px;">
+                      </div>
+                    </div>
+                    <h4><small>我们采用实名制，请认真填写，名字填好点击“保存修改”。以后如果要修改，要联系管理员哦。</small></h4>
+                  </div>
+
+                </div>
+
+                <div class="col-md-6 text-left">
+                  <div>
+                    <h4><strong>3. 个人主页颜色  </strong><i class="fa fa-question-circle text-lightgrey"></i></h4>
+                    <div class="block" name="template_color" data-color="<%= user.color %>">
+                      <div class="color-block blue" data-color="blue"></div>
+                      <div class="color-block green" data-color="green"></div>
+                      <div class="color-block orange" data-color="orange"></div>
+                      <div class="color-block red" data-color="red"></div>
+                      <div class="color-block pink" data-color="pink"></div>
+                      <div class="color-block purple" data-color="purple"></div>
+                      <div class="color-block black" data-color="black"></div>
+                      <script>
+                        $("div[name='template_color'] div").click(function(){
+                          $("div[name='template_color'] div").removeClass("active");
+                          $(this).addClass("active");
+                          $("div[name='template_color']").data("color",$(this).data("color"));
+                        });
+                        var colorSelector = $("div[name='template_color']");
+                        var color = colorSelector.data('color');
+                        if(color && colorSelector.length > 0) {
+                          colorSelector.find("div").each(function () {
+                            $(this).removeClass('active');
+                            if ($(this).hasClass(color)) {
+                              $(this).addClass('active');
+                            }
+                          })
+                        };
+                      </script>
+                    </div>
+                    <h4><small>我们会为你生成个人主页，可以随时改动主页的色调。选择代表你的颜色吧？</small></h4>
+                  </div>
+
+                  <div style="margin-top:34px;">
+                    <h4><strong>4. 一段话介绍自己(140字内)</strong><i class="fa fa-question-circle text-lightgrey"></i></h4>
+                    <div class="block">
+                      <textarea class="form-control" name="desc" rows="6" placeholder="我不是很喜欢吃辣，可是我老公喜欢吃，然后我就不得不吃辣。" maxlength="140"><% if(user.desc){%> <%=user.desc%> <%}%></textarea>
+                    </div>
+                    <h4><small>可以写最喜欢的菜系或最爱的菜名，让大家了解一下你吧。</small></h4>
                   </div>
                 </div>
               </div>
 
-            </div>
+              <div class="row" style="margin-top:15px;">
+                <div class="col-md-6 text-left">
+                  <h4><strong>5.手机号码</strong></h4>
+                  <div class="block">
+                    <input type="text" class="form-control" name="phone" placeholder="000-000-0000" data-error="电话格式不对" minLength="10" maxlength="11" value="<%= user.phone?user.phone:''%>">
+                    <div class="help-block with-errors"></div>
+                  </div>
+                </div>
 
-            <div class="col-md-6 text-left">
-              <div>
-                <h4><strong>3. 个人主页颜色  </strong><i class="fa fa-question-circle text-lightgrey"></i></h4>
-                <div class="block" name="template_color" data-color="<%= user.color %>">
-                  <div class="color-block blue" data-color="blue"></div>
-                  <div class="color-block green" data-color="green"></div>
-                  <div class="color-block orange" data-color="orange"></div>
-                  <div class="color-block red" data-color="red"></div>
-                  <div class="color-block pink" data-color="pink"></div>
-                  <div class="color-block purple" data-color="purple"></div>
-                  <div class="color-block black" data-color="black"></div>
-                  <script>
-                    $("div[name='template_color'] div").click(function(){
-                      $("div[name='template_color'] div").removeClass("active");
-                      $(this).addClass("active");
-                      $("div[name='template_color']").data("color",$(this).data("color"));
-                    });
-                    var colorSelector = $("div[name='template_color']");
-                    var color = colorSelector.data('color');
-                    if(color && colorSelector.length > 0) {
-                      colorSelector.find("div").each(function () {
-                        $(this).removeClass('active');
-                        if ($(this).hasClass(color)) {
-                          $(this).addClass('active');
-                        }
-                      })
-                    };
-                  </script>
+                <div class="col-md-6 text-left">
+                  <h4><strong>6.邮编</strong></h4>
+                  <div class="block">
+                    <input type="text" class="form-control" name="zipcode" placeholder="(zipcode)" data-error="邮编格式不对" minLength="5" maxlength="10" value="<%= user.zip?user.zip:''%>">
+                    <div class="help-block with-errors"></div>
+                  </div>
                 </div>
               </div>
 
-              <div style="margin-top:34px;">
-                <h4><strong>4. 一段话介绍自己(140字内)  </strong><i class="fa fa-question-circle text-lightgrey"></i></h4>
-                <div class="block">
-                  <textarea class="form-control" name="desc" rows="6" placeholder="我不是很喜欢吃辣，可是我老公喜欢吃，然后我就不得不吃辣。" maxlength="140"><% if(user.desc){%> <%=user.desc%> <%}%></textarea>
-                </div>
+              <div class="col-xs-12">
+                <div class="alert form-alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
               </div>
-            </div>
 
-            <div class="col-xs-12">
-              <div class="alert form-alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
-            </div>
+              <div class="divider"></div>
 
 
-            <div class="col-xs-12">
-              <button class="btn btn-red round save" style="width:80px;margin-right:10px;" >保存修改</button>
-            </div>
-
+              <div class="col-xs-12">
+                <button class="btn btn-red round save" style="width:80px;margin-right:10px;" >保存修改</button>
+              </div>
+            </form>
           </div>
         </div>
         <!-- info end -->
@@ -825,15 +851,15 @@
                 var address= addresses[key];
             %>
               <div class="text-left">
-                <div class="address_block" data-id="<%= user.id %>" data-address-id="<%=address.id%>" data-street="<%=address.street%>" data-city="<%= address.city%>" data-zip="<%= address.zip%>" data-phone="<%= address.phone%>">
+                <div class="address_block vertical-align" data-id="<%= user.id %>" data-address-id="<%=address.id%>" data-street="<%=address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>">
                   <% if(address.isDefault){ %>
                   <label class="text-red default">［默认］</label>
                   <%}else{%>
                   <label class="text-red default" style="width: 55px;"> </label>
                   <%}%>
                   <label class="actual_address"><%= address.street%>, &nbsp;<%= address.city%> <%= address.zip%> <br/>+<%= address.phone%></label>
-                  <a class="text-red cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">修改</a>
-                  <a class="text-red cursor-pointer deleteBtn" style="margin-left: 5px;" href="javascript:void(0)">删除</a>
+                  <a class="text-red cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">&nbsp;&nbsp;修改</a>
+                  <a class="text-red cursor-pointer deleteBtn" style="margin-left: 5px;" href="javascript:void(0)">&nbsp;删除</a>
                 </div>
               </div>
             <%})%>
@@ -850,10 +876,10 @@
                 </div>
               </div>
               <div class="text-left">
-                <div class="address_block" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street%>" data-city="<%= user.host.city%>" data-zip="<%= user.host.zip%>" data-phone="<%=user.phone%>">
+                <div class="address_block vertical-align" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street || ""%>" data-city="<%= user.host.city || ''%>" data-zip="<%= user.host.zip || ''%>" data-phone="<%=user.phone || ''%>">
                   <label class="text-green">［默认］</label>
-                  <label><%= user.host.full_address %><br/> +<%= user.phone %></label>
-                  <a class="text-green cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">修改</a>
+                  <label><%= user.host.full_address || '请输入地址' %><br/> +<%= user.phone %></label>
+                  <a class="text-green cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">&nbsp;&nbsp;修改</a>
                 </div>
               </div>
             <% } %>
@@ -1015,7 +1041,7 @@
 
 <script>
   new AddressView({ el : $("#myaddress"), model : new User()})
-  new UserProfileView( { el: $("#myinfo"), model : new User()})
+  var userProfileView = new UserProfileView( { el: $("#myinfo"), model : new User()})
   new ReviewView({ el : $("#myreview"), model : new Review()})
   var orderView = new OrderView({ el : $("#myorder"), model : new Order()});
 </script>

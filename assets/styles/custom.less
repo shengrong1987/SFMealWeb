@@ -160,6 +160,24 @@ input:focus{
 }
 
 /*logo*/
+.logo{
+  background-image: url(/images/sfmeal_logo.png);
+  display: block;
+  position: relative;
+  left: 50px;
+  top: 20px;
+  width: 220px;
+  height: 80px;
+  .cursor-pointer;
+}
+
+.logo-sm{
+  left:80px;
+  top: 0;
+  background-size: 110px 40px;
+  width: 110px;
+  height: 40px;
+}
 .logo-text{
   .cursor-pointer;
 }
@@ -167,6 +185,9 @@ input:focus{
 
 
 /*font*/
+.font-elegant{
+  font-family: BanglaMN;
+}
 @size-xs : 16px;
 .font-small{ font-size: @size-xs;}
 
@@ -279,26 +300,17 @@ input:focus{
   color: @yellow !important;
 }
 
+.text-blue{
+  color : @blue !important;
+}
+
+.text-background{
+  color : @background-grey !important;
+}
+
 /*cursor*/
 .cursor-pointer{
   cursor: pointer;
-}
-
-/*border*/
-.border{
-  border : solid 1px lightgrey;
-}
-.border-white{
-  border-color: white !important;
-}
-
-.border-lightgrey{
-  border-color: #adadad !important;
-}
-
-.border-round{
-  border : solid 1px lightgrey;
-  border-radius: 5px;
 }
 
 //date-picker
@@ -393,7 +405,7 @@ input:focus{
 }
 
 .btn:hover {
-  .text-white;
+  //.text-white;
 }
 
 .btn-lg{
@@ -440,6 +452,14 @@ input:focus{
 
 .btn-outline:hover{
   color : @blue !important;
+}
+
+.btn-outline-dark{
+  border: solid 1px @white !important;
+}
+
+.btn-outline-dark:hover{
+  color : @light-grey !important;
 }
 
 /*round*/
@@ -609,6 +629,28 @@ fieldset[disabled] .btn-red.active {
   color: #ffa489;
   .text-white;
 }
+
+/*border*/
+.border{
+  border : solid 1px lightgrey;
+}
+.border-white{
+  border-color: white !important;
+}
+
+.border-lightgrey{
+  border-color: @light-grey !important;
+}
+
+.border-blue{
+  border-color: @blue !important;
+}
+
+.border-round{
+  border : solid 1px lightgrey;
+  border-radius: 5px;
+}
+
 /*nav*/
 
 .nav-tab-cute li a{
@@ -942,6 +984,13 @@ fieldset[disabled] .btn-red.active {
   }
   .minus{
     .cursor-pointer
+  }
+}
+
+/*table*/
+.table-vertical-middle{
+  td{
+    vertical-align: middle !important;
   }
 }
 

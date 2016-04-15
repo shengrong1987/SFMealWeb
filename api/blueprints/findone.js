@@ -61,7 +61,17 @@ module.exports = function findOneRecord (req, res) {
           res.view('meal_edit',{meal : matchingRecord});
         });
       }else{
-        res.view('meal',{meal : matchingRecord});
+        if(req.session.authenticated){
+          var userId = req.session.user.id;
+          User.findOne(userId).populate("collects").exec(function(err,user){
+            if(err){
+              return res.badRequest(err);
+            }
+            res.view('meal',{meal : matchingRecord, user : user});
+          });
+        }else{
+          res.view('meal',{meal : matchingRecord, user : undefined});
+        }
       }
     }else if(Model.adapter.identity == "user"){
       res.view('user',{user : matchingRecord});

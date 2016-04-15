@@ -7,9 +7,8 @@
 
     <div class="row absolute" style="width: 100%;top:0;">
 
-      <div class="relative text-left cursor-pointer logo col-xs-4" style="" onclick="location.href='/'">
-        <h1 class="text-white">私房Meal</h1>
-        <p class="text-white text-left">SFMeal.com</p>
+      <div class="col-xs-4 relative text-left">
+        <a href="/" class="logo"></a>
       </div>
 
       <div class="relative text-left col-xs-8 content" style="">
@@ -40,9 +39,7 @@
                   <h2 class="text-left"><%= meal.title %>  <small class="text-orange"><% if(meal.type=='order'){ %> 即点 <% }else if(meal.type=='preorder'){ %> 预定 <% } %> <i class="fa fa-question-circle text-lightgrey"></i><%= meal.isFull()?"（已满）":"" %></small></h2>
                 </div>
                 <div class="col-xs-3 text-left">
-                  <button type="button" class="btn btn-default">
-                    <i class="fa fa-heart fa-2x text-grey cursor-pointer"></i>
-                  </button>
+                  <i class="fa fa-heart fa-2x cursor-pointer" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}else{%>false<%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
                 </div>
               </div>
 
@@ -114,12 +111,19 @@
             <div class="col-xs-6">
               <div class="vertical-align">
                 <h4><small>分享给大家：</small></h4>
-                <ul class="nav navbar-nav" style="width: 185px;float: none;">
-                  <li><a href="#"><i class="fa fa-facebook-f fa-lg"></i></a></li>
-                  <li><a href="#"><i class="fa fa-instagram fa-lg"></i></a></li>
-                  <li><a href="#"><i class="fa fa-pinterest-p fa-lg"></i></a></li>
-                  <li><a href="#"><i class="fa fa-twitter fa-lg"></i></a></li>
-                </ul>
+                <div id="social-share"></div>
+                <script>
+                  $("#social-share").jsSocials({
+                    shareIn: "popup",
+                    shares: ["facebook", "pinterest","twitter"]
+                  });
+                </script>
+                <!--<ul class="nav navbar-nav" style="width: 185px;float: none;">-->
+                  <!--<li><a href="#"><i class="fa fa-facebook-f fa-lg"></i></a></li>-->
+                  <!--<li><a href="#"><i class="fa fa-instagram fa-lg"></i></a></li>-->
+                  <!--<li><a href="#"><i class="fa fa-pinterest-p fa-lg"></i></a></li>-->
+                  <!--<li><a href="#"><i class="fa fa-twitter fa-lg"></i></a></li>-->
+                <!--</ul>-->
               </div>
 
               <h4 class="text-left"><small>取餐地点：（付款后就可以看到具体地址）</small></h4>

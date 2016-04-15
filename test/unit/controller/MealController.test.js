@@ -135,7 +135,7 @@ describe('MealController', function() {
       }
       agent
           .post('/meal')
-          .send({provideFromTime: new Date(now.getTime() - 3600 * 60 * 5), provideTillTime: new Date(now.getTime() + 3600 * 60 * 5), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, status : "on",cover : dish1})
+          .send({provideFromTime: new Date(now.getTime() - 3600 * 60 * 5), provideTillTime: new Date(now.getTime() + 3600 * 60 * 5), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, status : "on",cover : dish1, minimalOrder : 1})
           .expect(200)
           .end(function(err,res){
             if(err){
@@ -154,7 +154,7 @@ describe('MealController', function() {
       var now = new Date();
       agent
           .post('/meal')
-          .send({provideFromTime: new Date(now.getTime() - 3600 * 60 * 5), provideTillTime: new Date(now.getTime() + 3600 * 60 * 5), pickupFromTime : new Date(now.getTime() + 7200 * 60 * 5), pickupTillTime : new Date(now.getTime() + 7500 * 60 * 5),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "on", cover : dish1})
+          .send({provideFromTime: new Date(now.getTime() - 3600 * 60 * 5), provideTillTime: new Date(now.getTime() + 3600 * 60 * 5), pickupFromTime : new Date(now.getTime() + 7200 * 60 * 5), pickupTillTime : new Date(now.getTime() + 7500 * 60 * 5),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "on", cover : dish1, minimalOrder : 1})
           .expect(200)
           .end(function(err,res){
             if(res.body.chef != hostId){
@@ -166,13 +166,27 @@ describe('MealController', function() {
 
     it('should search the meals in San Francisco and with a keyword of 菜式', function (done) {
       agent
-          .get('/meal/search?keyword=猪肉馅饼&county=San%20Francisco%20County')
+          .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err,res){
             if(res.body.meals.length != 2){
               return done(Error("error searching for meal"));
+            }
+            done();
+          })
+    })
+
+    it('should search the meals in San Francisco and with a keyword of zipcode 94124', function (done) {
+      agent
+          .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County&zip=94124'))
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err,res){
+            if(res.body.meals.length != 2 && res.body.loc.longitude && res.body.loc.latitude){
+              return done(Error("error decoding zipcode"));
             }
             done();
           })
@@ -192,7 +206,7 @@ describe('MealController', function() {
 
     it('should search the meals in San Francisco and with a keyword of 菜式 again', function (done) {
       agent
-          .get('/meal/search?keyword=猪肉馅饼&county=San%20Francisco%20County')
+          .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(200)

@@ -2,6 +2,7 @@
  * Created by shengrong on 12/3/15.
  */
 var stripe = require('stripe')(sails.config.StripeKeys.secretKey);
+var async = require('async');
 
 module.exports = {
 
@@ -59,21 +60,46 @@ module.exports = {
   },
 
   listTransactions : function(attr, cb){
-    stripe.balance.listTransactions({stripe_account : attr.id},function(err, transactions){
+    stripe.balance.listTransactions({},{stripe_account : attr.id},function(err, transactions){
       if(err){
         return cb(err);
       }
-      cb(null,transactions);
+      async.each(transactions.data, function(tran, next){
+        stripe.charges.retrieve(tran.source,{stripe_account : attr.id}, function(err, charge){
+          if(err){
+            return next(err);
+          }
+          tran.metadata = charge.metadata || {};
+          next();
+        });
+      },function(err){
+        if(err){
+          return cb(err);
+        }
+        cb(null, transactions);
+      });
+      //cb(null, transactions);
     });
   },
 
+  retrieveCharge : function(attr, cb){
+    stripe.charges.retrieve(attr, cb);
+  },
+
+  retrieveTransfer : function(id, cb){
+    stripe.transfers.retrieve(id, cb);
+  },
+
   charge : function(attr ,cb){
+    var application_fee = attr.amount * 10 / 100;
     stripe.charges.create({
       amount: attr.amount,
       currency: "usd",
       receipt_email: attr.email,
       customer: attr.customerId,
-      destination : attr.destination
+      destination : attr.destination,
+      metadata : attr.metadata,
+      application_fee : application_fee
     }, function (err, charge) {
       if(err){
         return cb(err);
@@ -83,6 +109,7 @@ module.exports = {
   },
 
   refund : function(attr, cb){
+    console.log("refunding customer : " + attr.amount);
     stripe.refunds.create({
       charge : attr.id,
       amount : attr.amount

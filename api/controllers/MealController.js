@@ -5,6 +5,10 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+var dateUtil = require("../services/util.js");
+var moment = require("moment");
+var geoCoder = require("../services/geocode.js");
+
 module.exports = {
 
   new_form : function(req, res){
@@ -20,10 +24,9 @@ module.exports = {
 
   feature : function(req, res){
     var now = new Date();
-    var midnightToday = new Date().setHours(0,0,0,0);
     var county = req.param('county');
     county = county || "San Francisco County";
-    Meal.find({county : county, type : 'order',status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
+    Meal.find({county : county, type : 'order', status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
       if(err){
         return res.badRequest(err);
       }
@@ -38,7 +41,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            return res.view('home',{orders : orders, preorders : preorders, user : u});
+            return res.view('meals',{meals : orders.concat(preorders), user : u});
           });
         }else {
           return res.view('home',{orders : orders, preorders : preorders, user : user});
@@ -79,6 +82,7 @@ module.exports = {
 
   search : function(req, res){
     var keyword = req.param('keyword');
+    var zip = req.param('zip');
     var county = req.param('county');
     var now = new Date();
     Meal.find({ county : county,status : "on",provideFromTime : {'<' : now}, provideTillTime : {'>' : now}
@@ -98,11 +102,37 @@ module.exports = {
           }
           return valid;
         });
-        if(req.wantsJSON) {
-          res.ok({meals: found, search : true, keyword : keyword, user: req.session.user});
-        }else{
-          res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user });
+        if(!zip){
+          zip = req.session.user ? (req.session.user.zip ? req.session.user.zip : null) : null;
         }
+        if(zip){
+          var location = {};
+          geoCoder.geocodeAdvance(zip,function(err, result){
+            if(err || result.length == 0){
+              console.log("zipcode解析错误");
+              if(req.wantsJSON) {
+                res.ok({meals: found, search : true, keyword : keyword, user: req.session.user,loc : null});
+              }else{
+                res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, loc : null});
+              }
+            }else{
+              location.long = result[0].longitude;
+              location.lat = result[0].latitude;
+              if(req.wantsJSON) {
+                res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, loc : location});
+              }else{
+                res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, loc : location});
+              }
+            }
+          });
+        }else{
+          if(req.wantsJSON) {
+            res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, loc : null});
+          }else{
+            res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, loc : null});
+          }
+        }
+
       }
     });
   },
@@ -250,8 +280,8 @@ module.exports = {
   },
 
   dateIsValid : function(params){
-    var provideFromTime = new Date(params.provideFromTime).getTime();
-    var provideTillTime = new Date(params.provideTillTime).getTime();
+    var provideFromTime = new Date(params.provideFromTime);
+    var provideTillTime = new Date(params.provideTillTime);
     if(params.type == "order" && provideFromTime >= provideTillTime){
       return false;
     }else if(params.type == "preorder" && provideFromTime > provideTillTime){
@@ -265,8 +295,8 @@ module.exports = {
         console.log(" pickup time has passed");
         return false;
       }
-      var pickupFromTime = new Date(params.pickupFromTime).getTime();
-      var pickupTillTime = new Date(params.pickupTillTime).getTime();
+      var pickupFromTime = new Date(params.pickupFromTime);
+      var pickupTillTime = new Date(params.pickupTillTime);
 
       if(pickupFromTime >= pickupTillTime){
         console.log("pickup time period not long enough");
@@ -281,9 +311,7 @@ module.exports = {
         return false;
       }
     }else{
-      if(provideFromTime > now){
-        return false;
-      }
+
     }
     return true;
   },
