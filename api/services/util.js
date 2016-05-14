@@ -4,13 +4,23 @@
 var moment = require("moment");
 
 module.exports = {
+  getUTCTime : function(){
+    var mNow = moment.utc(Date.now());
+    return mNow._i;
+  },
+  getMidNightUTC : function(){
+    var today = new Date();
+    today.setHours(0,0,0,0);
+    var mMidnight = moment.utc(today.getTime());
+    return mMidnight._i;
+  },
   formattedHour : function(date){
     var mDate = moment(date);
-    return mDate.format("LT");
+    return mDate.local().format("LT");
   },
   formattedDate : function(date){
     var mDate = moment(date);
-    return mDate.format("MMM Do YYYY");
+    return mDate.local().format("MMM Do YYYY");
   },
   monthDesc : function(value){
     var month = "";

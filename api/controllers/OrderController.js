@@ -121,32 +121,41 @@ module.exports = {
             console.log("error: missing payment profile");
             return res.badRequest({ responseText : "payment method needed", code : -5});
           }
-          stripe.charge({
-            amount : (subtotal + delivery_fee) * 100,
-            email : email,
-            customerId : found.payment[0].customerId,
-            destination : m.chef.accountId
-          },function(err, charge){
+          Order.create(req.body).exec(function (err, order) {
             if (err) {
               return res.badRequest(err);
             }
-            if (charge.status == "succeeded") {
-              for (var i = 0; i < dishes.length; i++) {
-                var dishId = dishes[i].id;
-                var quantity = parseInt(orders[dishId]);
-                m.leftQty[dishId] -= quantity;
+            stripe.charge({
+              amount : (subtotal + delivery_fee) * 100,
+              email : email,
+              customerId : found.payment[0].customerId,
+              destination : m.chef.accountId,
+              metadata : {
+                mealId : m.id,
+                hostId : m.chef.id,
+                orderId : order.id
               }
-              req.body.charges = {};
-              req.body.charges[charge.id] = charge.amount/100;
-              m.save(function (err, result) {
-                if (err) {
+            },function(err, charge){
+              if (err) {
+                Order.destroy(order.id).exec(function(err){
+                  if(err){
+                    return res.badRequest(err);
+                  }
                   return res.badRequest(err);
+                });
+              }
+              if (charge.status == "succeeded") {
+                for (var i = 0; i < dishes.length; i++) {
+                  var dishId = dishes[i].id;
+                  var quantity = parseInt(orders[dishId]);
+                  m.leftQty[dishId] -= quantity;
                 }
-                if(req.body.type == "order"){
-                  req.body.status = "preparing";
-                }
-                Order.create(req.body).exec(function (err, order) {
-                  if (err) {
+                order.transfers = {};
+                order.transfers[charge.transfer] = charge.transfer;
+                order.charges = {};
+                order.charges[charge.id] = charge.amount/100;
+                m.save(function (err, result) {
+                  if(err){
                     return res.badRequest(err);
                   }
                   //test only
@@ -156,10 +165,10 @@ module.exports = {
                   }
                   return res.ok({responseText : "Your order has been taken successfully!You will be directed to orde page. Now just wait for your food to be ready."});
                 });
-              });
-            } else {
-              res.badRequest({ reponseText : "Encoutered unkown error", code : -6});
-            }
+              } else {
+                res.badRequest({ reponseText : "Encoutered unkown error", code : -6});
+              }
+            });
           });
         });
       }
@@ -191,8 +200,6 @@ module.exports = {
       if(err){
         return res.badRequest(err)
       }
-
-      console.log("order status is: " + order.status);
       if(order.status != "schedule" && order.status != "preparing"){
         return res.forbidden();
       }
@@ -208,6 +215,7 @@ module.exports = {
         if(order.status == "schedule"){
           //can update without permission of host or adjust by host
           var diff = (subtotal - order.subtotal).toFixed(2);
+          console.log("adjusting amount: " + diff);
           if(diff != 0){
             User.findOne(order.customer).populate('payment').exec(function (err, found) {
               if (err) {
@@ -222,13 +230,17 @@ module.exports = {
                   amount : diff * 100,
                   email : email,
                   customerId : found.payment[0].customerId,
-                  destination : order.host.accountId
+                  destination : order.host.accountId,
+                  metadata : {
+                    mealId : order.meal.id,
+                    hostId : order.host.id,
+                    orderId : order.id
+                  }
                 },function(err, charge){
                   if (err) {
                     console.log(err);
                     return res.badRequest(err);
                   }
-                  console.log(charge.status);
                   if(charge.status == "succeeded") {
                     $this.updateMealLeftQty(order.meal, order.orders, params.orders, function(err, m){
                       if(err){
@@ -388,7 +400,7 @@ module.exports = {
                     order.meal = m.id;
                     order.subtotal = 0;
                     order.save(function (err, result) {
-                      if (err) {
+                      if(err){
                         return res.badRequest(err);
                       }
                       //send notification
@@ -452,7 +464,12 @@ module.exports = {
                 amount : diff * 100,
                 email : email,
                 customerId : found.payment[0].customerId,
-                destination : order.host.accountId
+                destination : order.host.accountId,
+                metadata : {
+                  mealId : order.meal.id,
+                  hostId : order.host.id,
+                  orderId : order.id
+                }
               },function(err, charge){
                 if (err) {
                   return res.badRequest(err);
@@ -501,7 +518,7 @@ module.exports = {
                 var charge = refundCharges[i];
                 stripe.refund({
                   id : charge.id,
-                  amount : charge.amount
+                  amount : charge.amount * 100
                 },function(err, refund){
                   if(i==refundCharges.length){
                     if(err){

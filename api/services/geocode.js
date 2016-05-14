@@ -11,7 +11,6 @@ var extra = {
 var geocoder = require('node-geocoder')(geocoderProvider, httpAdapter, extra);
 
 module.exports = {
-
   geocode : function(address, cb){
     geocoder.geocode(address, function(err, res) {
       if(err){
@@ -20,7 +19,18 @@ module.exports = {
         cb(err,res);
       }
     });
+  },
+
+  geocodeAdvance : function(zipCode, cb){
+    geocoder.geocode({zipcode : zipCode, address : "USA", country : "USA"}, function(err, res) {
+      if(err){
+        cb(err);
+      }else{
+        cb(err,res);
+      }
+    });
   }
+
 }
 
 

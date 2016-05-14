@@ -73,6 +73,9 @@ module.exports = {
       type : 'string',
       enum : ["San Francisco County","Sacramento County"]
     },
+    zip : {
+      type : 'string'
+    },
     birthday : {
       type : 'datetime'
     },
@@ -102,12 +105,16 @@ module.exports = {
     featureDishes : {
       collection : 'Dish',
       defaultsTo : []
+    },
+    isCollect : function(mealId){
+      return this.collects.some(function(meal){
+        return meal.id == mealId;
+      });
     }
   }),
 
   cloneToUser : function(user,data,cb){
     delete user.auth.password;
-    console.log(user.auth);
     user.firstname = data.firstname;
     user.lastname = data.lastname;
     if(data.phone){

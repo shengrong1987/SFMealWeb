@@ -272,12 +272,12 @@
       var datePicker = $(this);
       Plugin.call(datePicker,datePicker.data());
     });
-    $('[data-toggle="dropdown"]').next().find("li").click(function(e){
+    $('[data-toggle="dropdown"][data-selected="true"]').next().find("li").click(function(e){
       //e.preventDefault();
       var text = $(this).text();
       var value = $(this).find("a").attr("value");
       var parent = $(this).parent().prev();
-      parent.text(text);
+      parent.html(text + "&nbsp;<span class='caret'></span>");
       parent.attr("value",value);
       parent.trigger("click.after");
     });
@@ -582,7 +582,7 @@
   var CollectItem = function(element, options){
     this.element = $(element);
     this.options = options;
-    if(this.options.select){
+    if(this.options.select === "true" || this.options.select === true){
       if(this.options["heart"]){
         this.element.addClass("text-red");
       }
@@ -604,12 +604,14 @@
     if(!userId || userId == "undefined"){
       return;
     }
-    if(this.options.select){
+    if(this.options.select === "true" || this.options.select === true){
       var method = "DELETE";
       ele.removeClass('text-red');
+      this.options.select = false;
     }else{
       method = "POST";
       ele.addClass('text-red');
+      this.options.select = true;
     }
     var $this = this;
     $.ajax({
@@ -815,9 +817,12 @@
   $(window).on('load',function(){
     $('[data-toggle="dateTimePicker"]').each(function(){
       var dateString = $(this).data("date");
-      if(typeof dateString != "undefined"){
+      if(typeof dateString != "undefined" && dateString != "undefined"){
         var date = new Date(dateString);
         var mDate = moment(date.toISOString());
+        if(mDate.isBefore(moment()) && $(this).data("min") == "now"){
+          mDate = moment();
+        }
       }
       $(this).datetimepicker({
         icons:{
@@ -833,6 +838,75 @@
         showTodayButton : true,
         defaultDate : mDate
       });
+    })
+  });
+}(jQuery);
+
++function($){
+  'user strict'
+
+  var DurationFilter = function(element, options){
+    this.element = element;
+    this.options = options;
+    this.element.find(".do").on("click",filterHandler);
+  }
+
+  $.fn.durationFilter              = Plugin
+  $.fn.durationFilter.Constructor  = DurationFilter
+
+  DurationFilter.prototype.filter = function(node){
+    this.element.find(".alert").hide();
+    var from = this.element.find(".from").data("DateTimePicker").date();
+    var to = this.element.find(".to").data("DateTimePicker").date();
+    if(from){
+      from = from.unix();
+    }
+    if(to){
+      to = to.unix();
+    }
+    var container = $(this.options.target);
+    container.find(".item").each(function(){
+      var date = $(this).data("created");
+      if(from && to){
+        if(date < from || date > to){
+          $(this).hide();
+        }else{
+          $(this).show();
+        }
+      }else if(from && date < from){
+        $(this).hide();
+      }else if(to && date > to){
+        $(this).hide();
+      }else{
+        $(this).show();
+      }
+    });
+  }
+
+  function Plugin(option, root){
+    var hasRoot = typeof root != 'undefined';
+    return this.each(function(){
+      if(!hasRoot) root = $(this);
+      var options = $.extend({}, DurationFilter.DEFAULTS, root.data(), typeof option == 'object' && option);
+      var data = root.data('bs.duration-filter');
+      if(!data){
+        root.data('bs.duration-filter',(data = new DurationFilter(root, options)));
+      }
+      if(typeof option == 'string'){
+        data[option]($(this));
+      }
+    });
+  }
+
+  var filterHandler = function(e){
+    e.preventDefault();
+    Plugin.call($(this),'filter',$(this).parentsUntil('[data-toggle="duration-filter"]').length > 0 ? $(this).parentsUntil('[data-toggle="duration-filter"]').parent() : $(this).parent());
+  }
+
+  $(window).on('load',function(){
+    $('[data-toggle="duration-filter"]').each(function(){
+      var durationFilter = $(this);
+      Plugin.call(durationFilter, durationFilter.data());
     })
   });
 }(jQuery);

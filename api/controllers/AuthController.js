@@ -51,13 +51,14 @@ module.exports = require('waterlock').waterlocked({
   },
 
   loginSuccess : function(req, res){
+    console.log("login success...");
     var auth = req.session.user.auth;
     if(auth.facebookId){
-      res.redirect("/");
+      res.redirect("/user/me#myinfo");
     }else if(auth.googleEmail){
-      res.redirect("/");
+      res.redirect("/user/me#myinfo");
     }else{
-      res.ok({});
+      res.ok(req.session.user);
     }
   },
 

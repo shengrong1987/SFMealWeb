@@ -30,7 +30,7 @@
       <div class="navbar">
         <div class="navbar-inner">
           <ul class="nav nav-pills">
-            <li class="active"><a href="#step1" data-toggle="tab" data-pass="<%= user.host%>" data-step="1">成为厨师</a></li>
+            <li class="active"><a href="#step1" data-toggle="tab" data-pass="<%= user.host || ''%>" data-step="1">成为厨师</a></li>
             <li><a href="#step2" data-toggle="tab" data-pass="<%= hasAddress%>" data-step="2">厨房地址</a></li>
             <li><a href="#step3" data-toggle="tab" data-pass="<%= hasDish%>" data-step="3">发布菜式</a></li>
             <li><a href="#step4" data-toggle="tab" data-pass="<%= hasMeal%>" data-step="4">发布菜单</a></li>

@@ -8,7 +8,7 @@
       </button>
 
         <div class="dropdown navbar-btn" id="citySelector">
-          <a class="btn btn-default dropdown-toggle text-dark" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="San Francisco County">
+          <a class="btn btn-outline dropdown-toggle text-background" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="San Francisco County">
             <span>美国/旧金山</span>
             <span class="caret"></span>
           </a>
@@ -24,20 +24,21 @@
 
     <div class="collapse navbar-collapse" id="myNavBar">
       <ul class="nav navbar-nav" style="margin-left: 20px;">
-        <li><a href="#"><i class="fa fa-facebook-f fa-lg"></i></a></li>
-        <li><a href="#" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-        <li><a href="#"><i class="fa fa-instagram fa-lg"></i></a></li>
-        <li><a href="#" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-        <li><a href="#"><i class="fa fa-pinterest-p fa-lg"></i></a></li>
-        <li><a href="#" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-        <li><a href="#"><i class="fa fa-twitter fa-lg"></i></a></li>
+        <li><a href="https://www.facebook.com/SFMeal/"><i class="fa fa-facebook-f fa-lg"></i></a></li>
+        <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
+        <li><a href="https://www.instagram.com/sfmeal/"><i class="fa fa-instagram fa-lg"></i></a></li>
+        <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
+        <li><a href="https://www.pinterest.com/sfmeal/"><i class="fa fa-pinterest-p fa-lg"></i></a></li>
+        <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a>   </li>
+        <li><a href="https://twitter.com/"><i class="fa fa-twitter fa-lg"></i></a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
+        <% if (req.session.user && !req.session.user.host) { %>
+          <li><button id="applyToHostBtn" class="btn btn-outline-dark navbar-btn round verticel-align text-white" style="background-color: transparent;margin-right: 20px;" title="注意" data-content="你必须先登陆才能申请成为大厨" type="button"><i class="icon icon-chef text-white" style="font-size: large;"></i><span style="position:relative;top:-3px;font-size: medium;">我做私房菜</span></button></li>
+        <% }%>
         <li><a href="#" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
         <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
-        <% if (req.session.user && !req.session.user.host) { %>
-          <li><button id="applyToHostBtn" class="btn btn-outline-light navbar-btn round" title="注意" data-content="你必须先登陆才能申请成为大厨" type="button">我做私房菜</button></li>
-        <% }
+        <%
           if(req.session.user){ %>
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
           <li><a href="/user/me#mycollect"><i class="fa fa-heart"></i> 收藏</a></li>

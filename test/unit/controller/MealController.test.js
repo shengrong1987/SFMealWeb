@@ -166,7 +166,7 @@ describe('MealController', function() {
       }
       agent
           .post('/meal')
-          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, status : "off", cover : dish1, minimalOrder : 1})
+          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, status : "off", cover : dish1, minimalOrder : 5})
           .expect(200)
           .end(function(err,res){
             if(err){
@@ -203,7 +203,7 @@ describe('MealController', function() {
 
     it('should search the meals in San Francisco and with a keyword of 菜式 but no records are found', function (done) {
       agent
-          .get('/meal/search?keyword=猪肉馅饼&county=San%20Francisco%20County')
+          .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(200)
@@ -281,7 +281,7 @@ describe('MealController', function() {
 
     it('should search the meals in San Francisco and with a keyword of 菜式 again', function (done) {
       agent
-          .get('/meal/search?keyword=猪肉馅饼&county=San%20Francisco%20County')
+          .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(200)
@@ -292,8 +292,6 @@ describe('MealController', function() {
             done();
           })
     })
-
-
 
   });
 

@@ -48,10 +48,6 @@ function dismissModal(cb){
   modal.removeData('bs.modal');
 }
 
-function getCurrentCounty(){
-  return $("#citySelector a").attr("value");
-}
-
 function reloadUrl(url, tag){
   if(location.href.indexOf(url)==-1){
     location.href = url + tag;
@@ -61,18 +57,29 @@ function reloadUrl(url, tag){
   return false;
 }
 
+function getZipCode(){
+  var zip = $(".zipCode").val();
+  var isValidZip = /(^\d{5}$)|(^\d{5}-\d{4}$)/.test(zip);
+  if(isValidZip){
+    zip = zip.match(/(^\d{5}$)|(^\d{5}-\d{4}$)/)[0];
+  }else{
+    zip = undefined;
+  }
+  return zip;
+}
+
 function getCountyInfo(){
   var county = readCookie("county");
   var county_value = readCookie("county-value");
   if(county){
-    $("#citySelector>a").text(county);
+    $("#citySelector>a").html(county + "&nbsp;<span class='caret'></span>");
     $("#citySelector>a").attr("value",county_value);
   }
   $('#citySelector [data-toggle="dropdown"]').on("click.after",function(){
     createCookie("county",$(this).text(),30);
     createCookie("county-value",$(this).attr("value"),30);
-    //var search = location.search;
   });
+  return county_value || "San Francisco County";
 }
 
 //UI Components setup
@@ -160,9 +167,31 @@ function enterAddressInfo(event){
 function search(target){
   var searchContainer = $(target).parent();
   var keyword = searchContainer.find("input[name='keyword']").val();
-  var zipcode = searchContainer.find("input[name='zipcode']").val();
-  var county = getCurrentCounty();
-  location.href = "/meal/search?keyword=" + keyword + "&county=" + county + "&zipcode=" + zipcode;
+  var zip = searchContainer.find("input[name='zipcode']").val();
+  var county = getCountyInfo();
+  var query = "keyword=" + keyword;
+  //check zip's county
+  if(zip) {
+    query += "&zip=" + zip;
+    $.ajax({
+      url: "http://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURI(zip)
+      + "&sensor=false",
+      success: function (response) {
+        if (response.results.length == 0) {
+          alert("无法解析邮编");
+          return;
+        }
+        var county = response.results[0].address_components[2]["long_name"];
+        query += "&county=" + county;
+        location.href = "/meal/search?" + query;
+      }, error: function (err) {
+        alert("您的地区尚未开通私房菜");
+      }
+    });
+  }else{
+    query += "&county=" + county;
+    location.href = "/meal/search?" + query;
+  }
 }
 /*
 * Order GUI

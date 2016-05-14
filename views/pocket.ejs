@@ -5,10 +5,10 @@
       <div style="width: 600px;" class="middle banner-text">
         <div class="row vertical-align" style="margin-bottom: 5px;">
           <div class="col-sm-3 cursor-pointer" onclick="location.href='/'">
-            <h3 class="text-white logo-text"><strong>私房Meal</strong><br><small class="text-white text-center">SFMeal.com</small></h3>
+            <a href="/" class="logo logo-sm" style="left: 0;"></a>
           </div>
           <div class="col-sm-9">
-            <h2 class="text-white text-left"><strong>我的钱包</strong></h2>
+            <h3 class="text-white text-left none-margin"><strong>我的钱包</strong></h3>
           </div>
         </div>
       </div>
@@ -25,8 +25,113 @@
       </ul>
 
       <div class="tab-content" style="padding-top: 20px;padding-bottom: 60px;min-height: 500px;">
-        <div id="mydetail" style="width: 90%;" class="tab-pane middle active">
 
+        <div id="mydetail" class="tab-pane active middle" style="width: 90%;">
+          <div class="box box-shadow white">
+            <div class="row">
+              <div data-toggle="duration-filter" data-target="#transaction_container">
+                <div class="form-group col-xs-12">
+                  <div class='input-group from col-xs-4' data-toggle="dateTimePicker" style="float: left">
+                    <span class="input-group-addon">起日期</span>
+                    <input type='text' class="form-control" />
+                <span class="input-group-addon">
+                  <span class="fa fa-calendar"></span>
+                </span>
+                  </div>
+                  <div class='input-group to col-xs-4' data-toggle="dateTimePicker" style="float: left;margin-left:20px;">
+                    <span class="input-group-addon">止日期</span>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                      <span class="fa fa-calendar"></span>
+                    </span>
+                  </div>
+                  <div class="btn btn-info do col-xs-2" style="float:left;margin-left: 15px;">筛选</div>
+                </div>
+                <div class="alert alert-warning" data-toggle="alert">必须选择开始或结束时间</div>
+              </div>
+            </div>
+
+            <h1></h1>
+
+            <div class="row text-left">
+              <div class="col-xs-4">
+                <div class="btn-group btn-outline round border-blue" style="border-radius: 5px;">
+                  <input class="btn input" placeholder="输入相关信息搜索">
+                  <button class="btn white border-blue" style="border-top: none !important;border-bottom: none !important;border-right: none !important;" onclick="">
+                    <i class="fa fa-search text-blue"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="col-xs-3">
+                <button class="btn btn-outline text-blue white border-blue" style="margin-left:20px;width:100px;">高级搜索</button>
+              </div>
+            </div>
+
+            <h1></h1>
+
+            <div id="transaction_container">
+              <%
+              user.pocket.transactions_history = user.pocket.transactions_history || [];
+              user.pocket.transactions_history.sort(function(a,b){
+                return a.created < b.created;
+              });
+              %>
+
+              <div class="row">
+                <div class="col-xs-12">
+                  <h5 class="text-left"><strong>待处理账单</strong></h5>
+                </div>
+              </div>
+
+              <%
+              user.pocket.transactions_history.forEach(function(tranObj){
+              if(tranObj.status == "pending"){
+              %>
+              <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>">
+                <div class="row vertical-align" style="padding:5px;">
+                  <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
+                  <div class="col-xs-4"><%= tranObj.type == "payment"? "订单收入" : "订单支出"%> <a href="<%= tranObj.type=='payment'?'/host/me' : '/user/me'%>">#<%= tranObj.charge.metadata.orderId%></a></div>
+                  <div class="col-xs-3"><img class="img-thumbnail round_thumb size-small" src="<%= tranObj.host.picture || "/images/profile_man.png"%>">&nbsp;<%= tranObj.host.shopName%></div>
+                  <div class="col-xs-3">$<%= tranObj.amount/100%></div>
+                </div>
+              </div>
+              <%}});%>
+
+              <h1></h1>
+
+              <div class="row">
+                <div class="col-xs-12">
+                  <h5 class="text-left"><strong>已出账单</strong></h5>
+                </div>
+              </div>
+
+              <%
+              user.pocket.transactions_history.forEach(function(tranObj){
+              if(tranObj.status == "paid" || tranObj.status == "succeeded"){
+              %>
+              <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>">
+                <div class="row vertical-align" style="padding:5px;">
+                  <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
+                  <div class="col-xs-4"><%= tranObj.type == "payment"? "订单收入" : "订单支出"%> <a href="<%= tranObj.type=='payment'?'/host/me' : '/user/me'%>">#<%= tranObj.metadata.orderId%></a></div>
+                  <div class="col-xs-3"><img class="img-thumbnail round_thumb size-small" src="<%= tranObj.host.picture || "/images/profile_man.png"%>">&nbsp;<%= tranObj.host.shopName%></div>
+                  <div class="col-xs-3">$<%= (tranObj.amount-tranObj.amount_refunded)/100 %><%= tranObj.amount_refunded ? " (Refunded : $" + tranObj.amount_refunded / 100 +  ")" : "" %></div>
+                </div>
+              </div>
+              <%}});%>
+            </div>
+
+            <nav class="pull-right">
+              <ul class="pagination pagination-sm" data-trigger="pagination" data-target="#transaction_container" data-npp="5">
+                <li class="active"><a href="javascript:void(0)">1</a></li>
+              </ul>
+            </nav>
+
+            <h1></h1>
+
+            <div class="row middle">
+              <div class="btn btn-outline border-blue white text-blue"><strong>查看全部</strong></div>
+            </div>
+          </div>
         </div>
         <!-- mypurse end -->
 
@@ -34,11 +139,11 @@
           <div class="box box-shadow white">
             <% if(user.host){%>
             <h4 class="text-left">我的银行账号: <small class="bank_name"></small>
-            <% if (user.host.bankId){%>
-            <small><a toggle="modal" data-updating="true" data-host="<%=user.host.id%>" data-target="#myModal" data-href="/templates/user/bank.html" href="javascript:void(0)" onclick="toggleModal(event,enterHostInfo)">  更新银行信息 </a></small><i class="fa fa-question-circle text-grey cursor-pointer"></i>
-            <%}else{%>
-            <small><a toggle="modal" data-updating="false" data-host="<%=user.host.id%>" data-target="#myModal" data-href="/templates/user/bank.html" href="javascript:void(0)" onclick="toggleModal(event,enterHostInfo)">  您尚未创建银行信息，请点击创建 </a></small><i class="fa fa-question-circle text-grey cursor-pointer"></i>
-            <%}%>
+              <% if (user.host.bankId){%>
+              <small><a toggle="modal" data-updating="true" data-host="<%= user.host.id%>" data-target="#myModal" data-href="/templates/user/bank.html" href="javascript:void(0)" onclick="toggleModal(event,enterHostInfo)">  更新银行信息 </a></small><i class="fa fa-question-circle text-grey cursor-pointer"></i>
+              <%}else{%>
+              <small><a toggle="modal" data-updating="false" data-host="<%= user.host.id%>" data-target="#myModal" data-href="/templates/user/bank.html" href="javascript:void(0)" onclick="toggleModal(event,enterHostInfo)">  您尚未创建银行信息，请点击创建 </a></small><i class="fa fa-question-circle text-grey cursor-pointer"></i>
+              <%}%>
             </h4>
             <h4 class="text-left">我的钱包存款为:</h4>
             <div class="jumbotron">
@@ -56,9 +161,9 @@
             for(var j=0; j < cards.length; j++){
               var card = cards[j];
               var last4 = card.cardNumber.slice(-4);
-              if(card.isDefaultPayment){
+            if(card.isDefaultPayment){
             %>
-            <button class="btn btn-disable blue btn-fat btn-lg active" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
+            <button class="btn btn-disable blue btn-fat btn-lg active" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/<%= card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
             <%}else{%>
             <button class="btn btn-disable btn-fat btn-lg<%if(card.isDefaultPayment){%> active<%}%>" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
             <%}}%>
@@ -66,7 +171,6 @@
           </div>
         </div>
         <!-- payment end -->
-        </div>
       </div>
     </div>
   </div>

@@ -34,6 +34,11 @@ describe('MealController', function() {
           .send({email : email, password: password,picture:picture})
           .expect(200)
           .end(function(err,res){
+            if(err){
+              console.log(err);
+              return done(err);
+            }
+            console.log(res.body);
             if(res.body.auth.email != email){
               return done(Error("not login with the same account(email not the same)"))
             }
@@ -122,7 +127,7 @@ describe('MealController', function() {
     it('should update address info for host', function (done) {
         agent
           .put('/host/' + hostId)
-          .send({address:address1})
+          .send({address:address2})
           .expect(200)
           .end(function(err,res){
             if(res.body.city != "San Francisco"){
@@ -224,6 +229,8 @@ describe('MealController', function() {
           })
     })
 
+
+    var preorderMealId;
     it('should create an preorder type meal ', function (done) {
       var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
       var now = new Date();
@@ -240,6 +247,7 @@ describe('MealController', function() {
             if(res.body.chef != hostId){
               return done(Error("error creating meal"));
             }
+            preorderMealId = res.body.id;
             done();
           })
     })
@@ -319,6 +327,7 @@ describe('MealController', function() {
 
     var orders = {};
     var subtotal = 12;
+    var orderId;
 
     it('should order a meal as a user', function(done){
       orders[dish1] = 0;
@@ -334,16 +343,41 @@ describe('MealController', function() {
             subtotal : subtotal,
             address : address1.street + address1.city + "CA" + address1.zip,
             method : "pickup",
-            mealId : mealId,
+            mealId : preorderMealId,
             phone : address1.phone,
             delivery_fee : 0,
             eta : new Date()
           })
           .expect(200)
           .end(function(err,res){
+            if(err){
+              return done(err);
+            }
+            orderId = res.body.id;
+            console.log("this is an order id: " + orderId);
             done();
           })
     })
+    var newSubtotal = 4;
+    it('should adjust an order as a user', function(done){
+      orders[dish1] = 0;
+      orders[dish2] = 1;
+      orders[dish3] = 0;
+      orders[dish4] = 0;
+      agent
+          .post('/order/' + orderId + '/adjust')
+          .send({
+            orders : orders,
+            subtotal : newSubtotal
+          })
+          .expect(200)
+          .end(function(err,res){
+            if(err){
+              return done(err);
+            }
+            done();
+          })
+    });
 
     var preparingOrderId;
     it('should order a meal as a user', function(done){
@@ -353,7 +387,7 @@ describe('MealController', function() {
           .expect('Content-Type', /json/)
           .send({
             orders : orders,
-            subtotal : subtotal,
+            subtotal : newSubtotal,
             address : address1.street + address1.city + "CA" + address1.zip,
             method : "pickup",
             mealId : mealId,
@@ -363,8 +397,8 @@ describe('MealController', function() {
           })
           .expect(200)
           .end(function(err,res){
-            if(res.body.meal != mealId){
-              return done(Error("error creating order"));
+            if(err){
+              return done(err);
             }
             preparingOrderId = res.body.id;
             done();
@@ -444,9 +478,6 @@ describe('MealController', function() {
             done();
           })
     })
-
-
-
+    
   });
-
 });

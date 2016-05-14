@@ -6,16 +6,20 @@
     </div>
 
     <div class="absolute" style="width: 100%;top:0;">
-      <div class="row relative text-left cursor-pointer" style="top: 0;left: 10%;" onclick="location.href='/'">
-        <h1 class="text-white">私房Meal</h1>
-        <p class="text-white text-left">SFMeal.com</p>
+      <div class="row relative text-left">
+        <a href="/" class="logo"></a>
       </div>
 
-      <div class="row relative text-left" style="top: 20px;width: 360px;margin: auto;">
+      <!--<div class="row " style="top: 0;left: 10%;" onclick="location.href='/'">-->
+        <!--<h1 class="text-white">私房Meal</h1>-->
+        <!--<p class="text-white text-left">SFMeal.com</p>-->
+      <!--</div>-->
+
+      <div class="row relative text-left" style="top: 20px;width: 300px;margin: auto;">
         <h4 class="text-white"><strong>今天吃什么好呢？</strong></h4>
         <div class="row">
           <div class="btn-group">
-            <input class="btn input round" placeholder="输入牛排看看">
+            <input class="btn input round keyword" placeholder="输入牛排看看">
             <button class="btn btn-warning round text-white" onclick="search(this)">
               <i class="fa fa-search"></i>
               搜索
@@ -64,11 +68,9 @@
         <div class="meal col-md-6 col-lg-4 appetizer">
           <div class="box-grid white" style="overflow: hidden;">
             <div>
-              <i class="fa fa-heart fa-2x fav text-white" data-select="<% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
-                true
-                <%}})%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>"></i>
+              <i class="fa fa-heart fa-2x fav text-white" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
               <img class="photo" src= "<%= mainDish.photos[0].v %>" data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
-              <h1 class="desc absolute text-white middle text-shadow" style="font-family: 'sf-meal Bangla MN'"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
+              <h1 class="desc absolute text-white middle text-shadow font-elegant"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
             </div>
             <div class="col-md-6 basic-info">
               <h3 class="text-red text-left">$<%= mainDish.price.toFixed(2) %><br>
@@ -81,7 +83,7 @@
             <div class="divider none-margin"></div>
             <div class="row vertical-align chef-cell">
               <div class="col-sm-3">
-                <img class="round_thumb size-small" src=<%= meal.chef.picture || "/images/thumbnail.jpg" %> onclick="javascript:location.href='/host/<%= meal.chef.id%>'">
+                <img class="round_thumb size-small" src=<%= meal.chef.picture || "/images/profile_man.png" %> onclick="javascript:location.href='/host/<%= meal.chef.id%>'">
               </div>
               <div class="col-sm-9">
                 <h4 class="text-left text-dark"><%= meal.chef.shopName %><br><small><%= meal.chef.intro %></small></h4>
@@ -111,7 +113,7 @@
       <div class="preorder-box meal preorder">
         <div class="row vertical-align chef-cell">
           <div class="col-md-1 text-left">
-            <img class="round_thumb size-small" src=<%= meal.chef.picture || "/images/thumbnail.jpg" %> onclick="javascript:location.href='/host/<%= meal.chef.id%>'">
+            <img class="round_thumb size-small" src=<%= meal.chef.picture || "/images/profile_man.png" %> onclick="javascript:location.href='/host/<%= meal.chef.id%>'">
           </div>
           <div class="col-md-11">
             <h4 class="text-left text-dark"><%= meal.chef.shopName %><br><small><%= meal.chef.intro %></small></h4>
@@ -120,11 +122,9 @@
 
         <div class="row box-grid white">
           <div class="col-sm-4 overflow-hidden none-padding">
-            <i class="fa fa-heart fa-2x fav text-white" data-select="<% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
-                true
-                <%}})%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>"></i>
+            <i class="fa fa-heart fa-2x fav text-white" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
             <img class="photo" src=<%= mainDish.photos[0].v %> data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
-            <h1 class="desc absolute text-white middle" style="font-family: 'sf-meal Bangla MN'"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
+            <h1 class="desc absolute text-white middle font-elegant"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
 
           </div>
           <div class="col-sm-8">

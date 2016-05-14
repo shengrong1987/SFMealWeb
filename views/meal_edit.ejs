@@ -5,7 +5,7 @@
       <div style="width: 600px;" class="middle banner-text">
         <div class="row vertical-align" style="margin-bottom: 5px;">
           <div class="col-sm-3">
-            <h3 class="text-white logo-text"><strong>私房Meal</strong><br><small class="text-white text-center">SFMeal.com</small></h3>
+            <a href="/" class="logo logo-sm"></a>
           </div>
           <div class="col-sm-9">
             <h4 class="text-white"><strong>欢迎加入我们,一起享受私房菜吧！</strong></h4>
@@ -117,7 +117,7 @@
                       </div>
                       <div class="col-xs-10 vertical-align start-booking" style="height: 40px;">
                         <div class="form-group">
-                          <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= meal.provideFromTime%>">
+                          <div class='input-group date' data-toggle="dateTimePicker" data-min="now" data-date="<%= meal.provideFromTime%>">
                             <input type='text' class="form-control" />
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
@@ -132,7 +132,7 @@
                       </div>
                       <div class="col-xs-10 vertical-align end-booking" style="height: 40px;">
                         <div class="form-group">
-                          <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= meal.provideTillTime%>">
+                          <div class='input-group date' data-toggle="dateTimePicker" data-min="now" data-date="<%= meal.provideTillTime%>">
                             <input type='text' class="form-control" />
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
@@ -150,7 +150,7 @@
                       </div>
                       <div class="col-xs-8">
                         <div class="form-group start-booking">
-                          <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= meal.provideFromTime%>">
+                          <div class='input-group date' data-toggle="dateTimePicker" data-min="now" data-date="<%= meal.provideFromTime%>">
                             <span class="input-group-addon">From</span>
                             <input type='text' class="form-control" />
                             <span class="input-group-addon">
@@ -159,7 +159,7 @@
                           </div>
                         </div>
                         <div class="form-group end-booking">
-                          <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= meal.provideTillTime%>">
+                          <div class='input-group date' data-toggle="dateTimePicker" data-min="now" data-date="<%= meal.provideTillTime%>">
                             <span class="input-group-addon">&nbsp;&nbsp;To&nbsp;&nbsp;</span>
                             <input type='text' class="form-control" />
                             <span class="input-group-addon">
@@ -236,14 +236,14 @@
                     <div class="row">
                       <div class="col-xs-4">
                         <div class="input-group" name="1">
-                          <input id="min-order" class="form-control" type="number" min="1" max="999" style="min-width: 100px;" data-error="最少份数或最少金额须填写一项" value="<%= meal.minimalOrder || 0%>">
+                          <input id="min-order" class="form-control" type="number" min="1" max="999" style="min-width: 100px;" data-error="最少份数或最少金额须填写一项" value="<%= meal.minimalOrder || 1%>">
                           <div class="input-group-addon">份</div>
                         </div>
                       </div>
                       <div class="col-xs-1 vertical-align" style="height: 35px;"><label class="middle">或</label></div>
                       <div class="col-xs-4">
                         <div class="input-group" name="2">
-                          <input id="min-total" class="form-control" type="number" min="1" max="9999" style="min-width: 100px;" data-error="最少份数或最少金额须填写一项" value="<%= meal.minimalTotal || 0%>">
+                          <input id="min-total" class="form-control" type="number" min="1" max="9999" style="min-width: 100px;" data-error="最少份数或最少金额须填写一项" value="<%= meal.minimalTotal || 1%>">
                           <div class="input-group-addon">.00美元</div>
                         </div>
                       </div>

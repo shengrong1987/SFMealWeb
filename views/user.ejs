@@ -5,7 +5,7 @@
       <div style="width: 600px;" class="middle banner-text">
         <div class="row vertical-align" style="margin-bottom: 5px;">
           <div class="col-sm-3 cursor-pointer" onclick="location.href='/'">
-            <h3 class="text-white logo-text"><strong>私房Meal</strong><br><small class="text-white text-center">SFMeal.com</small></h3>
+            <a href="/" class="logo logo-sm"></a>
           </div>
           <div class="col-sm-9">
             <h4 class="text-white"><strong>欢迎加入我们,一起享受私房菜吧！</strong></h4>
@@ -44,7 +44,7 @@
                 </ul>
                 <div class="tab-content">
                   <div id="order-all" style="width: 90%;" class="tab-pane middle active">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr>
                         <td>照片</td>
@@ -61,7 +61,7 @@
                           orders.forEach(function(order){
                       if(order.type == "order"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                         <tr class="active">
                           <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                         </tr>
@@ -115,7 +115,7 @@
                     </nav>
                   </div>
                   <div id="order-schedule" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -172,7 +172,7 @@
                   </div>
 
                   <div id="order-preparing" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -230,7 +230,7 @@
 
 
                   <div id="order-ready" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -247,7 +247,7 @@
                           orders.forEach(function(order){
                       if(order.type == "order" && order.status == "ready"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                       </tr>
@@ -289,7 +289,7 @@
                   </div>
 
                   <div id="order-review" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -355,7 +355,7 @@
                 </ul>
                 <div class="tab-content">
                   <div id="preorder-all" style="width: 90%;" class="tab-pane middle active">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -372,7 +372,7 @@
                           orders.forEach(function(order){
                       if(order.type == "preorder"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                       </tr>
@@ -425,7 +425,7 @@
                     </nav>
                   </div>
                   <div id="preorder-schedule" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -442,7 +442,7 @@
                           orders.forEach(function(order){
                       if(order.type == "preorder" && order.status == "schedule"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                       </tr>
@@ -482,7 +482,7 @@
                   </div>
 
                   <div id="preorder-preparing" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -499,7 +499,7 @@
                           orders.forEach(function(order){
                       if(order.type == "preorder" && order.status == "preparing"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                       </tr>
@@ -538,7 +538,7 @@
                   </div>
 
                   <div id="preorder-ready" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -555,7 +555,7 @@
                           orders.forEach(function(order){
                       if(order.type == "preorder" && order.status == "ready"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                       </tr>
@@ -597,7 +597,7 @@
                   </div>
 
                   <div id="preorder-review" style="width: 90%;" class="tab-pane middle">
-                    <table class="table table-bordered" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
                         <td>照片</td>
@@ -614,7 +614,7 @@
                           orders.forEach(function(order){
                       if(order.type == "preorder" && order.status == "review"){
                       %>
-                      <tbody class="item">
+                      <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="#"><%= order.host.shopName%></a></td>
                       </tr>
@@ -702,7 +702,7 @@
                 </div>
                 <div class="row">
                   <div class="col-sm-6">
-                    <button class="btn btn-red round" style="width: 100%;margin-top: 10px;" onclick="javascript:location.href='/host/<%= host.id%>'">进入</button>
+                    <button class="btn btn-red round" style="width: 100%;margin-top: 10px;" onclick="javascript:location.href='/meal/<%= meal.id%>'">进入</button>
                   </div>
                   <div class="col-sm-6">
                     <button class="btn btn-disable round" data-heart="false" data-select="true" style="width: 100%;margin-top: 10px;" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-cb="reloadUrl('/user/me','#mycollect')">取消收藏</button>
@@ -843,15 +843,15 @@
                 var address= addresses[key];
               %>
               <div class="text-left box-grid">
-                <div class="address_block vertical-align" data-id="<%= user.id %>" data-address-id="<%=address.id%>" data-street="<%=address.street%>" data-city="<%= address.city%>" data-zip="<%= address.zip%>" data-phone="<%= address.phone%>">
+                <div class="address_block vertical-align" data-id="<%= user.id %>" data-address-id="<%= address.id%>" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>">
                   <% if(address.isDefault){ %>
                   <label class="text-red default">［默认］</label>
                   <%}else{%>
                   <label class="text-red default" style="width: 55px;"> </label>
                   <%}%>
                   <label class="actual_address"><%= address.street%>, &nbsp;<%= address.city%> <%= address.zip%> <br/>+<%= address.phone%></label>
-                  <a class="text-red cursor-pointer edit" style="margin-left:10px;" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">修改</a>
-                  <a class="text-red cursor-pointer deleteBtn" style="margin-left: 5px;" href="javascript:void(0)">删除</a>
+                  <a class="text-red cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">&nbsp;&nbsp;修改</a>
+                  <a class="text-red cursor-pointer deleteBtn" style="margin-left: 5px;" href="javascript:void(0)">&nbsp;删除</a>
                 </div>
               </div>
               <%})%>
@@ -868,7 +868,7 @@
                 </div>
               </div>
               <div class="text-left box-grid">
-                <div class="address_block vertical-align" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street%>" data-city="<%= user.host.city%>" data-zip="<%= user.host.zip%>" data-phone="<%=user.phone%>">
+                <div class="address_block vertical-align" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street || ""%>" data-city="<%= user.host.city || ""%>" data-zip="<%= user.host.zip || ""%>" data-phone="<%=user.phone || ""%>">
                   <label class="text-green">［默认］</label>
                   <label><%= user.host.full_address %><br/> +<%= user.phone %></label>
                   <a class="text-green cursor-pointer edit" style="margin-left:10px;" toggle="modal" data-target="#myModal" data-host="true" data-href="/templates/user/address.html">修改</a>
@@ -1033,7 +1033,7 @@
 
 <script>
   new AddressView({ el : $("#myaddress"), model : new User()})
-  new UserProfileView( { el: $("#myinfo"), model : new User()})
+  var userProfileView = new UserProfileView( { el: $("#myinfo"), model : new User()})
   new ReviewView({ el : $("#myreview"), model : new Review()})
   var orderView = new OrderView({ el : $("#myorder"), model : new Order()});
 </script>

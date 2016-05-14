@@ -7,6 +7,7 @@
 
 var GeoCoder = require("../services/geocode.js");
 var moment = require("moment");
+
 module.exports = {
 
   new_form : function(req, res){
@@ -22,10 +23,9 @@ module.exports = {
 
   feature : function(req, res){
     var now = new Date();
-    var midnightToday = new Date().setHours(0,0,0,0);
     var county = req.param('county');
     county = county || "San Francisco County";
-    Meal.find({county : county, type : 'order',status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
+    Meal.find({county : county, type : 'order', status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
       if(err){
         return res.badRequest(err);
       }
@@ -40,8 +40,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-
-            return res.view('meals',{meals : preorders.concat(orders)});
+            return res.view('meals',{meals : orders.concat(preorders), user : u});
           });
         }else {
           return res.view('home',{orders : orders, preorders : preorders, user : user});
@@ -119,12 +118,6 @@ module.exports = {
             }
           }
         });
-      }else{
-        if(req.wantsJSON) {
-          res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : undefined});
-        }else{
-          res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : undefined});
-        }
       }
 
     });
@@ -296,7 +289,7 @@ module.exports = {
       return res.badRequest("Date format of meal is not valid");
     }
   },
-
+  
   requirementIsValid : function(params){
     var minOrderNumber = parseInt(params.minimalOrder);
     var minOrderTotal = parseFloat(params.minimalTotal);

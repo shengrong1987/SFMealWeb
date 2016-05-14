@@ -6,23 +6,20 @@
     </div>
 
     <div class="absolute" style="width: 95%;top:0;">
-      <div class="row relative text-left cursor-pointer" style="top: 0;left: 10%;" onclick="location.href='/'">
-        <h1 class="text-white">私房Meal</h1>
-        <p class="text-white text-left">SFMeal.com</p>
+      <div class="row relative text-left">
+        <a href="/" class="logo"></a>
       </div>
 
       <div class="row relative text-left" style="top: 20px;width:450px;margin: auto;">
         <h4 class="text-white"><strong>今天吃什么好呢？</strong></h4>
         <div class="btn-group">
-            <input name="keyword" class="input btn btn-default round light text-grey" placeholder="输入牛排看看">
-            <input name="zipcode" class="input btn btn-default" style="width: 100px;" type="text" placeholder="zipcode">
-            <button class="btn btn-warning round orange text-white" onclick="javascript:search(this)">
-              <i class="fa fa-search"></i>
-              搜索
-            </button>
-          </div>
-          <button class="btn btn-red round" onclick="location.href='/meal'">查看菜单</button>
-
+          <input name="keyword" class="input btn btn-default round light" placeholder="输入牛排看看">
+          <input name="zipcode" type="text" class="btn btn-default zipCode" placeholder="邮编" style="width: 100px;display: inline;" value="<%= user?(user.zipcode?user.zipcode:''):''%>">
+          <button class="btn btn-warning round orange text-white" onclick="javascript:search(this)">
+            <i class="fa fa-search"></i>
+            搜索
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -82,7 +79,7 @@
                 text-red
                 <%}})%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>"></i>
             <img class="photo" src= <%= mainDish.photos[0].v %> data-meal=<%= meal.id %> onclick="javascript:location.href='/meal/' + $(this).data('meal')">
-            <h1 class="desc absolute text-white middle text-shadow" style="font-family: 'sf-meal Bangla MN'"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
+            <h1 class="desc absolute text-white middle text-shadow font-elegant"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
         </div>
           <div class="col-md-6 basic-info">
             <h3 class="text-red text-left">$<%= mainDish.price.toFixed(2) %><br>
