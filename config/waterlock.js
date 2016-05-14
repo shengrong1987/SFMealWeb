@@ -123,7 +123,7 @@ module.exports.waterlock = {
       // obj - {controller: 'b  log', action: 'post'}
       // string - 'custom json response string'
       // default - 'default'
-      success: {controller : 'auth', action : 'done'},
+      success: process.env.NODE_ENV === 'production' ? {controller : 'auth', action : 'done'} : 'default',
 
       // This can be any one of the following
       //

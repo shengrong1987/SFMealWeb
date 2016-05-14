@@ -3,8 +3,10 @@
  */
 
 var assert = require('assert'),
-    sinon = require('sinon');
-request = require('supertest');
+    sinon = require('sinon'),
+    config = require('../../../config/stripe.js'),
+    stripe = require('stripe')(config.StripeKeys.secretKey);
+    request = require('supertest');
 var agent;
 
 before(function(done) {
@@ -21,6 +23,7 @@ describe('MealController', function() {
     var hostId;
     var email = 'host@gmail.com';
     var password = '12345678';
+    var address = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853};
 
     it('should login or register an account', function (done) {
       agent
@@ -53,6 +56,33 @@ describe('MealController', function() {
       }
     });
 
+    it('should create bank info for host', function (done) {
+      stripe.tokens.create({
+        bank_account: {
+          country: 'US',
+          currency: 'usd',
+          routing_number: '110000000',
+          account_number: '000123456789'
+        }
+      }, function(err, token) {
+        agent
+          .post("/bank")
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .send({
+            token : token.id
+          })
+          .expect(200)
+          .end(function(err, res){
+            console.log(res.body);
+            if(res.body.bank_name != "STRIPE TEST BANK"){
+              return done(Error("error creating bank, bank name doesen't match(STRIPE TEST BANK)"));
+            }
+            done();
+          })
+      });
+    });
+
     var dish1;
     var dish2;
     var dish3;
@@ -60,7 +90,7 @@ describe('MealController', function() {
     it('should create couple dishes', function (done) {
       agent
           .post('/dish')
-          .send({title : '韭菜盒子',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
+          .send({title : '韭菜盒子',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId, isVerified : true})
           .expect(200)
           .end(function(err,res){
             if(res.body.id == undefined){
@@ -71,7 +101,7 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '猪肉馅饼',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
+          .send({title : '猪肉馅饼',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId, isVerified : true})
           .expect(200)
           .end(function(err,res){
             if(res.body.id == undefined){
@@ -82,7 +112,7 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '五彩面',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'entree', chef : hostId})
+          .send({title : '五彩面',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'entree', chef : hostId, isVerified : true})
           .expect(200)
           .end(function(err,res){
             if(res.body.id == undefined){
@@ -93,7 +123,7 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '糖水',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'dessert', chef : hostId})
+          .send({title : '糖水',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'dessert', chef : hostId, isVerified : true})
           .expect(200)
           .end(function(err,res){
             if(res.body.id == undefined){
@@ -106,6 +136,7 @@ describe('MealController', function() {
 
 
     var mealId;
+    var preorderMealId;
     var leftQty = {};
     var totalQty = {};
 
@@ -135,7 +166,7 @@ describe('MealController', function() {
       }
       agent
           .post('/meal')
-          .send({provideFromTime: new Date(now.getTime() - 3600 * 60 * 5), provideTillTime: new Date(now.getTime() + 3600 * 60 * 5), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, status : "on",cover : dish1})
+          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, status : "off", cover : dish1, minimalOrder : 1})
           .expect(200)
           .end(function(err,res){
             if(err){
@@ -152,35 +183,66 @@ describe('MealController', function() {
     it('should create an preorder type meal ', function (done) {
       var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
       var now = new Date();
+      var pickups = [{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+        "location" : "1455 Market St, San Francisoc, CA 94124"
+      }];
       agent
           .post('/meal')
-          .send({provideFromTime: new Date(now.getTime() - 3600 * 60 * 5), provideTillTime: new Date(now.getTime() + 3600 * 60 * 5), pickupFromTime : new Date(now.getTime() + 7200 * 60 * 5), pickupTillTime : new Date(now.getTime() + 7500 * 60 * 5),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "on", cover : dish1})
+          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), pickups : JSON.stringify(pickups),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "off", cover : dish1, minimalOrder : 1})
           .expect(200)
           .end(function(err,res){
             if(res.body.chef != hostId){
               return done(Error("error creating meal"));
             }
+            preorderMealId = res.body.id;
             done();
           })
     })
 
-    it('should search the meals in San Francisco and with a keyword of 菜式', function (done) {
+    it('should search the meals in San Francisco and with a keyword of 菜式 but no records are found', function (done) {
       agent
           .get('/meal/search?keyword=猪肉馅饼&county=San%20Francisco%20County')
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err,res){
-            if(res.body.meals.length != 2){
+            if(res.body.meals.length != 0){
               return done(Error("error searching for meal"));
             }
             done();
           })
     })
 
-    it('should turn one meal off', function (done) {
+    it('should not turn one meal on, because missing address info', function (done) {
       agent
-          .post('/meal/' + mealId + "/off")
+        .post('/meal/' + mealId + "/on")
+        .expect(302)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    })
+
+    it('should update address info for host', function (done) {
+      agent
+        .put('/host/' + hostId)
+        .send({address:address})
+        .expect(200)
+        .end(function(err,res){
+          if(res.body.city != "San Francisco"){
+            return done(Error("error geocoding or updating address"));
+          }
+          done();
+        })
+    });
+
+    it('should turn one meal on', function (done) {
+      agent
+          .post('/meal/' + mealId + "/on")
           .expect(302)
           .end(function(err,res){
             if(err){
@@ -190,6 +252,33 @@ describe('MealController', function() {
           })
     })
 
+
+    it('should search the meals in San Francisco and with a keyword of 菜式 with success', function (done) {
+      agent
+        .get('/meal/search?keyword=猪肉馅饼&county=San%20Francisco%20County')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err,res){
+          if(res.body.meals.length != 1){
+            return done(Error("error searching for meal"));
+          }
+          done();
+        })
+    })
+
+    it('should turn another meal on', function (done) {
+      agent
+        .post('/meal/' + preorderMealId + "/on")
+        .expect(302)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    })
+
     it('should search the meals in San Francisco and with a keyword of 菜式 again', function (done) {
       agent
           .get('/meal/search?keyword=猪肉馅饼&county=San%20Francisco%20County')
@@ -197,7 +286,7 @@ describe('MealController', function() {
           .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err,res){
-            if(res.body.meals.length != 1){
+            if(res.body.meals.length != 2){
               return done(Error("error searching for meal"));
             }
             done();

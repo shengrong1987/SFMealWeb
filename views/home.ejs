@@ -68,7 +68,7 @@
                 true
                 <%}})%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>"></i>
               <img class="photo" src= "<%= mainDish.photos[0].v %>" data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
-              <h1 class="desc absolute text-white middle text-shadow"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
+              <h1 class="desc absolute text-white middle text-shadow" style="font-family: 'sf-meal Bangla MN'"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
             </div>
             <div class="col-md-6 basic-info">
               <h3 class="text-red text-left">$<%= mainDish.price.toFixed(2) %><br>
@@ -124,7 +124,7 @@
                 true
                 <%}})%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>"></i>
             <img class="photo" src=<%= mainDish.photos[0].v %> data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
-            <h1 class="desc absolute text-white middle"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
+            <h1 class="desc absolute text-white middle" style="font-family: 'sf-meal Bangla MN'"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
 
           </div>
           <div class="col-sm-8">

@@ -54,6 +54,10 @@ module.exports = {
     },
     isFeature : function(){
       return this.score >= 4.8 || this.numberOfReviews > 50;
+    },
+    isVerified : {
+      type : 'boolean',
+      defaultsTo : false
     }
   }
 };

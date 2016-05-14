@@ -28,6 +28,10 @@ module.exports = {
       type : 'string',
       defaultsTo : ""
     },
+    email : {
+      type : 'string',
+      required : true
+    },
     //[{"dish1": id}, {"dish2":id}, {"dish3":id}]
     feature_dishes : {
       type : 'json'
@@ -87,7 +91,7 @@ module.exports = {
               Math.sin(dLon/2) * Math.sin(dLon/2)
           ;
       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      var d = R * c; // Distance in km
+      var d = R * c * 0.62; // Distance in miles
       return d.toFixed(1);
     },
     shortIntro : function(){
@@ -96,6 +100,27 @@ module.exports = {
         return this.intro.slice(0,30) + "...";
       }
       return this.intro;
+    },
+    isValid : function(creatingMeal){
+      if(!this.full_address){
+        console.log("need kitchen address");
+        return false;
+      }
+      if(!this.dishes.some(function(dish){
+        return dish.isVerified;
+      })){
+        console.log("no dish is verified");
+        return false;
+      }
+      if(!creatingMeal && this.meals.length == 0){
+        console.log("no meals created");
+        return false;
+      }
+      if(!this.bankId){
+        console.log("no bank account created");
+        return false;
+      }
+      return true;
     }
   }
 };

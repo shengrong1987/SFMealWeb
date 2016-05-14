@@ -14,11 +14,17 @@ module.exports = {
     },
     status : {
       type : 'string',
-      enum : ['on','off','ongoing','fail']
+      enum : ['on','off']
     },
-    //pickups : {
-    //  type : 'json'
-    //},
+    /*
+      Array of object
+     Date pickupFromTime,
+     Date pickupTilltime,
+     String location
+     */
+    pickups : {
+     type : 'json'
+    },
     features : {
       type : 'string',
       defaultsTo : ''
@@ -27,12 +33,6 @@ module.exports = {
       type : 'date'
     },
     provideTillTime : {
-      type : 'date'
-    },
-    pickupFromTime : {
-      type : 'date'
-    },
-    pickupTillTime : {
       type : 'date'
     },
     prepareTime : {
@@ -52,10 +52,12 @@ module.exports = {
       type : 'json'
     },
     minimalOrder : {
-      type : 'integer'
+      type : 'integer',
+      defaultsTo : 1
     },
     minimalTotal : {
-      type : 'float'
+      type : 'float',
+      defaultsTo : 1
     },
     delivery_min : {
       type : 'float'
@@ -128,6 +130,7 @@ module.exports = {
     isValid : function(){
       var now = new Date();
       var midnightToday = new Date(new Date().setHours(0,0,0,0));
+      var valid = true;
       if(this.status){
         if(this.type == "order"){
           //console.log("now is :" + now + " from: " + this.provideFromTime + " till: " + this.provideTillTime);
@@ -135,14 +138,20 @@ module.exports = {
             return true;
           }
         }else{
-          var pickupFromDate = this.pickupFromTime;
-          var deadline = new Date(now.getTime() - this.prepareTime * 60 * 1000);
-          if(deadline < pickupFromDate){
-            return true;
-          }
+          var $this = this;
+          this.pickups.forEach(function(pickup){
+            var pickupFromDate = pickup.pickupFromTime;
+            var deadline = new Date(now.getTime() - $this.prepareTime * 60 * 1000);
+            if(deadline >= pickupFromDate){
+              valid = false;
+              return;
+            }
+          });
         }
+      }else{
+        valid = false;
       }
-      return false;
+      return valid;
     }
   },
 

@@ -725,118 +725,136 @@
         <!-- collect end -->
         <div id="myinfo" style="width: 90%;" class="tab-pane middle" data-id="<%= user.id %>">
           <div class="box box-shadow white">
-            <div class="col-md-6 text-left">
-              <h4><strong>1. 上传个人头像</strong>  <i class="fa fa-question-circle text-lightgrey"></i></h4>
-              <div class="fileinput fileinput-exists" data-provides="fileinput">
-                <div class="fileinput-new thumbnail size-large">
-                </div>
-                <div class="fileinput-preview fileinput-exists size-large round_thumb" data-src="<%= user.picture%>">
-                  <img src=<%= user.picture || "/images/profile_man.png"%>>
-                </div>
-                <div>
+            <form>
+              <div class="col-md-6 text-left form-group">
+                <label>1. 上传个人头像 <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="可以选jpg,png,gif,图片最大不超过5M"></i></label>
+                <div class="fileinput fileinput-exists" data-provides="fileinput">
+                  <div class="fileinput-new thumbnail size-large">
+                  </div>
+                  <div class="fileinput-preview fileinput-exists size-large round_thumb" data-src="<%= user.picture%>">
+                    <img src="<%= user.picture || '/images/profile_man.png'%>" onclick="$('#thumbnailUpload').trigger('click')">
+                  </div>
+                  <div>
                     <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span>
-                      <input type="file">
+                      <input id="thumbnailUpload" type="file" onchange="uploadThumbnail()">
                     </span>
-                  <!--<a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput">Remove</a>-->
-                  <script>
-                    $(".fileinput").on("clear.bs.fileinput",function(){
-                      $("input[type='file']").data("isDelete",true);
-                    });
-                  </script>
+                    <!--<a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput">Remove</a>-->
+                    <script>
+                      $(".fileinput").on("clear.bs.fileinput",function(){
+                        $("input[type='file']").data("isDelete",true);
+                      });
+                    </script>
+                  </div>
+                  <!--<button class="btn btn-red round" onclick="uploadThumbnail()">本地上传</button>-->
+                  <h4><small><br/><br/>点击头像或“本地上传”可以上传头像，点击“保存修改”才能生效哦。</small></h4>
+                  <div class="alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
                 </div>
-                <button class="btn btn-red round" onclick="uploadThumbnail()">本地上传</button>
-                <small>可以选jpg,png,gif,图片最大不超过5M</small>
-                <div class="alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
+
+                <div class="form-group text-left" style="margin-top:20px;">
+                  <label>2. 姓名 <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="我们采用实名制，请认真填写，名字填好点击“保存修改”。以后如果要修改，要联系管理员哦。"></i></label>
+                  <div class="block">
+                    <div class="input-group">
+                      <span class="input-group-addon" id="basic-addon2">名</span>
+                      <input name="firstname" type="text" class="form-control" placeholder="<% if(!user.firstname){ %> Firstname(名字)  <% } %>" value="<%= user.firstname?user.firstname : ""%>" aria-describedby="basic-addon2">
+                      <span class="input-group-addon" id="basic-addon1">姓</span>
+                      <input name="lastname" type="text" class="form-control" placeholder="<% if(!user.lastname){ %> Lastname(姓)  <% } %>" value="<%= user.lastname? user.lastname : ""%>" aria-describedby="basic-addon1" style="margin-right: 20px;">
+                    </div>
+                  </div>
+                  <div class="alert alert-warning">我们采用实名制，请认真填写，名字填好点击“保存修改”。以后如果要修改，要联系管理员哦。</div>
+                </div>
+
               </div>
 
-              <div style="margin-top:20px;">
-                <h4><strong>2. 姓名  </strong><i class="fa fa-question-circle text-lightgrey"></i></h4>
-                <div class="block">
-                  <div class="input-group">
-                    <span class="input-group-addon" id="basic-addon1">姓</span>
-                    <input name="lastname" type="text" class="form-control" placeholder="<% if(!user.lastname){ %> lastname  <% } %>" value="<%= user.lastname? user.lastname : ""%>" aria-describedby="basic-addon1" style="margin-right: 20px;">
-                    <span class="input-group-addon" id="basic-addon2">名</span>
-                    <input name="firstname" type="text" class="form-control" placeholder="<% if(!user.firstname){ %> firstname  <% } %>" value="<%= user.firstname?user.firstname : ""%>" aria-describedby="basic-addon2">
+              <div class="col-md-6 text-left">
+                <div class="form-group text-left">
+                  <label>3. 个人主页颜色  </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="我们会为你生成个人主页，可以随时改动主页的色调。选择代表你的颜色吧？"></i></label>
+                  <div class="block" name="template_color" data-color="<%= user.color %>">
+                    <div class="color-block blue" data-color="blue"></div>
+                    <div class="color-block green" data-color="green"></div>
+                    <div class="color-block orange" data-color="orange"></div>
+                    <div class="color-block red" data-color="red"></div>
+                    <div class="color-block pink" data-color="pink"></div>
+                    <div class="color-block purple" data-color="purple"></div>
+                    <div class="color-block black" data-color="black"></div>
+                    <script>
+                      $("div[name='template_color'] div").click(function(){
+                        $("div[name='template_color'] div").removeClass("active");
+                        $(this).addClass("active");
+                        $("div[name='template_color']").data("color",$(this).data("color"));
+                      });
+                      var colorSelector = $("div[name='template_color']");
+                      var color = colorSelector.data('color');
+                      if(color && colorSelector.length > 0) {
+                        colorSelector.find("div").each(function () {
+                          $(this).removeClass('active');
+                          if ($(this).hasClass(color)) {
+                            $(this).addClass('active');
+                          }
+                        })
+                      };
+                    </script>
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-top:34px;">
+                  <label>4. 一段话介绍自己(140字内)  </strong><i class="fa fa-question-circle text-lightgrey" data-toggle="tooltip" title="可以写最喜欢的菜系或最爱的菜名，让大家了解一下你吧。"></i></label>
+                  <div class="block">
+                    <textarea class="form-control" name="desc" rows="6" placeholder="我不是很喜欢吃辣，可是我老公喜欢吃，然后我就不得不吃辣。" maxlength="140"><% if(user.desc){%> <%=user.desc%> <%}%></textarea>
                   </div>
                 </div>
               </div>
 
-            </div>
-
-            <div class="col-md-6 text-left">
-              <div>
-                <h4><strong>3. 个人主页颜色  </strong><i class="fa fa-question-circle text-lightgrey"></i></h4>
-                <div class="block" name="template_color" data-color="<%= user.color %>">
-                  <div class="color-block blue" data-color="blue"></div>
-                  <div class="color-block green" data-color="green"></div>
-                  <div class="color-block orange" data-color="orange"></div>
-                  <div class="color-block red" data-color="red"></div>
-                  <div class="color-block pink" data-color="pink"></div>
-                  <div class="color-block purple" data-color="purple"></div>
-                  <div class="color-block black" data-color="black"></div>
-                  <script>
-                    $("div[name='template_color'] div").click(function(){
-                      $("div[name='template_color'] div").removeClass("active");
-                      $(this).addClass("active");
-                      $("div[name='template_color']").data("color",$(this).data("color"));
-                    });
-                    var colorSelector = $("div[name='template_color']");
-                    var color = colorSelector.data('color');
-                    if(color && colorSelector.length > 0) {
-                      colorSelector.find("div").each(function () {
-                        $(this).removeClass('active');
-                        if ($(this).hasClass(color)) {
-                          $(this).addClass('active');
-                        }
-                      })
-                    };
-                  </script>
+              <div class="col-md-6">
+                <div class="form-group text-left">
+                  <label for="phoneInput">5. 手机</label>
+                  <input class="form-control" type="text" id="phoneInput" required data-error="手机格式不对" minlength="10" maxlength="11" value="<%= user.phone%>">
+                  <div class="help-block with-errors"></div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group text-left">
+                  <label for="zipcodeInput">6. 邮编</label>
+                  <input class="form-control" type="text" id="zipcodeInput" required data-error="邮编格式不对" minlength="5" maxlength="9" value="<%= user.zipcode%>">
+                  <div class="help-block with-errors"></div>
                 </div>
               </div>
 
-              <div style="margin-top:34px;">
-                <h4><strong>4. 一段话介绍自己(140字内)  </strong><i class="fa fa-question-circle text-lightgrey"></i></h4>
-                <div class="block">
-                  <textarea class="form-control" name="desc" rows="6" placeholder="我不是很喜欢吃辣，可是我老公喜欢吃，然后我就不得不吃辣。" maxlength="140"><% if(user.desc){%> <%=user.desc%> <%}%></textarea>
-                </div>
+              <div class="col-xs-12">
+                <div class="alert form-alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
               </div>
-            </div>
-
-            <div class="col-xs-12">
-              <div class="alert form-alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
-            </div>
 
 
-            <div class="col-xs-12">
-              <button class="btn btn-red round save" style="width:80px;margin-right:10px;" >保存修改</button>
-            </div>
-
+              <div class="col-xs-12">
+                <button type="submit" class="btn btn-red round" style="width:80px;margin-right:10px;" >保存修改</button>
+              </div>
+            </form>
           </div>
         </div>
+
         <!-- info end -->
         <div id="myaddress" style="width: 90%;" class="tab-pane middle" data-id="<%= user.id %>">
-          <div class="box box-shadow white">
-            <div class="col-xs-12"><h4 class="text-left"><strong>1.收餐地址</strong></h4></div>
+          <div class="box box-shadow white text-left">
+            <label>1.收餐地址</label>
             <div class="address_blocks">
-            <%
+              <%
               var addresses = user.address_list;
               var keys = Object.keys(addresses);
               keys.forEach(function(key){
                 var address= addresses[key];
-            %>
-              <div class="text-left">
-                <div class="address_block" data-id="<%= user.id %>" data-address-id="<%=address.id%>" data-street="<%=address.street%>" data-city="<%= address.city%>" data-zip="<%= address.zip%>" data-phone="<%= address.phone%>">
+              %>
+              <div class="text-left box-grid">
+                <div class="address_block vertical-align" data-id="<%= user.id %>" data-address-id="<%=address.id%>" data-street="<%=address.street%>" data-city="<%= address.city%>" data-zip="<%= address.zip%>" data-phone="<%= address.phone%>">
                   <% if(address.isDefault){ %>
                   <label class="text-red default">［默认］</label>
                   <%}else{%>
                   <label class="text-red default" style="width: 55px;"> </label>
                   <%}%>
                   <label class="actual_address"><%= address.street%>, &nbsp;<%= address.city%> <%= address.zip%> <br/>+<%= address.phone%></label>
-                  <a class="text-red cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">修改</a>
+                  <a class="text-red cursor-pointer edit" style="margin-left:10px;" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">修改</a>
                   <a class="text-red cursor-pointer deleteBtn" style="margin-left: 5px;" href="javascript:void(0)">删除</a>
                 </div>
               </div>
-            <%})%>
+              <%})%>
             </div>
 
             <div class="col-xs-12 text-left" data-id="<%= user.id %>">
@@ -849,11 +867,11 @@
                   <h5 class="text-left" style="padding-top: 20px;"><strong>2.厨房地址<br/><br/>你当前的厨房地址为:</strong></h5>
                 </div>
               </div>
-              <div class="text-left">
-                <div class="address_block" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street%>" data-city="<%= user.host.city%>" data-zip="<%= user.host.zip%>" data-phone="<%=user.phone%>">
+              <div class="text-left box-grid">
+                <div class="address_block vertical-align" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street%>" data-city="<%= user.host.city%>" data-zip="<%= user.host.zip%>" data-phone="<%=user.phone%>">
                   <label class="text-green">［默认］</label>
                   <label><%= user.host.full_address %><br/> +<%= user.phone %></label>
-                  <a class="text-green cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">修改</a>
+                  <a class="text-green cursor-pointer edit" style="margin-left:10px;" toggle="modal" data-target="#myModal" data-host="true" data-href="/templates/user/address.html">修改</a>
                 </div>
               </div>
             <% } %>

@@ -818,9 +818,6 @@
       if(typeof dateString != "undefined"){
         var date = new Date(dateString);
         var mDate = moment(date.toISOString());
-        if(mDate.isBefore(moment())){
-          mDate = "now";
-        }
       }
       $(this).datetimepicker({
         icons:{
@@ -834,8 +831,7 @@
         },
         stepping : 30,
         showTodayButton : true,
-        defaultDate : mDate,
-        minDate : "now"
+        defaultDate : mDate
       });
     })
   });

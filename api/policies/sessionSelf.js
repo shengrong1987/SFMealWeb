@@ -11,7 +11,7 @@ module.exports = function(req, res, next) {
 
   // User is allowed, proceed to the next policy,
   // or if this is the last policy, the controller
-  var path = req.path;
+  var path = req.url;
   if (path.indexOf('host') != -1 ){
     var hostId = req.param('id');
     var userId = req.session.user.id;

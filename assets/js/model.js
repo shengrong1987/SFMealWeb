@@ -176,9 +176,142 @@ var Host = Backbone.Model.extend({
 
 var UserBarView = Backbone.View.extend({
   events : {
-    "click #applyToHostBtn" : "applyForHost"
+    "click #applyToHostBtn" : "applyForHost",
+    "mouseover #msgBtn" : "clearMsgBadges"
   },
   initialize : function(){
+    var userId = this.$el.data("user");
+    var hostId = this.$el.data("host");
+    this.$el.find("#msgBtn .badge").hide();
+    var hostBadgeView = this.$el.find("#hostActionBtn .badge");
+    hostBadgeView.data("badge", 0);
+    var userBadgeView = this.$el.find("#userActionBtn .badge");
+    userBadgeView.data("badge", 0);
+    var $this = this;
+    if(hostId){
+      io.socket.get("/host/" + hostId +  "/orders");
+      io.socket.get("/user/" + userId + "/orders");
+      io.socket.on("order", function(result){
+        console.log(result);
+        $this.handleNotification(result.verb, result.data.action, result.id);
+        if(result.data.host && result.data.host.id == hostId){
+          $this.handleBadge(true, "order");
+        }else{
+          $this.handleBadge(false, "order");
+        }
+      });
+    }else if(userId){
+      io.socket.get("/user/" + userId + "/orders");
+      io.socket.on("order", function(result){
+        console.log(result);
+        $this.handleNotification(result.verb, result.data.action, result.id);
+        $this.handleBadge(false, "order");
+      });
+    }
+  },
+  handleNotification : function(verb, action, id){
+    var msg = "unknown notification";
+    switch(verb){
+      case "updated":
+        msg = "order: " + id + " " + action;
+            break;
+      case "destroyed":
+        msg = "order: " + id + " is cancelled";
+            break;
+      case "created":
+        msg = "you have an new order: " + id;
+            break;
+    }
+    var msgBtn = this.$el.find("#msgBtn");
+    msgBtn.find(".badge").show();
+    if(msgBtn.attr("title") != ""){
+      msgBtn.attr("title",msgBtn.attr('title') + "<br/><br/>" + msg);
+      msgBtn.tooltip("fixTitle");
+    }else{
+      msgBtn.attr("title", msg);
+      msgBtn.tooltip({
+        title : msg
+      });
+      msgBtn.tooltip("fixTitle");
+    }
+  },
+
+  clearBadges : function(isHost, type){
+    switch(type){
+      case "msg":
+        break;
+    }
+  },
+
+  clearMsgBadges : function(){
+    this.$el.find("#msgBtn .badge").hide();
+  },
+
+  handleBadge : function(isHost, type){
+    var hostBadgeView = this.$el.find("#hostActionBtn .badge");
+    var userBadgeView = this.$el.find("#userActionBtn .badge");
+    if(isHost){
+      hostBadgeView.data("badge", hostBadgeView.data("badge") + 1);
+    }else{
+      userBadgeView.data("badge", userBadgeView.data("badge") + 1);
+      switch(type){
+        case "order":
+          var orderBadgeView = this.$el.find("#userActionBtn").next().find("a").eq(0).find(".badge");
+          var orderBadges =  parseInt(orderBadgeView.text() || 0);
+          orderBadges++;
+          orderBadgeView.text(orderBadges);
+          break;
+      }
+    }
+    var hostBadge = hostBadgeView.data("badge");
+    if(hostBadge == 0){
+      hostBadgeView.hide();
+    }else{
+      hostBadgeView.text(hostBadge);
+      hostBadgeView.show();
+    }
+    var userBadge = userBadgeView.data("badge");
+    if(userBadge == 0){
+      userBadgeView.hide();
+    }else{
+      userBadgeView.text(userBadge);
+      userBadgeView.show();
+    }
+
+    userBadgeView.next().find("a .badge").each(function(){
+      var badgeCount = parseInt($(this).text());
+      if(badgeCount == 0){
+        $(this).hide();
+      }else{
+        $(this).show();
+      }
+    });
+  }
+});
+
+var ApplyView = Backbone.View.extend({
+  events : {
+    "click #applyBtn" : "applyForHost"
+  },
+  initialize : function(){
+    var steps = this.$el.find(".navbar li a");
+    var curStep = 1;
+    var maxStep = 5;
+    steps.each(function(index, value){
+      if($(value).data("pass")){
+        curStep++;
+        if(curStep > maxStep){
+          curStep = maxStep;
+        }
+      }else{
+        return;
+      }
+    });
+    // var percent = (parseInt(curStep) / 5) * 100;
+    // this.$el.find('.progress-bar').css({width: percent + '%'});
+    // this.$el.find('.progress-bar').text("Step " + curStep + " of 5");
+    $('[href="#step'+curStep+'"]').tab('show');
+
   },
   applyForHost : function(e){
     e.preventDefault();
@@ -187,7 +320,7 @@ var UserBarView = Backbone.View.extend({
       success : function(){
         location.reload();
       },error : function(model,err){
-        alert(err.responseText);
+        BootstrapDialog.alert(err.responseText);
       }
     });
   }
@@ -365,7 +498,7 @@ var AddressView = Backbone.View.extend({
       success : function(){
         reloadUrl("/user/me","#myaddress");
       },error : function(model, err){
-        alert(err.responseText);
+        BootstrapDialog.alert(err.responseText);
       }
     })
   },
@@ -459,7 +592,9 @@ var MealView = Backbone.View.extend({
   isActivate : true,
   events : {
     "submit form" : "publishMeal",
-    "click button[name='save']" : "saveMeal"
+    "click button[name='save']" : "saveMeal",
+    "click #addNewPickupBtn" : "addNewPickup",
+    "click #removeNewPickupBtn" : "removeNewPickup"
   },
   initialize : function(){
     var form = this.$el.find("form");
@@ -472,6 +607,35 @@ var MealView = Backbone.View.extend({
     var dishesAlert = form.find("#dish-selector .alert");
     dishesAlert.hide();
     this.dishAlert = dishesAlert;
+  },
+  addNewPickup : function(e){
+    e.preventDefault();
+    this.$el.find("#pickupAlert").hide();
+    var pickupView = '<div class="well form-group pickup"> <div class="col-xs-4"> <label>取餐时间 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> <div class="col-xs-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">From</span> <input type="text" class="form-control" /> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">&nbsp;&nbsp;To&nbsp;&nbsp;</span> <input type="text" class="form-control"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div> <div class="form-group location"> <label>取餐地点</label> <input type="text" class="form-control"> </div> </div> </div>';
+    this.$el.find(".pickup_container").append(pickupView);
+    this.$el.find("[data-toggle='dateTimePicker']").datetimepicker({
+      icons:{
+        time: "fa fa-clock-o",
+        date: "fa fa-calendar",
+        up: "fa fa-arrow-up",
+        down: "fa fa-arrow-down",
+        previous : "fa fa-arrow-left",
+        next : "fa fa-arrow-right",
+        today : "fa fa-calendar-times-o"
+      },
+      stepping : 30,
+      showTodayButton : true,
+    });
+  },
+  removeNewPickup : function(e){
+    e.preventDefault();
+    this.$el.find("#pickupAlert").hide();
+    var pickupContainers = this.$el.find(".pickup_container .well");
+    if(pickupContainers.length == 1){
+      this.$el.find("#pickupAlert").show();
+      return;
+    }
+    pickupContainers.last().remove();
   },
   saveMeal : function(e){
     e.preventDefault();
@@ -534,15 +698,44 @@ var MealView = Backbone.View.extend({
       var endBookingDatePicker = form.find("#preorder .end-booking [data-toggle='dateTimePicker']");
       var endBookingDate = endBookingDatePicker.data("DateTimePicker").date();
 
-      var startPickupTimeDatePicker = form.find("#preorder .start-pickup [data-toggle='dateTimePicker']");
-      var startPickupDate = startPickupTimeDatePicker.data("DateTimePicker").date();
+      var pickupViews = form.find("#preorder .pickup_container .pickup");
+      var pickups = [];
+      var pickupValid = true;
 
-      var endPickupTimeDatePicker = form.find("#preorder .end-pickup [data-toggle='dateTimePicker']");
-      var endPickupDate = endPickupTimeDatePicker.data("DateTimePicker").date();
+      var $this = this;
 
-      type = "preorder";
+      pickupViews.each(function(){
+        var pickupObj = {};
+        var pickupFromTime = $(this).find(".start-pickup [data-toggle='dateTimePicker']").data("DateTimePicker").date();
+        var pickupTillTime = $(this).find(".end-pickup [data-toggle='dateTimePicker']").data("DateTimePicker").date();
+        var location = $(this).find(".location input").val();
+        if(!pickupFromTime || !pickupTillTime || !location){
+          pickupValid = false;
+          $this.scheduleAlert.show();
+          $this.scheduleAlert.html("提货时间/地点必须填");
+          return;
+        }else if(pickupFromTime.isSame(pickupTillTime)){
+          pickupValid = false;
+          $this.scheduleAlert.show();
+          $this.scheduleAlert.html("开始/结束取货时间不能一样");
+          return;
+        }else if(moment.duration(pickupTillTime.diff(pickupFromTime)).asMinutes() < 30){
+          pickupValid = false;
+          $this.scheduleAlert.show();
+          $this.scheduleAlert.html("开始到结束取货时间不能短于30分钟");
+          return;
+        }
+        pickupObj.pickupFromTime = pickupFromTime._d;
+        pickupObj.pickupTillTime = pickupTillTime._d;
+        pickupObj.location = location;
+        pickups.push(pickupObj);
+      });
 
-      if(!startBookingDate._d || !endBookingDate._d || !startPickupDate._d || !endPickupDate._d){
+      if(!pickupValid){
+        return;
+      }
+
+      if(!startBookingDate || !endBookingDate){
         this.scheduleAlert.show();
         this.scheduleAlert.html("接受/结束预定或提货时间必须填");
         return;
@@ -550,15 +743,14 @@ var MealView = Backbone.View.extend({
         this.scheduleAlert.show();
         this.scheduleAlert.html("接受/结束预定时间不能一样");
         return;
-      }else if(startPickupDate.isSame(endPickupDate)){
-        this.scheduleAlert.show();
-        this.scheduleAlert.html("开始/结束取货时间不能一样");
-        return;
       }else if(moment.duration(endBookingDate.diff(startBookingDate)).asMinutes() < 60){
         this.scheduleAlert.show();
         this.scheduleAlert.html("开始到结束预定时间不能短于1小时");
         return;
       }
+
+      type = "preorder";
+
     }else{
       var startBookingDatePicker = form.find("#order .start-booking [data-toggle='dateTimePicker']");
       var startBookingDate = startBookingDatePicker.data("DateTimePicker").date();
@@ -596,7 +788,7 @@ var MealView = Backbone.View.extend({
       }
     }
 
-    var status = this.isActivate? "ongoing" : "off";
+    var status = this.isActivate? "on" : "off";
     var title = form.find("#meal_title").val();
     if(mealId){
       this.model.set({id : mealId});
@@ -610,8 +802,7 @@ var MealView = Backbone.View.extend({
       dishes : dishes,
       provideFromTime : startBookingDate ? startBookingDate._d : undefined,
       provideTillTime : endBookingDate ? endBookingDate._d : undefined,
-      pickupFromTime : startPickupDate ? startPickupDate._d : undefined,
-      pickupTillTime : endPickupDate ? endPickupDate._d : undefined,
+      pickups : JSON.stringify(pickups),
       totalQty : totalQty,
       leftQty : totalQty,
       type : type,
@@ -628,8 +819,9 @@ var MealView = Backbone.View.extend({
         if(mealId) {
           $this.formAlert.html("Meal更新完成");
         }else{
-          alert("Meal新建完成!")
-          reloadUrl("/host/me#","mymeal");
+          BootstrapDialog.alert("Meal新建完成!", function(){
+            reloadUrl("/host/me#","mymeal");
+          })
         }
       },error : function(model, err){
         $this.formAlert.html(err.responseText);
@@ -802,8 +994,9 @@ var DishView = Backbone.View.extend({
                 $this.formAlert.html("菜品更新完成");
                 $this.formAlert.show();
               }else{
-                alert("菜品新建完成");
-                reloadUrl("/host/me#","mydish");
+                BootstrapDialog.alert("菜品新建完成", function(){
+                  reloadUrl("/host/me#","mydish");
+                });
               }
             },error : function(model, err){
               $this.formAlert.html(err.responseText);
@@ -856,7 +1049,7 @@ var BankView = Backbone.View.extend({
     }, function(status, response){
       var hostId = form.data("host");
       if (response.error) {
-        $this.alertForm.html(response.error);
+        $this.alertForm.html(response.error.message);
         $this.alertForm.show();
       } else {
         var token = response.id;
@@ -873,13 +1066,16 @@ var BankView = Backbone.View.extend({
           success : function(){
             dismissModal();
             if(form.data("updating")){
-              alert("银行账号已更新！");
+              BootstrapDialog.alert("银行账号已更新！", function(){
+                reloadUrl("/user/pocket","#mypurse");
+              });
             }else{
-              alert("银行账号已建立!");
+              BootstrapDialog.alert("银行账号已建立!", function(){
+                reloadUrl("/user/pocket","#mypurse");
+              });
             }
-            reloadUrl("/user/pocket","#mypurse");
           },error : function(model, err){
-            $this.alertForm.html(err.responseText);
+            $this.alertForm.html(err.responseJSON);
             $this.alertForm.show();
           }
         });
@@ -890,7 +1086,7 @@ var BankView = Backbone.View.extend({
 
 var UserProfileView = Backbone.View.extend({
   events : {
-    "click .save" : "saveProfile"
+    "submit form" : "saveProfile"
   },
   initialize : function(){
     var alertView = this.$el.find(".form-alert");
@@ -907,13 +1103,17 @@ var UserProfileView = Backbone.View.extend({
     var color = this.$el.find("div[name='template_color']").data('color');
     var desc = this.$el.find("textarea[name='desc']").val();
     var picture = this.$el.find(".fileinput-preview").data("src");
+    var phone = this.$el.find("#phoneInput").val();
+    var zipcode = this.$el.find("#zipcodeInput").val();
     this.model.set({
       id : this.$el.data("id"),
       firstname : firstname,
       lastname : lastname,
       desc : desc,
       color : color,
-      picture : picture
+      picture : picture,
+      phone : phone,
+      zipcode : zipcode
     });
     var $this = this;
     this.model.save({},{
@@ -1083,10 +1283,11 @@ var OrderView = Backbone.View.extend({
     this.model.action = "receive";
     this.model.save({},{
       success : function(model,result){
-        alert(result.responseText);
-        reloadUrl("/host/me", "#myorder");
+        BootstrapDialog.alert(result.responseText, function(){
+          reloadUrl("/host/me", "#myorder");
+        });
       },error : function(model, err){
-        alert(err.responseText);
+        BootstrapDialog.alert(err.responseText);
       }
     })
   },
@@ -1097,10 +1298,11 @@ var OrderView = Backbone.View.extend({
     this.model.action = "ready";
     this.model.save({},{
       success : function(model,result){
-        alert(result.responseText);
-        reloadUrl("/host/me", "#myorder");
+        BootstrapDialog.alert(result.responseText, function(){
+          reloadUrl("/host/me", "#myorder");
+        });
       },error : function(model, err){
-        alert(err.responseText);
+        BootstrapDialog.alert(err.responseText);
       }
     })
   },
@@ -1111,10 +1313,11 @@ var OrderView = Backbone.View.extend({
     this.model.action = "reject";
     this.model.save({},{
       success : function(model,result){
-        alert(result.responseText);
-        reloadUrl("/host/me", "#myorder");
+        BootstrapDialog.alert(result.responseText, function(){
+          reloadUrl("/host/me", "#myorder");
+        });
       },error : function(model, err){
-        alert(err.responseText);
+        BootstrapDialog.alert(err.responseText);
       }
     })
   },
@@ -1125,10 +1328,11 @@ var OrderView = Backbone.View.extend({
     this.model.action = "confirm";
     this.model.save({},{
       success : function(model,result){
-        alert(result.responseText);
-        reloadUrl("/host/me", "#myorder");
+        BootstrapDialog.alert(result.responseText, function(){
+          reloadUrl("/host/me", "#myorder");
+        });
       },error : function(model, err){
-        alert(err.responseText);
+        BootstrapDialog.alert(err.responseText);
       }
     })
   },
@@ -1140,7 +1344,7 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         alert(result.responseText);
-        if(location.href.indexOf("host")==-1){
+        if(location.href.indexOf("host/me")==-1){
           reloadUrl("/user/me", "#myorder");
         }else{
           reloadUrl("/host/me","#myorder");
@@ -1230,7 +1434,7 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         alert(result.responseText);
-        if(location.href.indexOf("host")==-1){
+        if(location.href.indexOf("host/me")==-1){
           reloadUrl("/user/me", "#myorder");
         }else{
           reloadUrl("/host/me","#myorder");

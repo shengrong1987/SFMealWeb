@@ -21,7 +21,7 @@ describe('MealController', function() {
   describe('build a meal with dishes', function() {
 
     var hostId;
-    var email = 'auth@gmail.com';
+    var email = 'aimbebe.r@gmail.com';
     var password = 'Rs89030659';
     var picture = "/images/thumbnail.jpg";
     var address1 = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853};
@@ -213,7 +213,7 @@ describe('MealController', function() {
       }
       agent
           .post('/meal')
-          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 3600 * 600 * 5), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, status : "on",cover : dish1})
+          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, status : "on",cover : dish1, minimalOrder : 5})
           .expect(200)
           .end(function(err,res){
             if(res.body.chef != hostId){
@@ -227,9 +227,14 @@ describe('MealController', function() {
     it('should create an preorder type meal ', function (done) {
       var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
       var now = new Date();
+      var pickups = [{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+        "location" : "1455 Market St, San Francisoc, CA 94124"
+      }];
       agent
           .post('/meal')
-          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 3600 * 60 * 5), pickupFromTime : new Date(now.getTime() + 3600 * 60 * 5), pickupTillTime : new Date(now.getTime() + 3600 * 60 * 7),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "on", cover : dish1})
+          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), pickups : JSON.stringify(pickups),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "on", cover : dish1, minimalOrder : 5})
           .expect(200)
           .end(function(err,res){
             if(res.body.chef != hostId){
@@ -240,7 +245,7 @@ describe('MealController', function() {
     })
 
     var guestId = "";
-    var guestEmail = 'guest@gmail.com';
+    var guestEmail = 'enjoymyself1987@gmail.com';
 
     it('should login or register an account for guest', function (done) {
       agent

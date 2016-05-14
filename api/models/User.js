@@ -49,6 +49,9 @@ module.exports = {
       type : 'string',
       defaultsTo : '000-000-0000'
     },
+    zipcode : {
+      type : 'string'
+    },
     full_address : {
       type : 'string'
     },

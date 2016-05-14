@@ -158,9 +158,11 @@ function enterAddressInfo(event){
 
 //on user search action - redirect
 function search(target){
-  var keyword = $(target).prev().val();
+  var searchContainer = $(target).parent();
+  var keyword = searchContainer.find("input[name='keyword']").val();
+  var zipcode = searchContainer.find("input[name='zipcode']").val();
   var county = getCurrentCounty();
-  location.href = "/meal/search?keyword=" + keyword + "&county=" + county;
+  location.href = "/meal/search?keyword=" + keyword + "&county=" + county + "&zipcode=" + zipcode;
 }
 /*
 * Order GUI
@@ -385,18 +387,22 @@ function adjustLayout(){
   }
 }
 
+function tooltipSetup(){
+  $('[data-toggle="tooltip"]').tooltip();
+}
+
 function setup(){
   tapController();
   stepContainer();
   getCountyInfo();
   loadOrder(true);
+  tooltipSetup();
   //setup mutual exclusive selectors(etc. signature dish select)
   selectorSetup();
   dishSelectorSetup();
   adjustLayout();
   $('[data-toggle="popover"]').popover();
   $('#meal-container').mixItUp();
-
 }
 
 $("document").ready(function(){

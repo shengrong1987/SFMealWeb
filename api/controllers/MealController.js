@@ -5,6 +5,8 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+var GeoCoder = require("../services/geocode.js");
+var moment = require("moment");
 module.exports = {
 
   new_form : function(req, res){
@@ -38,7 +40,8 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            return res.view('home',{orders : orders, preorders : preorders, user : u});
+
+            return res.view('meals',{meals : preorders.concat(orders)});
           });
         }else {
           return res.view('home',{orders : orders, preorders : preorders, user : user});
@@ -79,31 +82,51 @@ module.exports = {
 
   search : function(req, res){
     var keyword = req.param('keyword');
+    var zipcode = req.param('zipcode');
     var county = req.param('county');
     var now = new Date();
-    Meal.find({ county : county,status : "on",provideFromTime : {'<' : now}, provideTillTime : {'>' : now}
+    Meal.find({ county : county,status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}
     }).populate('dishes').populate('chef').exec(function(err,found){
       if(err){
-        res.badRequest(err);
-      }else{
-        found = found.filter(function(meal){
-          var dishes = meal.dishes;
-          var valid = false;
-          for(var i=0; i < dishes.length; i++){
-            var dish = dishes[i];
-            if(dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
-              valid = true;
-              break;
+        return res.badRequest(err);
+      }
+
+      if(typeof zipcode !== 'undefined' && zipcode && zipcode !== 'undefined' && typeof county !== 'undefined' && county && county !== 'undefined'){
+        GeoCoder.geocode(zipcode, function(err, result){
+          if (err) {
+            return res.badRequest("地址解析错误，请刷新再试。");
+          }  else {
+            if(result.length==0){
+              return res.badRequest("地址格式不对或地址不存在。");
+            }
+            var location = { lat : result[0].latitude, long : result[0].longitude };
+            found = found.filter(function(meal){
+              var dishes = meal.dishes;
+              var valid = false;
+              for(var i=0; i < dishes.length; i++){
+                var dish = dishes[i];
+                if(dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
+                  valid = true;
+                  break;
+                }
+              }
+              return valid;
+            });
+            if(req.wantsJSON) {
+              res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, anchor : location});
+            }else{
+              res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, anchor : location });
             }
           }
-          return valid;
         });
+      }else{
         if(req.wantsJSON) {
-          res.ok({meals: found, search : true, keyword : keyword, user: req.session.user});
+          res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : undefined});
         }else{
-          res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user });
+          res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : undefined});
         }
       }
+
     });
   },
 
@@ -167,25 +190,27 @@ module.exports = {
     var mealId = req.param("id");
     var hostId = req.session.user.host;
     var now = new Date();
-    Meal.findOne(mealId).exec(function(err,meal){
+    Host.findOne(hostId).populate("meals").populate("dishes").exec(function(err, host){
       if(err){
         return res.badRequest(err);
       }
-      if(meal.status != "off"){
-        return res.badRequest("Meal is invalid, please see meal editing page for details");
+      if(!host.isValid(false)){
+        return res.redirect("/apply");
       }
-      if(meal.provideTillTime < now){
-        return res.badRequest("Meal设定的结束时间已过");
-      }
-      if(meal.status == "on"){
-        return res.ok(meal);
-      }
-      meal.status = "on";
-      meal.save(function(err,result){
+      Meal.findOne(mealId).exec(function(err,meal){
         if(err){
           return res.badRequest(err);
         }
-        return res.redirect("/host/me#mymeal");
+        if(meal.status == "on"){
+          return res.ok(meal);
+        }
+        meal.status = "on";
+        meal.save(function(err,result){
+          if(err){
+            return res.badRequest(err);
+          }
+          return res.redirect("/host/me#mymeal");
+        });
       });
     });
   },
@@ -212,12 +237,35 @@ module.exports = {
     req.body.chef = hostId;
     if(this.dateIsValid(req.body)){
       if(this.requirementIsValid(req.body)){
-        Meal.create(req.body).exec(function(err,meal){
-          if(err){
-            console.log("ddd");
-            return res.badRequest(err);
+        this.dishIsValid(req.body, function(valid){
+          if(valid){
+            if(req.body.status === "on"){
+              Host.findOne(hostId).populate("meals").populate("dishes").exec(function(err, host){
+                if(err){
+                  return res.badRequest(err);
+                }
+                if(!host.isValid(true)){
+                  return res.badRequest("厨师信息未完整或菜式审核中, 详见/Apply页面");
+                }
+                Meal.create(req.body).exec(function(err,meal){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  return res.ok(meal);
+                });
+              });
+            }else{
+              Meal.create(req.body).exec(function(err,meal){
+                if(err){
+                  return res.badRequest(err);
+                }
+                return res.ok(meal);
+              });
+            }
+          }else{
+            console.log("meal contain unverified dishes");
+            return res.badRequest("meal contain unverified dishes");
           }
-          return res.ok(meal);
         });
       }else{
         console.log("meal minimal requirement are not valid");
@@ -233,7 +281,7 @@ module.exports = {
     var mealId = req.param("id");
     if(this.dateIsValid(req.body)){
       if(this.requirementIsValid(req.body)){
-        Meal.update(mealId,req.body).exec(function(err, meal){
+        Meal.update(mealId, req.body).exec(function(err, meal){
           if(err){
             return res.badRequest(err);
           }
@@ -249,45 +297,6 @@ module.exports = {
     }
   },
 
-  dateIsValid : function(params){
-    var provideFromTime = new Date(params.provideFromTime).getTime();
-    var provideTillTime = new Date(params.provideTillTime).getTime();
-    if(params.type == "order" && provideFromTime >= provideTillTime){
-      return false;
-    }else if(params.type == "preorder" && provideFromTime > provideTillTime){
-      return false;
-    }
-
-    var now = Date.now();
-    if(params.type == "preorder"){
-      var midNightToday = new Date().setHours(0,0,0,0);
-      if(provideTillTime < midNightToday){
-        console.log(" pickup time has passed");
-        return false;
-      }
-      var pickupFromTime = new Date(params.pickupFromTime).getTime();
-      var pickupTillTime = new Date(params.pickupTillTime).getTime();
-
-      if(pickupFromTime >= pickupTillTime){
-        console.log("pickup time period not long enough");
-        return false;
-      }
-      if(pickupFromTime <= now){
-        console.log("pickup time has started");
-        return false;
-      }
-      if(pickupFromTime < provideTillTime){
-        console.log("pickup time can not be earlier than meal booking end date");
-        return false;
-      }
-    }else{
-      if(provideFromTime > now){
-        return false;
-      }
-    }
-    return true;
-  },
-
   requirementIsValid : function(params){
     var minOrderNumber = parseInt(params.minimalOrder);
     var minOrderTotal = parseFloat(params.minimalTotal);
@@ -296,6 +305,57 @@ module.exports = {
       return false;
     }
     return true;
+  },
+
+  dishIsValid : function(params, cb){
+    var dishes = params.dishes.split(",");
+    async.each(dishes, function(dishId, next){
+      Dish.findOne(dishId).exec(function(err, dish){
+        if(err){
+          return next(err);
+        }
+        if(!dish.isVerified){
+          return next(err);
+        }
+        next();
+      });
+    }, function(err){
+      if(err){
+        return cb(false);
+      }
+      cb(true);
+    });
+  },
+
+  dateIsValid : function(params){
+    var provideFromTime = params.provideFromTime;
+    var provideTillTime = params.provideTillTime;
+    if(provideFromTime >= provideTillTime){
+      return false;
+    }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 60){
+      return false;
+    }
+    var valid = true;
+    if(params.pickups){
+      JSON.parse(params.pickups).forEach(function(pickup){
+        var pickupFromTime = pickup.pickupFromTime;
+        var pickupTillTime = pickup.pickupTillTime;
+        if(pickupFromTime >= pickupTillTime){
+          console.log("pickup time not valid");
+          valid = false;
+          return;
+        }else if(moment.duration(moment(pickupTillTime).diff(moment(pickupFromTime))).asMinutes() < 30){
+          console.log("pickup time too short");
+          valid = false;
+          return;
+        }else if(pickupFromTime <= provideTillTime){
+          console.log("pickup time too early");
+          valid = false;
+          return;
+        }
+      });
+    }
+    return valid;
   }
 
   //To test after finishing review model

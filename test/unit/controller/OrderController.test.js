@@ -52,7 +52,7 @@ describe('OrderController', function() {
             if(res.body.meals.length == 0){
               return done(Error("error getting any meal"));
             }
-            var meal = res.body.meals[0];
+            var meal = res.body.meals[1];
             mealId = meal.id;
             dishId1 = meal.dishes[0].id;
             dishId2 = meal.dishes[1].id;

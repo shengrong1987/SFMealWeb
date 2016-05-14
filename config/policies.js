@@ -59,7 +59,8 @@ module.exports.policies = {
     'update' : ['sessionAuth','sessionSelf'],
     'createBank' : ['sessionAuth','isHost'],
     'updateBank' : ['sessionAuth','isHost'],
-    'me' : ['sessionAuth','isHost']
+    'me' : ['sessionAuth','isHost'],
+    'apply' : ['sessionAuth']
   },
 
   PaymentController : {

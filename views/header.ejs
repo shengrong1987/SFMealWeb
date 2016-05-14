@@ -1,5 +1,5 @@
-<nav id="myUserBar" class="navbar navbar-inverse mynavbar">
-  <div class="container-fluid">
+<nav id="myUserBar" class="navbar navbar-inverse mynavbar" data-host="<%= req.session.user ? req.session.user.host : null%>" data-user="<%= req.session.user ? req.session.user.id : null%>">
+  <div>
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavBar">
         <span class="icon-bar"></span>
@@ -42,19 +42,20 @@
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
           <li><a href="/user/me#mycollect"><i class="fa fa-heart"></i> 收藏</a></li>
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-          <li><a href="/message"><i class="fa fa-envelope-o"></i> 消息</a></li>
+          <li><a id="msgBtn" data-toggle="tooltip" data-placement="bottom" href="/message"><i class="fa fa-envelope-o"></i> 消息 <span class="badge">New</span></a></li>
           <li>
-            <a href='/user/me' class="text-center dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a id="userActionBtn" data-badge="0" href='/user/me' class="text-center dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <img class="extra-small round_thumb" style="display:inline-block;" src=<%= req.session.user.picture || "/images/profile_man.png"%>>
               Hi, <%= req.session.user.firstname || (req.session.user.host ? "厨师" : "游客") %>
+              <span class="badge"></span>
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="/user/me"><strong>吃货订单</strong></a></li>
-              <li><a href="/user/me#myinfo"><strong>修改个人资料</strong></a></li>
-              <li><a href="/user/me#myaddress"><strong>地址管理</strong></a></li>
-              <li><a href="/user/pocket"><strong>我的钱包</strong></a></li>
-              <li><a href="/user/me#myreview"><strong>待评价</strong></a></li>
+              <li><a href="/user/me"><strong>吃货订单</strong><span class="badge pull-right"></span></a></li>
+              <li><a href="/user/me#myinfo"><strong>修改个人资料</strong><span class="badge pull-right"></span></a></li>
+              <li><a href="/user/me#myaddress"><strong>地址管理</strong><span class="badge pull-right"></span></a></li>
+              <li><a href="/user/pocket"><strong>我的钱包</strong><span class="badge pull-right"></span></a></li>
+              <li><a href="/user/me#myreview"><strong>待评价</strong><span class="badge pull-right"></span></a></li>
               <li><a href="/help"><strong>帮助中心</strong></a></li>
               <li role="separator" class="divider"></li>
               <li><a href="/auth/logout" class="text-grey"><strong>退出登陆</strong></a></li>
@@ -62,8 +63,8 @@
           </li>
           <%if(req.session.user.host){ %>
           <li>
-            <div class="navbar-btn">
-              <a href="/host/me" class="btn btn-green vertical-align"><i class="fa icon-chef fa-2x" style="padding-top: 3px;"></i>&nbsp;<strong>厨房管理</strong>&nbsp;&nbsp;</a>
+            <div id="hostActionBtn" data-badge="0" class="navbar-btn">
+              <a href="/host/me" class="btn btn-green vertical-align"><i class="fa icon-chef fa-2x" style="padding-top: 3px;"></i>&nbsp;<strong>厨房管理</strong>&nbsp;&nbsp;<span class="badge"></span></a>
             </div>
           </li>
         <%}}else{%>

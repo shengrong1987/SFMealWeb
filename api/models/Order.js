@@ -48,6 +48,14 @@ module.exports = {
       type: 'string',
       required: true
     },
+    guestEmail : {
+      type : 'string',
+      required : true
+    },
+    hostEmail : {
+      type : 'string',
+      required : true
+    },
     eta: {
       type: 'Date'
     },

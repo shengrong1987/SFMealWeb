@@ -170,6 +170,39 @@ module.exports = {
     });
   },
 
+  apply : function(req, res){
+    var user = req.session.user;
+    var hasAddress = false;
+    var hasDish = false;
+    var hasMeal = false;
+    var hasAccount = false;
+    if(user && user.host){
+      var hostId = user.host;
+      Host.findOne(hostId).populate("dishes").populate("meals").exec(function(err, host){
+        if(err){
+          return res.badRequest(err);
+        }
+        if(host.full_address){
+          hasAddress = true;
+        }
+        if(host.dishes.length > 0 && host.dishes.some(function(dish){
+            return dish.isVerified;
+          })){
+          hasDish = true;
+          if(host.meals.length > 0){
+            hasMeal = true;
+          }
+        }
+        if(host.bankId){
+          hasAccount = true;
+        }
+        return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount });
+      });
+    }else{
+      return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount });
+    }
+  },
+
   //to-test
   cashout : function(req, res){
     //check account balance

@@ -5,6 +5,8 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+var Notification = require("../services/notification.js");
+
 module.exports = {
   create : function(req, res){
     var async = require('async');
@@ -52,7 +54,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            return res.ok({});
+            return res.ok(result);
           });
         });
       }else{
@@ -68,9 +70,10 @@ module.exports = {
             });
           },function(err){
             if(err){
+              console.log("dd:" + err);
               return res.badRequest(err);
             }
-            return res.ok({});
+            return res.ok(review);
           });
         });
       }
@@ -86,6 +89,9 @@ module.exports = {
           order.reviewing_orders.splice(order.reviewing_orders.indexOf(dishId),1);
           if(order.reviewing_orders.length == 0){
             order.status = "complete";
+            var tempOrder = Object.assign({}, order);
+            tempOrder.host = { id : hostId};
+            Notification.notificationCenter("Order", "review", tempOrder, true);
           }
           return true;
         }
@@ -97,6 +103,9 @@ module.exports = {
           order.reviewing_orders.splice(order.reviewing_orders.indexOf(dishId),1);
           if(order.reviewing_orders.length == 0){
             order.status = "complete";
+            var tempOrder = Object.assign({}, order);
+            tempOrder.host = { id : hostId};
+            Notification.notificationCenter("Order", "review", tempOrder, true);
           }
           isValidReview = true;
         }

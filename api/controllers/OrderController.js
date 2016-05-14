@@ -8,6 +8,7 @@
 var stripe = require("../services/stripe.js");
 var extend = require('util')._extend;
 var async = require('async');
+var notification = require("../services/notification");
 
 //-1 : quantity now enough
 //-2 : dish not valid
@@ -109,6 +110,8 @@ module.exports = {
         req.body.type = m.type;
         req.body.dishes = dishes;
         req.body.meal = m.id;
+        req.body.guestEmail = email;
+        req.body.hostEmail = m.chef.email;
         User.findOne(userId).populate('payment').exec(function (err, found) {
           if (err) {
             console.log("error:" + err);
@@ -147,10 +150,11 @@ module.exports = {
                     return res.badRequest(err);
                   }
                   //test only
+                  notification.notificationCenter("Order", "new", order);
                   if(req.wantsJSON){
                     return res.ok(order);
                   }
-                  res.ok({responseText : "Your order has been taken successfully!You will be directed to orde page. Now just wait for your food to be ready."});
+                  return res.ok({responseText : "Your order has been taken successfully!You will be directed to orde page. Now just wait for your food to be ready."});
                 });
               });
             } else {
@@ -188,6 +192,7 @@ module.exports = {
         return res.badRequest(err)
       }
 
+      console.log("order status is: " + order.status);
       if(order.status != "schedule" && order.status != "preparing"){
         return res.forbidden();
       }
@@ -196,8 +201,11 @@ module.exports = {
       if($this.validate_meal(order.meal, params.orders, order.orders, subtotal, res)){
 
         console.log("pass meal validation");
-
-        if(order.status == "schedule" || hostId == order.host.id){
+        var isHostAction = false;
+        if(hostId == order.host.id){
+          isHostAction = true;
+        }
+        if(order.status == "schedule"){
           //can update without permission of host or adjust by host
           var diff = (subtotal - order.subtotal).toFixed(2);
           if(diff != 0){
@@ -235,6 +243,7 @@ module.exports = {
                           return res.badRequest(err);
                         }
                         //send notification
+                        notification.notificationCenter("Order", "adjust", result, isHostAction);
                         return res.ok({responseText : "订单调整完成,已从用户账户中扣除$" +  charge.amount/100});
                       })
                     });
@@ -286,6 +295,7 @@ module.exports = {
                         return res.badRequest(err);
                       }
                       //send notification
+                      notification.notificationCenter("Order", "adjust", result, isHostAction);
                       return res.ok({responseText : "订单调整完成,已返回$" +  totalRefund + "到用户账户中"});
                     })
                   });
@@ -300,15 +310,9 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
+              notification.notificationCenter("Order", "adjust", result, isHostAction);
               return res.ok({responseText :"订单调整完成,订单金额不变"});
             })
-          }
-          if(hostId == order.host.id){
-            //send notification to user
-            console.log("sending notification to user about adjust order")
-          }else{
-            //send notification to host
-            console.log("sending notification to host about adjust order")
           }
         }else if(order.status == "preparing"){
           order.lastStatus = order.status;
@@ -321,6 +325,7 @@ module.exports = {
               return res.badRequest(err);
             }
             //send notification
+            notification.notificationCenter("Order", "adjusting", result, isHostAction);
             return res.ok({responseText : "订单调整请求已提交，等待厨师确认"});
           });
         }
@@ -330,6 +335,7 @@ module.exports = {
 
   cancel : function(req, res){
     var userId = req.session.user.id;
+    var hostId = req.session.user.host;
     var email = req.session.user.auth.email;
     var orderId = req.params.id;
     var params = req.body;
@@ -341,6 +347,11 @@ module.exports = {
 
       if(order.status != "schedule" && order.status != "preparing"){
         return res.forbidden();
+      }
+
+      var isHostAction = false;
+      if(hostId == order.host.id){
+        isHostAction = true;
       }
 
       if(order.status == "schedule"){
@@ -381,6 +392,7 @@ module.exports = {
                         return res.badRequest(err);
                       }
                       //send notification
+                      notification.notificationCenter("Order", "cancel", result, isHostAction);
                       res.ok({responseText : "订单已取消。"});
                     })
                   });
@@ -395,6 +407,7 @@ module.exports = {
               return res.badRequest(err);
             }
             //send notification
+            notification.notificationCenter("Order", "cancel", result, isHostAction);
             return res.ok({ responseText : "订单已取消"});
           })
         }
@@ -406,6 +419,7 @@ module.exports = {
             return res.badRequest(err);
           }
           //send notification
+          notification.notificationCenter("Order", "cancelling", result, isHostAction);
           return res.ok({responseText : "已提交取消申请，请等待厨师确认"});
         });
       }
@@ -459,6 +473,7 @@ module.exports = {
                       if(err){
                         return res.badRequest(err);
                       }
+                      notification.notificationCenter("Order", "confirm", result);
                       return res.ok({responseText : "已确认调整的订单，请按照新订单准备。"});
                     })
                   });
@@ -507,6 +522,7 @@ module.exports = {
                         if(err){
                           return res.badRequest(err);
                         }
+                        notification.notificationCenter("Order", "confirm", result);
                         return res.ok({responseText : "已确认调整的订单，请按照新订单准备。"});
                       })
                     });
@@ -526,6 +542,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
+            notification.notificationCenter("Order", "confirm", result);
             return res.ok({responseText : "已确认调整的订单，请按照新订单准备。"});
           })
         }
@@ -562,6 +579,7 @@ module.exports = {
                       if (err) {
                         return res.badRequest(err);
                       }
+                      notification.notificationCenter("Order", "cancel", result);
                       return res.ok({responseText : "订单已确认取消"});
                     })
                   });
@@ -576,6 +594,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
+            notification.notificationCenter("Order", "cancel", result);
             return res.ok({responseText : "订单已确认取消"});
           })
         }
@@ -599,6 +618,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
+        notification.notificationCenter("Order", "reject", result);
         return res.ok({ responseText : "已拒绝订单修改请求"});
       });
     });
@@ -606,6 +626,7 @@ module.exports = {
 
   ready : function(req, res){
     var orderId = req.params.id;
+    var email = req.session.user.auth.email;
     Order.findOne(orderId).exec(function(err,order){
       if(err){
         return res.badRequest(err);
@@ -618,6 +639,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
+        notification.notificationCenter("Order", "ready", result);
         if(order.method == "pickup"){
           return res.ok({responseText : "订单已准备完毕，已通知吃货上门取货"});
         }else{
@@ -629,6 +651,7 @@ module.exports = {
 
   receive : function(req, res){
     var orderId = req.params.id;
+    var email = req.session.user.auth.email;
     Order.findOne(orderId).exec(function(err,order){
       if(err){
         return res.badRequest(err);
@@ -644,44 +667,10 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
+        notification.notificationCenter("Order", "receive", result);
         return res.ok({responseText : "订单已被领取"});
       });
     });
-  },
-
-  review : function(req, res){
-
-  },
-
-  complete : function(req, res){
-    //change the order to complete
-    var orderId = req.params.id;
-    //check the status of the order, if already complete skip it
-    //elseif cancel, return badRequest
-    Order.findOne(orderId).exec(function(err,order){
-      if(err){
-        return res.badRequest(err)
-      }
-      var stauts = order.status;
-      if(status == "complete"){
-        return res.badRequest("complete order can not be completed again")
-      }else if(status == "schedual" || stauts == "prepare" || status == "adjust"){
-        return res.badRequest("order must be ready before completion")
-      }else if(status == "cancel"){
-        return res.badRequest("order has been canceled")
-      }
-      order.stauts = "complete";
-
-      var total = order.total + order.delivery_fee;
-      //pay the host, transfer from my account to host account
-
-    });
-
-    //calculate subtotal + tax + delivery - fee
-
-    //set status to complete
-
-
   }
 };
 

@@ -35,6 +35,7 @@
                   <label for="dishList">1.从<span class="text-green">我的菜</span>加入Meal <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
                   <ul id="dishList" class="border-lightgrey selectable-list">
                     <% meal.allDishes.forEach(function(dish){
+                      if(dish.isVerified){
                         var dishes = meal.dishes;
                         var hasDish = false;
                         dishes.forEach(function(existDish){
@@ -46,7 +47,7 @@
                           <li class="select" data-id="<%= dish.id%>"><a class="text-white" name="title"><%= dish.title%><i class="fa fa-ticket"></i></a></li>
                         <%}else{%>
                           <li data-id="<%= dish.id%>"><a class="text-green" name="title"><%= dish.title%><i class="fa fa-ticket"></i></a></li>
-                        <%}});%>
+                        <%}}});%>
                   </ul>
                 </div>
 
@@ -101,11 +102,11 @@
               <div class="row">
                 <div class="col-xs-12">
                   <label class="btn btn-default fixed-label vertical-align" data-href="#order" style="width: 120px;" onclick="javascript:$($(this).data('href')).parent().find('.tab-pane').hide();$($(this).data('href')).show();">
-                    <input type="radio" id="radio-order-now" name="radio-set-1" class="regular-radio" checked=""><label for="radio-order-now"></label><span style="margin-left: 10px;">即点即做</span>
+                    <input type="radio" id="radio-order-now" name="radio-set-1" class="regular-radio" <%= meal.type=="order" ? "checked=''" : ''%> ><label for="radio-order-now"></label><span style="margin-left: 10px;">即点即做</span>
                   </label>
 
                   <label class="btn btn-default fixed-label vertical-align" data-href="#preorder" style="width: 120px;" onclick="javascript:$($(this).data('href')).parent().find('.tab-pane').hide();$($(this).data('href')).show();">
-                    <input type="radio" id="radio-preorder" name="radio-set-1" class="regular-radio"><label for="radio-preorder"></label><span style="margin-left: 10px;">预定</span>
+                    <input type="radio" id="radio-preorder" name="radio-set-1" class="regular-radio" <%= meal.type=="preorder" ? "checked=''" : ''%>><label for="radio-preorder"></label><span style="margin-left: 10px;">预定</span>
                   </label>
                 </div>
                 <div class="col-xs-12 tab-content">
@@ -169,31 +170,48 @@
                       </div>
                     </div>
 
-                    <div class="form-group row vertical-align" style="height: 80px;">
-                      <div class="col-xs-4">
-                        <label>取餐时间 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                      </div>
-                      <div class="col-xs-8 start-pickup">
-                        <div class="form-group">
-                          <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= meal.pickupFromTime%>">
-                            <span class="input-group-addon">From</span>
-                            <input type='text' class="form-control" />
+                    <div class="pickup_container">
+                      <% meal.pickups.forEach(function(pickup){%>
+                      <div class="well form-group pickup">
+                        <div class="col-xs-4">
+                          <label>取餐时间 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                        </div>
+
+                        <div class="col-xs-8 start-pickup">
+                          <div class="form-group">
+                            <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= pickup.pickupFromTime%>">
+                              <span class="input-group-addon">From</span>
+                              <input type='text' class="form-control" />
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
                             </span>
+                            </div>
                           </div>
-                        </div>
-                        <div class="form-group end-pickup">
-                          <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= meal.pickupTillTime%>">
-                            <span class="input-group-addon">&nbsp;&nbsp;To&nbsp;&nbsp;</span>
-                            <input type='text' class="form-control"/>
+
+                          <div class="form-group end-pickup">
+                            <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= pickup.pickupTillTime%>">
+                              <span class="input-group-addon">&nbsp;&nbsp;To&nbsp;&nbsp;</span>
+                              <input type='text' class="form-control"/>
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
                             </span>
+                            </div>
+                          </div>
+
+                          <div class="form-group location">
+                            <label>取餐地点</label>
+                            <input type="text" class="form-control" value="<%= pickup.location%>">
                           </div>
                         </div>
                       </div>
+                      <%});%>
                     </div>
+
+                    <div id="pickupAlert" class="alert alert-danger" data-toggle="alert">必须有至少一个取餐选项.</div>
+
+                    <button id="addNewPickupBtn" class="btn btn-info pull-right">新增取餐地点</button>
+                    <button id="removeNewPickupBtn" class="btn btn-danger pull-right" style="margin-right:10px;">移除取餐地点</button>
+
                   </div>
                 </div>
                 <script>

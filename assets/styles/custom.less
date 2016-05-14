@@ -1,6 +1,7 @@
 body{
   //font-style: normal;
   //font-family: Arial;
+  min-height: 550px;
 }
 
 *:focus {
@@ -814,6 +815,47 @@ fieldset[disabled] .btn-red.active {
   /*transition: all 5s ease-in-out;*/
 }
 
+/*
+  Customer form
+*/
+#address-form{
+  h4{
+    .text-red;
+  }
+  .guest{
+    display: block;
+  }
+  .host{
+    display: none;
+  }
+  span{
+    .text-red;
+  }
+}
+#address-form[data-host='true']{
+  h4{
+    .text-green;
+  }
+  button[type='submit']{
+    .green;
+  }
+  .host{
+    display: block;
+    label{
+      .text-green;
+    }
+  }
+  .guest{
+    display: none;
+  }
+  #host_title{
+    display: block;
+  }
+  span{
+    .text-green;
+  }
+}
+
 #our-story{
   width: 50%;
   top: 250px;
@@ -901,6 +943,14 @@ fieldset[disabled] .btn-red.active {
     position: absolute;
     .cursor-pointer;
   }
+}
+
+.container-fluid{
+  min-height: 550px;
+}
+
+.base_container{
+  min-height: 650px;
 }
 
 .default-container{

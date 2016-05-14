@@ -1,0 +1,162 @@
+
+<div class="text-center base_container" style="margin-top:-20px;">
+  <div class="row">
+    <div class="pure-banner vertical-align green">
+      <div style="width: 600px;" class="middle banner-text">
+        <div class="row vertical-align" style="margin-bottom: 5px;">
+          <div class="col-sm-3">
+            <h3 class="text-white logo-text"><strong>私房Meal</strong><br><small class="text-white text-center">SFMeal.com</small></h3>
+          </div>
+          <div class="col-sm-9">
+            <h4 class="text-white"><strong>欢迎加入我们,一起享受私房菜吧！</strong></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="applyView" class="default-container">
+    <div class="box white">
+      <h4 class="text-green">完成这五步, 你就可以和大家轻松分享私房菜啦!</h4>
+
+      <hr>
+
+      <div class="progress">
+        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="5" style="width: 20%;">
+          Step 1 of 5
+        </div>
+      </div>
+
+      <div class="navbar">
+        <div class="navbar-inner">
+          <ul class="nav nav-pills">
+            <li class="active"><a href="#step1" data-toggle="tab" data-pass="<%= user.host%>" data-step="1">成为厨师</a></li>
+            <li><a href="#step2" data-toggle="tab" data-pass="<%= hasAddress%>" data-step="2">厨房地址</a></li>
+            <li><a href="#step3" data-toggle="tab" data-pass="<%= hasDish%>" data-step="3">发布菜式</a></li>
+            <li><a href="#step4" data-toggle="tab" data-pass="<%= hasMeal%>" data-step="4">发布菜单</a></li>
+            <li><a href="#step5" data-toggle="tab" data-pass="<%= hasAccount%>" data-step="5">收款方式</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="tab-content">
+        <div class="tab-pane fade in active" id="step1">
+
+          <% if( typeof user.host !== 'undefined' && user.host){%>
+            <div class="well">
+              <label>您已成为厨师!</label>
+              <br>
+              <h4><small>我们为您建立了一个Stripe账户以管理您的收入.</small></h4>
+            </div>
+            <icon class="fa fa-check text-green"></icon>
+            <button class="btn btn-default round next">继续</button>
+          <%}else{%>
+            <div class="well">
+              <label>成为厨师需要什么?</label>
+              <br>
+              <h4><small>点击"申请成为厨师"按钮表示您已阅读及同意SFMeal.com条款和Stripe条款.</small></h4>
+            </div>
+            <button id="applyBtn" class="btn btn-info round">申请成为厨师</button>
+          <%}%>
+
+        </div>
+
+        <div class="tab-pane fade" id="step2">
+
+          <% if( hasAddress ){%>
+          <div class="well">
+            <label>厨房地址已建立!</label>
+            <br>
+            <h4><small>厨房地址帮助吃货们寻找附近的美食.</small></h4>
+          </div>
+          <icon class="fa fa-check text-green"></icon>
+          <button class="btn btn-default round next">继续</button>
+          <%}else{%>
+          <div class="well">
+            <label>为什么需要准确的厨房地址?</label>
+          </div>
+          <a target="_blank" href="/user/me#myaddress" class="btn btn-info round">添加地址</a>
+          <%}%>
+
+        </div>
+
+        <div class="tab-pane fade" id="step3">
+
+          <% if( hasDish ){%>
+          <div class="well">
+            <label>菜式已建立并通过验证!</label>
+            <br>
+          </div>
+          <icon class="fa fa-check text-green"></icon>
+          <button class="btn btn-default round next">继续</button>
+          <%}else{%>
+          <div class="well">
+            <label>为什么需要验证菜式?</label>
+            <h4><small>验证菜式帮助我们建立良好,健康的食物环境.</small></h4>
+          </div>
+          <a target="_blank" href="/host/me/createDish" class="btn btn-info round">添加菜式</a>
+          <%}%>
+
+        </div>
+
+        <div class="tab-pane fade" id="step4">
+
+          <% if( hasMeal ){%>
+          <div class="well">
+            <label>菜单已建立!</label>
+            <h4><small>请完成所有步骤以让菜单正式上线</small></h4>
+            <br>
+          </div>
+          <icon class="fa fa-check text-green"></icon>
+          <button class="btn btn-default round next">继续</button>
+          <%}else{%>
+          <div class="well">
+            <label>请建立一款菜单</label>
+            <h4><small>菜单是您在设定时间内提供给吃货的菜式集合.</small></h4>
+          </div>
+          <a target="_blank" href="/host/me/createMeal" class="btn btn-info round">添加菜单</a>
+          <%}%>
+
+        </div>
+
+        <div class="tab-pane fade" id="step5">
+
+          <% if( hasAccount ){%>
+          <div class="well">
+            <label>收款账号已建立!<br/><br/>您已完成了所有步骤, 菜单可以正式上线啦!</label>
+          </div>
+          <icon class="fa fa-check text-green"></icon>
+          <a href="/host/me#mymeal" class="btn btn-default round">完成</a>
+          <%}else{%>
+          <div class="well">
+            <label>请设置您的收款银行账号</label>
+            <h4><small>我们会每周将您的收入转账到此银行账号</small></h4>
+          </div>
+          <a target="_blank" href="/user/pocket#mypurse" class="btn btn-info round">添加账号</a>
+          <%}%>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  $('.next').click(function(){
+    var nextId = $(this).parents('.tab-pane').next().attr("id");
+    $('[href=#'+nextId+']').tab('show');
+    return false;
+  })
+
+  $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    //update progress
+    var step = $(e.target).data('step');
+    var percent = (parseInt(step) / 5) * 100;
+
+    $('.progress-bar').css({width: percent + '%'});
+    $('.progress-bar').text("Step " + step + " of 5");
+    //e.relatedTarget // previous tab
+  })
+
+  new ApplyView({el : $("#applyView"), model : new Host()});
+</script>
