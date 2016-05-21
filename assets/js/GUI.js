@@ -252,17 +252,27 @@ var refreshMenu = function(){
       $("#meal-detail-container .dish[data-id=" + key + "]").find(".take-order").html('再点一份');
       $("#meal-detail-container .dish[data-id=" + key + "]").find(".untake-order").show('slow');
     }
-    var subtotal = 0;
-    $("#order .item").each(function(){
-      subtotal += parseFloat($(this).find(".amount").text()) * $(this).find(".price").attr("value");
-    });
-    $("#order .subtotal").html("餐费小计: $" + subtotal.toFixed(2));
-    $("#order .subtotal").data("value", subtotal.toFixed(2));
-    var delivery = 0;
-    $("#order .total").data("value",(subtotal+delivery).toFixed(2));
-    $("#order .total").html("合计: $" + (subtotal+delivery).toFixed(2));
-    $("#meal-confirm-container .total").text("合计: $" + (subtotal+delivery).toFixed(2));
   }
+  var subtotal = 0;
+  var method = $("#meal-confirm-container #method .active").attr("value");
+  $("#order .item").each(function(){
+    subtotal += parseFloat($(this).find(".amount").text()) * $(this).find(".price").attr("value");
+  });
+  $("#order .subtotal").html("餐费小计: $" + subtotal.toFixed(2));
+  $("#order .subtotal").data("value", subtotal.toFixed(2));
+  if(method == "delivery"){
+    var delivery = $("#order .delivery").data("value");
+    $("#order .deliveryOpt").show();
+    $("#order .pickupOpt").hide();
+  }else{
+    $("#order .deliveryOpt").hide();
+    $("#order .pickupOpt").show();
+    delivery = 0;
+  }
+  $(".delivery").text("送餐费小计: $" + delivery.toFixed(2));
+  $("#order .total").data("value",(subtotal+delivery).toFixed(2));
+  $("#order .total").html("合计: $" + (subtotal+delivery).toFixed(2));
+  $("#meal-confirm-container .total").text("合计: $" + (subtotal+delivery).toFixed(2));
 }
 
 //render order view

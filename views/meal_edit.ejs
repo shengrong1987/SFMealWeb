@@ -171,7 +171,7 @@
                     </div>
 
                     <div class="pickup_container">
-                      <% meal.pickups.forEach(function(pickup){%>
+                      <% if(meal.pickups) { meal.pickups.forEach(function(pickup){%>
                       <div class="well form-group pickup">
                         <div class="col-xs-4">
                           <label>取餐时间 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
@@ -204,7 +204,40 @@
                           </div>
                         </div>
                       </div>
-                      <%});%>
+                      <%})}else{;%>
+                      <div class="well form-group pickup">
+                        <div class="col-xs-4">
+                          <label>取餐时间 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                        </div>
+
+                        <div class="col-xs-8 start-pickup">
+                          <div class="form-group">
+                            <div class='input-group date' data-toggle="dateTimePicker">
+                              <span class="input-group-addon">From</span>
+                              <input type='text' class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="fa fa-calendar"></span>
+                            </span>
+                            </div>
+                          </div>
+
+                          <div class="form-group end-pickup">
+                            <div class='input-group date' data-toggle="dateTimePicker">
+                              <span class="input-group-addon">&nbsp;&nbsp;To&nbsp;&nbsp;</span>
+                              <input type='text' class="form-control"/>
+                            <span class="input-group-addon">
+                                <span class="fa fa-calendar"></span>
+                            </span>
+                            </div>
+                          </div>
+
+                          <div class="form-group location">
+                            <label>取餐地点</label>
+                            <input type="text" class="form-control">
+                          </div>
+                        </div>
+                      </div>
+                      <%}%>
                     </div>
 
                     <div id="pickupAlert" class="alert alert-danger" data-toggle="alert">必须有至少一个取餐选项.</div>
@@ -256,8 +289,37 @@
               </div>
             </div>
 
-            <div class="form-group" style="margin-top: 30px;">
-              <label style="display: block;" >4.为你的Meal起个响亮的名字吧！</label>
+            <div class="form-group" style="margin-top: 40px;">
+              <div class="row">
+                <div class="col-xs-12">
+                  <label>4.送餐选项 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                </div>
+                <div class="col-xs-12">
+                  <label class="checkbox-inline" style="padding-bottom: 15px;"><input id="isDelivery" type="checkbox" <%= meal.isDelivery ? "checked=''" : ""%>>是否提供送餐服务</label>
+                </div>
+                <div class="row">
+                  <div class="col-sm-12 col-md-10 col-lg-8">
+                    <div class="col-xs-6">
+                      <div class="input-group">
+                        <div class="input-group-addon">送餐费: $</div>
+                        <input id="deliveryFeeInput" class="form-control" type="number" placeholder="5.0" value="<%= meal.delivery_fee%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
+                      </div>
+                    </div>
+                    <div class=col-xs-6>
+                      <div class="input-group">
+                        <div class="input-group-addon">送餐范围:</div>
+                        <input id="deliveryRangeInput" class="form-control" type="number" placeholder="5.0" value="<%= meal.delivery_range%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
+                        <div class="input-group-addon">Miles</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="help-block with-errors"></div>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 40px;">
+              <label style="display: block;" >5.为你的Meal起个响亮的名字吧！</label>
               <div class="row">
                 <div class="col-xs-12">
                   <input id="meal_title" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="7" placeholder="名字最多七个字" data-error="必须填写名字" required value="<%= meal.title%>"><small> &nbsp;Ex.艾米私房羊肉</small>

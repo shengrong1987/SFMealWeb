@@ -9,13 +9,15 @@ var stripe = require("../services/stripe.js");
 var extend = require('util')._extend;
 var async = require('async');
 var notification = require("../services/notification");
+var geocode = require("../services/geocode.js");
 
 //-1 : quantity now enough
 //-2 : dish not valid
 //-3 : order total doesn't match
 //-4 : meal not valid
 //-5 : missing payment profile
-//-6 : other payment error
+//-6 : address verification fail
+//-7 :
 
 module.exports = {
 
@@ -72,6 +74,30 @@ module.exports = {
     }
   },
 
+  validateAddress : function(method, host, address, pickupInfo, cb){
+    if(method === "delivery"){
+      var location = {lat : host.lat, long : host.long};
+      var range = host.deliveryRange;
+      geocode.distance(address, location, function(err, distance){
+        if(err){
+          console.log(err);
+          return cb(false);
+        }
+        if(distance > range){
+          console.log("distance verification failed");
+          return cb(false);
+        }
+        cb(true);
+      })
+    }else{
+      if(!pickupInfo || !pickupInfo.location){
+        console.log("pickup information missing");
+        return cb(false);
+      }
+      cb(true);
+    }
+  },
+
   updateMealLeftQty : function(meal, lastorder, order, cb){
     var leftQty = meal.leftQty;
     var dishes = Object.keys(lastorder);
@@ -94,84 +120,105 @@ module.exports = {
     var orders = req.body.orders;
     var mealId = req.body.mealId;
     var email = req.session.user.auth.email;
-    var delivery_fee = req.body.delivery_fee;
-    var subtotal = parseFloat(req.body.subtotal).toFixed(2);
+    var method = req.body.method;
+    var address = req.body.address;
+    var pickupInfo = req.body.pickupInfo;
+    var subtotal = parseFloat(req.body.subtotal.toFixed(2));
     req.body.customer = userId;
     var $this = this;
-
     Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,m) {
       if (err) {
         return res.badRequest(err);
       }
-      if($this.validate_meal(m, orders, undefined, subtotal, res)){
-        console.log("order pass meal validation");
-        var dishes = m.dishes;
-        req.body.host = m.chef.id;
-        req.body.type = m.type;
-        req.body.dishes = dishes;
-        req.body.meal = m.id;
-        req.body.guestEmail = email;
-        req.body.hostEmail = m.chef.email;
-        User.findOne(userId).populate('payment').exec(function (err, found) {
-          if (err) {
-            console.log("error:" + err);
-            return res.badRequest(err);
+      $this.validateAddress(method, m.chef, address, pickupInfo, function(valid){
+        if(!valid){
+          res.badRequest({responseText : "address verification fail", code : -6});
+        }else if($this.validate_meal(m, orders, undefined, subtotal, res)){
+          console.log("order pass meal validation");
+          var dishes = m.dishes;
+          if(method == "delivery"){
+            var delivery_fee = m.delivery_fee;
+          }else{
+            var delivery_fee = 0;
           }
-          if(!found.payment || found.payment.length == 0){
-            console.log("error: missing payment profile");
-            return res.badRequest({ responseText : "payment method needed", code : -5});
-          }
-          Order.create(req.body).exec(function (err, order) {
+          req.body.host = m.chef.id;
+          req.body.type = m.type;
+          req.body.dishes = dishes;
+          req.body.meal = m.id;
+          req.body.guestEmail = email;
+          req.body.hostEmail = m.chef.email;
+          User.findOne(userId).populate('payment').exec(function (err, found) {
             if (err) {
               return res.badRequest(err);
             }
-            stripe.charge({
-              amount : (subtotal + delivery_fee) * 100,
-              email : email,
-              customerId : found.payment[0].customerId,
-              destination : m.chef.accountId,
-              metadata : {
-                mealId : m.id,
-                hostId : m.chef.id,
-                orderId : order.id
-              }
-            },function(err, charge){
+            if(!found.payment || found.payment.length == 0){
+              return res.badRequest({ responseText : "payment method needed", code : -5});
+            }
+            if(m.type == "order"){
+              req.body.status = "preparing";
+            }
+            if(!found.phone && !req.body.phone){
+              return res.badRequest("need user's contact info");
+            }
+            req.body.phone = found.phone || req.body.phone;
+            console.log("everything seems good, creating order...");
+            Order.create(req.body).exec(function (err, order) {
               if (err) {
-                Order.destroy(order.id).exec(function(err){
-                  if(err){
-                    return res.badRequest(err);
-                  }
-                  return res.badRequest(err);
-                });
+                return res.badRequest(err);
               }
-              if (charge.status == "succeeded") {
-                for (var i = 0; i < dishes.length; i++) {
-                  var dishId = dishes[i].id;
-                  var quantity = parseInt(orders[dishId]);
-                  m.leftQty[dishId] -= quantity;
+              stripe.charge({
+                amount : (subtotal + delivery_fee) * 100,
+                email : email,
+                customerId : found.payment[0].customerId,
+                destination : m.chef.accountId,
+                metadata : {
+                  mealId : m.id,
+                  hostId : m.chef.id,
+                  orderId : order.id
                 }
-                order.transfers = {};
-                order.transfers[charge.transfer] = charge.transfer;
-                order.charges = {};
-                order.charges[charge.id] = charge.amount/100;
-                m.save(function (err, result) {
-                  if(err){
+              },function(err, charge){
+                if (err) {
+                  Order.destroy(order.id).exec(function(err2){
+                    if(err2){
+                      return res.badRequest(err2);
+                    }
                     return res.badRequest(err);
+                  });
+                } else if (charge.status == "succeeded") {
+                  console.log("charge succeed, gathering charing info for order");
+                  for (var i = 0; i < dishes.length; i++) {
+                    var dishId = dishes[i].id;
+                    var quantity = parseInt(orders[dishId]);
+                    m.leftQty[dishId] -= quantity;
                   }
-                  //test only
-                  notification.notificationCenter("Order", "new", order);
-                  if(req.wantsJSON){
-                    return res.ok(order);
-                  }
-                  return res.ok({responseText : "Your order has been taken successfully!You will be directed to orde page. Now just wait for your food to be ready."});
-                });
-              } else {
-                res.badRequest({ reponseText : "Encoutered unkown error", code : -6});
-              }
+                  order.transfers = {};
+                  order.transfers[charge.transfer] = charge.transfer;
+                  order.charges = {};
+                  order.charges[charge.id] = charge.amount/100;
+                  m.save(function (err, result) {
+                    if(err){
+                      return res.badRequest(err);
+                    }
+                    order.save(function(err, o){
+                      if(err){
+                        return res.badRequest(err);
+                      }
+                      notification.notificationCenter("Order", "new", order);
+                      //test only
+                      if(req.wantsJSON){
+                        return res.ok(order);
+                      }
+                      return res.ok({responseText : "Your order has been taken successfully!You will be directed to orde page. Now just wait for your food to be ready."});
+                    });
+                  });
+                } else {
+                  res.badRequest({ reponseText : "Encoutered unkown error", code : -7});
+                }
+              });
             });
           });
-        });
-      }
+        }
+      });
     });
   },
 
@@ -264,6 +311,7 @@ module.exports = {
               }else{
                 var totalRefund = Math.abs(diff);
                 diff = - diff;
+                console.log(order.charges);
                 var chargeIds = Object.keys(order.charges);
                 var refundCharges = [];
                 chargeIds.forEach(function(chargeId){

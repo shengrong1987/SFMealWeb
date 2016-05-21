@@ -42,7 +42,6 @@ module.exports = {
     },
     address: {
       type: 'string',
-      required: true
     },
     phone: {
       type: 'string',
@@ -63,6 +62,9 @@ module.exports = {
       type: 'string',
       enum: ['pickup', 'delivery'],
       defaultsTo: 'delivery'
+    },
+    pickupInfo : {
+      type : 'json'
     },
     customer: {
       model: 'User',

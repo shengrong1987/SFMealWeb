@@ -18,6 +18,11 @@
   <div class="row">
 
     <div class="default-container">
+      <% if(!user.host.passGuide){%>
+      <div class="col-xs-12 box">
+        <div class="alert alert-info">欢迎来到厨师管理页面, 点击这里会帮助您建立并发布菜单. <a class="btn btn-info" style="margin-left:10px;" href="/apply">厨师发布引导</a></div>
+      </div>
+      <%}%>
       <ul class="nav nav-tab-green nav-justified" style="padding: 20px;">
         <li class="active"><a data-toggle="tab" href="#myorder"><h4><strong>厨房订单</strong></h4></a></li>
         <li><a data-toggle="tab" href="#mymeal"><h4><strong>我的Meal</strong></h4></a></li>
@@ -939,9 +944,9 @@
                   <tbody class="item">
                     <tr class="success">
                       <% if(meal.type=="order"){%>
-                      <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:即点&nbsp&nbsp&nbsp&nbsp&nbsp供应时间: <%= meal.provideDate()%></td>
+                      <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:即点&nbsp&nbsp&nbsp&nbsp&nbsp供应时间: <span data-toggle="time-span" data-format="hourly" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>"></span></td>
                       <%}else{%>
-                      <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:预定&nbsp&nbsp&nbsp&nbsp&nbsp预定时间: <%= meal.provideDate()%>&nbsp&nbsp&nbsp&nbsp&nbsp取货时间:&nbsp<%= meal.dispatchingHour()%></td>
+                      <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:预定&nbsp&nbsp&nbsp&nbsp&nbsp预定时间: <span data-toggle="time-span" data-format="hourly" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>"></span>&nbsp&nbsp&nbsp&nbsp&nbsp取货时间:&nbsp <span data-toggle="time-span" data-format="day" data-date="<%= meal.pickups[0].pickupFromTime%>"></span></td>
                       <%}%>
                     </tr>
                     <tr>
@@ -1017,9 +1022,9 @@
                   <tbody class="item">
                   <tr class="success">
                     <% if(meal.type=="order"){%>
-                    <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:即点&nbsp&nbsp&nbsp&nbsp&nbsp供应时间: <%= meal.provideDate()%></td>
+                    <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:即点&nbsp&nbsp&nbsp&nbsp&nbsp供应时间: <span data-toggle="time-span" data-format="hourly" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>"></span></td>
                     <%}else{%>
-                    <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:预定&nbsp&nbsp&nbsp&nbsp&nbsp预定时间: <%= meal.provideDate()%>&nbsp&nbsp&nbsp&nbsp&nbsp取货时间:&nbsp <%= meal.dispatchingHour()%></td>
+                    <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:预定&nbsp&nbsp&nbsp&nbsp&nbsp预定时间: <span data-toggle="time-span" data-format="hourly" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>"></span>&nbsp&nbsp&nbsp&nbsp&nbsp取货时间:&nbsp <span data-toggle="time-span" data-format="day" data-date="<%= meal.pickups[0].pickupFromTime%>"></span></td>
                     <%}%>
                   </tr>
                   <tr>
@@ -1090,9 +1095,9 @@
                   <tbody class="item">
                   <tr class="success">
                     <% if(meal.type=="order"){%>
-                    <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:即点&nbsp&nbsp&nbsp&nbsp&nbsp供应时间: <%= meal.provideDate()%></td>
+                    <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:即点&nbsp&nbsp&nbsp&nbsp&nbsp供应时间: <span data-toggle="time-span" data-format="hourly" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>"></span></td>
                     <%}else{%>
-                    <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:预定&nbsp&nbsp&nbsp&nbsp&nbsp预定时间: <%= meal.provideDate()%>&nbsp&nbsp&nbsp&nbsp&nbsp取货时间:&nbsp<%= meal.dispatchingHour()%></td>
+                    <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:预定&nbsp&nbsp&nbsp&nbsp&nbsp预定时间: <span data-toggle="time-span" data-format="hourly" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>"></span>&nbsp&nbsp&nbsp&nbsp&nbsp取货时间:&nbsp <span data-toggle="time-span" data-format="day" data-date="<%= meal.pickups[0].pickupFromTime%>"></span></td>
                     <%}%>
                   </tr>
                   <tr>
@@ -1162,9 +1167,9 @@
                   <tbody class="item">
                   <tr class="success">
                     <% if(meal.type=="order"){%>
-                    <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:即点&nbsp&nbsp&nbsp&nbsp&nbsp供应时间: <%= meal.provideDate()%></td>
+                    <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:即点&nbsp&nbsp&nbsp&nbsp&nbsp供应时间: <span data-toggle="time-span" data-format="hourly" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>"></span></td>
                     <%}else{%>
-                    <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:预定&nbsp&nbsp&nbsp&nbsp&nbsp预定时间: <%= meal.provideDate()%>&nbsp&nbsp&nbsp&nbsp&nbsp取货时间:&nbsp<%= meal.dispatchingHour()%></td>
+                    <td align="left" colspan="6">最后发布时间 ：<%= meal.updatedAt%> &nbsp&nbsp&nbsp&nbsp&nbsp方式:预定&nbsp&nbsp&nbsp&nbsp&nbsp预定时间: <span data-toggle="time-span" data-format="hourly" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>"></span>&nbsp&nbsp&nbsp&nbsp&nbsp取货时间:&nbsp <span data-toggle="time-span" data-format="day" data-date="<%= meal.pickups[0].pickupFromTime%>"></span></td>
                     <%}%>
                   </tr>
                   <tr>

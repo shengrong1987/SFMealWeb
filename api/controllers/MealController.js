@@ -118,15 +118,32 @@ module.exports = {
             }
           }
         });
+      }else{
+        found = found.filter(function(meal){
+          var dishes = meal.dishes;
+          var valid = false;
+          for(var i=0; i < dishes.length; i++){
+            var dish = dishes[i];
+            if(dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
+              valid = true;
+              break;
+            }
+          }
+          return valid;
+        });
+        if(req.wantsJSON) {
+          res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : null, anchor : null});
+        }else{
+          res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : null, anchor : null });
+        }
       }
-
     });
   },
 
   confirm : function(req, res){
     var mealId = req.param("id");
     var userId = req.session.user.id;
-    Meal.find(mealId).populate("dishes").exec(function(err,m){
+    Meal.find(mealId).populate("dishes").populate("chef").exec(function(err,m){
       if(err){
         return res.badRequest(err);
       }
@@ -289,7 +306,7 @@ module.exports = {
       return res.badRequest("Date format of meal is not valid");
     }
   },
-  
+
   requirementIsValid : function(params){
     var minOrderNumber = parseInt(params.minimalOrder);
     var minOrderTotal = parseFloat(params.minimalTotal);

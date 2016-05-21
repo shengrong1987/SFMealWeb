@@ -92,7 +92,7 @@ describe('ReviewController', function() {
       dishObj[dishId4] = 0;
       agent
         .post('/order')
-        .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : address, phone : phone, method : "pickup", mealId : mealId, delivery_fee : 0})
+        .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : address, phone : phone, method : "delivery", mealId : mealId})
         .expect(200)
         .end(function(err,res){
           if(err){

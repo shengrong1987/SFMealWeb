@@ -174,37 +174,71 @@
                     <button id="removeNewPickupBtn" class="btn btn-danger pull-right" style="margin-right:10px;">移除取餐地点</button>
 
                   </div>
-
-                  <div class="form-group row order-require" style="margin-top: 10px;">
-                    <div class="col-xs-12">
-                      <label>几份order或达到多少钱预售成功？ <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                    </div>
-                    <div class="col-xs-12">
-                      <div class="col-xs-4">
-                        <div class="input-group">
-                          <input id="min-order" class="form-control" type="number" min="1" max="999" style="min-width: 100px;" data-error="最少份数或最少金额须填写一项">
-                          <div class="input-group-addon">份</div>
-                        </div>
-                      </div>
-                      <div class="col-xs-1 vertical-align" style="height: 35px;"><label class="middle">或</label></div>
-                      <div class="col-xs-4">
-                        <div class="input-group">
-                          <input id="min-total" class="form-control" type="number" min="1" max="9999" style="min-width: 100px;" data-error="最少份数或最少金额须填写一项">
-                          <div class="input-group-addon">.00美元</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="alert alert-danger" data-toggle="alert"></div>
-                  </div>
                 </div>
               </div>
               <div id="scheduleAlert" class="alert alert-danger" data-toggle="alert" style="margin-top:10px;"></div>
+            </div>
 
-            <div class="form-group row" style="margin-top: 20px;">
-              <div class="col-xs-12">
-                <label style="display: block;" for="">3.为你的Meal起个响亮的名字吧！</label>
-                <input id="meal_title" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="7" placeholder="名字最多七个字" data-error="必须填写名字" required><small>  Ex.艾米私房羊肉</small>
+            <div class="form-group order-require" style="margin-top: 10px;">
+              <div class="row">
+                <div class="col-xs-12">
+                  <label>3.几份order或达到多少钱预售成功？ <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                </div>
+                <div class="col-xs-12">
+                  <div class="col-xs-4">
+                    <div class="input-group">
+                      <input id="min-order" class="form-control" type="number" min="1" max="999" style="min-width: 100px;" data-error="最少份数或最少金额须填写一项">
+                      <div class="input-group-addon">份</div>
+                    </div>
+                  </div>
+                  <div class="col-xs-1 vertical-align" style="height: 35px;"><label class="middle">或</label></div>
+                  <div class="col-xs-4">
+                    <div class="input-group">
+                      <input id="min-total" class="form-control" type="number" min="1" max="9999" style="min-width: 100px;" data-error="最少份数或最少金额须填写一项">
+                      <div class="input-group-addon">.00美元</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="alert alert-danger" data-toggle="alert"></div>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 40px;">
+              <div class="row">
+                <div class="col-xs-12">
+                  <label>4.送餐选项 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                </div>
+                <div class="col-xs-12">
+                  <label class="checkbox-inline" style="padding-bottom: 15px;"><input id="isDelivery" type="checkbox" checked="checked">是否提供送餐服务</label>
+                </div>
+                <div class="row">
+                  <div class="col-sm-12 col-md-10 col-lg-8">
+                    <div class="col-xs-6">
+                      <div class="input-group">
+                        <div class="input-group-addon">送餐费: $</div>
+                        <input id="deliveryFeeInput" class="form-control" type="number" placeholder="5.0" value="5.0">
+                      </div>
+                    </div>
+                    <div class=col-xs-6>
+                      <div class="input-group">
+                        <div class="input-group-addon">送餐范围:</div>
+                        <input id="deliveryRangeInput" class="form-control" type="number" placeholder="5.0" value="5.0">
+                        <div class="input-group-addon">Miles</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div class="help-block with-errors"></div>
+              </div>
+            </div>
+
+            <div class="form-group row" style="margin-top: 30px;">
+              <div class="row">
+                <div class="col-xs-12">
+                  <label style="display: block;" for="">5.为你的Meal起个响亮的名字吧！</label>
+                  <input id="meal_title" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="7" placeholder="名字最多七个字" data-error="必须填写名字" required><small>  Ex.艾米私房羊肉</small>
+                  <div class="help-block with-errors"></div>
+                </div>
               </div>
             </div>
 
@@ -212,7 +246,6 @@
               <button name="publish" type="submit" class="btn btn-green btn-lg round" style="margin-right: 20px;">发布并保存到线上</button>
               <button name="save" type="button" class="btn btn-disable btn-lg round text-grey">发布预览但不发布</button>
               <div class="alert alert-danger" data-toggle="alert" style="margin-top: 20px;"></div>
-            </div>
             </div>
           </form>
 

@@ -27,7 +27,7 @@
     </div>
   </div>
 
-  <div id="meal-detail-container" class="container-fluid padding-clear">
+  <div id="meal-detail-container" class="container-fluid padding-clear" data-lat="<%= meal.chef.lat%>" data-long="<%= meal.chef.long%>" data-range="<%= meal.chef.deliveryRange%>">
 
     <div class="row">
       <div class="col-md-8">
@@ -61,10 +61,10 @@
               <div class="row">
                 <div class="col-xs-12">
                   <% if(meal.type=="order"){%>
-                    <h3 class="text-left"><small>供应时间 <span class="text-red"> <%= meal.provideDate()%></span></small></h3>
+                    <h3 class="text-left"><small>供应时间 <span data-toggle="time-span" data-format="hourly" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>" class="text-red"> <%= meal.provideDate()%></span></small></h3>
                   <%}else{%>
-                    <h3 class="text-left"><small>预定时间 <span class="text-red"> <%= meal.provideDate()%></span></small></h3>
-                    <h3 class="text-left"><small>取货时间 <span class="text-red"> <%= meal.dispatchingHour()%></span></small></h3>
+                    <h3 class="text-left"><small>预定时间 <span data-toggle="time-span" data-format="date" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>" class="text-red"> <%= meal.provideDate()%></span></small></h3>
+                    <h3 class="text-left"><small>取货时间 <span data-toggle="time-span" data-format="day" data-date="<%= meal.pickups[0].pickupFromTime%>" class="text-red"></span></small></h3>
                   <%}%>
                 </div>
               </div>
@@ -82,29 +82,34 @@
               </div>
 
               <div class="row">
-                <div class="box-simple text-left">
-                  <div class="checkbox">
-                    <label>
-                      <input type="checkbox"><small class="font-small"><span class="text-black">上门自取</span>  免费，时间根据点餐内容变动</small>
-                    </label>
+                <% if(meal.type === "order"){%>
+                  <div class="box-simple text-left">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox"><small class="font-small"><span class="text-black">上门自取</span>  免费，时间根据点餐内容变动</small>
+                      </label>
+                    </div>
                   </div>
-                </div>
                 <div class="divider"></div>
-                <div class="box-simple text-left">
-                  <div class="checkbox">
-                    <label>
-                      <input type="checkbox"><small class="font-small"><span class="text-black">集合点自取</span>  地点：Coscto, San Francisco，时间6:00PM-7:00PM</small>
-                    </label>
+                  <div class="box-simple text-left">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox"><small class="font-small"><span class="text-black">送餐</span>  送餐费及时间：<a class="text-red" href="#">点我算一下</a> </small>
+                      </label>
+                    </div>
                   </div>
-                </div>
-                <div class="divider"></div>
-                <div class="box-simple text-left">
-                  <div class="checkbox">
-                    <label>
-                      <input type="checkbox"><small class="font-small"><span class="text-black">送餐</span>  送餐费及时间：<a class="text-red" href="#">点我算一下</a> </small>
-                    </label>
+                <%}else{
+                var count = 1;
+                meal.pickups.forEach(function(pickupMethod){%>
+                  <div class="box-simple text-left">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox"><small class="font-small"><span class="text-black">自取 </span>地点<%= count%>：<%= pickupMethod.location%>，时间: <span data-toggle="time-span" data-format="hourly" data-from="<%= pickupMethod.pickupFromTime%>" data-to="<%= pickupMethod.pickupTillTime%>"></span></small>
+                      </label>
+                    </div>
                   </div>
-                </div>
+                  <div class="divider"></div>
+                <% count++;})}%>
               </div>
             </div>
 
@@ -128,7 +133,8 @@
 
               <h4 class="text-left"><small>取餐地点：（付款后就可以看到具体地址）</small></h4>
 
-              <iframe height="440" frameborder="0" style="border:0;width: 100%;" src="https://www.google.com/maps/embed/v1/place?q=place_id:ChIJIQBpAG2ahYAR_6128GcTUEo&key=AIzaSyAqQq-WgRUTFO9UtYyNvrJAlBcCZ_67P_U" allowfullscreen></iframe>
+              <div id="googlemap" style="height: 440px;"></div>
+
             </div>
           </div>
 
@@ -336,3 +342,9 @@
     <h1></h1>
   </div>
 </div>
+
+<script>
+  var mealSelectionView = new MealSelectionView({ el : $("#meal-detail-container"), model : new Meal()});
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA&callback=mealSelectionView.initMap" async defer></script>

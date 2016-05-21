@@ -10,13 +10,13 @@ var Sails = require('sails'),
 
 before(function(done) {
   // Increase the Mocha timeout so that Sails has enough time to lift.
-  this.timeout(5000);
+  this.timeout(8000);
 
   //fs.unlinkSync('/.tmp/myTestConnection.db');
 
   Sails.lift({
     // configuration for testing purposes
-    //log: { level: 'verbose' },
+    log: { level: 'verbose' },
     connections: {
       someMongodbServer : {
         database : 'test'

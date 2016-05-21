@@ -4,6 +4,7 @@
 var moment = require("moment");
 
 module.exports = {
+
   getUTCTime : function(){
     var mNow = moment.utc(Date.now());
     return mNow._i;

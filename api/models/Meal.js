@@ -91,6 +91,17 @@ module.exports = {
       type : 'integer',
       defaultsTo : 0
     },
+    delivery_fee : {
+      type : 'float',
+      defaultsTo : 5.0
+    },
+    delivery_range : {
+      type : 'float',
+      defaultsTo : 5.0
+    },
+    isDelivery : {
+      type : 'boolean'
+    },
     isFull : function(){
       var $this = this;
       var isFull = true;

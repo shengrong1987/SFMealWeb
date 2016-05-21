@@ -26,7 +26,7 @@
     </div>
   </div>
 
-  <div id="meal-confirm-container" class="container-fluid padding-clear">
+  <div id="meal-confirm-container" class="container-fluid padding-clear" data-lat="<%= meal.chef.lat%>" data-long="<%= meal.chef.long%>" data-range="<%= meal.chef.deliveryRange%>">
 
     <div class="row">
       <div class="col-md-8">
@@ -36,36 +36,69 @@
           <h4 class="text-left"><strong>请选择取餐方式:</strong></h4>
           <h3></h3>
           <div class="btn-set text-left" id="method" data-toggle="btn-set">
-            <button class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="pickup"><strong>自取</strong></button>
-            <button class="btn btn-disable btn-fat btn-lg" value="delivery"><strong>送餐</strong></button>
+            <%if(meal.isDelivery){%>
+            <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;" value="pickup"><strong>自取</strong></button>
+            <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active" value="delivery"><strong>送餐</strong></button>
+            <%}else{%>
+            <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="pickup"><strong>自取</strong></button>
+            <%}%>
           </div>
           <h3></h3>
-          <h4 class="text-left"><strong>输入收餐地址后，系统会自动计算送餐费用。</strong></h4>
-          <div class="row text-left">
-            <div class="col-xs-12">
-              <h5>1.收餐地址</h5>
-            </div>
-            <div class="radio-box col-xs-12 row" id="contact">
-              <%
-                var addresses= user.address_list;
-                var keys = Object.keys(addresses);
-                var i = 0;
-                keys.forEach(function(key){
-                  var addressObj = addresses[key];
-                  var address = addressObj.street + ", " + addressObj.city + " " + addressObj.zip + ", +" + addressObj.phone;
-              %>
-                <label class="btn btn-default fixed-label vertical-align" style="text-align: left;">
-                  <input type="radio" id="radio-1-<%= i%>" name="radio-1-set" class="regular-radio" checked=""><label for="radio-1-<%= i%>"></label>
-                  <span style="margin-left: 10px;"><%= address %></span>
-                </label>
-              <%i++;}); %>
-              <h4 style="margin-left: 42px;"><a class="text-red" data-action="updateFromOrder" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" data-id="<%=user.id%>" href="javascript:void(0)">新增收餐地址及电话</a></h4>
+          <div class="tab-content">
+            <div id="pickupTab" class="tab-pane <%= meal.isDelivery ? '':'active'%>">
+              <h4 class="text-left"><strong>请选择方便你的自取地点和时间.</strong></h4>
+              <div class="row text-left">
+                <div class="col-xs-12">
+                  <h5>1.自取地址和时间</h5>
+                </div>
+                <div class="radio-box col-xs-12 row" id="pickupMethod" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
+                  <%
+                  var i = 0;
+                  meal.pickups.forEach(function(pickup){ %>
+                  <label class="btn btn-default fixed-label vertical-inline" style="text-align: left;height: 70px;">
+                    <input type="radio" id="radio-1-<%= i%>" name="radio-1-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="radio-1-<%= i%>"></label>
+                    <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>">时间: <span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
+                    <br/>
+                    <label class="location" data-value="<%= pickup.location%>" style="margin-left: 23px;"><span>地点:&nbsp; <%= pickup.location%></span></label>
+                  </label>
+                  <%i++;}); %>
+                </div>
+
+                <h1></h1>
+                <div class="divider"></div>
+                <h4 class="text-right col-xs-12 delivery">送餐费小计: $<%= meal.delivery_fee%></h4>
+              </div>
             </div>
 
-            <h1></h1>
-            <div class="divider"></div>
-            <h4 class="text-right col-xs-12">送餐费小计: $0.00</h4>
-            <div id="contact-error" data-toggle="alert" style="margin-top: 40px;" class="alert alert-warning"></div>
+            <div id="deliveryTab" class="tab-pane <%= meal.isDelivery ? 'active':''%>">
+              <h4 class="text-left"><strong>输入收餐地址后，系统会自动计算送餐费用。</strong></h4>
+              <div class="row text-left">
+                <div class="col-xs-12">
+                  <h5>1.收餐地址</h5>
+                </div>
+                <div class="radio-box col-xs-12 row" id="contact" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
+                  <%
+                  var addresses= user.address_list;
+                  var keys = Object.keys(addresses);
+                  var i = 0;
+                  keys.forEach(function(key){
+                    var addressObj = addresses[key];
+                    var address = addressObj.street + ", " + addressObj.city + " " + addressObj.zip + ", +" + addressObj.phone;
+                  %>
+                  <label class="btn btn-default fixed-label vertical-align" style="text-align: left;">
+                    <input type="radio" id="radio-2-<%= i%>" name="radio-2-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="radio-2-<%= i%>"></label>
+                    <span style="margin-left: 10px;"><%= address %></span>
+                  </label>
+                  <%i++;}); %>
+                  <h4 style="margin-left: 42px;"><a class="text-red" data-action="updateFromOrder" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" data-id="<%= user.id%>" href="javascript:void(0)">新增收餐地址及电话</a></h4>
+                </div>
+
+                <h1></h1>
+                <div class="divider"></div>
+                <h4 class="text-right col-xs-12 delivery">送餐费小计: $<%= meal.delivery_fee%></h4>
+              </div>
+            </div>
+            <div id="contact-error" style="margin-top: 40px;" class="alert alert-warning"></div>
           </div>
 
           <h1 class="text-red text-left">Step3:<strong>支付方式</strong></h1>
@@ -144,22 +177,27 @@
               <td>送餐费</td>
             </tr>
             <tr></tr>
-            <tr class="info">
+            <tr class="pickupOpt" style="display: none;">
               <td>自取</td>
-              <td>30分钟</td>
+              <td><%= meal.prepareTime%> 分钟</td>
               <td>免</td>
             </tr>
+            <tr class="deliveryOpt">
+              <td>送餐</td>
+              <td> > <%= meal.prepareTime%> 分钟</td>
+              <td>$ <%= meal.delivery_fee%></td>
+            </tr>
             <tr>
               <th></th>
               <td></td>
-              <th class="text-right delivery" data-value="0">送餐费小计: $0.00</th>
+              <th class="text-right delivery" data-value="<%= meal.delivery_fee%>">送餐费小计: $ <%= meal.delivery_fee%></th>
             </tr>
             <tr></tr>
             <tr></tr>
             <tr>
               <th></th>
               <td></td>
-              <th class="text-right total">合计: $0.00</th>
+              <th class="text-right total">合计: $ 0.00</th>
             </tr>
             </tbody>
           </table>
@@ -176,7 +214,9 @@
 
 </div>
 
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA" async defer></script>
+
 <script>
-  new AddressView({ el : $("#meal-confirm-container"), model : new User()})
   new OrderView({ el : $("#meal-confirm-container"), model : new Order()})
+  new AddressView({ el : $("#meal-confirm-container"), model : new User()})
 </script>

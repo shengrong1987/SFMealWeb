@@ -46,8 +46,7 @@ module.exports = {
       model : 'Host'
     },
     phone : {
-      type : 'string',
-      defaultsTo : '000-000-0000'
+      type : 'string'
     },
     zipcode : {
       type : 'string'

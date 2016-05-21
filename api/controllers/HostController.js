@@ -20,24 +20,50 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        async.each(h.orders,function(order, next){
-          Order.findOne(order.id).populate("meal").exec(function(err, o){
+        if(!h.passGuide){
+          h.checkGuideRequirement(function(err, pass){
             if(err){
-              return next(err);
+              return res.badRequest(err);
             }
-            order = o;
-            next();
+            async.each(h.orders,function(order, next){
+              Order.findOne(order.id).populate("meal").exec(function(err, o){
+                if(err){
+                  return next(err);
+                }
+                order = o;
+                next();
+              });
+            },function(err){
+              if(err){
+                return res.badRequest(err);
+              }
+              h.host_orders = h.orders;
+              h.adjusting_orders = h.adjusting_orders;
+              h.host_dishes = h.dishes;
+              found.host = h;
+              return res.view('host',{user: found});
+            });
+          })
+        }else{
+          async.each(h.orders,function(order, next){
+            Order.findOne(order.id).populate("meal").exec(function(err, o){
+              if(err){
+                return next(err);
+              }
+              order = o;
+              next();
+            });
+          },function(err){
+            if(err){
+              return res.badRequest(err);
+            }
+            h.host_orders = h.orders;
+            h.adjusting_orders = h.adjusting_orders;
+            h.host_dishes = h.dishes;
+            found.host = h;
+            return res.view('host',{user: found});
           });
-        },function(err){
-          if(err){
-            return res.badRequest(err);
-          }
-          h.host_orders = h.orders;
-          h.adjusting_orders = h.adjusting_orders;
-          h.host_dishes = h.dishes;
-          found.host = h;
-          return res.view('host',{user: found});
-        });
+        }
       });
     });
   },
@@ -196,7 +222,12 @@ module.exports = {
         if(host.bankId){
           hasAccount = true;
         }
-        return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount });
+        host.checkGuideRequirement(function(err, pass){
+          if(err){
+            return res.badRequest(err);
+          }
+          return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount });
+        });
       });
     }else{
       return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount });

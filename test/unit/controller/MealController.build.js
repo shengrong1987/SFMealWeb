@@ -145,7 +145,7 @@ describe('MealController', function() {
     it('should create couple dishes', function (done) {
       agent
           .post('/dish')
-          .send({title : '韭菜盒子',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId, description : "韭菜盒子是中国北方地区陕西、山西等地非常流行的汉族小吃，在有些地区也是节日食品。一般选春季头刀韭菜和鸡蛋为主要原料加工制作而成的食品，适宜于春季食用。该制品表皮金黄酥脆。馅心韭香脆嫩，滋味优美，是适时佳点。"})
+          .send({title : '韭菜盒子',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId, description : "韭菜盒子是中国北方地区陕西、山西等地非常流行的汉族小吃，在有些地区也是节日食品。一般选春季头刀韭菜和鸡蛋为主要原料加工制作而成的食品，适宜于春季食用。该制品表皮金黄酥脆。馅心韭香脆嫩，滋味优美，是适时佳点。", isVerified : true})
           .expect(200)
           .end(function(err,res){
             if(res.body.id == undefined){
@@ -156,7 +156,7 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '猪肉馅饼',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
+          .send({title : '猪肉馅饼',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId, isVerified : true})
           .expect(200)
           .end(function(err,res){
             if(res.body.id == undefined){
@@ -167,7 +167,7 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '五彩面',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'entree', chef : hostId})
+          .send({title : '五彩面',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'entree', chef : hostId, isVerified: true})
           .expect(200)
           .end(function(err,res){
             if(res.body.id == undefined){
@@ -178,7 +178,7 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '糖水',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'dessert', chef : hostId})
+          .send({title : '糖水',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'dessert', chef : hostId, isVerified : true})
           .expect(200)
           .end(function(err,res){
             if(res.body.id == undefined){
@@ -218,7 +218,7 @@ describe('MealController', function() {
       }
       agent
           .post('/meal')
-          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, status : "on",cover : dish1, minimalOrder : 5})
+          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, status : "on",cover : dish1, minimalOrder : 5, isDelivery : true})
           .expect(200)
           .end(function(err,res){
             if(res.body.chef != hostId){
@@ -241,7 +241,7 @@ describe('MealController', function() {
       }];
       agent
           .post('/meal')
-          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), pickups : JSON.stringify(pickups),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "on", cover : dish1, minimalOrder : 5})
+          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), pickups : JSON.stringify(pickups),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "on", cover : dish1, minimalOrder : 5, isDelivery : false})
           .expect(200)
           .end(function(err,res){
             if(res.body.chef != hostId){
@@ -478,6 +478,6 @@ describe('MealController', function() {
             done();
           })
     })
-    
+
   });
 });

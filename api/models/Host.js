@@ -51,6 +51,10 @@ module.exports = {
     lat : {
       type : 'string'
     },
+    deliveryRange : {
+      type : "float",
+      defaultsTo : 4.0
+    },
     city : {
       type : 'string'
     },
@@ -77,6 +81,20 @@ module.exports = {
     orders : {
       collection : 'Order',
       via : 'host'
+    },
+    passGuide : {
+      type : 'boolean',
+      defaultsTo : false
+    },
+    checkGuideRequirement : function(cb){
+      if(this.full_address && this.dishes.length > 0 && this.dishes.some(function(dish){
+          return dish.isVerified;
+        }) && this.bankId){
+        this.passGuide = true;
+        this.save(cb);
+      }else{
+        cb(null,false);
+      }
     },
     getDistance : function(userLat, userLong){
       function deg2rad(deg) {

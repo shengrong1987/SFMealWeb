@@ -255,7 +255,7 @@ describe('MealController', function() {
 
     it('should search the meals in San Francisco and with a keyword of 菜式 with success', function (done) {
       agent
-        .get('/meal/search?keyword=猪肉馅饼&county=San%20Francisco%20County')
+        .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
         .expect(200)

@@ -820,9 +820,9 @@
       if(typeof dateString != "undefined" && dateString != "undefined"){
         var date = new Date(dateString);
         var mDate = moment(date.toISOString());
-        if(mDate.isBefore(moment()) && $(this).data("min") == "now"){
-          mDate = moment();
-        }
+        // if(mDate.isBefore(moment()) && $(this).data("min") == "now"){
+        //   mDate = moment();
+        // }
       }
       $(this).datetimepicker({
         icons:{
@@ -838,6 +838,47 @@
         showTodayButton : true,
         defaultDate : mDate
       });
+    })
+  });
+}(jQuery);
+
++function($){
+  'user strict'
+
+  var TimeSpan = function(element, options){
+    this.element = element;
+    this.options = options;
+    if(this.options.format === "hourly"){
+      this.element.text( utility.formattedHour(this.options.from) + " - " + utility.formattedHour(this.options.to));
+    }else if(this.options.format === "date"){
+      this.element.text( utility.formattedDate(this.options.from) + " - " + utility.formattedDate(this.options.to));
+    }else if(this.options.format === "day"){
+      this.element.text( utility.formattedDay(this.options.date));
+    }
+  }
+
+  $.fn.timeSpan              = Plugin
+  $.fn.timeSpan.Constructor  = TimeSpan
+
+  function Plugin(option, root){
+    var hasRoot = typeof root != 'undefined';
+    return this.each(function(){
+      if(!hasRoot) root = $(this);
+      var options = $.extend({}, TimeSpan.DEFAULTS, root.data(), typeof option == 'object' && option);
+      var data = root.data('bs.time-span');
+      if(!data){
+        root.data('bs.time-span',(data = new TimeSpan(root, options)));
+      }
+      if(typeof option == 'string'){
+        data[option]($(this));
+      }
+    });
+  }
+
+  $(window).on('load',function(){
+    $('[data-toggle="time-span"]').each(function(){
+      var timeSpan = $(this);
+      Plugin.call(timeSpan, timeSpan.data());
     })
   });
 }(jQuery);

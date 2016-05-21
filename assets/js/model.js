@@ -47,7 +47,7 @@ var LoginView = Backbone.View.extend({
     var $this = this;
     this.model.save({},{
       success : function(){
-        location.href='/meal';
+        location.reload();
       },error : function(model,err){
         $this.errorView.html(err.responseText || "用户名或密码不正确，请重试。");
         $this.errorView.show();
@@ -474,11 +474,48 @@ var AddressView = Backbone.View.extend({
     "click .edit" : "updateAddress",
     "click [data-action='updateFromOrder']" : "updateAddressFromOrder",
     "click .newAddress" : "newAddress",
-    "submit form" : "saveAddress"
+    "submit form" : "saveAddress",
+    "click #contact input[type='radio']" : "switchAddress",
+    "click #method button" : "switchDelivery"
   },
-  initialize : function(){
+  initialize : function() {
     var userId = this.$el.data("id");
-    this.model.set({ id : userId });
+    this.model.set({id: userId});
+    var range = this.$el.data("range");
+    var hostLoc = {lat: this.$el.data("lat"), long: this.$el.data("long")};
+    var contactView = this.$el.find("#contact");
+    var distance = utility.getDistance({lat: contactView.data("user-lat"), long: contactView.data("user-long")}, hostLoc);
+    if (distance > range) {
+      this.$el.find("#contact-error").html("地址超出送餐范围, 请选择自取.");
+      this.$el.find("#contact-error").show();
+      contactView.data("has-error", true);
+    }
+  },
+  switchDelivery : function(e){
+    var curMethod = $(e.target).attr("value");
+    refreshMenu();
+  },
+  switchAddress : function(e){
+    this.$el.find("#contact-error").hide();
+    var hostLoc = {lat : this.$el.data("lat"), long: this.$el.data("long")};
+    var range = this.$el.data("range");
+    var address = $(e.target).next().next().text();
+    var $this = this;
+    var contactView = this.$el.find("#contact");
+    utility.distance(address, hostLoc, function(err, distance){
+      if(err){
+        $this.$el.find("#contact-error").html(err);
+        $this.$el.find("#contact-error").show();
+        return;
+      }
+      if(distance > range){
+        $this.$el.find("#contact-error").html("地址超出送餐范围, 请选择自取.");
+        $this.$el.find("#contact-error").show();
+        contactView.data("has-error", true);
+      }else{
+        contactView.data("has-error", false);
+      }
+    });
   },
   updateAddress : function(e){
     e.data = {mt :this};
@@ -602,13 +639,42 @@ var Meal = Backbone.Model.extend({
   urlRoot : "/meal"
 });
 
+var MealSelectionView = Backbone.View.extend({
+  events : {
+
+  },
+  initialize : function(){
+
+  },
+  initMap : function(){
+    var range = this.$el.data("range") * 1609.34;
+    var center = {lat: this.$el.data("lat"), lng: this.$el.data("long")}
+    var map = new google.maps.Map(this.$el.find("#googlemap")[0], {
+      center: center,
+      scrollwheel: false,
+      zoom: 11
+    });
+    var deliveryCircle = new google.maps.Circle({
+      strokeColor: '#FF0000',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#FF0000',
+      fillOpacity: 0.35,
+      map: map,
+      center: center,
+      radius: range
+    });
+  }
+});
+
 var MealView = Backbone.View.extend({
   isActivate : true,
   events : {
     "submit form" : "publishMeal",
     "click button[name='save']" : "saveMeal",
     "click #addNewPickupBtn" : "addNewPickup",
-    "click #removeNewPickupBtn" : "removeNewPickup"
+    "click #removeNewPickupBtn" : "removeNewPickup",
+    "click #isDelivery" : "toggleDelivery"
   },
   initialize : function(){
     var form = this.$el.find("form");
@@ -621,6 +687,18 @@ var MealView = Backbone.View.extend({
     var dishesAlert = form.find("#dish-selector .alert");
     dishesAlert.hide();
     this.dishAlert = dishesAlert;
+  },
+  toggleDelivery : function(e){
+    var checkbox = $(e.target);
+    var deliveryFeeInput = this.$el.find("#deliveryFeeInput");
+    var deliveryRangeInput = this.$el.find("#deliveryRangeInput");
+    if(checkbox.prop("checked")){
+      deliveryFeeInput.prop('disabled', false);
+      deliveryRangeInput.prop('disabled', false);
+    }else{
+      deliveryFeeInput.prop('disabled', true);
+      deliveryRangeInput.prop('disabled', true);
+    }
   },
   addNewPickup : function(e){
     e.preventDefault();
@@ -701,6 +779,12 @@ var MealView = Backbone.View.extend({
 
     if(cover == ""){
       cover = $(dishesItems[0]).data("id");
+    }
+
+    var isDelivery = form.find("#isDelivery").prop("checked");
+    if(isDelivery){
+      var deliveryFee = form.find("#deliveryFeeInput").val();
+      var deliveryRange = form.find("#deliveryRangeInput").val();
     }
 
     var isOrderNow = form.find("#radio-order-now:checked").length > 0;
@@ -825,7 +909,10 @@ var MealView = Backbone.View.extend({
       minimalOrder : min_order,
       minimalTotal : min_total,
       cover : cover,
-      features : features
+      features : features,
+      isDelivery : isDelivery,
+      delivery_fee : deliveryFee,
+      delivery_range : deliveryRange
     });
     var $this = this;
     this.model.save({},{
@@ -1357,14 +1444,15 @@ var OrderView = Backbone.View.extend({
     this.model.action = "cancel";
     this.model.save({},{
       success : function(model,result){
-        alert(result.responseText);
-        if(location.href.indexOf("host/me")==-1){
-          reloadUrl("/user/me", "#myorder");
-        }else{
-          reloadUrl("/host/me","#myorder");
-        }
+        BootstrapDialog.alert(result.responseText, function(){
+          if(location.href.indexOf("host/me")==-1){
+            reloadUrl("/user/me", "#myorder");
+          }else{
+            reloadUrl("/host/me","#myorder");
+          }
+        });
       },error : function(model, err){
-        alert(err.responseText);
+        BootstrapDialog.alert(err.responseText);
       }
     })
   },
@@ -1381,23 +1469,48 @@ var OrderView = Backbone.View.extend({
     }
     var params = {};
     var method = this.$el.find("#method .active").attr("value");
-    var contacts = this.$el.find("#contact .regular-radio:checked + label + span").text().split("+");
-    if(method && contacts.length < 2){
-      this.contactAlert.html("联系方式不能为空。");
+    if(method == "delivery"){
+      var contacts = this.$el.find("#contact .regular-radio:checked + label + span").text().split("+");
+      if(method && contacts.length < 2){
+        this.contactAlert.html("地址和联系方式不能为空。");
+        this.contactAlert.show();
+        return;
+      }
+      var address = contacts[0];
+      var phone = contacts[1].replace(" ","");
+    }else{
+      var methodContainer = this.$el.find("#pickupMethod .regular-radio:checked").parent();
+      var from = methodContainer.find(".time").data("from");
+      var to = methodContainer.find(".time").data("to");
+      var address = methodContainer.find(".address").data("value");
+      var pickupInfo = {
+        from : from,
+        to : to,
+        address : address
+      };
+    }
+
+    var contactView = this.$el.find("#contact");
+    if(contactView.data("has-error")){
       this.contactAlert.show();
       return;
     }
+
+
     var cards = this.$el.find("#payment-cards button");
     if(cards && cards.length == 1){
       this.paymentAlert.html("支付方式不能为空。");
       this.paymentAlert.show();
       return;
     }
-    var address = contacts[0];
-    var phone = contacts[1].replace(" ","");
     var currentOrder = localOrders;
     var mealId = form.data("meal");
-    var delivery_fee = this.$el.find("#order .delivery").data("value");
+    var pickupMethod = this.$el.find("method .active").attr("value");
+    if(pickupMethod == "delivery"){
+      var delivery_fee = this.$el.find("#order .delivery").data("value");
+    }else{
+      var delivery_fee = 0;
+    }
     var subtotal = form.find(".subtotal").data("value");
     if(subtotal == 0){
       this.paymentAlert.html("您未点取任何菜式，请先下单。");
@@ -1409,6 +1522,7 @@ var OrderView = Backbone.View.extend({
       orders : currentOrder,
       subtotal : subtotal,
       address : address,
+      pickupInfo : pickupInfo,
       method : method,
       mealId : mealId,
       phone : phone,
@@ -1421,10 +1535,10 @@ var OrderView = Backbone.View.extend({
           eraseCookie(dishId);
         });
         localOrders = {};
-        alert(result.responseText);
+        BootstrapDialog.alert(result.responseText);
         reloadUrl("/user/me","#myorder");
       },error : function(model, err){
-        alert(err.responseText);
+        BootstrapDialog.alert(err.responseText);
       }
     })
   },
@@ -1447,14 +1561,15 @@ var OrderView = Backbone.View.extend({
     this.model.action = "adjust";
     this.model.save({},{
       success : function(model,result){
-        alert(result.responseText);
-        if(location.href.indexOf("host/me")==-1){
-          reloadUrl("/user/me", "#myorder");
-        }else{
-          reloadUrl("/host/me","#myorder");
-        }
+        BootstrapDialog.alert(result.responseText, function(){
+          if(location.href.indexOf("host/me")==-1){
+            reloadUrl("/user/me", "#myorder");
+          }else{
+            reloadUrl("/host/me","#myorder");
+          }
+        });
       },error : function(model, err){
-        alert(err.responseText);
+        BootstrapDialog.alert(err.responseText);
       }
     })
   }
@@ -1595,46 +1710,46 @@ function uploadImage(modual,file,cb,error,index,name){
 function uploadHostPhoto(e){
   var $this = $(e.currentTarget);
   var error_container = $($this.data("error-container"));
-  var alert = error_container.find(".alert");
-  alert.hide();
+  var alertView = error_container.find(".alert");
+  alertView.hide();
   var files = $("#myinfo input[name='story-pic']")[0].files;
   var file = files[0];
   if(!files || files.length==0){
-    alert.html("文件不存在或没有改变");
-    alert.show();
+    alertView.html("文件不存在或没有改变");
+    alertView.show();
     return;
   }
   uploadImage("story",file,function(url){
     $("#myinfo .story .fileinput-preview").data("src", url);
-    alert.html("厨师照片更新完成");
-    alert.show();
+    alertView.html("厨师照片更新完成");
+    alertView.show();
     hostProfileView.saveHostProfile(new Event("click"));
   },function(err){
-    alert.html(err);
-    alert.show();
+    alertView.html(err);
+    alertView.show();
   });
 }
 
 function uploadLicense(e){
   var $this = $(e.currentTarget);
   var error_container = $($this.data("error-container"));
-  var alert = error_container.find(".alert");
-  alert.hide();
+  var alertView = error_container.find(".alert");
+  alertView.hide();
   var files = $("#myinfo .license input[type='file']")[0].files;
   var file = files[0];
   if(!files || files.length==0){
-    alert.html("文件不存在或没有改变");
-    alert.show();
+    alertView.html("文件不存在或没有改变");
+    alertView.show();
     return;
   }
   uploadImage("license",file,function(url){
     $("#myinfo .license .fileinput-preview").data("src",url);
     hostProfileView.saveHostProfile(new Event("click"));
-    alert.html("执照更新完成");
-    alert.show();
+    alertView.html("执照更新完成");
+    alertView.show();
   },function(err){
-    alert.html(err);
-    alert.show();
+    alertView.html(err);
+    alertView.show();
   });
 }
 
