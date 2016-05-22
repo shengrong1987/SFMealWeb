@@ -41,7 +41,11 @@ module.exports = {
               h.adjusting_orders = h.adjusting_orders;
               h.host_dishes = h.dishes;
               found.host = h;
-              Notification.destroy({host : hostId}).exec();
+              Notification.destroy({host : hostId}).exec(function(err){
+                if(err){
+                  console.log(err);
+                }
+              });
               return res.view('host',{user: found});
             });
           })
