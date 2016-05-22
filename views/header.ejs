@@ -1,4 +1,4 @@
-<nav id="myUserBar" class="navbar navbar-inverse mynavbar" data-host="<%= req.session.user ? req.session.user.host : null%>" data-user="<%= req.session.user ? req.session.user.id : null%>">
+<nav id="myUserBar" class="navbar navbar-inverse mynavbar" data-host="<%= req.session.user ? (req.session.user.host ? req.session.user.host : null) : null%>" data-user="<%= req.session.user ? req.session.user.id : null%>">
   <div>
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavBar">
@@ -37,7 +37,7 @@
           <li><button id="applyToHostBtn" class="btn btn-outline-dark navbar-btn round verticel-align text-white" style="background-color: transparent;margin-right: 20px;" title="注意" data-content="你必须先登陆才能申请成为大厨" type="button"><i class="icon icon-chef text-white" style="font-size: large;"></i><span style="position:relative;top:-3px;font-size: medium;">我做私房菜</span></button></li>
         <% }%>
         <li><a href="#" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-        <li><a href="/"><i class="fa fa-home"></i> 主页</a></li>
+        <li><a href="/"><i class="fa fa-th-large  "></i> 主页</a></li>
         <%
           if(req.session.user){ %>
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
@@ -59,7 +59,7 @@
               <li><a href="/user/me#myreview"><strong>待评价</strong><span class="badge pull-right"></span></a></li>
               <li><a href="/help"><strong>帮助中心</strong></a></li>
               <li role="separator" class="divider"></li>
-              <li><a href="/auth/logout" class="text-grey"><strong>退出登陆</strong></a></li>
+              <li><a href="/auth/logout" class="text-grey"><strong>退出登录</strong></a></li>
             </ul>
           </li>
           <%if(req.session.user.host){ %>
@@ -70,11 +70,11 @@
           </li>
         <%}}else{%>
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-          <li><a href="/help"><i class="fa fa-question"></i> 帮助</a></li>
+          <li><a href="/help"><i class="fa fa-glass"></i> 帮助</a></li>
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-          <li><a toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fa fa-registered"></i> 注册</a></li>
+          <li><a toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fa fa-user"></i> 注册</a></li>
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-          <li><a toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fa fa-sign-in"></i> 登陆</a></li>
+          <li><a toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fa fa-sign-in"></i> 登录</a></li>
         <%}%>
       </ul>
     </div>

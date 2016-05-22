@@ -101,6 +101,10 @@ module.exports = {
     collects : {
       collection : 'Meal'
     },
+    notifications : {
+      collection : 'Notification',
+      via : 'user'
+    },
     featureDishes : {
       collection : 'Dish',
       defaultsTo : []

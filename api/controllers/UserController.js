@@ -171,7 +171,7 @@ module.exports = require('waterlock').actions.user({
   },
 
   me : function(req, res){
-    var userId = req.session.user.id;
+    var userId = req.session.user.id
     User.findOne(userId).populate("host").populate("orders").populate("collects").exec(function(err,found){
       if(err){
         return res.badRequest(err);
@@ -226,6 +226,11 @@ module.exports = require('waterlock').actions.user({
             return res.badRequest(err);
           }
           req.session.user = found;
+          Notification.destroy({user : userId}).exec(function(err){
+            if(err){
+              console.log(err);
+            }
+          });
           return res.view('user',{user: found});
         });
       });

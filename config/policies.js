@@ -37,7 +37,7 @@ module.exports.policies = {
   UserController : {
     '*' : ['sessionAuth','sessionSelf'],
     'becomeHost' : ['sessionAuth','notHost'],
-    'findone' : ['sessionAuth','sessionSelf'],
+    'findOne' : ['sessionAuth','sessionSelf'],
     'update' : ['sessionAuth','sessionSelf'],
     'find' : ['sessionAuth','sessionSelf'],
     'me' : ['sessionAuth'],

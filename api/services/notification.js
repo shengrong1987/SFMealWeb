@@ -25,11 +25,13 @@ var mailOptions = {
 
 var notification = {
   notificationCenter : function(model, action, params, isHostAction){
+    var verb = "updated";
     if(model === "Order"){
       switch(action){
         case "new":
-          isHostAction = false;
+          isHostAction = true;
           Order.publishCreate({id : params.id, host : params.host});
+          verb = "created";
           break;
         case "adjust":
           isHostAction = !isHostAction;
@@ -37,14 +39,17 @@ var notification = {
           break;
         case "adjusting":
           isHostAction = true;
+          action = "requested for adjust";
           Order.publishUpdate( params.id, { id : params.id, action : "requested for adjust", host : params.host});
           break;
         case "cancel":
           isHostAction = !isHostAction;
+          verb = "destroyed";
           Order.publishDestroy( params.id, undefined, {host : params.host} );
           break;
         case "cancelling":
           isHostAction = true;
+          action = "requested for cancel";
           Order.publishUpdate( params.id, { id : params.id, action : "requested for cancel", host : params.host});
           break;
         case "confirm":
@@ -61,16 +66,35 @@ var notification = {
           break;
         case "reject":
           isHostAction = false;
+          action = "changes are rejected";
           Order.publishUpdate( params.id, { id : params.id, action : "changes are rejected", host : params.host});
           break;
         case "review":
           isHostAction = true;
+          action = "has an new review!";
           Order.publishUpdate( params.id, { id : params.id, action : "has an new review!", host : params.host});
           break;
       }
       params.isHostAction = isHostAction;
     }
-    notification.sendEmail(model, action, params);
+    if(isHostAction){
+      Notification.create({ recordId : params.id, host : params.host, action : action, model : model, verb : verb }).exec(function(err, noti){
+        if(err){
+          console.log(err);
+          return;
+        }
+        notification.sendEmail(model, action, params);
+      });
+    }else{
+      Notification.create({ recordId : params.id, user : params.customer, action : action, model : model, verb : verb}).exec(function(err, noti){
+        if(err){
+          console.log(err);
+          return;
+        }
+        notification.sendEmail(model, action, params);
+      });
+    }
+
   },
   sendEmail : function(model, action, params){
     if(model === "Order"){

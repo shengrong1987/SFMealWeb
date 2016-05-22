@@ -208,6 +208,7 @@ var UserBarView = Backbone.View.extend({
         $this.handleBadge(false, "order");
       });
     }
+    this.getNotification();
   },
   applyForHost : function(e){
     location.href = "/apply";
@@ -239,6 +240,28 @@ var UserBarView = Backbone.View.extend({
     }
   },
 
+  getNotification : function(){
+    var userId = this.$el.data("user");
+    var hostId = this.$el.data("host");
+    var $this = this;
+    if(userId){
+      $.ajax("/user/" + userId + "/notifications").done(function(data){
+        data.forEach(function(notification){
+          $this.handleNotification(notification.verb, notification.action, notification.recordId);
+          $this.handleBadge(false, notification.model);
+        });
+      });
+    }
+    if(hostId){
+      $.ajax("/host/" + hostId + "/notifications").done(function(data){
+        data.forEach(function(notification){
+          $this.handleNotification(notification.verb, notification.action, notification.recordId);
+          $this.handleBadge(true, notification.model);
+        });
+      });
+    }
+  },
+
   clearBadges : function(isHost, type){
     switch(type){
       case "msg":
@@ -257,7 +280,7 @@ var UserBarView = Backbone.View.extend({
       hostBadgeView.data("badge", hostBadgeView.data("badge") + 1);
     }else{
       userBadgeView.data("badge", userBadgeView.data("badge") + 1);
-      switch(type){
+      switch(type.toLowerCase()){
         case "order":
           var orderBadgeView = this.$el.find("#userActionBtn").next().find("a").eq(0).find(".badge");
           var orderBadges =  parseInt(orderBadgeView.text() || 0);

@@ -82,6 +82,10 @@ module.exports = {
       collection : 'Order',
       via : 'host'
     },
+    notifications : {
+      collection : 'Notification',
+      via : 'host'
+    },
     passGuide : {
       type : 'boolean',
       defaultsTo : false
