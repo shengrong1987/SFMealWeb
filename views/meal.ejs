@@ -5,13 +5,13 @@
       <img src="/images/homecover-1.jpg" class="relative middle">
     </div>
 
-    <div class="row absolute" style="width: 100%;top:0;">
+    <div class="row absolute logo-container">
 
       <div class="col-xs-4 relative text-left">
         <a href="/" class="logo"></a>
       </div>
 
-      <div class="relative text-left col-xs-8 content" style="">
+      <div class="relative text-left col-xs-8 content search-container">
         <h4 class="text-white"><strong><%__('searching-word')%></strong></h4>
         <div class="btn-group">
           <input class="input btn btn-default round light text-grey" placeholder="<%= __('searching-tips')%>">
@@ -45,7 +45,7 @@
 
               <div class="row vertical-align-base">
                 <div class="col-xs-12 text-left">
-                  <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(2)%>">
+                  <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(2)%>" style="display: inline;">
                     <div class="rating" data-toggle="star-set" data-rate="<%= meal.score.toFixed(2)%>">
                       <i class="fa fa-star"></i>
                       <i class="fa fa-star"></i>

@@ -5,13 +5,13 @@
       <img src="/images/homecover-1.jpg" class="relative middle">
     </div>
 
-    <div class="row absolute" style="width: 100%;top:0;">
+    <div class="row absolute logo-container">
 
       <div class="col-xs-4 relative text-left">
         <a href="/" class="logo"></a>
       </div>
 
-      <div class="relative text-left col-xs-8 content" style="">
+      <div class="relative text-left col-xs-8 content search-container">
         <h4 class="text-white"><strong><%= __('searching-word') %></strong></h4>
         <div class="btn-group">
           <input class="input btn btn-default round light text-grey" placeholder="<%= __('searching-tips') %>">
@@ -54,14 +54,14 @@
                 <div class="radio-box col-xs-12 row" id="pickupMethod" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
                   <%
                   var i = 0;
-                  meal.pickups.forEach(function(pickup){ %>
+                  if(meal.pickups){ meal.pickups.forEach(function(pickup){ %>
                   <label class="btn btn-default fixed-label vertical-inline" style="text-align: left;height: 70px;">
                     <input type="radio" id="radio-1-<%= i%>" name="radio-1-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="radio-1-<%= i%>"></label>
                     <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"><%= __('time') %><span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
                     <br/>
                     <label class="location" data-value="<%= pickup.location%>" style="margin-left: 23px;"><span><%= __('location') %>&nbsp; <%= pickup.location%></span></label>
                   </label>
-                  <%i++;}); %>
+                  <%i++;})}; %>
                 </div>
 
                 <h1></h1>
@@ -113,7 +113,7 @@
             %>
             <button class="btn btn-disable btn-fat btn-lg<%if(card.isDefaultPayment){%> active<%}%>" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
             <%}%>
-            <button class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/>@<%= __('add-new') %>增加新的<br/>@<%= __('payment-method') %>支付方式</button>
+            <button class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
           </div>
 
           <h3></h3>

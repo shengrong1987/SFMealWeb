@@ -5,12 +5,12 @@
       <img src="/images/homecover-1.jpg" class="relative middle">
     </div>
 
-    <div class="absolute" style="width: 95%;top:0;">
+    <div class="absolute logo-container">
       <div class="row relative text-left">
         <a href="/" class="logo"></a>
       </div>
 
-      <div class="row relative text-left" style="top: 20px;width:450px;margin: auto;">
+      <div class="row relative text-left search-container" style="top: 20px;">
         <h4 class="text-white"><strong><%= __('searching-word')%></strong></h4>
         <div class="btn-group">
           <input name="keyword" class="input btn btn-default round light" placeholder="<%= __('searching-tips')%>">
@@ -64,7 +64,7 @@
       for(var i=0; i< meals.length; i++) {
           var meal = meals[i];
           var mainDish = meal.dishes[0];
-          if(typeof anchor !== 'undefined'){
+          if(typeof anchor !== 'undefined' && anchor){
             var distance = meal.chef.getDistance(anchor.lat, anchor.long);
           }else if(user){
             var distance = meal.chef.getDistance(user.lat, user.long);
