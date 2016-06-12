@@ -88,10 +88,10 @@ module.exports = {
       var actual_address = params.address.street + params.address.city + ", " + params.address.zip;
       require('../services/geocode').geocode(actual_address,function(err,result){
         if(err){
-          return res.badRequest("地址解析错误，请刷新再试。");
+          return res.badRequest(req.__('meal-error-address'));
         }else{
           if(result.length == 0){
-            return res.badRequest("地址格式不对或地址不存在。");
+            return res.badRequest(req.__('meal-error-address2'));
           }
           var administration= result[0].administrativeLevels;
           params.county = administration.level2long;
@@ -150,7 +150,7 @@ module.exports = {
           if(req.wantsJSON){
             return res.ok(bank_account);
           }
-          res.ok("your bank account is successfully updated");
+          res.ok(req.__('host-bank-ok'));
         });
       });
     });

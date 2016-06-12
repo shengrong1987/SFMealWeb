@@ -9,14 +9,14 @@
 
         <div class="dropdown navbar-btn" id="citySelector">
           <a class="btn btn-outline dropdown-toggle text-background" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="San Francisco County">
-            <span>美国/旧金山</span>
+            <span><%= __('location-san-francisco') %></span>
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            <li><a href="#" value="San Francisco County">美国/旧金山</a></li>
-            <li><a href="#" value="Los Angela County">美国/洛杉矶</a></li>
-            <li><a href="#" value="New York County">美国/纽约</a></li>
-            <li><a href="#" value="San Mateo County">美国/San Mateo County</a></li>
+            <li><a href="#" value="San Francisco County"><%= __('location-san-francisco') %></a></li>
+            <li><a href="#" value="Los Angeles County"><%= __('location-los-angeles-country') %></a></li>
+            <li><a href="#" value="New York County"><%= __('location-new-york-county') %></a></li>
+            <li><a href="#" value="San Mateo County"><%= __('location-san-mateo-county') %></a></li>
           </ul>
         </div>
 
@@ -34,47 +34,47 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <% if (req.session.user && !req.session.user.host) { %>
-          <li><button id="applyToHostBtn" class="btn btn-outline-dark navbar-btn round verticel-align text-white" style="background-color: transparent;margin-right: 20px;" title="注意" data-content="你必须先登陆才能申请成为大厨" type="button"><i class="icon icon-chef text-white" style="font-size: large;"></i><span style="position:relative;top:-3px;font-size: medium;">我做私房菜</span></button></li>
+          <li><button id="applyToHostBtn" class="btn btn-outline-dark navbar-btn round verticel-align text-white" style="background-color: transparent;margin-right: 20px;" title="<%= __('pay-attention') %>" data-content="<%= __('login-before-apply-chef') %>" type="button"><i class="icon icon-chef text-white" style="font-size: large;"></i><span style="position:relative;top:-3px;font-size: medium;"><%= __('i-cook') %></span></button></li>
         <% }%>
         <li><a href="#" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-        <li><a href="/"><i class="fa fa-th-large  "></i> 主页</a></li>
+        <li><a href="/"><i class="fa fa-th-large  "></i> <%= __('index') %></a></li>
         <%
           if(req.session.user){ %>
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-          <li><a href="/user/me#mycollect"><i class="fa fa-heart"></i> 收藏</a></li>
+          <li><a href="/user/me#mycollect"><i class="fa fa-heart"></i> <%= __('favourite') %></a></li>
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-          <li><a id="msgBtn" data-toggle="tooltip" data-placement="bottom" href="/message"><i class="fa fa-envelope-o"></i> 消息 <span class="badge">New</span></a></li>
+          <li><a id="msgBtn" data-toggle="tooltip" data-placement="bottom" href="/message"><i class="fa fa-envelope-o"></i> <%= __('notification') %> <span class="badge">New</span></a></li>
           <li>
             <a id="userActionBtn" data-badge="0" href='/user/me' class="text-center dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <img class="extra-small round_thumb" style="display:inline-block;" src=<%= req.session.user.picture || "/images/profile_man.png"%>>
-              Hi, <%= req.session.user.firstname || (req.session.user.host ? "厨师" : "游客") %>
+              Hi, <%= req.session.user.firstname || (req.session.user.host ? __('chef') : __('visitor')) %>
               <span class="badge"></span>
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="/user/me"><strong>吃货订单</strong><span class="badge pull-right"></span></a></li>
-              <li><a href="/user/me#myinfo"><strong>修改个人资料</strong><span class="badge pull-right"></span></a></li>
-              <li><a href="/user/me#myaddress"><strong>地址管理</strong><span class="badge pull-right"></span></a></li>
-              <li><a href="/user/pocket"><strong>我的钱包</strong><span class="badge pull-right"></span></a></li>
-              <li><a href="/user/me#myreview"><strong>待评价</strong><span class="badge pull-right"></span></a></li>
-              <li><a href="/help"><strong>帮助中心</strong></a></li>
+              <li><a href="/user/me"><strong><%= __('nav-bar-order') %></strong><span class="badge pull-right"></span></a></li>
+              <li><a href="/user/me#myinfo"><strong><%= __('nav-bar-info') %></strong><span class="badge pull-right"></span></a></li>
+              <li><a href="/user/me#myaddress"><strong><%= __('nav-bar-address') %></strong><span class="badge pull-right"></span></a></li>
+              <li><a href="/user/pocket"><strong><%= __('nav-bar-pocket') %></strong><span class="badge pull-right"></span></a></li>
+              <li><a href="/user/me#myreview"><strong><%= __('nav-bar-review') %></strong><span class="badge pull-right"></span></a></li>
+              <li><a href="/help"><strong><%= __('nav-bar-help') %></strong></a></li>
               <li role="separator" class="divider"></li>
-              <li><a href="/auth/logout" class="text-grey"><strong>退出登录</strong></a></li>
+              <li><a href="/auth/logout" class="text-grey"><strong><%= __('nav-bar-log-out') %></strong></a></li>
             </ul>
           </li>
           <%if(req.session.user.host){ %>
           <li>
             <div id="hostActionBtn" data-badge="0" class="navbar-btn">
-              <a href="/host/me" class="btn btn-green vertical-align"><i class="fa icon-chef fa-2x" style="padding-top: 3px;"></i>&nbsp;<strong>厨房管理</strong>&nbsp;&nbsp;<span class="badge"></span></a>
+              <a href="/host/me" class="btn btn-green vertical-align"><i class="fa icon-chef fa-2x" style="padding-top: 3px;"></i>&nbsp;<strong><%= __('nav-bar-kitchen') %></strong>&nbsp;&nbsp;<span class="badge"></span></a>
             </div>
           </li>
         <%}}else{%>
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-          <li><a href="/help"><i class="fa fa-glass"></i> 帮助</a></li>
+          <li><a href="/help"><i class="fa fa-glass"></i> <%= __('nav-bar-help') %></a></li>
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-          <li><a toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fa fa-user"></i> 注册</a></li>
+          <li><a toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fa fa-user"></i> <%= __('nav-bar-register') %></a></li>
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-          <li><a toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fa fa-sign-in"></i> 登录</a></li>
+          <li><a toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fa fa-sign-in"></i> <%= __('nav-bar-login') %></a></li>
         <%}%>
       </ul>
     </div>

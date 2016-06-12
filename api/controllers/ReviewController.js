@@ -26,7 +26,7 @@ module.exports = {
       });
       if(orders.length == 0){
         console.log("no available orders for review");
-        return res.forbidden("no available orders for review");
+        return res.forbidden(req.__('review-no-available'));
       }
       if(reviews && reviews.length > 0){
         async.each(reviews, function(review, next){

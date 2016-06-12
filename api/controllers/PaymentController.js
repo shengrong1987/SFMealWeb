@@ -16,7 +16,7 @@ module.exports = {
         return res.badRequest(err);
       }
       if(card.length > 0){
-        return res.badRequest("card already exist");
+        return res.badRequest(req.__('payment-card-exist'));
       }
       var param = req.body;
       param.user = userId;
@@ -94,7 +94,7 @@ module.exports = {
     var userId = req.session.user.id;
     Payment.count({user: userId}).exec(function(err,found){
       if(found==1){
-        return res.badRequest("can not delete the only payment profile");
+        return res.badRequest(req.__('payment-unique-card'));
       }
       Payment.destroy(paymentId).exec(function(err,p){
         if(err){

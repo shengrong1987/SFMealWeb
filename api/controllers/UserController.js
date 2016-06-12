@@ -33,7 +33,7 @@ module.exports = require('waterlock').actions.user({
     params.user = userId;
     params.email = email;
     if(req.session.user.host){
-      return res.badRequest("您已经是Host了。");
+      return res.badRequest(req.__('user-already-host'));
     }
     Host.create(params).exec(function(err, host){
       if(err){
@@ -111,7 +111,7 @@ module.exports = require('waterlock').actions.user({
           }
           var keys = Object.keys(user.address_list);
           if(keys.length == 1){
-            return res.badRequest("You can not delete the only address");
+            return res.badRequest(req.__('user-only-address'));
           }
           var isDefault = user.address_list[address.id].isDefault;
           delete user.address_list[address.id];
@@ -132,10 +132,10 @@ module.exports = require('waterlock').actions.user({
         var actualAddress = address.street + " " + address.city;
         require('../services/geocode').geocode(actualAddress, function (err, result) {
           if (err) {
-            return res.badRequest("地址解析错误，请刷新再试。");
+            return res.badRequest(req.__('meal-error-address'));
           }  else {
             if(result.length==0){
-              return res.badRequest("地址格式不对或地址不存在。");
+              return res.badRequest(req.__('meal-error-address2'));
             }
             var administration = result[0].administrativeLevels;
             User.findOne(userId).exec(function(err,user){
@@ -356,7 +356,7 @@ module.exports = require('waterlock').actions.user({
         case "license":
           var host = req.session.user.host;
           if(!host){
-            return res.badRequest("not a host");
+            return res.badRequest(req.__('user-not-host'));
           }
           Host.findOne(host).exec(function(err,host){
             if(err){
@@ -374,7 +374,7 @@ module.exports = require('waterlock').actions.user({
         case "story":
           var host = req.session.user.host;
           if(!host){
-            return res.badRequest("not a host");
+            return res.badRequest(req.__('user-not-host'));
           }
           Host.findOne(host).exec(function(err,host){
             if(err){
@@ -393,7 +393,7 @@ module.exports = require('waterlock').actions.user({
           return res.ok({ S3URL:url, publicURL : root + path});
           break;
         default:
-          return res.badRequest("need a moduel");
+          return res.badRequest(req.__('user-upload-need-module'));
           break;
       }
     });

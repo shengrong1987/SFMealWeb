@@ -11,13 +11,13 @@
       </div>
 
       <div class="row relative text-left" style="top: 20px;width:450px;margin: auto;">
-        <h4 class="text-white"><strong>今天吃什么好呢？</strong></h4>
+        <h4 class="text-white"><strong><%= __('searching-word')%></strong></h4>
         <div class="btn-group">
-          <input name="keyword" class="input btn btn-default round light" placeholder="输入牛排看看">
-          <input name="zipcode" type="text" class="btn btn-default zipCode" placeholder="邮编" style="width: 100px;display: inline;" value="<%= user?(user.zipcode?user.zipcode:''):''%>">
+          <input name="keyword" class="input btn btn-default round light" placeholder="<%= __('searching-tips')%>">
+          <input name="zipcode" type="text" class="btn btn-default zipCode" placeholder="<%= __('zipcode')%>" style="width: 100px;display: inline;" value="<%= user?(user.zipcode?user.zipcode:''):''%>">
           <button class="btn btn-warning round orange text-white" onclick="javascript:search(this)">
             <i class="fa fa-search"></i>
-            搜索
+            <%= __('search')%>
           </button>
         </div>
       </div>
@@ -39,22 +39,21 @@
       }).length;
     %>
     <% if (typeof search != 'undefined' && search ){ %>
-      <h4>以下是搜索“<%= typeof keyword === 'undefined' ? keyword : '' %>”的菜单，
-        <%= zipcode ? zipcode + "附近" : ""%>一共有<%= numberOfOrder %>份可现点，和<%= numberOfPreorder %>份可预定。</h4>
+      <h4><%= __('search-result', (typeof keyword === 'undefined' ? keyword : ''), (zipcode ? zipcode + __('nearby') : ""), numberOfOrder,numberOfPreorder)%></h4>
     <% } %>
     <div class="row middle" style="margin-bottom: 20px;margin-top: 20px;">
       <div class="btn-set" data-toggle="btn-set">
-        <button class="btn btn-disable btn-lg round active filter" data-filter="all" style="width: 100px;line-height: 15px;">全部</button>
-        <button class="btn btn-disable btn-lg round filter" data-filter=".order" style="width: 100px;line-height: 15px;">现点</button>
-        <button class="btn btn-disable btn-lg round filter" data-filter=".preorder" style="width: 100px;line-height: 15px;">预定</button>
+        <button class="btn btn-disable btn-lg round active filter" data-filter="all" style="width: 100px;line-height: 15px;"><%= __('all')%></button>
+        <button class="btn btn-disable btn-lg round filter" data-filter=".order" style="width: 100px;line-height: 15px;"><%= __('meal-type-order')%></button>
+        <button class="btn btn-disable btn-lg round filter" data-filter=".preorder" style="width: 100px;line-height: 15px;"><%= __('meal-type-preorder')%></button>
       </div>
       <h2></h2>
 
       <div class="btn-set" data-toggle="btn-set">
-        <button class="btn btn-info filter" data-filter=".appetizer">餐前小菜</button>
-        <button class="btn btn-info filter" data-filter=".entree">主食</button>
-        <button class="btn btn-info sort" data-sort="distance-order:asc">按照距离排序</button>
-        <button class="btn btn-info sort" data-sort="price-order:asc">按照热度排序 <i class="fa fa-question-circle"></i></button>
+        <button class="btn btn-info filter" data-filter=".appetizer"><%= __('appetizer')%></button>
+        <button class="btn btn-info filter" data-filter=".entree"><%= __('main')%></button>
+        <button class="btn btn-info sort" data-sort="distance-order:asc"><%= __('sort-as-distance')%></button>
+        <button class="btn btn-info sort" data-sort="price-order:asc"><%= __('sort-as-hot')%> <i class="fa fa-question-circle"></i></button>
       </div>
     </div>
 
@@ -87,7 +86,7 @@
             </h3>
           </div>
           <div class="col-md-6">
-            <h3><small>剩余<%= meal.leftQty[mainDish.id] %>份<br>自取/送餐</small></h3>
+            <h3><small><%= __('left')%><%= meal.leftQty[mainDish.id] + __('fen')%><br><%= __('order-nav-method')%></small></h3>
           </div>
           <div class="divider"></div>
           <div class="row vertical-align chef-cell">

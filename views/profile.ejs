@@ -1,4 +1,4 @@
-<div class="container-fluid text-center relative" style="margin-top:-20px;">
+<div class="text-center relative" style="margin-top:-20px;">
 
   <div class="row">
     <div class="pure-banner vertical-align red">
@@ -8,7 +8,7 @@
             <a href="/" class="logo logo-sm"></a>
           </div>
           <div class="col-sm-9">
-            <h4 class="text-white"><strong>欢迎加入我们,一起享受私房菜吧！</strong></h4>
+            <h4 class="text-white"><strong><%= __('welcome')%></strong></h4>
           </div>
         </div>
       </div>
@@ -32,7 +32,7 @@
           </div>
           <div class="row">
             <div class="col-xs-12">
-              <h4 class="text-left text-red"><strong>我的主打菜</strong></h4>
+              <h4 class="text-left text-red"><strong><%= __('main-dish')%></strong></h4>
               <div class="divider red none-margin" style="height: 8px;"></div>
             </div>
           </div>
@@ -78,14 +78,14 @@
         <div class="box white">
           <div class="row">
             <div class="col-xs-12">
-              <h4 class="text-left text-red"><strong>我的故事</strong></h4>
+              <h4 class="text-left text-red"><strong><%= __('my-story')%></strong></h4>
               <div class="divider red none-margin" style="height: 8px;"></div>
               <p style="margin-top: 10px;min-height: 50px;" class="text-left"><%= host.intro%></p>
             </div>
             <div class="col-xs-12">
-              <h4 class="text-left text-red">我的菜单</h4>
+              <h4 class="text-left text-red"><%= __('my-dish')%></h4>
               <div class="divider red none-margin" style="height: 8px;"></div>
-              <h4 class="none-margin text-left"><small>现点</small></h4>
+              <h4 class="none-margin text-left"><small><%= __('meal-type-order')%></small></h4>
               <div class="divider none-margin"></div>
               <div class="row">
               <%
@@ -107,13 +107,13 @@
                       </h4>
                     </div>
                     <div class="col-md-6">
-                      <h4><small>剩余<%= meal.leftQty[dish.id] %>份<br>自取/送餐</small></h4>
+                      <h4><small><%= __('left-how-much-dish',meal.leftQty[dish.id])%></small></h4>
                     </div>
                   </div>
                 </div>
                 <%}})}});%>
               </div>
-              <h4 class="none-margin text-left"><small>预定</small></h4>
+              <h4 class="none-margin text-left"><small><%= __('preorder')%></small></h4>
               <div class="divider none-margin"></div>
               <div class="row">
                 <%
@@ -135,7 +135,7 @@
                       </h4>
                     </div>
                     <div class="col-md-6">
-                      <h4><small>剩余<%= meal.leftQty[dish.id] %>份<br>自取/送餐</small></h4>
+                      <h4><small><%= __('left-how-much-dish',meal.leftQty[dish.id])%></small></h4>
                     </div>
                   </div>
                 </div>
@@ -143,7 +143,7 @@
               </div>
             </div>
             <div class="col-xs-12">
-              <h4 class="text-left text-red"><strong>评论我的</strong></h4>
+              <h4 class="text-left text-red"><strong><%= __('my-review')%></strong></h4>
               <div class="divider red none-margin" style="height: 8px;"></div>
               <div id="host-reviews">
               <%

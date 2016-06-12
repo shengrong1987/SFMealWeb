@@ -5,14 +5,14 @@
       <div class="row row-centered">
         <div class="col-xs-12">
           <div class="page-header">
-            <h2 class="gdfg">信用卡信息</h2>
+            <h2 class="gdfg"><%= __('address-info')%></h2>
           </div>
           <fieldset>
-          <legend>账单地址</legend>
+          <legend><%= __('address')%></legend>
 
           <!-- Street -->
           <div class="form-group">
-            <label class="col-sm-4 control-label" for="textinput">街道</label>
+            <label class="col-sm-4 control-label" for="textinput"><%= __('street')%></label>
             <div class="col-sm-6">
               <input type="text" name="street" placeholder="Street" class="address form-control" value="<%if(typeof payment != 'undefined'){%><%=payment.street%><%}%>" required>
             </div>
@@ -20,7 +20,7 @@
 
           <!-- City -->
           <div class="form-group">
-            <label class="col-sm-4 control-label" for="textinput">城市</label>
+            <label class="col-sm-4 control-label" for="textinput"><%= __('city')%></label>
             <div class="col-sm-6">
               <input type="text" name="city" placeholder="City" class="city form-control" value="<%if(typeof payment != 'undefined'){%><%=payment.city%><%}%>" required>
             </div>
@@ -28,7 +28,7 @@
 
           <!-- State -->
           <div class="form-group">
-            <label class="col-sm-4 control-label" for="textinput">州</label>
+            <label class="col-sm-4 control-label" for="textinput"><%= __('state')%></label>
             <div class="col-sm-6">
               <input type="text" name="state" maxlength="65" placeholder="State" class="state form-control" value="<%if(typeof payment != 'undefined'){%><%=payment.state%><%}%>" required>
               <div class="help-block with-errors"></div>
@@ -37,7 +37,7 @@
 
           <!-- Postcal Code -->
           <div class="form-group">
-            <label class="col-sm-4 control-label" for="textinput">邮编</label>
+            <label class="col-sm-4 control-label" for="textinput"><%= __('zipcode')%></label>
             <div class="col-sm-6">
               <input type="text" name="zip" maxlength="9" placeholder="Postal Code" class="zip form-control" value="<%if(typeof payment != 'undefined'){%><%=payment.postal%><%}%>" required>
               <div class="help-block with-errors"></div>
@@ -46,7 +46,7 @@
 
           <!-- Country -->
           <div class="form-group">
-            <label class="col-sm-4 control-label" for="textinput">国家</label>
+            <label class="col-sm-4 control-label" for="textinput"><%= __('country')%></label>
             <div class="col-sm-6">
               <!--<input type="text" name="country" placeholder="Country" class="country form-control">-->
               <div class="country bfh-selectbox bfh-countries" name="country" placeholder="Select Country" data-flags="true" data-filter="true" data-country="<%if(typeof payment != 'undefined'){%><%=payment.country%><%}else{%>US<%}%>"> </div>
@@ -55,11 +55,11 @@
           </fieldset>
 
           <fieldset>
-            <legend>卡号信息</legend>
+            <legend><%= __('card-info')%></legend>
 
             <!-- Card Holder Name -->
             <div class="form-group">
-              <label class="col-sm-4 control-label"  for="textinput">卡持有人姓名</label>
+              <label class="col-sm-4 control-label"  for="textinput"><%= __('card-holder')%></label>
               <div class="col-sm-6">
                 <input type="text" name="cardholdername" maxlength="70" placeholder="Card Holder Name" class="card-holder-name form-control" required value="<%if(typeof payment != 'undefined'){%><%=payment.cardholder%><%}%>">
               </div>
@@ -67,7 +67,7 @@
 
             <!-- Card Number -->
             <div class="form-group">
-              <label class="col-sm-4 control-label" for="textinput">卡号</label>
+              <label class="col-sm-4 control-label" for="textinput"><%= __('card-number')%></label>
               <div class="col-sm-6">
                 <input type="text" id="cardnumber" name="cardNumber" maxlength="19" placeholder="Card Number" class="card-number form-control" required value="<%if(typeof payment != 'undefined'){%><%=payment.cardNumber%><%}%>">
                 <div class="help-block with-errors"></div>
@@ -76,7 +76,7 @@
 
             <!-- Expiry-->
             <div class="form-group">
-              <label class="col-sm-4 control-label" for="textinput">有效期</label>
+              <label class="col-sm-4 control-label" for="textinput"><%= __('card-exp')%></label>
               <div class="col-sm-6">
                 <div class="form-inline">
                   <select name="month" data-stripe="exp-month" class="card-expiry-month stripe-sensitive required form-control" value=<%if(typeof payment != 'undefined'){%><%=payment.expMonth%><%}%>>
@@ -126,7 +126,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label" for="textinput">CVV/CVV2</label>
               <div class="col-sm-3">
-                <input type="text" id="cvv" placeholder="CVV" maxlength="4" class="card-cvc form-control" required data-error="CVV格式错误">
+                <input type="text" id="cvv" placeholder="CVV" maxlength="4" class="card-cvc form-control" required data-error="<%= __('cvv-wrong-format')%>">
                 <div class="help-block with-errors"></div>
               </div>
             </div>
@@ -138,10 +138,10 @@
               <!-- Submit -->
               <div class="control-group">
                 <div class="controls text-center">
-                  <button class="btn btn-success" type="submit"><% if( typeof payment != 'undefined'){%>保存<%}else{%>新建<%}%></button>
-                  <button class="btn btn-info" name="setToDefault" type="button">设为默认支付方式</button>
+                  <button class="btn btn-success" type="submit"><% if( typeof payment != 'undefined'){__('save')}else{__('create')}%></button>
+                  <button class="btn btn-info" name="setToDefault" type="button"><%= __('set-default-payment')%></button>
                   <% if (typeof payment != "undefined"){%>
-                  <button class="btn btn-error" name="delete" type="button">删除</button>
+                  <button class="btn btn-error" name="delete" type="button"><%= __('delete')%></button>
                   <%}%>
                 </div>
               </div>
@@ -154,7 +154,7 @@
     <span class="divider popline"></span>
 
     <% if( typeof payment != 'undefined'){%>
-    <h6 class="text-center">新增一张卡？<a href="javascript:void(0)" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)">添加新卡</a></h6>
+    <h6 class="text-center"><%= __('create-new-card?')%><a href="javascript:void(0)" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><%= __('create-new-card')%></a></h6>
     <%}%>
 
   </div>

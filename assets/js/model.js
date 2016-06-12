@@ -1224,7 +1224,7 @@ var UserProfileView = Backbone.View.extend({
     this.alertView.show();
     var lastname = this.$el.find("input[name='lastname']").val();
     var firstname = this.$el.find("input[name='firstname']").val();
-    var color = this.$el.find("div[name='template_color']").data('color');
+    var color = this.$el.find("div[name='template_color'] .active").data('color');
     var desc = this.$el.find("textarea[name='desc']").val();
     var picture = this.$el.find(".fileinput-preview").data("src");
     var phone = this.$el.find("#phoneInput").val();

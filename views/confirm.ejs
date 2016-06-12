@@ -12,15 +12,15 @@
       </div>
 
       <div class="relative text-left col-xs-8 content" style="">
-        <h4 class="text-white"><strong>今天吃什么好呢？</strong></h4>
+        <h4 class="text-white"><strong><%= __('searching-word') %></strong></h4>
         <div class="btn-group">
-          <input class="input btn btn-default round light text-grey" placeholder="输入牛排看看">
+          <input class="input btn btn-default round light text-grey" placeholder="<%= __('searching-tips') %>">
           <button class="btn btn-warning round orange text-white" onclick="javascript:search(this)">
             <i class="fa fa-search"></i>
-            搜索
+            <%= __('search') %>
           </button>
         </div>
-        <button class="btn btn-danger round red" onclick="location.href='/meal'">查看菜单</button>
+        <button class="btn btn-danger round red" onclick="location.href='/meal'"><%= __('see-menu') %></button>
       </div>
 
     </div>
@@ -31,25 +31,25 @@
     <div class="row">
       <div class="col-md-8">
         <div class="box white">
-          <h1 class="text-red text-left"><strong>联系方式</strong></h1>
+          <h1 class="text-red text-left"><strong><%= __('contact') %></strong></h1>
           <div class="divider"></div>
-          <h4 class="text-left"><strong>请选择取餐方式:</strong></h4>
+          <h4 class="text-left"><strong><%= __('choose-method') %></strong></h4>
           <h3></h3>
           <div class="btn-set text-left" id="method" data-toggle="btn-set">
             <%if(meal.isDelivery){%>
-            <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;" value="pickup"><strong>自取</strong></button>
-            <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active" value="delivery"><strong>送餐</strong></button>
+            <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
+            <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active" value="delivery"><strong><%= __('delivery') %></strong></button>
             <%}else{%>
-            <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="pickup"><strong>自取</strong></button>
+            <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
             <%}%>
           </div>
           <h3></h3>
           <div class="tab-content">
             <div id="pickupTab" class="tab-pane <%= meal.isDelivery ? '':'active'%>">
-              <h4 class="text-left"><strong>请选择方便你的自取地点和时间.</strong></h4>
+              <h4 class="text-left"><strong><%= __('choose-pickup-location') %></strong></h4>
               <div class="row text-left">
                 <div class="col-xs-12">
-                  <h5>1.自取地址和时间</h5>
+                  <h5><%= __('pickup-location-time') %></h5>
                 </div>
                 <div class="radio-box col-xs-12 row" id="pickupMethod" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
                   <%
@@ -57,24 +57,24 @@
                   meal.pickups.forEach(function(pickup){ %>
                   <label class="btn btn-default fixed-label vertical-inline" style="text-align: left;height: 70px;">
                     <input type="radio" id="radio-1-<%= i%>" name="radio-1-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="radio-1-<%= i%>"></label>
-                    <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>">时间: <span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
+                    <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"><%= __('time') %><span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
                     <br/>
-                    <label class="location" data-value="<%= pickup.location%>" style="margin-left: 23px;"><span>地点:&nbsp; <%= pickup.location%></span></label>
+                    <label class="location" data-value="<%= pickup.location%>" style="margin-left: 23px;"><span><%= __('location') %>&nbsp; <%= pickup.location%></span></label>
                   </label>
                   <%i++;}); %>
                 </div>
 
                 <h1></h1>
                 <div class="divider"></div>
-                <h4 class="text-right col-xs-12 delivery">送餐费小计: $<%= meal.delivery_fee%></h4>
+                <h4 class="text-right col-xs-12 delivery"><%= __('meal-delivery-fee') %><%= meal.delivery_fee%></h4>
               </div>
             </div>
 
             <div id="deliveryTab" class="tab-pane <%= meal.isDelivery ? 'active':''%>">
-              <h4 class="text-left"><strong>输入收餐地址后，系统会自动计算送餐费用。</strong></h4>
+              <h4 class="text-left"><strong><%= __('delivery-fee-explain') %></strong></h4>
               <div class="row text-left">
                 <div class="col-xs-12">
-                  <h5>1.收餐地址</h5>
+                  <h5>1.<%= __('delivery-location') %></h5>
                 </div>
                 <div class="radio-box col-xs-12 row" id="contact" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
                   <%
@@ -90,18 +90,18 @@
                     <span style="margin-left: 10px;"><%= address %></span>
                   </label>
                   <%i++;}); %>
-                  <h4 style="margin-left: 42px;"><a class="text-red" data-action="updateFromOrder" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" data-id="<%= user.id%>" href="javascript:void(0)">新增收餐地址及电话</a></h4>
+                  <h4 style="margin-left: 42px;"><a class="text-red" data-action="updateFromOrder" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" data-id="<%= user.id%>" href="javascript:void(0)"><%= __('new-location-phone') %></a></h4>
                 </div>
 
                 <h1></h1>
                 <div class="divider"></div>
-                <h4 class="text-right col-xs-12 delivery">送餐费小计: $<%= meal.delivery_fee%></h4>
+                <h4 class="text-right col-xs-12 delivery"><%= __('meal-delivery-fee') %><%= meal.delivery_fee%></h4>
               </div>
             </div>
             <div id="contact-error" style="margin-top: 40px;" class="alert alert-warning"></div>
           </div>
 
-          <h1 class="text-red text-left">Step3:<strong>支付方式</strong></h1>
+          <h1 class="text-red text-left">Step3:<strong><%= __('payment-method') %></strong></h1>
           <div class="divider"></div>
           <h2></h2>
           <div id="payment-cards" class="btn-set text-left">
@@ -113,7 +113,7 @@
             %>
             <button class="btn btn-disable btn-fat btn-lg<%if(card.isDefaultPayment){%> active<%}%>" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
             <%}%>
-            <button class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/>增加新的<br/>支付方式</button>
+            <button class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/>@<%= __('add-new') %>增加新的<br/>@<%= __('payment-method') %>支付方式</button>
           </div>
 
           <h3></h3>
@@ -123,29 +123,29 @@
 
           <div id="payment-error" data-toggle="alert" class="alert alert-warning"></div>
 
-          <button type="button" class="btn btn-danger red btn-lg round" data-action="takeOrder"><strong>下单並支付</strong></button>
+          <button type="button" class="btn btn-danger red btn-lg round" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
         </div>
       </div>
 
       <div class="col-md-4">
         <div class="box white floater" style="position: fixed;bottom: 10px;" >
           <div id="alert-order" class="alert alert-danger hide" role="alert">
-            这个菜已经被订完了，请选择其他。
+            <%= __('no-dish-left') %>
           </div>
           <% if(meal.isFull()){%>
             <div class="alert alert-danger" role="alert">
-              这个Meal已经被订完了，请选择其他或稍后再试。
+              <%= __('no-meal-left') %>
             </div>
           <%}%>
           <table id="order" class="table" data-meal="<%= meal.id%>" data-err-container="#alert-order">
             <thead>
             <tr>
-              <th>餐费</th>
+              <th><%= __('order-fee') %></th>
             </tr>
             <tr>
-              <th>名称</th>
-              <td>单价</td>
-              <td>数量</td>
+              <th><%= __('name') %></th>
+              <td><%= __('price') %></td>
+              <td><%= __('quantity') %></td>
             </tr>
             </thead>
             <tbody>
@@ -168,41 +168,41 @@
             <tr>
               <th></th>
               <td></td>
-              <th class="text-right subtotal">餐费小计: $0.00</th>
+              <th class="text-right subtotal"><%= __('meal-fee') %>$0.00</th>
             </tr>
             <tr></tr>
             <tr>
-              <th>取餐方式</th>
-              <td>预计时间</td>
-              <td>送餐费</td>
+              <th><%= __('pickup-method') %></th>
+              <td><%= __('estimated-time') %></td>
+              <td><%= __('delivery-fee') %></td>
             </tr>
             <tr></tr>
             <tr class="pickupOpt" style="display: none;">
-              <td>自取</td>
-              <td><%= meal.prepareTime%> 分钟</td>
-              <td>免</td>
+              <td><%= __('self-pickup') %></td>
+              <td><%= meal.prepareTime%><%= __('min') %></td>
+              <td><%= __('free') %></td>
             </tr>
             <tr class="deliveryOpt">
-              <td>送餐</td>
-              <td> > <%= meal.prepareTime%> 分钟</td>
+              <td><%= __('delivery') %></td>
+              <td> > <%= meal.prepareTime%> <%= __('min') %></td>
               <td>$ <%= meal.delivery_fee%></td>
             </tr>
             <tr>
               <th></th>
               <td></td>
-              <th class="text-right delivery" data-value="<%= meal.delivery_fee%>">送餐费小计: $ <%= meal.delivery_fee%></th>
+              <th class="text-right delivery" data-value="<%= meal.delivery_fee%>"><%= __('meal-delivery-fee') %><%= meal.delivery_fee%></th>
             </tr>
             <tr></tr>
             <tr></tr>
             <tr>
               <th></th>
               <td></td>
-              <th class="text-right total">合计: $ 0.00</th>
+              <th class="text-right total"><%= __('total') %></th>
             </tr>
             </tbody>
           </table>
 
-          <button type="button" data-action="takeOrder" class="btn btn-danger red">结账</button>
+          <button type="button" data-action="takeOrder" class="btn btn-danger red"><%= __('bill-check') %></button>
         </div>
       </div>
 

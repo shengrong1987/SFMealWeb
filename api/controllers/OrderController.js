@@ -21,10 +21,10 @@ var geocode = require("../services/geocode.js");
 
 module.exports = {
 
-  validate_meal : function(meal, orders, preorders, subtotal, res) {
+  validate_meal : function(meal, orders, preorders, subtotal, res, req) {
     if(!orders || !subtotal){
       console.log("missing order argument");
-      return res.badRequest("订单为空。");
+      return res.badRequest(req.__('order-empty'));
     }
     if(meal.isValid()) {
       console.log("meal is valid");
@@ -49,27 +49,27 @@ module.exports = {
               actual_subtotal += quantity * mealDish.price;
             } else {
               console.log("dish: " + dishId + " is not enough for " + quantity);
-              res.badRequest({responseText : "dish: " + dishId + " is not enough for " + quantity, code : -1});
+              res.badRequest({responseText : req.__('order-dish-not-enough',dishId, quantity), code : -1});
               return false;
             }
           }
         }
         if (!validDish) {
           console.log("dish: " + dishId + " is not valid");
-          res.badRequest({responseText : "dish: " + dishId + " is not valid", code : -2});
+          res.badRequest({responseText : req.__('order-invalid-dish',dishId), code : -2});
           return false;
         }
       }
       console.log("dish is valid");
       if (actual_subtotal.toFixed(2) != subtotal) {
         console.log("calculate subtotal is: " + actual_subtotal + "submit subtotal is :" + subtotal + "order subtotal is not correct");
-        res.badRequest({responseText : "order subtotal is not correct", code : -3});
+        res.badRequest({responseText : req.__('order-total-not-match'), code : -3});
         return false;
       }
       return true;
     }else{
       console.log("meal is not a valid meal");
-      res.badRequest({ responseText : "meal is not a valid meal", code : -4});
+      res.badRequest({ responseText : req.__('order-invalid-meal'), code : -4});
       return false;
     }
   },
@@ -132,8 +132,8 @@ module.exports = {
       }
       $this.validateAddress(method, m.chef, address, pickupInfo, function(valid){
         if(!valid){
-          res.badRequest({responseText : "address verification fail", code : -6});
-        }else if($this.validate_meal(m, orders, undefined, subtotal, res)){
+          res.badRequest({responseText : req.__('order-invalid-address'), code : -6});
+        }else if($this.validate_meal(m, orders, undefined, subtotal, res, req)){
           console.log("order pass meal validation");
           var dishes = m.dishes;
           if(method == "delivery"){
@@ -152,13 +152,13 @@ module.exports = {
               return res.badRequest(err);
             }
             if(!found.payment || found.payment.length == 0){
-              return res.badRequest({ responseText : "payment method needed", code : -5});
+              return res.badRequest({ responseText : req.__('order-lack-payment'), code : -5});
             }
             if(m.type == "order"){
               req.body.status = "preparing";
             }
             if(!found.phone && !req.body.phone){
-              return res.badRequest("need user's contact info");
+              return res.badRequest(req.__('order-lack-contact'));
             }
             req.body.phone = found.phone || req.body.phone;
             console.log("everything seems good, creating order...");
@@ -208,11 +208,11 @@ module.exports = {
                       if(req.wantsJSON){
                         return res.ok(order);
                       }
-                      return res.ok({responseText : "Your order has been taken successfully!You will be directed to orde page. Now just wait for your food to be ready."});
+                      return res.ok({responseText : req.__('order-ok')});
                     });
                   });
                 } else {
-                  res.badRequest({ reponseText : "Encoutered unkown error", code : -7});
+                  res.badRequest({ reponseText : req.__('order-unknown-error'), code : -7});
                 }
               });
             });
@@ -252,7 +252,7 @@ module.exports = {
       }
 
       order.meal.dishes = order.dishes;
-      if($this.validate_meal(order.meal, params.orders, order.orders, subtotal, res)){
+      if($this.validate_meal(order.meal, params.orders, order.orders, subtotal, res, req)){
 
         console.log("pass meal validation");
         var isHostAction = false;
@@ -269,7 +269,7 @@ module.exports = {
                 return res.badRequest(err);
               }
               if(!found.payment || found.payment.length == 0){
-                return res.badRequest({responseText : "payment profile missing", code : -5});
+                return res.badRequest({responseText : req.__('order-lack-payment'), code : -5});
               }
               if(diff>0){
                 //create another charge
@@ -303,7 +303,7 @@ module.exports = {
                         }
                         //send notification
                         notification.notificationCenter("Order", "adjust", result, isHostAction);
-                        return res.ok({responseText : "订单调整完成,已从用户账户中扣除$" +  charge.amount/100});
+                        return res.ok({responseText : req.__('order-adjust-ok',charge.amount/100)});
                       })
                     });
                   }
@@ -356,7 +356,7 @@ module.exports = {
                       }
                       //send notification
                       notification.notificationCenter("Order", "adjust", result, isHostAction);
-                      return res.ok({responseText : "订单调整完成,已返回$" +  totalRefund + "到用户账户中"});
+                      return res.ok({responseText : req.__('order-adjust-ok2',totalRefund)});
                     })
                   });
                 });
@@ -371,7 +371,7 @@ module.exports = {
                 return res.badRequest(err);
               }
               notification.notificationCenter("Order", "adjust", result, isHostAction);
-              return res.ok({responseText :"订单调整完成,订单金额不变"});
+              return res.ok({responseText :req.__('order-adjust-ok3')});
             })
           }
         }else if(order.status == "preparing"){
@@ -386,7 +386,7 @@ module.exports = {
             }
             //send notification
             notification.notificationCenter("Order", "adjusting", result, isHostAction);
-            return res.ok({responseText : "订单调整请求已提交，等待厨师确认"});
+            return res.ok({responseText : req.__('order-adjust-request')});
           });
         }
       }
@@ -453,7 +453,7 @@ module.exports = {
                       }
                       //send notification
                       notification.notificationCenter("Order", "cancel", result, isHostAction);
-                      res.ok({responseText : "订单已取消。"});
+                      return res.ok({responseText : req.__('order-cancel-ok')});
                     })
                   });
                 }
@@ -468,7 +468,7 @@ module.exports = {
             }
             //send notification
             notification.notificationCenter("Order", "cancel", result, isHostAction);
-            return res.ok({ responseText : "订单已取消"});
+            return res.ok({responseText : req.__('order-cancel-ok')});
           })
         }
       }else if(order.status == "preparing"){
@@ -480,7 +480,7 @@ module.exports = {
           }
           //send notification
           notification.notificationCenter("Order", "cancelling", result, isHostAction);
-          return res.ok({responseText : "已提交取消申请，请等待厨师确认"});
+          return res.ok({responseText : req.__('order-cancel-request')});
         });
       }
     });
@@ -539,7 +539,7 @@ module.exports = {
                         return res.badRequest(err);
                       }
                       notification.notificationCenter("Order", "confirm", result);
-                      return res.ok({responseText : "已确认调整的订单，请按照新订单准备。"});
+                      return res.ok({responseText : req.__('order-confirm')});
                     })
                   });
                 }
@@ -588,7 +588,7 @@ module.exports = {
                           return res.badRequest(err);
                         }
                         notification.notificationCenter("Order", "confirm", result);
-                        return res.ok({responseText : "已确认调整的订单，请按照新订单准备。"});
+                        return res.ok({responseText : req.__('order-confirm')});
                       })
                     });
                   }
@@ -608,7 +608,7 @@ module.exports = {
               return res.badRequest(err);
             }
             notification.notificationCenter("Order", "confirm", result);
-            return res.ok({responseText : "已确认调整的订单，请按照新订单准备。"});
+            return res.ok({responseText : req.__('order-confirm')});
           })
         }
       }else if(order.status == "canceling"){
@@ -645,7 +645,7 @@ module.exports = {
                         return res.badRequest(err);
                       }
                       notification.notificationCenter("Order", "cancel", result);
-                      return res.ok({responseText : "订单已确认取消"});
+                      return res.ok({responseText : req.__('order-confirm-cancel')});
                     })
                   });
                 }
@@ -660,7 +660,7 @@ module.exports = {
               return res.badRequest(err);
             }
             notification.notificationCenter("Order", "cancel", result);
-            return res.ok({responseText : "订单已确认取消"});
+            return res.ok({responseText : req.__('order-confirm-cancel')});
           })
         }
       }
@@ -684,7 +684,7 @@ module.exports = {
           return res.badRequest(err);
         }
         notification.notificationCenter("Order", "reject", result);
-        return res.ok({ responseText : "已拒绝订单修改请求"});
+        return res.ok({ responseText : req.__('order-reject-adjust')});
       });
     });
   },
@@ -706,9 +706,9 @@ module.exports = {
         }
         notification.notificationCenter("Order", "ready", result);
         if(order.method == "pickup"){
-          return res.ok({responseText : "订单已准备完毕，已通知吃货上门取货"});
+          return res.ok({responseText : req.__('order-ready')});
         }else{
-          return res.ok({responseText : "订单已准备完毕，请通知司机送餐"});
+          return res.ok({responseText : req.__('order-ready2')});
         }
       });
     });
@@ -733,7 +733,7 @@ module.exports = {
           return res.badRequest(err);
         }
         notification.notificationCenter("Order", "receive", result);
-        return res.ok({responseText : "订单已被领取"});
+        return res.ok({responseText : req.__('order-receive')});
       });
     });
   }

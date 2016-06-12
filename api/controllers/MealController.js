@@ -93,10 +93,10 @@ module.exports = {
       if(typeof zipcode !== 'undefined' && zipcode && zipcode !== 'undefined' && typeof county !== 'undefined' && county && county !== 'undefined'){
         GeoCoder.geocode(zipcode, function(err, result){
           if (err) {
-            return res.badRequest("地址解析错误，请刷新再试。");
+            return res.badRequest(req.__('meal-error-address'));
           }  else {
             if(result.length==0){
-              return res.badRequest("地址格式不对或地址不存在。");
+              return res.badRequest(req.__('meal-error-address2'));
             }
             var location = { lat : result[0].latitude, long : result[0].longitude };
             found = found.filter(function(meal){
@@ -148,7 +148,7 @@ module.exports = {
         return res.badRequest(err);
       }
       if(m.length==0){
-        return res.badRequest("No meal is founded");
+        return res.badRequest(req.__('meal-not-found'));
       }
       User.find(userId).populate("payment").exec(function(err,user){
         res.view("confirm",{meal : m[0], user : user[0]});
@@ -184,7 +184,7 @@ module.exports = {
           }
         });
         if(hasActiveOrder){
-          return res.badRequest("There are ongoing orders for this meal.Please finish all orders before turning it off.")
+          return res.badRequest(req.__('meal-active-error'));
         }
         Meal.update(mealId,{status : "off"}).exec(function(err, meal){
           if(err){
@@ -255,7 +255,7 @@ module.exports = {
                   return res.badRequest(err);
                 }
                 if(!host.isValid(true)){
-                  return res.badRequest("厨师信息未完整或菜式审核中, 详见/Apply页面");
+                  return res.badRequest(req.__('meal-chef-incomplete'));
                 }
                 Meal.create(req.body).exec(function(err,meal){
                   if(err){
@@ -274,16 +274,16 @@ module.exports = {
             }
           }else{
             console.log("meal contain unverified dishes");
-            return res.badRequest("meal contain unverified dishes");
+            return res.badRequest(req.__('meal-unverify-dish'));
           }
         });
       }else{
         console.log("meal minimal requirement are not valid");
-        return res.badRequest("meal minimal requirement are not valid");
+        return res.badRequest(req.__('meal-invalid-requirement'));
       }
     }else{
       console.log("Date format of meal is not valid");
-      return res.badRequest("Date format of meal is not valid");
+      return res.badRequest(req.__('meal-invalid-date'));
     }
   },
 
@@ -299,11 +299,11 @@ module.exports = {
         });
       }else{
         console.log("meal minimal requirement are not valid");
-        return res.badRequest("meal minimal requirement are not valid");
+        return res.badRequest(req.__('meal-invalid-requirement'));
       }
     }else{
       console.log("Date format of meal is not valid");
-      return res.badRequest("Date format of meal is not valid");
+      return res.badRequest(req.__('meal-invalid-date'));
     }
   },
 

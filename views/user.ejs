@@ -8,7 +8,7 @@
             <a href="/" class="logo logo-sm"></a>
           </div>
           <div class="col-sm-9">
-            <h4 class="text-white"><strong>欢迎加入我们,一起享受私房菜吧！</strong></h4>
+            <h4 class="text-white"><strong><%= __('welcome')%></strong></h4>
           </div>
         </div>
       </div>
@@ -19,41 +19,41 @@
 
     <div class="default-container">
       <ul class="nav nav-tab-cute nav-justified" style="padding: 20px;">
-        <li class="active"><a data-toggle="tab" href="#myorder"><h4><strong>吃货订单</strong></h4></a></li>
-        <li><a data-toggle="tab" role="tab" href="#mycollect"><h4><strong>我的收藏</strong></h4></a></li>
-        <li><a data-toggle="tab" role="tab" href="#myinfo"><h4><strong>个人资料</strong></h4></a></li>
-        <li><a data-toggle="tab" role="tab" href="#myaddress"><h4><strong>地址管理</strong></h4></a></li>
-        <li><a data-toggle="tab" role="tab" href="#myreview"><h4><strong>待评价</strong></h4></a></li>
+        <li class="active"><a data-toggle="tab" href="#myorder"><h4><strong><%= __('nav-bar-order')%></strong></h4></a></li>
+        <li><a data-toggle="tab" role="tab" href="#mycollect"><h4><strong><%= __('user-nav-collect')%></strong></h4></a></li>
+        <li><a data-toggle="tab" role="tab" href="#myinfo"><h4><strong><%= __('user-nav-info')%></strong></h4></a></li>
+        <li><a data-toggle="tab" role="tab" href="#myaddress"><h4><strong><%= __('user-nav-address')%></strong></h4></a></li>
+        <li><a data-toggle="tab" role="tab" href="#myreview"><h4><strong><%= __('nav-bar-review')%></strong></h4></a></li>
       </ul>
 
       <div class="tab-content" style="padding-top: 20px;padding-bottom: 60px;min-height: 500px;">
         <div id="myorder" style="width: 90%;" class="tab-pane middle active">
           <div class="box box-shadow white">
             <ul class="nav nav-justified nav-tab-cute" style="padding: 20px;">
-              <li class="active"><a data-toggle="tab" href="#myorder-order"><h4><strong>我的即点订单</strong></h4></a></li>
-              <li><a data-toggle="tab" href="#myorder-preorder"><h4><strong>我的预售订单</strong></h4></a></li>
+              <li class="active"><a data-toggle="tab" href="#myorder-order"><h4><strong><%= __('my-order')%></strong></h4></a></li>
+              <li><a data-toggle="tab" href="#myorder-preorder"><h4><strong><%= __('my-preorder')%></strong></h4></a></li>
             </ul>
             <div class="tab-content">
               <div id="myorder-order" style="width: 90%;" class="tab-pane middle active">
                 <ul class="nav nav-tabs" style="margin-top: 20px;margin-bottom: 10px;">
-                  <li class="active"><a data-toggle="tab" href="#order-all" class="btn-lg text-dark"><strong>所有订单</strong></a></li>
-                  <li><a data-toggle="tab" href="#order-schedule" class="btn-lg text-dark"><strong>待煮</strong></a></li>
-                  <li><a data-toggle="tab" href="#order-preparing" class="btn-lg text-dark"><strong>烹饪中</strong></a></li>
-                  <li><a data-toggle="tab" href="#order-ready" class="btn-lg text-dark"><strong>等自取/送餐中</strong></a></li>
-                  <li><a data-toggle="tab" href="#order-review" class="btn-lg text-dark"><strong>待评价</strong></a></li>
+                  <li class="active"><a data-toggle="tab" href="#order-all" class="btn-lg text-dark"><strong><%= __('order-nav-all')%></strong></a></li>
+                  <li><a data-toggle="tab" href="#order-schedule" class="btn-lg text-dark"><strong><%= __('order-nav-schedule')%></strong></a></li>
+                  <li><a data-toggle="tab" href="#order-preparing" class="btn-lg text-dark"><strong><%= __('order-nav-preparing')%></strong></a></li>
+                  <li><a data-toggle="tab" href="#order-ready" class="btn-lg text-dark"><strong><%= __('order-nav-prepared')%></strong></a></li>
+                  <li><a data-toggle="tab" href="#order-review" class="btn-lg text-dark"><strong><%= __('nav-bar-review')%></strong></a></li>
                 </ul>
                 <div class="tab-content">
                   <div id="order-all" style="width: 90%;" class="tab-pane middle active">
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr>
-                        <td>照片</td>
-                        <td>私房菜</td>
-                        <td>单价</td>
-                        <td>数量</td>
-                        <td>实付款</td>
-                        <td>状态</td>
-                        <td>交易操作</td>
+                        <td><%= __('photos')%></td>
+                        <td><%= __('meal')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('quantity')%></td>
+                        <td><%= __('paid-amount')%></td>
+                        <td><%= __('status')%></td>
+                        <td><%= __('trade-action')%></td>
                       </tr>
                       </thead>
                       <%
@@ -63,7 +63,7 @@
                       %>
                       <tbody class="item" style="vertical-align: middle;">
                         <tr class="active">
-                          <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
+                          <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('kitchen')%>: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
                         </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -81,25 +81,25 @@
                         <td>$<%= dish.price%></td>
                         <td><%= number%></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.status == "schedule"){ %>
-                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a><br/>
-                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
-                          <a href="#">联系厨师</a>
+                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
+                          <a href="#"><%= __('contact-chef')%></a>
                           <%}else if(order.status == "preparing"){%>
-                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a><br/>
-                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
-                          <a href="#">联系厨师</a>
+                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
+                          <a href="#"><%= __('contact-chef')%></a>
                           <%}else if(order.status == "ready"){
                           if(order.method == "pickup"){%>
-                          <a href="#">查看地址</a>
+                          <a href="#"><%= __('see-address')%></a>
                           <%}else{%>
-                          <a href="#">查看外卖</a>
+                          <a href="#"><%= __('see-delivery')%></a>
                           <%}%>
                           <%}else if(order.status == "review"){%>
-                          <a href="#myreview">评价</a>
+                          <a href="#myreview"><%= __('review')%></a>
                           <%}%>
                         </td>
                       </tr>
@@ -118,13 +118,13 @@
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
-                        <td>照片</td>
-                        <td>私房菜</td>
-                        <td>单价</td>
-                        <td>数量</td>
-                        <td>实付款</td>
-                        <td>状态</td>
-                        <td>交易操作</td>
+                        <td><%= __('photos')%></td>
+                        <td><%= __('meal')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('quantity')%></td>
+                        <td><%= __('paid-amount')%></td>
+                        <td><%= __('status')%></td>
+                        <td><%= __('trade-action')%></td>
                       </tr>
                       </thead>
                       <%
@@ -134,7 +134,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -152,12 +152,12 @@
                         <td>$<%= dish.price%></td>
                         <td><%= number%></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a><br/>
-                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
-                          <a href="#">联系厨师</a>
+                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
+                          <a href="#"><%= __('contact-chef')%></a>
                         </td>
                       </tr>
                       <%}}})})%>
@@ -175,13 +175,13 @@
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
-                        <td>照片</td>
-                        <td>私房菜</td>
-                        <td>单价</td>
-                        <td>数量</td>
-                        <td>实付款</td>
-                        <td>状态</td>
-                        <td>交易操作</td>
+                        <td><%= __('photos')%></td>
+                        <td><%= __('meal')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('quantity')%></td>
+                        <td><%= __('paid-amount')%></td>
+                        <td><%= __('status')%></td>
+                        <td><%= __('trade-action')%></td>
                       </tr>
                       </thead>
                       <%
@@ -191,7 +191,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('kitchen')%>: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -209,12 +209,12 @@
                         <td>$<%= dish.price%></td>
                         <td><%= number%></td>
                         <% if(index==0){%>
-                          <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
+                          <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                            <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a><br/>
-                            <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
-                            <a href="#">联系厨师</a>
+                            <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
+                            <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
+                            <a href="#"><%= __('contact-chef')%></a>
                           </td>
                       </tr>
                       <%}}})})%>
@@ -233,13 +233,13 @@
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
-                        <td>照片</td>
-                        <td>私房菜</td>
-                        <td>单价</td>
-                        <td>数量</td>
-                        <td>实付款</td>
-                        <td>状态</td>
-                        <td>交易操作</td>
+                        <td><%= __('photos')%></td>
+                        <td><%= __('meal')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('quantity')%></td>
+                        <td><%= __('paid-amount')%></td>
+                        <td><%= __('status')%></td>
+                        <td><%= __('trade-action')%></td>
                       </tr>
                       </thead>
                       <%
@@ -249,7 +249,7 @@
                       %>
                       <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('kitchen')%>: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -267,13 +267,13 @@
                         <td>$<%= dish.price%></td>
                         <td><%= number%></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == "pickup"){%>
-                          <a href="#">查看地址</a>
+                          <a href="#"><%= __('see-address')%></a>
                           <%}else{%>
-                          <a href="#">查看外卖</a>
+                          <a href="#"><%= __('see-delivery')%></a>
                           <%}%>
                         </td>
                       </tr>
@@ -292,13 +292,13 @@
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
-                        <td>照片</td>
-                        <td>私房菜</td>
-                        <td>单价</td>
-                        <td>数量</td>
-                        <td>实付款</td>
-                        <td>状态</td>
-                        <td>交易操作</td>
+                        <td><%= __('photos')%></td>
+                        <td><%= __('meal')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('quantity')%></td>
+                        <td><%= __('paid-amount')%></td>
+                        <td><%= __('status')%></td>
+                        <td><%= __('trade-action')%></td>
                       </tr>
                       </thead>
                       <%
@@ -308,7 +308,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('kitchen')%>: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -326,10 +326,10 @@
                         <td>$<%= dish.price%></td>
                         <td><%= number%></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="#myreview">评价</a>
+                          <a href="#myreview"><%= __('review')%></a>
                         </td>
                       </tr>
                       <%}}})})%>
@@ -347,24 +347,24 @@
 
               <div id="myorder-preorder" style="width: 90%;" class="tab-pane middle">
                 <ul class="nav nav-tabs" style="margin-top: 20px;margin-bottom: 10px;">
-                  <li class="active"><a data-toggle="tab" href="#preorder-all" class="btn-lg text-dark"><strong>所有订单</strong></a></li>
-                  <li><a data-toggle="tab" href="#preorder-schedule" class="btn-lg text-dark"><strong>待煮</strong></a></li>
-                  <li><a data-toggle="tab" href="#preorder-preparing" class="btn-lg text-dark"><strong>烹饪中</strong></a></li>
-                  <li><a data-toggle="tab" href="#preorder-ready" class="btn-lg text-dark"><strong>等自取/送餐中</strong></a></li>
-                  <li><a data-toggle="tab" href="#preorder-review" class="btn-lg text-dark"><strong>待评价</strong></a></li>
+                  <li class="active"><a data-toggle="tab" href="#preorder-all" class="btn-lg text-dark"><strong><%= __('order-nav-all')%></strong></a></li>
+                  <li><a data-toggle="tab" href="#preorder-schedule" class="btn-lg text-dark"><strong><%= __('order-nav-schedule')%></strong></a></li>
+                  <li><a data-toggle="tab" href="#preorder-preparing" class="btn-lg text-dark"><strong><%= __('order-nav-preparing')%></strong></a></li>
+                  <li><a data-toggle="tab" href="#preorder-ready" class="btn-lg text-dark"><strong><%= __('order-nav-prepared')%></strong></a></li>
+                  <li><a data-toggle="tab" href="#preorder-review" class="btn-lg text-dark"><strong><%= __('nav-bar-review')%></strong></a></li>
                 </ul>
                 <div class="tab-content">
                   <div id="preorder-all" style="width: 90%;" class="tab-pane middle active">
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
-                        <td>照片</td>
-                        <td>私房菜</td>
-                        <td>单价</td>
-                        <td>数量</td>
-                        <td>实付款</td>
-                        <td>状态</td>
-                        <td>交易操作</td>
+                        <td><%= __('photos')%></td>
+                        <td><%= __('meal')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('quantity')%></td>
+                        <td><%= __('paid-amount')%></td>
+                        <td><%= __('status')%></td>
+                        <td><%= __('trade-action')%></td>
                       </tr>
                       </thead>
                       <%
@@ -374,7 +374,7 @@
                       %>
                       <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('kitchen')%>: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -392,25 +392,25 @@
                         <td>$<%= dish.price%></td>
                         <td><%= number%></td>
                         <% if(index==0){%>
-                          <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
+                          <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                             <% if(order.status == "schedule"){ %>
-                            <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a><br/>
-                            <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
-                            <a href="#">联系厨师</a>
+                            <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
+                            <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
+                            <a href="#"><%= __('contact-chef')%></a>
                             <%}else if(order.status == "preparing"){%>
-                            <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a>
-                            <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
-                            <a href="#">联系厨师</a>
+                            <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a>
+                            <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
+                            <a href="#"><%= __('contact-chef')%></a>
                             <%}else if(order.status == "ready"){
                             if(order.method == "pickup"){%>
-                            <a href="#">查看地址</a>
+                            <a href="#"><%= __('see-address')%></a>
                             <%}else{%>
-                            <a href="#">查看外卖</a>
+                            <a href="#"><%= __('see-delivery')%></a>
                             <%}%>
                             <%}else if(order.status == "review"){%>
-                            <a href="#myreview">评价</a>
+                            <a href="#myreview"><%= __('review')%></a>
                             <%}%>
                           </td>
                       </tr>
@@ -428,13 +428,13 @@
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
-                        <td>照片</td>
-                        <td>私房菜</td>
-                        <td>单价</td>
-                        <td>数量</td>
-                        <td>实付款</td>
-                        <td>状态</td>
-                        <td>交易操作</td>
+                        <td><%= __('photos')%></td>
+                        <td><%= __('meal')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('quantity')%></td>
+                        <td><%= __('paid-amount')%></td>
+                        <td><%= __('status')%></td>
+                        <td><%= __('trade-action')%></td>
                       </tr>
                       </thead>
                       <%
@@ -444,7 +444,7 @@
                       %>
                       <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('kitchen')%>: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -462,12 +462,12 @@
                         <td>$<%= dish.price%></td>
                         <td><%= number%></td>
                         <% if(index==0){%>
-                          <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
+                          <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                            <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>">取消</a><br/>
-                            <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
-                            <a href="#">联系厨师</a>
+                            <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
+                            <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
+                            <a href="#"><%= __('contact-chef')%></a>
                           </td>
                       </tr>
                       <%}}})})%>
@@ -485,13 +485,13 @@
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
-                        <td>照片</td>
-                        <td>私房菜</td>
-                        <td>单价</td>
-                        <td>数量</td>
-                        <td>实付款</td>
-                        <td>状态</td>
-                        <td>交易操作</td>
+                        <td><%= __('photos')%></td>
+                        <td><%= __('meal')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('quantity')%></td>
+                        <td><%= __('paid-amount')%></td>
+                        <td><%= __('status')%></td>
+                        <td><%= __('trade-action')%></td>
                       </tr>
                       </thead>
                       <%
@@ -501,7 +501,7 @@
                       %>
                       <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('kitchen')%>: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -519,11 +519,11 @@
                         <td>$<%= dish.price%></td>
                         <td><%= number%></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form">调整</a><br/>
-                          <a href="#">联系厨师</a>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
+                          <a href="#"><%= __('contact-chef')%></a>
                         </td>
                       </tr>
                       <%}}})})%>
@@ -541,13 +541,13 @@
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
-                        <td>照片</td>
-                        <td>私房菜</td>
-                        <td>单价</td>
-                        <td>数量</td>
-                        <td>实付款</td>
-                        <td>状态</td>
-                        <td>交易操作</td>
+                        <td><%= __('photos')%></td>
+                        <td><%= __('meal')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('quantity')%></td>
+                        <td><%= __('paid-amount')%></td>
+                        <td><%= __('status')%></td>
+                        <td><%= __('trade-action')%></td>
                       </tr>
                       </thead>
                       <%
@@ -557,7 +557,7 @@
                       %>
                       <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('kitchen')%>: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -575,13 +575,13 @@
                         <td>$<%= dish.price%></td>
                         <td><%= number%></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == "pickup"){%>
-                          <a href="#">查看地址</a>
+                          <a href="#"><%= __('see-address')%></a>
                           <%}else{%>
-                          <a href="#">查看外卖</a>
+                          <a href="#"><%= __('see-delivery')%></a>
                           <%}%>
                         </td>
                       </tr>
@@ -600,13 +600,13 @@
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
-                        <td>照片</td>
-                        <td>私房菜</td>
-                        <td>单价</td>
-                        <td>数量</td>
-                        <td>实付款</td>
-                        <td>状态</td>
-                        <td>交易操作</td>
+                        <td><%= __('photos')%></td>
+                        <td><%= __('meal')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('quantity')%></td>
+                        <td><%= __('paid-amount')%></td>
+                        <td><%= __('status')%></td>
+                        <td><%= __('trade-action')%></td>
                       </tr>
                       </thead>
                       <%
@@ -616,7 +616,7 @@
                       %>
                       <tbody class="item" style="vertical-align: middle;">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp订单号: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp厨房: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>: <%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('kitchen')%>: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -635,10 +635,10 @@
                         <td>$<%= dish.price%></td>
                         <td><%= number%></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br>含送餐费<br>($<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="#myreview">评价</a>
+                          <a href="#myreview"><%= __('review')%></a>
                         </td>
                       </tr>
                       <%}}})})%>
@@ -660,7 +660,7 @@
         <div id="mycollect" style="width: 90%;" class="tab-pane middle">
           <div class="box box-shadow white">
             <%if(!user.collects || user.collects.length == 0){ %>
-            <h3><small>您尚未有任何收藏菜式，四处看看吧。<br/><a href="/meal">立即浏览</a></small></h3>
+            <h3><small><%= __('no-collect-tip')%><br/><a href="/meal"><%= __('browse')%></a></small></h3>
             <%}user.collects.forEach(function(meal){
               var host = meal.chef;%>
             <div class="row vertical-align item">
@@ -668,7 +668,7 @@
                 <img src="/images/dumplings.jpg" style="width: 100%;">
               </div>
               <div class="col-xs-4">
-                <h2 class="text-left"><%= meal.title%>  <small class="text-orange"><%= meal.type=="order"?"即点":"预定"%></small></h2>
+                <h2 class="text-left"><%= meal.title%>  <small class="text-orange"><%= meal.type=="order"?__('order'): __('preorder')%></small></h2>
                 <div class="row text-left">
                   <div class="col-xs-12">
                     <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(2)%>">
@@ -686,7 +686,7 @@
 
                 <div class="row">
                   <div class="col-xs-12">
-                    <h3 class="text-left"><small>供应时间 <span class="text-red"><%= meal.provideDate()%></span></small></h3>
+                    <h3 class="text-left"><small><%= __('provide-time')%> <span class="text-red"><%= meal.provideDate()%></span></small></h3>
                   </div>
                 </div>
 
@@ -702,10 +702,10 @@
                 </div>
                 <div class="row">
                   <div class="col-sm-6">
-                    <button class="btn btn-red round" style="width: 100%;margin-top: 10px;" onclick="javascript:location.href='/meal/<%= meal.id%>'">进入</button>
+                    <button class="btn btn-red round" style="width: 100%;margin-top: 10px;" onclick="javascript:location.href='/meal/<%= meal.id%>'"><%= __('enter')%></button>
                   </div>
                   <div class="col-sm-6">
-                    <button class="btn btn-disable round" data-heart="false" data-select="true" style="width: 100%;margin-top: 10px;" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-cb="reloadUrl('/user/me','#mycollect')">取消收藏</button>
+                    <button class="btn btn-disable round" data-heart="false" data-select="true" style="width: 100%;margin-top: 10px;" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-cb="reloadUrl('/user/me','#mycollect')"><%= __('cancel-collect')%></button>
                   </div>
                 </div>
               </div>
@@ -727,15 +727,15 @@
           <div class="box box-shadow white">
             <form>
               <div class="col-md-6 text-left form-group">
-                <label>1. 上传个人头像 <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="可以选jpg,png,gif,图片最大不超过5M"></i></label>
+                <label>1. <%= __('upload-thumbnail')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('photo-restrition')%>"></i></label>
                 <div class="fileinput fileinput-exists" data-provides="fileinput">
                   <div class="fileinput-new thumbnail size-large">
                   </div>
-                  <div class="fileinput-preview fileinput-exists size-large round_thumb" data-src="<%= user.picture%>">
+                  <div class="fileinput-preview fileinput-exists size-large round_thumb" data-src="<%= user.picture || ''%>">
                     <img src="<%= user.picture || '/images/profile_man.png'%>" onclick="$('#thumbnailUpload').trigger('click')">
                   </div>
                   <div>
-                    <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span>
+                    <span class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
                       <input id="thumbnailUpload" type="file" onchange="uploadThumbnail()">
                     </span>
                     <!--<a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput">Remove</a>-->
@@ -746,28 +746,28 @@
                     </script>
                   </div>
                   <!--<button class="btn btn-red round" onclick="uploadThumbnail()">本地上传</button>-->
-                  <h4><small><br/><br/>点击头像或“本地上传”可以上传头像，点击“保存修改”才能生效哦。</small></h4>
+                  <h4><small><br/><br/><%= __('upload-instruction')%></small></h4>
                   <div class="alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
                 </div>
 
                 <div class="form-group text-left" style="margin-top:20px;">
-                  <label>2. 姓名 <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="我们采用实名制，请认真填写，名字填好点击“保存修改”。以后如果要修改，要联系管理员哦。"></i></label>
+                  <label>2. <%= __('user-name')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('name-instruction')%>"></i></label>
                   <div class="block">
                     <div class="input-group">
                       <span class="input-group-addon" id="basic-addon2">名</span>
-                      <input name="firstname" type="text" class="form-control" placeholder="<% if(!user.firstname){ %> Firstname(名字)  <% } %>" value="<%= user.firstname?user.firstname : ""%>" aria-describedby="basic-addon2">
+                      <input name="firstname" type="text" class="form-control" placeholder="<% if(!user.firstname){ __('firstname') } %>" value="<%= user.firstname?user.firstname : ""%>" aria-describedby="basic-addon2" required>
                       <span class="input-group-addon" id="basic-addon1">姓</span>
-                      <input name="lastname" type="text" class="form-control" placeholder="<% if(!user.lastname){ %> Lastname(姓)  <% } %>" value="<%= user.lastname? user.lastname : ""%>" aria-describedby="basic-addon1" style="margin-right: 20px;">
+                      <input name="lastname" type="text" class="form-control" placeholder="<% if(!user.lastname){ __('lastname') } %>" value="<%= user.lastname? user.lastname : ""%>" aria-describedby="basic-addon1" style="margin-right: 20px;" required>
                     </div>
                   </div>
-                  <div class="alert alert-warning">我们采用实名制，请认真填写，名字填好点击“保存修改”。以后如果要修改，要联系管理员哦。</div>
+                  <div class="alert alert-warning"><%= __('name-instruction')%></div>
                 </div>
 
               </div>
 
               <div class="col-md-6 text-left">
                 <div class="form-group text-left">
-                  <label>3. 个人主页颜色  </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="我们会为你生成个人主页，可以随时改动主页的色调。选择代表你的颜色吧？"></i></label>
+                  <label>3. <%= __('page-color')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('color-instruction')%>"></i></label>
                   <div class="block" name="template_color" data-color="<%= user.color %>">
                     <div class="color-block blue" data-color="blue"></div>
                     <div class="color-block green" data-color="green"></div>
@@ -797,24 +797,24 @@
                 </div>
 
                 <div class="form-group" style="margin-top:34px;">
-                  <label>4. 一段话介绍自己(140字内)  </strong><i class="fa fa-question-circle text-lightgrey" data-toggle="tooltip" title="可以写最喜欢的菜系或最爱的菜名，让大家了解一下你吧。"></i></label>
+                  <label>4. <%= __('my-intro')%><i class="fa fa-question-circle text-lightgrey" data-toggle="tooltip" title="<%= __('intro-instruction')%>"></i></label>
                   <div class="block">
-                    <textarea class="form-control" name="desc" rows="6" placeholder="我不是很喜欢吃辣，可是我老公喜欢吃，然后我就不得不吃辣。" maxlength="140"><% if(user.desc){%> <%=user.desc%> <%}%></textarea>
+                    <textarea class="form-control" name="desc" rows="6" maxlength="140"><% if(user.desc){%> <%=user.desc%> <%}%></textarea>
                   </div>
                 </div>
               </div>
 
               <div class="col-md-6">
                 <div class="form-group text-left">
-                  <label for="phoneInput">5. 手机</label>
-                  <input class="form-control" type="text" id="phoneInput" required data-error="手机格式不对" minlength="10" maxlength="11" value="<%= user.phone || ''%>">
+                  <label for="phoneInput">5. <%= __('phone')%></label>
+                  <input class="form-control" type="text" id="phoneInput" required data-error="<%= __('phone-bad-format')%>" minlength="10" maxlength="11" value="<%= user.phone || ''%>">
                   <div class="help-block with-errors"></div>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group text-left">
-                  <label for="zipcodeInput">6. 邮编</label>
-                  <input class="form-control" type="text" id="zipcodeInput" required data-error="邮编格式不对" minlength="5" maxlength="9" value="<%= user.zipcode || ''%>">
+                  <label for="zipcodeInput">6. <%= __('zipcode')%></label>
+                  <input class="form-control" type="text" id="zipcodeInput" required data-error="<%= __('zipcode-bad-format')%>" minlength="5" maxlength="9" value="<%= user.zipcode || ''%>">
                   <div class="help-block with-errors"></div>
                 </div>
               </div>
@@ -825,7 +825,7 @@
 
 
               <div class="col-xs-12">
-                <button type="submit" class="btn btn-red round" style="width:80px;margin-right:10px;" >保存修改</button>
+                <button type="submit" class="btn btn-red round" style="width:80px;margin-right:10px;" ><%= __('save')%></button>
               </div>
             </form>
           </div>
@@ -834,7 +834,7 @@
         <!-- info end -->
         <div id="myaddress" style="width: 90%;" class="tab-pane middle" data-id="<%= user.id %>">
           <div class="box box-shadow white text-left">
-            <label>1.收餐地址</label>
+            <label>1.<%= __('delivery-location')%></label>
             <div class="address_blocks">
               <%
               var addresses = user.address_list;
@@ -845,33 +845,33 @@
               <div class="text-left box-grid">
                 <div class="address_block vertical-align" data-id="<%= user.id %>" data-address-id="<%= address.id%>" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>">
                   <% if(address.isDefault){ %>
-                  <label class="text-red default">［默认］</label>
+                  <label class="text-red default"><%= __('default')%></label>
                   <%}else{%>
                   <label class="text-red default" style="width: 55px;"> </label>
                   <%}%>
                   <label class="actual_address"><%= address.street%>, &nbsp;<%= address.city%> <%= address.zip%> <br/>+<%= address.phone%></label>
-                  <a class="text-red cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">&nbsp;&nbsp;修改</a>
-                  <a class="text-red cursor-pointer deleteBtn" style="margin-left: 5px;" href="javascript:void(0)">&nbsp;删除</a>
+                  <a class="text-red cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">&nbsp;&nbsp;<%= __('modify')%></a>
+                  <a class="text-red cursor-pointer deleteBtn" style="margin-left: 5px;" href="javascript:void(0)">&nbsp;<%= __('delete')%></a>
                 </div>
               </div>
               <%})%>
             </div>
 
             <div class="col-xs-12 text-left" data-id="<%= user.id %>">
-              <button style="margin: 10px 0 10px 0;" class="btn btn-red round newAddress" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">新增收餐地址及电话</button>
+              <button style="margin: 10px 0 10px 0;" class="btn btn-red round newAddress" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html"><%= __('new-location-phone')%></button>
             </div>
 
             <% if (typeof (user.host) != 'undefined'){ %>
               <div class="row">
                 <div class="col-xs-12">
-                  <h5 class="text-left" style="padding-top: 20px;"><strong>2.厨房地址<br/><br/>你当前的厨房地址为:</strong></h5>
+                  <h5 class="text-left" style="padding-top: 20px;"><strong>2.<%= __('host-address')%><br/><br/><%= __('host-current-address')%></strong></h5>
                 </div>
               </div>
               <div class="text-left box-grid">
                 <div class="address_block vertical-align" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street || ""%>" data-city="<%= user.host.city || ""%>" data-zip="<%= user.host.zip || ""%>" data-phone="<%=user.phone || ""%>">
-                  <label class="text-green">［默认］</label>
-                  <label><%= user.host.full_address || '请输入准确厨房地址' %><br/> +<%= user.phone || '输入联系电话' %></label>
-                  <a class="text-green cursor-pointer edit" style="margin-left:10px;" toggle="modal" data-target="#myModal" data-host="true" data-href="/templates/user/address.html">修改</a>
+                  <label class="text-green"><%= __('default')%></label>
+                  <label><%= user.host.full_address || __('need-kitchen-location') %><br/> +<%= user.phone || __('need-phone-number') %></label>
+                  <a class="text-green cursor-pointer edit" style="margin-left:10px;" toggle="modal" data-target="#myModal" data-host="true" data-href="/templates/user/address.html"><%= __('modify')%></a>
                 </div>
               </div>
             <% } %>
@@ -886,7 +886,7 @@
               <%
                 if(!user.featureDishes || user.featureDishes.length == 0){
               %>
-              <h3><small>您尚未有任何待评价菜，需要点餐吗？<br/><a href="/meal">立即点餐</a></small></h3>
+              <h3><small><%= __('no-review-tip')%><br/><a href="/meal"><%= __('order-action')%></a></small></h3>
               <%}else{
                 var i = 0;
                 user.featureDishes.forEach(function(featureDish) {
@@ -908,7 +908,7 @@
                                   </div>
                                 </div>
                               </div>
-                              <div class="col-xs-2">给我打个星吧！</div>
+                              <div class="col-xs-2"><%= __('review-star')%></div>
                             </div>
 
                             <div class="row" style="margin-top:20px;">
@@ -916,19 +916,19 @@
                                 <img src="<%= featureDish.photos[0].v%>" style="width:100%;">
                               </div>
                               <div class="col-xs-6">
-                                <textarea class="form-control review" placeholder="我好看吗？我好吃吗？我分量够吗？点这里评论一下。" style="height: 177px;"></textarea>
+                                <textarea class="form-control review" placeholder="<%= __('review-placeholder')%>" style="height: 177px;"></textarea>
                               </div>
                             </div>
 
                             <div class="row">
                               <div class="col-xs-12">
-                                <div id="feature-review-error-<%= i%>" class="alert alert-danger hide" style="margin-top:15px;">您尚未给菜品评分。</div>
+                                <div id="feature-review-error-<%= i%>" class="alert alert-danger hide" style="margin-top:15px;"><%= __('review-warning')%></div>
                               </div>
                             </div>
 
                             <div class="row text-center" style="margin-top: 15px;">
-                              <button class="btn btn-red round switch-button" style="width:120px;margin-right:10px;"><strong>换一款</strong></button>
-                              <button class="btn btn-red round leaveReview" style="width:120px;margin-left:10px;" data-host="<%= featureDish.chef%>" data-err-container="#feature-review-error-<%= i%>" data-meal="<%= featureDish.meal.id%>" data-dish="<%= featureDish.id%>" data-target="#rating<%= i%>"><strong>评好了!</strong></button>
+                              <button class="btn btn-red round switch-button" style="width:120px;margin-right:10px;"><strong><%= __('review-switch')%></strong></button>
+                              <button class="btn btn-red round leaveReview" style="width:120px;margin-left:10px;" data-host="<%= featureDish.chef%>" data-err-container="#feature-review-error-<%= i%>" data-meal="<%= featureDish.meal.id%>" data-dish="<%= featureDish.id%>" data-target="#rating<%= i%>"><strong><%= __('review-done')%></strong></button>
                             </div>
                           </div>
               <%}})}})})}%>
@@ -947,7 +947,7 @@
                   <img src="<%= order.meal.coverString %>" style="width: 100%;">
                 </div>
                 <div class="col-md-5 col-xs-7">
-                  <h2 class="text-left"><%= order.meal.title%>  <small class="text-orange"><%= order.meal.type=="order"?"即点":"预定"%></small></h2>
+                  <h2 class="text-left"><%= order.meal.title%>  <small class="text-orange"><%= order.meal.type=="order"?__('order'):__('preorder')%></small></h2>
                   <div class="vertical-align text-left">
                     <a href="#" class="round_thumb size-small">
                       <img src="<%= order.host.picture || "/images/thumbnail.jpg" %>">
@@ -956,7 +956,7 @@
                   </div>
                   <div class="row">
                     <div class="col-xs-12">
-                      <h3 class="text-left none-margin"><small><%= order.meal.finishDate()%>  <span class="text-red">交易完成</span></small></h3>
+                      <h3 class="text-left none-margin"><small><%= order.meal.finishDate()%>  <span class="text-red"><%= __('transaction-complete')%></span></small></h3>
                     </div>
                   </div>
 
@@ -964,12 +964,12 @@
                 <div class="col-md-3">
                   <div class="row">
                     <div class="col-xs-12">
-                      <button class="btn btn-red round" style="width:100%;margin-top:20px;" data-toggle="collapse" data-parent="#i<%= j%>" href=".collapse">评一下</button>
+                      <button class="btn btn-red round" style="width:100%;margin-top:20px;" data-toggle="collapse" data-parent="#i<%= j%>" href=".collapse"><%= __('review-action')%></button>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-xs-12">
-                      <h3><small>总额：</small><span class="text-red">$<%= order.subtotal%></span></h3>
+                      <h3><small><%= __('total')%></small><span class="text-red">$<%= order.subtotal%></span></h3>
                     </div>
                   </div>
                 </div>
@@ -986,7 +986,7 @@
                       <img src="<%= dish.photos[0].v%>" style="width:100%;max-height:100px;">
                     </div>
                     <div class="col-md-6 col-xs-9">
-                      <h3 class="none-margin"><small class="text-black"><%= dish.title%>&nbsp&nbsp&nbsp&nbsp&nbsp$<%= dish.price%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.orders[dish.id]%>份</small></h3>
+                      <h3 class="none-margin"><small class="text-black"><%= dish.title%>&nbsp&nbsp&nbsp&nbsp&nbsp$<%= dish.price%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.orders[dish.id]%><%= __('fen')%></small></h3>
                     </div>
                     <div class="col-md-4 col-xs-12">
                       <div data-toggle="tooltip" data-placement="bottom">
@@ -1002,15 +1002,15 @@
                   </div>
                   <div class="row" style="margin-top:10px;">
                     <div class="col-xs-12">
-                      <textarea class="form-control review" placeholder="点这里，点评一下这款菜吧。" style="height:100px;"></textarea>
+                      <textarea class="form-control review" placeholder="<%= __('review-placeholder')%>" style="height:100px;"></textarea>
                     </div>
                   </div>
                 </div>
             <%}})})%>
                 <div class="row" style="margin-top:10px;">
                   <div class="col-xs-12 text-right">
-                    <div id="meal-review-<%= j%>" class="alert alert-danger hide">您还有未评分的菜式。</div>
-                    <div class="btn btn-red leaveReview" data-target="#meal-review-<%= j%>" data-host="<%= order.host.id%>" data-meal="<%= order.meal.id%>" data-err-container="#meal-review-<%= j%>" style="margin-right:20px;">提交</div>
+                    <div id="meal-review-<%= j%>" class="alert alert-danger hide"><%= __('review-warning')%></div>
+                    <div class="btn btn-red leaveReview" data-target="#meal-review-<%= j%>" data-host="<%= order.host.id%>" data-meal="<%= order.meal.id%>" data-err-container="#meal-review-<%= j%>" style="margin-right:20px;"><%= __('submit')%></div>
                   </div>
                 </div>
               </div>
