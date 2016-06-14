@@ -112,7 +112,7 @@
               <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
-                  <div class="col-xs-4"><%= tranObj.type == "payment"? " __('pocket-income')" : "__('pocket-expend')" %> <a href="<%= tranObj.type=='payment'?'/host/me' : '/user/me'%>">#<%= tranObj.metadata.orderId%></a></div>
+                  <div class="col-xs-4"><%= tranObj.type == "payment"? __('pocket-income') : __('pocket-expend') %> <a href="<%= tranObj.type=='payment'?'/host/me' : '/user/me'%>">#<%= tranObj.metadata.orderId%></a></div>
                   <div class="col-xs-3"><img class="img-thumbnail round_thumb size-small" src="<%= tranObj.host.picture || "/images/profile_man.png"%>">&nbsp;<%= tranObj.host.shopName%></div>
                   <div class="col-xs-3">$<%= (tranObj.amount-tranObj.amount_refunded)/100 %><%= tranObj.amount_refunded ? " (Refunded : $" + tranObj.amount_refunded / 100 +  ")" : "" %></div>
                 </div>

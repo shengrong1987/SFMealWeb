@@ -26,29 +26,24 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  '*': true,
-
-  //'create' : ['sessionAuth','isHost'],
+  '*': false,
 
   AuthController : {
+    'login' : true,
+    'register' : true,
     'logout' : ['sessionAuth']
   },
 
   UserController : {
-    '*' : ['sessionAuth','sessionSelf'],
-    'becomeHost' : ['sessionAuth','notHost'],
-    'findOne' : ['sessionAuth','sessionSelf'],
-    'update' : ['sessionAuth','sessionSelf'],
-    'find' : ['sessionAuth','sessionSelf'],
-    'me' : ['sessionAuth'],
-    'calculateSignature' : ['sessionAuth'],
-    'deleteObject' : ['sessionAuth'],
-    'pocket' : ['sessionAuth']
+    '*' : 'or(and(sessionAuth, sessionSelf),isAdmin)',
+    'becomeHost' : 'or(and(sessionAuth, notHost),isAdmin)',
+    'pocket' : 'or(sessionAuth,isAdmin)',
+    'me' : ['sessionAuth']
   },
 
   MealController : {
-    '*' : ['sessionAuth'],
-    'create' : ['sessionAuth','isHost'],
+    '*' : 'or(and(sessionAuth,isHost,isOwnerOfMeal),isAdmin)',
+    'create' : 'or(and(sessionAuth,isHost),isAdmin)',
     'feature' : true,
     'find' : true,
     'findOne' : true,
@@ -56,46 +51,38 @@ module.exports.policies = {
   },
 
   HostController : {
-    'update' : ['sessionAuth','sessionSelf'],
-    'createBank' : ['sessionAuth','isHost'],
-    'updateBank' : ['sessionAuth','isHost'],
+    'update' : 'or(and(sessionAuth,sessionSelf),isAdmin)',
+    'createBank' : 'or(and(sessionAuth,isHost),isAdmin)',
+    'updateBank' : 'or(and(sessionAuth,isHost),isAdmin)',
     'me' : ['sessionAuth','isHost'],
     'apply' : ['sessionAuth']
   },
 
   PaymentController : {
-    'findOne' : ['sessionAuth', 'isOwnerOfCard'],
-    'find' : ['sessionAuth'],
-    'newForm' : ['sessionAuth'],
-    'update' : ['sessionAuth','isOwnerOfCard'],
-    'delete' : ['sessionAuth','isOwnerOfCard']
+    '*' : 'or(and(sessionAuth, isOwnerOfCard),isAdmin)',
+    'create' : 'or(sessionAuth,isAdmin)',
+    'newForm' : ['sessionAuth']
   },
 
   OrderController :{
-    'create' : ['sessionAuth','isNotOwnerOfMeal'],
-    'adjust_order_form' : ['sessionAuth','isBelongToOrder'],
-    'adjust' : ['sessionAuth','isBelongToOrder'],
-    'cancel' : ['sessionAuth','isBelongToOrder'],
-    'ready' : ['sessionAuth','isBelongToOrder'],
-    'receive' : ['sessionAuth','isBelongToOrder']
+    '*' : 'or(and(sessionAuth,isBelongToOrder),isAdmin)',
+    'create' : 'or(and(sessionAuth,isNotOwnerOfMeal),isAdmin)'
   },
 
   DishController : {
-    'new_form' : ['sessionAuth', 'isHost'],
-    'create' : ['sessionAuth','isHost']
-  }
+    '*' : 'or(and(sessionAuth, isHost),isAdmin)',
+  },
 
-  //MealController : {
-  //  '*' : ['sessionAuth']
-  //},
-  //
-  //DishController : {
-  //  '*' : ['sessionAuth']
-  //},
-  //
-  //UserController : {
-  //  '*' : ['sessionAuth']
-  //}
+  NotificationController : {
+    '*' : true
+  },
+
+  ReviewController : {
+    '*' : ['sessionAuth'],
+    'create' : ['sessionAuth', 'isGuestOfMeal'],
+    'delete' : ['isAdmin'],
+    'update' : ['isAdmin']
+  }
 
   /***************************************************************************
   *                                                                          *
