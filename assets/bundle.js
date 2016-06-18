@@ -42759,6 +42759,14 @@ var ActionsCreators = {
       type : ActionTypes.TAB_CHANGE,
       tab : tab
     });
+  },
+
+  search : function(model, criteria, content){
+    AppDispatcher.handleViewAction({
+      type : ActionTypes.SEARCH_CHANGE,
+      criteria : criteria,
+      search : content
+    })
   }
 };
 
@@ -42799,7 +42807,7 @@ var AdminPanel = React.createClass({displayName: "AdminPanel",
 
 module.exports = AdminPanel;
 
-},{"../actions/ActionCreators":170,"../stores/UserStore":185,"./Tab":174,"./TablePanel":178,"react":169}],172:[function(require,module,exports){
+},{"../actions/ActionCreators":170,"../stores/UserStore":186,"./Tab":174,"./TablePanel":178,"react":169}],172:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -42843,7 +42851,13 @@ module.exports = Hosts;
  */
 'use strict';
 
-var React = require('react/addons');
+var React = require('react/addons'),
+  SearchStore = require('../stores/SearchStore'),
+  SFMealAPI = require('../helpers/SFMealAPI');
+
+var _getStateFromStores = function(){
+  return SearchStore.getSearchData();
+}
 
 var Search = React.createClass({displayName: "Search",
   /*
@@ -42851,13 +42865,37 @@ var Search = React.createClass({displayName: "Search",
       parent component is the correct type.
   */
   propTypes: {
-    criteria : React.PropTypes.array
+    criteria : React.PropTypes.array,
+    model : React.PropTypes.string
   },
 
   getDefaultProps: function() {
     return {
       criteria : ["ID"]
     };
+  },
+
+  getInitialState: function () {
+    return {data: _getStateFromStores(), message: 'nothing yet'};
+  },
+
+  componentDidMount: function () {
+    SearchStore.addChangeListener(this._onChange);
+  },
+
+  componentWillUnmount: function () {
+    SearchStore.removeChangeListener(this._onChange);
+  },
+
+  _onChange: function () {
+    this.setState({
+      data: _getStateFromStores(),
+      message: ''
+    });
+  },
+
+  _onSearch : function(){
+    SFMealAPI.search(this.props.model,"User ID",$("#searchInput").val())
   },
 
   render: function () {
@@ -42868,19 +42906,20 @@ var Search = React.createClass({displayName: "Search",
     }, this);
     return (
       React.createElement("div", {className: "box"}, 
-        React.createElement("div", {className: "input-group row"}, 
+        React.createElement("div", {className: "input-group row vertical-align"}, 
           React.createElement("div", {className: "col-xs-10"}, 
-            React.createElement("input", {className: "input btn-lg btn-outline-blue round text-grey", style: divStyle, type: "search"})
+            React.createElement("input", {id: "searchInput", className: "input btn-lg btn-outline-blue round text-grey", style: divStyle, type: "search"})
           ), 
           React.createElement("div", {className: "col-xs-2"}, 
-            React.createElement("button", {className: "btn btn-info"}, "Search")
+            React.createElement("button", {className: "btn btn-info", onClick: this._onSearch}, "Search")
           )
         ), 
         React.createElement("div", {className: "row"}, 
           React.createElement("div", {className: "col-xs-12"}, 
             criterias
           )
-        )
+        ), 
+        React.createElement("div", {className: "alert alert-info"}, "Result of ", this.state.data.criteria, " searched as ", this.state.data.search)
       )
     );
   }
@@ -42888,7 +42927,7 @@ var Search = React.createClass({displayName: "Search",
 
 module.exports = Search;
 
-},{"react/addons":8}],174:[function(require,module,exports){
+},{"../helpers/SFMealAPI":182,"../stores/SearchStore":184,"react/addons":8}],174:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -42963,7 +43002,7 @@ var Tab = React.createClass({displayName: "Tab",
 
 module.exports = Tab;
 
-},{"../helpers/SFMealAPI":182,"../stores/TabStore":184,"react/addons":8}],175:[function(require,module,exports){
+},{"../helpers/SFMealAPI":182,"../stores/TabStore":185,"react/addons":8}],175:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -43153,7 +43192,7 @@ var TablePanel = React.createClass({displayName: "TablePanel",
 
 module.exports = TablePanel;
 
-},{"../stores/TabStore":184,"./Search":173,"./Table":175,"react/addons":8}],179:[function(require,module,exports){
+},{"../stores/TabStore":185,"./Search":173,"./Table":175,"react/addons":8}],179:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -43187,7 +43226,8 @@ module.exports = {
     GET_MEAL : null,
     GET_ORDERS : null,
     GET_ORDER : null,
-    TAB_CHANGE : null
+    TAB_CHANGE : null,
+    SEARCH_CHANGE : null
   }),
 };
 
@@ -43272,6 +43312,11 @@ module.exports = {
 
   changeTab : function(tab){
     ActionCreators.switchTab(tab);
+  },
+
+  search : function(model, criteria, content){
+    console.log("ddd");
+    ActionCreators.search(model, criteria, content);
   }
 
 
@@ -43286,6 +43331,61 @@ var TableMixin = {};
 module.exports = TableMixin;
 
 },{}],184:[function(require,module,exports){
+/*
+ * RecordStore
+ */
+
+'use strict';
+
+var AppDispatcher = require('../dispatcher/AppDispatcher'),
+  EventEmitter = require('events').EventEmitter,
+  AppConstants = require('../constants/AppConstants'),
+  ActionTypes = AppConstants.ActionTypes,
+  _ = require('lodash');
+
+var CHANGE_EVENT = 'change';
+
+var _criteria = '';
+var _search = '';
+
+var SearchStore = _.assign({}, EventEmitter.prototype, {
+  getSearchData: function () {
+    return { criteria : _criteria, search : _search};
+  },
+
+  emitChange: function () {
+    this.emit(CHANGE_EVENT);
+  },
+
+  addChangeListener: function (callback) {
+    this.on(CHANGE_EVENT, callback);
+  },
+
+  removeChangeListener: function (callback) {
+    this.removeListener(CHANGE_EVENT, callback);
+  }
+});
+
+// Register callback to handle all updates
+AppDispatcher.register(function (payload) {
+  var action = payload.action;
+  console.log(action)
+
+  switch (action.type) {
+    case ActionTypes.SEARCH_CHANGE:
+      _criteria = action.criteria;
+      _search = action.search;
+      SearchStore.emitChange();
+      break;
+
+    default:
+      // no op
+  }
+});
+
+module.exports = SearchStore;
+
+},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}],185:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -43337,7 +43437,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = TabStore;
 
-},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}],185:[function(require,module,exports){
+},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}],186:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -43389,4 +43489,4 @@ AppDispatcher.register(function (payload) {
 
 module.exports = UserStore;
 
-},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}]},{},[170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185]);
+},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}]},{},[170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186]);

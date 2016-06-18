@@ -42,6 +42,14 @@ var ActionsCreators = {
       type : ActionTypes.TAB_CHANGE,
       tab : tab
     });
+  },
+
+  search : function(model, criteria, content){
+    AppDispatcher.handleViewAction({
+      type : ActionTypes.SEARCH_CHANGE,
+      criteria : criteria,
+      search : content
+    })
   }
 };
 

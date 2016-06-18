@@ -12,6 +12,7 @@ module.exports = {
     GET_MEAL : null,
     GET_ORDERS : null,
     GET_ORDER : null,
-    TAB_CHANGE : null
+    TAB_CHANGE : null,
+    SEARCH_CHANGE : null
   }),
 };

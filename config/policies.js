@@ -46,6 +46,7 @@ module.exports.policies = {
   MealController : {
     '*' : 'or(and(sessionAuth,isHost,isOwnerOfMeal),isAdmin)',
     'create' : 'or(and(sessionAuth,isHost),isAdmin)',
+    'new_form' : ['sessionAuth','isHost'],
     'feature' : true,
     'find' : true,
     'findOne' : true,

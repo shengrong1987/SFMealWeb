@@ -47,6 +47,11 @@ module.exports = {
 
   changeTab : function(tab){
     ActionCreators.switchTab(tab);
+  },
+
+  search : function(model, criteria, content){
+    console.log("ddd");
+    ActionCreators.search(model, criteria, content);
   }
 
 
