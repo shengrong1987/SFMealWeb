@@ -13,7 +13,7 @@ module.exports.waterlock = {
   //
   // used by auth methods for callback URI's using oauth and for password
   // reset links.
-  baseUrl:  process.env.NODE_ENV === 'production' ? 'http://52.38.10.129:1337' : 'http://localhost:1337',
+  baseUrl:  process.env.NODE_ENV === 'production' ? 'http://52.39.170.17:1337' : 'http://localhost:1337',
 
   pluralizeEndpoints: false,
 

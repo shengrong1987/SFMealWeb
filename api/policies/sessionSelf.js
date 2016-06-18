@@ -13,7 +13,7 @@ module.exports = function(req, res, next) {
   // or if this is the last policy, the controller
   var path = req.url;
   if (path.indexOf('host') != -1 ){
-    var hostId = req.param('id');
+    var hostId = req.param('id') || req.param('parentid');
     var userId = req.session.user.id;
     User.findOne(userId).exec(function(err,user){
       if (err){

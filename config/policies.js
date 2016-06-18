@@ -36,6 +36,7 @@ module.exports.policies = {
 
   UserController : {
     '*' : 'or(and(sessionAuth, sessionSelf),isAdmin)',
+    'calculateSignature' : 'sessionAuth',
     'becomeHost' : 'or(and(sessionAuth, notHost),isAdmin)',
     'pocket' : 'or(sessionAuth,isAdmin)',
     'me' : ['sessionAuth']
@@ -51,7 +52,7 @@ module.exports.policies = {
   },
 
   HostController : {
-    'update' : 'or(and(sessionAuth,sessionSelf),isAdmin)',
+    '*' : 'or(and(sessionAuth,sessionSelf),isAdmin)',
     'createBank' : 'or(and(sessionAuth,isHost),isAdmin)',
     'updateBank' : 'or(and(sessionAuth,isHost),isAdmin)',
     'me' : ['sessionAuth','isHost'],
@@ -65,7 +66,8 @@ module.exports.policies = {
   },
 
   OrderController :{
-    '*' : 'or(and(sessionAuth,isBelongToOrder),isAdmin)',
+    '*' : 'or(and(sessionAuth, isBelongToOrder), isAdmin)',
+    'find' : 'or(and(sessionAuth, sessionSelf),isAdmin)',
     'create' : 'or(and(sessionAuth,isNotOwnerOfMeal),isAdmin)'
   },
 

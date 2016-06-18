@@ -88,14 +88,14 @@
             <div class="form-group">
               <label for="categoryInput"><%= __('what-kind') %></label>
               <div class="dropdown">
-                <button class="btn btn-default dropdown-toggle btn-outline" type="button" id="categoryInput" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="entree">
+                <button class="btn btn-default dropdown-toggle btn-outline" type="button" id="categoryInput" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="entree">
                   <%= __('main') %>
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                  <li class="active"><a value="entree"><%= __('main') %></a></li>
-                  <li><a value="appetizer"><%= __('appetizer') %></a></li>
-                  <li><a value="dessert"><%= __('dessert') %></a></li>
+                  <li class="active"><a href="javascript:void(0)" value="entree"><%= __('main') %></a></li>
+                  <li><a href="javascript:void(0)" value="appetizer"><%= __('appetizer') %></a></li>
+                  <li><a href="javascript:void(0)" value="dessert"><%= __('dessert') %></a></li>
                 </ul>
               </div>
             </div>

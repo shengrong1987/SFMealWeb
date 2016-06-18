@@ -55,7 +55,13 @@ module.exports.routes = {
   '/order/:id/ready' : 'OrderController.ready',
   '/order/:id/receive' : 'OrderController.receive',
   '/auth/resetForm' : "AuthController.resetForm",
-  "/apply" : "HostController.apply"
+  "/apply" : "HostController.apply",
+  "/admin" : {
+    view : 'admin/hello',
+    locals : {
+      layout : 'admin_layout'
+    }
+  }
 
   //'PUT /meal/:mealId/dish' : 'MealController.addNewDishes',
   //'DELETE /meal/:mealId/dish/:dishId' : 'MealController.removeDish',
