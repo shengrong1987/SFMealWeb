@@ -12,12 +12,12 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
 
 var CHANGE_EVENT = 'change';
 
-var _users = [];
+var _dishes = [];
 var _showDetail = false;
 
-var UserStore = _.assign({}, EventEmitter.prototype, {
-  getAllUsers: function () {
-    return _users;
+var DishStore = _.assign({}, EventEmitter.prototype, {
+  getAllDishes: function () {
+    return _dishes;
   },
 
   isShowDetail : function(){
@@ -42,30 +42,30 @@ AppDispatcher.register(function (payload) {
   var action = payload.action;
 
   switch (action.type) {
-    case ActionTypes.GET_USERS:
+    case ActionTypes.GET_DISHES:
       if(!Array.isArray(action.records)){
-        _users = [action.records];
+        _dishes = [action.records];
       }else{
-        _users = action.records;
+        _dishes = action.records;
       }
       _showDetail = false;
-      UserStore.emitChange();
+      DishStore.emitChange();
       break;
 
-    case ActionTypes.GET_USER:
+    case ActionTypes.GET_DISH:
       if(!Array.isArray(action.records)){
-        _users = [action.records];
+        _dishes = [action.records];
       }else{
-        _users = action.records;
+        _dishes = action.records;
       }
       _showDetail = true;
-      UserStore.emitChange();
+      DishStore.emitChange();
       break;
 
     case ActionTypes.NO_RESULT:
-      _users = [];
+      _dishes = [];
       _showDetail = false;
-      UserStore.emitChange();
+      DishStore.emitChange();
       break;
 
     default:
@@ -73,4 +73,4 @@ AppDispatcher.register(function (payload) {
   }
 });
 
-module.exports = UserStore;
+module.exports = DishStore;

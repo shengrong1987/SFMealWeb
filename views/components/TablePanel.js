@@ -19,7 +19,7 @@ var TablePanel = React.createClass({
   */
 
   getInitialState: function () {
-    return {tab: 'Users'};
+    return {tab: 'User'};
   },
 
   componentDidMount: function () {
@@ -38,23 +38,44 @@ var TablePanel = React.createClass({
 
   render: function () {
     var headers;
+    var details;
     var criterias;
+    var attrs;
     switch (this.state.tab){
-      case "Users":
-        headers = ['Name','User ID','Phone','Email','Status','Command'];
-        criterias = ['Name','User ID','Phone','Email'];
-      case "Hosts":
-        headers = ['Name','User ID','Phone','Email','Status','Command'];
-        criterias = ['Name','User ID','Phone','Email'];
+      case "User":
+        headers = {id: "User ID",firstname : 'Firstname',lastname :'Lastname',phone:'Phone','auth.email':'Email',status :'Status',command :'Command'};
+        details = {id: "User ID",firstname : 'Firstname',lastname :'Lastname',phone:'Phone','auth.email':'Email',status :'Status',command :'Command'};
+        criterias = ['id','firstname','lastname','phone','email'];
+        break;
+      case "Host":
+      headers = {id : 'Host ID', shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email',passGuide : 'Status',command : 'Command'};
+      details = {id : 'Host ID', shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email', license : 'License', passGuide : 'Status',command : 'Command'};
+      criterias = ['id','shopName','email'];
+      break;
+      case "Meal":
+        headers = {id : 'Meal ID', 'chef.id' : 'Host ID', title : 'Title', type : 'MealType', score : 'Score', county : 'County', status : 'Status', command : 'Command'};
+        details = {id : 'Meal ID', 'chef.id' : 'Host ID', title : 'Title', type : 'MealType', coverString : 'Cover', score : 'Score', delivery_fee : 'Fee', delivery_range : 'Range', isDelivery : 'isDelivery', county : 'County', provideFromTime : 'provideFrom', provideTillTime : 'provideTill', totalQty : 'totalSupply', leftQty: 'leftSupply', status : 'Status', command : 'Command'};
+        criterias = ['id','hostId','keyword','county'];
+        break;
+      case "Dish":
+        headers = {id : 'Dish ID', 'chef.id' : 'Host ID', title :'Title',price : 'Price',score : 'Score', isVerified : 'Status',command : 'Command'};
+        details = {id : 'Dish ID', 'chef.id' : 'Host ID', title :'Title',price : 'Price',score : 'Score', photos : 'Photos', isVerified : 'Status', command : 'Command', sold : 'Sold', numberOfReviews : 'numberOfReviews',description : 'Description', type : 'DishType'};
+        criterias = ['id','hostId','mealId','keyword'];
+        break;
+      case "Order":
+        headers = {id : 'Order ID', 'host.id' : 'Host ID', 'customer.id' : 'User ID', 'meal.id' : 'Meal ID', subtotal : 'SubTotal', type : 'OrderType', delivery_fee : 'DeliveryFee', method : 'DeliveryMethod', address : 'DeliveryAddress', status : 'Status', command : 'Command'};
+        details = {id : 'Order ID', 'host.id' : 'Host ID', 'customer.id' : 'User ID', 'meal.id' : 'Meal ID', subtotal : 'SubTotal', type : 'OrderType', delivery_fee : 'DeliveryFee', method : 'DeliveryMethod', address : 'DeliveryAddress', orders : 'OrderDishes', pickupInfo : 'pickupMethods', guestEmail : 'UserEmail', hostEmail : 'ChefEmail', status : 'Status',lastStatus : 'lastStatus', msg : 'Message', command : 'Command'};
+        criterias = ['id','hostId','userId','mealId','status','hostEmail', 'guestEmail'];
+        break;
     }
 
     return (
       <div>
-        <Search criteria={criterias}/>
+        <Search criteria={criterias} model={this.state.tab}/>
         <div className="panel panel-default">
           <div className="panel-heading">{this.state.tab}</div>
           <div className="table-responsive">
-            <Table header={headers}/>
+            <Table header={headers} details={details} model={this.state.tab}/>
           </div>
         </div>
       </div>

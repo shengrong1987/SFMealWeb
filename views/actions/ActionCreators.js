@@ -7,10 +7,25 @@ var ActionTypes = Constants.ActionTypes;
 
 var ActionsCreators = {
 
+  getUser: function (records) {
+
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_USER,
+      records: records
+    });
+  },
+
   getUsers: function (records) {
 
     AppDispatcher.handleServerAction({
       type: ActionTypes.GET_USERS,
+      records: records
+    });
+  },
+
+  getHost : function (records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_HOST,
       records: records
     });
   },
@@ -22,10 +37,38 @@ var ActionsCreators = {
     });
   },
 
+  getMeal : function( records ){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_MEAL,
+      records: records
+    });
+  },
+
   getMeals: function (records) {
 
     AppDispatcher.handleServerAction({
       type: ActionTypes.GET_MEALS,
+      records: records
+    });
+  },
+
+  getDish : function( records ){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_DISH,
+      records: records
+    });
+  },
+
+  getDishes: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_DISHES,
+      records: records
+    });
+  },
+
+  getOrder : function(records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_ORDER,
       records: records
     });
   },
@@ -44,11 +87,25 @@ var ActionsCreators = {
     });
   },
 
-  search : function(model, criteria, content){
+  search : function(criteria, content){
     AppDispatcher.handleViewAction({
       type : ActionTypes.SEARCH_CHANGE,
       criteria : criteria,
       search : content
+    })
+  },
+
+  noResult : function(msg){
+    AppDispatcher.handleViewAction({
+      type : ActionTypes.NO_RESULT,
+      msg : msg
+    })
+  },
+
+  badRequest : function(msg){
+    AppDispatcher.handleViewAction({
+      type : ActionTypes.BAD_REQUEST,
+      msg : msg
     })
   }
 };

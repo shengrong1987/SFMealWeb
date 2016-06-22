@@ -6,6 +6,8 @@
 */
 
 var dateUtil = require("../services/util.js");
+var moment = require("moment");
+
 module.exports = {
 
   attributes: {
@@ -112,6 +114,7 @@ module.exports = {
       });
       return isFull;
     },
+
     provideDate : function(){
       if(this.type == "preorder"){
         if(this.provideFromTime.getDate() == this.provideTillTime.getDate()){
@@ -123,6 +126,7 @@ module.exports = {
         return dateUtil.formattedHour(this.provideFromTime) + " - " + dateUtil.formattedHour(this.provideTillTime)
       }
     },
+
     finishDate : function(){
       if(this.type == "preorder"){
         if(this.pickupFromTime.getDate() == this.pickupTillTime.getDate()){
@@ -134,35 +138,47 @@ module.exports = {
         return dateUtil.formattedHour(this.provideFromTime) + " - " + dateUtil.formattedHour(this.provideTillTime)
       }
     },
+
     dispatchingHour : function() {
       return dateUtil.formattedHour(this.pickupFromTime) + " - " + dateUtil.formattedHour(this.pickupTillTime);
     },
 
-    isValid : function(){
-      var now = new Date();
-      var midnightToday = new Date(new Date().setHours(0,0,0,0));
+    dateIsValid : function(params){
+      var params = this;
+      var provideFromTime = params.provideFromTime;
+      var provideTillTime = params.provideTillTime;
+      if(provideFromTime >= provideTillTime){
+        return false;
+      }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 60){
+        return false;
+      }
       var valid = true;
-      if(this.status){
-        if(this.type == "order"){
-          //console.log("now is :" + now + " from: " + this.provideFromTime + " till: " + this.provideTillTime);
-          if(now < this.provideTillTime && now > this.provideFromTime){
-            return true;
+      if(params.pickups){
+        params.pickups.forEach(function(pickup){
+          var pickupFromTime = pickup.pickupFromTime;
+          var pickupTillTime = pickup.pickupTillTime;
+          if(pickupFromTime >= pickupTillTime){
+            console.log("pickup time not valid");
+            valid = false;
+            return;
+          }else if(moment.duration(moment(pickupTillTime).diff(moment(pickupFromTime))).asMinutes() < 30){
+            console.log("pickup time too short");
+            valid = false;
+            return;
+          }else if(pickupFromTime <= provideTillTime){
+            console.log("pickup time too early");
+            valid = false;
+            return;
           }
-        }else{
-          var $this = this;
-          this.pickups.forEach(function(pickup){
-            var pickupFromDate = pickup.pickupFromTime;
-            var deadline = new Date(now.getTime() - $this.prepareTime * 60 * 1000);
-            if(deadline >= pickupFromDate){
-              valid = false;
-              return;
-            }
-          });
-        }
-      }else{
-        valid = false;
+        });
       }
       return valid;
+    },
+
+    dishIsValid : function(){
+      return this.dishes.every(function(dish){
+        return dish.isVerified
+      });
     }
   },
 

@@ -47,6 +47,8 @@ module.exports.routes = {
   '/host/me/createMeal' : 'MealController.new_form',
   '/meal/:id/off' : 'MealController.off',
   '/meal/:id/on' : 'MealController.on',
+  '/dish/:id/verify' : 'DishController.verify',
+  '/dish/:id/fail' : 'DishController.fail',
   '/order/:id/adjust-form' : 'OrderController.adjust_order_form',
   '/order/:id/adjust' : 'OrderController.adjust',
   '/order/:id/cancel' : 'OrderController.cancel',
@@ -54,15 +56,10 @@ module.exports.routes = {
   '/order/:id/reject' : 'OrderController.reject',
   '/order/:id/ready' : 'OrderController.ready',
   '/order/:id/receive' : 'OrderController.receive',
+  '/order/:id/abort' : 'OrderController.abort',
+  '/order/:id/refund' : 'OrderController.refund',
   '/auth/resetForm' : "AuthController.resetForm",
-  "/apply" : "HostController.apply",
-  "/admin" : {
-    view : 'admin/hello',
-    locals : {
-      layout : 'admin_layout'
-    }
-  }
-
+  "/apply" : "HostController.apply"
   //'PUT /meal/:mealId/dish' : 'MealController.addNewDishes',
   //'DELETE /meal/:mealId/dish/:dishId' : 'MealController.removeDish',
   //'DELETE /meal/:mealId/dish' : 'MealController.removeAllDishes'

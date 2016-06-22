@@ -1649,15 +1649,16 @@ function uploadImage(modual,file,cb,error,index,name){
     return cb();
   }
   var filename = "";
+  var fileType = file.name.split('.').pop();
   switch(modual){
     case "thumbnail":
-      filename = "thumbnail"
+      filename = "thumbnail." + fileType
       break;
     case "license":
-      filename = "license";
+      filename = "license." + fileType;
       break;
     case "story":
-      filename = "story";
+      filename = "story." + fileType;
       break;
     case "dish":
       if(name && name!=""){

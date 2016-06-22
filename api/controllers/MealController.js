@@ -79,6 +79,32 @@ module.exports = {
     });
   },
 
+  searchAll : function(req, res){
+    var keyword = req.query.keyword;
+    delete req.query.keyword;
+    Meal.find(req.query).populate('dishes').exec(function(err,found){
+      if(err){
+        return res.badRequest(err);
+      }
+
+      if(keyword) {
+        found = found.filter(function(meal){
+          var dishes = meal.dishes;
+          var valid = false;
+          for(var i=0; i < dishes.length; i++){
+            var dish = dishes[i];
+            if(meal.title.indexOf(keyword) != -1 || dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
+              valid = true;
+              break;
+            }
+          }
+          return valid;
+        });
+      }
+      return res.ok(found);
+    });
+  },
+
   search : function(req, res){
     var keyword = req.param('keyword');
     var zipcode = req.param('zipcode');
@@ -104,7 +130,7 @@ module.exports = {
               var valid = false;
               for(var i=0; i < dishes.length; i++){
                 var dish = dishes[i];
-                if(dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
+                if(meal.title.indexOf(keyword) != -1 || dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
                   valid = true;
                   break;
                 }
@@ -124,7 +150,7 @@ module.exports = {
           var valid = false;
           for(var i=0; i < dishes.length; i++){
             var dish = dishes[i];
-            if(dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
+            if(meal.title.indexOf(keyword) != -1 || dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
               valid = true;
               break;
             }
@@ -158,39 +184,46 @@ module.exports = {
 
   off : function(req, res){
     var mealId = req.param("id");
-    var hostId = req.session.user.host;
-    Order.find({host : hostId,meal : mealId}).exec(function(err,orders){
+    var user = req.session.user;
+    var isAdmin = user.auth.email === 'admin@sfmeal.com';
+    Order.find({meal : mealId}).exec(function(err,orders){
       if(err){
         return res.badRequest(err);
       }
       if(orders.length == 0){
-        Meal.findOne(mealId).exec(function(err,found){
+        Meal.update({id : mealId},{status : "off"}).exec(function(err, meal){
           if(err){
             return res.badRequest(err);
           }
-          found.status = "off";
-          found.save(function(err,meal){
-            if(err){
-              return res.badRequest(err);
-            }
-            return res.redirect("/host/me#mymeal");
-          });
+          if(isAdmin){
+            return res.ok(meal);
+          }
+          return res.redirect("/host/me#mymeal");
         });
       }else{
         var hasActiveOrder = false;
         orders.forEach(function(order){
-          if(order.status != "complete" || order.status != "cancel"){
+          if(order.status != "complete" && order.status != "cancel"){
             hasActiveOrder = true;
           }
         });
         if(hasActiveOrder){
           return res.badRequest(req.__('meal-active-error'));
         }
-        Meal.update(mealId,{status : "off"}).exec(function(err, meal){
+        Meal.findOne(mealId).exec(function(err, meal){
           if(err){
             return res.badRequest(err);
           }
-          return res.redirect("/host/me#mymeal");
+          meal.status = "off";
+          meal.save(function(err, result){
+            if(err){
+              return res.badRequest(err);
+            }
+            if(isAdmin){
+              return res.ok(result);
+            }
+            return res.redirect("/host/me#mymeal");
+          });
         });
       }
     });
@@ -198,39 +231,88 @@ module.exports = {
 
   on : function(req, res){
     var mealId = req.param("id");
-    var hostId = req.session.user.host;
-    var now = new Date();
-    Host.findOne(hostId).populate("meals").populate("dishes").exec(function(err, host){
-      if(err){
-        return res.badRequest(err);
-      }
-      if(!host.isValid(false)){
-        return res.redirect("/apply");
-      }
-      Meal.findOne(mealId).exec(function(err,meal){
+    var user = req.session.user;
+    var isAdmin = user.auth.email === 'admin@sfmeal.com';
+    if(isAdmin){
+      Meal.findOne(mealId).populate('dishes').exec(function(err, meal){
         if(err){
           return res.badRequest(err);
         }
-        if(meal.status == "on"){
-          return res.ok(meal);
-        }
-        meal.status = "on";
-        meal.save(function(err,result){
+        Host.findOne(meal.chef).populate('meals').populate('dishes').exec(function(err, host){
           if(err){
             return res.badRequest(err);
           }
-          return res.redirect("/host/me#mymeal");
+          if(!host.isValid(false)){
+            return res.badRequest(req.__('meal-chef-incomplete'));
+          }
+          if(!meal.dateIsValid()){
+            console.log("Date format of meal is not valid");
+            return res.badRequest(req.__('meal-invalid-date'));
+          }
+          if(!meal.dishIsValid()){
+            console.log("meal contain unverified dishes");
+            return res.badRequest(req.__('meal-unverify-dish'));
+          }
+          meal.status = "on";
+          meal.save(function(err,result){
+            if(err){
+              return res.badRequest(err);
+            }
+            return res.ok(meal);
+          });
+        });
+      })
+    }else{
+      var hostId = req.session.user.host;
+      var now = new Date();
+      Host.findOne(hostId).populate("meals").populate("dishes").exec(function(err, host){
+        if(err){
+          return res.badRequest(err);
+        }
+        if(!host.isValid(false)){
+          return res.redirect("/apply");
+        }
+        Meal.findOne(mealId).exec(function(err,meal){
+          if(err){
+            return res.badRequest(err);
+          }
+          if(!meal.dateIsValid()){
+            console.log("Date format of meal is not valid");
+            return res.badRequest(req.__('meal-invalid-date'));
+          }
+          if(!meal.dishIsValid()){
+            console.log("meal contain unverified dishes");
+            return res.badRequest(req.__('meal-unverify-dish'));
+          }
+          if(meal.status == "on"){
+            return res.ok(meal);
+          }
+          meal.status = "on";
+          meal.save(function(err,result){
+            if(err){
+              return res.badRequest(err);
+            }
+            return res.redirect("/host/me#mymeal");
+          });
         });
       });
-    });
+    }
+  },
+
+  findAll : function(req, res){
+    Meal.find().exec(function(err, meals){
+      if(err){
+        return res.badRequest(err);
+      }
+      return res.ok(meals);
+    })
   },
 
   find : function(req, res){
     var county = req.param('county');
     county = county || "San Francisco County";
     var now = new Date();
-    Meal.find({ county : county,status : "on",provideFromTime : {'<' : now}, provideTillTime : {'>' : now}
-    }).populate('dishes').populate('chef').exec(function(err,found){
+    Meal.find({ county : county, status : 'on', provideFromTime : {'<' : now}, provideTillTime : {'>' : now}  }).populate('dishes').populate('chef').exec(function(err,found){
       if(err){
         return res.badRequest(err);
       }
@@ -290,16 +372,21 @@ module.exports = {
   update : function(req, res){
     var mealId = req.param("id");
     if(this.dateIsValid(req.body)){
-      if(this.requirementIsValid(req.body)){
-        Meal.update(mealId, req.body).exec(function(err, meal){
-          if(err){
-            return res.badRequest(err);
-          }
-          res.ok(meal);
-        });
+      if(this.dishIsValid(req.body)){
+        if(this.requirementIsValid(req.body)){
+          Meal.update({id : mealId}, req.body).exec(function(err, meal){
+            if(err){
+              return res.badRequest(err);
+            }
+            res.ok(meal);
+          });
+        }else{
+          console.log("meal minimal requirement are not valid");
+          return res.badRequest(req.__('meal-invalid-requirement'));
+        }
       }else{
-        console.log("meal minimal requirement are not valid");
-        return res.badRequest(req.__('meal-invalid-requirement'));
+        console.log("meal contain unverified dishes");
+        return res.badRequest(req.__('meal-unverify-dish'));
       }
     }else{
       console.log("Date format of meal is not valid");

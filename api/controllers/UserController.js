@@ -61,6 +61,20 @@ module.exports = require('waterlock').actions.user({
     });
   },
 
+  search : function(req, res){
+    var email = req.query.email;
+    delete req.query.email;
+    User.find(req.query).populate('auth').exec(function (err, users) {
+      if(err){
+        return res.badRequest(err);
+      }
+      users = users.filter(function(user){
+        return user.auth.email == email;
+      });
+      return res.ok(users);
+    })
+  },
+
   update : function(req, res) {
     var addAddress = function(address,res,user){
       if(address.id){

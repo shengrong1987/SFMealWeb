@@ -12,12 +12,12 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
 
 var CHANGE_EVENT = 'change';
 
-var _users = [];
+var _hosts = [];
 var _showDetail = false;
 
-var UserStore = _.assign({}, EventEmitter.prototype, {
-  getAllUsers: function () {
-    return _users;
+var HostStore = _.assign({}, EventEmitter.prototype, {
+  getAllHost: function () {
+    return _hosts;
   },
 
   isShowDetail : function(){
@@ -42,30 +42,30 @@ AppDispatcher.register(function (payload) {
   var action = payload.action;
 
   switch (action.type) {
-    case ActionTypes.GET_USERS:
+    case ActionTypes.GET_HOSTS:
       if(!Array.isArray(action.records)){
-        _users = [action.records];
+        _hosts = [action.records];
       }else{
-        _users = action.records;
+        _hosts = action.records;
       }
       _showDetail = false;
-      UserStore.emitChange();
+      HostStore.emitChange();
       break;
 
-    case ActionTypes.GET_USER:
+    case ActionTypes.GET_HOST:
       if(!Array.isArray(action.records)){
-        _users = [action.records];
+        _hosts = [action.records];
       }else{
-        _users = action.records;
+        _hosts = action.records;
       }
       _showDetail = true;
-      UserStore.emitChange();
+      HostStore.emitChange();
       break;
 
     case ActionTypes.NO_RESULT:
-      _users = [];
+      _hosts = [];
       _showDetail = false;
-      UserStore.emitChange();
+      HostStore.emitChange();
       break;
 
     default:
@@ -73,4 +73,4 @@ AppDispatcher.register(function (payload) {
   }
 });
 
-module.exports = UserStore;
+module.exports = HostStore;

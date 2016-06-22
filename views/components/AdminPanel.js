@@ -18,7 +18,7 @@ var AdminPanel = React.createClass({
   },
 
   render: function () {
-    var tabs = ['Users', 'Hosts', 'Meals','Orders'];
+    var tabs = ['User', 'Host', 'Meal','Dish','Order'];
 
     return (
       <div className="box">

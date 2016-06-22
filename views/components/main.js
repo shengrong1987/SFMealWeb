@@ -7,8 +7,6 @@ var React = require('react'),
   AdminPanel = require('./AdminPanel'),
   SFMealApi = require('../helpers/SFMealAPI');
 
-SFMealApi.getUsers();
-
 var container = document.getElementById('container');
 
 React.render(

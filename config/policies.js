@@ -32,7 +32,8 @@ module.exports.policies = {
     'login' : true,
     'register' : true,
     'loginSuccess' : ['sessionAuth'],
-    'logout' : ['sessionAuth']
+    'logout' : ['sessionAuth'],
+    'admin' : 'isAdmin'
   },
 
   UserController : {
@@ -40,7 +41,8 @@ module.exports.policies = {
     'calculateSignature' : 'sessionAuth',
     'becomeHost' : 'or(and(sessionAuth, notHost),isAdmin)',
     'pocket' : 'or(sessionAuth,isAdmin)',
-    'me' : ['sessionAuth']
+    'me' : ['sessionAuth'],
+    'search' : 'isAdmin'
   },
 
   MealController : {
@@ -50,7 +52,9 @@ module.exports.policies = {
     'feature' : true,
     'find' : true,
     'findOne' : true,
-    'search' : true
+    'search' : true,
+    'findAll' : 'isAdmin',
+    'searchAll' : 'isAdmin'
   },
 
   HostController : {
@@ -70,11 +74,16 @@ module.exports.policies = {
   OrderController :{
     '*' : 'or(and(sessionAuth, isBelongToOrder), isAdmin)',
     'find' : 'or(and(sessionAuth, sessionSelf),isAdmin)',
-    'create' : 'or(and(sessionAuth,isNotOwnerOfMeal),isAdmin)'
+    'create' : 'or(and(sessionAuth,isNotOwnerOfMeal),isAdmin)',
+    'search' : 'isAdmin',
+    'abort' : 'isAdmin',
+    'refund' : 'isAdmin'
   },
 
   DishController : {
     '*' : 'or(and(sessionAuth, isHost),isAdmin)',
+    'verify' : 'isAdmin',
+    'fail' : 'isAdmin'
   },
 
   NotificationController : {

@@ -14,10 +14,11 @@ var CHANGE_EVENT = 'change';
 
 var _criteria = '';
 var _search = '';
+var _errMsg = '';
 
 var SearchStore = _.assign({}, EventEmitter.prototype, {
   getSearchData: function () {
-    return { criteria : _criteria, search : _search};
+    return { criteria : _criteria, search : _search, errMsg : _errMsg};
   },
 
   emitChange: function () {
@@ -36,12 +37,22 @@ var SearchStore = _.assign({}, EventEmitter.prototype, {
 // Register callback to handle all updates
 AppDispatcher.register(function (payload) {
   var action = payload.action;
-  console.log(action)
 
   switch (action.type) {
     case ActionTypes.SEARCH_CHANGE:
       _criteria = action.criteria;
       _search = action.search;
+      _errMsg = "";
+      SearchStore.emitChange();
+      break;
+
+    case ActionTypes.NO_RESULT:
+      _errMsg = action.msg;
+      SearchStore.emitChange();
+      break;
+
+    case ActionTypes.BAD_REQUEST:
+      _errMsg = action.msg;
       SearchStore.emitChange();
       break;
 

@@ -14,6 +14,8 @@ before(function(done) {
 
 describe('OrderController', function() {
 
+  this.timeout(5000);
+
   describe('', function() {
 
     var guestEmail = 'guest@gmail.com'

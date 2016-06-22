@@ -24,7 +24,7 @@ var mailOptions = {
 };
 
 var notification = {
-  notificationCenter : function(model, action, params, isHostAction){
+  notificationCenter : function(model, action, params, isHostAction, isAdminAction = false){
     var verb = "updated";
     if(model === "Order"){
       switch(action){
@@ -44,6 +44,11 @@ var notification = {
           break;
         case "cancel":
           isHostAction = !isHostAction;
+          verb = "destroyed";
+          Order.publishDestroy( params.id, undefined, {host : params.host} );
+          break;
+        case "abort":
+          isHostAction = false;
           verb = "destroyed";
           Order.publishDestroy( params.id, undefined, {host : params.host} );
           break;
@@ -77,7 +82,26 @@ var notification = {
       }
       params.isHostAction = isHostAction;
     }
-    if(isHostAction){
+    if(isAdminAction){
+      Notification.create({ recordId : params.id, host : params.host, action : action, model : model, verb : verb }).exec(function(err, noti){
+        if(err){
+          console.log(err);
+          return;
+        }
+        params.isHostAction = true;
+        notification.sendEmail(model, action, params);
+      });
+      Notification.create({ recordId : params.id, user : params.customer, action : action, model : model, verb : verb}).exec(function(err, noti){
+        if(err){
+          console.log(err);
+          return;
+        }
+        params.isHostAction = false;
+        notification.sendEmail(model, action, params);
+      });
+
+    }
+    else if(isHostAction){
       Notification.create({ recordId : params.id, host : params.host, action : action, model : model, verb : verb }).exec(function(err, noti){
         if(err){
           console.log(err);

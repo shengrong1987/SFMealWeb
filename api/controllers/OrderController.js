@@ -26,7 +26,7 @@ module.exports = {
       console.log("missing order argument");
       return res.badRequest(req.__('order-empty'));
     }
-    if(meal.isValid()) {
+    if(meal.dateIsValid()) {
       console.log("meal is valid");
       //check order is valid
       //check amount is correct base on the dish price
@@ -74,10 +74,11 @@ module.exports = {
     }
   },
 
-  validateAddress : function(method, host, address, pickupInfo, cb){
+  validateAddress : function(method, meal, address, pickupInfo, cb){
     if(method === "delivery"){
+      var host = meal.chef;
       var location = {lat : host.lat, long : host.long};
-      var range = host.deliveryRange;
+      var range = meal.delivery_range;
       geocode.distance(address, location, function(err, distance){
         if(err){
           console.log(err);
@@ -130,7 +131,7 @@ module.exports = {
       if (err) {
         return res.badRequest(err);
       }
-      $this.validateAddress(method, m.chef, address, pickupInfo, function(valid){
+      $this.validateAddress(method, m, address, pickupInfo, function(valid){
         if(!valid){
           res.badRequest({responseText : req.__('order-invalid-address'), code : -6});
         }else if($this.validate_meal(m, orders, undefined, subtotal, res, req)){
@@ -393,6 +394,63 @@ module.exports = {
     });
   },
 
+  abort : function(req, res){
+    var orderId = req.params.id;
+    Order.findOne(orderId).populate("meal").populate("host").populate('customer').exec(function(err,order) {
+      if (err) {
+        return res.badRequest(err)
+      }
+      if (order.status === "complete" || order.status === "cancel") {
+        return res.badRequest(req.__('order-abort-complete'));
+      }
+
+      order.status = "cancel";
+      order.msg = "Order aborted by admin, please see email for detail, order id:" + order.id;
+      order.save(function(err, result){
+        if(err){
+          return res.badRequest(err);
+        }
+        notification.notificationCenter("Order", "cancel", result, false, true);
+        return res.ok(order);
+      })
+    });
+  },
+
+  refund : function(req, res){
+    var orderId = req.params.id;
+    Order.findOne(orderId).populate("meal").populate("host").populate('customer').exec(function(err,order) {
+      if (err) {
+        return res.badRequest(err)
+      }
+      if(!order.charges || order.charges.length == 0){
+        return res.badRequest(req.__('order-refund-fail'));
+      }
+      var refundCharges = Object.keys(order.charges);
+      async.each(refundCharges, function(chargeId,next){
+        stripe.refund({
+          id : chargeId
+        },function(err, refund){
+          if(err){
+            return next(err);
+          }
+          next();
+        });
+      },function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        order.charges = {};
+        order.save(function(err, result){
+          if(err){
+            return res.badRequest(err);
+          }
+          return res.ok(order);
+        })
+      })
+
+    });
+  },
+
   cancel : function(req, res){
     var userId = req.session.user.id;
     var hostId = req.session.user.host;
@@ -423,42 +481,41 @@ module.exports = {
               return res.badRequest(err);
             }
             var refundCharges = Object.keys(order.charges);
-            var callOnce = false;
-            for(var i=0; i<refundCharges.length;i++) {
-              var chargeId = refundCharges[i];
-              //refund the amount
+            async.each(refundCharges, function(chargeId, next){
               stripe.refund({
                 id : chargeId
-              },function(err, refund){
-                if(!callOnce){
-                  callOnce = true;
-                  if (err) {
-                    console.log("refund error: " + err);
+              },function(err, refund) {
+                if(err){
+                  return next(err);
+                }
+                next();
+              });
+            },function(err){
+              if (err) {
+                console.log("refund error: " + err);
+                return res.badRequest(err);
+              }
+              var curOrder = extend({}, order.orders);
+              Object.keys(curOrder).forEach(function (dishId) {
+                curOrder[dishId] = 0;
+              });
+              $this.updateMealLeftQty(order.meal, order.orders, curOrder, function(err, m) {
+                if (err) {
+                  return res.badRequest(err);
+                }
+                order.status = "cancel";
+                order.meal = m.id;
+                order.subtotal = 0;
+                order.save(function (err, result) {
+                  if(err){
                     return res.badRequest(err);
                   }
-                  var curOrder = extend({}, order.orders);
-                  Object.keys(curOrder).forEach(function (dishId) {
-                    curOrder[dishId] = 0;
-                  });
-                  $this.updateMealLeftQty(order.meal, order.orders, curOrder, function(err, m) {
-                    if (err) {
-                      return res.badRequest(err);
-                    }
-                    order.status = "cancel";
-                    order.meal = m.id;
-                    order.subtotal = 0;
-                    order.save(function (err, result) {
-                      if(err){
-                        return res.badRequest(err);
-                      }
-                      //send notification
-                      notification.notificationCenter("Order", "cancel", result, isHostAction);
-                      return res.ok({responseText : req.__('order-cancel-ok')});
-                    })
-                  });
-                }
+                  //send notification
+                  notification.notificationCenter("Order", "cancel", result, isHostAction);
+                  return res.ok({responseText : req.__('order-cancel-ok')});
+                })
               });
-            }
+            });
           });
         }else{
           order.status = "cancel";
@@ -736,6 +793,15 @@ module.exports = {
         return res.ok({responseText : req.__('order-receive')});
       });
     });
+  },
+
+  search : function(req, res){
+    Order.find(req.query).populate('customer').populate('meal').populate('host').exec(function(err, orders){
+      if(err){
+        return res.badRequest(err);
+      }
+      return res.ok(orders);
+    })
   }
 };
 

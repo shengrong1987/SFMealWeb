@@ -368,6 +368,8 @@
   "order-ready" : "订单已准备完毕，已通知吃货上门取货",
   "order-ready2" : "订单已准备完毕，请通知司机送餐",
   "order-receive" : "订单已被领取",
+  "order-abort-complete" : "订单已完成或已取消,无法终止",
+  "order-refund-fail" : "订单无须退款或已经全额退款",
   "payment-card-exist" : "银行卡已存在",
   "payment-unique-card" : "不能删除唯一的支付方式",
   "review-no-available" : "没有可供评价的Meal",

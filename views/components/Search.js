@@ -23,12 +23,13 @@ var Search = React.createClass({
 
   getDefaultProps: function() {
     return {
-      criteria : ["ID"]
+      criteria : ["ID"],
+      model : 'User'
     };
   },
 
   getInitialState: function () {
-    return {data: _getStateFromStores(), message: 'nothing yet'};
+    return {data: _getStateFromStores(), model:'User', message: 'nothing yet'};
   },
 
   componentDidMount: function () {
@@ -47,7 +48,7 @@ var Search = React.createClass({
   },
 
   _onSearch : function(){
-    SFMealAPI.search(this.props.model,"User ID",$("#searchInput").val())
+    SFMealAPI.search(this.props.model,$("input[type='radio']:checked").val(),encodeURI($("#searchInput").val()))
   },
 
   render: function () {
@@ -56,6 +57,7 @@ var Search = React.createClass({
     }, criterias = this.props.criteria.map(function(c){
       return (<label className="radio-inline"><input type="radio" name="criteriaOpt" value={c}/>{c}</label>);
     }, this);
+    var resultContent = this.state.data.errMsg ? this.state.data.errMsg : 'Result of "' + this.state.data.criteria + '" searched as "' + decodeURI(this.state.data.search) + '"';
     return (
       <div className="box">
         <div className="input-group row vertical-align">
@@ -71,7 +73,8 @@ var Search = React.createClass({
             {criterias}
           </div>
         </div>
-        <div className="alert alert-info">Result of {this.state.data.criteria} searched as {this.state.data.search}</div>
+        <h1></h1>
+        <div className="alert alert-info">{resultContent}</div>
       </div>
     );
   }

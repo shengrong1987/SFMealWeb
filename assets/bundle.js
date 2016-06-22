@@ -42724,10 +42724,25 @@ var ActionTypes = Constants.ActionTypes;
 
 var ActionsCreators = {
 
+  getUser: function (records) {
+
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_USER,
+      records: records
+    });
+  },
+
   getUsers: function (records) {
 
     AppDispatcher.handleServerAction({
       type: ActionTypes.GET_USERS,
+      records: records
+    });
+  },
+
+  getHost : function (records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_HOST,
       records: records
     });
   },
@@ -42739,10 +42754,38 @@ var ActionsCreators = {
     });
   },
 
+  getMeal : function( records ){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_MEAL,
+      records: records
+    });
+  },
+
   getMeals: function (records) {
 
     AppDispatcher.handleServerAction({
       type: ActionTypes.GET_MEALS,
+      records: records
+    });
+  },
+
+  getDish : function( records ){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_DISH,
+      records: records
+    });
+  },
+
+  getDishes: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_DISHES,
+      records: records
+    });
+  },
+
+  getOrder : function(records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_ORDER,
       records: records
     });
   },
@@ -42761,11 +42804,25 @@ var ActionsCreators = {
     });
   },
 
-  search : function(model, criteria, content){
+  search : function(criteria, content){
     AppDispatcher.handleViewAction({
       type : ActionTypes.SEARCH_CHANGE,
       criteria : criteria,
       search : content
+    })
+  },
+
+  noResult : function(msg){
+    AppDispatcher.handleViewAction({
+      type : ActionTypes.NO_RESULT,
+      msg : msg
+    })
+  },
+
+  badRequest : function(msg){
+    AppDispatcher.handleViewAction({
+      type : ActionTypes.BAD_REQUEST,
+      msg : msg
     })
   }
 };
@@ -42793,7 +42850,7 @@ var AdminPanel = React.createClass({displayName: "AdminPanel",
   },
 
   render: function () {
-    var tabs = ['Users', 'Hosts', 'Meals','Orders'];
+    var tabs = ['User', 'Host', 'Meal','Dish','Order'];
 
     return (
       React.createElement("div", {className: "box"}, 
@@ -42807,7 +42864,7 @@ var AdminPanel = React.createClass({displayName: "AdminPanel",
 
 module.exports = AdminPanel;
 
-},{"../actions/ActionCreators":170,"../stores/UserStore":186,"./Tab":174,"./TablePanel":178,"react":169}],172:[function(require,module,exports){
+},{"../actions/ActionCreators":170,"../stores/UserStore":190,"./Tab":174,"./TablePanel":178,"react":169}],172:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -42871,12 +42928,13 @@ var Search = React.createClass({displayName: "Search",
 
   getDefaultProps: function() {
     return {
-      criteria : ["ID"]
+      criteria : ["ID"],
+      model : 'User'
     };
   },
 
   getInitialState: function () {
-    return {data: _getStateFromStores(), message: 'nothing yet'};
+    return {data: _getStateFromStores(), model:'User', message: 'nothing yet'};
   },
 
   componentDidMount: function () {
@@ -42895,7 +42953,7 @@ var Search = React.createClass({displayName: "Search",
   },
 
   _onSearch : function(){
-    SFMealAPI.search(this.props.model,"User ID",$("#searchInput").val())
+    SFMealAPI.search(this.props.model,$("input[type='radio']:checked").val(),encodeURI($("#searchInput").val()))
   },
 
   render: function () {
@@ -42904,6 +42962,7 @@ var Search = React.createClass({displayName: "Search",
     }, criterias = this.props.criteria.map(function(c){
       return (React.createElement("label", {className: "radio-inline"}, React.createElement("input", {type: "radio", name: "criteriaOpt", value: c}), c));
     }, this);
+    var resultContent = this.state.data.errMsg ? this.state.data.errMsg : 'Result of "' + this.state.data.criteria + '" searched as "' + decodeURI(this.state.data.search) + '"';
     return (
       React.createElement("div", {className: "box"}, 
         React.createElement("div", {className: "input-group row vertical-align"}, 
@@ -42919,7 +42978,8 @@ var Search = React.createClass({displayName: "Search",
             criterias
           )
         ), 
-        React.createElement("div", {className: "alert alert-info"}, "Result of ", this.state.data.criteria, " searched as ", this.state.data.search)
+        React.createElement("h1", null), 
+        React.createElement("div", {className: "alert alert-info"}, resultContent)
       )
     );
   }
@@ -42927,7 +42987,7 @@ var Search = React.createClass({displayName: "Search",
 
 module.exports = Search;
 
-},{"../helpers/SFMealAPI":182,"../stores/SearchStore":184,"react/addons":8}],174:[function(require,module,exports){
+},{"../helpers/SFMealAPI":182,"../stores/SearchStore":188,"react/addons":8}],174:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -42952,7 +43012,7 @@ var Tab = React.createClass({displayName: "Tab",
 
   getDefaultProps: function() {
     return {
-      cols: ['Users','Meals','Dishes','Orders']
+      cols: ['User','Meal','Dish','Order']
     };
   },
 
@@ -43002,14 +43062,20 @@ var Tab = React.createClass({displayName: "Tab",
 
 module.exports = Tab;
 
-},{"../helpers/SFMealAPI":182,"../stores/TabStore":185,"react/addons":8}],175:[function(require,module,exports){
+},{"../helpers/SFMealAPI":182,"../stores/TabStore":189,"react/addons":8}],175:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
 'use strict';
 
 var React = require('react/addons'),
-  TableHeader = require('./TableHeader');
+  TableHeader = require('./TableHeader'),
+  UserStore = require('../stores/UserStore'),
+  HostStore = require('../stores/HostStore'),
+  MealStore = require('../stores/MealStore'),
+  DishStore = require('../stores/DishStore'),
+  OrderStore = require('../stores/OrderStore'),
+  TableItem = require('./TableItem');
 
 var Table = React.createClass({displayName: "Table",
   /*
@@ -43017,18 +43083,100 @@ var Table = React.createClass({displayName: "Table",
       parent component is the correct type.
   */
   propTypes: {
+    model : React.PropTypes.string,
+    attrs : React.PropTypes.array,
+    header : React.PropTypes.object
   },
 
   getDefaultProps: function() {
     return {
+      model : 'User',
+      attrs : [],
+      header : []
     };
   },
 
+  getStateFromStore : function(model){
+    switch( model || this.props.model ){
+      case "User":
+        return {data : UserStore.getAllUsers(), detail : UserStore.isShowDetail()};
+        break;
+      case "Host":
+        return {data : HostStore.getAllHost(), detail : HostStore.isShowDetail()};
+        break;
+      case "Meal":
+        return {data : MealStore.getAllMeals(), detail : MealStore.isShowDetail()};
+        break;
+      case "Dish":
+        return {data : DishStore.getAllDishes(), detail : DishStore.isShowDetail()};
+        break;
+      case "Order":
+        return {data : OrderStore.getAllOrders(), detail : OrderStore.isShowDetail()};
+        break;
+    }
+  },
+
+  getInitialState: function () {
+    return this.getStateFromStore();
+  },
+
+  componentWillReceiveProps : function(nextProps){
+    this.state = this.getStateFromStore(nextProps.model);
+  },
+
+  componentDidMount: function () {
+    UserStore.addChangeListener(this._onChange);
+    HostStore.addChangeListener(this._onChange);
+    MealStore.addChangeListener(this._onChange);
+    DishStore.addChangeListener(this._onChange);
+    OrderStore.addChangeListener(this._onChange);
+  },
+
+  componentWillUnmount: function () {
+    UserStore.removeChangeListener(this._onChange);
+    HostStore.removeChangeListener(this._onChange);
+    MealStore.removeChangeListener(this._onChange);
+    DishStore.removeChangeListener(this._onChange);
+    OrderStore.removeChangeListener(this._onChange);
+  },
+
+  _onChange: function () {
+    this.setState(this.getStateFromStore());
+  },
+
   render: function () {
+    if(this.state.detail){
+      var detailHeaders = this.props.details;
+      var attrs = Object.keys(detailHeaders);
+      var header = Object.keys(detailHeaders).map(function(key){
+        return detailHeaders[key];
+      });
+    }else{
+      var propHeaders = this.props.header;
+      var attrs = Object.keys(propHeaders);
+      var header = Object.keys(propHeaders).map(function(key){
+        return propHeaders[key];
+      });
+    }
+
+    var model = this.props.model;
+
+    var tableRows = this.state.data.map(function(item, key){
+      return (
+        React.createElement(TableItem, {
+          key: key, 
+          data: item, 
+          attrs: attrs, 
+          model: model, 
+          detail: this.state.detail}
+        )
+      );
+    },this);
     return (
         React.createElement("table", {className: "table table-striped table-bordered table-hover"}, 
-          React.createElement(TableHeader, {cols: this.props.header}), 
-          React.createElement("tbody", null
+          React.createElement(TableHeader, {cols: header}), 
+          React.createElement("tbody", null, 
+            tableRows
           )
         )
     );
@@ -43037,7 +43185,7 @@ var Table = React.createClass({displayName: "Table",
 
 module.exports = Table;
 
-},{"./TableHeader":176,"react/addons":8}],176:[function(require,module,exports){
+},{"../stores/DishStore":184,"../stores/HostStore":185,"../stores/MealStore":186,"../stores/OrderStore":187,"../stores/UserStore":190,"./TableHeader":176,"./TableItem":177,"react/addons":8}],176:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -43087,6 +43235,7 @@ module.exports = TableHeader;
 'use strict';
 
 var React = require('react/addons'),
+  SFMealAPI = require('../helpers/SFMealAPI'),
   _ = require('lodash');
 
 var TableItem = React.createClass({displayName: "TableItem",
@@ -43096,22 +43245,115 @@ var TableItem = React.createClass({displayName: "TableItem",
       parent component is the correct type.
   */
   propTypes: {
-    data: React.PropTypes.object
+    data: React.PropTypes.object,
+    model : React.PropTypes.string
   },
 
   getDefaultProps: function () {
     return {
       data: {},
-      attrs: []
+      attrs: [],
+      model : 'User'
     };
+  },
+
+  _verify : function(event){
+    var target = $(event.target);
+    SFMealAPI.command(target.data('model'),target.data('id'),'verify',this.props.detail);
+  },
+
+  _fail : function(event){
+    var target = $(event.target);
+    SFMealAPI.command(target.data('model'),target.data('id'),'fail',this.props.detail);
+  },
+
+  _on : function(event){
+    var target = $(event.target);
+    SFMealAPI.command(target.data('model'),target.data('id'),'on',this.props.detail);
+  },
+
+  _off : function(event){
+    var target = $(event.target);
+    SFMealAPI.command(target.data('model'),target.data('id'),'off',this.props.detail);
+  },
+
+  _abort : function(event){
+    var target = $(event.target);
+    SFMealAPI.command(target.data('model'),target.data('id'),'abort',this.props.detail);
+  },
+
+  _refund : function(event){
+    var target = $(event.target);
+    SFMealAPI.command(target.data('model'),target.data('id'),'refund',this.props.detail);
   },
 
   render: function() {
     var item = this.props.data,
       attributes = this.props.attrs,
       cols = attributes.map(function (col, i) {
+        var attrs = col.split('.');
+        if(attrs.length == 1){
+          var rowContent = item[col];
+          if(col === 'command'){
+            switch(this.props.model){
+              case "Dish":
+                if(item.hasOwnProperty('isVerified')){
+                  if(item['isVerified']){
+                    rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._fail}, "Off")
+                  }else{
+                    rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._verify}, "On")
+                  }
+                }
+                break;
+              case "Meal":
+              if(item.hasOwnProperty('status')){
+                if(item['status'] === 'on'){
+                  rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._off}, "Off")
+                }else{
+                  rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._on}, "On")
+                }
+              }
+              break;
+              case "Order":
+                if(item.hasOwnProperty('status')){
+                  if(item['status'] !== 'complete' && item['status'] !== 'cancel'){
+                    rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._abort}, "Cancel"), React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._refund}, "Refund"))
+                  }else if(item.hasOwnProperty('charges')){
+                    if(item['charges'] && Object.keys(item['charges']).length > 0){
+                      rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._refund}, "Refund")
+                    }
+                  }
+                }
+                break;
+            }
+          }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){
+            rowContent = React.createElement("img", {src: rowContent, width: "100"})
+          }else if(Array.isArray(rowContent)){
+            rowContent = rowContent.map(function(ele){
+              for(var key in ele){
+                if(typeof ele[key] === 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(ele[key])){
+                  ele[key] = React.createElement("img", {src: ele[key], width: "100"})
+                  return ele[key];
+                }
+              }
+              return key + ":" + ele[key];
+            });
+          }else if(typeof rowContent === "boolean"){
+            rowContent = rowContent ? "true" : "false";
+          }else if(typeof rowContent === 'object'){
+            rowContent = Object.keys(rowContent).map(function(key){
+              return React.createElement("p", null, key, " : ", rowContent[key]);
+            });
+          }
+        }else{
+          var tmpItem = Object.assign({}, item);
+          attrs.map(function(attr){
+            tmpItem = tmpItem[attr]?tmpItem[attr]:tmpItem;
+          },this);
+          var rowContent = tmpItem;
+        }
         return (
-          React.createElement("td", {key: i, className: "col-md-1"}, item[col])
+          React.createElement("td", {key: i, className: "col-md-1"}, rowContent)
         );
       }, this);
 
@@ -43125,7 +43367,7 @@ var TableItem = React.createClass({displayName: "TableItem",
 
 module.exports = TableItem;
 
-},{"lodash":7,"react/addons":8}],178:[function(require,module,exports){
+},{"../helpers/SFMealAPI":182,"lodash":7,"react/addons":8}],178:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -43147,7 +43389,7 @@ var TablePanel = React.createClass({displayName: "TablePanel",
   */
 
   getInitialState: function () {
-    return {tab: 'Users'};
+    return {tab: 'User'};
   },
 
   componentDidMount: function () {
@@ -43166,23 +43408,44 @@ var TablePanel = React.createClass({displayName: "TablePanel",
 
   render: function () {
     var headers;
+    var details;
     var criterias;
+    var attrs;
     switch (this.state.tab){
-      case "Users":
-        headers = ['Name','User ID','Phone','Email','Status','Command'];
-        criterias = ['Name','User ID','Phone','Email'];
-      case "Hosts":
-        headers = ['Name','User ID','Phone','Email','Status','Command'];
-        criterias = ['Name','User ID','Phone','Email'];
+      case "User":
+        headers = {id: "User ID",firstname : 'Firstname',lastname :'Lastname',phone:'Phone','auth.email':'Email',status :'Status',command :'Command'};
+        details = {id: "User ID",firstname : 'Firstname',lastname :'Lastname',phone:'Phone','auth.email':'Email',status :'Status',command :'Command'};
+        criterias = ['id','firstname','lastname','phone','email'];
+        break;
+      case "Host":
+      headers = {id : 'Host ID', shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email',passGuide : 'Status',command : 'Command'};
+      details = {id : 'Host ID', shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email', license : 'License', passGuide : 'Status',command : 'Command'};
+      criterias = ['id','shopName','email'];
+      break;
+      case "Meal":
+        headers = {id : 'Meal ID', 'chef.id' : 'Host ID', title : 'Title', type : 'MealType', score : 'Score', county : 'County', status : 'Status', command : 'Command'};
+        details = {id : 'Meal ID', 'chef.id' : 'Host ID', title : 'Title', type : 'MealType', coverString : 'Cover', score : 'Score', delivery_fee : 'Fee', delivery_range : 'Range', isDelivery : 'isDelivery', county : 'County', provideFromTime : 'provideFrom', provideTillTime : 'provideTill', totalQty : 'totalSupply', leftQty: 'leftSupply', status : 'Status', command : 'Command'};
+        criterias = ['id','hostId','keyword','county'];
+        break;
+      case "Dish":
+        headers = {id : 'Dish ID', 'chef.id' : 'Host ID', title :'Title',price : 'Price',score : 'Score', isVerified : 'Status',command : 'Command'};
+        details = {id : 'Dish ID', 'chef.id' : 'Host ID', title :'Title',price : 'Price',score : 'Score', photos : 'Photos', isVerified : 'Status', command : 'Command', sold : 'Sold', numberOfReviews : 'numberOfReviews',description : 'Description', type : 'DishType'};
+        criterias = ['id','hostId','mealId','keyword'];
+        break;
+      case "Order":
+        headers = {id : 'Order ID', 'host.id' : 'Host ID', 'customer.id' : 'User ID', 'meal.id' : 'Meal ID', subtotal : 'SubTotal', type : 'OrderType', delivery_fee : 'DeliveryFee', method : 'DeliveryMethod', address : 'DeliveryAddress', status : 'Status', command : 'Command'};
+        details = {id : 'Order ID', 'host.id' : 'Host ID', 'customer.id' : 'User ID', 'meal.id' : 'Meal ID', subtotal : 'SubTotal', type : 'OrderType', delivery_fee : 'DeliveryFee', method : 'DeliveryMethod', address : 'DeliveryAddress', orders : 'OrderDishes', pickupInfo : 'pickupMethods', guestEmail : 'UserEmail', hostEmail : 'ChefEmail', status : 'Status',lastStatus : 'lastStatus', msg : 'Message', command : 'Command'};
+        criterias = ['id','hostId','userId','mealId','status','hostEmail', 'guestEmail'];
+        break;
     }
 
     return (
       React.createElement("div", null, 
-        React.createElement(Search, {criteria: criterias}), 
+        React.createElement(Search, {criteria: criterias, model: this.state.tab}), 
         React.createElement("div", {className: "panel panel-default"}, 
           React.createElement("div", {className: "panel-heading"}, this.state.tab), 
           React.createElement("div", {className: "table-responsive"}, 
-            React.createElement(Table, {header: headers})
+            React.createElement(Table, {header: headers, details: details, model: this.state.tab})
           )
         )
       )
@@ -43192,7 +43455,7 @@ var TablePanel = React.createClass({displayName: "TablePanel",
 
 module.exports = TablePanel;
 
-},{"../stores/TabStore":185,"./Search":173,"./Table":175,"react/addons":8}],179:[function(require,module,exports){
+},{"../stores/TabStore":189,"./Search":173,"./Table":175,"react/addons":8}],179:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -43201,8 +43464,6 @@ module.exports = TablePanel;
 var React = require('react'),
   AdminPanel = require('./AdminPanel'),
   SFMealApi = require('../helpers/SFMealAPI');
-
-SFMealApi.getUsers();
 
 var container = document.getElementById('container');
 
@@ -43226,8 +43487,12 @@ module.exports = {
     GET_MEAL : null,
     GET_ORDERS : null,
     GET_ORDER : null,
+    GET_DISHES : null,
+    GET_DISH : null,
     TAB_CHANGE : null,
-    SEARCH_CHANGE : null
+    SEARCH_CHANGE : null,
+    NO_RESULT : null,
+    BAD_REQUEST : null
   }),
 };
 
@@ -43270,43 +43535,209 @@ var ActionCreators = require('../actions/ActionCreators'),
 
 module.exports = {
 
-  getUsers: function() {
+  getUser : function(id){
     $.ajax({
-      url: '/user',
+      url: "/user/" + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getUser(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getUsers: function(criteria, value) {
+    if(!criteria || !value){
+      var url = "/user";
+    }else{
+      var url = "/user/search?" + criteria + "=" + value;
+    }
+    $.ajax({
+      url: url,
       type: 'GET',
       dataType: 'json',
     }).done(function (data) {
       ActionCreators.getUsers(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
     });
   },
 
-  getHosts: function() {
+  getHost: function(id) {
     $.ajax({
-      url: '/host',
+      url: '/host/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getHost(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getHosts: function(criteria, value) {
+    if(!criteria || !value){
+      var url = "/host";
+    }else{
+      var url = "/host/search?" + criteria + "=" + value;
+    }
+    $.ajax({
+      url: url,
       type: 'GET',
       dataType: 'json',
     }).done(function (data) {
       ActionCreators.getHosts(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
     });
   },
 
-  getMeals : function(){
+  getMeal : function(id){
     $.ajax({
-      url: '/meal',
+      url: '/meal/' + id,
       type: 'GET',
       dataType: 'json',
     }).done(function (data) {
-      ActionCreators.getMeals(data);
+      ActionCreators.getMeal(data.meals?data.meals:data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
     });
   },
 
-  getOrders : function(){
+  getMeals : function(criteria, value){
+    if(criteria == "hostId" && value){
+      var url = "/host/" + value + "/meals";
+    }else if(value) {
+      var url = "/meal/searchAll?" + criteria + "=" + value;
+    }else{
+      var url = "/meal/findAll";
+    }
     $.ajax({
-      url: '/order',
+      url: url,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getMeals(data.meals?data.meals:data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getDish : function(id){
+    $.ajax({
+      url: '/dish/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getDish(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getDishes : function(criteria, value){
+    if(criteria == "hostId" && value){
+      var url = "/host/" + value + "/dishes";
+    }else if(criteria == "mealId" && value) {
+      var url = "/meal/" + value + "/dishes";
+    }else if(value) {
+      var url = "/dish/search?" + criteria + "=" + value;
+    }else{
+      var url = "/dish";
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getDishes(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getOrder : function(id){
+    $.ajax({
+      url: '/order/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getOrder(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getOrders : function(criteria, value){
+    if(criteria == "hostId" && value){
+      var url = "/host/" + value + "/orders";
+    }else if(criteria == "userId" && value) {
+      var url = "/user/" + value + "/orders";
+    }else if(criteria == "mealId" && value) {
+      var url = "/order/search?meal=" + value;
+    }else if(value) {
+      var url = "/order/search?" + criteria + "=" + value;
+    }else{
+      var url = "/order";
+    }
+    $.ajax({
+      url: url,
       type: 'GET',
       dataType: 'json',
     }).done(function (data) {
       ActionCreators.getOrders(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  command : function(model, id, action, detail){
+    var url = '/' + model.toLowerCase() + '/' + id + '/' + action;
+    $.ajax({
+      url: url,
+      type: 'POST',
+      dataType: 'json',
+    }).done(function (data) {
+      switch(model) {
+        case "User":
+          if(detail){
+            ActionCreators.getUser(data);
+          }else{
+            ActionCreators.getUsers(data);
+          }
+          break;
+        case "Host":
+          if(detail){
+            ActionCreators.getHost(data);
+          }else{
+            ActionCreators.getHosts(data);
+          }
+          break;
+        case "Meal":
+          if(detail){
+            ActionCreators.getMeal(data);
+          }else{
+            ActionCreators.getMeals(data);
+          }
+          break;
+        case "Dish":
+          if(detail){
+            ActionCreators.getDish(data);
+          }else{
+            ActionCreators.getDishes(data);
+          }
+          break;
+        case "Order":
+          if(detail){
+            ActionCreators.getOrder(data);
+          }else{
+            ActionCreators.getOrders(data);
+          }
+          break;
+      }
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.badRequest(jqXHR.responseText);
     });
   },
 
@@ -43315,8 +43746,44 @@ module.exports = {
   },
 
   search : function(model, criteria, content){
-    console.log("ddd");
-    ActionCreators.search(model, criteria, content);
+    switch (model){
+      case "User":
+        if(criteria == "id" && content){
+          this.getUser(content);
+        }else{
+          this.getUsers(criteria,content);
+        }
+        break;
+      case "Host":
+        if(criteria == "id" && content){
+          this.getHost(content)
+        }else{
+          this.getHosts(criteria,content);
+        }
+        break;
+      case "Meal":
+        if(criteria == "id" && content){
+          this.getMeal(content);
+        }else{
+          this.getMeals(criteria,content);
+        }
+        break;
+      case "Dish":
+        if(criteria == "id" && content){
+          this.getDish(content);
+        }else{
+          this.getDishes(criteria,content);
+        }
+        break;
+      case "Order":
+        if(criteria == "id" && content){
+          this.getOrder(content);
+        }else{
+          this.getOrders(criteria,content);
+        }
+        break;
+    }
+    ActionCreators.search(criteria, content);
   }
 
 
@@ -43345,12 +43812,16 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
 
 var CHANGE_EVENT = 'change';
 
-var _criteria = '';
-var _search = '';
+var _dishes = [];
+var _showDetail = false;
 
-var SearchStore = _.assign({}, EventEmitter.prototype, {
-  getSearchData: function () {
-    return { criteria : _criteria, search : _search};
+var DishStore = _.assign({}, EventEmitter.prototype, {
+  getAllDishes: function () {
+    return _dishes;
+  },
+
+  isShowDetail : function(){
+    return _showDetail;
   },
 
   emitChange: function () {
@@ -43369,12 +43840,332 @@ var SearchStore = _.assign({}, EventEmitter.prototype, {
 // Register callback to handle all updates
 AppDispatcher.register(function (payload) {
   var action = payload.action;
-  console.log(action)
+
+  switch (action.type) {
+    case ActionTypes.GET_DISHES:
+      if(!Array.isArray(action.records)){
+        _dishes = [action.records];
+      }else{
+        _dishes = action.records;
+      }
+      _showDetail = false;
+      DishStore.emitChange();
+      break;
+
+    case ActionTypes.GET_DISH:
+      if(!Array.isArray(action.records)){
+        _dishes = [action.records];
+      }else{
+        _dishes = action.records;
+      }
+      _showDetail = true;
+      DishStore.emitChange();
+      break;
+
+    case ActionTypes.NO_RESULT:
+      _dishes = [];
+      _showDetail = false;
+      DishStore.emitChange();
+      break;
+
+    default:
+      // no op
+  }
+});
+
+module.exports = DishStore;
+
+},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}],185:[function(require,module,exports){
+/*
+ * RecordStore
+ */
+
+'use strict';
+
+var AppDispatcher = require('../dispatcher/AppDispatcher'),
+  EventEmitter = require('events').EventEmitter,
+  AppConstants = require('../constants/AppConstants'),
+  ActionTypes = AppConstants.ActionTypes,
+  _ = require('lodash');
+
+var CHANGE_EVENT = 'change';
+
+var _hosts = [];
+var _showDetail = false;
+
+var HostStore = _.assign({}, EventEmitter.prototype, {
+  getAllHost: function () {
+    return _hosts;
+  },
+
+  isShowDetail : function(){
+    return _showDetail;
+  },
+
+  emitChange: function () {
+    this.emit(CHANGE_EVENT);
+  },
+
+  addChangeListener: function (callback) {
+    this.on(CHANGE_EVENT, callback);
+  },
+
+  removeChangeListener: function (callback) {
+    this.removeListener(CHANGE_EVENT, callback);
+  }
+});
+
+// Register callback to handle all updates
+AppDispatcher.register(function (payload) {
+  var action = payload.action;
+
+  switch (action.type) {
+    case ActionTypes.GET_HOSTS:
+      if(!Array.isArray(action.records)){
+        _hosts = [action.records];
+      }else{
+        _hosts = action.records;
+      }
+      _showDetail = false;
+      HostStore.emitChange();
+      break;
+
+    case ActionTypes.GET_HOST:
+      if(!Array.isArray(action.records)){
+        _hosts = [action.records];
+      }else{
+        _hosts = action.records;
+      }
+      _showDetail = true;
+      HostStore.emitChange();
+      break;
+
+    case ActionTypes.NO_RESULT:
+      _hosts = [];
+      _showDetail = false;
+      HostStore.emitChange();
+      break;
+
+    default:
+      // no op
+  }
+});
+
+module.exports = HostStore;
+
+},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}],186:[function(require,module,exports){
+/*
+ * RecordStore
+ */
+
+'use strict';
+
+var AppDispatcher = require('../dispatcher/AppDispatcher'),
+  EventEmitter = require('events').EventEmitter,
+  AppConstants = require('../constants/AppConstants'),
+  ActionTypes = AppConstants.ActionTypes,
+  _ = require('lodash');
+
+var CHANGE_EVENT = 'change';
+
+var _meals = [];
+var _showDetail = false;
+
+var MealStore = _.assign({}, EventEmitter.prototype, {
+  getAllMeals: function () {
+    return _meals;
+  },
+
+  isShowDetail : function(){
+    return _showDetail;
+  },
+
+  emitChange: function () {
+    this.emit(CHANGE_EVENT);
+  },
+
+  addChangeListener: function (callback) {
+    this.on(CHANGE_EVENT, callback);
+  },
+
+  removeChangeListener: function (callback) {
+    this.removeListener(CHANGE_EVENT, callback);
+  }
+});
+
+// Register callback to handle all updates
+AppDispatcher.register(function (payload) {
+  var action = payload.action;
+
+  switch (action.type) {
+    case ActionTypes.GET_MEALS:
+      if(!Array.isArray(action.records)){
+        _meals = [action.records];
+      }else{
+        _meals = action.records;
+      }
+      _showDetail = false;
+      MealStore.emitChange();
+      break;
+
+    case ActionTypes.GET_MEAL:
+      if(!Array.isArray(action.records)){
+        _meals = [action.records];
+      }else{
+        _meals = action.records;
+      }
+      _showDetail = true;
+      MealStore.emitChange();
+
+      break;
+
+    case ActionTypes.NO_RESULT:
+      _meals = [];
+      _showDetail = false;
+      MealStore.emitChange();
+      break;
+
+    default:
+      // no op
+  }
+});
+
+module.exports = MealStore;
+
+},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}],187:[function(require,module,exports){
+/*
+ * RecordStore
+ */
+
+'use strict';
+
+var AppDispatcher = require('../dispatcher/AppDispatcher'),
+  EventEmitter = require('events').EventEmitter,
+  AppConstants = require('../constants/AppConstants'),
+  ActionTypes = AppConstants.ActionTypes,
+  _ = require('lodash');
+
+var CHANGE_EVENT = 'change';
+
+var _orders = [];
+var _showDetail = false;
+
+var OrderStore = _.assign({}, EventEmitter.prototype, {
+  getAllOrders: function () {
+    return _orders;
+  },
+
+  isShowDetail : function(){
+    return _showDetail;
+  },
+
+  emitChange: function () {
+    this.emit(CHANGE_EVENT);
+  },
+
+  addChangeListener: function (callback) {
+    this.on(CHANGE_EVENT, callback);
+  },
+
+  removeChangeListener: function (callback) {
+    this.removeListener(CHANGE_EVENT, callback);
+  }
+});
+
+// Register callback to handle all updates
+AppDispatcher.register(function (payload) {
+  var action = payload.action;
+
+  switch (action.type) {
+    case ActionTypes.GET_ORDERS:
+      if(!Array.isArray(action.records)){
+        _orders = [action.records];
+      }else{
+        _orders = action.records;
+      }
+      _showDetail = false;
+      OrderStore.emitChange();
+      break;
+
+    case ActionTypes.GET_ORDER:
+      if(!Array.isArray(action.records)){
+        _orders = [action.records];
+      }else{
+        _orders = action.records;
+      }
+      _showDetail = true;
+      OrderStore.emitChange();
+      break;
+
+    case ActionTypes.NO_RESULT:
+      _orders = [];
+      _showDetail = false;
+      OrderStore.emitChange();
+      break;
+
+    default:
+      // no op
+  }
+});
+
+module.exports = OrderStore;
+
+},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}],188:[function(require,module,exports){
+/*
+ * RecordStore
+ */
+
+'use strict';
+
+var AppDispatcher = require('../dispatcher/AppDispatcher'),
+  EventEmitter = require('events').EventEmitter,
+  AppConstants = require('../constants/AppConstants'),
+  ActionTypes = AppConstants.ActionTypes,
+  _ = require('lodash');
+
+var CHANGE_EVENT = 'change';
+
+var _criteria = '';
+var _search = '';
+var _errMsg = '';
+
+var SearchStore = _.assign({}, EventEmitter.prototype, {
+  getSearchData: function () {
+    return { criteria : _criteria, search : _search, errMsg : _errMsg};
+  },
+
+  emitChange: function () {
+    this.emit(CHANGE_EVENT);
+  },
+
+  addChangeListener: function (callback) {
+    this.on(CHANGE_EVENT, callback);
+  },
+
+  removeChangeListener: function (callback) {
+    this.removeListener(CHANGE_EVENT, callback);
+  }
+});
+
+// Register callback to handle all updates
+AppDispatcher.register(function (payload) {
+  var action = payload.action;
 
   switch (action.type) {
     case ActionTypes.SEARCH_CHANGE:
       _criteria = action.criteria;
       _search = action.search;
+      _errMsg = "";
+      SearchStore.emitChange();
+      break;
+
+    case ActionTypes.NO_RESULT:
+      _errMsg = action.msg;
+      SearchStore.emitChange();
+      break;
+
+    case ActionTypes.BAD_REQUEST:
+      _errMsg = action.msg;
       SearchStore.emitChange();
       break;
 
@@ -43385,7 +44176,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = SearchStore;
 
-},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}],185:[function(require,module,exports){
+},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}],189:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -43437,7 +44228,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = TabStore;
 
-},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}],186:[function(require,module,exports){
+},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}],190:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -43453,10 +44244,15 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
 var CHANGE_EVENT = 'change';
 
 var _users = [];
+var _showDetail = false;
 
 var UserStore = _.assign({}, EventEmitter.prototype, {
   getAllUsers: function () {
     return _users;
+  },
+
+  isShowDetail : function(){
+    return _showDetail;
   },
 
   emitChange: function () {
@@ -43478,7 +44274,28 @@ AppDispatcher.register(function (payload) {
 
   switch (action.type) {
     case ActionTypes.GET_USERS:
-      _users = action.users;
+      if(!Array.isArray(action.records)){
+        _users = [action.records];
+      }else{
+        _users = action.records;
+      }
+      _showDetail = false;
+      UserStore.emitChange();
+      break;
+
+    case ActionTypes.GET_USER:
+      if(!Array.isArray(action.records)){
+        _users = [action.records];
+      }else{
+        _users = action.records;
+      }
+      _showDetail = true;
+      UserStore.emitChange();
+      break;
+
+    case ActionTypes.NO_RESULT:
+      _users = [];
+      _showDetail = false;
       UserStore.emitChange();
       break;
 
@@ -43489,4 +44306,4 @@ AppDispatcher.register(function (payload) {
 
 module.exports = UserStore;
 
-},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}]},{},[170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186]);
+},{"../constants/AppConstants":180,"../dispatcher/AppDispatcher":181,"events":1,"lodash":7}]},{},[170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190]);

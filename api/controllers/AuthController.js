@@ -62,6 +62,12 @@ module.exports = require('waterlock').waterlocked({
     }
   },
 
+  admin : function(req, res){
+    return res.view('admin/hello',{
+      layout : 'admin_layout'
+    });
+  },
+
   resetForm : function(req, res){
     return res.view("resetPassword");
   }

@@ -78,6 +78,15 @@ module.exports = {
     });
   },
 
+  search : function(req, res){
+    Host.find(req.query).exec(function (err, hosts) {
+      if(err){
+        return res.badRequest(err);
+      }
+      return res.ok(hosts);
+    })
+  },
+
   update : function(req, res){
     var params = req.body;
     var hostId = req.params.id;
@@ -187,6 +196,9 @@ module.exports = {
       }
       if(!host){
         return res.notFound();
+      }
+      if(req.wantsJSON){
+        return res.ok(host);
       }
       var publicHost = {};
       publicHost.dishes = host.dishes;

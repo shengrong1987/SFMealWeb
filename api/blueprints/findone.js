@@ -47,9 +47,9 @@ module.exports = function findOneRecord (req, res) {
       actionUtil.subscribeDeep(req, matchingRecord);
     }
 
-    //if(req.wantsJSON){
-    //  res.ok(matchingRecord);
-    //}else
+    if(req.wantsJSON){
+     res.ok(matchingRecord);
+    }else
     if(Model.adapter.identity == "meal"){
       if(isEditMode){
         matchingRecord.userId = user.id;

@@ -26,6 +26,11 @@ module.exports = {
       type : 'string',
       maxLength : 10
     },
+    status : {
+      type : 'string',
+      enum : ['active','frozen'],
+      defaultsTo : 'active'
+    },
     desc : {
       type : 'string',
       maxLength : 140,

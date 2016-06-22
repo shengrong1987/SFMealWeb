@@ -18,8 +18,7 @@ module.exports = {
       type : 'string'
     },
     shopName : {
-      type : 'string',
-      defaultsTo : "我的小厨房"
+      type : 'string'
     },
     picture : {
       type : 'string'
@@ -50,10 +49,6 @@ module.exports = {
     },
     lat : {
       type : 'string'
-    },
-    deliveryRange : {
-      type : "float",
-      defaultsTo : 4.0
     },
     city : {
       type : 'string'

@@ -22,7 +22,7 @@ var Tab = React.createClass({
 
   getDefaultProps: function() {
     return {
-      cols: ['Users','Meals','Dishes','Orders']
+      cols: ['User','Meal','Dish','Order']
     };
   },
 
