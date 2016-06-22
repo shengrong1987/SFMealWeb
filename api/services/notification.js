@@ -24,7 +24,7 @@ var mailOptions = {
 };
 
 var notification = {
-  notificationCenter : function(model, action, params, isHostAction, isAdminAction = false){
+  notificationCenter : function(model, action, params, isHostAction, isAdminAction){
     var verb = "updated";
     if(model === "Order"){
       switch(action){
