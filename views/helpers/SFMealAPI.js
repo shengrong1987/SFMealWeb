@@ -162,6 +162,37 @@ module.exports = {
     });
   },
 
+  getTransaction : function(id){
+    $.ajax({
+      url: '/pocket/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getTransaction(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getTransactions : function(criteria, value){
+    if(criteria == "hostId" && value){
+      var url = "/host/" + value + "/balance";
+    }else if(criteria == "userId" && value) {
+      var url = "/user/" + value + "/balance";
+    }else{
+      return;
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getTransactions(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
   command : function(model, id, action, detail){
     var url = '/' + model.toLowerCase() + '/' + id + '/' + action;
     $.ajax({
@@ -250,6 +281,13 @@ module.exports = {
           this.getOrder(content);
         }else{
           this.getOrders(criteria,content);
+        }
+        break;
+      case "Transaction":
+        if(criteria == "id" && content){
+          this.getTransaction(content);
+        }else{
+          this.getTransactions(criteria,content);
         }
         break;
     }

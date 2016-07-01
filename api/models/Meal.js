@@ -176,6 +176,9 @@ module.exports = {
     },
 
     dishIsValid : function(){
+      if(this.dishes.length == 0){
+        return false;
+      }
       return this.dishes.every(function(dish){
         return dish.isVerified
       });
@@ -189,7 +192,17 @@ module.exports = {
           return cb(err);
         }
         values.county = host.county;
-        cb();
+        if(values.cover){
+          Dish.findOne(values.cover).exec(function(err,dish){
+            if(err){
+              return cb(err);
+            }
+            values.coverString = dish ? dish.photos[0].v : '';
+            cb();
+          });
+        }else{
+          cb();
+        }
       });
     }else{
       cb();
@@ -202,9 +215,11 @@ module.exports = {
         if(err){
           return cb(err);
         }
-        values.coverString = dish.photos[0].v;
+        values.coverString = dish ? dish.photos[0].v : '';
         cb();
       });
+    }else{
+      cb();
     }
   }
 };

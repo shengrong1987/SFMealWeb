@@ -16,7 +16,7 @@ before(function(done) {
 
 describe('MealController', function() {
 
-  this.timeout(5000);
+  this.timeout(8000);
 
   describe('build a meal with dishes', function() {
 
@@ -27,11 +27,14 @@ describe('MealController', function() {
     var address1 = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853};
     var address2 = {"street":"1455 Market St","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853, "isDefault" : true};
     var userId = "";
+    var firstname = "Shiga";
+    var lastname = "Lian";
+    var shopName = "Crispy, Tangy, Sweet, and Spicy";
 
     it('should login or register an account', function (done) {
       agent
           .post('/auth/login?type=local')
-          .send({email : email, password: password,picture:picture})
+          .send({email : email, password: password})
           .expect(200)
           .end(function(err,res){
             if(err){
@@ -127,7 +130,7 @@ describe('MealController', function() {
     it('should update address info for host', function (done) {
         agent
           .put('/host/' + hostId)
-          .send({address:address2})
+          .send({address:address2, picture: picture, shopName : shopName})
           .expect(200)
           .end(function(err,res){
             if(res.body.city != "San Francisco"){
@@ -268,6 +271,21 @@ describe('MealController', function() {
             done();
           })
     });
+
+    it('should update user info', function (done) {
+      agent
+        .post('/user/' + guestId)
+        .send({firstname : firstname, lastname : lastname})
+        .expect(200)
+        .end(function(err,res){
+          if(res.body.firstname != firstname){
+            return done(Error("error updating user info"))
+          }
+          done();
+        })
+    });
+
+
 
     it('should create a new card', function (done) {
       var number = "4242424242424242";

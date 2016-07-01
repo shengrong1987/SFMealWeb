@@ -272,7 +272,7 @@ module.exports = {
         if(!host.isValid(false)){
           return res.redirect("/apply");
         }
-        Meal.findOne(mealId).exec(function(err,meal){
+        Meal.findOne(mealId).populate("dishes").exec(function(err,meal){
           if(err){
             return res.badRequest(err);
           }
@@ -369,24 +369,44 @@ module.exports = {
     }
   },
 
+  remove : function(req, res){
+    var mealId = req.param('parentid');
+    var dishId = req.param('id');
+    Meal.findOne(mealId).populate('dishes').exec(function(err, meal){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(meal.status == 'on'){
+        return res.badRequest(req.__('meal-active-delete-dish'));
+      }
+      if(meal.dishes.filter(function(dish){
+        return dish.id != dishId;
+      }) == 0){
+        return res.badRequest(req.__('meal-dishes-empty'));
+      }
+      meal.dishes.remove(dishId);
+      meal.save(function(err, result){
+        if(err){
+          return res.badRequest(err);
+        }
+        return res.ok({});
+      });
+    });
+  },
+
   update : function(req, res){
     var mealId = req.param("id");
     if(this.dateIsValid(req.body)){
-      if(this.dishIsValid(req.body)){
-        if(this.requirementIsValid(req.body)){
-          Meal.update({id : mealId}, req.body).exec(function(err, meal){
-            if(err){
-              return res.badRequest(err);
-            }
-            res.ok(meal);
-          });
-        }else{
-          console.log("meal minimal requirement are not valid");
-          return res.badRequest(req.__('meal-invalid-requirement'));
-        }
+      if(this.requirementIsValid(req.body)){
+        Meal.update({id : mealId}, req.body).exec(function(err, meal){
+          if(err){
+            return res.badRequest(err);
+          }
+          res.ok(meal);
+        });
       }else{
-        console.log("meal contain unverified dishes");
-        return res.badRequest(req.__('meal-unverify-dish'));
+        console.log("meal minimal requirement are not valid");
+        return res.badRequest(req.__('meal-invalid-requirement'));
       }
     }else{
       console.log("Date format of meal is not valid");
@@ -406,6 +426,9 @@ module.exports = {
 
   dishIsValid : function(params, cb){
     var dishes = params.dishes.split(",");
+    if(dishes.length == 0){
+      return cb(false);
+    }
     async.each(dishes, function(dishId, next){
       Dish.findOne(dishId).exec(function(err, dish){
         if(err){

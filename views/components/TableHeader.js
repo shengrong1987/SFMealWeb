@@ -12,13 +12,15 @@ var TableHeader = React.createClass({
       parent component is the correct type.
   */
   propTypes: {
-    cols: React.PropTypes.array
+    cols: React.PropTypes.array,
+    data : React.PropTypes.object
   },
 
   getDefaultProps: function () {
     return {
-      cols: []
-    };
+      cols: [],
+      data: null
+    }
   },
 
   render: function () {

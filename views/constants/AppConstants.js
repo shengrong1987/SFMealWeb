@@ -14,6 +14,8 @@ module.exports = {
     GET_ORDER : null,
     GET_DISHES : null,
     GET_DISH : null,
+    GET_TRANSACTIONS : null,
+    GET_TRANSACTION : null,
     TAB_CHANGE : null,
     SEARCH_CHANGE : null,
     NO_RESULT : null,

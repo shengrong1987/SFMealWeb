@@ -42,7 +42,8 @@ module.exports.policies = {
     'becomeHost' : 'or(and(sessionAuth, notHost),isAdmin)',
     'pocket' : 'or(sessionAuth,isAdmin)',
     'me' : ['sessionAuth'],
-    'search' : 'isAdmin'
+    'search' : 'isAdmin',
+    'deleteObject' : 'or(sessionAuth,isAdmin)'
   },
 
   MealController : {
@@ -53,6 +54,7 @@ module.exports.policies = {
     'find' : true,
     'findOne' : true,
     'search' : true,
+    'confirm' : 'sessionAuth',
     'findAll' : 'isAdmin',
     'searchAll' : 'isAdmin'
   },
@@ -95,6 +97,10 @@ module.exports.policies = {
     'create' : ['sessionAuth', 'isGuestOfMeal'],
     'delete' : ['isAdmin'],
     'update' : ['isAdmin']
+  },
+
+  PocketController : {
+    '*' : ['isAdmin']
   }
 
   /***************************************************************************

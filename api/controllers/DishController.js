@@ -49,6 +49,32 @@ module.exports = {
       }
       return res.ok(found);
     });
+  },
+
+  destroy : function(req, res){
+    var dishId = req.params.id;
+    var hostId = req.session.user.host.id ? req.session.user.host.id : req.session.user.host;
+    Meal.find({chef : hostId}).populate("dishes").exec(function(err, meals){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(!meals.every(function(meal){
+          if(meal.status == "off"){
+            return true;
+          }
+          return meal.dishes.every(function(dish){
+            return dish.id != dishId;
+          });
+      })){
+        return res.badRequest(req.__("meal-active-delete-dish"));
+      }
+      Dish.destroy(dishId).exec(function(err, dish){
+        if(err){
+          return res.badRequest(err);
+        }
+        return res.ok({dishId : dish.id});
+      })
+    });
   }
 };
 

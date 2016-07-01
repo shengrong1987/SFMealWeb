@@ -10,6 +10,7 @@ var React = require('react/addons'),
   MealStore = require('../stores/MealStore'),
   DishStore = require('../stores/DishStore'),
   OrderStore = require('../stores/OrderStore'),
+  TransactionStore = require('../stores/TransactionStore'),
   TableItem = require('./TableItem');
 
 var Table = React.createClass({
@@ -48,6 +49,9 @@ var Table = React.createClass({
       case "Order":
         return {data : OrderStore.getAllOrders(), detail : OrderStore.isShowDetail()};
         break;
+      case "Transaction":
+        return {data : TransactionStore.getAllTransactions(), headData : TransactionStore.getBalance(), detail : TransactionStore.isShowDetail()};
+        break;
     }
   },
 
@@ -65,6 +69,7 @@ var Table = React.createClass({
     MealStore.addChangeListener(this._onChange);
     DishStore.addChangeListener(this._onChange);
     OrderStore.addChangeListener(this._onChange);
+    TransactionStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount: function () {
@@ -73,6 +78,7 @@ var Table = React.createClass({
     MealStore.removeChangeListener(this._onChange);
     DishStore.removeChangeListener(this._onChange);
     OrderStore.removeChangeListener(this._onChange);
+    TransactionStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function () {
@@ -109,6 +115,7 @@ var Table = React.createClass({
     },this);
     return (
         <table className="table table-striped table-bordered table-hover">
+          <tr><td colSpan={header.length}>{this.state.headData}</td></tr>
           <TableHeader cols={header}/>
           <tbody>
             {tableRows}

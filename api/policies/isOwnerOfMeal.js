@@ -11,7 +11,7 @@ module.exports = function(req, res, next) {
   // User is allowed, proceed to the next policy,
   // or if this is the last policy, the controller
   var hostId = req.session.user.host;
-  var meal = req.param('id') || req.body.meal;
+  var meal = req.param('parentid') || req.param('id') || req.body.meal;
   Meal.findOne(meal).populate("chef").exec(function(err,m){
     if(hostId && hostId == m.chef.id){
       return next();

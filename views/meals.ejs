@@ -64,6 +64,9 @@
       for(var i=0; i< meals.length; i++) {
           var meal = meals[i];
           var mainDish = meal.dishes[0];
+          if(!mainDish){
+            break;
+          }
           if(typeof anchor !== 'undefined' && anchor){
             var distance = meal.chef.getDistance(anchor.lat, anchor.long);
           }else if(user){
@@ -71,13 +74,13 @@
           }
       %>
 
-      <div class="meal-box meal col-md-4 col-lg-3 col-xs-12 mix appetizer item <%= meal.type %>" data-distance-order=<%= distance %> data-price-order=<%= mainDish.price %>>
+      <div class="meal-box meal col-md-4 col-lg-3 col-xs-12 mix appetizer item <%= meal.type %>" data-distance-order=<%= distance %> data-price-order=<%= mainDish.price.toFixed(2)%>>
         <div class="box-grid white" style="overflow: hidden;">
           <div class="relative">
           <i class="fa fa-heart fa-2x fav text-white <% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
                 text-red
                 <%}})%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>"></i>
-            <img class="photo" src= <%= mainDish.photos[0].v %> data-meal=<%= meal.id %> onclick="javascript:location.href='/meal/' + $(this).data('meal')">
+            <img class="photo" src= <%= meal.coverString %> data-meal=<%= meal.id %> onclick="javascript:location.href='/meal/' + $(this).data('meal')">
             <h1 class="desc absolute text-white middle text-shadow font-elegant"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
         </div>
           <div class="col-md-6 basic-info">
@@ -91,7 +94,7 @@
           <div class="divider"></div>
           <div class="row vertical-align chef-cell">
             <div class="col-sm-3">
-              <img class="round_thumb size-small" onclick="location.href='/host/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/thumbnail.jpg" %>>
+              <img class="round_thumb size-small" onclick="location.href='/host/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/profile_man.png" %>>
             </div>
             <div class="col-sm-9">
               <h4 class="text-left text-dark"><%= meal.chef.shopName %><br><small><%= meal.chef.intro %></small></h4>

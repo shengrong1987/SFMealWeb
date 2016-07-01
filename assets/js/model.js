@@ -1069,7 +1069,6 @@ var DishView = Backbone.View.extend({
     this.formAlert.show();
     this.formAlert.html("保存中...");
 
-    var root = "https://sfmeal.s3.amazonaws.com/users/" + form.data("id") + "/";
     var dishId = form.data("dish-id");
     var title = $("#mealTitleInput").val();
     var price = $("#priceInput").val();
@@ -1079,26 +1078,26 @@ var DishView = Backbone.View.extend({
       this.model.set({id: dishId});
     }
     //update dish
-    imageHandler('dish',file1,function(){
-      imageHandler('dish',file2,function(){
-        imageHandler('dish',file3,function(){
+    imageHandler('dish',file1,function(filename1){
+      imageHandler('dish',file2,function(filename2){
+        imageHandler('dish',file3,function(filename3){
           var photos = [];
           if(file1){
-            photos[0] = {v:root + filename1};
+            photos[0] = {v:filename1};
           }else if(oldname1){
             photos[0] = {v:oldname1}
           }else{
             photos[0] = {v:""};
           }
           if(file2){
-            photos[1] = {v:root + filename2};
+            photos[1] = {v:filename2};
           }else if(oldname2){
             photos[1] = {v:oldname2};
           }else{
             photos[1] = {v:""};
           }
           if(file3){
-            photos[2] = {v:root + filename3};
+            photos[2] = {v:filename3};
           }else if(oldname3){
             photos[2] = {v:oldname3};
           }else{
@@ -1599,15 +1598,27 @@ var OrderView = Backbone.View.extend({
 });
 
 function deleteMeal(event){
-  deleteHandler($(event.target).data("order"), "meal");
+  var options = $(event.target).data();
+  deleteHandler(options["order"], "meal", $(options["errorContainer"]));
 }
 
 function deleteDish(event){
-  deleteHandler($(event.target).data("order"), "dish");
+  var options = $(event.target).data();
+  deleteHandler(options["order"], "dish", $(options["errorContainer"]));
 }
 
-function deleteHandler(id, module){
-  location.href = "/" + module + "/destroy/" + id;
+function deleteHandler(id, module, alertView){
+  alertView.hide();
+  var url = "/" + module + "/destroy/" + id;
+  $.ajax({
+    url : url,
+    success : function(){
+      location.reload();
+    },error : function(err){
+      alertView.show();
+      alertView.html(err.responseText);
+    }
+  })
 }
 
 function imageHandler(modual,file,cb,error,index,name,isDelete){
@@ -1628,7 +1639,7 @@ function imageHandler(modual,file,cb,error,index,name,isDelete){
 
 function deleteImage(filename,modual,cb,error){
   $.ajax({
-    url : '/user/delete',
+    url : '/user/me/delete',
     data : {
       name : filename,
       modual : modual
@@ -1662,7 +1673,7 @@ function uploadImage(modual,file,cb,error,index,name){
       break;
     case "dish":
       if(name && name!=""){
-        filename = name;
+        filename = name + "." + fileType;
       }
       break;
     default :

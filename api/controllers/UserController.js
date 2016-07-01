@@ -68,9 +68,11 @@ module.exports = require('waterlock').actions.user({
       if(err){
         return res.badRequest(err);
       }
-      users = users.filter(function(user){
-        return user.auth.email == email;
-      });
+      if(email){
+        users = users.filter(function(user){
+          return user.auth.email == email;
+        });
+      }
       return res.ok(users);
     })
   },
@@ -119,7 +121,7 @@ module.exports = require('waterlock').actions.user({
     if (params.address) {
       var address = params.address;
       if(address.delete){
-        User.findOne(userId).exec(function(err,user) {
+        User.findOne(userId).populate('auth').exec(function(err,user) {
           if (err) {
             return res.badRequest(err);
           }
@@ -152,7 +154,7 @@ module.exports = require('waterlock').actions.user({
               return res.badRequest(req.__('meal-error-address2'));
             }
             var administration = result[0].administrativeLevels;
-            User.findOne(userId).exec(function(err,user){
+            User.findOne(userId).populate('auth').exec(function(err,user){
               if(err){
                 return res.badRequest(err);
               }
@@ -166,7 +168,7 @@ module.exports = require('waterlock').actions.user({
           }
         });
       }else{
-        User.findOne(userId).exec(function(err,user) {
+        User.findOne(userId).populate('auth').exec(function(err,user) {
           if (err) {
             return res.badRequest(err);
           }
@@ -174,10 +176,12 @@ module.exports = require('waterlock').actions.user({
         });
       }
     } else {
+      var auth = req.session.user.auth;
       User.update({id: userId}, params).exec(function (err, user) {
         if (err) {
           return res.badRequest(err);
         }
+        user[0].auth = auth;
         req.session.user = user[0];
         res.ok(user[0]);
       });

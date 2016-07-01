@@ -64,7 +64,7 @@
           <div class="box-grid white" style="overflow: hidden;">
             <div>
               <i class="fa fa-heart fa-2x fav text-white" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
-              <img class="photo" src= "<%= mainDish.photos[0].v %>" data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
+              <img class="photo" src= "<%= meal.coverString %>" data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
               <h1 class="desc absolute text-white middle text-shadow font-elegant"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
             </div>
             <div class="col-md-6 basic-info">
@@ -118,7 +118,7 @@
         <div class="row box-grid white">
           <div class="col-sm-4 overflow-hidden none-padding">
             <i class="fa fa-heart fa-2x fav text-white" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
-            <img class="photo" src=<%= mainDish.photos[0].v %> data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
+            <img class="photo" src=<%= meal.coverString %> data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
             <h1 class="desc absolute text-white middle font-elegant"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
 
           </div>

@@ -80,6 +80,23 @@ var ActionsCreators = {
     });
   },
 
+  getTransaction : function(records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_TRANSACTION,
+      transactions: records.transactions,
+      total : records.totalBalance
+    });
+  },
+
+  getTransactions : function (records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_TRANSACTIONS,
+      transactions: records.transactions,
+      totalBalance : records.totalBalance,
+      pendingBalance : records.pendingBalance
+    });
+  },
+
   switchTab : function(tab){
     AppDispatcher.handleViewAction({
       type : ActionTypes.TAB_CHANGE,

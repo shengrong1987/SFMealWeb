@@ -148,6 +148,7 @@ module.exports = {
           req.body.meal = m.id;
           req.body.guestEmail = email;
           req.body.hostEmail = m.chef.email;
+          req.body.delivery_fee = delivery_fee;
           User.findOne(userId).populate('payment').exec(function (err, found) {
             if (err) {
               return res.badRequest(err);
@@ -175,7 +176,8 @@ module.exports = {
                 metadata : {
                   mealId : m.id,
                   hostId : m.chef.id,
-                  orderId : order.id
+                  orderId : order.id,
+                  userId : userId
                 }
               },function(err, charge){
                 if (err) {
@@ -282,7 +284,8 @@ module.exports = {
                   metadata : {
                     mealId : order.meal.id,
                     hostId : order.host.id,
-                    orderId : order.id
+                    orderId : order.id,
+                    userId : userId
                   }
                 },function(err, charge){
                   if (err) {
@@ -439,7 +442,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        order.charges = {};
+        order.msg = "Order refunded by admin, please see email for detail, order id:" + order.id;
         order.save(function(err, result){
           if(err){
             return res.badRequest(err);
@@ -573,7 +576,8 @@ module.exports = {
                 metadata : {
                   mealId : order.meal.id,
                   hostId : order.host.id,
-                  orderId : order.id
+                  orderId : order.id,
+                  userId : userId
                 }
               },function(err, charge){
                 if (err) {

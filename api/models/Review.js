@@ -11,6 +11,14 @@ module.exports = {
     dish : {
       model : 'Dish'
     },
+    title : {
+      type : 'string',
+      required : true
+    },
+    price : {
+      type : 'float',
+      required : true
+    },
     meal : {
       model : 'Meal'
     },
@@ -34,12 +42,6 @@ module.exports = {
       var date = this.updatedAt.getDate();
       return month + "/" + date + "/" + this.updatedAt.getFullYear();
     }
-  },
-  beforeCreate : function(values, cb){
-    User.find(values.user).exec(function(err,u){
-      values.username = u.pop().username || "未命名用户";
-      cb(err,values);
-    });
   },
   afterCreate : function(review, cb){
     var dishId = review.dish;

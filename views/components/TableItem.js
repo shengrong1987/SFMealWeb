@@ -63,56 +63,58 @@ var TableItem = React.createClass({
         var attrs = col.split('.');
         if(attrs.length == 1){
           var rowContent = item[col];
-          if(col === 'command'){
-            switch(this.props.model){
-              case "Dish":
-                if(item.hasOwnProperty('isVerified')){
-                  if(item['isVerified']){
-                    rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._fail}>Off</button>
-                  }else{
-                    rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._verify}>On</button>
-                  }
-                }
-                break;
-              case "Meal":
-              if(item.hasOwnProperty('status')){
-                if(item['status'] === 'on'){
-                  rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._off}>Off</button>
-                }else{
-                  rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._on}>On</button>
-                }
-              }
-              break;
-              case "Order":
-                if(item.hasOwnProperty('status')){
-                  if(item['status'] !== 'complete' && item['status'] !== 'cancel'){
-                    rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._abort}>Cancel</button><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._refund}>Refund</button></div>
-                  }else if(item.hasOwnProperty('charges')){
-                    if(item['charges'] && Object.keys(item['charges']).length > 0){
-                      rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._refund}>Refund</button>
+          if(rowContent){
+            if(col === 'command'){
+              switch(this.props.model){
+                case "Dish":
+                  if(item.hasOwnProperty('isVerified')){
+                    if(item['isVerified']){
+                      rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._fail}>Off</button>
+                    }else{
+                      rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._verify}>On</button>
                     }
                   }
-                }
-                break;
-            }
-          }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){
-            rowContent = <img src={rowContent} width="100"/>
-          }else if(Array.isArray(rowContent)){
-            rowContent = rowContent.map(function(ele){
-              for(var key in ele){
-                if(typeof ele[key] === 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(ele[key])){
-                  ele[key] = <img src={ele[key]} width="100"/>
-                  return ele[key];
-                }
+                  break;
+                case "Meal":
+                  if(item.hasOwnProperty('status')){
+                    if(item['status'] === 'on'){
+                      rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._off}>Off</button>
+                    }else{
+                      rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._on}>On</button>
+                    }
+                  }
+                  break;
+                case "Order":
+                  if(item.hasOwnProperty('status')){
+                    if(item['status'] !== 'complete' && item['status'] !== 'cancel'){
+                      rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._abort}>Cancel</button><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._refund}>Refund</button></div>
+                    }else if(item.hasOwnProperty('charges')){
+                      if(item['charges'] && Object.keys(item['charges']).length > 0){
+                        rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._refund}>Refund</button>
+                      }
+                    }
+                  }
+                  break;
               }
-              return key + ":" + ele[key];
-            });
-          }else if(typeof rowContent === "boolean"){
-            rowContent = rowContent ? "true" : "false";
-          }else if(typeof rowContent === 'object'){
-            rowContent = Object.keys(rowContent).map(function(key){
-              return <p>{key} : {rowContent[key]}</p>;
-            });
+            }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){
+              rowContent = <img src={rowContent} width="100"/>
+            }else if(Array.isArray(rowContent)){
+              rowContent = rowContent.map(function(ele){
+                for(var key in ele){
+                  if(typeof ele[key] === 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(ele[key])){
+                    ele[key] = <img src={ele[key]} width="100"/>
+                    return ele[key];
+                  }
+                }
+                return key + ":" + ele[key];
+              });
+            }else if(typeof rowContent === "boolean"){
+              rowContent = rowContent ? "true" : "false";
+            }else if(typeof rowContent === 'object'){
+              rowContent = Object.keys(rowContent).map(function(key){
+                return <p>{key} : {rowContent[key]}</p>;
+              });
+            }
           }
         }else{
           var tmpItem = Object.assign({}, item);

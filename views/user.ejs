@@ -665,7 +665,7 @@
               var host = meal.chef;%>
             <div class="row vertical-align item">
               <div class="col-xs-3">
-                <img src="/images/dumplings.jpg" style="width: 100%;">
+                <img src=<%= meal.coverString%> style="width: 100%;">
               </div>
               <div class="col-xs-4">
                 <h2 class="text-left"><%= meal.title%>  <small class="text-orange"><%= meal.type=="order"?__('order'): __('preorder')%></small></h2>
@@ -694,7 +694,7 @@
               <div class="col-xs-5">
                 <div class="row vertical-align">
                   <div class="col-md-2">
-                    <img src="<%= host.picture || '/images/thumbnail.jpg'%>" class="round_thumb size-small text-center">
+                    <img src="<%= host.picture || '/images/profile_man.png'%>" class="round_thumb size-small text-center">
                   </div>
                   <div class="col-md-10">
                     <h4 class="text-left" style="margin-top: 15px;"><%= host.shopName%><br><small><%= host.shortIntro()%></small></h4>
@@ -950,7 +950,7 @@
                   <h2 class="text-left"><%= order.meal.title%>  <small class="text-orange"><%= order.meal.type=="order"?__('order'):__('preorder')%></small></h2>
                   <div class="vertical-align text-left">
                     <a href="#" class="round_thumb size-small">
-                      <img src="<%= order.host.picture || "/images/thumbnail.jpg" %>">
+                      <img src="<%= order.host.picture || "/images/profile_man.png" %>">
                     </a>
                     <h4 class="text-left text-lightgrey" style="margin-top: 15px;margin-left:10px;"><%= order.meal.chef.shopName %><br><small><%= order.meal.chef.intro %></small></h4>
                   </div>

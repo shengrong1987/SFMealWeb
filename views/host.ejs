@@ -950,7 +950,7 @@
                       <%}%>
                     </tr>
                     <tr>
-                      <td><img src="<%= meal.coverString || '/images/food_default.png'%>" style="width: 200px;"><br><%= meal.title%></td>
+                      <td><img class="cursor-pointer" src="<%= meal.coverString || '/images/food_default.png'%>" style="width: 200px;" onclick="javascript:location.href='/meal/<%= meal.id%>'"><br><%= meal.title%></td>
                       <td style="vertical-align: middle;">
                         <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(1)%>">
                           <div class="rating" data-toggle="star-set" data-rate="<%= meal.score%>">
@@ -1028,7 +1028,7 @@
                     <%}%>
                   </tr>
                   <tr>
-                    <td><img src="<%= meal.coverString || '/images/food_default.png'%>" style="width: 200px;"><br><%= meal.title%></td>
+                    <td><img class="cursor-pointer" src="<%= meal.coverString || '/images/food_default.png'%>" style="width: 200px;" onclick="javascript:location.href='/meal/<%= meal.id%>'"><br><%= meal.title%></td>
                     <td style="vertical-align: middle;">
                       <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(1)%>">
                         <div class="rating" data-toggle="star-set" data-rate="<%= meal.score%>">
@@ -1102,7 +1102,7 @@
                     <%}%>
                   </tr>
                   <tr>
-                    <td><img src="<%= meal.coverString || '/images/food_default.png'%>" style="width: 200px;"><br><%= meal.title%></td>
+                    <td><img class="cursor-pointer" src="<%= meal.coverString || '/images/food_default.png'%>" style="width: 200px;" onclick="javascript:location.href='/meal/<%= meal.id%>'"><br><%= meal.title%></td>
                     <td style="vertical-align: middle;">
                       <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(1)%>">
                         <div class="rating" data-toggle="star-set" data-rate="<%= meal.score%>">
@@ -1176,7 +1176,7 @@
                     <%}%>
                   </tr>
                   <tr>
-                    <td><img src="<%= meal.coverString || '/images/food_default.png'%>" style="width: 200px;"><br><%= meal.title%></td>
+                    <td><img class="cursor-pointer" src="<%= meal.coverString || '/images/food_default.png'%>" style="width: 200px;" onclick="javascript:location.href='/meal/<%= meal.id%>'"><br><%= meal.title%></td>
                     <td style="vertical-align: middle;">
                       <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(1)%>">
                         <div class="rating" data-toggle="star-set" data-rate="<%= meal.score%>">
@@ -1265,11 +1265,11 @@
                       <td style="vertical-align: middle;">$<%= dish.price.toFixed(2)%></td>
                       <td style="vertical-align: middle;"><%= dish.numberOfReviews%></td>
                       <td style="vertical-align: middle;">
-                        <!--<a href="#">加数量</a><br/>-->
                         <a href="/dish/<%= dish.id%>?edit=true"><%= __('modify')%></a><br/>
-                        <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:deleteDish" data-argument="<%= dish.id%>"><%= __('delete')%></a><br/>
+                        <a href="javascript:void(0)" data-toggle="alert-button" data-container="#mydish" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:deleteDish" data-error-container="#dish-error-<%= i%>"  data-argument="<%= dish.id%>"><%= __('delete')%></a><br/>
                       </td>
                     </tr>
+                    <tr><td colspan="6" data-toggle="alert" id="dish-error-<%= i%>" class="alert alert-warning"></td></tr>
                     </tbody>
                     <%}}%>
 
@@ -1362,7 +1362,7 @@
                     <div class="fileinput-new thumbnail">
                       <img class="cursor-pointer" src="/images/upload_default.png" onclick="$('storyUpload').trigger('click')">
                     </div>
-                    <div class="fileinput-preview fileinput-exists thumbnail" style="max-height: 275px;" data-src="<%= user.host.picture%>">
+                    <div class="fileinput-preview fileinput-exists thumbnail" style="max-height: 275px;" data-src="<%= user.host.picture || '/images/upload_default.png'%>">
                       <img class="cursor-pointer" src="<%= user.host.picture ? user.host.picture : '/images/upload_default.png'%>" style="max-height: 265px;" onclick="$('#storyUpload').trigger('click')">
                     </div>
                     <div>

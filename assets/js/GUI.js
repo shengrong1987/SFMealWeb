@@ -291,93 +291,6 @@ function tapController(){
   }
 }
 
-function addRemoveDish(meal_id, dish_id, remove){
-  var method = remove ? "DELETE" : "POST"
-  var dishSelector = $("#dish-selector");
-  $.ajax({
-    url : "/meal/" + meal_id + "/dishes/" + dish_id,
-    type : method,
-    success : function(){
-
-    },
-    error : function(err){
-      dishSelector.find(".alert").show();
-      dishSelector.find(".alert").html(err);
-    }
-  });
-}
-
-function dishListHandler(add,item,remoteData){
-  var form = $("#edit-meal-form");
-  var dishSelector = $("#dish-selector");
-  var dishList = dishSelector.find("#dishList");
-  var id = item.data("id");
-  var meal_id = form.data("meal-id");
-  dishList.find("li").each(function(){
-    if($(this).data("id")==id){
-      if(add){
-        $(this).addClass("select");
-        if(remoteData){
-          addRemoveDish(meal_id,id,false);
-        }
-      }else{
-        $(this).removeClass("select");
-        item.remove();
-        if(remoteData){
-          addRemoveDish(meal_id,id,true);
-        }
-      }
-    }
-  });
-}
-
-function dishSelectorSetup(){
-  var dishSelector = $("#dish-selector");
-  var remoteData = $("#edit-meal-form").length > 0;
-  if(dishSelector.length > 0){
-    dishSelector.find("#dishList li").click(function(){
-      if($(this).hasClass("select")){
-        $(this).removeClass("select");
-        var id = $(this).data("id");
-        var obj = {id : id};
-        existDishHandler(false,obj,remoteData);
-      }else{
-        $(this).addClass("select");
-        var title = $(this).find("a[name='title']").text();
-        var id = $(this).data("id");
-        var obj = {title : title, id : id};
-        existDishHandler(true,obj,remoteData);
-      }
-    });
-  }
-
-  function existDishHandler(add,obj,remoteData){
-    var form = $("#edit-meal-form");
-    var meal_id = form.data("meal-id");
-    var dishSelector = $("#dish-selector");
-    var dishSelected = dishSelector.find("#dishSelected");
-    if(add){
-      var title = obj.title;
-      var id = obj.id;
-      var li = '<li class="row" data-toggle="manipulate-item" data-id="' + id + '"> <div class="col-xs-3">&nbsp;<i class="manipulate-button fa fa-star text-grey cursor-pointer" data-type="feature"></i>&nbsp;<i class="manipulate-button fa fa-camera text-grey cursor-pointer" data-type="cover"></i><label name="title">' + title + '</label></div><div class="col-xs-1"><i class="fa fa-close cursor-pointer" style="margin-left:10px;" onclick="javascript:dishListHandler(false,$(this).parent().parent())"></i></div> <div class="col-xs-5 vertical-align" style="height:52px;padding-top: -10px;"> <div class="input-group amount-input" data-toggle="amount-input"> <div class="input-group-addon minus">-</div> <input class="form-control" type="number" placeholder="1" value="1" style="min-width: 75px;"> <div class="input-group-addon add">+</div> </div> </div><div class="col-xs-3"></div> </li>';
-      dishSelected.append(li);
-      $(document).ready(function(){
-        dishSelected.find('[data-id="' + id + '"] [data-toggle="amount-input"]').amountInput();
-        dishSelected.find('[data-toggle="manipulate-item"][data-id="' + id + '"]').manipulate();
-      });
-      if(remoteData){
-        addRemoveDish(meal_id,id,false);
-      }
-    }else{
-      var id = obj.id;
-      dishSelected.find("li[data-id='" + id + "']").remove();
-      if(remoteData){
-        addRemoveDish(meal_id,id,true);
-      }
-    }
-  }
-}
-
 function selectorSetup(){
   $("#myinfo .dishes a").each(function(){
     if($(this).data("toggle")=="dropdown"){
@@ -438,7 +351,7 @@ function setup(){
   tooltipSetup();
   //setup mutual exclusive selectors(etc. signature dish select)
   selectorSetup();
-  dishSelectorSetup();
+  // dishSelectorSetup();
   adjustLayout();
   $('[data-toggle="popover"]').popover();
   $('#meal-container').mixItUp();

@@ -33,10 +33,12 @@ module.exports = {
           var dishId = review.dish;
           var score = review.score;
           var review = review.content;
-          $this.reviewForDish(dishId, mealId, userId, hostId, orders, score, review, function(err, result){
+          var reviewModel;
+          $this.reviewForDish(dishId, mealId, user, hostId, orders, score, review, function(err, result){
             if(err){
               return next(err);
             }
+            reviewModel = result;
             next();
           });
         },function(err){
@@ -54,33 +56,36 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            return res.ok(result);
+            console.log(reviewModel);
+            return res.ok(reviewModel);
           });
         });
       }else{
         var score = req.body.score;
         var review = req.body.review;
-        $this.reviewForDish(dishId, mealId, userId, hostId, orders, score, review, function(err, review){
+        var reviewModel;
+        $this.reviewForDish(dishId, mealId, user, hostId, orders, score, review, function(err, review){
           async.each(orders, function(order,next){
             order.save(function(err,o){
               if(err){
                 return next(err);
               }
+              reviewModel = review;
               next();
             });
           },function(err){
             if(err){
-              console.log("dd:" + err);
               return res.badRequest(err);
             }
-            return res.ok(review);
+            console.log(reviewModel);
+            return res.ok(reviewModel);
           });
         });
       }
     });
   },
 
-  reviewForDish : function(dishId, mealId, userId, hostId, orders, score, content, cb){
+  reviewForDish : function(dishId, mealId, user, hostId, orders, score, content, cb){
     var isValidReview = false;
     if(mealId){
       //it's an review for a meal
@@ -115,12 +120,18 @@ module.exports = {
       console.log("Review for the meal/dish is not valid");
       return cb(Error("Review for the meal/dish is not valid"));
     }
-    Review.create({dish : dishId, meal : mealId, score : score, review : content, user : userId, host : hostId}).exec(function(err, review){
+    Dish.findOne(dishId).exec(function(err, dish){
       if(err){
         return cb(err);
       }
-      cb(null,review);
-    });
+      Review.create({dish : dishId, title : dish.title, price : dish.price, meal : mealId, score : score, review : content, user : user.id, host : hostId, username : user.firstname}).exec(function(err, review){
+        console.log(err);
+        if(err){
+          return cb(err);
+        }
+        cb(null,review);
+      });
+    })
   }
 };
 

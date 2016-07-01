@@ -665,8 +665,8 @@
   var AlertButton = function(element, options){
     this.element = $(element);
     this.options = options;
-    var myTemplate = template(this.options.title, this.options.content, this.options.actionfn, this.options.argument);
-    var container = this.element.parent();
+    var myTemplate = template(this.options);
+    var container = $(this.options.container) || this.element.parent();
     this.element.popover({
       template : myTemplate,
       container : container,
@@ -678,9 +678,9 @@
   $.fn.alertButton              = Plugin
   $.fn.alertButton.Constructor  = AlertButton
 
-  var template = function(title,content,actionFn,arg1){
-    var popover = '<div class="popover" role="tooltip"><div class="arrow"></div> <div class="text-center"><h3 class="popover-title">$title</h3> <div style="width: 200px;padding: 5px;"> <input id="popover_msg" class="form-control" type="text" name="msg" maxlength="20"></div> <button class="btn btn-info middle" data-target="#popover_msg" style="margin-bottom: 5px;" onclick="$actionFn(event)" data-order=$argument">确认</button></div></div>';
-    popover = popover.replace("$title",title).replace("$content",content).replace("$actionFn",actionFn).replace("$argument","'" + arg1 + "'");
+  var template = function(options){
+    var popover = '<div class="popover" role="tooltip"><div class="arrow"></div> <div class="text-center"><h3 class="popover-title">$title</h3> <div style="width: 200px;padding: 5px;"> <input id="popover_msg" class="form-control" type="text" name="msg" maxlength="20"></div> <button class="btn btn-info middle" data-target="#popover_msg" style="margin-bottom: 5px;" onclick="$actionFn(event)" data-error-container="$error-container" data-order=$argument">确认</button></div></div>';
+    popover = popover.replace("$title",options["title"]).replace("$content",options["content"]).replace("$actionFn",options["actionfn"]).replace("$argument","'" + options["argument"] + "'").replace("$error-container", options["errorContainer"]);
     return popover;
   }
 
@@ -948,6 +948,142 @@
     $('[data-toggle="duration-filter"]').each(function(){
       var durationFilter = $(this);
       Plugin.call(durationFilter, durationFilter.data());
+    })
+  });
+}(jQuery);
+
++function($){
+  'user strict'
+
+  var DishSelector = function(element, options){
+    this.element = element;
+    this.options = options;
+    this.element.find("#dishList li").on('click', selectHandler)
+    this.element.find("#dishSelected li [data-type='close']").on('click', selectHandler);
+  }
+
+  $.fn.dishSelector              = Plugin
+  $.fn.dishSelector.Constructor  = DishSelector
+
+  DishSelector.prototype.select = function(node){
+    this.options.isAppend = true;
+    this.options.content = node.find("a[name='title']").text();
+    var isRemote = this.options.isremote;
+    var $this = this;
+    if(isRemote){
+      this.remote(node.data("id"),function(success){
+        if(success){
+          node.addClass('select');
+          $this.render(node.data('id'));
+        }
+      });
+    }else{
+      node.addClass('select');
+      $this.render(node.data('id'));
+    }
+  }
+
+  DishSelector.prototype.remove = function(node){
+    this.options.isAppend = false;
+    this.options.content = node.find("a[name='title']").text();
+    var isRemote = this.options.isremote;
+    var $this = this;
+    if(isRemote){
+      this.remote(node.data("id"),function(success){
+        if(success){
+          node.removeClass('select');
+          $this.render(node.data('id'));
+        }
+      });
+    }else{
+      node.removeClass('select');
+      $this.render(node.data('id'));
+    }
+  }
+
+  DishSelector.prototype.render = function(dishId){
+    var isAppend = this.options.isAppend;
+    var content = this.options.content;
+    var selectedDishContainer = this.element.find("#dishSelected");
+    var selectingDishContainer = this.element.find("#dishList");
+    var mealId = this.options.mealid;
+    if(isAppend){
+      var li = '<li class="row" data-toggle="manipulate-item" data-id="' + dishId + '"> <div class="col-xs-3">&nbsp;<i class="manipulate-button fa fa-star text-grey cursor-pointer" data-type="feature"></i>&nbsp;<i class="manipulate-button fa fa-camera text-grey cursor-pointer" data-type="cover"></i><label name="title">' + content + '</label></div><div class="col-xs-1"><i class="fa fa-close cursor-pointer select" data-id="' + dishId + '" data-type="close" style="margin-left:10px;"></i></div> <div class="col-xs-5 vertical-align" style="height:52px;padding-top: -10px;"> <div class="input-group amount-input" data-toggle="amount-input"> <div class="input-group-addon minus">-</div> <input class="form-control" type="number" placeholder="1" value="1" style="min-width: 75px;"> <div class="input-group-addon add">+</div> </div> </div><div class="col-xs-3"></div> </li>';
+      $.when(selectedDishContainer.append(li)).done(function(){
+        selectedDishContainer.find("[data-type='close']").on('click', selectHandler);
+        reloadComp(dishId);
+      });
+    }else{
+      selectingDishContainer.find("li[data-id='" + dishId + "']").removeClass("select");
+      selectedDishContainer.find("li[data-id='" + dishId +  "']").remove();
+    }
+  }
+
+  DishSelector.prototype.remote = function(dishId, cb){
+    var isAppend = this.options.isAppend;
+    var alertView = this.element.find(".alert");
+    alertView.hide();
+    var mealId = this.options.mealid;
+    var requestType = this.options.isAppend ? "POST" : "DELETE";
+    var url = "/meal/" + mealId + "/dishes/" + dishId;
+    $.ajax({
+      url : url,
+      type : requestType,
+      success : function(){
+        cb(true);
+      },
+      error : function(err){
+        alertView.show();
+        alertView.html(err.responseText);
+        cb(false);
+      }
+    })
+  }
+
+  function Plugin(option, root){
+    var hasRoot = typeof root != 'undefined';
+    return this.each(function(){
+      if(!hasRoot) root = $(this);
+      var options = $.extend({}, DishSelector.DEFAULTS, root.data(), typeof option == 'object' && option);
+      var data = root.data('bs.dish-selector');
+      if(!data){
+        root.data('bs.dish-selector',(data = new DishSelector(root, options)));
+      }
+      if(typeof option == 'string'){
+        data[option]($(this));
+      }
+    });
+  }
+
+  DishSelector.DEFAULTS = {
+
+  }
+
+  var reloadComp = function(dishId) {
+    $('[data-toggle="amount-input"]').each(function(){
+      var amountInput = $(this);
+      amountInput.amountInput(amountInput.data(), amountInput);
+    });
+    $('[data-toggle="manipulate-item"][data-id="' + dishId + '"]').each(function(){
+      var manipulate = $(this);
+      manipulate.manipulate(manipulate.data(),manipulate);
+    });
+  }
+
+  var selectHandler = function(e){
+    e.preventDefault();
+    var node = $(e.currentTarget);
+    if(node.hasClass('select')){
+      Plugin.call($(this),'remove',$(this).closest('[data-toggle="dish-selector"]'));
+    }else{
+      Plugin.call($(this),'select',$(this).closest('[data-toggle="dish-selector"]'));
+    }
+  }
+
+  $(window).on('load',function(){
+    $('[data-toggle="dish-selector"]').each(function(){
+      var dishSelector = $(this);
+      Plugin.call(dishSelector, dishSelector.data());
     })
   });
 }(jQuery);

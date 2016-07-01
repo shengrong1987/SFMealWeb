@@ -183,7 +183,7 @@ describe('ReviewController', function() {
       agent
         .post('/review')
         .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
+        // .expect('Content-Type', /json/)
         .send({meal : mealId, dish : dishId2, score : 4.5, review : "Very delicious could be more",user: guestId})
         .expect(200)
         .end(function(err,res){
@@ -201,7 +201,7 @@ describe('ReviewController', function() {
       agent
         .post('/review')
         .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
+        // .expect('Content-Type', /json/)
         .send({meal : mealId, dish : dishId1, score : 5, review : "Very delicious could be more",user: guestId})
         .expect(403)
         .end(function(err,res){

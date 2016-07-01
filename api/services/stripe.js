@@ -112,7 +112,9 @@ module.exports = {
     console.log("refunding customer : " + attr.amount);
     stripe.refunds.create({
       charge : attr.id,
-      amount : attr.amount
+      amount : attr.amount,
+      reverse_transfer : true,
+      refund_application_fee : true
     },function(err,refund) {
       if(err){
         return cb(err);

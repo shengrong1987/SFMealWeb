@@ -38,7 +38,7 @@ module.exports.routes = {
   '/auth/done' : "AuthController.loginSuccess",
   '/user/me' : 'UserController.me',
   '/user/getSignedUrl' : 'UserController.calculateSignature',
-  '/user/delete' : 'UserController.deleteObject',
+  '/user/me/delete' : 'UserController.deleteObject',
   '/user/pocket' : 'UserController.pocket',
   'POST /bank' : 'HostController.createBank',
   'PUT /bank/:id' : 'HostController.updateBank',
@@ -59,7 +59,9 @@ module.exports.routes = {
   '/order/:id/abort' : 'OrderController.abort',
   '/order/:id/refund' : 'OrderController.refund',
   '/auth/resetForm' : "AuthController.resetForm",
-  "/apply" : "HostController.apply"
+  "/apply" : "HostController.apply",
+  '/host/:id/balance' : "PocketController.getHostBalance",
+  '/user/:id/balance' : "PocketController.getUserBalance"
   //'PUT /meal/:mealId/dish' : 'MealController.addNewDishes',
   //'DELETE /meal/:mealId/dish/:dishId' : 'MealController.removeDish',
   //'DELETE /meal/:mealId/dish' : 'MealController.removeAllDishes'
