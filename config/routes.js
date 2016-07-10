@@ -61,11 +61,18 @@ module.exports.routes = {
   '/auth/resetForm' : "AuthController.resetForm",
   "/apply" : "HostController.apply",
   '/host/:id/balance' : "PocketController.getHostBalance",
-  '/user/:id/balance' : "PocketController.getUserBalance"
+  '/user/:id/balance' : "PocketController.getUserBalance",
   //'PUT /meal/:mealId/dish' : 'MealController.addNewDishes',
   //'DELETE /meal/:mealId/dish/:dishId' : 'MealController.removeDish',
   //'DELETE /meal/:mealId/dish' : 'MealController.removeAllDishes'
-
+  '/email/new' : { view : 'emailTemplates/new/html', locals : {layout : 'email_layout'}},
+  '/email/cancel' : { view : 'emailTemplates/cancel/html', locals : {layout : 'email_layout'}},
+  '/email/confirm' : { view : 'emailTemplates/confirm/html', locals : {layout : 'email_layout'}},
+  '/email/cancelling' : { view : 'emailTemplates/cancelling/html', locals : {layout : 'email_layout'}},
+  '/email/adjust' : { view : 'emailTemplates/adjust/html', locals : {layout : 'email_layout'}},
+  '/email/reject' : { view : 'emailTemplates/reject/html', locals : {layout : 'email_layout'}},
+  '/email/adjusting' : { view : 'emailTemplates/adjusting/html', locals : {layout : 'email_layout'}},
+  '/email/ready' : { view : 'emailTemplates/ready/html', locals : {layout : 'email_layout'}}
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

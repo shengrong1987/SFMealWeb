@@ -264,7 +264,7 @@
     </div>
 
       <div class="col-md-4">
-        <div class="box white floater" style="position: fixed;bottom: 10px;">
+        <div class="box white floater static-floater">
           <div id="order-alert" class="alert alert-danger hide" role="alert">
             <%= __('dish-out-tips')%>
           </div>
@@ -333,6 +333,36 @@
             </tbody>
           </table>
           <button type="button" class="btn btn-red" onclick="location.href += '/confirm'"><%= __('next-step')%></button>
+
+          <div style="max-height: 200px;overflow: -moz-scrollbars-vertical;overflow: auto;">
+            <table id="confirm-order" class="table text-grey" style="margin-top: 10px;">
+              <thead class="text-left">
+              <tr><td><b><%= __('meal-orders')%></b></td></tr>
+              </thead>
+              <tbody class="text-left">
+              <%
+                if(!orders){%>
+              <tr><td><%= __('meal-orders-login-can-see')%></td></tr>
+              <%
+              }else if(orders && orders.length > 0){
+                  var index = 1;
+                  orders.forEach(function(order){%>
+                    <tr><td><%= index%>. <%= __('user')%>
+                    <%
+                      Object.keys(order).forEach(function(dishId){
+                      meal.dishes.forEach(function(dish){
+                        if(dish.id == dishId){
+                          var amount = order[dishId];
+                          if(amount>0){
+                    %>
+                      <%= dish.title%>(<%= amount%>)
+                    <%index++;
+                    }}});})})}else{ %>
+                          <tr><td><%= __('meal-no-orders')%></td></tr>
+              <%}%>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 

@@ -23,8 +23,10 @@ module.exports = {
 
   validate_meal : function(meal, orders, preorders, subtotal, res, req) {
     if(!orders || !subtotal){
-      console.log("missing order argument");
       return res.badRequest(req.__('order-empty'));
+    }
+    if(meal.status === "off"){
+      return res.badRequest(req.__('meal-not-active'));
     }
     if(meal.dateIsValid()) {
       console.log("meal is valid");
@@ -124,7 +126,7 @@ module.exports = {
     var method = req.body.method;
     var address = req.body.address;
     var pickupInfo = req.body.pickupInfo;
-    var subtotal = parseFloat(req.body.subtotal.toFixed(2));
+    var subtotal = parseFloat(req.body.subtotal);
     req.body.customer = userId;
     var $this = this;
     Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,m) {
@@ -142,6 +144,7 @@ module.exports = {
           }else{
             var delivery_fee = 0;
           }
+          delivery_fee = parseFloat(delivery_fee);
           req.body.host = m.chef.id;
           req.body.type = m.type;
           req.body.dishes = dishes;
@@ -169,7 +172,7 @@ module.exports = {
                 return res.badRequest(err);
               }
               stripe.charge({
-                amount : (subtotal + delivery_fee) * 100,
+                amount : parseInt((subtotal + delivery_fee) * 100),
                 email : email,
                 customerId : found.payment[0].customerId,
                 destination : m.chef.accountId,
@@ -246,7 +249,7 @@ module.exports = {
     var subtotal = parseFloat(params.subtotal);
     var delivery_fee = parseFloat(params.delivery_fee);
     var $this = this;
-    Order.findOne(orderId).populate("meal").populate("dishes").populate("host").exec(function(err,order){
+    Order.findOne(orderId).populate("meal").populate("dishes").populate("host").populate("customer").exec(function(err,order){
       if(err){
         return res.badRequest(err)
       }
@@ -267,7 +270,7 @@ module.exports = {
           var diff = (subtotal - order.subtotal).toFixed(2);
           console.log("adjusting amount: " + diff);
           if(diff != 0){
-            User.findOne(order.customer).populate('payment').exec(function (err, found) {
+            User.findOne(order.customer.id).populate('payment').exec(function (err, found) {
               if (err) {
                 return res.badRequest(err);
               }
@@ -461,7 +464,7 @@ module.exports = {
     var orderId = req.params.id;
     var params = req.body;
     var $this = this;
-    Order.findOne(orderId).populate("meal").populate("dishes").exec(function(err,order){
+    Order.findOne(orderId).populate("meal").populate("host").populate("dishes").populate("customer").exec(function(err,order){
       if(err){
         return res.badRequest(err)
       }
@@ -471,7 +474,7 @@ module.exports = {
       }
 
       var isHostAction = false;
-      if(hostId == order.host.id){
+      if(hostId == order.host){
         isHostAction = true;
       }
 
@@ -479,7 +482,7 @@ module.exports = {
         //can cancel without permission of host
         var amount = (order.subtotal + order.delivery_fee).toFixed(2);
         if(amount > 0){
-          User.findOne(order.customer).populate('payment').exec(function (err, found) {
+          User.findOne(order.customer.id).populate('payment').exec(function (err, found) {
             if (err || !found.payment || found.payment.length == 0) {
               return res.badRequest(err);
             }
@@ -552,7 +555,7 @@ module.exports = {
     var orderId = req.params.id;
     var params = req.body;
     var $this = this;
-    Order.findOne(orderId).populate("meal").populate("host").exec(function(err,order){
+    Order.findOne(orderId).populate("meal").populate("host").populate("customer").exec(function(err,order){
       if(err){
         return res.badRequest(err);
       }
@@ -560,7 +563,7 @@ module.exports = {
         var adjusting_subtotal = order.adjusting_subtotal;
         var adjusting_orders = order.adjusting_orders;
         var diff = (parseFloat(adjusting_subtotal) - order.subtotal).toFixed(2);
-        var customerId = order.customer;
+        var customerId = order.customer.id;
         if(diff != 0){
           User.findOne(customerId).populate('payment').exec(function (err, found) {
             if (err || !found.payment || found.payment.length == 0) {
@@ -734,7 +737,7 @@ module.exports = {
     var orderId = req.params.id;
     var params = req.body;
     var $this = this;
-    Order.findOne(orderId).exec(function(err,order){
+    Order.findOne(orderId).populate("customer").populate("host").exec(function(err,order){
       if(err){
         return res.badRequest(err);
       }
@@ -753,7 +756,7 @@ module.exports = {
   ready : function(req, res){
     var orderId = req.params.id;
     var email = req.session.user.auth.email;
-    Order.findOne(orderId).exec(function(err,order){
+    Order.findOne(orderId).populate("customer").populate("host").exec(function(err,order){
       if(err){
         return res.badRequest(err);
       }
@@ -778,7 +781,7 @@ module.exports = {
   receive : function(req, res){
     var orderId = req.params.id;
     var email = req.session.user.auth.email;
-    Order.findOne(orderId).exec(function(err,order){
+    Order.findOne(orderId).populate("customer").populate("host").exec(function(err,order){
       if(err){
         return res.badRequest(err);
       }

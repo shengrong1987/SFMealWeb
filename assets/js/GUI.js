@@ -400,15 +400,28 @@ $(window).scroll(function () {
   if($('.footer').length==0){
     return;
   }
+  var headerHeight = $('.compact-banner').height() + $("#myUserBar").height() - 3;
   var footertotop = ($('.footer').position().top);
   var footerHeight = $('.footer').height();
   var fixedElementHeight = $('.floater').height();
-  var scrolltop = $(document).scrollTop() + fixedElementHeight + 10 + 360;
+  var scrolltop = $(document).scrollTop();
   var difference = scrolltop-footertotop;
-  if (scrolltop > footertotop) {
-    $('.floater').css('bottom',  10 + difference );
-  }
-  else  {
-    $('.floater').css('bottom', 10);
+
+  console.log("scrolling height: " + scrolltop);
+  console.log("header height: " + headerHeight);
+
+  if (scrolltop + fixedElementHeight > footertotop) {
+    // $('.floater').css('top', '');
+    // $('.floater').css('top', 0);
+    // $('.floater').css('bottom',  25);
+    // $('.floater').removeClass("fix-floater");
+    // $('.floater').addClass("static-floater");
+  }else if (scrolltop > headerHeight){
+    $('.floater').removeClass("static-floater");
+    $('.floater').addClass("fix-floater");
+    $('.floater').css('top', 25);
+  }else{
+    $('.floater').removeClass("fix-floater");
+    $('.floater').addClass("static-floater");
   }
 });

@@ -31,9 +31,12 @@ module.exports.policies = {
   AuthController : {
     'login' : true,
     'register' : true,
+    'reset' : true,
     'loginSuccess' : ['sessionAuth'],
     'logout' : ['sessionAuth'],
-    'admin' : 'isAdmin'
+    'admin' : 'isAdmin',
+    'facebook_oauth2' : true,
+    'google_oauth2' : true
   },
 
   UserController : {

@@ -4,6 +4,15 @@ body{
   min-height: 550px;
 }
 
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0,0,0,.5);
+  -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
 .container{
   width: 100%;
 }
@@ -680,6 +689,12 @@ fieldset[disabled] .btn-red.active {
 
 /*nav*/
 
+.footer-nav{
+  li{
+    float: left;
+  }
+}
+
 .nav-tab-cute li a{
   color: @dark-grey;
 }
@@ -1070,6 +1085,16 @@ fieldset[disabled] .btn-red.active {
   }
 }
 
+.border-less{
+  border: none !important;
+  tr{
+    border: none !important;
+  }
+  td{
+    border: none !important;
+  }
+}
+
 /*list*/
 .selectable-list{
   padding: 0;
@@ -1192,6 +1217,14 @@ fieldset[disabled] .btn-red.active {
   overflow: hidden;
 }
 
+.box-larger-simple{
+  min-height: 20px;
+  padding: 35px;
+  background-color: #fff9f5;
+  border: none;
+  margin-right: 20px;
+  margin-left: 20px ;
+}
 
 .box-simple{
   min-height: 20px;
@@ -1248,6 +1281,19 @@ fieldset[disabled] .btn-red.active {
   padding: 5px 10px 5px 10px;
 }
 
+//position
+.fix-floater{
+  position: fixed;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.static-floater{
+  position: static;
+  width: 375px;
+  margin-left: 0;
+}
+
 
 @media (min-width: 768px){
   .mynavbar .navbar-header{
@@ -1267,7 +1313,15 @@ fieldset[disabled] .btn-red.active {
   }
 }
 
+
 @media (max-width: 992px){
+
+  .floater{
+    position: static !important;
+    width:100%;
+    margin-top: 10px;
+  }
+
   .popup {
     //margin: 70px auto;
     padding: 20px;

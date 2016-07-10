@@ -118,29 +118,71 @@ var notification = {
         notification.sendEmail(model, action, params);
       });
     }
-
   },
+
   sendEmail : function(model, action, params){
+    var recipientEmail;
+    var recipientName;
+    var template;
     if(model === "Order"){
-      if(params.isHostAction === true){
-        mailOptions.to = params.hostEmail;
+      if(params.isHostAction){
+        recipientEmail = params.hostEmail;
+        recipientName = params.host.shopName;
       }else{
-        mailOptions.to = params.guestEmail;
+        recipientEmail = params.guestEmail;
+        recipientName = params.customer.firstname;
       }
-      var content = notification.getEmailTemplate(model, action, params.id);
-      mailOptions.text = content;
-      mailOptions.html = content;
-      transporter.sendMail(mailOptions,function(err, info){
-        if(err){
-          return console.log(err);
-        }
-        console.log('Message sent: ' + info.response);
+      switch(action){
+        case "new":
+          template = "new";
+          break;
+        case "adjust":
+          template = "adjust";
+          break;
+        case "adjusting":
+          template = "adjusting";
+          break;
+        case "cancel":
+          template = "cancel";
+          break;
+        case "cancelling":
+          template = "cancelling";
+          break;
+        case "abort":
+          template = "cancel";
+          break;
+        case "confirm":
+          template = "confirm";
+          break;
+        case "ready":
+          template = "ready";
+          break;
+        case "reject":
+          template = "reject";
+          break;
+        case "review":
+          template = "review";
+          break;
+        default:
+          template = "adjust";
+          break;
+      }
+      //juice it using email-template
+
+      sails.hooks.email.send(template,{
+        recipientName : recipientName,
+        senderName : "SFMeal.com",
+        id : params.id,
+        lastStatus : params.lastStatus,
+        layout : 'email_layout'
+      },{
+        to : recipientEmail,
+        subject : "SFMeal.com"
+      },function(err){
+
+        console.log(recipientEmail, err || "It worked!");
       })
     }
-  },
-
-  getEmailTemplate : function(model, action, id){
-    return model + ": " + id + " " + action;
   }
 }
 

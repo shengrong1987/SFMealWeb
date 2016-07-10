@@ -63,7 +63,7 @@ var TableItem = React.createClass({
         var attrs = col.split('.');
         if(attrs.length == 1){
           var rowContent = item[col];
-          if(rowContent){
+          if(rowContent || col === 'command'){
             if(col === 'command'){
               switch(this.props.model){
                 case "Dish":

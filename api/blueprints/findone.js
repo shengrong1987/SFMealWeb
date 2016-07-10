@@ -49,8 +49,7 @@ module.exports = function findOneRecord (req, res) {
 
     if(req.wantsJSON){
      res.ok(matchingRecord);
-    }else
-    if(Model.adapter.identity == "meal"){
+    }else if(Model.adapter.identity == "meal"){
       if(isEditMode){
         matchingRecord.userId = user.id;
         Host.findOne(hostId).populate("dishes").exec(function(err,host){
@@ -67,10 +66,18 @@ module.exports = function findOneRecord (req, res) {
             if(err){
               return res.badRequest(err);
             }
-            res.view('meal',{meal : matchingRecord, user : user});
+            Order.find({meal : matchingRecord.id, status : ["schedule","preparing"]}).exec(function(err, orders){
+              if(err){
+                return res.badRequest(err);
+              }
+              orders = orders.map(function(order){
+                return order.orders;
+              });
+              res.view('meal',{meal : matchingRecord, user : user, orders : orders});
+            });
           });
         }else{
-          res.view('meal',{meal : matchingRecord, user : undefined});
+          res.view('meal',{meal : matchingRecord, user : undefined, orders : null});
         }
       }
     }else if(Model.adapter.identity == "user"){
