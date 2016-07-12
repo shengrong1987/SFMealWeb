@@ -4,7 +4,7 @@
       <div style="width: 600px;" class="middle banner-text">
         <div class="row vertical-align" style="margin-bottom: 5px;">
           <div class="col-xs-3 cursor-pointer" onclick="location.href='/'">
-            <a href="/" class="logo"></a>
+            <a href="/" class="logo-remote"></a>
           </div>
           <div class="col-xs-9 text-right">
             <button class="btn btn-danger" onclick="location.href='http://www.sfmeal.com'">进入网站</button>
@@ -75,31 +75,4 @@
     </div>
   </div>
 </div>
-
-<div class="footer text-center">
-  <!--<h5></h5>-->
-  <div class="row">
-    <div class="middle" style="width: 386px;">
-      <div class="navbar navbar-inverse" style="background:none;border:none;margin-top: 20px;">
-        <ul class="nav navbar-nav footer-nav">
-          <li><a href="https://www.facebook.com/SFMeal/"><i class="fa fa-facebook-f fa-2x"></i></a></li>
-          <li><a href="javascript:void(0)"><i class="icon-dot text-red" style="font-size: 30px;"></i></a> </li>
-          <li><a href="https://www.instagram.com/sfmeal/"><i class="fa fa-instagram fa-2x"></i></a></li>
-          <li><a href="javascript:void(0)"><i class="icon-dot text-red" style="font-size: 30px;"></i></a> </li>
-          <li><a href="https://www.pinterest.com/sfmeal/"><i class="fa fa-pinterest-p fa-2x"></i></a></li>
-          <li><a href="javascript:void(0)"><i class="icon-dot text-red" style="font-size: 30px;"></i></a> </li>
-          <li><a href="https://twitter.com/sfmeal"><i class="fa fa-twitter fa-2x"></i></a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <h5><a href="javascript:void(0)" class="text-grey"><%= __('footer-bar-contact')%></a></h5>
-  </div>
-
-  <div class="row">
-    <h5 class="text-white"> <%= __('footer-bar-info')%></h5>
-  </div>
-
-</div>
+<%- include ../email_footer %>

@@ -46,7 +46,9 @@
     "browserify": "^9.0.4",
     "jquery": "^2.1.3",
     "email-templates" : "~2.3.2",
-    "less" : "~v2.6.1"
+    "less" : "~v2.6.1",
+    "sails-hook-email" : "~v0.12.1",
+    "email-templates" : "~2.3.2 "
   },
   "scripts": {
     "debug": "node debug app.js",

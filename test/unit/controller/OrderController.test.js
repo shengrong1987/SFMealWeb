@@ -52,6 +52,10 @@ describe('OrderController', function() {
           .get('/meal')
           .expect(200)
           .end(function(err,res){
+            if(err){
+              console.log(err);
+              return done(err);
+            }
             if(res.body.meals.length == 0){
               return done(Error("error getting any meal"));
             }

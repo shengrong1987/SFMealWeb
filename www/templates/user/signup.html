@@ -1,0 +1,227 @@
+<div id="registerView" class="step-container">
+  <div class="alert alert-warning hide">
+    <strong>注意！</strong> 此邮箱已存在.
+  </div>
+  <div id="step1" class="container-fluid text-center step">
+    <div class="popup box middle" style="width: 350px;">
+      <h2></h2>
+
+      <button id="FBBtn" class="popline btn btn-info btn-lg round blue light">
+        <span><i class="fa fa-facebook-f fa" style="padding-right: 15px;"></i>Facebook 账号登录</span>
+      </button>
+
+      <h4></h4>
+
+      <button id="GoogleBtn" class="popline btn btn-default btn-lg outline round text-orange">
+        <span><i class="fa fa-google-plus fa" style="padding-right: 10px;"></i>Google 账号登录</span>
+      </button>
+
+      <h4 class="text-center">
+        <small>------------------或者------------------</small>
+      </h4>
+
+      <button class="popline btn btn-lg btn-danger round red light next-step" data-step="1" onclick="nextStep(event)">
+        邮箱注册
+      </button>
+
+      <h6 class="text-center">我想注册，並同意SFMeal的《用户使用协议》。</h6>
+
+      <span class="divider popline"></span>
+
+      <h6>已经是我们一员？请点击这里<a toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)">登录</a></h6>
+    </div>
+  </div>
+
+  <div id="step2" class="container-fluid text-center hide step">
+    <div class="popup box middle" style="width: 400px;">
+      <h3 class="text-center">
+        <small>可以用<a href="#" class="last-step" data-step="2" onclick="lastStep(event)">Facebook</a>账号或者<a href="#" class="last-step" data-step="2" onclick="lastStep(event)">Google</a>账号注册哦。</small>
+      </h3>
+
+      <h4 class="text-center">
+        <small>------------------或者------------------</small>
+      </h4>
+
+      <form class="text-center" data-toggle="validator" role="form">
+        <div class="form-group">
+          <label class="sr-only" for="lastnameInput">贵姓</label>
+          <input type="text" data-maxLength="15" class="form-control" id="lastnameInput" placeholder="贵姓?" required data-error="姓不得长于15位">
+        </div>
+
+        <div class="form-group">
+          <label class="sr-only" for="firstnameInput">名字</label>
+          <input type="text" data-maxLength="15" class="form-control" id="firstnameInput" placeholder="大名?" required data-error="名字不得长于15位">
+        </div>
+
+        <div class="form-group">
+          <label class="sr-only" for="emailInput">邮箱</label>
+          <input type="email" class="form-control" id="emailInput" placeholder="邮箱?" data-error="邮箱格式不正确" required>
+          <div class="help-block with-errors"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="sr-only" for="passwordInput">密码</label>
+          <input type="password" data-minLength="8" class="form-control" id="passwordInput" placeholder="密码?" data-error="请输入密码" required>
+          <span class="help-block">密码至少8位数</span>
+        </div>
+
+        <div class="form-group">
+          <label class="sr-only" for="passwordInput">密码</label>
+          <input type="password" data-minLength="8" class="form-control" id="passwordConfirmInput" data-match="#passwordInput" data-error="密码至少8位数" data-match-error="密码不匹配" placeholder="请再次输入密码" required>
+          <div class="help-block with-errors"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="sr-only" for="phoneInput">手机</label>
+          <input type="text" data-minLength="10" data-maxLength="12" class="form-control" id="phoneInput" placeholder="手机?" data-error="手机号码格式不正确" required>
+          <div class="help-block with-errors"></div>
+        </div>
+
+        <div class="form-group">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" id="receivedEmailInput" checked="checked"> 我通过邮箱来接受SFMeal的最新消息和优惠。
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="birthdayInput">什么时候生日哇？</label>
+          <div>
+            <select id="bMonthInput" class="form-control" required>
+              <option>01</option>
+              <option>02</option>
+              <option>03</option>
+              <option>04</option>
+              <option>05</option>
+              <option>06</option>
+              <option>07</option>
+              <option>08</option>
+              <option>09</option>
+              <option>10</option>
+              <option>11</option>
+              <option>12</option>
+            </select>
+            <select id="bDayInput"  class="form-control" required>
+              <option>01</option>
+              <option>02</option>
+              <option>03</option>
+              <option>04</option>
+              <option>05</option>
+              <option>06</option>
+              <option>07</option>
+              <option>08</option>
+              <option>09</option>
+              <option>10</option>
+              <option>11</option>
+              <option>12</option>
+              <option>13</option>
+              <option>14</option>
+              <option>15</option>
+              <option>16</option>
+              <option>17</option>
+              <option>18</option>
+              <option>19</option>
+              <option>20</option>
+              <option>21</option>
+              <option>21</option>
+              <option>22</option>
+              <option>23</option>
+              <option>24</option>
+              <option>25</option>
+              <option>26</option>
+              <option>27</option>
+              <option>28</option>
+              <option>29</option>
+              <option>30</option>
+              <option>31</option>
+            </select>
+            <select id="bYearInput" class="form-control" required>
+              <option>1950</option>
+              <option>1951</option>
+              <option>1952</option>
+              <option>1953</option>
+              <option>1954</option>
+              <option>1955</option>
+              <option>1956</option>
+              <option>1957</option>
+              <option>1958</option>
+              <option>1959</option>
+              <option>1960</option>
+              <option>1961</option>
+              <option>1962</option>
+              <option>1963</option>
+              <option>1964</option>
+              <option>1965</option>
+              <option>1966</option>
+              <option>1967</option>
+              <option>1968</option>
+              <option>1969</option>
+              <option>1970</option>
+              <option>1971</option>
+              <option>1972</option>
+              <option>1973</option>
+              <option>1974</option>
+              <option>1975</option>
+              <option>1976</option>
+              <option>1977</option>
+              <option>1978</option>
+              <option>1979</option>
+              <option>1980</option>
+              <option>1981</option>
+              <option>1982</option>
+              <option>1983</option>
+              <option>1984</option>
+              <option>1985</option>
+              <option>1986</option>
+              <option>1987</option>
+              <option>1988</option>
+              <option>1989</option>
+              <option>1990</option>
+              <option>1991</option>
+              <option>1992</option>
+              <option>1993</option>
+              <option>1994</option>
+              <option>1995</option>
+              <option>1996</option>
+              <option>1997</option>
+
+              <option>1998</option>
+              <option>1999</option>
+              <option>2000</option>
+              <option>2001</option>
+              <option>2002</option>
+              <option>2003</option>
+              <option>2004</option>
+              <option>2005</option>
+              <option>2006</option>
+              <option>2007</option>
+              <option>2008</option>
+              <option>2009</option>
+              <option>2010</option>
+              <option>2011</option>
+              <option>2012</option>
+              <option>2013</option>
+              <option>2014</option>
+            </select>
+          </div>
+
+        </div>
+        <div class="form-group">
+          <button id="register-btn" type="submit" class="btn btn-danger btn-lg round red popline">注册</button>
+        </div>
+      </form>
+
+      <h6 class="text-center">我想注册，並同意SFMeal的《用户使用协议》。</h6>
+      <span class="divider popline"></span>
+      <h6>已经是我们一员？请点击这里<a toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)">登录</a></h6>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+  $("#register-email-form").validator({});
+  new RegisterView({el : $("#registerView"), model : new Auth()});
+</script>

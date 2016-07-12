@@ -1,3 +1,10 @@
+@remoteHost : "http://ec2-52-39-170-17.us-west-2.compute.amazonaws.com:1337";
+@sfmeal_logo : %("%s/images/sfmeal_logo.png", @remoteHost);
+@fa-facebook : %("%s/images/fa-facebook.png", @remoteHost);
+@fa-instagram : %("%s/images/fa-instagram.png", @remoteHost);
+@fa-pinterest : %("%s/images/fa-pinterest.png", @remoteHost);
+@fa-twitter : %("%s/images/fa-twitter.png", @remoteHost);
+
 body{
   //font-style: normal;
   //font-family: Arial;
@@ -191,8 +198,28 @@ input:focus{
   text-align: center;
 }
 
+.fa-facebook-remote{
+  background-image: url("@{fa-facebook}");
+  background-size: 16px,28px;
+}
+
+.fa-instagram-remote{
+  background-image: url("@{fa-instagram}");
+  background-size: 16px,28px;
+}
+
+.fa-pinterest-remote{
+  background-image: url("@{fa-pinterest}");
+  background-size: 16px,28px;
+}
+
+.fa-twitter-remote{
+  background-image: url("@{fa-twitter}");
+  background-size: 16px,28px;
+}
+
 .logo{
-  background-image: url(/images/sfmeal_logo.png);
+  background-image: url(../images/sfmeal_logo.png);
   display: block;
   position: relative;
   left: 50px;
@@ -201,6 +228,10 @@ input:focus{
   height: 60px;
   background-size: 225px 60px;
   .cursor-pointer;
+}
+
+.logo-remote{
+  background-image: url("@{sfmeal_logo}");
 }
 
 .logo-sm{

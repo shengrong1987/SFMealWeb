@@ -174,7 +174,8 @@ var notification = {
         senderName : "SFMeal.com",
         id : params.id,
         lastStatus : params.lastStatus,
-        layout : 'email_layout'
+        layout : '../email_layout',
+        filename : '/emailTemplate'
       },{
         to : recipientEmail,
         subject : "SFMeal.com"

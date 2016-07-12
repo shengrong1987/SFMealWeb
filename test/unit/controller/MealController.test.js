@@ -233,6 +233,9 @@ describe('MealController', function() {
         .send({address:address})
         .expect(200)
         .end(function(err,res){
+          if(err){
+            return done(err);
+          }
           if(res.body.city != "San Francisco"){
             return done(Error("error geocoding or updating address"));
           }

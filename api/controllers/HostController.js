@@ -97,6 +97,7 @@ module.exports = {
       var actual_address = params.address.street + params.address.city + ", " + params.address.zip;
       require('../services/geocode').geocode(actual_address,function(err,result){
         if(err){
+          console.log(err);
           return res.badRequest(req.__('meal-error-address'));
         }else{
           if(result.length == 0){

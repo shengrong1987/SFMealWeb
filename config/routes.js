@@ -69,7 +69,7 @@ module.exports.routes = {
   '/email/cancel' : { view : 'emailTemplates/cancel/html', locals : {layout : 'email_layout'}},
   '/email/confirm' : { view : 'emailTemplates/confirm/html', locals : {layout : 'email_layout'}},
   '/email/cancelling' : { view : 'emailTemplates/cancelling/html', locals : {layout : 'email_layout'}},
-  '/email/adjust' : { view : 'emailTemplates/adjust/html', locals : {layout : 'email_layout'}},
+  '/email/adjust' : { view : 'emailTemplates/adjust/html', locals : {layout : false}},
   '/email/reject' : { view : 'emailTemplates/reject/html', locals : {layout : 'email_layout'}},
   '/email/adjusting' : { view : 'emailTemplates/adjusting/html', locals : {layout : 'email_layout'}},
   '/email/ready' : { view : 'emailTemplates/ready/html', locals : {layout : 'email_layout'}}

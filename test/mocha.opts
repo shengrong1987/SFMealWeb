@@ -2,3 +2,4 @@
  * Created by shengrong on 11/19/15.
  */
 --recursive
+--timeout 8s
