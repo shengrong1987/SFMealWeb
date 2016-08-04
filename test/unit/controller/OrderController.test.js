@@ -103,7 +103,14 @@ describe('OrderController', function() {
       dishObj[dishId4] = 0;
       agent
           .post('/order')
-          .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, pickupInfo : { location : address, from : new Date(), to : new Date()}, phone : phone, method : "pickup", mealId : mealId, delivery_fee : 0})
+          .send({
+            orders : dishObj,
+            subtotal : price1 * 1 + price2 * 2,
+            pickupOption : 1,
+            phone : phone,
+            method : "pickup",
+            mealId : mealId,
+            delivery_fee : 0})
           .expect(200)
           .end(function(err,res){
             if(err){

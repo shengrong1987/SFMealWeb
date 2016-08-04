@@ -360,8 +360,9 @@ describe('MealController', function() {
             orders : orders,
             subtotal : subtotal,
             address : address1.street + address1.city + "CA" + address1.zip,
-            method : "delivery",
+            method : "pickup",
             mealId : preorderMealId,
+            pickupOption : 1,
             phone : address1.phone,
             delivery_fee : 0,
             eta : new Date()

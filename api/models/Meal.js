@@ -18,6 +18,10 @@ module.exports = {
       type : 'string',
       enum : ['on','off']
     },
+    isScheduled : {
+      type : 'boolean',
+      defaultsTo : false
+    },
     /*
       Array of object
      Date pickupFromTime,
@@ -149,7 +153,7 @@ module.exports = {
       var provideTillTime = params.provideTillTime;
       if(provideFromTime >= provideTillTime){
         return false;
-      }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 60){
+      }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
         return false;
       }
       var valid = true;

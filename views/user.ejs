@@ -776,23 +776,6 @@
                     <div class="color-block pink" data-color="pink"></div>
                     <div class="color-block purple" data-color="purple"></div>
                     <div class="color-block black" data-color="black"></div>
-                    <script>
-                      $("div[name='template_color'] div").click(function(){
-                        $("div[name='template_color'] div").removeClass("active");
-                        $(this).addClass("active");
-                        $("div[name='template_color']").data("color",$(this).data("color"));
-                      });
-                      var colorSelector = $("div[name='template_color']");
-                      var color = colorSelector.data('color');
-                      if(color && colorSelector.length > 0) {
-                        colorSelector.find("div").each(function () {
-                          $(this).removeClass('active');
-                          if ($(this).hasClass(color)) {
-                            $(this).addClass('active');
-                          }
-                        })
-                      };
-                    </script>
                   </div>
                 </div>
 
@@ -807,7 +790,7 @@
               <div class="col-md-6">
                 <div class="form-group text-left">
                   <label for="phoneInput">5. <%= __('phone')%></label>
-                  <input class="form-control" type="text" id="phoneInput" required data-error="<%= __('phone-bad-format')%>" minlength="10" maxlength="11" value="<%= user.phone || ''%>">
+                  <input class="form-control" id="phoneInput" type="tel" required data-error="<%= __('phone-bad-format')%>" value="<%= user.phone || ''%>">
                   <div class="help-block with-errors"></div>
                 </div>
               </div>

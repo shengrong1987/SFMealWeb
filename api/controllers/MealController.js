@@ -186,46 +186,30 @@ module.exports = {
     var mealId = req.param("id");
     var user = req.session.user;
     var isAdmin = user.auth.email === 'admin@sfmeal.com';
-    Order.find({meal : mealId}).exec(function(err,orders){
+    var $this = this;
+    Order.find({meal : mealId, status : { '!' : ['complete','review','cancel']}}).exec(function(err,orders){
       if(err){
         return res.badRequest(err);
       }
-      if(orders.length == 0){
-        Meal.update({id : mealId},{status : "off"}).exec(function(err, meal){
-          if(err){
-            return res.badRequest(err);
-          }
-          if(isAdmin){
-            return res.ok(meal);
-          }
-          return res.redirect("/host/me#mymeal");
-        });
-      }else{
-        var hasActiveOrder = false;
-        orders.forEach(function(order){
-          if(order.status != "complete" && order.status != "cancel"){
-            hasActiveOrder = true;
-          }
-        });
-        if(hasActiveOrder){
-          return res.badRequest(req.__('meal-active-error'));
-        }
-        Meal.findOne(mealId).exec(function(err, meal){
-          if(err){
-            return res.badRequest(err);
-          }
-          meal.status = "off";
-          meal.save(function(err, result){
-            if(err){
-              return res.badRequest(err);
-            }
-            if(isAdmin){
-              return res.ok(result);
-            }
-            return res.redirect("/host/me#mymeal");
-          });
-        });
+
+      if(orders.length > 0) {
+        return res.badRequest(req.__('meal-active-error'));
       }
+
+      Meal.update({id : mealId},{status : "off", isSchedule : false}).exec(function(err, meal){
+        if(err){
+          return res.badRequest(err);
+        }
+        if($this.cancelMealJobs( mealId, function(err){
+          if(err){
+            return res.badRequest(err);
+          }
+          if(isAdmin) {
+            return res.ok(meal);
+          }return res.redirect("/host/me#mymeal");
+        }));
+      });
+
     });
   },
 
@@ -369,6 +353,26 @@ module.exports = {
     }
   },
 
+  add : function(req, res){
+    var mealId = req.param('parentid');
+    var dishId = req.param('id');
+    Meal.findOne(mealId).populate('dishes').exec(function(err, meal){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(meal.status == 'on'){
+        return res.badRequest(req.__('meal-active-update-dish'));
+      }
+      meal.dishes.add(dishId);
+      meal.save(function(err, result){
+        if(err){
+          return res.badRequest(err);
+        }
+        return res.ok({});
+      });
+    });
+  },
+
   remove : function(req, res){
     var mealId = req.param('parentid');
     var dishId = req.param('id');
@@ -377,7 +381,7 @@ module.exports = {
         return res.badRequest(err);
       }
       if(meal.status == 'on'){
-        return res.badRequest(req.__('meal-active-delete-dish'));
+        return res.badRequest(req.__('meal-active-update-dish'));
       }
       if(meal.dishes.filter(function(dish){
         return dish.id != dishId;
@@ -396,13 +400,23 @@ module.exports = {
 
   update : function(req, res){
     var mealId = req.param("id");
+    var status = req.body.status;
     if(this.dateIsValid(req.body)){
       if(this.requirementIsValid(req.body)){
-        Meal.update({id : mealId}, req.body).exec(function(err, meal){
+        Meal.findOne(mealId).populate("dishes").exec(function(err,meal){
           if(err){
             return res.badRequest(err);
           }
-          res.ok(meal);
+          if(status == "on" && !meal.dishIsValid()){
+            console.log("meal contain unverified dishes");
+            return res.badRequest(req.__('meal-unverify-dish'));
+          }
+          Meal.update({id : mealId}, req.body).exec(function(err, result){
+            if(err){
+              return res.badRequest(err);
+            }
+            return res.ok(result);
+          });
         });
       }else{
         console.log("meal minimal requirement are not valid");
@@ -452,7 +466,7 @@ module.exports = {
     var provideTillTime = params.provideTillTime;
     if(provideFromTime >= provideTillTime){
       return false;
-    }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 60){
+    }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
       return false;
     }
     var valid = true;
@@ -476,6 +490,16 @@ module.exports = {
       });
     }
     return valid;
+  },
+
+  cancelMealJobs : function(mealId, cb){
+    Jobs.cancel({'data.mealId' : mealId}, function(err, numberRemoved){
+      if(err){
+        return cb(err);
+      }
+      console.log(numberRemoved + " meal jobs removed");
+      return cb();
+    })
   }
 
   //To test after finishing review model

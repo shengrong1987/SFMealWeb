@@ -39,6 +39,10 @@ input:hover{
 input:focus{
   border: solid 1px @orange !important;
 }
+//tooltip
+.tooltip-inner {
+  text-align: left;
+}
 //margin,divider,seperator
 .divider {
   height: 1px;
@@ -185,6 +189,21 @@ input:focus{
 }
 .pagination-green .active a{
   color : @white !important;
+}
+
+/*image*/
+.item-image {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 75%; /* here the desired aspect ratio */
+}
+.item-image img {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
 }
 
 /*logo*/
@@ -356,7 +375,7 @@ input:focus{
 }
 
 .text-shadow{
-  text-shadow: 1px 1px #FF0000 !important;
+  text-shadow: 1px 1px 1px @grey !important;
 }
 
 .text-yellow{

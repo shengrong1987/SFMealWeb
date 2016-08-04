@@ -64,6 +64,18 @@ module.exports = {
         break;
     }
     return month;
+  },
+  oneHourBefore : function(date){
+    var mDate = moment(date).subtract(1, 'hour');
+    return mDate._d;
+  },
+  oneDayBefore : function(date){
+    var mDate = moment(date).subtract(1, 'day');
+    return mDate._d;
+  },
+  minutesBefore : function(date, minutes){
+    var mDate = moment(date).subtract(minutes, 'minute');
+    return mDate._d;
   }
 };
 

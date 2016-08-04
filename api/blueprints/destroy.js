@@ -42,7 +42,13 @@ module.exports = function destroyOneRecord (req, res) {
       if(Model.adapter.identity == "dish"){
         return res.redirect("/host/me#mydish");
       }else if(Model.adapter.identity == "meal"){
-        return res.redirect("/host/me#mymeal");
+        Jobs.cancel({ 'data.mealId' : record.id}, function(err, numberRemoved){
+          if(err){
+            console.log(err);
+          }
+          console.log(numberRemoved + "meal jobs removed");
+          return res.redirect("/host/me#mymeal");
+        });
       }
       return res.ok(record);
     });

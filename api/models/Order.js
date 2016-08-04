@@ -11,6 +11,10 @@ module.exports = {
     index: {
       type: 'string'
     },
+    isScheduled : {
+      type : 'boolean',
+      defaultsTo : false
+    },
     type: {
       type: 'string',
       enum: ['order', 'preorder'],
@@ -62,6 +66,9 @@ module.exports = {
       type: 'string',
       enum: ['pickup', 'delivery'],
       defaultsTo: 'delivery'
+    },
+    pickupOption : {
+      type : 'integer'
     },
     pickupInfo : {
       type : 'json'

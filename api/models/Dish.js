@@ -21,6 +21,9 @@ module.exports = {
       defaultsTo : "",
       maxLength : 200
     },
+    quantity : {
+      type : 'string'
+    },
     photos : {
       type : 'json',
       required : true
@@ -42,7 +45,8 @@ module.exports = {
       defaultsTo : 5.0
     },
     prepareTime : {
-      type: 'datetime'
+      type: 'integer',
+      defaultsTo : 30
     },
     chef : {
       model : 'Host'

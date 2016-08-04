@@ -24,90 +24,131 @@ var mailOptions = {
 };
 
 var notification = {
-  notificationCenter : function(model, action, params, isHostAction, isAdminAction){
+  /*
+    publish event method
+    @params
+    model : the event model
+    action : the action of the event
+    params : model data
+    isSendToHost : if the event is sent to host
+    isAdminAction : if the event is post by admin
+   */
+  notificationCenter : function(model, action, params, isSendToHost, isAdminAction){
+
+    isSendToHost = isSendToHost || false;
+    isAdminAction = isAdminAction || false;
+
+    this.publishEvent(model, action, params, isSendToHost, isAdminAction);
+
+    if(isAdminAction){
+      //send emails to both chef and guest as it's modified by admin
+      params.isSendToHost = true;
+      notification.sendEmail(model, action, params);
+      params.isSendToHost = false;
+      notification.sendEmail(model, action, params);
+    }
+    else{
+      params.isSendToHost = isSendToHost;
+      notification.sendEmail(model, action, params);
+    }
+  },
+
+  sendEmail : function(model, action, params){
+
+    var basicInfo = this.inquireBasicInfo(params.isSendToHost, params);
+    var template = this.inquireTemplate(model,action);
+
+    //juice it using email-template
+    sails.hooks.email.send(template,{
+      recipientName : basicInfo.recipientName,
+      senderName : "SFMeal.com",
+      id : params.id,
+      lastStatus : params.lastStatus,
+      layout : '../email_layout',
+      filename : '/emailTemplate'
+    },{
+      to : basicInfo.recipientEmail,
+      subject : "SFMeal.com"
+    },function(err){
+
+      console.log(basicInfo.recipientEmail, err || "It worked!");
+    })
+  },
+
+  publishEvent : function(model, action, params, isSendToHost, isAdminAction){
     var verb = "updated";
     if(model === "Order"){
       switch(action){
         case "new":
-          isHostAction = true;
           Order.publishCreate({id : params.id, host : params.host});
           verb = "created";
           break;
         case "adjust":
-          isHostAction = !isHostAction;
           Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
           break;
         case "adjusting":
-          isHostAction = true;
-          action = "requested for adjust";
           Order.publishUpdate( params.id, { id : params.id, action : "requested for adjust", host : params.host});
           break;
         case "cancel":
-          isHostAction = !isHostAction;
           verb = "destroyed";
           Order.publishDestroy( params.id, undefined, {host : params.host} );
           break;
         case "abort":
-          isHostAction = false;
           verb = "destroyed";
           Order.publishDestroy( params.id, undefined, {host : params.host} );
           break;
         case "cancelling":
-          isHostAction = true;
-          action = "requested for cancel";
           Order.publishUpdate( params.id, { id : params.id, action : "requested for cancel", host : params.host});
           break;
         case "confirm":
-          isHostAction = false;
           Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
           break;
         case "ready":
-          isHostAction = false;
           Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
           break;
         case "receive":
-          isHostAction = false;
           Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
           break;
         case "reject":
-          isHostAction = false;
-          action = "changes are rejected";
           Order.publishUpdate( params.id, { id : params.id, action : "changes are rejected", host : params.host});
           break;
+        case "reminder":
+          Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
+          break;
         case "review":
-          isHostAction = true;
-          action = "has an new review!";
           Order.publishUpdate( params.id, { id : params.id, action : "has an new review!", host : params.host});
           break;
       }
-      params.isHostAction = isHostAction;
+    }else if(model == "Meal"){
+      switch(action){
+        case "scheduleEnd":
+          Meal.publishUpdate( params.id, { id : params.id, action: "Your meal book time is over", host: params.host });
+          break;
+        case "start":
+          Meal.publishUpdate( params.id, { id : params.id, action: "Your meal will start in 10 minutes.", host: params.host });
+          break;
+      }
     }
+
     if(isAdminAction){
       Notification.create({ recordId : params.id, host : params.host, action : action, model : model, verb : verb }).exec(function(err, noti){
         if(err){
           console.log(err);
           return;
         }
-        params.isHostAction = true;
-        notification.sendEmail(model, action, params);
       });
       Notification.create({ recordId : params.id, user : params.customer, action : action, model : model, verb : verb}).exec(function(err, noti){
         if(err){
           console.log(err);
           return;
         }
-        params.isHostAction = false;
-        notification.sendEmail(model, action, params);
       });
-
-    }
-    else if(isHostAction){
+    }else if(isSendToHost){
       Notification.create({ recordId : params.id, host : params.host, action : action, model : model, verb : verb }).exec(function(err, noti){
         if(err){
           console.log(err);
           return;
         }
-        notification.sendEmail(model, action, params);
       });
     }else{
       Notification.create({ recordId : params.id, user : params.customer, action : action, model : model, verb : verb}).exec(function(err, noti){
@@ -115,23 +156,25 @@ var notification = {
           console.log(err);
           return;
         }
-        notification.sendEmail(model, action, params);
       });
     }
   },
 
-  sendEmail : function(model, action, params){
-    var recipientEmail;
-    var recipientName;
-    var template;
-    if(model === "Order"){
-      if(params.isHostAction){
-        recipientEmail = params.hostEmail;
-        recipientName = params.host.shopName;
-      }else{
-        recipientEmail = params.guestEmail;
-        recipientName = params.customer.firstname;
-      }
+  inquireBasicInfo : function(isSendToHost, params){
+    var info = {};
+    if(isSendToHost){
+      info.recipientEmail = params.hostEmail;
+      info.recipientName = (params.host || params.chef).shopName;
+    }else{
+      info.recipientEmail = params.guestEmail;
+      info.recipientName = params.customer.firstname;
+    }
+    return info;
+  },
+
+  inquireTemplate : function(model,action){
+    var template = "";
+    if(model == "Order"){
       switch(action){
         case "new":
           template = "new";
@@ -163,27 +206,18 @@ var notification = {
         case "review":
           template = "review";
           break;
-        default:
-          template = "adjust";
+      }
+    }else if(model == "Meal"){
+      switch(action){
+        case "scheduleEnd":
+          template = "scheduleEnd";
+          break;
+        case "start":
+          template = "start";
           break;
       }
-      //juice it using email-template
-
-      sails.hooks.email.send(template,{
-        recipientName : recipientName,
-        senderName : "SFMeal.com",
-        id : params.id,
-        lastStatus : params.lastStatus,
-        layout : '../email_layout',
-        filename : '/emailTemplate'
-      },{
-        to : recipientEmail,
-        subject : "SFMeal.com"
-      },function(err){
-
-        console.log(recipientEmail, err || "It worked!");
-      })
     }
+    return template;
   }
 }
 

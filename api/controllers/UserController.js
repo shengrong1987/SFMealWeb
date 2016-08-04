@@ -29,9 +29,11 @@ module.exports = require('waterlock').actions.user({
   becomeHost : function(req, res){
     var userId = req.session.user.id;
     var email = req.session.user.auth.email;
+    var shopName = req.query.shopName;
     var params = {};
     params.user = userId;
     params.email = email;
+    params.shopName = shopName;
     if(req.session.user.host){
       return res.badRequest(req.__('user-already-host'));
     }
@@ -182,8 +184,7 @@ module.exports = require('waterlock').actions.user({
           return res.badRequest(err);
         }
         user[0].auth = auth;
-        req.session.user = user[0];
-        res.ok(user[0]);
+        return res.ok(user[0]);
       });
     }
   },

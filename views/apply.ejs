@@ -30,11 +30,11 @@
       <div class="navbar">
         <div class="navbar-inner">
           <ul class="nav nav-pills">
-            <li class="active"><a href="#step1" data-toggle="tab" data-pass="<%= user.host || ''%>" data-step="1"><%= __('step1')%></a></li>
-            <li><a href="#step2" data-toggle="tab" data-pass="<%= hasAddress%>" data-step="2"><%= __('step2')%></a></li>
-            <li><a href="#step3" data-toggle="tab" data-pass="<%= hasDish%>" data-step="3"><%= __('step3')%></a></li>
-            <li><a href="#step4" data-toggle="tab" data-pass="<%= hasMeal%>" data-step="4"><%= __('step4')%></a></li>
-            <li><a href="#step5" data-toggle="tab" data-pass="<%= hasAccount%>" data-step="5"><%= __('step5')%></a></li>
+            <li class="active"><a href="#step1" data-toggle="tab" data-pass="<%= user.host || ''%>" data-step="1"><%= __('step1')%></a><br/><% if(user.host){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li><a href="#step2" data-toggle="tab" data-pass="<%= hasAddress%>" data-step="2"><%= __('step2')%></a><br/><% if(hasAddress){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li><a href="#step3" data-toggle="tab" data-pass="<%= hasDish%>" data-step="3"><%= __('step3')%></a><br/><%if(hasDish){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li><a href="#step4" data-toggle="tab" data-pass="<%= hasMeal%>" data-step="4"><%= __('step4')%></a><br/><%if(hasMeal){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li><a href="#step5" data-toggle="tab" data-pass="<%= hasAccount%>" data-step="5"><%= __('step5')%></a><br/><%if(hasAccount){%><i class="fa fa-check text-green"></i><%}%></li>
           </ul>
         </div>
       </div>
@@ -55,7 +55,13 @@
               <br>
               <h4><small><%= __('step1-ongoing-tip')%></small></h4>
             </div>
+            <div class="form-group">
+              <label>为您的厨房起个响亮的名字吧!</label>
+              <input class="form-control middle" name="shopName" style="width: 200px;" type="text" required>
+            </div>
             <button id="applyBtn" class="btn btn-info round"><%= __('step1-action-btn')%></button>
+            <h2></h2>
+            <div class="alert alert-danger" data-toggle="alert"></div>
           <%}%>
         </div>
 
@@ -73,7 +79,7 @@
           <div class="well">
             <label><%= __('step2-ongoing')%></label>
           </div>
-          <a target="_blank" href="/user/me#myaddress" class="btn btn-info round"><%= __('step2-action-btn')%></a>
+          <a id="addAddress" class="btn btn-info round" toggle="modal" data-target="#myModal" data-host="true" data-id="<%= user.host%>" data-href="/templates/user/address.html"><%= __('step2-action-btn')%></a>
           <%}%>
 
         </div>

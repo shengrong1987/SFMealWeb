@@ -40,6 +40,7 @@ module.exports.waterlock = {
       //redirectUri : 'http://localhost:1337/auth/google_oauth2',
       allow: ['*'],
       fieldMap : {
+        email : 'email'
       }
     },
     {
@@ -123,7 +124,8 @@ module.exports.waterlock = {
       // obj - {controller: 'b  log', action: 'post'}
       // string - 'custom json response string'
       // default - 'default'
-      success: process.env.NODE_ENV === 'production' ? {controller : 'auth', action : 'done'} : 'default',
+      // success: process.env.NODE_ENV === 'production' ? {controller : 'auth', action : 'done'} : 'default',
+      success: {controller : 'auth', action : 'done'},
 
       // This can be any one of the following
       //

@@ -354,6 +354,7 @@ function setup(){
   // dishSelectorSetup();
   adjustLayout();
   $('[data-toggle="popover"]').popover();
+  $("input[type='tel']").inputmask({"mask": "(999) 999-9999"});
   $('#meal-container').mixItUp();
 }
 
