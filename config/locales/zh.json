@@ -386,7 +386,22 @@
   "user-already-host" : "您已经是厨师了",
   "user-only-address" : "不能删除唯一的厨房地址",
   "user-not-host" : "需要成为厨师",
-  "user-upload-need-module" : "上传资料不完成"
-
+  "user-upload-need-module" : "上传资料不完成",
+  "enter-website" : "进入网站",
+  "footer-send-by" : "这封电邮是由SFMeal.com发送的.遇到问题? SFMeal客户服务邮箱:",
+  "de-order" : "了订单",
+  "adjust-order-context" : "修改了他/她的订单",
+  "apply-adjust-order-context" : "申请修改了他/她的订单,请",
+  "cancel-order-context" : "您之前在SFMeal来自Sheng的订单被取消了,订单金额将会退还给吃货,平台手续费将会退还给您。订单剩余数量将会恢复。",
+  "order" : "订单",
+  "apply-adjust" : "申请修改",
+  "order-time" : "下单时间",
+  "adjust-time" : "修改时间",
+  "ready-time" : "准备时间",
+  "preorder-end-time" : "预定截止时间",
+  "cancel-time" : "订单取消时间",
+  "open-order" : "打开订单",
+  "confirm-or-reject" : "确认或拒绝",
+  "pity" : "可惜"
 
 }

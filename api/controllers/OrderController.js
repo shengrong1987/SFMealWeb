@@ -224,7 +224,7 @@ module.exports = {
                       if(err){
                         return res.badRequest(err);
                       }
-                      notification.notificationCenter("Order", "new", order, true);
+                      notification.notificationCenter("Order", "new", order, true, false, req);
                       //test only
                       if(req.wantsJSON){
                         return res.ok(order);
@@ -324,7 +324,7 @@ module.exports = {
                           return res.badRequest(err);
                         }
                         //send notification
-                        notification.notificationCenter("Order", "adjust", result, isSendToHost);
+                        notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
                         return res.ok({responseText : req.__('order-adjust-ok',charge.amount/100)});
                       })
                     });
@@ -377,7 +377,7 @@ module.exports = {
                         return res.badRequest(err);
                       }
                       //send notification
-                      notification.notificationCenter("Order", "adjust", result, isSendToHost);
+                      notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
                       return res.ok({responseText : req.__('order-adjust-ok2',totalRefund)});
                     })
                   });
@@ -392,7 +392,7 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
-              notification.notificationCenter("Order", "adjust", result, isSendToHost);
+              notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
               return res.ok({responseText :req.__('order-adjust-ok3')});
             })
           }
@@ -407,7 +407,7 @@ module.exports = {
               return res.badRequest(err);
             }
             //send notification
-            notification.notificationCenter("Order", "adjusting", result, isSendToHost);
+            notification.notificationCenter("Order", "adjusting", result, isSendToHost, false, req);
             return res.ok({responseText : req.__('order-adjust-request')});
           });
         }
@@ -432,7 +432,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        notification.notificationCenter("Order", "cancel", result, false, true);
+        notification.notificationCenter("Order", "cancel", result, false, true, req);
         $this.cancelOrderJob(result.id, function(err){
           if(err){
             return res.badRequest(err);
@@ -538,7 +538,7 @@ module.exports = {
                     return res.badRequest(err);
                   }
                   //send notification
-                  notification.notificationCenter("Order", "cancel", result, isSendToHost);
+                  notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
                   $this.cancelOrderJob(result.id, function(err){
                     if(err){
                       return res.badRequest(err);
@@ -556,7 +556,7 @@ module.exports = {
               return res.badRequest(err);
             }
             //send notification
-            notification.notificationCenter("Order", "cancel", result, isSendToHost);
+            notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
             $this.cancelOrderJob(result.id, function(err){
               if(err){
                 return res.badRequest(err);
@@ -573,7 +573,7 @@ module.exports = {
             return res.badRequest(err);
           }
           //send notification
-          notification.notificationCenter("Order", "cancelling", result, isSendToHost);
+          notification.notificationCenter("Order", "cancelling", result, isSendToHost, false, req);
           return res.ok({responseText : req.__('order-cancel-request')});
         });
       }
@@ -633,7 +633,7 @@ module.exports = {
                       if(err){
                         return res.badRequest(err);
                       }
-                      notification.notificationCenter("Order", "confirm", result);
+                      notification.notificationCenter("Order", "confirm", result, false, false, req);
                       return res.ok({responseText : req.__('order-confirm')});
                     })
                   });
@@ -682,7 +682,7 @@ module.exports = {
                         if(err){
                           return res.badRequest(err);
                         }
-                        notification.notificationCenter("Order", "confirm", result);
+                        notification.notificationCenter("Order", "confirm", result, false, false, req);
                         return res.ok({responseText : req.__('order-confirm')});
                       })
                     });
@@ -702,7 +702,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            notification.notificationCenter("Order", "confirm", result);
+            notification.notificationCenter("Order", "confirm", result, false, false, req);
             return res.ok({responseText : req.__('order-confirm')});
           })
         }
@@ -739,7 +739,7 @@ module.exports = {
                       if (err) {
                         return res.badRequest(err);
                       }
-                      notification.notificationCenter("Order", "cancel", result);
+                      notification.notificationCenter("Order", "cancel", result, false, false, req);
                       $this.cancelOrderJob(result.id, function(err){
                         if(err){
                           return res.badRequest(err);
@@ -759,7 +759,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            notification.notificationCenter("Order", "cancel", result);
+            notification.notificationCenter("Order", "cancel", result, false, false, req);
             $this.cancelOrderJob(result.id, function(err){
               if(err){
                 return res.badRequest(err);
@@ -788,7 +788,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        notification.notificationCenter("Order", "reject", result);
+        notification.notificationCenter("Order", "reject", result, false, false, req);
         return res.ok({ responseText : req.__('order-reject-adjust')});
       });
     });
@@ -809,7 +809,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        notification.notificationCenter("Order", "ready", result);
+        notification.notificationCenter("Order", "ready", result, false, false, req);
         if(order.method == "pickup"){
           return res.ok({responseText : req.__('order-ready')});
         }else{
@@ -837,7 +837,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        notification.notificationCenter("Order", "receive", result);
+        notification.notificationCenter("Order", "receive", result, false, false, req);
         return res.ok({responseText : req.__('order-receive')});
       });
     });

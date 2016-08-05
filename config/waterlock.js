@@ -61,7 +61,7 @@ module.exports.waterlock = {
           forwardUrl: '/auth/resetForm'
         },
         template:{
-          file: '/views/email.jade',
+          file: '/emailTemplates/reset/html.jade',
           vars:{}
         }
       },
@@ -125,7 +125,7 @@ module.exports.waterlock = {
       // string - 'custom json response string'
       // default - 'default'
       // success: process.env.NODE_ENV === 'production' ? {controller : 'auth', action : 'done'} : 'default',
-      success: {controller : 'auth', action : 'done'},
+       success: {controller : 'auth', action : 'done'},
 
       // This can be any one of the following
       //

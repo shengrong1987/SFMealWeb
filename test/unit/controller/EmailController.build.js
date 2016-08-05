@@ -35,10 +35,10 @@ describe('EmailController', function() {
       agent
         .post('/auth/login?type=local')
         .send({email : hostEmail, password: password})
-        .expect(200)
-        .end(function(err,res){
-          if(res.body.auth.email != hostEmail){
-            return done(Error("not login with the same account(email not the same)"))
+        .expect(302)
+        .end(function(err, res){
+          if(err){
+            return done(err);
           }
           done();
         })
@@ -194,7 +194,8 @@ describe('EmailController', function() {
           dishes : dishes,
           status : "on",
           cover : dish1,
-          minimalOrder : 1
+          minimalOrder : 1,
+          isDelivery : true
         })
         .expect(200)
         .end(function(err,res){
@@ -254,14 +255,25 @@ describe('EmailController', function() {
       agent
           .post('/auth/login?type=local')
           .send({email : guestEmail, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != guestEmail){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            guestId = res.body.id;
-            done();
-          })
+          .expect(302)
+          .expect('Location','/auth/done')
+          .end(done)
+    });
+
+    it('should get guest id', function (done) {
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          console.log(res.body);
+          guestId = res.body.id;
+          done();
+        })
     });
 
     it('should create a new card', function (done) {
@@ -421,13 +433,9 @@ describe('EmailController', function() {
       agent
         .post('/auth/login?type=local')
         .send({email : hostEmail, password: password})
-        .expect(200)
-        .end(function(err,res){
-          if(res.body.auth.email != hostEmail){
-            return done(Error("not login with the same account(email not the same)"))
-          }
-          done();
-        })
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
 
     it('should turn the order to preparing', function (done) {
@@ -447,13 +455,9 @@ describe('EmailController', function() {
       agent
         .post('/auth/login?type=local')
         .send({email : guestEmail, password: password})
-        .expect(200)
-        .end(function(err,res){
-          if(res.body.auth.email != guestEmail){
-            return done(Error("not login with the same account(email not the same)"))
-          }
-          done();
-        })
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
 
     it('should request for cancelling and confirm ' + hostEmail + ' receive a cancelling request email', function (done) {
@@ -470,15 +474,11 @@ describe('EmailController', function() {
 
     it('should login or register an account', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : hostEmail, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != hostEmail){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : hostEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
 
     it('should reject a cancelling order and confirm ' + guestEmail + 'receive reject cancelling email', function (done) {
@@ -493,16 +493,11 @@ describe('EmailController', function() {
 
     it('should login or register an account for guest', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : guestEmail, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != guestEmail){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            guestId = res.body.id;
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
 
     it('should request for cancelling and confirm ' + hostEmail + 'receive cancelling request email', function (done) {
@@ -519,15 +514,11 @@ describe('EmailController', function() {
 
     it('should login or register an account', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : hostEmail, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != hostEmail){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : hostEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
 
     it('should confirm a cancelling order and confirm ' + guestEmail + ' receive confirm cancel email', function (done) {

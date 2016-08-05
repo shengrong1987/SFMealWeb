@@ -33,7 +33,7 @@ var notification = {
     isSendToHost : if the event is sent to host
     isAdminAction : if the event is post by admin
    */
-  notificationCenter : function(model, action, params, isSendToHost, isAdminAction){
+  notificationCenter : function(model, action, params, isSendToHost, isAdminAction, req){
 
     isSendToHost = isSendToHost || false;
     isAdminAction = isAdminAction || false;
@@ -43,30 +43,32 @@ var notification = {
     if(isAdminAction){
       //send emails to both chef and guest as it's modified by admin
       params.isSendToHost = true;
-      notification.sendEmail(model, action, params);
+      notification.sendEmail(model, action, params, req);
       params.isSendToHost = false;
-      notification.sendEmail(model, action, params);
+      notification.sendEmail(model, action, params, req);
     }
     else{
       params.isSendToHost = isSendToHost;
-      notification.sendEmail(model, action, params);
+      notification.sendEmail(model, action, params, req);
     }
   },
 
-  sendEmail : function(model, action, params){
+  sendEmail : function(model, action, params, req){
 
     var basicInfo = this.inquireBasicInfo(params.isSendToHost, params);
     var template = this.inquireTemplate(model,action);
 
-    //juice it using email-template
-    sails.hooks.email.send(template,{
+    var vars = this.mergeI18N(model, action, req);
+
+    var params = Object.assign({
       recipientName : basicInfo.recipientName,
-      senderName : "SFMeal.com",
-      id : params.id,
-      lastStatus : params.lastStatus,
-      layout : '../email_layout',
-      filename : '/emailTemplate'
-    },{
+      senderName : "SFMeal.com"
+    }, params);
+
+    params = Object.assign(params, vars);
+
+    //juice it using email-template
+    sails.hooks.email.send(template,params,{
       to : basicInfo.recipientEmail,
       subject : "SFMeal.com"
     },function(err){
@@ -218,6 +220,63 @@ var notification = {
       }
     }
     return template;
+  },
+
+  mergeI18N : function(model, action, req){
+    var localVar = {};
+    var i18ns = ['enter-website','open-order','fen','order','order-number','user','delivery-fee','total','footer-send-by'];
+    if(model == "Order"){
+      switch(action){
+        case "new":
+          i18ns = i18ns.concat(['adjust-order-context','modify','de-order','order-time','adjust-time']);
+          break;
+        case "adjust":
+          i18ns = i18ns.concat(['adjust-order-context','modify','de-order','order-time','adjust-time']);
+          break;
+        case "adjusting":
+          i18ns = i18ns.concat(['apply-adjust','apply-adjust-order-context','confirm-or-reject','order-time','adjust-time','ready-time']);
+          break;
+        case "cancel":
+          i18ns = i18ns.concat(['pity','cancel','de-order','cancel-order-context','order-time','preorder-end-time','cancel-time']);
+          break;
+        case "cancelling":
+          i18ns = [];
+          break;
+        case "abort":
+          i18ns = [];
+          break;
+        case "confirm":
+          i18ns = [];
+          break;
+        case "ready":
+          i18ns = [];
+          break;
+        case "reject":
+          i18ns = [];
+          break;
+        case "review":
+          i18ns = [];
+          break;
+        case "reminder":
+          i18ns = [];
+          break;
+      }
+    }else if(model == "Meal"){
+      switch(action){
+        case "scheduleEnd":
+          i18ns = [];
+          break;
+        case "start":
+          i18ns = [];
+          break;
+      }
+    }
+
+    i18ns.forEach(function(keyword){
+      localVar[keyword.replace(/\-/g,'')] = req.__(keyword);
+    });
+
+    return localVar;
   }
 }
 

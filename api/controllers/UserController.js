@@ -190,13 +190,16 @@ module.exports = require('waterlock').actions.user({
   },
 
   me : function(req, res){
-    var userId = req.session.user.id
-    User.findOne(userId).populate("host").populate("orders").populate("collects").exec(function(err,found){
+    var userId = req.session.user.id;
+    User.findOne(userId).populate("host").populate("orders").populate('auth').populate("collects").exec(function(err,found){
       if(err){
         return res.badRequest(err);
       }
       found.featureDishes = [];
       if(found.orders.length == 0 && found.collects.length == 0) {
+        if(req.wantsJSON){
+          return res.ok(found);
+        }
         return res.view('user', {user: found});
       }
 
@@ -250,6 +253,9 @@ module.exports = require('waterlock').actions.user({
               console.log(err);
             }
           });
+          if(req.wantsJSON){
+              return res.ok(found);
+          }
           return res.view('user',{user: found});
         });
       });

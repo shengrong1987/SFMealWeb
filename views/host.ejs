@@ -104,7 +104,7 @@
                             <a href="#"><%= __('contact-user')%></a>
                             <%}else if(order.status == "adjust" || order.status == "canceling") {%>
                             <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
-                            <a data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= reason%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>"><%= __('reject')%></a><br/>
+                            <a data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>"><%= __('reject')%></a><br/>
                             <a href="#"><%= __('contact-user')%></a>
                             <%}else if(order.status == "preparing"){%>
                             <a href="javascript:void(0)" data-action="ready" data-order="<%= order.id%>"><%= __('complete')%></a><br/>
@@ -173,7 +173,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= confirm%></a><br/>
+                          <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
                           <a data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="rejectOrder" data-argument="<%= order.id%>"><%= __('reject')%></a><br/>
                           <a href="#"><%= __('contact-user')%></a>
                         </td>
