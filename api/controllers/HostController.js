@@ -46,7 +46,13 @@ module.exports = {
                   console.log(err);
                 }
               });
-              return res.view('host',{user: found});
+              found.locale = req.getLocale();
+              found.save(function(err, result){
+                if(err){
+                  return res.badRequest(err);
+                }
+                return res.view('host',{user: found});
+              })
             });
           })
         }else{
@@ -71,7 +77,13 @@ module.exports = {
                 console.log(err);
               }
             });
-            return res.view('host',{user: found});
+            h.locale = req.getLocale();
+            h.save(function(err, result){
+              if(err){
+                return res.badRequest(err);
+              }
+              return res.view('host',{user: found});
+            })
           });
         }
       });

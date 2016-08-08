@@ -34,37 +34,32 @@ module.exports = function(agenda) {
           return done();
         }
 
-        async.each(orders, function( order, cb){
+        async.each(orders, function(order, cb){
           order.isScheduled = true;
           order.save(function(err, result){
             if(err){
               return cb(err);
             }
             if(order.type == "order"){
-              var tenMinutesBeforePickup = util.minutesBefore(order.eta);
-              if(order.method == "pickup"){
-                console.log("scheduling pickup reminding Job at: " + tenMinutesBeforePickup);
-                Jobs.schedule(tenMinutesBeforePickup, 'pickupReminderJob', {orderId : order.id, period : "minute"});
-              }else{
-                console.log("scheduling delivery reminding Job at: " + tenMinutesBeforePickup);
-                Jobs.schedule(tenMinutesBeforePickup, 'deliveryReminderJob', {orderId : order.id, period : "minute"});
-              }
+              var tenMinutesBeforePickup = util.minutesBefore(order.eta, 10);
+              console.log("scheduling pickup reminding Job at: " + tenMinutesBeforePickup);
+              Jobs.schedule(tenMinutesBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "minute"});
             }else{
               if(order.method == "pickup"){
-                var oneHourBeforePickup = util.oneHourBefore(order.pickupInfo.pickupFromTime);
-                var oneDayBeforePickup = util.oneDayBefore(order.pickupInfo.pickupFromTime);
+                var oneHourBeforePickup = new Date(util.oneHourBefore(order.pickupInfo.pickupFromTime));
+                var oneDayBeforePickup = new Date(util.oneDayBefore(order.pickupInfo.pickupFromTime));
                 if(now < oneDayBeforePickup){
-                  console.log("scheduling pickup reminding Job at: " + oneHourBeforePickup);
-                  Jobs.schedule(oneHourBeforePickup, 'pickupReminderJob', {orderId : order.id, period : "hour"});
+                  console.log("scheduling pickup reminding Job at: " + oneDayBeforePickup);
+                  Jobs.schedule(oneDayBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "day"});
                 }
                 if(now < oneHourBeforePickup){
-                  console.log("scheduling pickup reminding Job at: " + oneDayBeforePickup);
-                  Jobs.schedule(oneDayBeforePickup, 'pickupReminderJob', {orderId : order.id, period : "day"});
+                  console.log("scheduling pickup reminding Job at: " + oneHourBeforePickup);
+                  Jobs.schedule(oneHourBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "hour"});
                 }
               }else{
-                var tenMinutesBeforeReceive = util.minutesBefore(order.eta);
-                console.log("scheduling pickup deliverying Job at: " + tenMinutesBeforeReceive);
-                Jobs.schedule(tenMinutesBeforeReceive, 'arriveReminderJob', {orderId : order.id, period : "minute"});
+                var startDeliveryTime = new Date(order.pickupInfo.pickupFromTime);
+                console.log("scheduling delivering reminder Job at: " + startDeliveryTime);
+                Jobs.schedule(startDeliveryTime, 'OrderDeliveringReminderJob', {orderId : order.id, period : "minute"});
               }
             }
             cb();

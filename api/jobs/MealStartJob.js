@@ -26,9 +26,17 @@ module.exports = function(agenda) {
 
     // execute job
     run: function(job, done) {
-      console.log("your order will be delivered in 10 minutes");
-      done();
-    },
+      var mealId = job.attrs.data.mealId;
+      Meal.findOne(mealId).populate('chef').exec(function(err, meal){
+        if(err){
+          return done();
+        }
+        console.log("your meal will be online in 10 minutes");
+        meal.hostEmail = meal.chef.email;
+        notification.notificationCenter("Meal","start",meal,true,false,null);
+        done();
+      })
+    }
   };
   return job;
 }

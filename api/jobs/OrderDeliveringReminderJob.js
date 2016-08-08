@@ -26,8 +26,14 @@ module.exports = function(agenda) {
 
     // execute job
     run: function(job, done) {
-      console.log("your order will be ready in 10 minutes, dispatching delivery");
-      done();
+      var orderId = job.attrs.data.orderId;
+      Order.findOne(orderId).populate('host').populate('dishes').populate("customer").exec(function(err, order){
+        if(err){
+          return done();
+        }
+        console.log("sending arrive reminder email to guest");
+        notification.notificationCenter("Order","reminder", order, false, false, null);
+      })
     },
   };
   return job;

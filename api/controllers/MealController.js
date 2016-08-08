@@ -315,29 +315,20 @@ module.exports = {
       if(this.requirementIsValid(req.body)){
         this.dishIsValid(req.body, function(valid){
           if(valid){
-            if(req.body.status === "on"){
-              Host.findOne(hostId).populate("meals").populate("dishes").exec(function(err, host){
-                if(err){
-                  return res.badRequest(err);
-                }
-                if(!host.isValid(true)){
-                  return res.badRequest(req.__('meal-chef-incomplete'));
-                }
-                Meal.create(req.body).exec(function(err,meal){
-                  if(err){
-                    return res.badRequest(err);
-                  }
-                  return res.ok(meal);
-                });
-              });
-            }else{
+            Host.findOne(hostId).populate("meals").populate("dishes").exec(function(err, host){
+              if(err){
+                return res.badRequest(err);
+              }
+              if(valid && !host.isValid(true)){
+                return res.badRequest(req.__('meal-chef-incomplete'));
+              }
               Meal.create(req.body).exec(function(err,meal){
                 if(err){
                   return res.badRequest(err);
                 }
                 return res.ok(meal);
               });
-            }
+            });
           }else{
             console.log("meal contain unverified dishes");
             return res.badRequest(req.__('meal-unverify-dish'));
@@ -403,7 +394,7 @@ module.exports = {
     var status = req.body.status;
     if(this.dateIsValid(req.body)){
       if(this.requirementIsValid(req.body)){
-        Meal.findOne(mealId).populate("dishes").exec(function(err,meal){
+        Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,meal){
           if(err){
             return res.badRequest(err);
           }

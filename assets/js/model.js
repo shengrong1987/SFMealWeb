@@ -1000,7 +1000,8 @@ var MealView = Backbone.View.extend({
       features : features,
       isDelivery : isDelivery,
       delivery_fee : deliveryFee,
-      delivery_range : deliveryRange
+      delivery_range : deliveryRange,
+      host : hostId
     });
     var $this = this;
     this.model.save({},{
@@ -1537,7 +1538,7 @@ var OrderView = Backbone.View.extend({
   reject : function(e){
     e.preventDefault();
     var orderId = $(e.target).data("order");
-    this.model.set({ id : orderId});
+    this.model.set({ id : orderId, msg : $("#popover_msg").val()});
     this.model.action = "reject";
     this.model.save({},{
       success : function(model,result){

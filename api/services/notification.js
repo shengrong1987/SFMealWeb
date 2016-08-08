@@ -2,6 +2,7 @@
  * Created by shengrong on 12/3/15.
  */
 var nodemailer = require('nodemailer');
+var moment = require('moment');
 var transporter = nodemailer.createTransport("SMTP",{
   host : "smtp.office365.com",
   secureConnection : false,
@@ -57,8 +58,11 @@ var notification = {
 
     var basicInfo = this.inquireBasicInfo(params.isSendToHost, params);
     var template = this.inquireTemplate(model,action);
+    var locale = req ? (params.isSendToHost ? params.host.locale : params.customer.locale) : '';
 
-    var vars = this.mergeI18N(model, action, req);
+    var vars = this.mergeI18N(model, action, req, locale);
+
+    this.transitLocaleTimeZone(params);
 
     var params = Object.assign({
       recipientName : basicInfo.recipientName,
@@ -208,6 +212,9 @@ var notification = {
         case "review":
           template = "review";
           break;
+        case "reminder":
+          template = "reminder";
+          break;
       }
     }else if(model == "Meal"){
       switch(action){
@@ -222,13 +229,13 @@ var notification = {
     return template;
   },
 
-  mergeI18N : function(model, action, req){
+  mergeI18N : function(model, action, req, locale){
     var localVar = {};
-    var i18ns = ['enter-website','open-order','fen','order','order-number','user','delivery-fee','total','footer-send-by'];
+    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by'];
     if(model == "Order"){
       switch(action){
         case "new":
-          i18ns = i18ns.concat(['adjust-order-context','modify','de-order','order-time','adjust-time']);
+          i18ns = i18ns.concat(['new-order-title','new-order-context','order-time','ready-time','order','preorder']);
           break;
         case "adjust":
           i18ns = i18ns.concat(['adjust-order-context','modify','de-order','order-time','adjust-time']);
@@ -240,25 +247,25 @@ var notification = {
           i18ns = i18ns.concat(['pity','cancel','de-order','cancel-order-context','order-time','preorder-end-time','cancel-time']);
           break;
         case "cancelling":
-          i18ns = [];
+          i18ns = i18ns.concat(['apply-cancel','cancelling-order-title','cancelling-order-context','cancel-reason','order-time','apply-cancel-time','confirm-or-reject']);
           break;
         case "abort":
           i18ns = [];
           break;
         case "confirm":
-          i18ns = [];
+          i18ns = i18ns.concat(['confirm-cancel','confirm-adjust','confirm-cancel-context','confirm-adjust-context','order-time','apply-cancel-time','apply-adjust-time','refund-method']);
           break;
         case "ready":
-          i18ns = [];
+          i18ns = i18ns.concat(['order-ready-title','order-pickup-ready-context','order-delivery-ready-context','pickup-method','self-pickup','delivery','pickup-location','order-time','complete-time']);
           break;
         case "reject":
-          i18ns = [];
+          i18ns = i18ns.concat(['cancel', 'adjust', 'get-reject','order-time','reject-reason',"order-cancel-reject-context","order-adjust-reject-context"]);
           break;
         case "review":
-          i18ns = [];
+          i18ns = i18ns.concat(['review-order-title','review-order-context-1','review-order-context-2','review-dish','review-meal','scoreLabel','content','review-time','view-review']);
           break;
         case "reminder":
-          i18ns = [];
+          i18ns = i18ns.concat(['order-pickup-reminder-title','order-pickup-reminder-hourly-context','order-pickup-reminder-daily-context','order-arrive-reminder-title','order-arrive-reminder-context','pickup-location','pickup-time','contact-phone','delivery-location']);
           break;
       }
     }else if(model == "Meal"){
@@ -267,16 +274,31 @@ var notification = {
           i18ns = [];
           break;
         case "start":
-          i18ns = [];
+          i18ns = i18ns.concat(['meal-name','meal-number','meal-order-start-title','meal-order-start-context','step2','provide-time','ready-time','min']);
           break;
       }
     }
 
     i18ns.forEach(function(keyword){
-      localVar[keyword.replace(/\-/g,'')] = req.__(keyword);
+      if(req){
+        localVar[keyword.replace(/\-/g,'')] = req.__(keyword);
+      }else{
+        localVar[keyword.replace(/\-/g,'')] = sails.__({
+          phrase : keyword,
+          locale : locale
+        });
+      }
     });
 
     return localVar;
+  },
+
+  transitLocaleTimeZone : function(params){
+    moment.tz.add('America/Los_Angeles|PST PDT|80 70|0101|1Lzm0 1zb0 Op0');
+    if(params.pickupInfo){
+      params.pickupInfo.pickupFromTime = moment.tz(params.pickupInfo.pickupFromTime, "America/Los_Angeles");
+      params.pickupInfo.pickupTillTime = moment.tz(params.pickupInfo.pickupTillTime, "America/Los_Angeles");
+    }
   }
 }
 

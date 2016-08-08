@@ -35,7 +35,10 @@ module.exports = {
     var $this = this;
     geocoder.geocode({ address : address}, function(err, res){
       if (err) {
-        cb(err);
+        return cb(err);
+      }
+      if(res.length == 0 ){
+        return cb("cannot connect to Internet");
       }
       var distance = $this.getDistance({lat : res[0].latitude, long: res[0].longitude}, location);
       cb(null, distance);

@@ -200,46 +200,38 @@ module.exports = require('waterlock').actions.user({
         if(req.wantsJSON){
           return res.ok(found);
         }
-        return res.view('user', {user: found});
-      }
-
-      async.each(found.orders, function(order,next){
-        Order.findOne(order.id).populate("dishes").populate("host").populate("meal").exec(function (err, result) {
+        found.locale = req.getLocale();
+        found.save(function(err, result){
           if(err){
-            next(err);
-          }else{
-            order.dishes = result.dishes;
-            order.host = result.host;
-            order.meal = result.meal;
-            if(order.status == "review"){
-              Object.keys(order.orders).forEach(function(dishId){
-                if(order.orders[dishId]>0){
-                  order.dishes.forEach(function(dish){
-                    if(dish.id == dishId){
-                      if(dish.isFeature()){
-                        dish.meal = order.meal;
-                        if(found.featureDishes.indexOf(dishId) == -1){
-                          found.featureDishes.push(dish);
-                        }
-                      }
-                    }
-                  });
-                }
-              });
-            }
-            next();
+            return res.badRequest(err);
           }
-        });
-      },function(err){
-        if(err){
-          return res.badRequest(err);
-        }
-        async.each(found.collects, function(collect,next){
-          Meal.findOne(collect.id).populate("chef").exec(function(err, meal){
+          return res.view('user', {user: found});
+        })
+      }else{
+        async.each(found.orders, function(order,next){
+          Order.findOne(order.id).populate("dishes").populate("host").populate("meal").exec(function (err, result) {
             if(err){
               next(err);
             }else{
-              collect.chef = meal.chef;
+              order.dishes = result.dishes;
+              order.host = result.host;
+              order.meal = result.meal;
+              if(order.status == "review"){
+                Object.keys(order.orders).forEach(function(dishId){
+                  if(order.orders[dishId]>0){
+                    order.dishes.forEach(function(dish){
+                      if(dish.id == dishId){
+                        if(dish.isFeature()){
+                          dish.meal = order.meal;
+                          if(found.featureDishes.indexOf(dishId) == -1){
+                            found.featureDishes.push(dish);
+                          }
+                        }
+                      }
+                    });
+                  }
+                });
+              }
               next();
             }
           });
@@ -247,18 +239,38 @@ module.exports = require('waterlock').actions.user({
           if(err){
             return res.badRequest(err);
           }
-          req.session.user = found;
-          Notification.destroy({user : userId}).exec(function(err){
+          async.each(found.collects, function(collect,next){
+            Meal.findOne(collect.id).populate("chef").exec(function(err, meal){
+              if(err){
+                next(err);
+              }else{
+                collect.chef = meal.chef;
+                next();
+              }
+            });
+          },function(err){
             if(err){
-              console.log(err);
+              return res.badRequest(err);
             }
+            req.session.user = found;
+            Notification.destroy({user : userId}).exec(function(err){
+              if(err){
+                console.log(err);
+              }
+            });
+            found.locale = req.getLocale();
+            found.save(function(err, result){
+              if(err){
+                return res.badRequest(err);
+              }
+              if(req.wantsJSON){
+                return res.ok(found);
+              }
+              return res.view('user',{user: found});
+            })
           });
-          if(req.wantsJSON){
-              return res.ok(found);
-          }
-          return res.view('user',{user: found});
         });
-      });
+      }
     });
   },
 

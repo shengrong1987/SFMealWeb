@@ -119,6 +119,9 @@ module.exports = {
     if(params.method == "delivery"){
       params.delivery_fee = parseFloat(meal.delivery_fee);
     }else{
+      if(!meal.pickups || params.pickupOption-1>=meal.pickups.length){
+        return false;
+      }
       var pickupInfo = meal.pickups[params.pickupOption-1];
       if(!pickupInfo){
         return false;
@@ -153,9 +156,11 @@ module.exports = {
           console.log("order pass meal validation");
 
           //calculate pickup method and delivery fee
-          req.body = $this.buildDeliveryData(req.body, m) || (function(){
-              return res.badRequest({responseText : req.__('order-pickup-option-error'), code : -7});
-          })();
+          req.body = $this.buildDeliveryData(req.body, m);
+
+          if(typeof req.body == "boolean" && req.body == false){
+            return res.badRequest({responseText : req.__('order-pickup-option-error'), code : -7});
+          }
 
           //calculate ETA
           var now = new Date();
@@ -739,7 +744,7 @@ module.exports = {
                       if (err) {
                         return res.badRequest(err);
                       }
-                      notification.notificationCenter("Order", "cancel", result, false, false, req);
+                      notification.notificationCenter("Order", "confirm", result, false, false, req);
                       $this.cancelOrderJob(result.id, function(err){
                         if(err){
                           return res.badRequest(err);
@@ -759,7 +764,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            notification.notificationCenter("Order", "cancel", result, false, false, req);
+            notification.notificationCenter("Order", "confirm", result, false, false, req);
             $this.cancelOrderJob(result.id, function(err){
               if(err){
                 return res.badRequest(err);
@@ -782,7 +787,9 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      order.status = order.lastStatus;
+      var lastStatus = order.lastStatus;
+      order.lastStatus = order.status;
+      order.status = lastStatus;
       order.msg = params.msg;
       order.save(function(err,result){
         if(err){

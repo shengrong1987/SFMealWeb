@@ -41,20 +41,25 @@ module.exports = function(agenda) {
               if(err){
                 return cb(err);
               }
-              console.log("scheduling bookingEnd Job at: " + meal.provideTillTime);
-              Jobs.schedule(meal.provideTillTime, 'bookingEndJob', { mealId : result.id });
+              console.log("scheduling meal schedule end Job at: " + meal.provideTillTime);
+              Jobs.schedule(meal.provideTillTime, 'MealScheduleEndJob', { mealId : result.id });
               cb();
             });
-          }else if(meal.type == "order" && util.minutesBefore(meal.provideFromTime,10) > now){
-            meal.isScheduled = true;
-            meal.save(function(err, result){
-              if(err){
-                return cb(err);
-              }
-              console.log("scheduling meal start reminder Job at: " + util.minutesBefore(meal.provideFromTime,10));
-              Jobs.schedule(util.minutesBefore(meal.provideFromTime,10), 'preparingStartJob', { mealId : result.id });
+          }else if(meal.type == "order"){
+            var tenMinutesBeforeProvideFromTime = new Date(util.minutesBefore(meal.provideFromTime,10));
+            if(tenMinutesBeforeProvideFromTime > now){
+              meal.isScheduled = true;
+              meal.save(function(err, result){
+                if(err){
+                  return cb(err);
+                }
+                console.log("scheduling meal start reminder Job at: " + util.minutesBefore(meal.provideFromTime,10));
+                Jobs.schedule(util.minutesBefore(meal.provideFromTime,10), 'MealStartJob', { mealId : result.id });
+                cb();
+              });
+            }else{
               cb();
-            });
+            }
           }
         },function(err){
           done();

@@ -7,6 +7,7 @@
 
 var dateUtil = require("../services/util.js");
 var moment = require("moment");
+var async = require("async");
 
 module.exports = {
 
@@ -190,41 +191,75 @@ module.exports = {
   },
 
   beforeCreate : function(values, cb){
-    if(values.chef && !values.county){
-      Host.findOne(values.chef).exec(function(err,host){
-        if(err){
-          return cb(err);
-        }
-        values.county = host.county;
-        if(values.cover){
-          Dish.findOne(values.cover).exec(function(err,dish){
-            if(err){
-              return cb(err);
-            }
-            values.coverString = dish ? dish.photos[0].v : '';
+    if(values.chef){
+      if(!values.county || values.type == "order"){
+        Host.findOne(values.chef).exec(function(err,host){
+          if(err){
+            return cb(err);
+          }
+          if(!values.county){
+            values.county = host.county;
+          }
+          if(values.type == "order"){
+            values.pickups = JSON.stringify([{
+              "pickupFromTime" : values.provideFromTime,
+              "pickupTillTime" : values.provideTillTime,
+              "location" : host.full_address
+            }])
+          }
+          if(values.cover){
+            Dish.findOne(values.cover).exec(function(err,dish){
+              if(err){
+                return cb(err);
+              }
+              values.coverString = dish ? dish.photos[0].v : '';
+              cb();
+            });
+          }else{
             cb();
-          });
-        }else{
-          cb();
-        }
-      });
+          }
+        });
+      }
     }else{
       cb();
     }
   },
 
   beforeUpdate : function(values,cb){
-    if(values.cover && values.cover != ""){
-      Dish.findOne(values.cover).exec(function(err,dish){
-        if(err){
-          return cb(err);
+    async.auto({
+      updateCover : function(next){
+        if(values.cover && values.cover != ""){
+          Dish.findOne(values.cover).exec(function(err,dish){
+            if(err){
+              return next(err);
+            }
+            values.coverString = dish ? dish.photos[0].v : '';
+            next();
+          });
+        }else{
+          next();
         }
-        values.coverString = dish ? dish.photos[0].v : '';
-        cb();
-      });
-    }else{
-      cb();
-    }
+      },
+      updatePickup : function(next){
+        if(values.type == "order"){
+          Host.findOne(values.host).exec(function(err, host){
+            if(err){
+              return next(err);
+            }
+            values.pickups = JSON.stringify([{
+              "pickupFromTime" : values.provideFromTime,
+              "pickupTillTime" : values.provideTillTime,
+              "location" : host.full_address
+            }])
+            next();
+          });
+        }else{
+          next();
+        }
+      }
+    },function(err){
+      cb(err);
+    });
   }
 };
 
