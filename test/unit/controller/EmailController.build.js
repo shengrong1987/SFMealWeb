@@ -16,7 +16,7 @@ before(function(done) {
 
 describe('EmailController', function() {
 
-  this.timeout(5000);
+  this.timeout(12000);
 
   describe('', function() {
 
@@ -221,7 +221,7 @@ describe('EmailController', function() {
       var pickups = [{
         "pickupFromTime" : onHourAndOneMinuteLater,
         "pickupTillTime" : twoHourLater,
-        "location" : "1455 Market St, San Francisoc, CA 94124"
+        "location" : "1455 Market St, San Francisco, CA 94124"
       }];
       agent
         .post('/meal')

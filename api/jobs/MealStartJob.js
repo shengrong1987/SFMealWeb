@@ -27,7 +27,10 @@ module.exports = function(agenda) {
     // execute job
     run: function(job, done) {
       var mealId = job.attrs.data.mealId;
-      Meal.findOne(mealId).populate('chef').exec(function(err, meal){
+      if(!mealId){
+        return done();
+      }
+      Meal.findOne(mealId).populate('chef').populate('dishes').exec(function(err, meal){
         if(err){
           return done();
         }

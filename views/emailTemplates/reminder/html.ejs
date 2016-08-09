@@ -14,28 +14,34 @@
 <div class="green" style="padding: 25px;">
   <div class="box-email white relative middle text-left">
     <h4 class="text-green"><%= method == 'pickup' ? orderpickupremindertitle : orderarriveremindertitle%></h4>
-    <p>Hi Aimee,</p>
+    <p>Hi <%= recipientName%>,</p>
     <p><%= method == 'pickup' ? (period == "hour" ? orderpickupreminderhourlycontext : orderpickupreminderdailycontext) : orderarriveremindercontext%></p>
     <div class="divider" style="margin-bottom: 10px;"></div>
-    <p><%= ordernumber%>:02727936</p>
+    <p><%= ordernumber%>: <%= id%></p>
     <table class="table table-email">
+      <% Object.keys(orders).forEach(function(dishId){
+        var amount = parseInt(orders[dishId]);
+      if(amount > 0){
+        var dish;
+        dishes.forEach(function(d){
+          if(d.id == dishId){
+            dish = d;
+            return;
+          }
+        });
+      %>
       <tr>
-        <td><img src="/images/dumplings.jpg" style="width: 100px;"></td>
-        <td class="text-green" style="vertical-align: middle;">阳澄湖边的大闸蟹</td>
-        <td style="vertical-align: middle;">2<%= fen%></td>
-        <td style="vertical-align: middle;">$84.34</td>
+        <td><img src="<%= dish.photos[0].v%>" style="width: 100px;"></td>
+        <td class="text-green" style="vertical-align: middle;"><%= dish.title%></td>
+        <td style="vertical-align: middle;"><%= amount%><%= fen%></td>
+        <td style="vertical-align: middle;text-align: right;">$<%= (amount * dish.price).toFixed(2)%></td>
       </tr>
-      <tr class="border-less">
-        <td><img src="/images/dumplings.jpg" style="width: 100px;"></td>
-        <td class="text-green" style="vertical-align: middle;">阳澄湖边的大闸蟹</td>
-        <td style="vertical-align: middle;">2<%= fen%></td>
-        <td style="vertical-align: middle;">$84.34</td>
-      </tr>
+      <%}});%>
       <tr>
         <td></td>
         <td></td>
         <td></td>
-        <td><%= dingdan%>: $183.00</td>
+        <td style="text-align: right;"><%= dingdan%>:$<%= subtotal.toFixed(2)%></td>
       </tr>
       <tr class="border-less">
         <td><%= method == 'pickup' ? pickuplocation : deliverylocation%>: <%= pickupInfo.location%></td>

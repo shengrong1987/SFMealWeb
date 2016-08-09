@@ -14,29 +14,25 @@
 <div class="green" style="padding: 25px;">
   <div class="box-email white relative middle text-left">
     <h4 class="text-green"><%= mealorderstarttitle%></h4>
-    <p>Hi Aimee,</p>
+    <p>Hi <%= recipientName%>,</p>
     <p><%= mealorderstartcontext%></p>
     <div class="divider" style="margin-bottom: 10px;"></div>
     <p><%= mealname%>: <%= title%></p>
     <p><%= mealnumber%>: <%= id%></p>
     <table class="table table-email">
+      <% dishes.forEach(function(dish){ %>
       <tr>
-        <td><img src="/images/dumplings.jpg" style="width: 100px;"></td>
-        <td class="text-green" style="vertical-align: middle;">阳澄湖边的大闸蟹</td>
-        <td style="vertical-align: middle;">2<%= fen%></td>
-        <td style="vertical-align: middle;">$84.34</td>
+        <td><img src="<%= dish.photos[0].v%>" style="width: 100px;"></td>
+        <td class="text-green" style="vertical-align: middle;"><%= dish.title%></td>
+        <td style="vertical-align: middle;"><%= totalQty[dish.id]%><%= fen%></td>
+        <td style="vertical-align: middle;text-align: right;">$<%= dish.price.toFixed(2)%></td>
       </tr>
-      <tr class="border-less">
-        <td><img src="/images/dumplings.jpg" style="width: 100px;"></td>
-        <td class="text-green" style="vertical-align: middle;">阳澄湖边的大闸蟹</td>
-        <td style="vertical-align: middle;">2<%= fen%></td>
-        <td style="vertical-align: middle;">$84.34</td>
-      </tr>
+      <%});%>
       <tr class="border-less">
         <td></td>
         <td></td>
         <td></td>
-        <td><%= deliveryfee%>: $5.00</td>
+        <td style="text-align: right;"><%= deliveryfee%>: $<%= delivery_fee.toFixed(2)%></td>
       </tr>
       <tr>
         <td><%= step2%>: <%= chef.full_address%></td>
@@ -45,7 +41,7 @@
         <td></td>
       </tr>
       <tr>
-        <td><%= providetime%>: 2016-7-4 03:51</td>
+        <td><%= providetime%>: <%= provideFromTime%> - <%= provideTillTime%></td>
         <td></td>
         <td></td>
         <td></td>

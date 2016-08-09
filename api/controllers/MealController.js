@@ -311,6 +311,7 @@ module.exports = {
   create : function(req, res){
     var hostId = req.session.user.host.id? req.session.user.host.id : req.session.user.host;
     req.body.chef = hostId;
+
     if(this.dateIsValid(req.body)){
       if(this.requirementIsValid(req.body)){
         this.dishIsValid(req.body, function(valid){

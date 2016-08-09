@@ -191,15 +191,20 @@ module.exports = {
   },
 
   beforeCreate : function(values, cb){
-    if(values.chef){
-      if(!values.county || values.type == "order"){
-        Host.findOne(values.chef).exec(function(err,host){
+    async.auto({
+      updateCountyAndPickup: function(next){
+        if(!values.chef){
+          console.log("meal has no chef");
+          return next(Error("meal has no chef"));
+        }
+        if(values.county && values.type != "order"){
+          return next();
+        }
+        Host.findOne(values.chef).exec(function(err, host){
           if(err){
-            return cb(err);
+            return next(err);
           }
-          if(!values.county){
-            values.county = host.county;
-          }
+          values.county = host.county;
           if(values.type == "order"){
             values.pickups = JSON.stringify([{
               "pickupFromTime" : values.provideFromTime,
@@ -207,22 +212,24 @@ module.exports = {
               "location" : host.full_address
             }])
           }
-          if(values.cover){
-            Dish.findOne(values.cover).exec(function(err,dish){
-              if(err){
-                return cb(err);
-              }
-              values.coverString = dish ? dish.photos[0].v : '';
-              cb();
-            });
-          }else{
-            cb();
+          next();
+        });
+      },
+      updateMealCover : function(next){
+        if(!values.cover){
+          return next();
+        }
+        Dish.findOne(values.cover).exec(function(err,dish){
+          if(err){
+            return cb(err);
           }
+          values.coverString = dish ? dish.photos[0].v : '';
+          next();
         });
       }
-    }else{
+    },function(err){
       cb();
-    }
+    });
   },
 
   beforeUpdate : function(values,cb){
@@ -242,7 +249,7 @@ module.exports = {
       },
       updatePickup : function(next){
         if(values.type == "order"){
-          Host.findOne(values.host).exec(function(err, host){
+          Host.findOne(values.chef || values.host).exec(function(err, host){
             if(err){
               return next(err);
             }

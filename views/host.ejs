@@ -102,7 +102,7 @@
                             <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
                             <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
                             <a href="#"><%= __('contact-user')%></a>
-                            <%}else if(order.status == "adjust" || order.status == "canceling") {%>
+                            <%}else if(order.status == "adjust" || order.status == "cancelling") {%>
                             <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
                             <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-order"><%= __('reject')%></a><br/>
                             <a href="#"><%= __('contact-user')%></a>
@@ -148,7 +148,7 @@
                       <%
                       var host = user.host;
                           host.host_orders.forEach(function(order){
-                      if(order.type == "order" && (order.status == "adjust" || order.status == "canceling")){
+                      if(order.type == "order" && (order.status == "adjust" || order.status == "cancelling")){
                       %>
                       <tbody class="item">
                       <tr class="active">
@@ -532,7 +532,7 @@
                           <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
                           <a href="#"><%= __('contact-user')%></a>
-                          <%}else if(order.status == "adjust" || order.status == "canceling") {%>
+                          <%}else if(order.status == "adjust" || order.status == "cancelling") {%>
                           <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('reject')%></a><br/>
                           <a href="#"><%= __('contact-user')%></a>
@@ -576,7 +576,7 @@
                       <%
                       var host = user.host;
                           host.host_orders.forEach(function(order){
-                      if(order.type == "preorder" && (order.status == "adjust" || order.status == "canceling")){
+                      if(order.type == "preorder" && (order.status == "adjust" || order.status == "cancelling")){
                       %>
                       <tbody class="item">
                       <tr class="active">

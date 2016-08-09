@@ -218,8 +218,8 @@ var notification = {
       }
     }else if(model == "Meal"){
       switch(action){
-        case "scheduleEnd":
-          template = "scheduleEnd";
+        case "mealScheduleEnd":
+          template = "guestlist";
           break;
         case "start":
           template = "start";
@@ -253,7 +253,7 @@ var notification = {
           i18ns = [];
           break;
         case "confirm":
-          i18ns = i18ns.concat(['confirm-cancel','confirm-adjust','confirm-cancel-context','confirm-adjust-context','order-time','apply-cancel-time','apply-adjust-time','refund-method']);
+          i18ns = i18ns.concat(['confirm-cancel','confirm-adjust','confirm-cancel-context','confirm-adjust-context','order-time','apply-cancel-time','apply-adjust-time','refund-method','default-card']);
           break;
         case "ready":
           i18ns = i18ns.concat(['order-ready-title','order-pickup-ready-context','order-delivery-ready-context','pickup-method','self-pickup','delivery','pickup-location','order-time','complete-time']);
@@ -298,6 +298,13 @@ var notification = {
     if(params.pickupInfo){
       params.pickupInfo.pickupFromTime = moment.tz(params.pickupInfo.pickupFromTime, "America/Los_Angeles");
       params.pickupInfo.pickupTillTime = moment.tz(params.pickupInfo.pickupTillTime, "America/Los_Angeles");
+    }
+    if(params.eta){
+      params.eta = moment.tz(params.eta,"America/Los_Angeles");
+    }
+    if(params.meal){
+      params.meal.provideFromTime = moment.tz(params.meal.provideFromTime, "America/Los_Angeles");
+      params.meal.provideTillTime = moment.tz(params.meal.provideTillTime, "America/Los_Angeles");
     }
   }
 }

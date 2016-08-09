@@ -1000,8 +1000,7 @@ var MealView = Backbone.View.extend({
       features : features,
       isDelivery : isDelivery,
       delivery_fee : deliveryFee,
-      delivery_range : deliveryRange,
-      host : hostId
+      delivery_range : deliveryRange
     });
     var $this = this;
     this.model.save({},{

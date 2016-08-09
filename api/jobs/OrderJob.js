@@ -29,6 +29,7 @@ module.exports = function(agenda) {
     run: function(job, done) {
       console.log("Order check executed");
       var now = new Date();
+
       Order.find({ status : ["schedule","preparing"], isScheduled : false}).exec(function(err, orders){
         if(err){
           return done();

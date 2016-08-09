@@ -29,6 +29,7 @@ module.exports = function(agenda) {
     run: function(job, done) {
       console.log("Meal check executed");
       var now = new Date();
+
       Meal.find({status : 'on', isScheduled : false}).exec(function(err, meals){
         if(err){
           return done();
@@ -42,7 +43,7 @@ module.exports = function(agenda) {
                 return cb(err);
               }
               console.log("scheduling meal schedule end Job at: " + meal.provideTillTime);
-              Jobs.schedule(meal.provideTillTime, 'MealScheduleEndJob', { mealId : result.id });
+              Jobs.schedule(meal.provideTillTime, 'MealScheduleEndJob', { mealId : meal.id });
               cb();
             });
           }else if(meal.type == "order"){
@@ -60,12 +61,14 @@ module.exports = function(agenda) {
             }else{
               cb();
             }
+          }else{
+            cb();
           }
         },function(err){
           done();
         });
       });
-    },
+    }
   };
   return job;
 }

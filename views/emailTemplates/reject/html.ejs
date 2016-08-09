@@ -14,30 +14,37 @@
 <div class="green" style="padding: 25px;">
   <div class="box-email white relative middle text-left">
     <h4 class="text-red"><%= dingdan%><b><%= lastStatus == "canceling" ? cancel : adjust%><%= getreject%></b></h4>
-    <p>Hi Aimee,</p>
+    <p>Hi <%= recipientName%>,</p>
     <p><%= lastStatus == "canceling" ? ordercancelrejectcontext : orderadjustrejectcontext%></p>
     <div class="divider" style="margin-bottom: 10px;"></div>
     <p><%= rejectreason%>: <%= msg%></p>
     <div class="divider" style="margin-bottom: 10px;margin-top: 5px;"></div>
     <p><%= ordernumber%>: <%= id%></p>
     <table class="table table-email">
+      <% Object.keys(orders).forEach(function(dishId){
+        var amount = parseInt(orders[dishId]);
+      if(amount > 0){
+        var dish;
+        dishes.forEach(function(d){
+          if(d.id == dishId){
+            dish = d;
+            return;
+          }
+        });
+      %>
       <tr>
-        <td><img src="/images/dumplings.jpg" style="width: 100px;"></td>
-        <td class="text-red" style="vertical-align: middle;">阳澄湖边的大闸蟹</td>
-        <td style="vertical-align: middle;">2<%= fen%></td>
+        <td><img src="<%= dish.photos[0].v%>" style="width: 100px;"></td>
+        <td class="text-green" style="vertical-align: middle;"><%= dish.title%></td>
+        <td style="vertical-align: middle;text-align: right;"><%= amount%><%= fen%></td>
       </tr>
-      <tr class="border-less">
-        <td><img src="/images/dumplings.jpg" style="width: 100px;"></td>
-        <td class="text-red" style="vertical-align: middle;">阳澄湖边的大闸蟹</td>
-        <td style="vertical-align: middle;">2<%= fen%></td>
-      </tr>
+      <%}});%>
       <tr>
         <td></td>
         <td></td>
-        <td><%= dingdan%>: $183.00</td>
+        <td><%= dingdan%>: $<%= subtotal.toFixed(2)%></td>
       </tr>
       <tr>
-        <td><%= ordertime%>: 2016-7-4 03:51</td>
+        <td><%= ordertime%>: <%= createdAt%></td>
         <td></td>
         <td></td>
       </tr>

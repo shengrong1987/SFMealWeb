@@ -229,7 +229,9 @@ module.exports = {
                       if(err){
                         return res.badRequest(err);
                       }
-                      notification.notificationCenter("Order", "new", order, true, false, req);
+                      o.chef = m.chef;
+                      o.dishes = m.dishes;
+                      notification.notificationCenter("Order", "new", o, true, false, req);
                       //test only
                       if(req.wantsJSON){
                         return res.ok(order);
@@ -320,6 +322,8 @@ module.exports = {
                       if(err){
                         return res.badRequest(err);
                       }
+                      order.adjusting_orders = order.orders;
+                      order.adjusting_subtotal = order.subtotal;
                       order.orders = params.orders;
                       order.subtotal = params.subtotal;
                       order.charges[charge.id] = charge.amount/100;
@@ -374,6 +378,8 @@ module.exports = {
                     if(err){
                       return res.badRequest(err);
                     }
+                    order.adjusting_orders = order.orders;
+                    order.adjusting_subtotal = order.subtotal;
                     order.orders = params.orders;
                     order.subtotal = params.subtotal;
                     order.meal = m.id;
@@ -572,7 +578,7 @@ module.exports = {
         }
       }else if(order.status == "preparing"){
         order.lastStatus = order.status;
-        order.status = "canceling";
+        order.status = "cancelling";
         order.save(function(err,result){
           if(err){
             return res.badRequest(err);
@@ -631,7 +637,9 @@ module.exports = {
                     order.subtotal = adjusting_subtotal;
                     order.adjusting_orders = {};
                     order.adjusting_subtotal = 0;
+                    var tmpLastStatus = order.status;
                     order.status = order.lastStatus;
+                    order.lastStatus = tmpLastStatus;
                     order.charges[charge.id] = charge.amount / 100;
                     order.meal = order.meal.id;
                     order.save(function(err,result){
@@ -680,7 +688,9 @@ module.exports = {
                       order.subtotal = adjusting_subtotal;
                       order.adjusting_orders = {};
                       order.adjusting_subtotal = 0;
+                      var tmpLastStatus = order.status;
                       order.status = order.lastStatus;
+                      order.lastStatus = tmpLastStatus;
                       //order.charges[result.id] = result.amount/100;
                       order.meal = order.meal.id;
                       order.save(function(err,result){
@@ -701,7 +711,9 @@ module.exports = {
           order.subtotal = adjusting_subtotal;
           order.adjusting_orders = {};
           order.adjusting_subtotal = 0;
+          var tmpLastStatus = order.status;
           order.status = order.lastStatus;
+          order.lastStatus = tmpLastStatus;
           order.meal = order.meal.id;
           order.save(function(err,result){
             if(err){
@@ -711,7 +723,7 @@ module.exports = {
             return res.ok({responseText : req.__('order-confirm')});
           })
         }
-      }else if(order.status == "canceling"){
+      }else if(order.status == "cancelling"){
         var amount = (order.subtotal + order.delivery_fee).toFixed(2);
         if(amount > 0){
           User.findOne(userId).populate('payment').exec(function (err, found) {
@@ -739,6 +751,7 @@ module.exports = {
                       return res.badRequest(err);
                     }
                     order.status = "cancel";
+                    order.lastStatus = "cancelling";
                     order.meal = order.meal.id;
                     order.save(function (err, result) {
                       if (err) {
@@ -759,6 +772,7 @@ module.exports = {
           });
         }else{
           order.status = "cancel";
+          order.lastStatus = "cancelling";
           order.meal = order.meal.id;
           order.save(function(err,result){
             if(err){

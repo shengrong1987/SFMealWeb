@@ -441,5 +441,6 @@
   "review-meal" : "评价菜单",
   "scoreLabel" : "分数",
   "content" : "内容",
-  "view-review" : "查看评论"
+  "view-review" : "查看评论",
+  "default-card" : "默认银行卡"
 }

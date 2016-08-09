@@ -33,6 +33,7 @@ module.exports = function(agenda) {
         }
         console.log("sending arrive reminder email to guest");
         notification.notificationCenter("Order","reminder", order, false, false, null);
+        done();
       })
     },
   };

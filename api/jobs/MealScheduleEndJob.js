@@ -39,7 +39,7 @@ module.exports = function(agenda) {
           if(err){
             return done()
           }
-          notification.notificationCenter("Meal","scheduleEnd",meal,true);
+          notification.notificationCenter("Meal","mealScheduleEnd",meal,true);
           return done();
         });
       })
