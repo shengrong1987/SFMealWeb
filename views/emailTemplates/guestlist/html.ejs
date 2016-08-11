@@ -13,60 +13,109 @@
 
 <div class="green" style="padding: 25px;">
   <div class="box-email white relative middle text-left">
-    <h4 class="text-green">恭喜!新的预定Meal列表!</h4>
+    <h4 class="text-green"><%= orders.length == 0 ? guestlistnotitle : guestlisttitle%></h4>
     <p>Hi <%= recipientName%>,</p>
-    <p>恭喜你在SFMeal的Meal收到了以下预定订单。</p>
-    <h3 class="green"><u>艾米海鲜大杂烩迎国庆</u></h3>
-    <p>送餐时间: 2016-7-17 18:00 - 19:00</p>
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <td>吃货</td>
-          <td>订单号</td>
-          <td>订单内容</td>
-          <td>联系方式</td>
-          <td>地址</td>
-          <td>备注</td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Aimbebe</td>
-          <td>239123123</td>
-          <td>阳澄湖大闸蟹(2),龙虾(4),多宝鱼(2)</td>
-          <td>(415)609-2357</td>
-          <td>1943 Palou Ave, San Francisco, CA 94124</td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
+    <p><%= orders.length == 0 ? guestlistnocontext : guestlistcontext%></p>
 
-    <p>取餐时间: 2016-7-17 18:00 - 19:00 取餐地址: 1987 Palou Ave, San Francisco</p>
+    <% if(orders.length == 0){%>
+      <h3 class="text-green"><u><%= title%></u> <small><%= guestlistnotips%></small></h3>
+    <%}else{%>
+      <h3 class="text-green"><u><%= title%></u></h3>
+    <%}%>
+
+    <% if(orders.length != 0){ if(isDelivery){
+    pickups.forEach(function(pickup){if(pickup.method == "delivery"){%>
+
+    <p><%= deliverytime%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%></p>
     <table class="table table-bordered">
       <thead>
       <tr>
-        <td>吃货</td>
-        <td>订单号</td>
-        <td>订单内容</td>
-        <td>联系方式</td>
-        <td>地址</td>
-        <td>备注</td>
+        <td><%= user%></td>
+        <td><%= ordernumber%></td>
+        <td><%= content%></td>
+        <td><%= contact%></td>
+        <td><%= deliverylocation%></td>
+        <td><%= comment%></td>
       </tr>
       </thead>
       <tbody>
+      <%}})%>
+      <% orders.forEach(function(order){
+      if(order.method == 'delivery'){%>
       <tr>
-        <td>Aimbebe</td>
-        <td>239123123</td>
-        <td>阳澄湖大闸蟹(2),龙虾(4),多宝鱼(2)</td>
-        <td>(415)609-2357</td>
+        <td><%= order.customer.firstname + " " + order.customer.lastname%></td>
+        <td><%= order.id%></td>
+        <td>
+          <% Object.keys(order.orders).forEach(function(dishId){
+            var amount = order.orders[dishId];
+          if(amount > 0){
+            var dish;
+            dishes.forEach(function(d){
+              if(d.id == dishId){
+                dish = d;
+                return;
+              }
+            })%>
+          <%= dish.title%>(<%= amount%>)
+          <%}});%>
+        </td>
+        <td><%= order.phone%></td>
+        <td><%= order.address%></td>
+        <td></td>
+      </tr>
+      <%}})%>
+      </tbody>
+    </table>
+    <%} pickups.forEach(function(pickup, index){if(pickup.method == "pickup"){%>
+    <p><%= pickuptime%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%> <%= pickuplocation%>: <%= pickup.location%></p>
+    <table class="table table-bordered">
+      <thead>
+      <tr>
+        <td><%= user%></td>
+        <td><%= ordernumber%></td>
+        <td><%= content%></td>
+        <td><%= contact%></td>
+        <td><%= deliverylocation%></td>
+        <td><%= comment%></td>
+      </tr>
+      </thead>
+      <tbody>
+      <% orders.forEach(function(order){if(order.pickupOption-1 == index){%>
+      <tr>
+        <td><%= order.customer.firstname + " " + order.customer.lastname%></td>
+        <td><%= order.id%></td>
+        <td>
+          <% Object.keys(order.orders).forEach(function(dishId){
+            var amount = order.orders[dishId];
+          if(amount > 0){
+            var dish;
+            dishes.forEach(function(d){
+              if(d.id == dishId){
+                dish = d;
+                return;
+              }
+            })%>
+          <%= dish.title%>(<%= amount%>)
+          <%}});%>
+        </td>
+        <td><%= order.phone%></td>
         <td>N/A</td>
         <td></td>
       </tr>
+      <%}})%>
       </tbody>
     </table>
+    <%}});} %>
+
+    <div class="divider"></div>
 
     <div class="row text-center">
-      <a class="btn btn-green btn-inline" href="http://www.sfmeal.com/host/me#myorder">打印列表</a>
+      <% if(orders.length == 0){%>
+        <a class="btn btn-green btn-inline" href="http://www.sfmeal.com/meal/<%= id%>?edit=true"><%= openmeal%></a>
+      <%}else{%>
+        <a class="btn btn-green btn-inline" href="http://www.sfmeal.com/host/me#myorder"><%= printlist%></a>
+      <%}%>
+
     </div>
   </div>
 

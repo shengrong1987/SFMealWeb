@@ -119,16 +119,18 @@ module.exports = {
     if(params.method == "delivery"){
       params.delivery_fee = parseFloat(meal.delivery_fee);
     }else{
-      if(!meal.pickups || params.pickupOption-1>=meal.pickups.length){
-        return false;
-      }
-      var pickupInfo = meal.pickups[params.pickupOption-1];
-      if(!pickupInfo){
-        return false;
-      }
-      params.pickupInfo = pickupInfo;
       params.delivery_fee = 0;
     }
+
+    if(!meal.pickups || params.pickupOption-1>=meal.pickups.length){
+      return false;
+    }
+    var pickupInfo = meal.pickups[params.pickupOption-1];
+    if(!pickupInfo || pickupInfo.method != params.method){
+      return false;
+    }
+    params.pickupInfo = pickupInfo;
+
     return params;
   },
 
@@ -166,6 +168,10 @@ module.exports = {
           var now = new Date();
           req.body.eta = new Date(now.getTime() + m.prepareTime * 60 * 1000);
 
+          //calculate total
+          var total = $this.calculateTotal(req.body, m.chef.county);
+          console.log("total is: " + total);
+
           req.body.host = m.chef.id;
           req.body.type = m.type;
           req.body.dishes = m.dishes;
@@ -192,7 +198,7 @@ module.exports = {
                 return res.badRequest(err);
               }
               stripe.charge({
-                amount : parseInt((subtotal + req.body.delivery_fee) * 100),
+                amount : parseInt(total * 100),
                 email : email,
                 customerId : found.payment[0].customerId,
                 destination : m.chef.accountId,
@@ -302,7 +308,7 @@ module.exports = {
               if(diff>0){
                 //create another charge
                 stripe.charge({
-                  amount : diff * 100,
+                  amount : parseInt(diff * 100),
                   email : email,
                   customerId : found.payment[0].customerId,
                   destination : order.host.accountId,
@@ -614,7 +620,7 @@ module.exports = {
             if(diff>0){
               //create another charge
               stripe.charge({
-                amount : diff * 100,
+                amount : parseInt(diff * 100),
                 email : email,
                 customerId : found.payment[0].customerId,
                 destination : order.host.accountId,
@@ -882,6 +888,26 @@ module.exports = {
       console.log(numberRemoved + " order jobs removed");
       cb();
     })
+  },
+
+  calculateTotal : function(params, county){
+    var total = params.subtotal;
+    switch (county){
+      case "San Francisco County":
+        tax = 1.0875;
+            break;
+      case "Sacramento County":
+        tax = 1.08;
+        break;
+      default:
+        tax = 1.08;
+    }
+    tax = tax || 1.08;
+    total = total * tax;
+    if(params.delivery_fee){
+      total += params.delivery_fee;
+    }
+    return total.toFixed(2);
   }
 };
 

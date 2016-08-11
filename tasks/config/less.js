@@ -21,7 +21,7 @@ module.exports = function(grunt) {
         { 'views/emailTemplates/cancel/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/cancelling/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/confirm/style.css' : 'assets/styles/importer.less' },
-        { 'views/emailTemplates/guest/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/guestlist/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/new/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/ready/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/reject/style.css' : 'assets/styles/importer.less' },

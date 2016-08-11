@@ -2,6 +2,7 @@
  * Created by shengrong on 7/27/16.
  */
 var notification = require('../services/notification');
+var async = require('async');
 module.exports = function(agenda) {
   var job = {
 
@@ -39,8 +40,22 @@ module.exports = function(agenda) {
           if(err){
             return done()
           }
-          notification.notificationCenter("Meal","mealScheduleEnd",meal,true);
-          return done();
+          async.each(orders, function(order, cb){
+            User.findOne(order.customer).exec(function(err, user){
+              if(err){
+                return cb(err);
+              }
+              order.customer = user;
+              cb();
+            });
+          },function(err){
+            if(err){
+              return done();
+            }
+            meal.orders = orders;
+            notification.notificationCenter("Meal","mealScheduleEnd",meal,true);
+            return done();
+          });
         });
       })
     },

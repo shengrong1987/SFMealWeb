@@ -239,7 +239,12 @@ describe('MealController', function() {
       var pickups = [{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
-        "location" : "1455 Market St, San Francisco, CA 94124"
+        "location" : "1455 Market St, San Francisco, CA 94124",
+        "method" : "pickup"
+      },{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
+        "method" : "delivery"
       }];
       agent
           .post('/meal')

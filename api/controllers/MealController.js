@@ -200,14 +200,15 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        if($this.cancelMealJobs( mealId, function(err){
+        $this.cancelMealJobs( mealId, function(err){
           if(err){
             return res.badRequest(err);
           }
           if(isAdmin) {
             return res.ok(meal);
-          }return res.redirect("/host/me#mymeal");
-        }));
+          }
+          return res.redirect("/host/me#mymeal");
+        });
       });
 
     });
@@ -217,6 +218,7 @@ module.exports = {
     var mealId = req.param("id");
     var user = req.session.user;
     var isAdmin = user.auth.email === 'admin@sfmeal.com';
+    var $this = this;
     if(isAdmin){
       Meal.findOne(mealId).populate('dishes').exec(function(err, meal){
         if(err){
@@ -237,13 +239,19 @@ module.exports = {
             console.log("meal contain unverified dishes");
             return res.badRequest(req.__('meal-unverify-dish'));
           }
-          meal.status = "on";
-          meal.save(function(err,result){
+          $this.cancelMealJobs( mealId, function(err){
             if(err){
               return res.badRequest(err);
             }
-            return res.ok(meal);
-          });
+            meal.status = "on";
+            meal.isScheduled = false;
+            meal.save(function(err,result){
+              if(err){
+                return res.badRequest(err);
+              }
+              return res.ok(meal);
+            });
+          })
         });
       })
     }else{
@@ -271,13 +279,19 @@ module.exports = {
           if(meal.status == "on"){
             return res.ok(meal);
           }
-          meal.status = "on";
-          meal.save(function(err,result){
+          $this.cancelMealJobs( mealId, function(err){
             if(err){
               return res.badRequest(err);
             }
-            return res.redirect("/host/me#mymeal");
-          });
+            meal.status = "on";
+            meal.isScheduled = false;
+            meal.save(function(err,result){
+              if(err){
+                return res.badRequest(err);
+              }
+              return res.ok(meal);
+            });
+          })
         });
       });
     }
@@ -393,6 +407,7 @@ module.exports = {
   update : function(req, res){
     var mealId = req.param("id");
     var status = req.body.status;
+    var $this = this;
     if(this.dateIsValid(req.body)){
       if(this.requirementIsValid(req.body)){
         Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,meal){
@@ -403,12 +418,18 @@ module.exports = {
             console.log("meal contain unverified dishes");
             return res.badRequest(req.__('meal-unverify-dish'));
           }
-          Meal.update({id : mealId}, req.body).exec(function(err, result){
+          $this.cancelMealJobs(mealId, function(err){
             if(err){
               return res.badRequest(err);
             }
-            return res.ok(result);
-          });
+            req.body.isScheduled = false;
+            Meal.update({id : mealId}, req.body).exec(function(err, result){
+              if(err){
+                return res.badRequest(err);
+              }
+              return res.ok(result);
+            });
+          })
         });
       }else{
         console.log("meal minimal requirement are not valid");
@@ -456,7 +477,10 @@ module.exports = {
   dateIsValid : function(params){
     var provideFromTime = params.provideFromTime;
     var provideTillTime = params.provideTillTime;
-    if(provideFromTime >= provideTillTime){
+    var now = new Date();
+    if(now < provideFromTime || now > provideTillTime){
+      return false;
+    }else if(provideFromTime >= provideTillTime){
       return false;
     }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
       return false;

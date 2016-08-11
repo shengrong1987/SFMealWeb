@@ -163,6 +163,15 @@
                             <label><%= __('pickup-location')%></label>
                             <input type="text" class="form-control">
                           </div>
+
+                          <div class="form-group method">
+                            <label><%= __('pickup-method')%></label>
+                            <select class="form-control">
+                              <option value="delivery"><%= __('delivery')%></option>
+                              <option value="pickup" selected="true"><%= __('self-pickup')%></option>
+                            </select>
+                          </div>
+
                         </div>
                       </div>
                     </div>

@@ -758,7 +758,8 @@ var MealView = Backbone.View.extend({
     "click button[name='save']" : "off",
     "click #addNewPickupBtn" : "addNewPickup",
     "click #removeNewPickupBtn" : "removeNewPickup",
-    "click #isDelivery" : "toggleDelivery"
+    "click #isDelivery" : "toggleDelivery",
+    "change .method select" : "changeMethod"
   },
   initialize : function(){
     var form = this.$el.find("form");
@@ -771,6 +772,18 @@ var MealView = Backbone.View.extend({
     var dishesAlert = form.find("#dish-selector .alert");
     dishesAlert.hide();
     this.dishAlert = dishesAlert;
+  },
+  changeMethod : function(e){
+    var select = $(e.target);
+    var method = select.val();
+    var locationInput = select.closest('.method').prev().find('input');
+    if(method == 'delivery'){
+      locationInput.prop('disabled',true);
+      locationInput.val('N/A');
+    }else{
+      locationInput.removeAttr('disabled');
+      locationInput.val('');
+    }
   },
   toggleDelivery : function(e){
     var checkbox = $(e.target);
@@ -787,7 +800,7 @@ var MealView = Backbone.View.extend({
   addNewPickup : function(e){
     e.preventDefault();
     this.$el.find("#pickupAlert").hide();
-    var pickupView = '<div class="well form-group pickup"> <div class="col-xs-4"> <label>取餐时间 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> <div class="col-xs-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">From</span> <input type="text" class="form-control" /> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">&nbsp;&nbsp;To&nbsp;&nbsp;</span> <input type="text" class="form-control"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div> <div class="form-group location"> <label>取餐地点</label> <input type="text" class="form-control"> </div> </div> </div>';
+    var pickupView = '<div class="well form-group pickup"> <div class="col-xs-4"> <label>取餐时间 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> <div class="col-xs-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">From</span> <input type="text" class="form-control" /> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">&nbsp;&nbsp;To&nbsp;&nbsp;</span> <input type="text" class="form-control"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div> <div class="form-group location"> <label>取餐地点</label> <input type="text" class="form-control"> </div><div class="form-group method"> <label>取餐方式</label> <select class="form-control"> <option value="delivery">送餐</option> <option value="pickup" selected="true">自取</option> </select> </div> </div> </div>';
     this.$el.find(".pickup_container").append(pickupView);
     this.$el.find("[data-toggle='dateTimePicker']").datetimepicker({
       icons:{
@@ -896,6 +909,7 @@ var MealView = Backbone.View.extend({
         var pickupFromTime = $(this).find(".start-pickup [data-toggle='dateTimePicker']").data("DateTimePicker").date();
         var pickupTillTime = $(this).find(".end-pickup [data-toggle='dateTimePicker']").data("DateTimePicker").date();
         var location = $(this).find(".location input").val();
+        var method = $(this).find('.method select').val();
         if(!pickupFromTime || !pickupTillTime || !location){
           pickupValid = false;
           $this.scheduleAlert.show();
@@ -915,6 +929,7 @@ var MealView = Backbone.View.extend({
         pickupObj.pickupFromTime = pickupFromTime._d;
         pickupObj.pickupTillTime = pickupTillTime._d;
         pickupObj.location = location;
+        pickupObj.method = method;
         pickups.push(pickupObj);
       });
 
@@ -1605,6 +1620,7 @@ var OrderView = Backbone.View.extend({
       }
       var address = contacts[0];
       var phone = contacts[1].replace(" ","");
+      var pickupOption = parseInt(this.$el.find("#deliveryMethod .regular-radio:checked").data("index")) + 1;
     }else{
       var pickupOption = parseInt(this.$el.find("#pickupMethod .regular-radio:checked").data("index")) + 1;
     }

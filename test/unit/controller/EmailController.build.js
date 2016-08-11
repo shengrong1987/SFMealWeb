@@ -218,10 +218,16 @@ describe('EmailController', function() {
       var thirtyMinutesLater = new Date(now.getTime() + 60 * 30 * 1000);
       var onHourAndOneMinuteLater = new Date(now.getTime() + 1000 * 60 * 61);
       var twoHourLater = new Date(now.getTime() + 1000 * 3600 * 2);
+      var threeHourLater = new Date(now.getTime() + 1000 * 3600 * 3);
       var pickups = [{
         "pickupFromTime" : onHourAndOneMinuteLater,
         "pickupTillTime" : twoHourLater,
-        "location" : "1455 Market St, San Francisco, CA 94124"
+        "location" : "1455 Market St, San Francisco, CA 94124",
+        "method" : "pickup"
+      },{
+        "pickupFromTime" : twoHourLater,
+        "pickupTillTime" : threeHourLater,
+        "method" : "delivery"
       }];
       agent
         .post('/meal')
@@ -333,7 +339,7 @@ describe('EmailController', function() {
     });
 
     var orderId;
-    it('should order the meal and ' + hostEmail + " should receive a new order email", function (done) {
+    it('should order the meal and ' + hostEmail + " should receive a new order email and " + guestEmail + " should receive pickup reminder email 1 minutes later", function (done) {
       var dishObj = {};
       dishObj[dish1] = 1;
       dishObj[dish2] = 2;
@@ -384,8 +390,7 @@ describe('EmailController', function() {
     it('should cancel the meal at schedule successfully and '
       + hostEmail
       + "should receive a cancel order email "
-      + "and shoudnt receive arrive reminder email at: "
-      + guestEmail, function (done) {
+      + "and should remove pickup reminder job", function (done) {
       agent
           .post('/order/' + orderId + "/cancel")
           .expect(200)
@@ -412,6 +417,7 @@ describe('EmailController', function() {
             subtotal : price1 * 1 + price2 * 2,
             address : address,
             phone : phone,
+            pickupOption : 2,
             method : "delivery",
             mealId : preorderMealId,
             delivery_fee : 0
@@ -481,7 +487,7 @@ describe('EmailController', function() {
         .end(done)
     });
 
-    it('should reject a cancelling order and confirm ' + guestEmail + 'receive reject cancelling email', function (done) {
+    it('should reject a cancelling order and confirm ' + guestEmail + ' receive reject cancelling email', function (done) {
       agent
           .put('/order/' + orderId + "/reject")
           .send({msg:"The meal is being cooked, too late to cancel"})
@@ -500,7 +506,7 @@ describe('EmailController', function() {
         .end(done)
     });
 
-    it('should request for cancelling and confirm ' + hostEmail + 'receive cancelling request email', function (done) {
+    it('should request for cancelling and confirm ' + hostEmail + ' receive cancelling request email', function (done) {
       agent
           .post('/order/' + orderId + "/cancel")
           .expect(200)

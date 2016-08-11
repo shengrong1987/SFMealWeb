@@ -47,13 +47,13 @@
         <td></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;">Tax: $2.45</td>
+        <td style="text-align: right;"><%= tax%>: $<%= (subtotal * taxRate).toFixed(2)%></td>
       </tr>
       <tr class="border-less">
         <td></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= total%> $<%= (subtotal + delivery_fee).toFixed(2)%></td>
+        <td style="text-align: right;"><%= total%> $<%= (subtotal * (1 + taxRate) + delivery_fee).toFixed(2)%></td>
       </tr>
       <tr>
         <td><%= ordertime%>: <%= createdAt%></td>

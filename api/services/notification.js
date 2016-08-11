@@ -63,6 +63,7 @@ var notification = {
     var vars = this.mergeI18N(model, action, req, locale);
 
     this.transitLocaleTimeZone(params);
+    this.calculateTax(params);
 
     var params = Object.assign({
       recipientName : basicInfo.recipientName,
@@ -231,7 +232,7 @@ var notification = {
 
   mergeI18N : function(model, action, req, locale){
     var localVar = {};
-    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by'];
+    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','tax'];
     if(model == "Order"){
       switch(action){
         case "new":
@@ -270,8 +271,8 @@ var notification = {
       }
     }else if(model == "Meal"){
       switch(action){
-        case "scheduleEnd":
-          i18ns = [];
+        case "mealScheduleEnd":
+          i18ns = i18ns.concat(['guest-list-title','guest-list-context','guest-list-no-title','guest-list-no-context','guest-list-no-tips','delivery-location','delivery-time','pickup-time','pickup-location','print-list','content','contact','comment','open-meal']);
           break;
         case "start":
           i18ns = i18ns.concat(['meal-name','meal-number','meal-order-start-title','meal-order-start-context','step2','provide-time','ready-time','min']);
@@ -306,6 +307,20 @@ var notification = {
       params.meal.provideFromTime = moment.tz(params.meal.provideFromTime, "America/Los_Angeles");
       params.meal.provideTillTime = moment.tz(params.meal.provideTillTime, "America/Los_Angeles");
     }
+  },
+
+  calculateTax : function(params){
+    var county = (params.host || params.chef).county;
+    var tax = 0.08;
+    switch(county){
+      case "San Francisco County":
+        tax = 0.0875;
+        break;
+      case "Sacramento County":
+        tax = 0.08;
+        break;
+    }
+    params.taxRate = tax;
   }
 }
 

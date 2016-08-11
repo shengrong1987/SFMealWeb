@@ -152,7 +152,10 @@ module.exports = {
       var params = this;
       var provideFromTime = params.provideFromTime;
       var provideTillTime = params.provideTillTime;
-      if(provideFromTime >= provideTillTime){
+      var now = new Date();
+      if(now < provideFromTime || now > provideTillTime){
+        return false;
+      }else if(provideFromTime >= provideTillTime){
         return false;
       }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
         return false;
