@@ -11,3 +11,4 @@ npm install -g grunt
 sudo chown -R $USER ./data
 sudo chown -R 500 ./.tmp
 sudo chown -R 500 ./views
+sudo grunt build
