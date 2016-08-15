@@ -38,7 +38,6 @@ module.exports = function(agenda) {
           }else{
             console.log("dispatching delivery for the pickup");
           }
-          done();
         }else{
           if(order.method == "pickup"){
             order.period = period;
@@ -46,8 +45,8 @@ module.exports = function(agenda) {
           }else{
             console.log("dispatching delivery for the pickup");
           }
-          done();
         }
+        done();
       })
     }
   };

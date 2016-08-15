@@ -31,11 +31,8 @@ module.exports = function(agenda) {
         return done();
       }
       Meal.findOne(mealId).populate('chef').populate('dishes').exec(function(err, meal){
-        if(err){
+        if(err || !meal){
           return done();
-        }
-        if(!meal){
-          return done()
         }
         console.log("your meal will be online in 10 minutes");
         meal.hostEmail = meal.chef.email;

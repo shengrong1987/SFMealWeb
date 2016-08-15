@@ -38,7 +38,7 @@ module.exports = function(agenda) {
         //update all orders to preparing
         Order.update({ meal : mealId, status : "schedule"}, { status : "preparing"}).exec(function(err, orders){
           if(err){
-            return done()
+            return done();
           }
           async.each(orders, function(order, cb){
             User.findOne(order.customer).exec(function(err, user){
