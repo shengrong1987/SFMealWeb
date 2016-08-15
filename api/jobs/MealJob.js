@@ -31,7 +31,7 @@ module.exports = function(agenda) {
       var now = new Date();
 
       Meal.find({status : 'on', isScheduled : false}).exec(function(err, meals){
-        if(err){
+        if(err || !meals){
           return done();
         }
         //schedule an end job for each meals

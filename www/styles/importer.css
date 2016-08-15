@@ -7790,6 +7790,9 @@ input:hover {
 input:focus {
   border: solid 1px #ff931e !important;
 }
+.tooltip-inner {
+  text-align: left;
+}
 .divider {
   height: 1px;
   width: 100%;
@@ -7912,6 +7915,21 @@ input:focus {
 .pagination-green .active a {
   color: #ffffff !important;
 }
+/*image*/
+.item-image {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 75%;
+  /* here the desired aspect ratio */
+}
+.item-image img {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
 /*logo*/
 .logo-container {
   width: 100%;
@@ -7919,6 +7937,18 @@ input:focus {
 }
 .search-container {
   text-align: center;
+}
+.fa-facebook-remote {
+  background: url("http://ec2-52-39-170-17.us-west-2.compute.amazonaws.com:1337/images/fa-facebook.png") no-repeat center / 70% auto;
+}
+.fa-instagram-remote {
+  background: url("http://ec2-52-39-170-17.us-west-2.compute.amazonaws.com:1337/images/fa-instagram.png") no-repeat center / 70% auto;
+}
+.fa-pinterest-remote {
+  background: url("http://ec2-52-39-170-17.us-west-2.compute.amazonaws.com:1337/images/fa-pinterest.png") no-repeat center / 70% auto;
+}
+.fa-twitter-remote {
+  background: url("http://ec2-52-39-170-17.us-west-2.compute.amazonaws.com:1337/images/fa-twitter.png") no-repeat center / 70% auto;
 }
 .logo {
   background-image: url(../images/sfmeal_logo.png);
@@ -7932,7 +7962,9 @@ input:focus {
   cursor: pointer;
 }
 .logo-remote {
-  background-image: url("http://ec2-52-39-170-17.us-west-2.compute.amazonaws.com:1337/images/sfmeal_logo.png");
+  padding: 30px 150px 50px 150px;
+  background: url("http://ec2-52-39-170-17.us-west-2.compute.amazonaws.com:1337/images/sfmeal_logo.png") no-repeat center / 100% auto;
+  background-color: transparent;
 }
 .logo-sm {
   left: 80px;
@@ -8018,7 +8050,7 @@ input:focus {
   color: #333333 !important;
 }
 .text-shadow {
-  text-shadow: 1px 1px #FF0000 !important;
+  text-shadow: 1px 1px 1px #999999 !important;
 }
 .text-yellow {
   color: #ffd65a !important;
@@ -8142,6 +8174,9 @@ input:focus {
 /*sharp*/
 .btn.sharp {
   border-radius: 0;
+}
+.btn-inline {
+  display: inline !important;
 }
 /*outline*/
 .btn-outline {
@@ -8293,8 +8328,18 @@ fieldset[disabled] .btn-red.active {
   border-radius: 5px;
 }
 /*nav*/
+.nav-email {
+  margin-bottom: 20px;
+  min-height: 20px;
+}
+.footer-nav {
+  padding-left: 25px;
+}
 .footer-nav li {
   float: left;
+}
+.footer-nav li a {
+  display: inline !important;
 }
 .nav-tab-cute li a {
   color: #333333;
@@ -8373,6 +8418,14 @@ fieldset[disabled] .btn-red.active {
 .footer {
   background-color: #333333;
 }
+.email-footer {
+  background-color: #e6e6e6;
+  padding: 15px;
+}
+.email-footer p {
+  color: #999999;
+  font-size: 12px;
+}
 #birthdayInput select {
   display: inline-block;
 }
@@ -8406,6 +8459,9 @@ fieldset[disabled] .btn-red.active {
 .normal-banner .img-wrapper img {
   width: 100%;
   min-height: 200px;
+}
+.email-banner {
+  height: 120px;
 }
 .compact-banner {
   height: 150px;
@@ -8600,6 +8656,17 @@ fieldset[disabled] .btn-red.active {
   cursor: pointer;
 }
 /*table*/
+.table-email .border-less {
+  border: none;
+}
+.table-email tr {
+  border-bottom: 1px solid #e6e6e6;
+}
+.table-email td {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  vertical-align: middle !important;
+}
 .table-vertical-middle td {
   vertical-align: middle !important;
 }
@@ -8718,6 +8785,10 @@ fieldset[disabled] .btn-red.active {
   padding: 50px;
   border-radius: 10px;
   overflow: hidden;
+}
+.box-email {
+  padding: 25px;
+  border: none ;
 }
 .box-larger-simple {
   min-height: 20px;

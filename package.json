@@ -14,7 +14,7 @@
     "email-templates": "~2.3.2",
     "es5-ext": "~0.10.12",
     "flux": "^2.0.1",
-    "grunt": "0.4.2",
+    "grunt": "~0.4.2",
     "grunt-browserify": "^3.6.0",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-coffee": "~0.10.1",
@@ -35,7 +35,7 @@
     "lodash": "~3.10.1",
     "mimer": "~0.2.1",
     "moment": "~2.12.0",
-    "moment-timezone" : "~0.5.5",
+    "moment-timezone": "~0.5.5",
     "node-geocoder": "~3.9.1",
     "nodemailer": "~v0.7.1",
     "object-assign": "^1.0.0",
@@ -44,8 +44,8 @@
     "sails": "~0.11.2",
     "sails-disk": "~0.10.0",
     "sails-hook-email": "~v0.12.1",
+    "sails-hook-jobs": "~0.1.3",
     "sails-hook-parametized-policies": "^0.3.1",
-    "sails-hook-jobs" : "~0.1.3",
     "sails-mongo": "~v0.12.0",
     "stripe": "~4.5.0",
     "waterlock": "~v0.1.2-rc1",
@@ -74,7 +74,7 @@
     "mocha": "^2.3.4",
     "sinon": "^1.17.2",
     "supertest": "~1.2.0",
-    "supertest-as-promised" : "~v3.2.0",
+    "supertest-as-promised": "~v3.2.0",
     "wolfpack": "^0.4.0"
   }
 }
