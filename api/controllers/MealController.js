@@ -186,46 +186,31 @@ module.exports = {
     var mealId = req.param("id");
     var user = req.session.user;
     var isAdmin = user.auth.email === 'admin@sfmeal.com';
-    Order.find({meal : mealId}).exec(function(err,orders){
+    var $this = this;
+    Order.find({meal : mealId, status : { '!' : ['complete','review','cancel']}}).exec(function(err,orders){
       if(err){
         return res.badRequest(err);
       }
-      if(orders.length == 0){
-        Meal.update({id : mealId},{status : "off"}).exec(function(err, meal){
+
+      if(orders.length > 0) {
+        return res.badRequest(req.__('meal-active-error'));
+      }
+
+      Meal.update({id : mealId},{status : "off", isSchedule : false}).exec(function(err, meal){
+        if(err){
+          return res.badRequest(err);
+        }
+        $this.cancelMealJobs( mealId, function(err){
           if(err){
             return res.badRequest(err);
           }
-          if(isAdmin){
+          if(isAdmin) {
             return res.ok(meal);
           }
           return res.redirect("/host/me#mymeal");
         });
-      }else{
-        var hasActiveOrder = false;
-        orders.forEach(function(order){
-          if(order.status != "complete" && order.status != "cancel"){
-            hasActiveOrder = true;
-          }
-        });
-        if(hasActiveOrder){
-          return res.badRequest(req.__('meal-active-error'));
-        }
-        Meal.findOne(mealId).exec(function(err, meal){
-          if(err){
-            return res.badRequest(err);
-          }
-          meal.status = "off";
-          meal.save(function(err, result){
-            if(err){
-              return res.badRequest(err);
-            }
-            if(isAdmin){
-              return res.ok(result);
-            }
-            return res.redirect("/host/me#mymeal");
-          });
-        });
-      }
+      });
+
     });
   },
 
@@ -233,6 +218,7 @@ module.exports = {
     var mealId = req.param("id");
     var user = req.session.user;
     var isAdmin = user.auth.email === 'admin@sfmeal.com';
+    var $this = this;
     if(isAdmin){
       Meal.findOne(mealId).populate('dishes').exec(function(err, meal){
         if(err){
@@ -253,13 +239,19 @@ module.exports = {
             console.log("meal contain unverified dishes");
             return res.badRequest(req.__('meal-unverify-dish'));
           }
-          meal.status = "on";
-          meal.save(function(err,result){
+          $this.cancelMealJobs( mealId, function(err){
             if(err){
               return res.badRequest(err);
             }
-            return res.ok(meal);
-          });
+            meal.status = "on";
+            meal.isScheduled = false;
+            meal.save(function(err,result){
+              if(err){
+                return res.badRequest(err);
+              }
+              return res.ok(meal);
+            });
+          })
         });
       })
     }else{
@@ -287,13 +279,19 @@ module.exports = {
           if(meal.status == "on"){
             return res.ok(meal);
           }
-          meal.status = "on";
-          meal.save(function(err,result){
+          $this.cancelMealJobs( mealId, function(err){
             if(err){
               return res.badRequest(err);
             }
-            return res.redirect("/host/me#mymeal");
-          });
+            meal.status = "on";
+            meal.isScheduled = false;
+            meal.save(function(err,result){
+              if(err){
+                return res.badRequest(err);
+              }
+              return res.ok(meal);
+            });
+          })
         });
       });
     }
@@ -327,33 +325,25 @@ module.exports = {
   create : function(req, res){
     var hostId = req.session.user.host.id? req.session.user.host.id : req.session.user.host;
     req.body.chef = hostId;
+
     if(this.dateIsValid(req.body)){
       if(this.requirementIsValid(req.body)){
         this.dishIsValid(req.body, function(valid){
           if(valid){
-            if(req.body.status === "on"){
-              Host.findOne(hostId).populate("meals").populate("dishes").exec(function(err, host){
-                if(err){
-                  return res.badRequest(err);
-                }
-                if(!host.isValid(true)){
-                  return res.badRequest(req.__('meal-chef-incomplete'));
-                }
-                Meal.create(req.body).exec(function(err,meal){
-                  if(err){
-                    return res.badRequest(err);
-                  }
-                  return res.ok(meal);
-                });
-              });
-            }else{
+            Host.findOne(hostId).populate("meals").populate("dishes").exec(function(err, host){
+              if(err){
+                return res.badRequest(err);
+              }
+              if(req.body.status == 'on' && !host.isValid(true)){
+                return res.badRequest(req.__('meal-chef-incomplete'));
+              }
               Meal.create(req.body).exec(function(err,meal){
                 if(err){
                   return res.badRequest(err);
                 }
                 return res.ok(meal);
               });
-            }
+            });
           }else{
             console.log("meal contain unverified dishes");
             return res.badRequest(req.__('meal-unverify-dish'));
@@ -369,6 +359,26 @@ module.exports = {
     }
   },
 
+  add : function(req, res){
+    var mealId = req.param('parentid');
+    var dishId = req.param('id');
+    Meal.findOne(mealId).populate('dishes').exec(function(err, meal){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(meal.status == 'on'){
+        return res.badRequest(req.__('meal-active-update-dish'));
+      }
+      meal.dishes.add(dishId);
+      meal.save(function(err, result){
+        if(err){
+          return res.badRequest(err);
+        }
+        return res.ok({});
+      });
+    });
+  },
+
   remove : function(req, res){
     var mealId = req.param('parentid');
     var dishId = req.param('id');
@@ -377,7 +387,7 @@ module.exports = {
         return res.badRequest(err);
       }
       if(meal.status == 'on'){
-        return res.badRequest(req.__('meal-active-delete-dish'));
+        return res.badRequest(req.__('meal-active-update-dish'));
       }
       if(meal.dishes.filter(function(dish){
         return dish.id != dishId;
@@ -396,13 +406,30 @@ module.exports = {
 
   update : function(req, res){
     var mealId = req.param("id");
+    var status = req.body.status;
+    var $this = this;
     if(this.dateIsValid(req.body)){
       if(this.requirementIsValid(req.body)){
-        Meal.update({id : mealId}, req.body).exec(function(err, meal){
+        Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,meal){
           if(err){
             return res.badRequest(err);
           }
-          res.ok(meal);
+          if(status == "on" && !meal.dishIsValid()){
+            console.log("meal contain unverified dishes");
+            return res.badRequest(req.__('meal-unverify-dish'));
+          }
+          $this.cancelMealJobs(mealId, function(err){
+            if(err){
+              return res.badRequest(err);
+            }
+            req.body.isScheduled = false;
+            Meal.update({id : mealId}, req.body).exec(function(err, result){
+              if(err){
+                return res.badRequest(err);
+              }
+              return res.ok(result);
+            });
+          })
         });
       }else{
         console.log("meal minimal requirement are not valid");
@@ -450,9 +477,10 @@ module.exports = {
   dateIsValid : function(params){
     var provideFromTime = params.provideFromTime;
     var provideTillTime = params.provideTillTime;
+    var now = new Date();
     if(provideFromTime >= provideTillTime){
       return false;
-    }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 60){
+    }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
       return false;
     }
     var valid = true;
@@ -476,6 +504,16 @@ module.exports = {
       });
     }
     return valid;
+  },
+
+  cancelMealJobs : function(mealId, cb){
+    Jobs.cancel({'data.mealId' : mealId}, function(err, numberRemoved){
+      if(err){
+        return cb(err);
+      }
+      console.log(numberRemoved + " meal jobs removed");
+      return cb();
+    })
   }
 
   //To test after finishing review model

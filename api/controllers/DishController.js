@@ -51,6 +51,25 @@ module.exports = {
     });
   },
 
+  create : function(req, res){
+    var hostId = req.session.user.host.id ? req.session.user.host.id : req.session.user.host;
+    var params = Object.assign(req.body,{
+      chef : hostId
+    });
+    Dish.create(params).exec(function(err, dish){
+      if(err){
+        return res.badRequest(err);
+      }
+      Host.findOne(hostId).exec(function(err, result){
+        if(err){
+          return res.badRequest(err);
+        }
+        dish.host = result;
+        return res.ok(dish);
+      });
+    })
+  },
+
   destroy : function(req, res){
     var dishId = req.params.id;
     var hostId = req.session.user.host.id ? req.session.user.host.id : req.session.user.host;

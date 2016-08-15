@@ -16,8 +16,7 @@ module.exports = {
       required : true
     },
     price : {
-      type : 'float',
-      required : true
+      type : 'string'
     },
     meal : {
       model : 'Meal'

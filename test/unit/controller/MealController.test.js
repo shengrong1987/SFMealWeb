@@ -5,8 +5,8 @@
 var assert = require('assert'),
     sinon = require('sinon'),
     config = require('../../../config/stripe.js'),
-    stripe = require('stripe')(config.StripeKeys.secretKey);
-    request = require('supertest');
+    stripe = require('stripe')(config.StripeKeys.secretKey),
+    request = require("supertest-as-promised");
 var agent;
 
 before(function(done) {
@@ -16,44 +16,35 @@ before(function(done) {
 
 describe('MealController', function() {
 
-  this.timeout(5000);
+  this.timeout(7000);
 
   describe('build a meal with dishes', function() {
 
     var hostId;
-    var email = 'host@gmail.com';
+    var email = 'aimbebe.r@gmail.com';
     var password = '12345678';
     var address = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853};
 
     it('should login or register an account', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : email, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != email){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            hostId = res.body.host;
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
 
     it('should become a host if is not one', function (done) {
-      if(!hostId){
-        agent
-            .post('/user/becomeHost')
-            .expect(200)
-            .end(function(err,res){
-              if(res.body.user.host == undefined){
-                return done(Error("become host for a logged user doesn't work"));
-              }
-              hostId = res.body.user.host;
-              done();
-            })
-      }else{
-        done();
-      }
+      agent
+        .post('/user/becomeHost')
+        .expect(200)
+        .end(function(err,res){
+          if(res.body.user.host == undefined){
+            return done(Error("become host for a logged user doesn't work"));
+          }
+          hostId = res.body.user.host;
+          done();
+        })
     });
 
     it('should create bank info for host', function (done) {
@@ -74,7 +65,6 @@ describe('MealController', function() {
           })
           .expect(200)
           .end(function(err, res){
-            console.log(res.body);
             if(res.body.bank_name != "STRIPE TEST BANK"){
               return done(Error("error creating bank, bank name doesen't match(STRIPE TEST BANK)"));
             }
@@ -166,7 +156,7 @@ describe('MealController', function() {
       }
       agent
           .post('/meal')
-          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, status : "off", cover : dish1, minimalOrder : 5})
+          .send({provideFromTime: new Date(now.getTime() + 1000 * 60 * 11), provideTillTime: new Date(now.getTime() + 1000 * 2 * 3600), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, cover : dish1, minimalOrder : 5, status : 'off'})
           .expect(200)
           .end(function(err,res){
             if(err){
@@ -186,7 +176,12 @@ describe('MealController', function() {
       var pickups = [{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
-        "location" : "1455 Market St, San Francisoc, CA 94124"
+        "location" : "1455 Market St, San Francisoc, CA 94124",
+        "method" : "pickup"
+      },{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
+        "method" : "delivery"
       }];
       agent
           .post('/meal')
@@ -245,42 +240,115 @@ describe('MealController', function() {
 
     it('should turn one meal on', function (done) {
       agent
-          .post('/meal/' + mealId + "/on")
-          .expect(302)
-          .end(function(err,res){
-            if(err){
-              return done(err);
-            }
-            done();
-          })
+        .post('/meal/' + mealId + "/on")
+        .expect(200)
+        .toPromise()
+        .delay(6000)
+        .then(function(res){
+          agent
+            .get('/job?name=MealStartJob&data.mealId=' + mealId)
+            .expect(200)
+            .then(function(res){
+              if(res.body.length != 1){
+                return done(Error('meal start reminding jobs count not right'));
+              }
+              done();
+            })
+            .catch(function(err){
+              done(err)
+            })
+        })
+        .catch(function(err){
+          done(err);
+        })
     })
 
 
-    it('should search the meals in San Francisco and with a keyword of 菜式 with success', function (done) {
+    it('should search the meals in San Francisco and with a keyword of 菜式 with no results', function (done) {
       agent
         .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
-          if(res.body.meals.length != 1){
-            return done(Error("error searching for meal"));
+          if(res.body.meals.length != 0){
+            return done(Error("meal should be not active yet"));
           }
           done();
         })
     })
 
-    it('should turn another meal on', function (done) {
+    it('should update the meals provideFromTime to now and appear in the search results', function(done){
+      var now = new Date()
       agent
-        .post('/meal/' + preorderMealId + "/on")
-        .expect(302)
-        .end(function(err,res){
-          if(err){
-            return done(err);
+        .put('/meal/' + mealId)
+        .send({
+          status : 'on',
+          provideFromTime : now,
+          provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
+          minimalOrder : 5
+        })
+        .expect(200)
+        .toPromise()
+        .delay(6000)
+        .then(function(res){
+          agent
+            .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .end(function(err,res){
+              if(res.body.meals.length != 1){
+                return done(Error("meal should be not active yet"));
+              }
+              done();
+            })
+        })
+        .catch(function(err){
+          done(err);
+        })
+    })
+
+    it('should cancel the meal starting reminder and should not start a new one because start time less than 10 minutes', function(done){
+      agent
+        .get('/job?data.mealId=' + mealId)
+        .expect(200)
+        .then(function(res){
+          if(res.body.length != 0){
+            return done(Error('meal start reminding jobs count not right'));
           }
           done();
         })
+        .catch(function(err){
+          done(err)
+        })
     })
+
+
+    it('should turn another meal on and schedule preorder schedule end job', function (done) {
+      agent
+        .post('/meal/' + preorderMealId + "/on")
+        .expect(200)
+        .toPromise()
+        .delay(6000)
+        .then(function(res){
+          agent
+            .get('/job?name=MealScheduleEndJob&data.mealId=' + preorderMealId)
+            .expect(200)
+            .then(function(res){
+              if(res.body.length != 1){
+                return done(Error('meal shedule end jobs not get scheduled correctly'));
+              }
+              done();
+            })
+            .catch(function(err){
+              done(err)
+            })
+        })
+        .catch(done)
+    })
+
+
 
     it('should search the meals in San Francisco and with a keyword of 菜式 again', function (done) {
       agent

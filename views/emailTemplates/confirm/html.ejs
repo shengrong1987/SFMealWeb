@@ -1,78 +1,90 @@
-<div class="container-fluid text-center red" style="margin-top:-20px;">
-  <div class="row">
-    <div class="compact-banner vertical-align dark">
-      <div style="width: 600px;" class="middle banner-text">
-        <div class="row vertical-align" style="margin-bottom: 5px;">
-          <div class="col-xs-3 cursor-pointer" onclick="location.href='/'">
-            <a href="/" class="logo"></a>
-          </div>
-          <div class="col-xs-9 text-right">
-            <button class="btn btn-danger" onclick="location.href='http://www.sfmeal.com'">进入网站</button>
-          </div>
-        </div>
+<div class="email-banner vertical-align dark">
+  <div style="width: 600px;" class="middle banner-text">
+    <div class="row vertical-align" style="margin-bottom: 5px;">
+      <div class="col-xs-3 cursor-pointer" onclick="location.href='/'">
+        <a href="/" class="logo-remote"></a>
+      </div>
+      <div class="col-xs-9 text-right">
+        <a class="btn btn-red btn-inline" href='http://www.sfmeal.com'><%= enterwebsite%></a>
       </div>
     </div>
   </div>
+</div>
 
-  <div class="box-larger-simple white relative middle text-left" style="top: -50px;">
-    <h4 class="text-red">订单已<b>确认取消/调整</b></h4>
-    <p>Hi Aimee,</p>
-    <p>您之前在SFMeal下的订单已成功取消,退款将在48小时内退回给您。</p>
-    <p>您之前在SFMeal下的订单已成功调整, 订单差价将会立刻从您的帐号扣除或退还。</p>
+<div class="green" style="padding: 25px;">
+  <div class="box-email white relative middle text-left">
+    <h4 class="text-red"><%= order%><%= dingdan%><b><%= lastStatus == 'cancelling' ? confirmcancel : confirmadjust%></b></h4>
+    <p>Hi <%= recipientName%>,</p>
+    <p><%= lastStatus == 'cancelling' ? confirmcancelcontext : confirmadjustcontext%></p>
     <div class="divider" style="margin-bottom: 10px;"></div>
-    <p>订单号:02727936</p>
-    <table class="table">
+    <p><%= ordernumber%>: <%= id%></p>
+    <table class="table table-email">
+      <% Object.keys(orders).forEach(function(dishId){
+        var amount = parseInt(orders[dishId]);
+      if(amount > 0){
+        var dish;
+        dishes.forEach(function(d){
+          if(d.id == dishId){
+            dish = d;
+            return;
+          }
+        });
+      %>
       <tr>
-        <td><img src="/images/dumplings.jpg" style="width: 100px;"></td>
-        <td class="text-red" style="vertical-align: middle;">阳澄湖边的大闸蟹</td>
-        <td style="vertical-align: middle;">2份</td>
-        <!--<td style="vertical-align: middle;">$84.34</td>-->
+        <td><img src="<%= dish.photos[0].v%>" style="width: 100px;"></td>
+        <td class="text-green" style="vertical-align: middle;"><%= dish.title%></td>
+        <td style="vertical-align: middle;"><%= amount%><%= fen%></td>
+        <td style="vertical-align: middle;text-align: right;">$<%= (amount * dish.price).toFixed(2)%></td>
       </tr>
-      <tr class="border-less">
-        <td><img src="/images/dumplings.jpg" style="width: 100px;"></td>
-        <td class="text-red" style="vertical-align: middle;">阳澄湖边的大闸蟹</td>
-        <td style="vertical-align: middle;">2份</td>
-        <!--<td style="vertical-align: middle;">$84.34</td>-->
-      </tr>
+      <%}});%>
       <tr>
         <td></td>
         <td></td>
-        <td>订单: $183.00</td>
-      </tr>
-      <tr class="border-less">
         <td></td>
-        <td></td>
-        <td>送餐费: $5.00</td>
-      </tr>
-      <tr class="border-less">
-        <td></td>
-        <td></td>
-        <td>Tax: $2.45</td>
+        <td style="text-align: right;"><%= dingdan%>:$<%= subtotal.toFixed(2)%></td>
       </tr>
       <tr class="border-less">
         <td></td>
         <td></td>
-        <td>总计: $244.5</td>
+        <td></td>
+        <td style="text-align: right;"><%= deliveryfee%>: $<%= delivery_fee.toFixed(2)%></td>
+      </tr>
+      <tr class="border-less">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style="text-align: right;"><%= tax%>: $<%= (subtotal * taxRate).toFixed(2)%></td>
+      </tr>
+      <tr class="border-less">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style="text-align: right;"><%= total%> $<%= (subtotal * (1 + taxRate) + delivery_fee).toFixed(2)%></td>
       </tr>
       <tr>
-        <td>下单时间: 2016-7-4 03:51</td>
+        <td><%= ordertime%>: <%= createdAt%></td>
         <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>订单取消/调整时间: 2016-7-4 04:51</td>
         <td></td>
         <td></td>
       </tr>
       <tr>
-        <td>退款方式: 尾数为1127的银行卡</td>
+        <td><%= lastStatus == 'cancelling' ? applycanceltime : applyadjusttime%>: <%= updatedAt%></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><%= refundmethod%>: <%= defaultcard%></td>
+        <td></td>
         <td></td>
         <td></td>
       </tr>
     </table>
     <div class="row text-center">
-      <button class="btn btn-red">打开订单</button>
+      <a class="btn btn-green btn-inline" href="http://www.sfmeal.com/host/me#myorder"><%= openorder%></a>
     </div>
   </div>
 
 </div>
+
+<%- include ../email_footer %>

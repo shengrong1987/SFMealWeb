@@ -7,6 +7,7 @@
 
 var dateUtil = require("../services/util.js");
 var moment = require("moment");
+var async = require("async");
 
 module.exports = {
 
@@ -17,6 +18,10 @@ module.exports = {
     status : {
       type : 'string',
       enum : ['on','off']
+    },
+    isScheduled : {
+      type : 'boolean',
+      defaultsTo : false
     },
     /*
       Array of object
@@ -147,9 +152,10 @@ module.exports = {
       var params = this;
       var provideFromTime = params.provideFromTime;
       var provideTillTime = params.provideTillTime;
+      var now = new Date();
       if(provideFromTime >= provideTillTime){
         return false;
-      }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 60){
+      }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
         return false;
       }
       var valid = true;
@@ -186,41 +192,84 @@ module.exports = {
   },
 
   beforeCreate : function(values, cb){
-    if(values.chef && !values.county){
-      Host.findOne(values.chef).exec(function(err,host){
-        if(err){
-          return cb(err);
+    async.auto({
+      updateCountyAndPickup: function(next){
+        if(!values.chef){
+          console.log("meal has no chef");
+          return next(Error("meal has no chef"));
         }
-        values.county = host.county;
-        if(values.cover){
-          Dish.findOne(values.cover).exec(function(err,dish){
-            if(err){
-              return cb(err);
-            }
-            values.coverString = dish ? dish.photos[0].v : '';
-            cb();
-          });
-        }else{
-          cb();
+        if(values.county && values.type != "order"){
+          return next();
         }
-      });
-    }else{
+        Host.findOne(values.chef).exec(function(err, host){
+          if(err){
+            return next(err);
+          }
+          if(!values.county){
+            values.county = host.county;
+          }
+          if(values.type == "order"){
+            values.pickups = JSON.stringify([{
+              "pickupFromTime" : values.provideFromTime,
+              "pickupTillTime" : values.provideTillTime,
+              "location" : host.full_address
+            }])
+          }
+          next();
+        });
+      },
+      updateMealCover : function(next){
+        if(!values.cover){
+          return next();
+        }
+        Dish.findOne(values.cover).exec(function(err,dish){
+          if(err){
+            return cb(err);
+          }
+          values.coverString = dish ? dish.photos[0].v : '';
+          next();
+        });
+      }
+    },function(err){
       cb();
-    }
+    });
   },
 
   beforeUpdate : function(values,cb){
-    if(values.cover && values.cover != ""){
-      Dish.findOne(values.cover).exec(function(err,dish){
-        if(err){
-          return cb(err);
+    async.auto({
+      updateCover : function(next){
+        if(values.cover && values.cover != ""){
+          Dish.findOne(values.cover).exec(function(err,dish){
+            if(err){
+              return next(err);
+            }
+            values.coverString = dish ? dish.photos[0].v : '';
+            next();
+          });
+        }else{
+          next();
         }
-        values.coverString = dish ? dish.photos[0].v : '';
-        cb();
-      });
-    }else{
-      cb();
-    }
+      },
+      updatePickup : function(next){
+        if(values.type == "order"){
+          Host.findOne(values.chef || values.host).exec(function(err, host){
+            if(err){
+              return next(err);
+            }
+            values.pickups = JSON.stringify([{
+              "pickupFromTime" : values.provideFromTime,
+              "pickupTillTime" : values.provideTillTime,
+              "location" : host.full_address
+            }])
+            next();
+          });
+        }else{
+          next();
+        }
+      }
+    },function(err){
+      cb(err);
+    });
   }
 };
 

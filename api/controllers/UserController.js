@@ -29,9 +29,11 @@ module.exports = require('waterlock').actions.user({
   becomeHost : function(req, res){
     var userId = req.session.user.id;
     var email = req.session.user.auth.email;
+    var shopName = req.query.shopName;
     var params = {};
     params.user = userId;
     params.email = email;
+    params.shopName = shopName;
     if(req.session.user.host){
       return res.badRequest(req.__('user-already-host'));
     }
@@ -78,164 +80,152 @@ module.exports = require('waterlock').actions.user({
   },
 
   update : function(req, res) {
-    var addAddress = function(address,res,user){
-      if(address.id){
-        //address exist, just to update with the id
-        if(address.isDefault){
-          for (var key in user.address_list) {
-            if(user.address_list.hasOwnProperty(key)) {
-              user.address_list[key].isDefault = false;
-            }
-          }
-        }
-        user.address_list[address.id] = address;
-        user.save(function(err,found){
-          if(err){
-            return res.badRequest(err);
-          }
-          res.ok(found);
-        })
-      }else{
-        //adding as it's a new address
-        if(address.isDefault){
-          for (var key in user.address_list) {
-            if(user.address_list.hasOwnProperty(key)) {
-              user.address_list[key].isDefault = false;
-            }
-          }
-        }
-        //var address_count = Object.keys(user.address_list).length;
-        var id = new Date().getTime();
-        address.id = id;
-        user.address_list[id] = address;
-        user.save(function(err,found) {
-          if (err) {
-            return res.badRequest(err);
-          }
-          res.ok(found);
-        });
-      }
-    };
+
     var params = req.body;
     var userId = req.params.id;
-    if (params.address) {
-      var address = params.address;
-      if(address.delete){
-        User.findOne(userId).populate('auth').exec(function(err,user) {
-          if (err) {
-            return res.badRequest(err);
-          }
-          var keys = Object.keys(user.address_list);
-          if(keys.length == 1){
-            return res.badRequest(req.__('user-only-address'));
-          }
-          var isDefault = user.address_list[address.id].isDefault;
-          delete user.address_list[address.id];
-          keys = Object.keys(user.address_list);
-          if(isDefault){
-            user.address_list[keys[0]].isDefault = true;
-          }
 
-          user.save(function(err,found) {
-            if (err) {
-              return res.badRequest(err);
-            }
-            res.ok(found);
-          });
-        });
-      }else if(address.isDefault){
-        //isDefault address, need to geocode it
-        var actualAddress = address.street + " " + address.city;
-        require('../services/geocode').geocode(actualAddress, function (err, result) {
-          if (err) {
-            return res.badRequest(req.__('meal-error-address'));
-          }  else {
-            if(result.length==0){
-              return res.badRequest(req.__('meal-error-address2'));
-            }
-            var administration = result[0].administrativeLevels;
-            User.findOne(userId).populate('auth').exec(function(err,user){
-              if(err){
-                return res.badRequest(err);
+    async.auto({
+      handleAddress : function(cb){
+        console.log("handling address");
+        if(!params.address){
+          return cb();
+        }
+        var addresses = params.address;
+        User.findOne(userId).exec(function(err, user){
+          if(err){
+            return cb(err);
+          }
+          async.each(addresses, function(addObj, next){
+            if(addObj.delete){
+              var keys = Object.keys(user.address_list);
+              if(keys.length == 1){
+                return next(req.__('user-only-address'));
               }
-              user.county = administration.level2long;
-              user.city = result[0].city;
-              user.full_address = result[0].formattedAddress;
-              user.lat = result[0].latitude;
-              user.long = result[0].longitude;
-              addAddress(address,res,user);
+              var isDefault = user.address_list[address.id].isDefault;
+              delete user.address_list[addObj.id];
+              keys = Object.keys(user.address_list);
+              if(isDefault){
+                user.address_list[keys[0]].isDefault = true;
+              }
+              return next(null, user);
+            }
+            if(addObj.isDefault){
+              for (var key in user.address_list) {
+                if(user.address_list.hasOwnProperty(key)) {
+                  user.address_list[key].isDefault = false;
+                }
+              }
+              var actualAddress = addObj.street + " " + addObj.city;
+              require('../services/geocode').geocode(actualAddress, function (err, result) {
+                if (err) {
+                  return next(req.__('meal-error-address'));
+                }
+                if(result.length==0){
+                  return next(req.__('meal-error-address2'));
+                }
+                var administration = result[0].administrativeLevels;
+                user.county = administration.level2long;
+                user.city = result[0].city;
+                user.full_address = result[0].formattedAddress;
+                user.lat = result[0].latitude;
+                user.long = result[0].longitude;
+                return next();
+              });
+            }else{
+              if(addObj.id){
+                user.address_list[addObj.id] = address;
+              }else{
+                var id = new Date().getTime();
+                user.address_list[id] = addObj;
+              }
+              return next();
+            }
+          },function(err){
+            if(err){
+              return cb(err);
+            }
+            cb(null, user);
+          });
+        })
+      },
+      updateUser : ['handleAddress',function(cb, results){
+        console.log("updating info");
+        if(results && results.handleAddress) {
+          results.handleAddress.save(function(err, u){
+            if(err){
+              return cb(err);
+            }
+            var auth = req.session.user.auth;
+            User.update({id: userId}, params).exec(function (err, user) {
+              if (err) {
+                return cb(err);
+              }
+              user[0].auth = auth;
+              cb(null, user[0]);
             });
-          }
-        });
-      }else{
-        User.findOne(userId).populate('auth').exec(function(err,user) {
-          if (err) {
-            return res.badRequest(err);
-          }
-          addAddress(address,res, user);
-        });
-      }
-    } else {
-      var auth = req.session.user.auth;
-      User.update({id: userId}, params).exec(function (err, user) {
-        if (err) {
+          })
+        }else{
+          var auth = req.session.user.auth;
+          User.update({id: userId}, params).exec(function (err, user) {
+            if (err) {
+              return cb(err);
+            }
+            user[0].auth = auth;
+            cb(null, user[0]);
+          });
+        }
+      }]}, function(err, results){
+        if(err){
           return res.badRequest(err);
         }
-        user[0].auth = auth;
-        req.session.user = user[0];
-        res.ok(user[0]);
-      });
-    }
+        console.log(results.updateUser);
+        return res.ok(results.updateUser);
+      })
   },
 
   me : function(req, res){
-    var userId = req.session.user.id
-    User.findOne(userId).populate("host").populate("orders").populate("collects").exec(function(err,found){
+    var userId = req.session.user.id;
+    User.findOne(userId).populate("host").populate("orders").populate('auth').populate("collects").exec(function(err,found){
       if(err){
         return res.badRequest(err);
       }
       found.featureDishes = [];
       if(found.orders.length == 0 && found.collects.length == 0) {
-        return res.view('user', {user: found});
-      }
-
-      async.each(found.orders, function(order,next){
-        Order.findOne(order.id).populate("dishes").populate("host").populate("meal").exec(function (err, result) {
-          if(err){
-            next(err);
-          }else{
-            order.dishes = result.dishes;
-            order.host = result.host;
-            order.meal = result.meal;
-            if(order.status == "review"){
-              Object.keys(order.orders).forEach(function(dishId){
-                if(order.orders[dishId]>0){
-                  order.dishes.forEach(function(dish){
-                    if(dish.id == dishId){
-                      if(dish.isFeature()){
-                        dish.meal = order.meal;
-                        if(found.featureDishes.indexOf(dishId) == -1){
-                          found.featureDishes.push(dish);
-                        }
-                      }
-                    }
-                  });
-                }
-              });
-            }
-            next();
-          }
-        });
-      },function(err){
-        if(err){
-          return res.badRequest(err);
+        if(req.wantsJSON){
+          return res.ok(found);
         }
-        async.each(found.collects, function(collect,next){
-          Meal.findOne(collect.id).populate("chef").exec(function(err, meal){
+        found.locale = req.getLocale();
+        found.save(function(err, result){
+          if(err){
+            return res.badRequest(err);
+          }
+          return res.view('user', {user: found});
+        })
+      }else{
+        async.each(found.orders, function(order,next){
+          Order.findOne(order.id).populate("dishes").populate("host").populate("meal").exec(function (err, result) {
             if(err){
               next(err);
             }else{
-              collect.chef = meal.chef;
+              order.dishes = result.dishes;
+              order.host = result.host;
+              order.meal = result.meal;
+              if(order.status == "review"){
+                Object.keys(order.orders).forEach(function(dishId){
+                  if(order.orders[dishId]>0){
+                    order.dishes.forEach(function(dish){
+                      if(dish.id == dishId){
+                        if(dish.isFeature()){
+                          dish.meal = order.meal;
+                          if(found.featureDishes.indexOf(dishId) == -1){
+                            found.featureDishes.push(dish);
+                          }
+                        }
+                      }
+                    });
+                  }
+                });
+              }
               next();
             }
           });
@@ -243,15 +233,38 @@ module.exports = require('waterlock').actions.user({
           if(err){
             return res.badRequest(err);
           }
-          req.session.user = found;
-          Notification.destroy({user : userId}).exec(function(err){
+          async.each(found.collects, function(collect,next){
+            Meal.findOne(collect.id).populate("chef").exec(function(err, meal){
+              if(err){
+                next(err);
+              }else{
+                collect.chef = meal.chef;
+                next();
+              }
+            });
+          },function(err){
             if(err){
-              console.log(err);
+              return res.badRequest(err);
             }
+            req.session.user = found;
+            Notification.destroy({user : userId}).exec(function(err){
+              if(err){
+                console.log(err);
+              }
+            });
+            found.locale = req.getLocale();
+            found.save(function(err, result){
+              if(err){
+                return res.badRequest(err);
+              }
+              if(req.wantsJSON){
+                return res.ok(found);
+              }
+              return res.view('user',{user: found});
+            })
           });
-          return res.view('user',{user: found});
         });
-      });
+      }
     });
   },
 

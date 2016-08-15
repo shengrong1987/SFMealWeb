@@ -2,6 +2,7 @@
  * Created by shengrong on 12/3/15.
  */
 var nodemailer = require('nodemailer');
+var moment = require('moment');
 var transporter = nodemailer.createTransport("SMTP",{
   host : "smtp.office365.com",
   secureConnection : false,
@@ -24,90 +25,137 @@ var mailOptions = {
 };
 
 var notification = {
-  notificationCenter : function(model, action, params, isHostAction, isAdminAction){
+  /*
+    publish event method
+    @params
+    model : the event model
+    action : the action of the event
+    params : model data
+    isSendToHost : if the event is sent to host
+    isAdminAction : if the event is post by admin
+   */
+  notificationCenter : function(model, action, params, isSendToHost, isAdminAction, req){
+
+    isSendToHost = isSendToHost || false;
+    isAdminAction = isAdminAction || false;
+
+    this.publishEvent(model, action, params, isSendToHost, isAdminAction);
+
+    if(isAdminAction){
+      //send emails to both chef and guest as it's modified by admin
+      params.isSendToHost = true;
+      notification.sendEmail(model, action, params, req);
+      params.isSendToHost = false;
+      notification.sendEmail(model, action, params, req);
+    }
+    else{
+      params.isSendToHost = isSendToHost;
+      notification.sendEmail(model, action, params, req);
+    }
+  },
+
+  sendEmail : function(model, action, params, req){
+
+    var basicInfo = this.inquireBasicInfo(params.isSendToHost, params);
+    var template = this.inquireTemplate(model,action);
+    var locale = req ? (params.isSendToHost ? params.host.locale : params.customer.locale) : '';
+
+    var vars = this.mergeI18N(model, action, req, locale);
+
+    this.transitLocaleTimeZone(params);
+    this.calculateTax(params);
+
+    var params = Object.assign({
+      recipientName : basicInfo.recipientName,
+      senderName : "SFMeal.com"
+    }, params);
+
+    params = Object.assign(params, vars);
+
+    //juice it using email-template
+    sails.hooks.email.send(template,params,{
+      to : basicInfo.recipientEmail,
+      subject : "SFMeal.com"
+    },function(err){
+
+      console.log(basicInfo.recipientEmail, err || "It worked!");
+    })
+  },
+
+  publishEvent : function(model, action, params, isSendToHost, isAdminAction){
     var verb = "updated";
     if(model === "Order"){
       switch(action){
         case "new":
-          isHostAction = true;
           Order.publishCreate({id : params.id, host : params.host});
           verb = "created";
           break;
         case "adjust":
-          isHostAction = !isHostAction;
           Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
           break;
         case "adjusting":
-          isHostAction = true;
-          action = "requested for adjust";
           Order.publishUpdate( params.id, { id : params.id, action : "requested for adjust", host : params.host});
           break;
         case "cancel":
-          isHostAction = !isHostAction;
           verb = "destroyed";
           Order.publishDestroy( params.id, undefined, {host : params.host} );
           break;
         case "abort":
-          isHostAction = false;
           verb = "destroyed";
           Order.publishDestroy( params.id, undefined, {host : params.host} );
           break;
         case "cancelling":
-          isHostAction = true;
-          action = "requested for cancel";
           Order.publishUpdate( params.id, { id : params.id, action : "requested for cancel", host : params.host});
           break;
         case "confirm":
-          isHostAction = false;
           Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
           break;
         case "ready":
-          isHostAction = false;
           Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
           break;
         case "receive":
-          isHostAction = false;
           Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
           break;
         case "reject":
-          isHostAction = false;
-          action = "changes are rejected";
           Order.publishUpdate( params.id, { id : params.id, action : "changes are rejected", host : params.host});
           break;
+        case "reminder":
+          Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
+          break;
         case "review":
-          isHostAction = true;
-          action = "has an new review!";
           Order.publishUpdate( params.id, { id : params.id, action : "has an new review!", host : params.host});
           break;
       }
-      params.isHostAction = isHostAction;
+    }else if(model == "Meal"){
+      switch(action){
+        case "scheduleEnd":
+          Meal.publishUpdate( params.id, { id : params.id, action: "Your meal book time is over", host: params.host });
+          break;
+        case "start":
+          Meal.publishUpdate( params.id, { id : params.id, action: "Your meal will start in 10 minutes.", host: params.host });
+          break;
+      }
     }
+
     if(isAdminAction){
       Notification.create({ recordId : params.id, host : params.host, action : action, model : model, verb : verb }).exec(function(err, noti){
         if(err){
           console.log(err);
           return;
         }
-        params.isHostAction = true;
-        notification.sendEmail(model, action, params);
       });
       Notification.create({ recordId : params.id, user : params.customer, action : action, model : model, verb : verb}).exec(function(err, noti){
         if(err){
           console.log(err);
           return;
         }
-        params.isHostAction = false;
-        notification.sendEmail(model, action, params);
       });
-
-    }
-    else if(isHostAction){
+    }else if(isSendToHost){
       Notification.create({ recordId : params.id, host : params.host, action : action, model : model, verb : verb }).exec(function(err, noti){
         if(err){
           console.log(err);
           return;
         }
-        notification.sendEmail(model, action, params);
       });
     }else{
       Notification.create({ recordId : params.id, user : params.customer, action : action, model : model, verb : verb}).exec(function(err, noti){
@@ -115,23 +163,25 @@ var notification = {
           console.log(err);
           return;
         }
-        notification.sendEmail(model, action, params);
       });
     }
   },
 
-  sendEmail : function(model, action, params){
-    var recipientEmail;
-    var recipientName;
-    var template;
-    if(model === "Order"){
-      if(params.isHostAction){
-        recipientEmail = params.hostEmail;
-        recipientName = params.host.shopName;
-      }else{
-        recipientEmail = params.guestEmail;
-        recipientName = params.customer.firstname;
-      }
+  inquireBasicInfo : function(isSendToHost, params){
+    var info = {};
+    if(isSendToHost){
+      info.recipientEmail = params.hostEmail;
+      info.recipientName = (params.host || params.chef).shopName;
+    }else{
+      info.recipientEmail = params.guestEmail;
+      info.recipientName = params.customer.firstname;
+    }
+    return info;
+  },
+
+  inquireTemplate : function(model,action){
+    var template = "";
+    if(model == "Order"){
       switch(action){
         case "new":
           template = "new";
@@ -163,27 +213,114 @@ var notification = {
         case "review":
           template = "review";
           break;
-        default:
-          template = "adjust";
+        case "reminder":
+          template = "reminder";
           break;
       }
-      //juice it using email-template
-
-      sails.hooks.email.send(template,{
-        recipientName : recipientName,
-        senderName : "SFMeal.com",
-        id : params.id,
-        lastStatus : params.lastStatus,
-        layout : '../email_layout',
-        filename : '/emailTemplate'
-      },{
-        to : recipientEmail,
-        subject : "SFMeal.com"
-      },function(err){
-
-        console.log(recipientEmail, err || "It worked!");
-      })
+    }else if(model == "Meal"){
+      switch(action){
+        case "mealScheduleEnd":
+          template = "guestlist";
+          break;
+        case "start":
+          template = "start";
+          break;
+      }
     }
+    return template;
+  },
+
+  mergeI18N : function(model, action, req, locale){
+    var localVar = {};
+    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','tax'];
+    if(model == "Order"){
+      switch(action){
+        case "new":
+          i18ns = i18ns.concat(['new-order-title','new-order-context','order-time','ready-time','order','preorder']);
+          break;
+        case "adjust":
+          i18ns = i18ns.concat(['adjust-order-context','modify','de-order','order-time','adjust-time']);
+          break;
+        case "adjusting":
+          i18ns = i18ns.concat(['apply-adjust','apply-adjust-order-context','confirm-or-reject','order-time','adjust-time','ready-time']);
+          break;
+        case "cancel":
+          i18ns = i18ns.concat(['pity','cancel','de-order','cancel-order-context','order-time','preorder-end-time','cancel-time']);
+          break;
+        case "cancelling":
+          i18ns = i18ns.concat(['apply-cancel','cancelling-order-title','cancelling-order-context','cancel-reason','order-time','apply-cancel-time','confirm-or-reject']);
+          break;
+        case "abort":
+          i18ns = [];
+          break;
+        case "confirm":
+          i18ns = i18ns.concat(['confirm-cancel','confirm-adjust','confirm-cancel-context','confirm-adjust-context','order-time','apply-cancel-time','apply-adjust-time','refund-method','default-card']);
+          break;
+        case "ready":
+          i18ns = i18ns.concat(['order-ready-title','order-pickup-ready-context','order-delivery-ready-context','pickup-method','self-pickup','delivery','pickup-location','order-time','complete-time']);
+          break;
+        case "reject":
+          i18ns = i18ns.concat(['cancel', 'adjust', 'get-reject','order-time','reject-reason',"order-cancel-reject-context","order-adjust-reject-context"]);
+          break;
+        case "review":
+          i18ns = i18ns.concat(['review-order-title','review-order-context-1','review-order-context-2','review-dish','review-meal','scoreLabel','content','review-time','view-review']);
+          break;
+        case "reminder":
+          i18ns = i18ns.concat(['order-pickup-reminder-title','order-pickup-reminder-hourly-context','order-pickup-reminder-daily-context','order-arrive-reminder-title','order-arrive-reminder-context','pickup-location','pickup-time','contact-phone','delivery-location']);
+          break;
+      }
+    }else if(model == "Meal"){
+      switch(action){
+        case "mealScheduleEnd":
+          i18ns = i18ns.concat(['guest-list-title','guest-list-context','guest-list-no-title','guest-list-no-context','guest-list-no-tips','delivery-location','delivery-time','pickup-time','pickup-location','print-list','content','contact','comment','open-meal']);
+          break;
+        case "start":
+          i18ns = i18ns.concat(['meal-name','meal-number','meal-order-start-title','meal-order-start-context','step2','provide-time','ready-time','min']);
+          break;
+      }
+    }
+
+    i18ns.forEach(function(keyword){
+      if(req){
+        localVar[keyword.replace(/\-/g,'')] = req.__(keyword);
+      }else{
+        localVar[keyword.replace(/\-/g,'')] = sails.__({
+          phrase : keyword,
+          locale : locale
+        });
+      }
+    });
+
+    return localVar;
+  },
+
+  transitLocaleTimeZone : function(params){
+    moment.tz.add('America/Los_Angeles|PST PDT|80 70|0101|1Lzm0 1zb0 Op0');
+    if(params.pickupInfo){
+      params.pickupInfo.pickupFromTime = moment.tz(params.pickupInfo.pickupFromTime, "America/Los_Angeles");
+      params.pickupInfo.pickupTillTime = moment.tz(params.pickupInfo.pickupTillTime, "America/Los_Angeles");
+    }
+    if(params.eta){
+      params.eta = moment.tz(params.eta,"America/Los_Angeles");
+    }
+    if(params.meal){
+      params.meal.provideFromTime = moment.tz(params.meal.provideFromTime, "America/Los_Angeles");
+      params.meal.provideTillTime = moment.tz(params.meal.provideTillTime, "America/Los_Angeles");
+    }
+  },
+
+  calculateTax : function(params){
+    var county = (params.host || params.chef).county;
+    var tax = 0.08;
+    switch(county){
+      case "San Francisco County":
+        tax = 0.0875;
+        break;
+      case "Sacramento County":
+        tax = 0.08;
+        break;
+    }
+    params.taxRate = tax;
   }
 }
 

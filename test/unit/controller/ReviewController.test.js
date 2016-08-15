@@ -19,26 +19,36 @@ describe('ReviewController', function() {
   describe('', function() {
 
     var hostId;
-    var email = 'host@gmail.com';
+    var email = 'aimbebe.r@gmail.com';
     var password = '12345678';
     var address = "1455 Market St, San Francisco";
     var phone = "1-415-802-3853";
 
-    var guestEmail = 'guest@gmail.com'
+    var guestEmail = 'enjoymyself1987@gmail.com'
 
     it('should login or register an account', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : email, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != email){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            hostId = res.body.host;
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
+
+    it('should get host info', function(done){
+      agent
+        .get('/host/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          hostId = res.body.id;
+          done()
+        })
+    })
 
     var mealId;
     var dishId1;
@@ -73,17 +83,27 @@ describe('ReviewController', function() {
 
     it('should login or register an account for guest', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : guestEmail, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != guestEmail){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            guestId = res.body.id;
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
+
+    it('should get user info', function(done){
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          guestId = res.body.id;
+          done()
+        })
+    })
 
     var orderId;
     it('should order the meal', function (done) {
@@ -112,14 +132,9 @@ describe('ReviewController', function() {
       agent
         .post('/auth/login?type=local')
         .send({email : email, password: password})
-        .expect(200)
-        .end(function(err,res){
-          if(res.body.auth.email != email){
-            return done(Error("not login with the same account(email not the same)"))
-          }
-          hostId = res.body.host;
-          done();
-        })
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
 
     it('should change the order to complete', function(done){
@@ -150,14 +165,9 @@ describe('ReviewController', function() {
       agent
         .post('/auth/login?type=local')
         .send({email : guestEmail, password: password})
-        .expect(200)
-        .end(function(err,res){
-          if(res.body.auth.email != guestEmail){
-            return done(Error("not login with the same account(email not the same)"))
-          }
-          guestId = res.body.id;
-          done();
-        })
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
 
 
@@ -168,40 +178,48 @@ describe('ReviewController', function() {
           .expect('Content-Type', /json/)
           .send({meal : mealId, dish : dishId1, score : 4.0, review : "Very delicious could be more",user: guestId})
           .expect(200)
-          .end(function(err,res){
+          .end(function(err, res){
             if(err){
               return done(err);
             }
-            if(res.body.meal != mealId || res.body.dish != dishId1){
-              return done(Error("error creating review"));
+            if(res.body.meal.id != mealId || res.body.dish != dishId1){
+              return done(Error('error reviewing dish'));
             }
             done();
           })
     })
 
-    it('should leave a review for another dish of the meal', function (done) {
+    it('should leave a review for the meal', function (done) {
       agent
         .post('/review')
         .set('Accept', 'application/json')
-        // .expect('Content-Type', /json/)
-        .send({meal : mealId, dish : dishId2, score : 4.5, review : "Very delicious could be more",user: guestId})
+        .expect('Content-Type', /json/)
+        .send({meal : mealId, score : 5.0, review : "Very delicious could be more",user: guestId})
         .expect(200)
         .end(function(err,res){
           if(err){
             return done(err);
           }
-          if(res.body.meal != mealId || res.body.dish != dishId2){
+          if(res.body.meal.id != mealId){
             return done(Error("error creating review"));
           }
           done();
         })
     })
 
+    it('should not leave a review for another dish of the meal', function (done) {
+      agent
+        .post('/review')
+        .send({meal : mealId, dish : dishId2, score : 4.5, review : "Very delicious could be more",user: guestId})
+        .expect(403)
+        .end(done)
+    })
+
     it('should not be able to leave a review for the already reviewed meal', function (done) {
       agent
         .post('/review')
         .set('Accept', 'application/json')
-        // .expect('Content-Type', /json/)
+        .expect('Content-Type', /json/)
         .send({meal : mealId, dish : dishId1, score : 5, review : "Very delicious could be more",user: guestId})
         .expect(403)
         .end(function(err,res){

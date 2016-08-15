@@ -141,9 +141,5 @@ module.exports = {
       user.receivedEmail = data.receivedEmail;
     }
     user.save(cb);
-    //cb(null, user);
   }
-
-  //beforeCreate: require('waterlock').models.user.beforeCreate,
-  //beforeUpdate: require('waterlock').models.user.beforeUpdate
 };

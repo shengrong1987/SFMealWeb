@@ -104,11 +104,17 @@
                   <div class="box-simple text-left">
                     <div class="checkbox">
                       <label>
-                        <input type="checkbox"><small class="font-small"><span class="text-black"><% __('self-pickup')%> </span><%= __('location') + count %>：<%= pickupMethod.location%>，<%= __('time')%> <span data-toggle="time-span" data-format="hourly" data-from="<%= pickupMethod.pickupFromTime%>" data-to="<%= pickupMethod.pickupTillTime%>"></span></small>
+                        <input type="checkbox">
+                        <small class="font-small">
+                          <!--<span class="text-black"><% __('self-pickup')%> </span>-->
+                          <b><%= __('location') + count %>:</b> <%= pickupMethod.location%>，<br/><br/>
+                          <b><%= __('time')%></b> <span data-toggle="time-span" data-format="date" data-from="<%= pickupMethod.pickupFromTime%>" data-to="<%= pickupMethod.pickupTillTime%>"></span><br/><br/>
+                          <b><%= __('pickup-method')%>: <%= pickupMethod.method == 'delivery' ? __('delivery') : __('self-pickup') %></b>
+                        </small>
                       </label>
                     </div>
                   </div>
-                  <div class="divider"></div>
+                  <!--<div class="divider"></div>-->
                 <% count++;})}%>
               </div>
             </div>
@@ -124,12 +130,6 @@
                     shares: ["facebook", "pinterest","twitter"]
                   });
                 </script>
-                <!--<ul class="nav navbar-nav" style="width: 185px;float: none;">-->
-                  <!--<li><a href="#"><i class="fa fa-facebook-f fa-lg"></i></a></li>-->
-                  <!--<li><a href="#"><i class="fa fa-instagram fa-lg"></i></a></li>-->
-                  <!--<li><a href="#"><i class="fa fa-pinterest-p fa-lg"></i></a></li>-->
-                  <!--<li><a href="#"><i class="fa fa-twitter fa-lg"></i></a></li>-->
-                <!--</ul>-->
               </div>
 
               <h4 class="text-left"><small><% __('pickup-location-after-order')%></small></h4>

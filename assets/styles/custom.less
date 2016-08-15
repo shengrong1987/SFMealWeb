@@ -39,6 +39,10 @@ input:hover{
 input:focus{
   border: solid 1px @orange !important;
 }
+//tooltip
+.tooltip-inner {
+  text-align: left;
+}
 //margin,divider,seperator
 .divider {
   height: 1px;
@@ -187,6 +191,21 @@ input:focus{
   color : @white !important;
 }
 
+/*image*/
+.item-image {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 75%; /* here the desired aspect ratio */
+}
+.item-image img {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
 /*logo*/
 
 .logo-container{
@@ -199,23 +218,19 @@ input:focus{
 }
 
 .fa-facebook-remote{
-  background-image: url("@{fa-facebook}");
-  background-size: 16px,28px;
+  background: url("@{fa-facebook}") no-repeat center/70% auto;
 }
 
 .fa-instagram-remote{
-  background-image: url("@{fa-instagram}");
-  background-size: 16px,28px;
+  background: url("@{fa-instagram}") no-repeat center/70% auto;
 }
 
 .fa-pinterest-remote{
-  background-image: url("@{fa-pinterest}");
-  background-size: 16px,28px;
+  background: url("@{fa-pinterest}") no-repeat center/70% auto;
 }
 
 .fa-twitter-remote{
-  background-image: url("@{fa-twitter}");
-  background-size: 16px,28px;
+  background: url("@{fa-twitter}") no-repeat center/70% auto;
 }
 
 .logo{
@@ -231,7 +246,9 @@ input:focus{
 }
 
 .logo-remote{
-  background-image: url("@{sfmeal_logo}");
+  padding: 30px 150px 50px 150px;
+  background: url("@{sfmeal_logo}") no-repeat center/100% auto;
+  background-color: transparent
 }
 
 .logo-sm{
@@ -356,7 +373,7 @@ input:focus{
 }
 
 .text-shadow{
-  text-shadow: 1px 1px #FF0000 !important;
+  text-shadow: 1px 1px 1px @grey !important;
 }
 
 .text-yellow{
@@ -506,6 +523,10 @@ input:focus{
 /*sharp*/
 .btn.sharp {
   border-radius:0;
+}
+
+.btn-inline{
+  display: inline !important;
 }
 
 /*outline*/
@@ -720,9 +741,18 @@ fieldset[disabled] .btn-red.active {
 
 /*nav*/
 
+.nav-email{
+  margin-bottom: 20px;
+  min-height: 20px;
+}
+
 .footer-nav{
+  padding-left: 25px;
   li{
     float: left;
+    a{
+      display: inline !important;
+    }
   }
 }
 
@@ -823,6 +853,14 @@ fieldset[disabled] .btn-red.active {
   background-color: #333333;
 }
 
+.email-footer{
+  background-color: @light-grey;
+  p{
+    color: @grey;
+    font-size: 12px;
+  }
+  padding: 15px;
+}
 
 #birthdayInput select{
   display: inline-block;
@@ -866,6 +904,10 @@ fieldset[disabled] .btn-red.active {
 .normal-banner .img-wrapper img{
   width: 100%;
   min-height: 200px;
+}
+
+.email-banner{
+  height: 120px;
 }
 
 .compact-banner{
@@ -1110,6 +1152,19 @@ fieldset[disabled] .btn-red.active {
 }
 
 /*table*/
+.table-email{
+  .border-less{
+    border: none;
+  }
+  tr{
+    border-bottom: 1px solid @light-grey;
+  }
+  td{
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    vertical-align: middle !important;
+  }
+}
 .table-vertical-middle{
   td{
     vertical-align: middle !important;
@@ -1246,6 +1301,11 @@ fieldset[disabled] .btn-red.active {
   padding: 50px;
   border-radius: 10px;
   overflow: hidden;
+}
+
+.box-email{
+  padding : 25px;
+  border:none ;
 }
 
 .box-larger-simple{

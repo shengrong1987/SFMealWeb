@@ -24,78 +24,65 @@ describe('MealController', function() {
     var email = 'aimbebe.r@gmail.com';
     var password = 'Rs89030659';
     var picture = "/images/thumbnail.jpg";
-    var address1 = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853};
-    var address2 = {"street":"1455 Market St","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853, "isDefault" : true};
+    var address1 = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853,"isDefault" : true};
+    var address2 = {"street":"7116 Tiant Way","city" : "Elk Grove", "zip" : 95758, "phone" : 14158023853};
     var userId = "";
     var firstname = "Shiga";
     var lastname = "Lian";
     var shopName = "Crispy, Tangy, Sweet, and Spicy";
+    var phone = "(415)802-3853";
 
     it('should login or register an account', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : email, password: password})
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should get user id', function (done) {
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          userId = res.body.id;
+          done();
+        })
+    });
+
+    it('should update addresses info', function (done) {
+      agent
+          .put('/user/' + userId)
+          .send({address : [address1,address2]})
           .expect(200)
           .end(function(err,res){
             if(err){
-              console.log(err);
               return done(err);
             }
-            console.log(res.body);
-            if(res.body.auth.email != email){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            hostId = res.body.host;
-            userId = res.body.id;
-            done();
-          })
-    });
-
-    it('should update address info (not default)', function (done) {
-      agent
-          .put('/user/' + userId)
-          .send({address : address1})
-          .expect(200)
-          .end(function(err,res){
-            if(err){
-              return done(err);
-            }
-            if(Object.keys(res.body.address_list).length == 0){
-              return done(Error("error geocoding and updating the address"))
-            }
-            done();
-          })
-    });
-
-    it('should update address info (default)', function (done) {
-      agent
-          .put('/user/' + userId)
-          .send({address : address2})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.city != 'San Francisco'){
-              return done(Error("error geocoding and updating the address"))
+            if(Object.keys(res.body.address_list)[0].isDefault && !Object.keys(res.body.address_list)[1].isDefault && res.body.city != "San Francisco"){
+              return done(Error('error geocoding the address'));
             }
             done();
           })
     });
 
     it('should become a host if isnt one', function (done) {
-      if(!hostId){
-        agent
-            .post('/user/becomeHost')
-            .send({shopName: "山东健康面馆", intro: "从小吃了奶奶做的山东包子长大的我希望能分享家乡美食到湾区"})
-            .expect(200)
-            .end(function(err,res){
-              if(res.body.user.host == undefined){
-                return done(Error("become host for a logged user doesn't work"));
-              }
-              hostId = res.body.user.host;
-              done();
-            })
-      }else{
-        done();
-      }
+      agent
+        .post('/user/becomeHost')
+        .send({shopName: "山东健康面馆", intro: "从小吃了奶奶做的山东包子长大的我希望能分享家乡美食到湾区"})
+        .expect(200)
+        .end(function(err,res){
+          if(res.body.user.host == undefined){
+            return done(Error("become host for a logged user doesn't work"));
+          }
+          hostId = res.body.user.host;
+          done();
+        })
     });
 
     it('should create bank info for host', function (done) {
@@ -130,7 +117,7 @@ describe('MealController', function() {
     it('should update address info for host', function (done) {
         agent
           .put('/host/' + hostId)
-          .send({address:address2, picture: picture, shopName : shopName})
+          .send({address:address1, picture: picture, shopName : shopName})
           .expect(200)
           .end(function(err,res){
             if(res.body.city != "San Francisco"){
@@ -240,7 +227,12 @@ describe('MealController', function() {
       var pickups = [{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
-        "location" : "1455 Market St, San Francisoc, CA 94124"
+        "location" : "1455 Market St, San Francisco, CA 94124",
+        "method" : "pickup"
+      },{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
+        "method" : "delivery"
       }];
       agent
           .post('/meal')
@@ -260,22 +252,32 @@ describe('MealController', function() {
 
     it('should login or register an account for guest', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : guestEmail, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != guestEmail){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            guestId = res.body.id;
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should get user id', function (done) {
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          guestId = res.body.id;
+          done();
+        })
     });
 
     it('should update user info', function (done) {
       agent
         .post('/user/' + guestId)
-        .send({firstname : firstname, lastname : lastname})
+        .send({firstname : firstname, lastname : lastname, phone : phone})
         .expect(200)
         .end(function(err,res){
           if(res.body.firstname != firstname){
@@ -284,8 +286,6 @@ describe('MealController', function() {
           done();
         })
     });
-
-
 
     it('should create a new card', function (done) {
       var number = "4242424242424242";
@@ -359,9 +359,9 @@ describe('MealController', function() {
           .send({
             orders : orders,
             subtotal : subtotal,
-            address : address1.street + address1.city + "CA" + address1.zip,
-            method : "delivery",
+            method : "pickup",
             mealId : preorderMealId,
+            pickupOption : 1,
             phone : address1.phone,
             delivery_fee : 0,
             eta : new Date()
@@ -437,17 +437,11 @@ describe('MealController', function() {
 
     it('should login an chef account', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : email, password: password,picture:picture})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != email){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            hostId = res.body.host;
-            userId = res.body.id;
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : email, password: password,picture:picture})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
 
     it('should ready an order', function(done){
@@ -470,31 +464,23 @@ describe('MealController', function() {
 
     it('should login or register an account for guest', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : guestEmail, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != guestEmail){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            guestId = res.body.id;
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect("Location","/auth/done")
+        .end(done)
     });
 
     it('should leave a review for the dish of the meal', function (done) {
       agent
-          .post('/review')
-          .set('Accept', 'application/json')
-          .expect('Content-Type', /json/)
-          .send({meal : mealId, dish : dish2, host: hostId, score : 4.0, review : "Very delicious could be more"})
-          .expect(200)
-          .end(function(err,res){
-            //if(res.body.meal != mealId || res.body.dish != dish2){
-            //  return done(Error("error creating review"));
-            //}
-            done();
-          })
+        .post('/review')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .send({meal : mealId, dish : dish2, host: hostId, score : 4.0, review : "Very delicious could be more"})
+        .expect(200)
+        .end(function(err,res){
+          done();
+        })
     })
 
   });

@@ -18,7 +18,7 @@ describe('OrderController', function() {
 
   describe('', function() {
 
-    var guestEmail = 'guest@gmail.com'
+    var guestEmail = 'enjoymyself1987@gmail.com'
     var password = '12345678';
     var guestId = "";
     var address = "1455 Market St, San Francisco";
@@ -27,17 +27,25 @@ describe('OrderController', function() {
 
     it('should login or register an account for guest', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : guestEmail, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != guestEmail){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            guestId = res.body.id;
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
+
+    it('should get user info', function(done){
+      agent
+        .get('/user/me')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          guestId = res.body.id;
+          done()
+        })
+    })
 
     var mealId;
     var dishId1;
@@ -103,7 +111,14 @@ describe('OrderController', function() {
       dishObj[dishId4] = 0;
       agent
           .post('/order')
-          .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, pickupInfo : { location : address, from : new Date(), to : new Date()}, phone : phone, method : "pickup", mealId : mealId, delivery_fee : 0})
+          .send({
+            orders : dishObj,
+            subtotal : price1 * 1 + price2 * 2,
+            pickupOption : 1,
+            phone : phone,
+            method : "pickup",
+            mealId : mealId
+          })
           .expect(200)
           .end(function(err,res){
             if(err){
@@ -227,7 +242,16 @@ describe('OrderController', function() {
       dishObj[dishId4] = 0;
       agent
           .post('/order')
-          .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : address, phone : phone, method : "delivery", mealId : mealId, delivery_fee : 0})
+          .send({
+            orders : dishObj,
+            subtotal : price1 * 1 + price2 * 2,
+            address : address,
+            phone : phone,
+            method : "delivery",
+            pickupOption : 2,
+            mealId : mealId,
+            delivery_fee : 0
+          })
           .expect(200)
           .end(function(err,res){
             if(err){
@@ -270,20 +294,16 @@ describe('OrderController', function() {
           })
     })
 
-    var email = 'host@gmail.com';
+    var email = 'aimbebe.r@gmail.com';
     var password = '12345678';
 
     it('should login or register an account', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : email, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != email){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
 
     it('should reject an cancelling order', function (done) {
@@ -298,16 +318,11 @@ describe('OrderController', function() {
 
     it('should login or register an account for guest', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : guestEmail, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != guestEmail){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            guestId = res.body.id;
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
 
     it('should request for cancelling', function (done) {
@@ -324,15 +339,11 @@ describe('OrderController', function() {
 
     it('should login or register an account', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : email, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != email){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
 
     it('should confirm an cancelling order', function (done) {

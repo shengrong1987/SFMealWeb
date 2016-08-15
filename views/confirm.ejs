@@ -54,14 +54,14 @@
                 <div class="radio-box col-xs-12 row" id="pickupMethod" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
                   <%
                   var i = 0;
-                  if(meal.pickups){ meal.pickups.forEach(function(pickup){ %>
+                  if(meal.pickups){ meal.pickups.forEach(function(pickup){ if(pickup.method == 'pickup'){ %>
                   <label class="btn btn-default fixed-label vertical-inline" style="text-align: left;height: 70px;">
-                    <input type="radio" id="radio-1-<%= i%>" name="radio-1-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="radio-1-<%= i%>"></label>
+                    <input type="radio" id="radio-1-<%= i%>" data-index="<%= i%>" name="radio-1-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="radio-1-<%= i%>"></label>
                     <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"><%= __('time') %><span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
                     <br/>
                     <label class="location" data-value="<%= pickup.location%>" style="margin-left: 23px;"><span><%= __('location') %>&nbsp; <%= pickup.location%></span></label>
                   </label>
-                  <%i++;})}; %>
+                  <%}i++;})}; %>
                 </div>
 
                 <h1></h1>
@@ -91,6 +91,22 @@
                   </label>
                   <%i++;}); %>
                   <h4 style="margin-left: 42px;"><a class="text-red" data-action="updateFromOrder" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" data-id="<%= user.id%>" href="javascript:void(0)"><%= __('new-location-phone') %></a></h4>
+                </div>
+
+                <div class="col-xs-12">
+                  <h5>2.<%= __('delivery-time')%></h5>
+                </div>
+
+                <div class="radio-box col-xs-12 row" id="deliveryMethod" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
+                  <%
+                  var i = 0;
+                  if(meal.pickups){ meal.pickups.forEach(function(pickup){ if(pickup.method == 'delivery'){ %>
+                  <label class="btn btn-default fixed-label vertical-inline" style="text-align: left;height: 70px;">
+                    <input type="radio" id="radio-1-<%= i%>" data-index="<%= i%>" name="radio-1-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="radio-1-<%= i%>"></label>
+                    <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"><%= __('time') %><span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
+                    <br/>
+                  </label>
+                  <%}i++;})}; %>
                 </div>
 
                 <h1></h1>

@@ -36,10 +36,9 @@
                 <div class="col-md-5">
                   <label for="dishList">1.从<span class="text-green"><%= __('host-nav-meal')%></span><%= __('add-to-meal')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
                   <ul id="dishList" class="border-lightgrey selectable-list">
-                    <% dishes.forEach(function(dish){
-                      if(dish.isVerified){%>
-                        <li data-id="<%=dish.id%>"><a name="title"><%=dish.title%><i class="fa fa-ticket"></i></a></li>
-                    <%}});%>
+                    <% dishes.forEach(function(dish){%>
+                      <li data-id="<%= dish.id%>"><a name="title"><%= dish.title%><i class="fa fa-ticket"></i></a></li>
+                    <%});%>
                   </ul>
                 </div>
 
@@ -164,6 +163,15 @@
                             <label><%= __('pickup-location')%></label>
                             <input type="text" class="form-control">
                           </div>
+
+                          <div class="form-group method">
+                            <label><%= __('pickup-method')%></label>
+                            <select class="form-control">
+                              <option value="delivery"><%= __('delivery')%></option>
+                              <option value="pickup" selected="true"><%= __('self-pickup')%></option>
+                            </select>
+                          </div>
+
                         </div>
                       </div>
                     </div>
@@ -243,7 +251,7 @@
             </div>
 
             <div class="form-group text-center submit">
-              <button name="publish" type="submit" class="btn btn-green btn-lg round" style="margin-right: 20px;"><%= __('save-and-on')%></button>
+              <button name="publish" type="button" class="btn btn-green btn-lg round" style="margin-right: 20px;"><%= __('save-and-on')%></button>
               <button name="save" type="button" class="btn btn-disable btn-lg round text-grey"><%= __('save-and-off')%></button>
               <div class="alert alert-danger" data-toggle="alert" style="margin-top: 20px;"></div>
             </div>

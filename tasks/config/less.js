@@ -14,13 +14,21 @@ module.exports = function(grunt) {
 
 	grunt.config.set('less', {
 		dev: {
-			files: [{
-				expand: true,
-				cwd: 'assets/styles/',
-				src: ['importer.less'],
-				dest: '.tmp/public/styles/',
-				ext: '.css'
-			}]
+      files : [
+        { '.tmp/public/styles/importer.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/adjust/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/adjusting/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/cancel/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/cancelling/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/confirm/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/guestlist/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/new/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/ready/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/reject/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/review/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/start/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/reminder/style.css' : 'assets/styles/importer.less' }
+      ]
 		}
 	});
 

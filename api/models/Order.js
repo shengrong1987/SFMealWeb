@@ -11,6 +11,10 @@ module.exports = {
     index: {
       type: 'string'
     },
+    isScheduled : {
+      type : 'boolean',
+      defaultsTo : false
+    },
     type: {
       type: 'string',
       enum: ['order', 'preorder'],
@@ -63,6 +67,9 @@ module.exports = {
       enum: ['pickup', 'delivery'],
       defaultsTo: 'delivery'
     },
+    pickupOption : {
+      type : 'integer'
+    },
     pickupInfo : {
       type : 'json'
     },
@@ -80,12 +87,12 @@ module.exports = {
     },
     status: {
       type: 'string',
-      enum: ['schedule', 'preparing', 'ready', 'adjust', 'canceling', 'cancel', 'review', 'complete'],
+      enum: ['schedule', 'preparing', 'ready', 'adjust', 'cancelling', 'cancel', 'review', 'complete'],
       defaultsTo : 'schedule'
     },
     lastStatus : {
       type : 'string',
-      enum: ['schedule', 'preparing', 'ready', 'adjust', 'canceling', 'cancel', 'review', 'complete']
+      enum: ['schedule', 'preparing', 'ready', 'adjust', 'cancelling', 'cancel', 'review', 'complete']
     },
     charges : {
       type : 'json'
@@ -109,9 +116,9 @@ module.exports = {
           return "已完成";
         case "cancel":
           return "已取消";
-        case "adjust":
+        case "adjusting":
           return "调整中，待确认";
-        case "canceling":
+        case "cancelling":
           return "取消中，待确认";
         case "review":
           return "待评价";

@@ -6,12 +6,11 @@
  */
 
 var Notification = require("../services/notification.js");
-
+var async = require('async');
 module.exports = {
   create : function(req, res){
     var async = require('async');
     var userId = req.session.user.id;
-    var hostId = req.body.host;
     var mealId = req.body.meal;
     var dishId = req.body.dish;
     var reviews = req.body.reviews;
@@ -33,12 +32,10 @@ module.exports = {
           var dishId = review.dish;
           var score = review.score;
           var review = review.content;
-          var reviewModel;
-          $this.reviewForDish(dishId, mealId, user, hostId, orders, score, review, function(err, result){
+          $this.reviewForDish(dishId, mealId, user, orders, score, review, function(err, results){
             if(err){
               return next(err);
             }
-            reviewModel = result;
             next();
           });
         },function(err){
@@ -56,82 +53,135 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            console.log(reviewModel);
-            return res.ok(reviewModel);
+            return res.ok({});
           });
-        });
+        }, req);
       }else{
         var score = req.body.score;
         var review = req.body.review;
-        var reviewModel;
-        $this.reviewForDish(dishId, mealId, user, hostId, orders, score, review, function(err, review){
+        $this.reviewForDish(dishId, mealId, user, orders, score, review, function(err, results){
           async.each(orders, function(order,next){
             order.save(function(err,o){
               if(err){
                 return next(err);
               }
-              reviewModel = review;
               next();
             });
           },function(err){
             if(err){
               return res.badRequest(err);
             }
-            console.log(reviewModel);
-            return res.ok(reviewModel);
+            console.log("review done, results: " + results);
+            return res.ok(results);
           });
-        });
+        }, req);
       }
     });
   },
 
-  reviewForDish : function(dishId, mealId, user, hostId, orders, score, content, cb){
+  reviewForDish : function(dishId, mealId, user, orders, score, content, cb, req){
     var isValidReview = false;
-    if(mealId){
-      //it's an review for a meal
-      isValidReview = orders.some(function(order){
-        if(order.meal == mealId && order.reviewing_orders.indexOf(dishId) != -1){
-          order.reviewing_orders.splice(order.reviewing_orders.indexOf(dishId),1);
-          if(order.reviewing_orders.length == 0){
-            order.status = "complete";
-            var tempOrder = Object.assign({}, order);
-            tempOrder.host = { id : hostId};
-            Notification.notificationCenter("Order", "review", tempOrder, true);
-          }
-          return true;
+    async.auto({
+      checkReviewForMeal : function(cb){
+        if(!mealId) {
+          return cb(Error(req.__('review-invalid')));
         }
-        return false;
-      });
-    }else{
-      orders.forEach(function(order){
-        if(order.reviewing_orders.indexOf(dishId) != -1){
-          order.reviewing_orders.splice(order.reviewing_orders.indexOf(dishId),1);
-          if(order.reviewing_orders.length == 0){
-            order.status = "complete";
-            var tempOrder = Object.assign({}, order);
-            tempOrder.host = { id : hostId};
-            Notification.notificationCenter("Order", "review", tempOrder, true);
-          }
-          isValidReview = true;
+        if(dishId){
+          return cb();
         }
-      });
-    }
-    if(!isValidReview){
-      console.log("Review for the meal/dish is not valid");
-      return cb(Error("Review for the meal/dish is not valid"));
-    }
-    Dish.findOne(dishId).exec(function(err, dish){
+        isValidReview = orders.some(function(order){
+          if(order.meal == mealId){
+            order.reviewing_orders = [];
+            order.status = "complete";
+            return true;
+          }
+          return false;
+        });
+        if(!isValidReview){
+          cb(Error(req.__('review-invalid')))
+        }else{
+          cb();
+        }
+      },
+      checkReviewForDish : function(cb){
+        if(!dishId){
+          return cb();
+        }
+        orders.forEach(function(order){
+          if(order.reviewing_orders.indexOf(dishId) != -1){
+            order.reviewing_orders.splice(order.reviewing_orders.indexOf(dishId),1);
+            if(order.reviewing_orders.length == 0){
+              order.status = "complete";
+            }
+            isValidReview = true;
+            return cb();
+          }
+        });
+        if(!isValidReview){
+          cb(Error(req.__('review-invalid')))
+        }
+      },
+      getDish : function(cb){
+        if(!dishId){
+          return cb();
+        }
+        Dish.findOne(dishId).populate('chef').exec(function(err, dish) {
+          if(err) {
+            return cb(err);
+          }
+          cb(null, dish);
+        });
+      },
+      getMeal : function(cb){
+        console.log("getting meal");
+        Meal.findOne(mealId).populate('chef').exec(function(err, meal){
+          if(err){
+            return cb(err);
+          }
+          cb(null, meal);
+        })
+      },
+      createReview : ['getDish','getMeal', function(cb, results){
+        console.log("creating review");
+        var dish = results.getDish;
+        var meal = results.getMeal;
+        Review.create({
+          dish : dish ? dish.id : null,
+          title : dish ? dish.title : meal.title,
+          price : dish ? dish.price : 'N/A',
+          meal : mealId,
+          score : score,
+          review : content,
+          user : user.id,
+          host : dish ? dish.chef.id : meal.chef.id,
+          username : user.firstname
+        }).exec(function(err, review){
+          if(err){
+            console.log(err);
+            return cb(err);
+          }
+          var host = dish?dish.chef:meal.chef;
+          review.host = host;
+          if(meal){
+            review.meal = meal;
+            review.hostEmail = host.email;
+          }else if(dish){
+            review.dish = dish;
+            review.hostEmail = host.email;
+          }else{
+            return cb(Error('no data for review'))
+          }
+          console.log("sending review email");
+          Notification.notificationCenter("Order", "review", review, true, false, req);
+          cb(null,review);
+        });
+      }]
+    },function(err, results){
       if(err){
         return cb(err);
       }
-      Review.create({dish : dishId, title : dish.title, price : dish.price, meal : mealId, score : score, review : content, user : user.id, host : hostId, username : user.firstname}).exec(function(err, review){
-        console.log(err);
-        if(err){
-          return cb(err);
-        }
-        cb(null,review);
-      });
-    })
+      cb(null, results.createReview);
+    });
   }
 };
 

@@ -17,17 +17,24 @@ var geocode = require("../services/geocode.js");
 //-4 : meal not valid
 //-5 : missing payment profile
 //-6 : address verification fail
-//-7 :
+//-7 : pickup option not exist
 
 module.exports = {
 
   validate_meal : function(meal, orders, preorders, subtotal, res, req) {
+    var now = new Date();
+    var params = req.body;
     if(!orders || !subtotal){
       return res.badRequest(req.__('order-empty'));
     }
     if(meal.status === "off"){
       return res.badRequest(req.__('meal-not-active'));
     }
+
+    if(now < params.provideFromTime || now > params.provideTillTime){
+      return res.badRequest(req.__('meal-not-active'));
+    }
+
     if(meal.dateIsValid()) {
       console.log("meal is valid");
       //check order is valid
@@ -76,7 +83,7 @@ module.exports = {
     }
   },
 
-  validateAddress : function(method, meal, address, pickupInfo, cb){
+  validateAddress : function(method, meal, address, cb){
     if(method === "delivery"){
       var host = meal.chef;
       var location = {lat : host.lat, long : host.long};
@@ -93,10 +100,6 @@ module.exports = {
         cb(true);
       })
     }else{
-      if(!pickupInfo || !pickupInfo.location){
-        console.log("pickup information missing");
-        return cb(false);
-      }
       cb(true);
     }
   },
@@ -118,40 +121,72 @@ module.exports = {
     });
   },
 
+  buildDeliveryData : function(params, meal){
+    var dishes = meal.dishes;
+    if(params.method == "delivery"){
+      params.delivery_fee = parseFloat(meal.delivery_fee);
+    }else{
+      params.delivery_fee = 0;
+    }
+
+    if(meal.type == "preorder"){
+      if(!meal.pickups || params.pickupOption-1>=meal.pickups.length){
+        return false;
+      }
+      var pickupInfo = meal.pickups[params.pickupOption-1];
+      if(!pickupInfo || pickupInfo.method != params.method){
+        return false;
+      }
+      params.pickupInfo = pickupInfo;
+    }
+
+    return params;
+  },
+
 	create : function(req, res){
+
     var userId = req.session.user.id;
     var orders = req.body.orders;
     var mealId = req.body.mealId;
     var email = req.session.user.auth.email;
     var method = req.body.method;
     var address = req.body.address;
-    var pickupInfo = req.body.pickupInfo;
     var subtotal = parseFloat(req.body.subtotal);
     req.body.customer = userId;
+
     var $this = this;
+
     Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,m) {
       if (err) {
         return res.badRequest(err);
       }
-      $this.validateAddress(method, m, address, pickupInfo, function(valid){
+      $this.validateAddress(method, m, address, function(valid){
         if(!valid){
-          res.badRequest({responseText : req.__('order-invalid-address'), code : -6});
+          return res.badRequest({responseText : req.__('order-invalid-address'), code : -6});
         }else if($this.validate_meal(m, orders, undefined, subtotal, res, req)){
           console.log("order pass meal validation");
-          var dishes = m.dishes;
-          if(method == "delivery"){
-            var delivery_fee = m.delivery_fee;
-          }else{
-            var delivery_fee = 0;
+
+          //calculate pickup method and delivery fee
+          req.body = $this.buildDeliveryData(req.body, m);
+
+          if(typeof req.body == "boolean" && req.body == false){
+            return res.badRequest({responseText : req.__('order-pickup-option-error'), code : -7});
           }
-          delivery_fee = parseFloat(delivery_fee);
+
+          //calculate ETA
+          var now = new Date();
+          req.body.eta = new Date(now.getTime() + m.prepareTime * 60 * 1000);
+
+          //calculate total
+          var total = $this.calculateTotal(req.body, m.chef.county);
+          console.log("total is: " + total);
+
           req.body.host = m.chef.id;
           req.body.type = m.type;
-          req.body.dishes = dishes;
+          req.body.dishes = m.dishes;
           req.body.meal = m.id;
           req.body.guestEmail = email;
           req.body.hostEmail = m.chef.email;
-          req.body.delivery_fee = delivery_fee;
           User.findOne(userId).populate('payment').exec(function (err, found) {
             if (err) {
               return res.badRequest(err);
@@ -172,7 +207,7 @@ module.exports = {
                 return res.badRequest(err);
               }
               stripe.charge({
-                amount : parseInt((subtotal + delivery_fee) * 100),
+                amount : parseInt(total * 100),
                 email : email,
                 customerId : found.payment[0].customerId,
                 destination : m.chef.accountId,
@@ -192,8 +227,8 @@ module.exports = {
                   });
                 } else if (charge.status == "succeeded") {
                   console.log("charge succeed, gathering charing info for order");
-                  for (var i = 0; i < dishes.length; i++) {
-                    var dishId = dishes[i].id;
+                  for (var i = 0; i < m.dishes.length; i++) {
+                    var dishId = m.dishes[i].id;
                     var quantity = parseInt(orders[dishId]);
                     m.leftQty[dishId] -= quantity;
                   }
@@ -209,7 +244,9 @@ module.exports = {
                       if(err){
                         return res.badRequest(err);
                       }
-                      notification.notificationCenter("Order", "new", order);
+                      o.chef = m.chef;
+                      o.dishes = m.dishes;
+                      notification.notificationCenter("Order", "new", o, true, false, req);
                       //test only
                       if(req.wantsJSON){
                         return res.ok(order);
@@ -261,9 +298,9 @@ module.exports = {
       if($this.validate_meal(order.meal, params.orders, order.orders, subtotal, res, req)){
 
         console.log("pass meal validation");
-        var isHostAction = false;
+        var isSendToHost = true;
         if(hostId == order.host.id){
-          isHostAction = true;
+          isSendToHost = false;
         }
         if(order.status == "schedule"){
           //can update without permission of host or adjust by host
@@ -280,7 +317,7 @@ module.exports = {
               if(diff>0){
                 //create another charge
                 stripe.charge({
-                  amount : diff * 100,
+                  amount : parseInt(diff * 100),
                   email : email,
                   customerId : found.payment[0].customerId,
                   destination : order.host.accountId,
@@ -300,6 +337,8 @@ module.exports = {
                       if(err){
                         return res.badRequest(err);
                       }
+                      order.adjusting_orders = order.orders;
+                      order.adjusting_subtotal = order.subtotal;
                       order.orders = params.orders;
                       order.subtotal = params.subtotal;
                       order.charges[charge.id] = charge.amount/100;
@@ -309,7 +348,7 @@ module.exports = {
                           return res.badRequest(err);
                         }
                         //send notification
-                        notification.notificationCenter("Order", "adjust", result, isHostAction);
+                        notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
                         return res.ok({responseText : req.__('order-adjust-ok',charge.amount/100)});
                       })
                     });
@@ -354,6 +393,8 @@ module.exports = {
                     if(err){
                       return res.badRequest(err);
                     }
+                    order.adjusting_orders = order.orders;
+                    order.adjusting_subtotal = order.subtotal;
                     order.orders = params.orders;
                     order.subtotal = params.subtotal;
                     order.meal = m.id;
@@ -362,7 +403,7 @@ module.exports = {
                         return res.badRequest(err);
                       }
                       //send notification
-                      notification.notificationCenter("Order", "adjust", result, isHostAction);
+                      notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
                       return res.ok({responseText : req.__('order-adjust-ok2',totalRefund)});
                     })
                   });
@@ -377,7 +418,7 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
-              notification.notificationCenter("Order", "adjust", result, isHostAction);
+              notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
               return res.ok({responseText :req.__('order-adjust-ok3')});
             })
           }
@@ -392,7 +433,7 @@ module.exports = {
               return res.badRequest(err);
             }
             //send notification
-            notification.notificationCenter("Order", "adjusting", result, isHostAction);
+            notification.notificationCenter("Order", "adjusting", result, isSendToHost, false, req);
             return res.ok({responseText : req.__('order-adjust-request')});
           });
         }
@@ -402,6 +443,7 @@ module.exports = {
 
   abort : function(req, res){
     var orderId = req.params.id;
+    var $this = this;
     Order.findOne(orderId).populate("meal").populate("host").populate('customer').exec(function(err,order) {
       if (err) {
         return res.badRequest(err)
@@ -416,8 +458,13 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        notification.notificationCenter("Order", "cancel", result, false, true);
-        return res.ok(order);
+        notification.notificationCenter("Order", "cancel", result, false, true, req);
+        $this.cancelOrderJob(result.id, function(err){
+          if(err){
+            return res.badRequest(err);
+          }
+          return res.ok(order);
+        });
       })
     });
   },
@@ -473,9 +520,9 @@ module.exports = {
         return res.forbidden();
       }
 
-      var isHostAction = false;
+      var isSendToHost = true;
       if(hostId == order.host){
-        isHostAction = true;
+        isSendToHost = false;
       }
 
       if(order.status == "schedule"){
@@ -517,8 +564,13 @@ module.exports = {
                     return res.badRequest(err);
                   }
                   //send notification
-                  notification.notificationCenter("Order", "cancel", result, isHostAction);
-                  return res.ok({responseText : req.__('order-cancel-ok')});
+                  notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
+                  $this.cancelOrderJob(result.id, function(err){
+                    if(err){
+                      return res.badRequest(err);
+                    }
+                    return res.ok({responseText : req.__('order-cancel-ok')});
+                  });
                 })
               });
             });
@@ -530,19 +582,24 @@ module.exports = {
               return res.badRequest(err);
             }
             //send notification
-            notification.notificationCenter("Order", "cancel", result, isHostAction);
-            return res.ok({responseText : req.__('order-cancel-ok')});
+            notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
+            $this.cancelOrderJob(result.id, function(err){
+              if(err){
+                return res.badRequest(err);
+              }
+              return res.ok({responseText : req.__('order-cancel-ok')});
+            });
           })
         }
       }else if(order.status == "preparing"){
         order.lastStatus = order.status;
-        order.status = "canceling";
+        order.status = "cancelling";
         order.save(function(err,result){
           if(err){
             return res.badRequest(err);
           }
           //send notification
-          notification.notificationCenter("Order", "cancelling", result, isHostAction);
+          notification.notificationCenter("Order", "cancelling", result, isSendToHost, false, req);
           return res.ok({responseText : req.__('order-cancel-request')});
         });
       }
@@ -572,7 +629,7 @@ module.exports = {
             if(diff>0){
               //create another charge
               stripe.charge({
-                amount : diff * 100,
+                amount : parseInt(diff * 100),
                 email : email,
                 customerId : found.payment[0].customerId,
                 destination : order.host.accountId,
@@ -595,14 +652,16 @@ module.exports = {
                     order.subtotal = adjusting_subtotal;
                     order.adjusting_orders = {};
                     order.adjusting_subtotal = 0;
+                    var tmpLastStatus = order.status;
                     order.status = order.lastStatus;
+                    order.lastStatus = tmpLastStatus;
                     order.charges[charge.id] = charge.amount / 100;
                     order.meal = order.meal.id;
                     order.save(function(err,result){
                       if(err){
                         return res.badRequest(err);
                       }
-                      notification.notificationCenter("Order", "confirm", result);
+                      notification.notificationCenter("Order", "confirm", result, false, false, req);
                       return res.ok({responseText : req.__('order-confirm')});
                     })
                   });
@@ -644,14 +703,16 @@ module.exports = {
                       order.subtotal = adjusting_subtotal;
                       order.adjusting_orders = {};
                       order.adjusting_subtotal = 0;
+                      var tmpLastStatus = order.status;
                       order.status = order.lastStatus;
+                      order.lastStatus = tmpLastStatus;
                       //order.charges[result.id] = result.amount/100;
                       order.meal = order.meal.id;
                       order.save(function(err,result){
                         if(err){
                           return res.badRequest(err);
                         }
-                        notification.notificationCenter("Order", "confirm", result);
+                        notification.notificationCenter("Order", "confirm", result, false, false, req);
                         return res.ok({responseText : req.__('order-confirm')});
                       })
                     });
@@ -665,17 +726,19 @@ module.exports = {
           order.subtotal = adjusting_subtotal;
           order.adjusting_orders = {};
           order.adjusting_subtotal = 0;
+          var tmpLastStatus = order.status;
           order.status = order.lastStatus;
+          order.lastStatus = tmpLastStatus;
           order.meal = order.meal.id;
           order.save(function(err,result){
             if(err){
               return res.badRequest(err);
             }
-            notification.notificationCenter("Order", "confirm", result);
+            notification.notificationCenter("Order", "confirm", result, false, false, req);
             return res.ok({responseText : req.__('order-confirm')});
           })
         }
-      }else if(order.status == "canceling"){
+      }else if(order.status == "cancelling"){
         var amount = (order.subtotal + order.delivery_fee).toFixed(2);
         if(amount > 0){
           User.findOne(userId).populate('payment').exec(function (err, found) {
@@ -703,13 +766,19 @@ module.exports = {
                       return res.badRequest(err);
                     }
                     order.status = "cancel";
+                    order.lastStatus = "cancelling";
                     order.meal = order.meal.id;
                     order.save(function (err, result) {
                       if (err) {
                         return res.badRequest(err);
                       }
-                      notification.notificationCenter("Order", "cancel", result);
-                      return res.ok({responseText : req.__('order-confirm-cancel')});
+                      notification.notificationCenter("Order", "confirm", result, false, false, req);
+                      $this.cancelOrderJob(result.id, function(err){
+                        if(err){
+                          return res.badRequest(err);
+                        }
+                        return res.ok({responseText : req.__('order-confirm-cancel')});
+                      });
                     })
                   });
                 }
@@ -718,13 +787,19 @@ module.exports = {
           });
         }else{
           order.status = "cancel";
+          order.lastStatus = "cancelling";
           order.meal = order.meal.id;
           order.save(function(err,result){
             if(err){
               return res.badRequest(err);
             }
-            notification.notificationCenter("Order", "cancel", result);
-            return res.ok({responseText : req.__('order-confirm-cancel')});
+            notification.notificationCenter("Order", "confirm", result, false, false, req);
+            $this.cancelOrderJob(result.id, function(err){
+              if(err){
+                return res.badRequest(err);
+              }
+              return res.ok({responseText : req.__('order-confirm-cancel')});
+            });
           })
         }
       }
@@ -741,13 +816,15 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      order.status = order.lastStatus;
+      var lastStatus = order.lastStatus;
+      order.lastStatus = order.status;
+      order.status = lastStatus;
       order.msg = params.msg;
       order.save(function(err,result){
         if(err){
           return res.badRequest(err);
         }
-        notification.notificationCenter("Order", "reject", result);
+        notification.notificationCenter("Order", "reject", result, false, false, req);
         return res.ok({ responseText : req.__('order-reject-adjust')});
       });
     });
@@ -768,7 +845,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        notification.notificationCenter("Order", "ready", result);
+        notification.notificationCenter("Order", "ready", result, false, false, req);
         if(order.method == "pickup"){
           return res.ok({responseText : req.__('order-ready')});
         }else{
@@ -796,7 +873,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        notification.notificationCenter("Order", "receive", result);
+        notification.notificationCenter("Order", "receive", result, false, false, req);
         return res.ok({responseText : req.__('order-receive')});
       });
     });
@@ -809,6 +886,37 @@ module.exports = {
       }
       return res.ok(orders);
     })
+  },
+
+  cancelOrderJob : function(orderId, cb){
+    Jobs.cancel({ 'data.orderId' : orderId }, function(err, numberRemoved){
+      if(err){
+        console.log(err);
+        return cb(err);
+      }
+      console.log(numberRemoved + " order jobs removed");
+      cb();
+    })
+  },
+
+  calculateTotal : function(params, county){
+    var total = params.subtotal;
+    switch (county){
+      case "San Francisco County":
+        tax = 1.0875;
+            break;
+      case "Sacramento County":
+        tax = 1.08;
+        break;
+      default:
+        tax = 1.08;
+    }
+    tax = tax || 1.08;
+    total = total * tax;
+    if(params.delivery_fee){
+      total += params.delivery_fee;
+    }
+    return total.toFixed(2);
   }
 };
 

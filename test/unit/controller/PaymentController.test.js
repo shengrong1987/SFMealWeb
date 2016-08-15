@@ -21,22 +21,32 @@ describe('PaymentController', function() {
   describe('create a payment profile', function() {
 
     var userId;
-    var email = 'guest@gmail.com';
+    var email = 'enjoymyself1987@gmail.com';
     var password = '12345678';
 
     it('should login or register an account', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : email, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != email){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            userId = res.body.id;
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
+
+    it('should get user info', function(done){
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          userId = res.body.id;
+          done()
+        })
+    })
 
     var cardId;
     it('should create a new card', function (done) {

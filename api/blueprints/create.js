@@ -23,8 +23,8 @@ module.exports = function createRecord (req, res) {
 	// Create data object (monolithic combination of all parameters)
 	// Omit the blacklisted params (like JSONP callback param, etc.)
 	var data = actionUtil.parseValues(req);
-  var hostId = req.session.user.host;
-  data.chef = hostId;
+  // var hostId = req.session.user.host;
+  // data.chef = hostId;
 
 	// Create new instance of model using data from params
 	Model.create(data).exec(function created (err, newInstance) {

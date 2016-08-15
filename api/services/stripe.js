@@ -91,7 +91,7 @@ module.exports = {
   },
 
   charge : function(attr ,cb){
-    var application_fee = attr.amount * 10 / 100;
+    var application_fee = Math.floor(attr.amount * 0.1);
     stripe.charges.create({
       amount: attr.amount,
       currency: "usd",
