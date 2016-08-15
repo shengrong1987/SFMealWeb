@@ -18,7 +18,7 @@ describe('UsersController', function() {
 
   describe('user login', function() {
 
-    var email = "auth@gmail.com";
+    var email = "aimbebe.r@gmail.com";
     var password = "12345678";
     var shortPassword = "1234567";
     var invalidEmail = "auth@gmail.com123";
@@ -69,19 +69,14 @@ describe('UsersController', function() {
 
     it('should login if account exist', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : email, password: password})
-          .expect(200)
-          .end(function(err,res){
-            console.log(res.body);
-            if(res.body.auth.email != email){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     })
 
-    it('shouldnot login if password not correct', function (done) {
+    it('should not login if password not correct', function (done) {
       agent
           .post('/auth/login?type=local')
           .send({email : email, password: shortPassword})
@@ -94,18 +89,14 @@ describe('UsersController', function() {
           })
     })
 
-    var newEmail = "auth2@gmail.com"
+    var newEmail = "shengrong1225@gmail.com"
     it('should register instead if account not exist', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : newEmail, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != newEmail){
-              return done(Error("registration not being processed with the same email"))
-            }
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : newEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     })
 
     it('should become a host if logged in', function (done) {
@@ -153,41 +144,57 @@ describe('UsersController', function() {
     var userId = '';
     it('should login if account exist', function (done) {
       agent
-          .post('/auth/login?type=local')
-          .send({email : email, password: password})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.auth.email != email){
-              return done(Error("not login with the same account(email not the same)"))
-            }
-            userId = res.body.id;
-            done();
-          })
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     })
 
-    var addresses = [{"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853,"isDefault": true},{"street":"1455 Market St","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853, "isDefault" : false}];
+    it('should get user info', function(done){
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          userId = res.body.id;
+          done()
+        })
+    })
+
+    var addresses = [{"street":"1974 palou ave","city" : "San Francisco", "zip" : '94124', "phone" : '14158023853',"isDefault": true},{"street":"7116 Tiant Way","city" : "Elk Grove", "zip" : '95758', "phone" : '14158023853', "isDefault" : false}];
+    var firstname = "sheng";
+    var lastname = "rong";
 
     it('should update the address info', function (done) {
       agent
           .put('/user/' + userId)
-          .send({address_list : addresses})
+          .send({
+            address : addresses,
+            firstname : firstname,
+            lastname : lastname
+          })
           .expect(200)
           .end(function(err,res){
-            if(res.body.address_list[0].city != "San Francisco"){
+            if(Object.keys(res.body.address_list)[0].isDefault && !Object.keys(res.body.address_list)[1].isDefault && res.body.city != "San Francisco"){
               return done(Error('error geocoding the address'));
             }
             done();
           })
     })
 
-    var email = "auth@gmail.com";
+    var email = "aimbebe.r@gmail.com";
     var password = "12345678";
     var anotherEmail = "notauth@gmail.com"
     var anotherUserId = "";
 
     it('should register instead if account not exist', function (done) {
       agent
-          .post('/auth/login?type=local')
+          .post('/auth/register')
           .send({email : anotherEmail, password: password})
           .expect(200)
           .end(function(err,res){
@@ -224,7 +231,6 @@ describe('UsersController', function() {
           .send({address : "1974 palou ave, San Francisco"})
           .expect(403, done)
     })
-
 
   });
 

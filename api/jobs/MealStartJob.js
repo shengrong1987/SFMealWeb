@@ -34,6 +34,9 @@ module.exports = function(agenda) {
         if(err){
           return done();
         }
+        if(!meal){
+          return done()
+        }
         console.log("your meal will be online in 10 minutes");
         meal.hostEmail = meal.chef.email;
         notification.notificationCenter("Meal","start",meal,true,false,null);

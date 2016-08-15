@@ -49,6 +49,10 @@ module.exports.policies = {
     'deleteObject' : 'or(sessionAuth,isAdmin)'
   },
 
+  JobController : {
+    '*' : 'true'
+  },
+
   MealController : {
     '*' : 'or(and(sessionAuth,isHost,isOwnerOfMeal),isAdmin)',
     'create' : 'or(and(sessionAuth,isHost),isAdmin)',

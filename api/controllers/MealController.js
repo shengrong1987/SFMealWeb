@@ -334,7 +334,7 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
-              if(valid && !host.isValid(true)){
+              if(req.body.status == 'on' && !host.isValid(true)){
                 return res.badRequest(req.__('meal-chef-incomplete'));
               }
               Meal.create(req.body).exec(function(err,meal){
@@ -478,9 +478,7 @@ module.exports = {
     var provideFromTime = params.provideFromTime;
     var provideTillTime = params.provideTillTime;
     var now = new Date();
-    if(now < provideFromTime || now > provideTillTime){
-      return false;
-    }else if(provideFromTime >= provideTillTime){
+    if(provideFromTime >= provideTillTime){
       return false;
     }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
       return false;

@@ -272,7 +272,7 @@
   "card-holder" : "持卡人姓名",
   "card-number" : "卡号",
   "card-exp" : "有效期",
-  "card-new" : "增加新的<br/>支付方式",
+  "card-new" : "增加新的支付方式",
   "cvv-wrong-format" : "CVV格式错误",
   "password" : "密码",
   "reset-password" : "重置密码",

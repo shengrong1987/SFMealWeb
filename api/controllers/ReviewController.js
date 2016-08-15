@@ -11,7 +11,6 @@ module.exports = {
   create : function(req, res){
     var async = require('async');
     var userId = req.session.user.id;
-    var hostId = req.body.host;
     var mealId = req.body.meal;
     var dishId = req.body.dish;
     var reviews = req.body.reviews;
@@ -33,7 +32,7 @@ module.exports = {
           var dishId = review.dish;
           var score = review.score;
           var review = review.content;
-          $this.reviewForDish(dishId, mealId, user, hostId, orders, score, review, function(err, results){
+          $this.reviewForDish(dishId, mealId, user, orders, score, review, function(err, results){
             if(err){
               return next(err);
             }
@@ -60,7 +59,7 @@ module.exports = {
       }else{
         var score = req.body.score;
         var review = req.body.review;
-        $this.reviewForDish(dishId, mealId, user, hostId, orders, score, review, function(err, results){
+        $this.reviewForDish(dishId, mealId, user, orders, score, review, function(err, results){
           async.each(orders, function(order,next){
             order.save(function(err,o){
               if(err){
@@ -72,6 +71,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
+            console.log("review done, results: " + results);
             return res.ok(results);
           });
         }, req);
@@ -79,7 +79,7 @@ module.exports = {
     });
   },
 
-  reviewForDish : function(dishId, mealId, user, hostId, orders, score, content, cb, req){
+  reviewForDish : function(dishId, mealId, user, orders, score, content, cb, req){
     var isValidReview = false;
     async.auto({
       checkReviewForMeal : function(cb){
@@ -90,11 +90,9 @@ module.exports = {
           return cb();
         }
         isValidReview = orders.some(function(order){
-          if(order.meal == mealId && order.reviewing_orders.indexOf(dishId) != -1){
-            order.reviewing_orders.splice(order.reviewing_orders.indexOf(dishId),1);
-            if(order.reviewing_orders.length == 0){
-              order.status = "complete";
-            }
+          if(order.meal == mealId){
+            order.reviewing_orders = [];
+            order.status = "complete";
             return true;
           }
           return false;
@@ -127,7 +125,7 @@ module.exports = {
         if(!dishId){
           return cb();
         }
-        Dish.findOne(dishId).exec(function(err, dish) {
+        Dish.findOne(dishId).populate('chef').exec(function(err, dish) {
           if(err) {
             return cb(err);
           }
@@ -135,7 +133,8 @@ module.exports = {
         });
       },
       getMeal : function(cb){
-        Meal.findOne(mealId).exec(function(err, meal){
+        console.log("getting meal");
+        Meal.findOne(mealId).populate('chef').exec(function(err, meal){
           if(err){
             return cb(err);
           }
@@ -143,6 +142,7 @@ module.exports = {
         })
       },
       createReview : ['getDish','getMeal', function(cb, results){
+        console.log("creating review");
         var dish = results.getDish;
         var meal = results.getMeal;
         Review.create({
@@ -153,36 +153,34 @@ module.exports = {
           score : score,
           review : content,
           user : user.id,
-          host : hostId,
+          host : dish ? dish.chef.id : meal.chef.id,
           username : user.firstname
         }).exec(function(err, review){
           if(err){
+            console.log(err);
             return cb(err);
           }
-          Host.findOne(hostId).exec(function(err, host){
-            if(err){
-              return false;
-            }
-            review.host = host;
-            if(mealId){
-              Meal.findOne(mealId).exec(function(err, meal){
-                if(err){
-                  return false;
-                }
-                review.meal = meal;
-                review.hostEmail = host.email;
-                Notification.notificationCenter("Order", "review", review, true, false, req);
-                cb(null,review);
-              })
-            }
-          })
+          var host = dish?dish.chef:meal.chef;
+          review.host = host;
+          if(meal){
+            review.meal = meal;
+            review.hostEmail = host.email;
+          }else if(dish){
+            review.dish = dish;
+            review.hostEmail = host.email;
+          }else{
+            return cb(Error('no data for review'))
+          }
+          console.log("sending review email");
+          Notification.notificationCenter("Order", "review", review, true, false, req);
+          cb(null,review);
         });
       }]
     },function(err, results){
       if(err){
         return cb(err);
       }
-      cb(null, results);
+      cb(null, results.createReview);
     });
   }
 };

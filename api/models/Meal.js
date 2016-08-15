@@ -153,9 +153,7 @@ module.exports = {
       var provideFromTime = params.provideFromTime;
       var provideTillTime = params.provideTillTime;
       var now = new Date();
-      if(now < provideFromTime || now > provideTillTime){
-        return false;
-      }else if(provideFromTime >= provideTillTime){
+      if(provideFromTime >= provideTillTime){
         return false;
       }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
         return false;
@@ -207,7 +205,9 @@ module.exports = {
           if(err){
             return next(err);
           }
-          values.county = host.county;
+          if(!values.county){
+            values.county = host.county;
+          }
           if(values.type == "order"){
             values.pickups = JSON.stringify([{
               "pickupFromTime" : values.provideFromTime,

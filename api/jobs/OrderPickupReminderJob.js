@@ -29,7 +29,7 @@ module.exports = function(agenda) {
       var orderId = job.attrs.data.orderId;
       var period = job.attrs.data.period;
       Order.findOne(orderId).populate('host').populate('dishes').populate("customer").exec(function(err, order){
-        if(err){
+        if(err || !order){
           return done();
         }
         if(order.type == "order"){

@@ -22,7 +22,7 @@
     <div class="divider" style="margin-bottom: 10px;margin-top:5px;"></div>
     <p><%= pickupmethod%>: <%= method == 'pickup' ? selfpickup : delivery%></p>
     <div class="divider" style="margin-bottom: 10px;margin-top:5px;"></div>
-    <p><%= pickuplocation%>: <%= pickupInfo.location%></p>
+    <p><%= pickuplocation%>: <%= address%></p>
     <table class="table table-email">
       <% Object.keys(orders).forEach(function(dishId){
         var amount = parseInt(orders[dishId]);

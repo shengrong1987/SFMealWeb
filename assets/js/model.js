@@ -1495,6 +1495,55 @@ var Order = Backbone.Model.extend({
   }
 })
 
+var Transaction = Backbone.Model.extend({
+
+});
+
+var TransactionView = Backbone.View.extend({
+  events : {
+    "click #searchBtn" : 'advanced',
+    "click #durationBtn" : 'filter'
+  },
+  advanced : function(e){
+    var btn = $(e.currentTarget);
+    var container = $(btn.data('target'));
+    var searchText = btn.prev().val().trim().toLowerCase();
+    this.model.title = searchText;
+    this.search(container);
+  },
+  filter : function(e){
+    var btn = $(e.currentTarget);
+    var container = $(btn.data('target'));
+    var from = this.$el.find(".from").data("DateTimePicker").date();
+    var to = this.$el.find(".to").data("DateTimePicker").date();
+    if(from){
+      from = from.unix();
+    }
+    this.model.from = from;
+    if(to){
+      to = to.unix();
+    }
+    this.model.to = to;
+    this.search(container);
+  },
+  search : function(container){
+
+    var searchTitle = this.model.title;
+    var from = this.model.from;
+    var to = this.model.to;
+
+    container.find(".item").each(function() {
+      var title = $(this).data("title").toLowerCase();
+      var date = $(this).data("created");
+      if ((searchTitle && title.search(searchTitle) == -1) || (from && date < from) || (to && date > to)) {
+        $(this).hide();
+      } else {
+        $(this).show();
+      }
+    });
+  }
+});
+
 var OrderView = Backbone.View.extend({
   events : {
     "click [data-action='receive']" : "receive",
@@ -1630,7 +1679,6 @@ var OrderView = Backbone.View.extend({
       this.contactAlert.show();
       return;
     }
-
 
     var cards = this.$el.find("#payment-cards button");
     if(cards && cards.length == 1){

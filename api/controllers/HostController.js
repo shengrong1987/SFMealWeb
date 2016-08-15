@@ -12,51 +12,20 @@ module.exports = {
   me : function(req, res){
     var userId = req.session.user.id;
     var hostId = req.session.user.host.id ? req.session.user.host.id : req.session.user.host;
-    User.findOne(userId).populate("auth").exec(function(err,found){
+    User.update(userId, {locale : req.getLocale()}).populate("auth").limit(1).exec(function(err, user){
       if(err){
         return res.badRequest(err);
       }
-      Host.findOne(hostId).populate("dishes").populate("meals").populate('orders').exec(function(err,h){
+      Host.findOne(hostId).populate("dishes").populate("meals").populate('orders').exec(function(err,host){
         if(err){
           return res.badRequest(err);
         }
-        if(!h.passGuide){
-          h.checkGuideRequirement(function(err, pass){
-            if(err){
-              return res.badRequest(err);
-            }
-            async.each(h.orders,function(order, next){
-              Order.findOne(order.id).populate("meal").exec(function(err, o){
-                if(err){
-                  return next(err);
-                }
-                order = o;
-                next();
-              });
-            },function(err){
-              if(err){
-                return res.badRequest(err);
-              }
-              h.host_orders = h.orders;
-              h.adjusting_orders = h.adjusting_orders;
-              h.host_dishes = h.dishes;
-              found.host = h;
-              Notification.destroy({host : hostId}).exec(function(err){
-                if(err){
-                  console.log(err);
-                }
-              });
-              found.locale = req.getLocale();
-              found.save(function(err, result){
-                if(err){
-                  return res.badRequest(err);
-                }
-                return res.view('host',{user: found});
-              })
-            });
-          })
-        }else{
-          async.each(h.orders,function(order, next){
+        host.checkGuideRequirement(function(err, pass){
+          if(err){
+            return res.badRequest(err);
+          }
+          //construct orders for host
+          async.each(host.orders,function(order, next){
             Order.findOne(order.id).populate("meal").exec(function(err, o){
               if(err){
                 return next(err);
@@ -68,24 +37,21 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            h.host_orders = h.orders;
-            h.adjusting_orders = h.adjusting_orders;
-            h.host_dishes = h.dishes;
-            found.host = h;
+            host.host_orders = host.orders;
+            host.adjusting_orders = host.adjusting_orders;
+            host.host_dishes = host.dishes;
             Notification.destroy({host : hostId}).exec(function(err){
               if(err){
                 console.log(err);
               }
             });
-            h.locale = req.getLocale();
-            h.save(function(err, result){
-              if(err){
-                return res.badRequest(err);
-              }
-              return res.view('host',{user: found});
-            })
+            user.host = host;
+            if(req.wantsJSON){
+              return res.ok(user);
+            }
+            return res.view('host',{user: user});
           });
-        }
+        })
       });
     });
   },

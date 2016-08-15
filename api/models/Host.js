@@ -86,6 +86,9 @@ module.exports = {
       defaultsTo : false
     },
     checkGuideRequirement : function(cb){
+      if(this.passGuide){
+        return cb(null, true);
+      }
       if(this.full_address && this.dishes.length > 0 && this.dishes.some(function(dish){
           return dish.isVerified;
         }) && this.bankId){

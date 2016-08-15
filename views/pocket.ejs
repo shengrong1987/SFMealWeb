@@ -29,14 +29,14 @@
         <div id="mydetail" class="tab-pane active middle" style="width: 90%;">
           <div class="box box-shadow white">
             <div class="row">
-              <div data-toggle="duration-filter" data-target="#transaction_container">
+              <div>
                 <div class="form-group col-xs-12">
                   <div class='input-group from col-xs-4' data-toggle="dateTimePicker" style="float: left">
                     <span class="input-group-addon"><%= __('date-from')%></span>
                     <input type='text' class="form-control" />
-                <span class="input-group-addon">
-                  <span class="fa fa-calendar"></span>
-                </span>
+                    <span class="input-group-addon">
+                      <span class="fa fa-calendar"></span>
+                    </span>
                   </div>
                   <div class='input-group to col-xs-4' data-toggle="dateTimePicker" style="float: left;margin-left:20px;">
                     <span class="input-group-addon"><%= __('date-to')%></span>
@@ -45,7 +45,7 @@
                       <span class="fa fa-calendar"></span>
                     </span>
                   </div>
-                  <div class="btn btn-info do col-xs-2" style="float:left;margin-left: 15px;"><%= __('filter')%></div>
+                  <div id="durationBtn" data-target="#transaction_container" class="btn btn-info do col-xs-2" style="float:left;margin-left: 15px;"><%= __('filter')%></div>
                 </div>
                 <div class="alert alert-warning" data-toggle="alert"><%= __('need-from-or-to-time')%></div>
               </div>
@@ -57,14 +57,14 @@
               <div class="col-xs-4">
                 <div class="btn-group btn-outline round border-blue" style="border-radius: 5px;">
                   <input class="btn input" placeholder="<%= __('search-placeholder')%>">
-                  <button class="btn white border-blue" style="border-top: none !important;border-bottom: none !important;border-right: none !important;" onclick="">
+                  <button id="searchBtn" data-target="#transaction_container" class="btn white border-blue" style="border-top: none !important;border-bottom: none !important;border-right: none !important;">
                     <i class="fa fa-search text-blue"></i>
                   </button>
                 </div>
               </div>
-              <div class="col-xs-3">
-                <button class="btn btn-outline text-blue white border-blue" style="margin-left:20px;width:100px;"><%= __('search-advanced')%></button>
-              </div>
+              <!--<div class="col-xs-3">-->
+                <!--<button class="btn btn-outline text-blue white border-blue" style="margin-left:20px;width:100px;"><%= __('search-advanced')%></button>-->
+              <!--</div>-->
             </div>
 
             <h1></h1>
@@ -87,7 +87,7 @@
               user.pocket.transactions_history.forEach(function(tranObj){
               if(tranObj.status == "pending"){
               %>
-              <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>">
+              <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
                   <div class="col-xs-4"><%= tranObj.type == "payment"? __('pocket-income') : __('pocket-expend')%> <a href="<%= tranObj.type=='payment'?'/host/me' : '/user/me'%>">#<%= tranObj.charge.metadata.orderId%></a></div>
@@ -109,7 +109,7 @@
               user.pocket.transactions_history.forEach(function(tranObj){
               if(tranObj.status == "paid" || tranObj.status == "succeeded"){
               %>
-              <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>">
+              <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
                   <div class="col-xs-4"><%= tranObj.type == "payment"? __('pocket-income') : __('pocket-expend') %> <a href="<%= tranObj.type=='payment'?'/host/me' : '/user/me'%>">#<%= tranObj.metadata.orderId%></a></div>
@@ -175,3 +175,7 @@
     </div>
   </div>
 </div>
+
+<script>
+  new TransactionView({ el : $("#mydetail"), model : new Transaction()});
+</script>

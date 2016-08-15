@@ -24,12 +24,13 @@ describe('MealController', function() {
     var email = 'aimbebe.r@gmail.com';
     var password = 'Rs89030659';
     var picture = "/images/thumbnail.jpg";
-    var address1 = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853};
-    var address2 = {"street":"1455 Market St","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853, "isDefault" : true};
+    var address1 = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853,"isDefault" : true};
+    var address2 = {"street":"7116 Tiant Way","city" : "Elk Grove", "zip" : 95758, "phone" : 14158023853};
     var userId = "";
     var firstname = "Shiga";
     var lastname = "Lian";
     var shopName = "Crispy, Tangy, Sweet, and Spicy";
+    var phone = "(415)802-3853";
 
     it('should login or register an account', function (done) {
       agent
@@ -54,30 +55,17 @@ describe('MealController', function() {
         })
     });
 
-    it('should update address info (not default)', function (done) {
+    it('should update addresses info', function (done) {
       agent
           .put('/user/' + userId)
-          .send({address : address1})
+          .send({address : [address1,address2]})
           .expect(200)
           .end(function(err,res){
             if(err){
               return done(err);
             }
-            if(Object.keys(res.body.address_list).length == 0){
-              return done(Error("error geocoding and updating the address"))
-            }
-            done();
-          })
-    });
-
-    it('should update address info (default)', function (done) {
-      agent
-          .put('/user/' + userId)
-          .send({address : address2})
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.city != 'San Francisco'){
-              return done(Error("error geocoding and updating the address"))
+            if(Object.keys(res.body.address_list)[0].isDefault && !Object.keys(res.body.address_list)[1].isDefault && res.body.city != "San Francisco"){
+              return done(Error('error geocoding the address'));
             }
             done();
           })
@@ -129,7 +117,7 @@ describe('MealController', function() {
     it('should update address info for host', function (done) {
         agent
           .put('/host/' + hostId)
-          .send({address:address2, picture: picture, shopName : shopName})
+          .send({address:address1, picture: picture, shopName : shopName})
           .expect(200)
           .end(function(err,res){
             if(res.body.city != "San Francisco"){
@@ -289,7 +277,7 @@ describe('MealController', function() {
     it('should update user info', function (done) {
       agent
         .post('/user/' + guestId)
-        .send({firstname : firstname, lastname : lastname})
+        .send({firstname : firstname, lastname : lastname, phone : phone})
         .expect(200)
         .end(function(err,res){
           if(res.body.firstname != firstname){
@@ -298,8 +286,6 @@ describe('MealController', function() {
           done();
         })
     });
-
-
 
     it('should create a new card', function (done) {
       var number = "4242424242424242";
@@ -373,7 +359,6 @@ describe('MealController', function() {
           .send({
             orders : orders,
             subtotal : subtotal,
-            address : address1.street + address1.city + "CA" + address1.zip,
             method : "pickup",
             mealId : preorderMealId,
             pickupOption : 1,

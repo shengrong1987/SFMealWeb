@@ -22,12 +22,19 @@ var geocode = require("../services/geocode.js");
 module.exports = {
 
   validate_meal : function(meal, orders, preorders, subtotal, res, req) {
+    var now = new Date();
+    var params = req.body;
     if(!orders || !subtotal){
       return res.badRequest(req.__('order-empty'));
     }
     if(meal.status === "off"){
       return res.badRequest(req.__('meal-not-active'));
     }
+
+    if(now < params.provideFromTime || now > params.provideTillTime){
+      return res.badRequest(req.__('meal-not-active'));
+    }
+
     if(meal.dateIsValid()) {
       console.log("meal is valid");
       //check order is valid
@@ -122,14 +129,16 @@ module.exports = {
       params.delivery_fee = 0;
     }
 
-    if(!meal.pickups || params.pickupOption-1>=meal.pickups.length){
-      return false;
+    if(meal.type == "preorder"){
+      if(!meal.pickups || params.pickupOption-1>=meal.pickups.length){
+        return false;
+      }
+      var pickupInfo = meal.pickups[params.pickupOption-1];
+      if(!pickupInfo || pickupInfo.method != params.method){
+        return false;
+      }
+      params.pickupInfo = pickupInfo;
     }
-    var pickupInfo = meal.pickups[params.pickupOption-1];
-    if(!pickupInfo || pickupInfo.method != params.method){
-      return false;
-    }
-    params.pickupInfo = pickupInfo;
 
     return params;
   },

@@ -30,7 +30,7 @@ module.exports = function(agenda) {
       console.log("sending guest list to host");
       var mealId = job.attrs.data.mealId;
       Meal.findOne(mealId).populate("chef").populate("dishes").exec(function(err, meal){
-        if(err){
+        if(err || !meal){
           return done();
         }
         meal.hostEmail = meal.chef.email;
