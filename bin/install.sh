@@ -10,7 +10,7 @@ npm install sails-hook-jobs
 npm install
 npm install --save sails-hook-parametized-policies
 npm install -g grunt
-sudo chown -R 500 ./data
-sudo chown -R 500 ./.tmp
-sudo chown -R 500 ./views
+sudo chown -R 501 ./data
+sudo chown -R 501 ./.tmp
+sudo chown -R 501 ./views
 sudo grunt prod

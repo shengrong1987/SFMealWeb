@@ -67,7 +67,10 @@
       </tbody>
     </table>
     <%} pickups.forEach(function(pickup, index){if(pickup.method == "pickup"){%>
-    <p><%= pickuptime%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%> <%= pickuplocation%>: <%= pickup.location%></p>
+    <p>
+      <%= pickuptime%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/>
+      <%= pickuplocation%>: <%= pickup.location%>
+    </p>
     <table class="table table-bordered">
       <thead>
       <tr>

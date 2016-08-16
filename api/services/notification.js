@@ -60,17 +60,12 @@ var notification = {
     var template = this.inquireTemplate(model,action);
     var locale = req ? (params.isSendToHost ? params.host.locale : params.customer.locale) : '';
 
-    var vars = this.mergeI18N(model, action, req, locale);
+    this.mergeI18N(model, action, req, locale, params);
 
     this.transitLocaleTimeZone(params);
     this.calculateTax(params);
-
-    var params = Object.assign({
-      recipientName : basicInfo.recipientName,
-      senderName : "SFMeal.com"
-    }, params);
-
-    params = Object.assign(params, vars);
+    params.recipientName = basicInfo.recipientName;
+    params.senderName = "SFMeal.com";
 
     //juice it using email-template
     sails.hooks.email.send(template,params,{
@@ -230,8 +225,7 @@ var notification = {
     return template;
   },
 
-  mergeI18N : function(model, action, req, locale){
-    var localVar = {};
+  mergeI18N : function(model, action, req, locale, params){
     var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','tax'];
     if(model == "Order"){
       switch(action){
@@ -282,16 +276,14 @@ var notification = {
 
     i18ns.forEach(function(keyword){
       if(req){
-        localVar[keyword.replace(/\-/g,'')] = req.__(keyword);
+        params[keyword.replace(/\-/g,'')] = req.__(keyword);
       }else{
-        localVar[keyword.replace(/\-/g,'')] = sails.__({
+        params[keyword.replace(/\-/g,'')] = sails.__({
           phrase : keyword,
           locale : locale
         });
       }
     });
-
-    return localVar;
   },
 
   transitLocaleTimeZone : function(params){
@@ -306,6 +298,12 @@ var notification = {
     if(params.meal){
       params.meal.provideFromTime = moment.tz(params.meal.provideFromTime, "America/Los_Angeles");
       params.meal.provideTillTime = moment.tz(params.meal.provideTillTime, "America/Los_Angeles");
+    }
+    if(params.pickups){
+      params.pickups.forEach(function(pickup){
+        pickup.pickupFromTime = moment.tz(pickup.pickupFromTime, "America/Los_Angeles");
+        pickup.pickupTillTime = moment.tz(pickup.pickupTillTime, "America/Los_Angeles");
+      });
     }
   },
 

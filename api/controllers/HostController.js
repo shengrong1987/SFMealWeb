@@ -45,11 +45,12 @@ module.exports = {
                 console.log(err);
               }
             });
-            user.host = host;
+            var u = user[0];
+            u.host = host;
             if(req.wantsJSON){
-              return res.ok(user);
+              return res.ok(u);
             }
-            return res.view('host',{user: user});
+            return res.view('host',{user: u});
           });
         })
       });

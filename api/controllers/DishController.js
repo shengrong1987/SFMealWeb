@@ -53,9 +53,8 @@ module.exports = {
 
   create : function(req, res){
     var hostId = req.session.user.host.id ? req.session.user.host.id : req.session.user.host;
-    var params = Object.assign(req.body,{
-      chef : hostId
-    });
+    var params = req.body;
+    params.chef = hostId;
     Dish.create(params).exec(function(err, dish){
       if(err){
         return res.badRequest(err);

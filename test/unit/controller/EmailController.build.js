@@ -554,6 +554,46 @@ describe('EmailController', function() {
         })
     })
 
+    it('should login or register an account for guest', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should order the meal again', function (done) {
+      var dishObj = {};
+      dishObj[dish1] = 1;
+      dishObj[dish2] = 2;
+      dishObj[dish3] = 0;
+      dishObj[dish4] = 0;
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 1 + price2 * 2,
+          address : address,
+          phone : phone,
+          pickupOption : 2,
+          method : "delivery",
+          mealId : preorderMealId,
+          delivery_fee : 0
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          if(res.body.customer != guestId){
+            return done(Error("error making order"));
+          }
+          orderId = res.body.id;
+          done();
+        })
+    })
+
   });
 
 });
