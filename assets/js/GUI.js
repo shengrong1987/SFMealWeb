@@ -6,7 +6,7 @@
 
 //Modal open/switch
 function toggleModal(event,cb){
-  var target = event.target?event.target:event;
+  var target = event.currentTarget?event.currentTarget:event;
   var url = $(target).data('href');
   var modalId = $(target).data('target');
   var modal = $(modalId);
@@ -178,14 +178,14 @@ function search(target){
       + "&sensor=false",
       success: function (response) {
         if (response.results.length == 0) {
-          alert("无法解析邮编");
+          alert(jQuery.i18n.prop('zipcodeGeoError'));
           return;
         }
         var county = response.results[0].address_components[2]["long_name"];
         query += "&county=" + county;
         location.href = "/meal/search?" + query;
       }, error: function (err) {
-        alert("您的地区尚未开通私房菜");
+        alert(jQuery.i18n.prop('notAvailable'));
       }
     });
   }else{
@@ -246,10 +246,8 @@ function orderFood(id,number){
 var refreshMenu = function(){
   for(var key in localOrders){
     if(localOrders[key]==0){
-      $("#meal-detail-container .dish[data-id=" + key + "]").find(".take-order").html('点一份');
       $("#meal-detail-container .dish[data-id=" + key + "]").find(".untake-order").hide('slow');
     }else{
-      $("#meal-detail-container .dish[data-id=" + key + "]").find(".take-order").html('再点一份');
       $("#meal-detail-container .dish[data-id=" + key + "]").find(".untake-order").show('slow');
     }
   }
@@ -258,7 +256,7 @@ var refreshMenu = function(){
   $("#order .item").each(function(){
     subtotal += parseFloat($(this).find(".amount").text()) * $(this).find(".price").attr("value");
   });
-  $("#order .subtotal").html("餐费小计: $" + subtotal.toFixed(2));
+  $("#order .subtotal").html("$" + subtotal.toFixed(2));
   $("#order .subtotal").data("value", subtotal.toFixed(2));
   if(method == "delivery"){
     var delivery = $("#order .delivery").data("value");
@@ -269,10 +267,10 @@ var refreshMenu = function(){
     $("#order .pickupOpt").show();
     delivery = 0;
   }
-  $(".delivery").text("送餐费小计: $" + delivery.toFixed(2));
+  $(".delivery").text("$" + delivery.toFixed(2));
   $("#order .total").data("value",(subtotal+delivery).toFixed(2));
-  $("#order .total").html("合计: $" + (subtotal+delivery).toFixed(2));
-  $("#meal-confirm-container .total").text("合计: $" + (subtotal+delivery).toFixed(2));
+  $("#order .total").html(" $" + (subtotal+delivery).toFixed(2));
+  $("#meal-confirm-container .total").text(" $" + (subtotal+delivery).toFixed(2));
 }
 
 //render order view
@@ -312,14 +310,14 @@ function selectorSetup(){
             if(curValue == selectedDishId){
               var indexChar = "";
               if(index==0){
-                indexChar = "第一款";
+                key = "firstDish";
               }else if(index==1){
-                indexChar = "第二款";
+                key = "secondDish";
               }else{
-                indexChar = "第三款";
+                key = "thirdDish";
               }
               otherDropBtn.data("value","");
-              otherDropBtn.html("<div style='width: 100px;display: inline-block;'>" + indexChar + "</div><span class='caret'></span>");
+              otherDropBtn.html("<div style='width: 100px;display: inline-block;' data-toggle='i18n' data-key='" + key + "'></div><span class='caret'></span>");
             }
           }
           index++;
@@ -344,6 +342,7 @@ function tooltipSetup(){
 }
 
 function setup(){
+  setupLanguage();
   tapController();
   stepContainer();
   getCountyInfo();
@@ -354,8 +353,55 @@ function setup(){
   // dishSelectorSetup();
   adjustLayout();
   $('[data-toggle="popover"]').popover();
+  $('[data-toggle="validator"]').validator({
+    feedback : {
+      success: "fa fa-check",
+      error : "fa fa-remove"
+    }
+  });
   $("input[type='tel']").inputmask({"mask": "(999) 999-9999"});
   $('#meal-container').mixItUp();
+}
+
+function setupLanguage(){
+  var language = window.navigator.userLanguage || window.navigator.language;
+  console.log(language);
+  jQuery.i18n.properties({
+    name:'Message',
+    path:'/locale/',
+    mode:'both',
+    language:language,
+    checkAvailableLanguages: true,
+    async: true,
+    callback: function() {
+
+      $("[data-toggle='i18n']").each(function(){
+        $(this).text(jQuery.i18n.prop($(this).data("key")));
+        if($(this).data("error")){
+          $(this).data("error", jQuery.i18n.prop($(this).data("key")));
+        }
+        if($(this).data("pattern-error") && $(this).data("pattern-key")){
+          $(this).data("pattern-error", jQuery.i18n.prop($(this).data("pattern-key")));
+        }
+        if($(this).data("match-error") && $(this).data("match-key")){
+          $(this).data("match-error", jQuery.i18n.prop($(this).data("match-key")));
+        }
+      });
+
+      // We specified mode: 'both' so translated values will be
+      // available as JS vars/functions and as a map
+
+      // Accessing a simple value through the map
+      // jQuery.i18n.prop('msg_hello');
+      // // Accessing a value with placeholders through the map
+      // jQuery.i18n.prop('msg_complex', 'John');
+      //
+      // // Accessing a simple value through a JS variable
+      // alert(msg_hello +' '+ msg_world);
+      // // Accessing a value with placeholders through a JS function
+      // alert(msg_complex('John'));
+    }
+  });
 }
 
 $("document").ready(function(){

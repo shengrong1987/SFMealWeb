@@ -23,6 +23,7 @@ module.exports = {
     },
     password : {
       type : 'string',
+      regex : /^[_A-z0-9]{8,}$/,
       minLength : 8
     }
   }),

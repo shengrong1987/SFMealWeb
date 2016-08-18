@@ -97,53 +97,61 @@ module.exports = require('waterlock').actions.user({
           }
           async.each(addresses, function(addObj, next){
             if(addObj.delete){
-              var keys = Object.keys(user.address_list);
-              if(keys.length == 1){
+              if(user.address.length == 1){
                 return next(req.__('user-only-address'));
               }
-              var isDefault = user.address_list[address.id].isDefault;
-              delete user.address_list[addObj.id];
-              keys = Object.keys(user.address_list);
-              if(isDefault){
-                user.address_list[keys[0]].isDefault = true;
+              var deletingAdd = user.address.filter(function(one){
+                return one.id == addObj.id;
+              })[0];
+              user.address.splice(user.address.indexOf(deletingAdd),1);
+              if(deletingAdd.isDefault){
+                user.address[0].isDefault = true;
               }
               return next(null, user);
             }
-            if(addObj.isDefault){
-              for (var key in user.address_list) {
-                if(user.address_list.hasOwnProperty(key)) {
-                  user.address_list[key].isDefault = false;
-                }
+            var actualAddress = addObj.street + " " + addObj.city;
+            require('../services/geocode').geocode(actualAddress, function (err, result) {
+              if (err) {
+                return next(req.__('meal-error-address'));
               }
-              var actualAddress = addObj.street + " " + addObj.city;
-              require('../services/geocode').geocode(actualAddress, function (err, result) {
-                if (err) {
-                  return next(req.__('meal-error-address'));
-                }
-                if(result.length==0){
-                  return next(req.__('meal-error-address2'));
-                }
+              if(result.length==0){
+                return next(req.__('meal-error-address2'));
+              }
+              if(addObj.isDefault) {
+                user.address.forEach(function (one) {
+                  one.isDefault = false;
+                });
                 var administration = result[0].administrativeLevels;
                 user.county = administration.level2long;
                 user.city = result[0].city;
                 user.full_address = result[0].formattedAddress;
                 user.lat = result[0].latitude;
                 user.long = result[0].longitude;
-                return next();
-              });
-            }else{
-              if(addObj.id){
-                user.address_list[addObj.id] = address;
+                user.zip = result[0].zipcode;
+              }
+
+              addObj.street = result[0].streetNumber + " " + result[0].streetName;
+              addObj.city = result[0].city;
+              addObj.zip = result[0].zipcode;
+
+              if(addObj.id && addObj.id != 'undefined'){
+                user.address.forEach(function(add, index){
+                  if(add.id == addObj.id){
+                    user.address[index] = addObj;
+                  }
+                });
               }else{
                 var id = new Date().getTime();
-                user.address_list[id] = addObj;
+                addObj.id = id;
+                user.address.push(addObj);
               }
               return next();
-            }
+            });
           },function(err){
             if(err){
               return cb(err);
             }
+            delete params.address;
             cb(null, user);
           });
         })

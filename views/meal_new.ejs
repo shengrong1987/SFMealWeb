@@ -29,7 +29,7 @@
         <div class="box box-shadow box-primary white text-left">
           <h4 class="text-green"><%= __('new-meal')%></h4>
           <h1></h1>
-          <form class="form-horizontal" data-host-id="<%= host.id%>" data-err-container=".submit">
+          <form class="form-horizontal" data-host-id="<%= host.id%>" data-err-container=".submit" data-toggle="validator">
 
             <div class="form-group">
               <div id="dish-selector" data-toggle="dish-selector" class="row" data-isRemote="false">
@@ -265,6 +265,5 @@
 </div>
 
 <script>
-  $("#mealCreatingView form").validator({});
   new MealView({ el : "#mealCreatingView", model : new Meal()});
 </script>

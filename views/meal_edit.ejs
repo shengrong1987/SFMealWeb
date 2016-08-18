@@ -27,7 +27,7 @@
 
       <div id="mealEditingView" style="padding: 5px 20px 50px 20px;">
         <div class="box box-shadow box-primary white text-left">
-          <form class="form-horizontal" data-meal-id="<%= meal.id%>" data-id="<%= meal.userId%>" data-host-id="<%= meal.chef.id%>" data-err-container=".submit">
+          <form class="form-horizontal" data-meal-id="<%= meal.id%>" data-id="<%= meal.userId%>" data-host-id="<%= meal.chef.id%>" data-err-container=".submit" data-toggle="validator">
 
             <div class="form-group">
               <div data-toggle="dish-selector" data-mealid="<%= meal.id%>" data-isremote="true" class="row">
@@ -355,6 +355,5 @@
 </div>
 
 <script>
-  $("#mealEditingView form").validator({});
   var mealView = new MealView({ el : "#mealEditingView", model : new Meal()});
 </script>

@@ -193,8 +193,9 @@
                   </div>
 
                   <div class="col-sm-4" style="padding-top: 25px;">
-                    <button class="btn btn-red round take-order" onclick="javascript:orderFood('<%= dish.id %>',1)"><%= __('order-one')%></button>
+                    <button class="btn btn-red round take-order" data-toggle="i18n" data-key="orderOne" onclick="javascript:orderFood('<%= dish.id %>',1)"><%= __('order-one')%></button>
                     <button class="btn btn-red round untake-order" onclick="javascript:orderFood('<%= dish.id %>',-1)" style="width: 50px;display: none;">-</button>
+                    <div class="getsocial gs-reaction-button" style="margin-top: 25px;"></div>
                   </div>
                 </div>
 
@@ -304,7 +305,7 @@
             <tr>
               <th></th>
               <td></td>
-              <th class="text-right subtotal"><%= __('meal-fee')%> $0.00</th>
+              <th class="text-right"><%= __('meal-fee')%><span class="subtotal">$0.00</span></th>
             </tr>
             <tr></tr>
             <tr>
@@ -321,14 +322,14 @@
             <tr>
               <th></th>
               <td></td>
-              <th class="text-right delivery" data-value="0"><%= __('meal-delivery-fee')%> $0.00</th>
+              <th class="text-right"><%= __('meal-delivery-fee')%><span class="delivery" data-value="0"> $0.00</span></th>
             </tr>
             <tr></tr>
             <tr></tr>
             <tr>
               <th></th>
               <td></td>
-              <th class="text-right total"><%= __('total')%><span class="total"></span></th>
+              <th class="text-right"><%= __('total')%><span class="total"></span></th>
             </tr>
             </tbody>
           </table>

@@ -73,7 +73,9 @@ module.exports = {
     if(params.address){
       //use googlemap api to geocode address
       //store it into lat, long
+      params.address = params.address[0];
       var actual_address = params.address.street + params.address.city + ", " + params.address.zip;
+      var cellphone = params.address.phone;
       require('../services/geocode').geocode(actual_address,function(err,result){
         if(err){
           console.log(err);
@@ -90,12 +92,13 @@ module.exports = {
           params.long = result[0].longitude;
           params.street = result[0].streetNumber + " " + result[0].streetName;
           params.zip = result[0].zipcode;
+          delete params.address;
         }
         Host.update({id: hostId}, params).exec(function(err,host){
           if(err){
             res.badRequest(err);
           }else{
-            User.update(userId,{phone : params.address.phone}).exec(function(err,user){
+            User.update(userId,{phone : cellphone}).exec(function(err,user){
               if(err){
                 return res.badRequest(err);
               }

@@ -28,7 +28,7 @@
       <div id="dishEditView" style="padding: 5px 20px 50px 20px;">
         <div class="box box-shadow box-primary white text-left">
           <h1></h1>
-          <form data-id="<%= dish.userId%>" data-dish-id="<%= dish.id%>" data-err-container=".submit">
+          <form data-id="<%= dish.userId%>" data-dish-id="<%= dish.id%>" data-err-container=".submit" data-toggle="validator">
             <div class="form-group">
               <label for="mealTitleInput">1.<%= __('dish-name') %></label>
               <input id="mealTitleInput" class="form-control" type="text" placeholder="<%= __('full-name') %>" maxlength="7" data-error="<%= __('full-name') %>" required value="<%= dish.title%>">
@@ -51,7 +51,7 @@
                   </div>
                   <div>
                     <div class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
-                      <input id="photoInput-<%= i%>" class="form-control" type="file" data-error="<%= __('need-photo') %>">
+                      <input id="photoInput-<%= i%>" class="form-control" type="file" name="image" data-error="<%= __('need-photo') %>">
                     </div>
                     <a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput"><%= __('remove')%></a>
                     <script>
@@ -131,6 +131,5 @@
 </div>
 
 <script>
-  $("#dishEditView form").validator({});
   new DishView({ el : $("#dishEditView"), model : new Dish()})
 </script>

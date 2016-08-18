@@ -29,7 +29,7 @@
         <div class="box box-shadow box-primary white text-left">
           <h4 class="text-green"><%= __('new-dish') %></h4>
           <h1></h1>
-          <form data-id="<%= user.id %>">
+          <form data-id="<%= user.id %>" data-toggle="validator">
             <div class="form-group">
               <label for="mealTitleInput">1.<%= __('dish-name') %></label>
               <input id="mealTitleInput" class="form-control" type="text" placeholder="<%= __('full-name') %>" maxlength="7" data-error="<%= __('full-name') %>" required>
@@ -115,6 +115,5 @@
 </div>
 
 <script>
-  $("#dishNewView form").validator({});
   new DishView({ el : $("#dishNewView"), model : new Dish()})
 </script>

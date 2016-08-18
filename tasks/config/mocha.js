@@ -14,18 +14,18 @@ module.exports = function(grunt) {
     //     'test/**/**/ReviewController.test.js'
 		// 	]
 		// }
-    // build : {
-    //  options: {
-    //    reporter: 'spec'
-    //  },
-    //  src:['test/bootstrap.build.js','test/**/MealController.build.js']
-    // }
-    buildEmail : {
+    build : {
      options: {
        reporter: 'spec'
      },
-     src:['test/bootstrap.build.js','test/**/EmailController.build.js']
+     src:['test/bootstrap.build.js','test/**/MealController.build.js']
     }
+    // buildEmail : {
+    //  options: {
+    //    reporter: 'spec'
+    //  },
+    //  src:['test/bootstrap.build.js','test/**/EmailController.build.js']
+    // }
 	});
 	grunt.loadNpmTasks('grunt-mocha-test');
 };

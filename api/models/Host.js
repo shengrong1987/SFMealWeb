@@ -18,18 +18,21 @@ module.exports = {
       type : 'string'
     },
     shopName : {
-      type : 'string'
+      type : 'string',
+      maxLength : 35
     },
     picture : {
       type : 'string'
+      // url : true
     },
     intro : {
       type : 'string',
       defaultsTo : ""
     },
     email : {
-      type : 'string',
-      required : true
+      type : 'email',
+      required : true,
+      unique : true
     },
     //[{"dish1": id}, {"dish2":id}, {"dish3":id}]
     feature_dishes : {
@@ -62,8 +65,7 @@ module.exports = {
     },
     zip : {
       type : 'string',
-      minLength : 10,
-      minLength : 5
+      regex : /^\d{5}(?:[-\s]\d{4})?$/
     },
     dishes : {
       collection : 'Dish',

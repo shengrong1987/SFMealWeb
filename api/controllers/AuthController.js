@@ -18,7 +18,7 @@ module.exports = require('waterlock').waterlocked({
     var params = req.params.all(),
       def = waterlock.Auth.definition,
       criteria = { },
-      scopeKey = def.email !== undefined ? 'email' : 'username';
+      scopeKey = 'email';
     var attr = {
       password: params.password
     }

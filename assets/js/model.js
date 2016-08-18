@@ -18,7 +18,7 @@ var Auth = Backbone.Model.extend({
 
 var LoginView = Backbone.View.extend({
   events : {
-    "submit #loginForm" : "login",
+    "submit form" : "login",
     "click #FBBtn" : "FBLogin",
     "click #GoogleBtn" : "GoogleLogin",
     "submit #sendEmailForm" : "sendEmail",
@@ -41,6 +41,9 @@ var LoginView = Backbone.View.extend({
     this.errorView.hide();
     this.model.type = "login";
     this.model.method = "local";
+    if(this.$el.find("button[type='submit']").hasClass("disabled")){
+      return;
+    }
     var email = this.$el.find("#emailInput").val();
     var password = this.$el.find("#passwordInput").val();
     this.model.set({email : email, password : password});
@@ -49,7 +52,7 @@ var LoginView = Backbone.View.extend({
       success : function(){
         location.reload();
       },error : function(model,err){
-        $this.errorView.html(err.responseText || "用户名或密码不正确，请重试。");
+        $this.errorView.html(err.responseText);
         $this.errorView.show();
       }
     });
@@ -80,7 +83,7 @@ var LoginView = Backbone.View.extend({
     this.model.save({},{
       success : function(model, result){
         $this.successView.show();
-        $this.successView.html("邮件已发送，查阅重置密码邮件。")
+        $this.successView.html(jQuery.i18n.prop('emailSent'))
       },error : function(model, err){
         $this.errorView.show();
         $this.errorView.html(err.responseText);
@@ -95,7 +98,7 @@ var LoginView = Backbone.View.extend({
     this.model.save({},{
       success : function(model, result){
         if(result=="200"){
-          $this.successView.html("密码重置成功，请点击链接使用新密码登陆<a href='/'>www.sfmeal.com</a>");
+          $this.successView.html(jQuery.i18n.prop('resetPasswordSuccess'));
           $this.successView.show();
         }else{
           $this.errorView.html(result.responseText);
@@ -111,6 +114,7 @@ var LoginView = Backbone.View.extend({
 var RegisterView = Backbone.View.extend({
   events : {
     "submit form" : "register",
+    "click #FBBtn" : "FBLogin",
     "click #FBBtn" : "FBLogin",
     "click #GoogleBtn" : "GoogleLogin"
   },
@@ -217,13 +221,13 @@ var UserBarView = Backbone.View.extend({
     var msg = "unknown notification";
     switch(verb){
       case "updated":
-        msg = "order: " + id + " " + action;
+        msg = jQuery.i18n.prop('orderUpdatedNotification',id, action);
             break;
       case "destroyed":
-        msg = "order: " + id + " is cancelled";
+        msg = jQuery.i18n.prop('orderCancelNotification',id);
             break;
       case "created":
-        msg = "you have an new order: " + id;
+        msg = jQuery.i18n.prop('newOrderNotification',id);
             break;
     }
     var msgBtn = this.$el.find("#msgBtn");
@@ -338,9 +342,6 @@ var ApplyView = Backbone.View.extend({
         stopHere = true;
       }
     });
-    // var percent = (parseInt(curStep) / 5) * 100;
-    // this.$el.find('.progress-bar').css({width: percent + '%'});
-    // this.$el.find('.progress-bar').text("Step " + curStep + " of 5");
     $('[href="#step'+curStep+'"]').tab('show');
 
   },
@@ -351,7 +352,7 @@ var ApplyView = Backbone.View.extend({
   enterAddressInfo : function(event){
     var target = $(event.target);
     var hostId = target.data("id");
-    var address_form = $("#address-form");
+    var address_form = $("#addressDetailView form");
     address_form.off("submit");
     address_form.on("submit",{ mt : event.data.mt}, event.data.mt.saveAddress);
     address_form.find("button[name='cancel']").off("click");
@@ -363,7 +364,11 @@ var ApplyView = Backbone.View.extend({
   },
   saveAddress : function(e) {
     e.preventDefault();
-    var address_form = $("#address-form");
+    var address_form = $("#addressDetailView form");
+    var submit_btn = address_form.find("[type='submit']");
+    if (submit_btn.hasClass('disabled')) {
+      return;
+    }
     var alert_block = address_form.find(".alert");
     var $this = e.data.mt;
     alert_block.removeClass("hide");
@@ -402,7 +407,7 @@ var ApplyView = Backbone.View.extend({
     var shopName = this.$el.find("input[name='shopName']").val();
     if(!shopName){
       var alert1 = this.$el.find("#step1 .alert");
-      alert1.text("店名必须填写");
+      alert1.text(jQuery.i18n.prop('shopnameEmptyError'));
       alert1.show();
       return;
     }
@@ -570,7 +575,7 @@ var AddressView = Backbone.View.extend({
     var contactView = this.$el.find("#contact");
     var distance = utility.getDistance({lat: contactView.data("user-lat"), long: contactView.data("user-long")}, hostLoc);
     if (distance > range) {
-      this.$el.find("#contact-error").html("地址超出送餐范围, 请选择自取.");
+      this.$el.find("#contact-error").html(jQuery.i18n.prop('addressOutOfRangeError'));
       this.$el.find("#contact-error").show();
       contactView.data("has-error", true);
     }
@@ -593,7 +598,7 @@ var AddressView = Backbone.View.extend({
         return;
       }
       if(distance > range){
-        $this.$el.find("#contact-error").html("地址超出送餐范围, 请选择自取.");
+        $this.$el.find("#contact-error").html(jQuery.i18n.prop('addressOutOfRangeError'));
         $this.$el.find("#contact-error").show();
         contactView.data("has-error", true);
       }else{
@@ -617,10 +622,10 @@ var AddressView = Backbone.View.extend({
     var target = $(event.target).parent();
     var address_id = target.data("address-id");
     this.model.set({
-      address : {
+      address : [{
         id : address_id,
         delete : true
-      }
+      }]
     });
     this.model.save({},{
       success : function(){
@@ -633,7 +638,7 @@ var AddressView = Backbone.View.extend({
   enterAddressInfoFromOrder : function (event){
     var target = $(event.target);
     var id = target.data("id");
-    var address_form = $("#address-form");
+    var address_form = $("#addressDetailView form");
     address_form.attr("data-id",id);
     address_form.find(".user").show();
     address_form.find(".host").hide();
@@ -644,14 +649,14 @@ var AddressView = Backbone.View.extend({
     address_form.find("button[name='cancel']").on("click",dismissModal);
   },
   enterAddressInfo : function(event){
-    var target = $(event.target).parent();
+    var target = $(event.target).closest('.address_block');
     var address_id = target.data("address-id");
     var id = target.data("id");
     var street = target.data("street") || "";
     var city = target.data("city");
     var zip = target.data("zip");
     var phone = target.data("phone");
-    var address_form = $("#address-form");
+    var address_form = $("#addressDetailView form");
     address_form.off("submit");
     address_form.on("submit",{ mt : event.data.mt}, event.data.mt.saveAddress);
     address_form.find("button[name='cancel']").off("click");
@@ -679,7 +684,11 @@ var AddressView = Backbone.View.extend({
   },
   saveAddress : function(e) {
     e.preventDefault();
-    var address_form = $("#address-form");
+    var address_form = $("#addressDetailView form");
+    var submit_btn = address_form.find("[type='submit']");
+    if (submit_btn.hasClass('disabled')) {
+      return;
+    }
     var alert_block = address_form.find(".alert");
     var $this = e.data.mt;
     alert_block.removeClass("hide");
@@ -697,14 +706,14 @@ var AddressView = Backbone.View.extend({
     }
     $this.model.set({id: id});
     $this.model.set({
-      address: {
+      address: [{
         id: address_id,
         street: street,
         city: city,
         zip: zip,
         phone: phone,
         isDefault: isDefault
-      }
+      }]
     });
     $this.model.save({}, {
       success: function () {
@@ -800,7 +809,7 @@ var MealView = Backbone.View.extend({
   addNewPickup : function(e){
     e.preventDefault();
     this.$el.find("#pickupAlert").hide();
-    var pickupView = '<div class="well form-group pickup"> <div class="col-xs-4"> <label>取餐时间 <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> <div class="col-xs-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">From</span> <input type="text" class="form-control" /> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">&nbsp;&nbsp;To&nbsp;&nbsp;</span> <input type="text" class="form-control"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div> <div class="form-group location"> <label>取餐地点</label> <input type="text" class="form-control"> </div><div class="form-group method"> <label>取餐方式</label> <select class="form-control"> <option value="delivery">送餐</option> <option value="pickup" selected="true">自取</option> </select> </div> </div> </div>';
+    var pickupView = '<div class="well form-group pickup"> <div class="col-xs-4"> <label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> <div class="col-xs-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">From</span> <input type="text" class="form-control" /> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">&nbsp;&nbsp;To&nbsp;&nbsp;</span> <input type="text" class="form-control"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div> <div class="form-group location"> <label data-toggle="i18n" data-key="pickupAddress"></label> <input type="text" class="form-control"> </div><div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div> </div> </div>';
     this.$el.find(".pickup_container").append(pickupView);
     this.$el.find("[data-toggle='dateTimePicker']").datetimepicker({
       icons:{
@@ -815,6 +824,7 @@ var MealView = Backbone.View.extend({
       stepping : 30,
       showTodayButton : true,
     });
+    setupLanguage();
   },
   removeNewPickup : function(e){
     e.preventDefault();
@@ -913,17 +923,17 @@ var MealView = Backbone.View.extend({
         if(!pickupFromTime || !pickupTillTime || !location){
           pickupValid = false;
           $this.scheduleAlert.show();
-          $this.scheduleAlert.html("提货时间/地点必须填");
+          $this.scheduleAlert.html(jQuery.i18n.prop('pickupLocationError'));
           return;
         }else if(pickupFromTime.isSame(pickupTillTime)){
           pickupValid = false;
           $this.scheduleAlert.show();
-          $this.scheduleAlert.html("开始/结束取货时间不能一样");
+          $this.scheduleAlert.html(jQuery.i18n.prop('provideTimeError'));
           return;
         }else if(moment.duration(pickupTillTime.diff(pickupFromTime)).asMinutes() < 30){
           pickupValid = false;
           $this.scheduleAlert.show();
-          $this.scheduleAlert.html("开始到结束取货时间不能短于30分钟");
+          $this.scheduleAlert.html(jQuery.i18n.prop('pickupTimeError'));
           return;
         }
         pickupObj.pickupFromTime = pickupFromTime._d;
@@ -939,15 +949,15 @@ var MealView = Backbone.View.extend({
 
       if(!startBookingDate || !endBookingDate){
         this.scheduleAlert.show();
-        this.scheduleAlert.html("接受/结束预定或提货时间必须填");
+        this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeError'));
         return;
       }else if(startBookingDate.isSame(endBookingDate)){
         this.scheduleAlert.show();
-        this.scheduleAlert.html("接受/结束预定时间不能一样");
+        this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeSameError'));
         return;
       }else if(moment.duration(endBookingDate.diff(startBookingDate)).asMinutes() < 60){
         this.scheduleAlert.show();
-        this.scheduleAlert.html("开始到结束预定时间不能短于1小时");
+        this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeTooShortError'));
         return;
       }
 
@@ -962,19 +972,19 @@ var MealView = Backbone.View.extend({
 
       if(!startBookingDate._d || !endBookingDate._d){
         this.scheduleAlert.show();
-        this.scheduleAlert.html("营业时间必须填");
+        this.scheduleAlert.html(jQuery.i18n.prop('provideTimeNotError'));
         return
       }else if(startBookingDate.isSame(endBookingDate)){
         this.scheduleAlert.show();
-        this.scheduleAlert.html("开始时间不能和结束时间一样");
+        this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeSameError'));
         return;
       }else if(startBookingDate.isAfter(endBookingDate)){
         this.scheduleAlert.show();
-        this.scheduleAlert.html("开始时间不能晚于结束时间");
+        this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeInvalidError'));
         return;
       }else if(moment.duration(endBookingDate.diff(startBookingDate)).asMinutes() < 60){
         this.scheduleAlert.show();
-        this.scheduleAlert.html("开始时间到结束时间不能短于1小时");
+        this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeTooShortError'));
         return;
       }
     }
@@ -998,7 +1008,7 @@ var MealView = Backbone.View.extend({
     }
 
     this.formAlert.show();
-    this.formAlert.html("保存中...");
+    this.formAlert.html(jQuery.i18n.prop('saving'));
     this.model.unset("chef");
     this.model.set({
       dishes : dishes,
@@ -1021,9 +1031,9 @@ var MealView = Backbone.View.extend({
     this.model.save({},{
       success : function(){
         if(mealId) {
-          $this.formAlert.html("Meal更新完成");
+          $this.formAlert.html("Meal" + jQuery.i18n.prop('updatedComplete'));
         }else{
-          BootstrapDialog.alert("Meal新建完成!", function(){
+          BootstrapDialog.alert("Meal" + jQuery.i18n.prop('createdComplete'), function(){
             reloadUrl("/host/me#","mymeal");
           })
         }
@@ -1066,8 +1076,6 @@ var DishView = Backbone.View.extend({
     var exist;
 
     var p1Input = form.find("#photoInput-1");
-
-
     if (p1Input[0].files) {
       exist = form.find(".fileinput-preview:eq(" + 0 + ")").data("src");
       file1 = form.find("#photoInput-1")[0].files[0];
@@ -1147,7 +1155,7 @@ var DishView = Backbone.View.extend({
     }
 
     this.formAlert.show();
-    this.formAlert.html("保存中...");
+    this.formAlert.html(jQuery.i18n.prop('saving'));
 
     var dishId = form.data("dish-id");
     var title = $("#mealTitleInput").val();
@@ -1194,32 +1202,32 @@ var DishView = Backbone.View.extend({
           $this.model.save({},{
             success : function(model, response){
               if(dishId){
-                $this.formAlert.html("菜品更新完成");
+                $this.formAlert.html("Dish" + jQuery.i18n.prop('updatedComplete'));
                 $this.formAlert.show();
               }else{
                 if(!response.host.passGuide){
                   BootstrapDialog.show({
-                    title: '提示',
-                    message : "菜品新建完成",
+                    title: jQuery.i18n.prop('tip'),
+                    message : jQuery.i18n.prop('createdComplete'),
                     buttons: [{
-                      label: '回到教程',
+                      label: jQuery.i18n.prop('backToGuide'),
                       action: function(dialog) {
                         reloadUrl("/apply",'');
                       }
                     }, {
-                      label: '回到菜单',
+                      label: jQuery.i18n.prop('backToList'),
                       action: function(dialog) {
                         reloadUrl("/host/me#","mydish");
                       }
                     }, {
-                      label: '继续新建菜式',
+                      label: jQuery.i18n.prop('continueCreateDish'),
                       action: function(dialog) {
                         reloadUrl("/host/me/createDish","");
                       }
                     }]
                   });
                 }else{
-                  BootstrapDialog.alert("菜品新建完成", function(){
+                  BootstrapDialog.alert("Dish" + jQuery.i18n.prop('createdComplete'), function(){
                     reloadUrl("/host/me#","mydish");
                   });
                 }
@@ -1231,15 +1239,15 @@ var DishView = Backbone.View.extend({
           });
         },function(){
           $this.formAlert.show();
-          $this.formAlert.html("菜品更新错误，请稍后再试。")
+          $this.formAlert.html("Dish" + jQuery.i18n.prop('saveError'))
         },3,filename3,delete3)
       },function(){
         $this.formAlert.show();
-        $this.formAlert.html("菜品更新错误，请稍后再试。")
+        $this.formAlert.html("Dish" + jQuery.i18n.prop('saveError'))
       },2,filename2,delete2);
     },function(){
       $this.formAlert.show();
-      $this.formAlert.html("菜品更新错误，请稍后再试。")
+      $this.formAlert.html("Dish" + jQuery.i18n.prop('saveError'))
     },1,filename1,delete1);
   }
 });
@@ -1292,11 +1300,11 @@ var BankView = Backbone.View.extend({
           success : function(){
             dismissModal();
             if(form.data("updating")){
-              BootstrapDialog.alert("银行账号已更新！", function(){
+              BootstrapDialog.alert(jQuery.i18n.prop('bankUpdated'), function(){
                 reloadUrl("/user/pocket","#mypurse");
               });
             }else{
-              BootstrapDialog.alert("银行账号已建立!", function(){
+              BootstrapDialog.alert(jQuery.i18n.prop('bankCreated'), function(){
                 reloadUrl("/user/pocket","#mypurse");
               });
             }
@@ -1333,7 +1341,7 @@ var UserProfileView = Backbone.View.extend({
   },
   saveProfile : function(e){
     e.preventDefault();
-    this.alertView.html("保存中...");
+    this.alertView.html(jQuery.i18n.prop('saving'));
     this.alertView.show();
     var lastname = this.$el.find("input[name='lastname']").val();
     var firstname = this.$el.find("input[name='firstname']").val();
@@ -1356,14 +1364,14 @@ var UserProfileView = Backbone.View.extend({
     this.model.save({},{
       success : function(){
         if(e.data && e.data.update){
-          BootstrapDialog.alert("个人资料更新完毕。", function(){
+          BootstrapDialog.alert(jQuery.i18n.prop('profileUpdated'), function(){
             reloadUrl("/user/me","myinfo");
           });
         }else{
-          $this.alertView.html("个人资料更新完毕。");
+          $this.alertView.html(jQuery.i18n.prop('profileUpdated'));
         }
       },error : function(model, err){
-        $this.alertView.html("更改未保存，请刷新页面再重试。")
+        $this.alertView.html(jQuery.i18n.prop('saveError'))
       }
     });
   }
@@ -1394,7 +1402,7 @@ var HostProfileView = Backbone.View.extend({
       feature_dish_obj["dish" + index] = {"id": $(this).data("value"), "title" : $(this).text()};
       feature_dishes.push(feature_dish_obj);
     });
-    this.alertView.html("保存中...");
+    this.alertView.html(jQuery.i18n.prop('saving'));
     this.alertView.show();
     this.model.set({
       id : form.data("id"),
@@ -1407,9 +1415,9 @@ var HostProfileView = Backbone.View.extend({
     var $this = this;
     this.model.save({},{
       success : function(){
-        $this.alertView.html("修改已保存。");
+        $this.alertView.html(jQuery.i18n.prop('profileUpdated'));
       },error : function(model, err){
-        $this.alertView.html("修改未保存,请稍后再试。");
+        $this.alertView.html(jQuery.i18n.prop('saveError'));
       }
     });
   }
@@ -1663,7 +1671,7 @@ var OrderView = Backbone.View.extend({
     if(method == "delivery"){
       var contacts = this.$el.find("#contact .regular-radio:checked + label + span").text().split("+");
       if(method && contacts.length < 2){
-        this.contactAlert.html("地址和联系方式不能为空。");
+        this.contactAlert.html(jQuery.i18n.prop('contactAndAddressEmpty'));
         this.contactAlert.show();
         return;
       }
@@ -1682,7 +1690,7 @@ var OrderView = Backbone.View.extend({
 
     var cards = this.$el.find("#payment-cards button");
     if(cards && cards.length == 1){
-      this.paymentAlert.html("支付方式不能为空。");
+      this.paymentAlert.html(jQuery.i18n.prop('paymentEmptyError'));
       this.paymentAlert.show();
       return;
     }
@@ -1696,7 +1704,7 @@ var OrderView = Backbone.View.extend({
     }
     var subtotal = form.find(".subtotal").data("value");
     if(subtotal == 0){
-      this.paymentAlert.html("您未点取任何菜式，请先下单。");
+      this.paymentAlert.html(jQuery.i18n.prop('orderEmptyError'));
       this.paymentAlert.show();
       return;
     }
@@ -1731,7 +1739,7 @@ var OrderView = Backbone.View.extend({
     var delivery_fee = this.$el.find("#order .delivery").data("value");
     var subtotal = form.find(".subtotal").data("value");
     if(subtotal == 0){
-      this.formAlert.html("调整订单金额不能为零，您想取消订单吗？请在订单页选取消");
+      this.formAlert.html(jQuery.i18n.prop('orderAdjustZeroError'));
       this.formAlert.show();
       return;
     }
@@ -1911,13 +1919,13 @@ function uploadHostPhoto(e){
   var files = $("#myinfo input[name='story-pic']")[0].files;
   var file = files[0];
   if(!files || files.length==0){
-    alertView.html("文件不存在或没有改变");
+    alertView.html(jQuery.i18n.prop('fileNotExistedError'));
     alertView.show();
     return;
   }
   uploadImage("story",file,function(url){
     $("#myinfo .story .fileinput-preview").data("src", url);
-    alertView.html("厨师照片更新完成");
+    alertView.html(jQuery.i18n.prop('imageUploadComplete'));
     alertView.show();
     hostProfileView.saveHostProfile(new Event("click"));
   },function(err){
@@ -1934,14 +1942,14 @@ function uploadLicense(e){
   var files = $("#myinfo .license input[type='file']")[0].files;
   var file = files[0];
   if(!files || files.length==0){
-    alertView.html("文件不存在或没有改变");
+    alertView.html(jQuery.i18n.prop('fileNotExistedError'));
     alertView.show();
     return;
   }
   uploadImage("license",file,function(url){
     $("#myinfo .license .fileinput-preview").data("src",url);
     hostProfileView.saveHostProfile(new Event("click"));
-    alertView.html("执照更新完成");
+    alertView.html(jQuery.i18n.prop('imageUploadComplete'));
     alertView.show();
   },function(err){
     alertView.html(err);
@@ -1955,7 +1963,7 @@ function uploadThumbnail(){
   var alert_block = $("#myinfo .alert:eq(0)");
   var file = files[0];
   if(!files || files.length==0){
-    alert_block.html("please upload a thumbnail first");
+    alert_block.html(jQuery.i18n.prop('fileNotExistedError'));
     alert_block.show();
     return;
   }
@@ -1967,12 +1975,12 @@ function uploadThumbnail(){
       e.data = {update : true};
       userProfileView.saveProfile(e);
       alert_block.removeClass('hide');
-      alert_block.html("upload complete!");
+      alert_block.html(jQuery.i18n.prop('imageUploadComplete'));
       alert_block.show();
     }else{
       $("#myinfo .fileinput-preview").data("src", '');
       alert_block.removeClass('hide');
-      alert_block.html("profile clear!");
+      alert_block.html(jQuery.i18n.prop('imageRemoveComplete'));
       alert_block.show();
     }
   },function(err){

@@ -1,18 +1,18 @@
 
 <div id="addressDetailView" class="address">
   <div class="alert alert-danger hide">
-    <strong>错误！</strong> 地址更新失败，请稍后再试。
+    <p data-toggle="i18n" data-key="error"></p>
   </div>
   <div class="popup box middle" style="width: 400px;">
 
-    <form class="text-center form-inline" id="address-form" role="form">
+    <form class="text-center form-inline" data-toggle="validator" role="form">
 
-      <h4 id="new_title" class="hide text-left" style="margin-bottom:20px;"><strong>新建收餐地址...</strong></h4>
-      <h4 id="exist_title" class="hide text-left" style="margin-bottom:20px;"><strong class="guest">修改收餐地址</strong><strong class="host">填写准确的厨房地址</strong></h4>
+      <h4 id="new_title" class="hide text-left" data-toggle="i18n" data-key="newAddress" style="margin-bottom:20px;"><strong></strong></h4>
+      <h4 id="exist_title" class="hide text-left" data-toggle="i18n" data-key="editAddress" style="margin-bottom:20px;"><strong class="guest"></strong><strong class="host" data-i18n="enterKitchenAddress"></strong></h4>
 
       <fieldset>
         <div class="form-group" role="form">
-          <label for="streetInput">地址<span>*</span></label>
+          <label for="streetInput"><span data-toggle="i18n" data-key="address"></span><span>* </span>:</label>
           <input type="text" class="form-control" style="min-width: 250px;" id="streetInput" placeholder="No., Street name" required data-error="不能为空">
           <div class="help-block with-errors"></div>
         </div>
@@ -20,7 +20,7 @@
         <h4></h4>
 
         <div class="form-group" role="form">
-          <label for="cityInput">城市<span>*</span></label>
+          <label for="cityInput"><span data-toggle="i18n" data-key="city"></span><span>* </span>:</label>
           <input type="text" class="form-control" style="min-width: 250px;" id="cityInput" placeholder="(San Francisco)" required data-error="不能为空">
           <div class="help-block with-errors"></div>
         </div>
@@ -28,16 +28,16 @@
         <h4></h4>
 
         <div class="form-group" role="form">
-          <label for="zipcodeInput">邮编<span>*</span></label>
-          <input type="text" class="form-control" style="min-width: 250px;" id="zipcodeInput" placeholder="(zip-code)" required data-error="邮编格式不对" minLength="5" maxlength="10">
+          <label for="zipcodeInput"><span data-toggle="i18n" data-key="zipcode"></span><span>* </span>:</label>
+          <input type="text" class="form-control" style="min-width: 250px;" id="zipcodeInput" pattern="^\d{5}(?:[-\s]\d{4})?$" data-toggle="i18n" data-pattern-key="zipcodeBadFormat" data-pattern-error="bad format" placeholder="(zip-code)" required>
           <div class="help-block with-errors"></div>
         </div>
 
         <h4></h4>
 
         <div class="form-group" role="form">
-          <label for="phoneInput">电话<span>*</span></label>
-          <input type="text" class="form-control" style="min-width: 250px;" id="phoneInput" placeholder="＋1(415)888-8888" required data-error="电话格式不对" minLength="10" maxlength="11">
+          <label for="phoneInput"><span data-toggle="i18n" data-key="phone"></span><span>* </span>:</label>
+          <input type="tel" class="form-control" style="min-width: 250px;" id="phoneInput" required data-toggle="i18n" data-key="needPhone" data-error="电话格式不对">
           <div class="help-block with-errors"></div>
         </div>
 
@@ -45,12 +45,12 @@
 
         <div class="form-group guest" role="form">
           <input id="isDefault" type="checkbox" checked="checked" aria-label="...">
-          <label aria-label="...">设置为默认收餐地址</label>
+          <label aria-label="..." data-toggle="i18n" data-key="setAsDefault"></label>
         </div>
 
         <div class="form-group host" role="form">
-          <input id="isDefault" type="checkbox" checked="checked" aria-label="...">
-          <label aria-label="...">我同意某些东西</label>
+          <input type="checkbox" checked="checked" aria-label="...">
+          <label aria-label="..." data-toggle="i18n" data-key="userAgreement"></label>
         </div>
 
         <div class="alert alert-danger hide"></div>
@@ -58,8 +58,8 @@
         <div class="col-xs-12 form-group" style="margin-top: 10px;">
           <div class="control-group">
             <div class="controls">
-              <button type="submit" class="btn btn-danger red round disabled">保存</button>
-              <button type="button" name="cancel" class="btn btn-disable round">取消</button>
+              <button type="submit" class="btn btn-danger red round disabled" data-toggle="i18n" data-key="save"></button>
+              <button type="button" name="cancel" class="btn btn-disable round" data-toggle="i18n" data-key="cancel"></button>
             </div>
           </div>
         </div>
@@ -69,6 +69,6 @@
 </div>
 
 <script>
-  $("#address-form").validator({});
+  setup();
 </script>
 <script src="../../js/bootstrap/bootstrap-formhelpers-min.js"></script>

@@ -186,7 +186,7 @@
   "location" : "地点",
   "share-to-all" : "分享给大家:",
   "pickup-location-after-order" : "取餐地点: (付款后就可以看到具体地址)",
-  "meal-delivery-fee" : "送餐费小计: $",
+  "meal-delivery-fee" : "送餐费小计: ",
   "delivery-fee-explain" : "输入收餐地址后，系统会自动计算送餐费用。",
   "delivery-location" : "收餐地址",
   "payment-method" : "支付方式",

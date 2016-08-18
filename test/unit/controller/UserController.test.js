@@ -180,7 +180,7 @@ describe('UsersController', function() {
           })
           .expect(200)
           .end(function(err,res){
-            if(Object.keys(res.body.address_list)[0].isDefault && !Object.keys(res.body.address_list)[1].isDefault && res.body.city != "San Francisco"){
+            if(Object.keys(res.body.address)[0].isDefault && !Object.keys(res.body.address)[1].isDefault && res.body.city != "San Francisco"){
               return done(Error('error geocoding the address'));
             }
             done();

@@ -14,17 +14,18 @@ module.exports = {
     /* e.g.
     nickname: 'string'
     */
-    username : {
-      type : 'string',
-      maxLength : 20
+    birthday : {
+      type : 'Date'
     },
     firstname : {
       type : 'string',
-      maxLength : 10
+      maxLength : 15,
+      regex : /^([A-z\ ]{1,15})$/
     },
     lastname : {
       type : 'string',
-      maxLength : 10
+      maxLength : 15,
+      regex : /^([A-z\ ]{1,15})$/
     },
     status : {
       type : 'string',
@@ -41,7 +42,8 @@ module.exports = {
       enum : ['male','female']
     },
     picture : {
-      type : 'string'
+      type : 'string',
+      url : true
     },
     color : {
       type : 'string',
@@ -51,18 +53,16 @@ module.exports = {
       model : 'Host'
     },
     phone : {
-      type : 'string'
-    },
-    zipcode : {
-      type : 'string'
+      type : 'string',
+      regex : /^\((\d{3})\)\s{0,1}\d{3}-\d{4}$/
     },
     full_address : {
       type : 'string'
     },
     //[{ street : "1974 palou ave", "city" : "San Francisco", "zip" : 94124, "phone" : 14158023853},{},{}]
-    address_list : {
-      type : 'json',
-      defaultsTo : {}
+    address : {
+      type : 'array',
+      defaultsTo : []
     },
     long : {
       type : 'string'
@@ -78,7 +78,8 @@ module.exports = {
       enum : ["San Francisco County","Sacramento County"]
     },
     zip : {
-      type : 'string'
+      type : 'string',
+      regex : /^\d{5}(?:[-\s]\d{4})?$/
     },
     birthday : {
       type : 'datetime'
@@ -123,23 +124,11 @@ module.exports = {
 
   cloneToUser : function(user,data,cb){
     delete user.auth.password;
-    user.firstname = data.firstname;
-    user.lastname = data.lastname;
-    if(data.phone){
-      user.phone = data.phone;
-    }
-    if(data.gender){
-      user.gender = data.gender;
-    }
-    if(data.birthday){
-      user.birthday = data.birthday;
-    }
-    if(data.picture){
-      user.picture = data.picture;
-    }
-    if(data.receivedEmail){
-      user.receivedEmail = data.receivedEmail;
-    }
+    Object.keys(data).forEach(function(key){
+      if(user.hasOwnProperty(key)){
+        user[key] = data[key];
+      };
+    });
     user.save(cb);
   }
 };
