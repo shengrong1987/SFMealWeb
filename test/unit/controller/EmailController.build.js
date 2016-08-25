@@ -4,7 +4,7 @@
 
 var assert = require('assert'),
     sinon = require('sinon');
-request = require('supertest');
+    request = require("supertest-as-promised");
 var config = require('../../../config/stripe.js'),
   stripe = require('stripe')(config.StripeKeys.secretKey);
 var agent;
@@ -16,7 +16,7 @@ before(function(done) {
 
 describe('EmailController', function() {
 
-  this.timeout(12000);
+  this.timeout(15000);
 
   describe('', function() {
 
@@ -25,11 +25,13 @@ describe('EmailController', function() {
     var password = 'Rs89030659';
     var guestId = "";
     var address = "1455 Market St, San Francisco";
-    var address2 = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853};
+    var address2 = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : "(415)802-3853"};
     var farAddress = "7116 Tiant way, Elk Grove, CA 95758";
-    var phone = "1-415-802-3853";
     var hostId;
+    var firstname = "Shiga";
+    var lastname = "Lian";
     var shopName = "Crispy, Tangy, Sweet, and Spicy";
+    var phone = "(415)802-3853";
 
     it('should login or register an account', function (done) {
       agent
@@ -60,7 +62,7 @@ describe('EmailController', function() {
     it('should update address info for host', function (done) {
       agent
         .put('/host/' + hostId)
-        .send({address:address2, shopName : shopName})
+        .send({address:[address2], shopName : shopName})
         .expect(200)
         .end(function(err,res){
           if(res.body.city != "San Francisco"){
@@ -195,7 +197,7 @@ describe('EmailController', function() {
           status : "on",
           cover : dish1,
           minimalOrder : 1,
-          isDelivery : true
+          isDelivery : false
         })
         .expect(200)
         .end(function(err,res){
@@ -216,18 +218,20 @@ describe('EmailController', function() {
       var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
       var now = new Date();
       var thirtyMinutesLater = new Date(now.getTime() + 60 * 30 * 1000);
-      var onHourAndOneMinuteLater = new Date(now.getTime() + 1000 * 60 * 61);
+      var onHourAndTwoMinuteLater = new Date(now.getTime() + 1000 * 60 * 62);
       var twoHourLater = new Date(now.getTime() + 1000 * 3600 * 2);
       var threeHourLater = new Date(now.getTime() + 1000 * 3600 * 3);
       var pickups = [{
-        "pickupFromTime" : onHourAndOneMinuteLater,
+        "pickupFromTime" : onHourAndTwoMinuteLater,
         "pickupTillTime" : twoHourLater,
         "location" : "1455 Market St, San Francisco, CA 94124",
-        "method" : "pickup"
+        "method" : "pickup",
+        "phone" : "(415)993-9993"
       },{
         "pickupFromTime" : twoHourLater,
         "pickupTillTime" : threeHourLater,
-        "method" : "delivery"
+        "method" : "delivery",
+        "phone" : "(415)993-9993"
       }];
       agent
         .post('/meal')
@@ -243,7 +247,8 @@ describe('EmailController', function() {
           dishes : dishes,
           status : "on",
           cover : dish1,
-          minimalOrder : 1
+          minimalOrder : 1,
+          isDelivery : true
         })
         .expect(200)
         .end(function(err,res){
@@ -278,6 +283,19 @@ describe('EmailController', function() {
           }
           console.log(res.body);
           guestId = res.body.id;
+          done();
+        })
+    });
+
+    it('should update user info', function (done) {
+      agent
+        .post('/user/' + guestId)
+        .send({firstname : firstname, lastname : lastname, phone : phone})
+        .expect(200)
+        .end(function(err,res){
+          if(res.body.firstname != firstname){
+            return done(Error("error updating user info"))
+          }
           done();
         })
     });
@@ -563,7 +581,7 @@ describe('EmailController', function() {
         .end(done)
     });
 
-    it('should order the meal again', function (done) {
+    it('should order the meal again and ' + guestEmail + " should receive pickup reminder 1 minutes later", function (done) {
       var dishObj = {};
       dishObj[dish1] = 1;
       dishObj[dish2] = 2;
@@ -574,23 +592,63 @@ describe('EmailController', function() {
         .send({
           orders : dishObj,
           subtotal : price1 * 1 + price2 * 2,
-          address : address,
           phone : phone,
-          pickupOption : 2,
-          method : "delivery",
-          mealId : preorderMealId,
-          delivery_fee : 0
+          pickupOption : 1,
+          method : "pickup",
+          mealId : preorderMealId
         })
         .expect(200)
-        .end(function(err,res){
-          if(err){
-            return done(err);
-          }
-          if(res.body.customer != guestId){
-            return done(Error("error making order"));
-          }
-          orderId = res.body.id;
-          done();
+        .toPromise()
+        .delay(31000)
+        .then(function(res){
+          agent
+            .get('/job?name=OrderPickupReminderJob&data.orderId=' + res.body.id)
+            .expect(200)
+            .then(function(res){
+              if(res.body.length != 1){
+                return done(Error('order pickup reminding jobs count not right'));
+              }
+              done();
+            })
+            .catch(function(err){
+              done(err)
+            })
+        });
+    })
+
+    it('should order the meal again with delivery and ' + hostEmail + " should receive delivery reminding job later at pickupFromTime", function (done) {
+      var dishObj = {};
+      dishObj[dish1] = 0;
+      dishObj[dish2] = 0;
+      dishObj[dish3] = 1;
+      dishObj[dish4] = 1;
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 1 + price2 * 2,
+          phone : phone,
+          address : address,
+          pickupOption : 2,
+          method : "delivery",
+          mealId : preorderMealId
+        })
+        .expect(200)
+        .toPromise()
+        .delay(31000)
+        .then(function(res){
+          agent
+            .get('/job?name=OrderDeliveringReminderJob&data.orderId=' + res.body.id)
+            .expect(200)
+            .then(function(res){
+              if(res.body.length != 1){
+                return done(Error('order delivery reminding jobs count not right'));
+              }
+              done();
+            })
+            .catch(function(err){
+              done(err)
+            })
         })
     })
 

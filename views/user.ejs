@@ -725,7 +725,7 @@
         <!-- collect end -->
         <div id="myinfo" style="width: 90%;" class="tab-pane middle" data-id="<%= user.id %>">
           <div class="box box-shadow white">
-            <form>
+            <form data-toggle="validator">
               <div class="col-md-6 text-left form-group">
                 <label>1. <%= __('upload-thumbnail')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('photo-restrition')%>"></i></label>
                 <div class="fileinput fileinput-exists" data-provides="fileinput">
@@ -736,7 +736,7 @@
                   </div>
                   <div>
                     <span class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
-                      <input id="thumbnailUpload" type="file" onchange="uploadThumbnail()">
+                      <input id="thumbnailUpload" type="file" data-wantsImage=true onchange="uploadThumbnail()">
                     </span>
                     <!--<a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput">Remove</a>-->
                     <script>
@@ -754,9 +754,9 @@
                   <label>2. <%= __('user-name')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('name-instruction')%>"></i></label>
                   <div class="block">
                     <div class="input-group">
-                      <span class="input-group-addon" id="basic-addon2">名</span>
+                      <span class="input-group-addon" id="basic-addon2"><%= __('firstname')%></span>
                       <input name="firstname" type="text" class="form-control" placeholder="<% if(!user.firstname){ __('firstname') } %>" value="<%= user.firstname?user.firstname : ""%>" aria-describedby="basic-addon2" required>
-                      <span class="input-group-addon" id="basic-addon1">姓</span>
+                      <span class="input-group-addon" id="basic-addon1"><%= __('lastname')%></span>
                       <input name="lastname" type="text" class="form-control" placeholder="<% if(!user.lastname){ __('lastname') } %>" value="<%= user.lastname? user.lastname : ""%>" aria-describedby="basic-addon1" style="margin-right: 20px;" required>
                     </div>
                   </div>

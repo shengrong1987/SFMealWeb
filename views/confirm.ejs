@@ -78,7 +78,7 @@
                 </div>
                 <div class="radio-box col-xs-12 row" id="contact" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
                   <%
-                  var addresses= user.address_list;
+                  var addresses= user.address;
                   var keys = Object.keys(addresses);
                   var i = 0;
                   keys.forEach(function(key){
@@ -107,6 +107,10 @@
                     <br/>
                   </label>
                   <%}i++;})}; %>
+                </div>
+
+                <div class="col-xs-12">
+                  <h5>3.<%= __('delivery-range')%> : <%= meal.delivery_range%><%= __('miles')%></h5>
                 </div>
 
                 <h1></h1>
@@ -184,7 +188,7 @@
             <tr>
               <th></th>
               <td></td>
-              <th class="text-right subtotal"><%= __('meal-fee') %>$0.00</th>
+              <th class="text-right"><%= __('meal-fee') %> <span class="subtotal">0.00</span></th>
             </tr>
             <tr></tr>
             <tr>
@@ -206,14 +210,18 @@
             <tr>
               <th></th>
               <td></td>
-              <th class="text-right delivery" data-value="<%= meal.delivery_fee%>"><%= __('meal-delivery-fee') %><%= meal.delivery_fee%></th>
+              <th class="text-right"><%= __('meal-delivery-fee') %><span class="delivery" data-value="<%= meal.delivery_fee%>">$<%= meal.delivery_fee%></span></th>
             </tr>
-            <tr></tr>
+            <tr>
+              <th></th>
+              <td></td>
+              <th class="text-right"><%= __('tax')%>:<span class="tax" data-value="0"> $0.00</span></th>
+            </tr>
             <tr></tr>
             <tr>
               <th></th>
               <td></td>
-              <th class="text-right total"><%= __('total') %></th>
+              <th class="text-right"><%= __('total') %><span class="total"></span></th>
             </tr>
             </tbody>
           </table>

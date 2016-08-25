@@ -4,7 +4,7 @@
 * @description :: TODO: You might write a short summary of how this model works and what it represents here.
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
-
+var stripe = require("../services/stripe.js");
 module.exports = {
 
   attributes: {
@@ -45,7 +45,8 @@ module.exports = {
       type : 'json'
     },
     license : {
-      type : 'string'
+      type : 'string',
+      url : true
     },
     long : {
       type : 'string'
@@ -62,6 +63,9 @@ module.exports = {
     county : {
       type : 'string',
       enum : ["San Francisco County", "Sacramento County"]
+    },
+    state : {
+      type : 'string'
     },
     zip : {
       type : 'string',
@@ -87,17 +91,34 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
+    //check stripe verification, return verification object if not there's field_needed
+    checkVerification : function(cb){
+      var host = this;
+      stripe.getAccount(this.accountId, function(err, account){
+        if(err){
+          console.log(err);
+          return cb(err);
+        }
+        if(account.verification.fields_needed.length != 0){
+          host.verification = account.verification;
+          return cb();
+        }
+        return cb();
+      });
+    },
+    //check all validation as host
     checkGuideRequirement : function(cb){
-      if(this.passGuide){
-        return cb(null, true);
-      }
+      var host = this;
       if(this.full_address && this.dishes.length > 0 && this.dishes.some(function(dish){
           return dish.isVerified;
         }) && this.bankId){
-        this.passGuide = true;
-        this.save(cb);
+        this.checkVerification(function(valid, verification){
+          host.passGuide = valid;
+          return cb(valid)
+        });
       }else{
-        cb(null,false);
+        host.passGuide = false;
+        return cb(false);
       }
     },
     getDistance : function(userLat, userLong){

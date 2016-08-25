@@ -148,7 +148,7 @@ module.exports = {
         Review.create({
           dish : dish ? dish.id : null,
           title : dish ? dish.title : meal.title,
-          price : dish ? dish.price : 'N/A',
+          price : dish ? dish.price.toString() : 'N/A',
           meal : mealId,
           score : score,
           review : content,

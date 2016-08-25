@@ -1297,7 +1297,7 @@
                   <%= user.desc %> <i class="fa fa-edit text-lightgrey cursor-pointer" onclick="location.href='/user/me#myinfo'"></i>
                 </h5>
                 <h5>
-                  <p class="text-lightgrey"><%= __('email')%><%= user.auth.email%></p>
+                  <p class="text-grey"><%= __('email')%> <%= user.host.email%></p>
                 </h5>
               </div>
             </div>
@@ -1306,7 +1306,7 @@
 
         <div id="myinfo" style="width: 90%;" class="tab-pane middle">
           <div class="box box-shadow white">
-            <form class="form-horizontal text-left" data-id="<%= user.host.id%>" data-err-container="#formAlert">
+            <form class="form-horizontal text-left" data-toggle="validator" data-id="<%= user.host.id%>" data-err-container="#formAlert">
 
               <div class="license">
                 <label>1. <%= __('host-license')%> </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
@@ -1320,7 +1320,7 @@
                         <img class="cursor-pointer" src="<%= user.host.license ? user.host.license : '/images/upload_default.png'%>" style="max-height: 250px;" onclick="$('#licenseUpload').trigger('click')">
                       </div>
                       <div>
-                        <span class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span><input id="licenseUpload" type="file" onchange="uploadLicense(event)" data-error-container=".license"></span>
+                        <span class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span><input id="licenseUpload" type="file" data-wantsImage=true onchange="uploadLicense(event)" data-error-container=".license"></span>
                           <!--<a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput">Remove</a>-->
                         <script>
                           $(".fileinput").on("clear.bs.fileinput",function(){
@@ -1375,7 +1375,7 @@
                     </div>
                     <div>
                     <span class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
-                      <input name='story-pic' id="storyUpload" type="file" onchange="uploadHostPhoto(event)" data-error-container=".story">
+                      <input name='story-pic' id="storyUpload" type="file" data-wantsImage=true onchange="uploadHostPhoto(event)" data-error-container=".story">
                     </span>
                       <!--<a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput">Remove</a>-->
                       <script>

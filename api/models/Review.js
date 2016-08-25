@@ -16,7 +16,7 @@ module.exports = {
       required : true
     },
     price : {
-      type : 'number'
+      type : 'string'
     },
     meal : {
       model : 'Meal'

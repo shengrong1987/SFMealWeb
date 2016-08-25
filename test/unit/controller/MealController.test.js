@@ -16,14 +16,14 @@ before(function(done) {
 
 describe('MealController', function() {
 
-  this.timeout(7000);
+  this.timeout(32000);
 
   describe('build a meal with dishes', function() {
 
     var hostId;
     var email = 'aimbebe.r@gmail.com';
     var password = '12345678';
-    var address = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : 14158023853};
+    var address = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : "(415)802-3853"};
 
     it('should login or register an account', function (done) {
       agent
@@ -225,7 +225,7 @@ describe('MealController', function() {
     it('should update address info for host', function (done) {
       agent
         .put('/host/' + hostId)
-        .send({address:address})
+        .send({address:[address]})
         .expect(200)
         .end(function(err,res){
           if(err){
@@ -243,7 +243,7 @@ describe('MealController', function() {
         .post('/meal/' + mealId + "/on")
         .expect(200)
         .toPromise()
-        .delay(6000)
+        .delay(31000)
         .then(function(res){
           agent
             .get('/job?name=MealStartJob&data.mealId=' + mealId)
@@ -290,7 +290,7 @@ describe('MealController', function() {
         })
         .expect(200)
         .toPromise()
-        .delay(6000)
+        .delay(31000)
         .then(function(res){
           agent
             .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
@@ -330,7 +330,7 @@ describe('MealController', function() {
         .post('/meal/' + preorderMealId + "/on")
         .expect(200)
         .toPromise()
-        .delay(6000)
+        .delay(31000)
         .then(function(res){
           agent
             .get('/job?name=MealScheduleEndJob&data.mealId=' + preorderMealId)

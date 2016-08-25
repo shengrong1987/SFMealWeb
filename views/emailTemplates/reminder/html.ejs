@@ -44,7 +44,12 @@
         <td style="text-align: right;"><%= dingdan%>:$<%= subtotal.toFixed(2)%></td>
       </tr>
       <tr class="border-less">
-        <td><%= method == 'pickup' ? pickuplocation : deliverylocation%>: <%= pickupInfo.location%></td>
+        <% if(method == 'pickup'){%>
+        <td><%= pickuplocation %>: <%= pickupInfo.location%></td>
+        <%}else{%>
+        <td><%= deliverylocation %> : <%= address%></td>
+        <%}%>
+
         <td></td>
         <td></td>
         <td></td>
@@ -56,7 +61,7 @@
         <td></td>
       </tr>
       <tr>
-        <td><%= contactphone%>: <%= phone%></td>
+        <td><%= contactphone%>: <%= pickupInfo.phone%></td>
         <td></td>
         <td></td>
         <td></td>

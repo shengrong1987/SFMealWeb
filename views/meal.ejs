@@ -27,7 +27,7 @@
     </div>
   </div>
 
-  <div id="meal-detail-container" class="container-fluid padding-clear" data-lat="<%= meal.chef.lat%>" data-long="<%= meal.chef.long%>" data-range="<%= meal.chef.deliveryRange%>">
+  <div id="meal-detail-container" class="container-fluid padding-clear" data-meal-prepareTime="<%= meal.prepareTime%>" data-lat="<%= meal.chef.lat%>" data-long="<%= meal.chef.long%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>">
 
     <div class="row">
       <div class="col-md-8">
@@ -94,10 +94,16 @@
                   <div class="box-simple text-left">
                     <div class="checkbox">
                       <label>
-                        <input type="checkbox"><small class="font-small"><span class="text-black"><%= __('delivery')%></span>  <%= __('delivery-fee-and-time')%>：<a class="text-red" href="#"><%= __('click-to-cal')%></a> </small>
+                        <input type="checkbox">
+                        <small class="font-small">
+                          <span class="text-black"><%= __('delivery')%></span>
+                          <%= __('delivery-fee')%>：$<%= meal.delivery_fee%><br/>
+                          <%= __('delivery-time')%>:<a id="calculateBtn" class="text-red" href="javascript:void(0)"><%= __('click-to-cal')%></a><label></label>
+                        </small>
                       </label>
                     </div>
                   </div>
+                  <div id="addressAlertView" class="alert alert-danger hide"><%= __('delivery-out-of-range-error')%></div>
                 <%}else{
                 var count = 1;
                 meal.pickups.forEach(function(pickupMethod){%>
@@ -107,7 +113,7 @@
                         <input type="checkbox">
                         <small class="font-small">
                           <!--<span class="text-black"><% __('self-pickup')%> </span>-->
-                          <b><%= __('location') + count %>:</b> <%= pickupMethod.location%>，<br/><br/>
+                          <b><%= __('location') + count %>:</b> <%= pickupMethod.location || 'N/A'%>，<br/><br/>
                           <b><%= __('time')%></b> <span data-toggle="time-span" data-format="date" data-from="<%= pickupMethod.pickupFromTime%>" data-to="<%= pickupMethod.pickupTillTime%>"></span><br/><br/>
                           <b><%= __('pickup-method')%>: <%= pickupMethod.method == 'delivery' ? __('delivery') : __('self-pickup') %></b>
                         </small>
@@ -324,7 +330,11 @@
               <td></td>
               <th class="text-right"><%= __('meal-delivery-fee')%><span class="delivery" data-value="0"> $0.00</span></th>
             </tr>
-            <tr></tr>
+            <tr>
+              <th></th>
+              <td></td>
+              <th class="text-right"><%= __('tax')%>:<span class="tax" data-value="0"> $0.00</span></th>
+            </tr>
             <tr></tr>
             <tr>
               <th></th>

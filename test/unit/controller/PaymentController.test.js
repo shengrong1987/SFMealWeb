@@ -21,15 +21,14 @@ describe('PaymentController', function() {
   describe('create a payment profile', function() {
 
     var userId;
-    var email = 'enjoymyself1987@gmail.com';
-    var password = '12345678';
+    var email = "enjoymyself1987@gmail.com";
+    var password = "12345678";
 
-    it('should login or register an account', function (done) {
+    it('should register a guest account', function (done) {
       agent
-        .post('/auth/login?type=local')
+        .post('/auth/register')
         .send({email : email, password: password})
-        .expect(302)
-        .expect('Location','/auth/done')
+        .expect(200)
         .end(done)
     });
 

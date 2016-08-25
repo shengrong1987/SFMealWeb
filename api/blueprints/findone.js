@@ -52,11 +52,12 @@ module.exports = function findOneRecord (req, res) {
     }else if(Model.adapter.identity == "meal"){
       if(isEditMode){
         matchingRecord.userId = user.id;
-        Host.findOne(hostId).populate("dishes").exec(function(err,host){
+        Host.findOne(hostId).populate("user").populate("dishes").exec(function(err,host){
           if(err){
             return res.badRequest(err);
           }
           matchingRecord.allDishes = host.dishes;
+          matchingRecord.phone = host.user.phone;
           res.view('meal_edit',{meal : matchingRecord});
         });
       }else{

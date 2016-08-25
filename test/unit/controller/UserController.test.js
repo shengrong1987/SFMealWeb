@@ -16,6 +16,8 @@ describe('UsersController', function() {
 
   this.timeout(5000);
 
+  var newEmail = "shengrong1225" + new Date().getTime() + "@gmail.com"
+
   describe('user login', function() {
 
     var email = "aimbebe.r@gmail.com";
@@ -89,14 +91,28 @@ describe('UsersController', function() {
           })
     })
 
-    var newEmail = "shengrong1225@gmail.com"
-    it('should register instead if account not exist', function (done) {
+    it('should not login instead if account not exist', function (done) {
       agent
         .post('/auth/login?type=local')
         .send({email : newEmail, password: password})
-        .expect(302)
-        .expect('Location','/auth/done')
+        .expect(403)
         .end(done)
+    })
+
+    it('should register if account not exist', function (done) {
+      agent
+        .post('/auth/register')
+        .send({email : newEmail, password: password})
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          if(res.body.auth.email != newEmail){
+            return done("register email does not match user email");
+          }
+          done();
+        })
     })
 
     it('should become a host if logged in', function (done) {
@@ -131,12 +147,9 @@ describe('UsersController', function() {
 
     it('should pop authenticated error trying to log out when no one is logged in', function (done) {
       agent
-          .post('/auth/logout')
-          .expect(403,done)
-          })
-
-
-
+        .post('/auth/logout')
+        .expect(403,done)
+    })
   });
 
   describe('user profile update', function() {
@@ -234,6 +247,88 @@ describe('UsersController', function() {
 
   });
 
+  describe('user managed account verification', function() {
+
+    var password = "12345678";
+    var fields_need = [];
+    var hostId;
+    var firstname = "sheng";
+    var lastname = "rong";
+    it('should login a host account', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({email : newEmail, password : password})
+        .expect(302)
+        .expect("Location","/auth/done")
+        .end(done)
+    });
+
+    it('should be an unverified account', function(done){
+      agent
+        .get('/apply')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          if(res.body.verification.length == 0){
+            return done("check stripe account verification data");
+          }
+          hostId = res.body.id;
+          done();
+        })
+    });
+
+    it('should update name and save to manged account', function(done){
+        agent
+          .put('/host/' + hostId)
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .send({legal_entity : JSON.stringify({
+            first_name : "sheng",
+            last_name : "rong",
+            dob : {
+              month : 12,
+              day : 25,
+              year : 1987
+            }
+          })})
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            console.log(res.body);
+            if(res.body.firstname != "sheng" || res.body.lastname != "rong" || new Date(res.body.birthday).getFullYear() != 1987){
+              return done(Error("error updating info from host to user"));
+            }
+            done();
+          })
+
+      it('should get the updated managed account', function(done){
+        agent
+          .get("/apply")
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            console.log(res.body.verification);
+            if(res.body.verification.some(function(field){
+              console.log(field);
+              return field == "legal_entity.first_name" || field == "legal_entity.last_name" || field == "legal_entity.dob.month";
+              })){
+              return done("Error updating managed account");
+            }
+            done();
+          });
+      });
+    });
+  });
     //need manual test for facebook and google login
 
 });

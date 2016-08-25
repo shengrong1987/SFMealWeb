@@ -196,7 +196,7 @@ module.exports = {
         return res.badRequest(req.__('meal-active-error'));
       }
 
-      Meal.update({id : mealId},{status : "off", isSchedule : false}).exec(function(err, meal){
+      Meal.update({id : mealId},{status : "off", isScheduled : false}).exec(function(err, meal){
         if(err){
           return res.badRequest(err);
         }
@@ -406,6 +406,7 @@ module.exports = {
 
   update : function(req, res){
     var mealId = req.param("id");
+    var hostId = req.session.user.host.id? req.session.user.host.id : req.session.user.host;
     var status = req.body.status;
     var $this = this;
     if(this.dateIsValid(req.body)){
@@ -423,6 +424,7 @@ module.exports = {
               return res.badRequest(err);
             }
             req.body.isScheduled = false;
+            req.body.chef = hostId;
             Meal.update({id : mealId}, req.body).exec(function(err, result){
               if(err){
                 return res.badRequest(err);

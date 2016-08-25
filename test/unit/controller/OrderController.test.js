@@ -30,7 +30,7 @@ describe('OrderController', function() {
         .post('/auth/login?type=local')
         .send({email : guestEmail, password: password})
         .expect(302)
-        .expect('Location','/auth/done')
+        .expect("Location","/auth/done")
         .end(done)
     });
 

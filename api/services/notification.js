@@ -251,7 +251,7 @@ var notification = {
           i18ns = i18ns.concat(['confirm-cancel','confirm-adjust','confirm-cancel-context','confirm-adjust-context','order-time','apply-cancel-time','apply-adjust-time','refund-method','default-card']);
           break;
         case "ready":
-          i18ns = i18ns.concat(['order-ready-title','order-pickup-ready-context','order-delivery-ready-context','pickup-method','self-pickup','delivery','pickup-location','order-time','complete-time']);
+          i18ns = i18ns.concat(['order-ready-title','order-pickup-ready-context','order-delivery-ready-context','pickup-method','self-pickup','delivery','pickup-location','order-time','complete-time','contact-phone']);
           break;
         case "reject":
           i18ns = i18ns.concat(['cancel', 'adjust', 'get-reject','order-time','reject-reason',"order-cancel-reject-context","order-adjust-reject-context"]);

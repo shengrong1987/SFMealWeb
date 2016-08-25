@@ -32,11 +32,11 @@ describe('MealController', function() {
     var shopName = "Crispy, Tangy, Sweet, and Spicy";
     var phone = "(415)802-3853";
 
-    it('should login or register an account', function (done) {
+    it('should register an account', function (done) {
       agent
         .post('/auth/login?type=local')
         .send({email : email, password: password})
-        .expect('Location','/auth/done')
+        .expect(200)
         .end(done)
     });
 
@@ -228,11 +228,13 @@ describe('MealController', function() {
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "location" : "1455 Market St, San Francisco, CA 94124",
-        "method" : "pickup"
+        "method" : "pickup",
+        "phone" : "(415)993-9993"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
-        "method" : "delivery"
+        "method" : "delivery",
+        "phone" : "(415)993-9993"
       }];
       agent
           .post('/meal')
@@ -250,12 +252,11 @@ describe('MealController', function() {
     var guestId = "";
     var guestEmail = 'enjoymyself1987@gmail.com';
 
-    it('should login or register an account for guest', function (done) {
+    it('should register an account for guest', function (done) {
       agent
-        .post('/auth/login?type=local')
+        .post('/auth/register')
         .send({email : guestEmail, password: password})
-        .expect(302)
-        .expect('Location','/auth/done')
+        .expect(200)
         .end(done)
     });
 
@@ -423,18 +424,6 @@ describe('MealController', function() {
           })
     })
 
-    it('should change an order to preparing', function(done){
-      agent
-          .put('/order/' + preparingOrderId)
-          .send({
-            status : 'preparing'
-          })
-          .expect(200)
-          .end(function(err,res){
-            done();
-          })
-    })
-
     it('should login an chef account', function (done) {
       agent
         .post('/auth/login?type=local')
@@ -443,6 +432,18 @@ describe('MealController', function() {
         .expect('Location','/auth/done')
         .end(done)
     });
+
+    it('should change an order to preparing', function(done){
+      agent
+        .put('/order/' + preparingOrderId)
+        .send({
+          status : 'preparing'
+        })
+        .expect(200)
+        .end(function(err,res){
+          done();
+        })
+    })
 
     it('should ready an order', function(done){
       agent
@@ -462,7 +463,7 @@ describe('MealController', function() {
           })
     })
 
-    it('should login or register an account for guest', function (done) {
+    it('should login an account for guest', function (done) {
       agent
         .post('/auth/login?type=local')
         .send({email : guestEmail, password: password})

@@ -1,12 +1,12 @@
 
 <div id="bankView" class="bank">
-  <div class="alert alert-danger hide" data-toggle="18n" data-key="error">
+  <div class="alert alert-danger hide" data-toggle="i18n" data-key="error">
   </div>
   <div class="popup box middle" style="width: 350px;">
 
-    <form class="text-center" role="form">
+    <form class="text-center" data-toggle="validator" role="form">
 
-      <h3 class="text-left text-red"><strong data-toggle="18n" data-key="bankAccount"></strong></h3>
+      <h3 class="text-left text-red"><strong data-toggle="i18n" data-key="bankAccount"></strong></h3>
 
       <fieldset>
 
@@ -27,8 +27,8 @@
         <div class="col-xs-12 form-group">
           <div class="control-group">
             <div class="controls">
-              <button type="submit" class="btn btn-danger red round disabled" data-toggle="18n" data-key="save"></button>
-              <button type="button" name="cancel" class="btn btn-disable round" data-toggle="18n" data-key="cancel"></button>
+              <button type="submit" class="btn btn-danger red round" data-toggle="i18n" data-key="save"></button>
+              <button type="button" name="cancel" class="btn btn-disable round" data-toggle="i18n" data-key="cancel"></button>
             </div>
           </div>
         </div>
@@ -38,7 +38,7 @@
 </div>
 
 <script>
-  $("#bankView form").validator({});
+  setup();
   new BankView({ el : $("#bankView"), model : new Bank()})
 </script>
 <script src="../../js/bootstrap/bootstrap-formhelpers-min.js"></script>
