@@ -1559,7 +1559,9 @@ var HostProfileView = Backbone.View.extend({
       shopName : title,
       intro : intro,
       feature_dishes : feature_dishes,
-      license : license,
+      license : JSON.stringify({
+        url : license
+      }),
       picture : shopPhoto
     });
     var $this = this;

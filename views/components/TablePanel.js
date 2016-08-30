@@ -49,7 +49,7 @@ var TablePanel = React.createClass({
         break;
       case "Host":
       headers = {id : 'Host ID', shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email',passGuide : 'Status',command : 'Command'};
-      details = {id : 'Host ID', shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email', license : 'License', passGuide : 'Status',command : 'Command'};
+      details = {id : 'Host ID', shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email', "license.url" : 'License', "license.exp" : 'Expire', passGuide : 'passGuide', "license.valid" : "licenseVerified", command : 'Command'};
       criterias = ['id','shopName','email'];
       break;
       case "Meal":

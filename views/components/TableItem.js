@@ -56,6 +56,99 @@ var TableItem = React.createClass({
     SFMealAPI.command(target.data('model'),target.data('id'),'refund',this.props.detail);
   },
 
+  _verifyLicense : function(event){
+    var target = $(event.target);
+    var month = target.find("~input[name='month']").val();
+    var day = target.find("~input[name='day']").val();
+    var year = target.find("~input[name='year']").val();
+    if(!month || !day || !year){
+      return;
+    }
+    var date = new Date(year, month-1, day);
+    if(date.getTime() < new Date().getTime()){
+      return;
+    }
+    var data = {
+      month : month,
+      day : day,
+      year : year
+    }
+    SFMealAPI.command(target.data('model'),target.data('id'),'verifyLicense',this.props.detail, data);
+  },
+
+  _unverifyLicense : function(event){
+    var target = $(event.target);
+    SFMealAPI.command(target.data('model'),target.data('id'),'unverifyLicense',this.props.detail);
+  },
+
+  _renderRow : function(rowContent, col, item){
+    if((typeof rowContent !== 'boolean' && rowContent) || typeof rowContent === 'boolean' || col === 'command'){
+      if(col === 'command'){
+        switch(this.props.model){
+          case "Dish":
+            if(item.hasOwnProperty('isVerified')){
+              if(item['isVerified']){
+                rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._fail}>Off</button>
+              }else{
+                rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._verify}>On</button>
+              }
+            }
+            break;
+          case "Meal":
+            if(item.hasOwnProperty('status')){
+              if(item['status'] === 'on'){
+                rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._off}>Off</button>
+              }else{
+                rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._on}>On</button>
+              }
+            }
+            break;
+          case "Order":
+            if(item.hasOwnProperty('status')){
+              if(item['status'] !== 'complete' && item['status'] !== 'cancel'){
+                rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._abort}>Cancel</button><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._refund}>Refund</button></div>
+              }else if(item.hasOwnProperty('charges')){
+                if(item['charges'] && Object.keys(item['charges']).length > 0){
+                  rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._refund}>Refund</button>
+                }
+              }
+            }
+            break;
+          case "Host":
+            if(item.hasOwnProperty('license')){
+              if(item['license']){
+                if(!item['license']['valid']){
+                  rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._verifyLicense}>VerifyLicense</button><input name="month" type="text" placeholder="month"/><input  name="day" type="text" placeholder="day"/><input name="year" type="text" placeholder="year"/></div>
+                }else{
+                  rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._unverifyLicense}>UnverifyLicense</button><input name="month" type="text" value={new Date(item['license']['exp']).getMonth() + 1}/><input name="day" type="text" value={new Date(item['license']['exp']).getDate()}/><input name="year" type="text" value={new Date(item['license']['exp']).getFullYear()}/></div>
+                }
+              }
+            }
+            break;
+        }
+      }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){
+        rowContent = <img src={rowContent} width="100"/>
+      }else if(Array.isArray(rowContent)){
+        rowContent = rowContent.map(function(ele){
+          for(var key in ele){
+            if(typeof ele[key] === 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(ele[key])){
+              ele[key] = <img src={ele[key]} width="100"/>
+              return ele[key];
+            }
+          }
+          return key + ":" + ele[key];
+        });
+      }else if(typeof rowContent === "boolean"){
+        rowContent = rowContent ? "true" : "false";
+      }else if(typeof rowContent === 'object'){
+        rowContent = Object.keys(rowContent).map(function(key){
+          return <p>{key} : {rowContent[key]}</p>;
+        });
+      }
+    }
+    return rowContent;
+  },
+
   render: function() {
     var item = this.props.data,
       attributes = this.props.attrs,
@@ -63,65 +156,13 @@ var TableItem = React.createClass({
         var attrs = col.split('.');
         if(attrs.length == 1){
           var rowContent = item[col];
-          if(rowContent || col === 'command'){
-            if(col === 'command'){
-              switch(this.props.model){
-                case "Dish":
-                  if(item.hasOwnProperty('isVerified')){
-                    if(item['isVerified']){
-                      rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._fail}>Off</button>
-                    }else{
-                      rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._verify}>On</button>
-                    }
-                  }
-                  break;
-                case "Meal":
-                  if(item.hasOwnProperty('status')){
-                    if(item['status'] === 'on'){
-                      rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._off}>Off</button>
-                    }else{
-                      rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._on}>On</button>
-                    }
-                  }
-                  break;
-                case "Order":
-                  if(item.hasOwnProperty('status')){
-                    if(item['status'] !== 'complete' && item['status'] !== 'cancel'){
-                      rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._abort}>Cancel</button><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._refund}>Refund</button></div>
-                    }else if(item.hasOwnProperty('charges')){
-                      if(item['charges'] && Object.keys(item['charges']).length > 0){
-                        rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._refund}>Refund</button>
-                      }
-                    }
-                  }
-                  break;
-              }
-            }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){
-              rowContent = <img src={rowContent} width="100"/>
-            }else if(Array.isArray(rowContent)){
-              rowContent = rowContent.map(function(ele){
-                for(var key in ele){
-                  if(typeof ele[key] === 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(ele[key])){
-                    ele[key] = <img src={ele[key]} width="100"/>
-                    return ele[key];
-                  }
-                }
-                return key + ":" + ele[key];
-              });
-            }else if(typeof rowContent === "boolean"){
-              rowContent = rowContent ? "true" : "false";
-            }else if(typeof rowContent === 'object'){
-              rowContent = Object.keys(rowContent).map(function(key){
-                return <p>{key} : {rowContent[key]}</p>;
-              });
-            }
-          }
+          rowContent = this._renderRow(rowContent, col, item);
         }else{
           var tmpItem = Object.assign({}, item);
           attrs.map(function(attr){
             tmpItem = tmpItem[attr]?tmpItem[attr]:tmpItem;
           },this);
-          var rowContent = tmpItem;
+          var rowContent = this._renderRow(tmpItem, col, null);
         }
         return (
           <td key={i} className="col-md-1">{rowContent}</td>

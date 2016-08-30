@@ -34,7 +34,7 @@ describe('MealController', function() {
 
     it('should register an account', function (done) {
       agent
-        .post('/auth/login?type=local')
+        .post('/auth/register')
         .send({email : email, password: password})
         .expect(200)
         .end(done)

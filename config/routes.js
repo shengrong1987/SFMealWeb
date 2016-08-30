@@ -45,6 +45,8 @@ module.exports.routes = {
   '/host/me' : 'HostController.me',
   '/host/me/createDish' : 'DishController.new_form',
   '/host/me/createMeal' : 'MealController.new_form',
+  '/host/:id/verifyLicense' : "HostController.verifyLicense",
+  '/host/:id/unverifyLicense' : "HostController.unverifyLicense",
   '/meal/:id/off' : 'MealController.off',
   '/meal/:id/on' : 'MealController.on',
   '/dish/:id/verify' : 'DishController.verify',

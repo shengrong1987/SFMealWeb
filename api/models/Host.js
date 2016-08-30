@@ -44,9 +44,14 @@ module.exports = {
     pickup_addresses : {
       type : 'json'
     },
+    /*
+    @url license url
+    @exp expiration date
+    @issuedTo issue to name string
+    @valid pass admin check
+    */
     license : {
-      type : 'string',
-      url : true
+      type : 'json'
     },
     long : {
       type : 'string'

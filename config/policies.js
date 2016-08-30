@@ -70,6 +70,7 @@ module.exports.policies = {
     '*' : 'or(and(sessionAuth,sessionSelf),isAdmin)',
     'createBank' : 'or(and(sessionAuth,isHost),isAdmin)',
     'updateBank' : 'or(and(sessionAuth,isHost),isAdmin)',
+    'verifyLicense' : 'isAdmin',
     'me' : ['sessionAuth','isHost'],
     'apply' : ['sessionAuth']
   },

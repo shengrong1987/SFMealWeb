@@ -67,6 +67,51 @@ module.exports = {
     })
   },
 
+  verifyLicense : function(req, res){
+    var year = req.body.year;
+    var month = req.body.month;
+    var day = req.body.day;
+    var expDate = new Date(year,month-1,day);
+    var hostId = req.params.id;
+    Host.findOne(hostId).exec(function(err, host){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(!host.license){
+        return res.badRequest("none license");
+      }
+      host.license.exp = expDate;
+      host.license.valid = true;
+      host.save(function(err, result){
+        if(err){
+          return res.badRequest(err);
+        }
+        return res.ok(result);
+      })
+    });
+  },
+
+  unverifyLicense : function(req, res){
+    var hostId = req.params.id;
+    var reason = req.body.reason;
+    Host.findOne(hostId).exec(function(err, host){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(!host.license){
+        return res.badRequest("none license");
+      }
+      host.license.reason = reason;
+      host.license.valid = false;
+      host.save(function(err, result){
+        if(err){
+          return res.badRequest(err);
+        }
+        return res.ok(result);
+      })
+    });
+  },
+
   update : function(req, res){
     var params = req.body;
     var hostId = req.params.id;
@@ -131,6 +176,10 @@ module.exports = {
       if(params.hasImage){
         var hasImage = params.hasImage;
         delete params.hasImage;
+      }
+      if(params.license){
+        params.license = JSON.parse(params.license);
+        params.license.valid = false;
       }
       Host.update({id: hostId}, params).exec(function(err,host){
         if(err){
