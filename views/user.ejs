@@ -797,7 +797,7 @@
               <div class="col-md-6">
                 <div class="form-group text-left">
                   <label for="zipcodeInput">6. <%= __('zipcode')%></label>
-                  <input class="form-control" type="text" id="zipcodeInput" required data-error="<%= __('zipcode-bad-format')%>" minlength="5" maxlength="9" value="<%= user.zip || ''%>">
+                  <input class="form-control" type="text" id="zipcodeInput" required data-error="<%= __('zipcode-bad-format')%>" minlength="5" maxlength="9" value="<%= user.zipcode || ''%>">
                   <div class="help-block with-errors"></div>
                 </div>
               </div>
@@ -846,7 +846,7 @@
               <%})%>
             </div>
 
-            <div class="col-xs-12 text-left" data-id="<%= user.id %>">
+            <div class="col-xs-12 text-left address_block" data-id="<%= user.id%>">
               <button style="margin: 10px 0 10px 0;" class="btn btn-red round newAddress" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html"><%= __('new-location-phone')%></button>
             </div>
 

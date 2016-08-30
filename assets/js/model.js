@@ -713,7 +713,7 @@ var AddressView = Backbone.View.extend({
     toggleModal(e,this.enterAddressInfoFromOrder);
   },
   deleteAddress : function(e){
-    var target = $(event.target).parent();
+    var target = $(event.target).closest('.address_block');
     var address_id = target.data("address-id");
     this.model.set({
       address : [{

@@ -408,7 +408,7 @@
   "review-no-available" : "没有可供评价的Meal",
   "review-invalid" : "评价的Meal/菜式错误",
   "user-already-host" : "您已经是厨师了",
-  "user-only-address" : "不能删除唯一的厨房地址",
+  "user-only-address" : "不能删除唯一的地址",
   "user-not-host" : "需要成为厨师",
   "user-upload-need-module" : "上传资料不完成",
   "enter-website" : "进入网站",
