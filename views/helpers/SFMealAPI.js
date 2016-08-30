@@ -193,11 +193,12 @@ module.exports = {
     });
   },
 
-  command : function(model, id, action, detail){
+  command : function(model, id, action, detail, data){
     var url = '/' + model.toLowerCase() + '/' + id + '/' + action;
     $.ajax({
       url: url,
       type: 'POST',
+      data : data,
       dataType: 'json',
     }).done(function (data) {
       switch(model) {

@@ -7,19 +7,30 @@ var async = require('async');
 module.exports = {
 
   createManagedAccount : function(attr,cb){
-    stripe.accounts.create({
-      managed : true,
-      country : 'US',
-      email : attr.email,
-      transfer_schedule : {
-        interval : "weekly",
-        weekly_anchor : "monday"
-      }
-    },function(err, account) {
+    stripe.accounts.create(attr,function(err, account) {
       if (err) {
         return cb(err);
       }
       cb(null,account);
+    });
+  },
+
+  updateManagedAccount : function(id, attr, cb){
+    stripe.accounts.update(id, attr, cb);
+  },
+
+  uploadFile : function(params, id, cb){
+    stripe.fileUploads.create(params, {
+      stripe_account : id
+    }, cb);
+  },
+
+  getAccount : function(id, cb){
+    stripe.accounts.retrieve(id, function(err, result){
+      if(err){
+        return cb(err);
+      }
+      cb(null, result);
     });
   },
 

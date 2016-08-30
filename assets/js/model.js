@@ -148,7 +148,7 @@ var RegisterView = Backbone.View.extend({
       email : email,
       password : password,
       phone : phone,
-      birthDate : birthDate,
+      birthday : birthDate,
       receivedEmail : receivedEmail
     });
     this.model.save({},{
@@ -322,12 +322,16 @@ var UserBarView = Backbone.View.extend({
 var ApplyView = Backbone.View.extend({
   events : {
     "click #applyBtn" : "applyForHost",
-    "click #addAddress" : "addAddress"
+    "click #addAddress" : "addAddress",
+    "click #additionalBtn" : "handleAdditional"
   },
   initialize : function(){
+    var alertView = this.$el.find("#additionalAlert");
+    alertView.hide();
+    this.alertView = alertView;
     var steps = this.$el.find(".navbar li a");
     var curStep = 1;
-    var maxStep = 5;
+    var maxStep = 6;
     var stopHere = false;
     steps.each(function(index, value){
       if(stopHere){
@@ -345,6 +349,96 @@ var ApplyView = Backbone.View.extend({
     $('[href="#step'+curStep+'"]').tab('show');
 
   },
+  handleAdditional : function(e){
+    e.preventDefault();
+    var submit_btn = this.$el.find("[type='submit']");
+    if (submit_btn.hasClass('disabled')) {
+      return;
+    }
+    var alertView = this.alertView;
+    alertView.hide();
+    var $this = this;
+    var idNumber = this.$el.find("#idNumberInput").val();
+    if(idNumber){
+      this.handleIDInfo(idNumber, function(){
+        $this.saveAdditional();
+      })
+    }else{
+      $this.saveAdditional();
+    }
+  },
+
+  handleIDInfo : function(id, cb){
+    Stripe.piiData.createToken({
+      personal_id_number: id
+    }, (function(ele, next){
+      return function(status, res){
+        if(res.error){
+          console.log(res.error);
+          return cb(res.error);
+        }
+        ele.find("#idNumberInput").val(res.id);
+        next();
+      }
+    })(this.$el, cb));
+  },
+
+  handleDocument : function(file, cb){
+
+    cb();
+  },
+
+  saveAdditional : function(){
+    var lastname = this.$el.find("#lastnameInput").val();
+    var firstname = this.$el.find("#firstnameInput").val();
+    var bMonth = parseInt(this.$el.find("#bMonthInput").val());
+    var bDay = parseInt(this.$el.find("#bDayInput").val());
+    var bYear = parseInt(this.$el.find("#bYearInput").val());
+    var ssnLast4 = this.$el.find("#socialInput").val();
+    var idNumber = this.$el.find("#idNumberInput").val();
+    var hostId = this.$el.data("host-id");
+    var document = this.$el.find("#documentInput").length > 0 ? this.$el.find("#documentInput")[0].files : null;
+    var formData = new FormData(this.$el.find("form")[0]);
+    this.model.set('id',hostId);
+    var legalObj = {};
+    if(bDay && bMonth && bYear){
+      legalObj.dob = {
+        day : bDay,
+        month : bMonth,
+        year : bYear
+      }
+    }
+    if(firstname && lastname){
+      legalObj.first_name = firstname;
+      legalObj.last_name = lastname;
+    }
+    if(ssnLast4){
+      legalObj.ssn_last_4 = ssnLast4;
+    }
+    if(idNumber){
+      legalObj.personal_id_number = idNumber;
+    }
+    formData.append('legal_entity', JSON.stringify(legalObj));
+    if(document){
+      formData.append('hasImage', true);
+      formData.append('image',document[0]);
+    }
+
+    var $this = this;
+    this.model.save({},{
+      data : formData,
+      processData: false,
+      cache: false,
+      contentType: false,
+      success : function(){
+        reloadUrl("/apply#","step6");
+      },error : function(model,err){
+        $this.alertView.html(err.responseText);
+        $this.alertView.show();
+      }
+    })
+  },
+
   addAddress : function(e){
     e.data = {mt :this};
     toggleModal(e,this.enterAddressInfo);
@@ -385,13 +479,13 @@ var ApplyView = Backbone.View.extend({
     }
     $this.model.set({id: id});
     $this.model.set({
-      address: {
+      address: [{
         street: street,
         city: city,
         zip: zip,
         phone: phone,
         isDefault: isDefault
-      }
+      }]
     });
     $this.model.save({}, {
       success: function () {
@@ -734,12 +828,16 @@ var Meal = Backbone.Model.extend({
 
 var MealSelectionView = Backbone.View.extend({
   events : {
-
+    "click #calculateBtn" : "calculateDelivery"
   },
   initialize : function(){
 
   },
   initMap : function(){
+    var directionsDisplay = new google.maps.DirectionsRenderer;
+    var directionsService = new google.maps.DirectionsService;
+    this.googlemapDisplay = directionsDisplay;
+    this.googlemapService = directionsService;
     var range = this.$el.data("range") * 1609.34;
     var center = {lat: this.$el.data("lat"), lng: this.$el.data("long")}
     var map = new google.maps.Map(this.$el.find("#googlemap")[0], {
@@ -747,6 +845,7 @@ var MealSelectionView = Backbone.View.extend({
       scrollwheel: false,
       zoom: 11
     });
+    directionsDisplay.setMap(map);
     var deliveryCircle = new google.maps.Circle({
       strokeColor: '#FF0000',
       strokeOpacity: 0.8,
@@ -757,6 +856,41 @@ var MealSelectionView = Backbone.View.extend({
       center: center,
       radius: range
     });
+  },
+  calculateDelivery : function(e){
+    var $this = this;
+    this.$el.find("#addressAlertView").removeClass('hide');
+    this.$el.find("#addressAlertView").hide();
+    var origin = {lat: this.$el.data("lat"), lng: this.$el.data("long")};
+    var uLat = this.$el.data("user-lat");
+    var uLong = this.$el.data("user-long");
+    if(!uLat || !uLong){
+      return;
+    }
+    var range = this.$el.data("range") * 1609.34;
+    var readyIn = this.$el.data("meal-prepareTime");
+    var destination = {lat : uLat, lng: uLong};
+    this.googlemapService.route({
+      origin : origin,
+      destination : destination,
+      travelMode: google.maps.TravelMode.DRIVING,
+      drivingOptions: {
+        departureTime: new Date(Date.now() + readyIn * 60 * 1000),  // for the time N milliseconds from now.
+        trafficModel: "optimistic"
+      }
+    }, function(response, status){
+      if (status == google.maps.DirectionsStatus.OK) {
+        $this.googlemapDisplay.setDirections(response);
+        var travelTime = response.routes[0].legs[0].duration.text;
+        var distance = response.routes[0].legs[0].distance.value;
+        $(e.currentTarget).find("+ label").text(travelTime + " " + response.routes[0].legs[0].distance.text);
+        if(distance > range){
+          $this.$el.find("#addressAlertView").show();
+        }
+      } else {
+        window.alert('Directions request failed due to ' + status);
+      }
+    })
   }
 });
 
@@ -920,6 +1054,7 @@ var MealView = Backbone.View.extend({
         var pickupTillTime = $(this).find(".end-pickup [data-toggle='dateTimePicker']").data("DateTimePicker").date();
         var location = $(this).find(".location input").val();
         var method = $(this).find('.method select').val();
+        var phone = $(this).find('.phone input').val();
         if(!pickupFromTime || !pickupTillTime || !location){
           pickupValid = false;
           $this.scheduleAlert.show();
@@ -940,6 +1075,7 @@ var MealView = Backbone.View.extend({
         pickupObj.pickupTillTime = pickupTillTime._d;
         pickupObj.location = location;
         pickupObj.method = method;
+        pickupObj.phone = phone;
         pickups.push(pickupObj);
       });
 
@@ -1297,16 +1433,30 @@ var BankView = Backbone.View.extend({
           token : token
         });
         $this.model.save({},{
-          success : function(){
+          success : function(model, response){
             dismissModal();
             if(form.data("updating")){
               BootstrapDialog.alert(jQuery.i18n.prop('bankUpdated'), function(){
                 reloadUrl("/user/pocket","#mypurse");
               });
             }else{
-              BootstrapDialog.alert(jQuery.i18n.prop('bankCreated'), function(){
-                reloadUrl("/user/pocket","#mypurse");
-              });
+              if(response.passGuide){
+                BootstrapDialog.alert(jQuery.i18n.prop('bankCreated'), function(){
+                  reloadUrl("/user/pocket","#mypurse");
+                });
+              }else{
+                BootstrapDialog.show({
+                  title: jQuery.i18n.prop('tip'),
+                  message : jQuery.i18n.prop('createdComplete'),
+                  buttons: [{
+                    label: jQuery.i18n.prop('backToGuide'),
+                    action: function(dialog) {
+                      reloadUrl("/apply",'');
+                    }
+                  }]
+                });
+              }
+
             }
           },error : function(model, err){
             $this.alertForm.html(err.responseJSON);
@@ -1409,7 +1559,9 @@ var HostProfileView = Backbone.View.extend({
       shopName : title,
       intro : intro,
       feature_dishes : feature_dishes,
-      license : license,
+      license : JSON.stringify({
+        url : license
+      }),
       picture : shopPhoto
     });
     var $this = this;

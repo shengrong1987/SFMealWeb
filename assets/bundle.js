@@ -45133,6 +45133,99 @@ var TableItem = React.createClass({displayName: "TableItem",
     SFMealAPI.command(target.data('model'),target.data('id'),'refund',this.props.detail);
   },
 
+  _verifyLicense : function(event){
+    var target = $(event.target);
+    var month = target.find("~input[name='month']").val();
+    var day = target.find("~input[name='day']").val();
+    var year = target.find("~input[name='year']").val();
+    if(!month || !day || !year){
+      return;
+    }
+    var date = new Date(year, month-1, day);
+    if(date.getTime() < new Date().getTime()){
+      return;
+    }
+    var data = {
+      month : month,
+      day : day,
+      year : year
+    }
+    SFMealAPI.command(target.data('model'),target.data('id'),'verifyLicense',this.props.detail, data);
+  },
+
+  _unverifyLicense : function(event){
+    var target = $(event.target);
+    SFMealAPI.command(target.data('model'),target.data('id'),'unverifyLicense',this.props.detail);
+  },
+
+  _renderRow : function(rowContent, col, item){
+    if((typeof rowContent !== 'boolean' && rowContent) || typeof rowContent === 'boolean' || col === 'command'){
+      if(col === 'command'){
+        switch(this.props.model){
+          case "Dish":
+            if(item.hasOwnProperty('isVerified')){
+              if(item['isVerified']){
+                rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._fail}, "Off")
+              }else{
+                rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._verify}, "On")
+              }
+            }
+            break;
+          case "Meal":
+            if(item.hasOwnProperty('status')){
+              if(item['status'] === 'on'){
+                rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._off}, "Off")
+              }else{
+                rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._on}, "On")
+              }
+            }
+            break;
+          case "Order":
+            if(item.hasOwnProperty('status')){
+              if(item['status'] !== 'complete' && item['status'] !== 'cancel'){
+                rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._abort}, "Cancel"), React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._refund}, "Refund"))
+              }else if(item.hasOwnProperty('charges')){
+                if(item['charges'] && Object.keys(item['charges']).length > 0){
+                  rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._refund}, "Refund")
+                }
+              }
+            }
+            break;
+          case "Host":
+            if(item.hasOwnProperty('license')){
+              if(item['license']){
+                if(!item['license']['valid']){
+                  rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._verifyLicense}, "VerifyLicense"), React.createElement("input", {name: "month", type: "text", placeholder: "month"}), React.createElement("input", {name: "day", type: "text", placeholder: "day"}), React.createElement("input", {name: "year", type: "text", placeholder: "year"}))
+                }else{
+                  rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._unverifyLicense}, "UnverifyLicense"), React.createElement("input", {name: "month", type: "text", value: new Date(item['license']['exp']).getMonth() + 1}), React.createElement("input", {name: "day", type: "text", value: new Date(item['license']['exp']).getDate()}), React.createElement("input", {name: "year", type: "text", value: new Date(item['license']['exp']).getFullYear()}))
+                }
+              }
+            }
+            break;
+        }
+      }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){
+        rowContent = React.createElement("img", {src: rowContent, width: "100"})
+      }else if(Array.isArray(rowContent)){
+        rowContent = rowContent.map(function(ele){
+          for(var key in ele){
+            if(typeof ele[key] === 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(ele[key])){
+              ele[key] = React.createElement("img", {src: ele[key], width: "100"})
+              return ele[key];
+            }
+          }
+          return key + ":" + ele[key];
+        });
+      }else if(typeof rowContent === "boolean"){
+        rowContent = rowContent ? "true" : "false";
+      }else if(typeof rowContent === 'object'){
+        rowContent = Object.keys(rowContent).map(function(key){
+          return React.createElement("p", null, key, " : ", rowContent[key]);
+        });
+      }
+    }
+    return rowContent;
+  },
+
   render: function() {
     var item = this.props.data,
       attributes = this.props.attrs,
@@ -45140,65 +45233,13 @@ var TableItem = React.createClass({displayName: "TableItem",
         var attrs = col.split('.');
         if(attrs.length == 1){
           var rowContent = item[col];
-          if(rowContent || col === 'command'){
-            if(col === 'command'){
-              switch(this.props.model){
-                case "Dish":
-                  if(item.hasOwnProperty('isVerified')){
-                    if(item['isVerified']){
-                      rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._fail}, "Off")
-                    }else{
-                      rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._verify}, "On")
-                    }
-                  }
-                  break;
-                case "Meal":
-                  if(item.hasOwnProperty('status')){
-                    if(item['status'] === 'on'){
-                      rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._off}, "Off")
-                    }else{
-                      rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._on}, "On")
-                    }
-                  }
-                  break;
-                case "Order":
-                  if(item.hasOwnProperty('status')){
-                    if(item['status'] !== 'complete' && item['status'] !== 'cancel'){
-                      rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._abort}, "Cancel"), React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._refund}, "Refund"))
-                    }else if(item.hasOwnProperty('charges')){
-                      if(item['charges'] && Object.keys(item['charges']).length > 0){
-                        rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._refund}, "Refund")
-                      }
-                    }
-                  }
-                  break;
-              }
-            }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){
-              rowContent = React.createElement("img", {src: rowContent, width: "100"})
-            }else if(Array.isArray(rowContent)){
-              rowContent = rowContent.map(function(ele){
-                for(var key in ele){
-                  if(typeof ele[key] === 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(ele[key])){
-                    ele[key] = React.createElement("img", {src: ele[key], width: "100"})
-                    return ele[key];
-                  }
-                }
-                return key + ":" + ele[key];
-              });
-            }else if(typeof rowContent === "boolean"){
-              rowContent = rowContent ? "true" : "false";
-            }else if(typeof rowContent === 'object'){
-              rowContent = Object.keys(rowContent).map(function(key){
-                return React.createElement("p", null, key, " : ", rowContent[key]);
-              });
-            }
-          }
+          rowContent = this._renderRow(rowContent, col, item);
         }else{
           var tmpItem = Object.assign({}, item);
           attrs.map(function(attr){
             tmpItem = tmpItem[attr]?tmpItem[attr]:tmpItem;
           },this);
-          var rowContent = tmpItem;
+          var rowContent = this._renderRow(tmpItem, col, null);
         }
         return (
           React.createElement("td", {key: i, className: "col-md-1"}, rowContent)
@@ -45267,7 +45308,7 @@ var TablePanel = React.createClass({displayName: "TablePanel",
         break;
       case "Host":
       headers = {id : 'Host ID', shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email',passGuide : 'Status',command : 'Command'};
-      details = {id : 'Host ID', shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email', license : 'License', passGuide : 'Status',command : 'Command'};
+      details = {id : 'Host ID', shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email', "license.url" : 'License', "license.exp" : 'Expire', passGuide : 'passGuide', "license.valid" : "licenseVerified", command : 'Command'};
       criterias = ['id','shopName','email'];
       break;
       case "Meal":
@@ -45578,11 +45619,12 @@ module.exports = {
     });
   },
 
-  command : function(model, id, action, detail){
+  command : function(model, id, action, detail, data){
     var url = '/' + model.toLowerCase() + '/' + id + '/' + action;
     $.ajax({
       url: url,
       type: 'POST',
+      data : data,
       dataType: 'json',
     }).done(function (data) {
       switch(model) {

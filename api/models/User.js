@@ -82,7 +82,7 @@ module.exports = {
       regex : /^\d{5}(?:[-\s]\d{4})?$/
     },
     birthday : {
-      type : 'datetime'
+      type : 'date'
     },
     receivedEmail : {
       type : 'boolean',
@@ -124,10 +124,10 @@ module.exports = {
 
   cloneToUser : function(user,data,cb){
     delete user.auth.password;
+    delete data.password;
+    delete data.id;
     Object.keys(data).forEach(function(key){
-      if(user.hasOwnProperty(key)){
-        user[key] = data[key];
-      };
+      user[key] = data[key];
     });
     user.save(cb);
   }

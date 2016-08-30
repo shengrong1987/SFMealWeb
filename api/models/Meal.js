@@ -28,6 +28,7 @@ module.exports = {
      Date pickupFromTime,
      Date pickupTilltime,
      String location
+     String phone
      */
     pickups : {
      type : 'json'
@@ -201,7 +202,7 @@ module.exports = {
         if(values.county && values.type != "order"){
           return next();
         }
-        Host.findOne(values.chef).exec(function(err, host){
+        Host.findOne(values.chef).populate("user").exec(function(err, host){
           if(err){
             return next(err);
           }
@@ -212,7 +213,9 @@ module.exports = {
             values.pickups = JSON.stringify([{
               "pickupFromTime" : values.provideFromTime,
               "pickupTillTime" : values.provideTillTime,
-              "location" : host.full_address
+              "location" : host.full_address,
+              "phone" : host.user.phone,
+              "method" : "pickup"
             }])
           }
           next();
@@ -252,14 +255,16 @@ module.exports = {
       },
       updatePickup : function(next){
         if(values.type == "order"){
-          Host.findOne(values.chef || values.host).exec(function(err, host){
+          Host.findOne(values.chef || values.host).populate("user").exec(function(err, host){
             if(err){
               return next(err);
             }
             values.pickups = JSON.stringify([{
               "pickupFromTime" : values.provideFromTime,
               "pickupTillTime" : values.provideTillTime,
-              "location" : host.full_address
+              "location" : host.full_address,
+              "phone" : host.user.phone,
+              "method" : "pickup"
             }])
             next();
           });

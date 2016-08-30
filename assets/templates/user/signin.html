@@ -16,17 +16,15 @@
     <h2 data-toggle="i18n" data-key="emailLogin"></h2>
 
     <form class="text-center" data-toggle="validator" role="form">
-      <div class="form-group has-feedback">
+      <div class="form-group">
         <label class="sr-only" for="emailInput" data-toggle="i18n" data-key="email"></label>
         <input type="email" class="form-control" id="emailInput" data-toggle="i18n" data-pattern-key="emailBadFormat" data-pattern-error="bad format" placeholder="邮箱 (Email)" required>
-        <span class="form-control-feedback" aria-hidden="true" style="top: 10px;"></span>
         <div class="help-block with-errors"></div>
       </div>
 
-      <div class="form-group has-feedback">
+      <div class="form-group">
         <label class="sr-only" for="passwordInput" data-toggle="i18n" data-key="password"></label>
         <input type="password" class="form-control" id="passwordInput" pattern="^[_A-z0-9]{8,}$" data-toggle="i18n" data-pattern-key="passwordRequirement" placeholder="密码 (Password)" data-pattern-error="bad format" required>
-        <span class="form-control-feedback" aria-hidden="true" style="top: 10px;"></span>
         <div class="help-block with-errors"></div>
       </div>
 

@@ -7,6 +7,7 @@
 
 var stripe = require("../services/stripe.js");
 var async = require('async');
+var fs = require("fs");
 module.exports = {
 
   me : function(req, res){
@@ -66,6 +67,51 @@ module.exports = {
     })
   },
 
+  verifyLicense : function(req, res){
+    var year = req.body.year;
+    var month = req.body.month;
+    var day = req.body.day;
+    var expDate = new Date(year,month-1,day);
+    var hostId = req.params.id;
+    Host.findOne(hostId).exec(function(err, host){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(!host.license){
+        return res.badRequest("none license");
+      }
+      host.license.exp = expDate;
+      host.license.valid = true;
+      host.save(function(err, result){
+        if(err){
+          return res.badRequest(err);
+        }
+        return res.ok(result);
+      })
+    });
+  },
+
+  unverifyLicense : function(req, res){
+    var hostId = req.params.id;
+    var reason = req.body.reason;
+    Host.findOne(hostId).exec(function(err, host){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(!host.license){
+        return res.badRequest("none license");
+      }
+      host.license.reason = reason;
+      host.license.valid = false;
+      host.save(function(err, result){
+        if(err){
+          return res.badRequest(err);
+        }
+        return res.ok(result);
+      })
+    });
+  },
+
   update : function(req, res){
     var params = req.body;
     var hostId = req.params.id;
@@ -86,6 +132,7 @@ module.exports = {
           }
           var administration= result[0].administrativeLevels;
           params.county = administration.level2long;
+          params.state = administration.level1short;
           params.city = result[0].city;
           params.full_address = result[0].formattedAddress;
           params.lat = result[0].latitude;
@@ -94,26 +141,109 @@ module.exports = {
           params.zip = result[0].zipcode;
           delete params.address;
         }
-        Host.update({id: hostId}, params).exec(function(err,host){
+        Host.update({id: hostId}, params).limit(1).exec(function(err,host){
           if(err){
-            res.badRequest(err);
-          }else{
-            User.update(userId,{phone : cellphone}).exec(function(err,user){
+            return res.badRequest(err);
+          }
+          var host = host[0];
+          stripe.updateManagedAccount(host.accountId, {
+              legal_entity: {
+                address: {
+                  city: host.city,
+                  line1: host.street,
+                  postal_code: host.zip,
+                  state : host.state
+                }
+              }
+            },function(err, result){
               if(err){
                 return res.badRequest(err);
               }
-              res.ok(host[0]);
+              User.update(userId,{phone : cellphone}).exec(function(err,user){
+                if(err){
+                  return res.badRequest(err);
+                }
+                return res.ok(host);
+              });
             });
-          }
         });
       });
     }else{
+      if(params.legal_entity){
+        var legal_entity = JSON.parse(params.legal_entity);
+        delete params.legal_entity;
+      }
+      if(params.hasImage){
+        var hasImage = params.hasImage;
+        delete params.hasImage;
+      }
+      if(params.license){
+        params.license = JSON.parse(params.license);
+        params.license.valid = false;
+      }
       Host.update({id: hostId}, params).exec(function(err,host){
         if(err){
-          res.badRequest(err);
-        }else{
-          res.ok(host[0]);
+          return res.badRequest(err);
         }
+        host = host[0];
+        async.auto({
+          uploadDocument : function(cb){
+            if(!hasImage){
+              return cb();
+            }
+            req.file("image").upload(function(err, files){
+              var file = files[0];
+              stripe.uploadFile({
+                purpose : 'identity_document',
+                file : {
+                  data : fs.readFileSync(file.fd),
+                  name : file.filename,
+                  type: 'application/octet-stream'
+                }
+              }, host.accountId, function(err, data){
+                if(err){
+                  return cb(err);
+                }
+                legal_entity.verification = {document : data.id};
+                cb();
+            });
+           });
+          },
+          updateAccount : ['uploadDocument', function(cb){
+            if(!legal_entity){
+              return cb();
+            }
+            stripe.updateManagedAccount(host.accountId, {legal_entity : legal_entity},function(err, result){
+              if(err){
+                return cb(err)
+              }
+              cb();
+            });
+          }]
+        }, function(err, result){
+          if(err){
+            return res.badRequest(err);
+          }
+          var updatingToUser = {};
+          if(!legal_entity){
+            return res.ok({});
+          }
+          if(legal_entity.dob){
+            updatingToUser.birthday = new Date(legal_entity.dob.year,legal_entity.dob.month-1,legal_entity.dob.day);
+          }if(legal_entity.first_name && legal_entity.last_name){
+            updatingToUser.firstname = legal_entity.first_name;
+            updatingToUser.lastname = legal_entity.last_name;
+          }
+          User.update(userId,updatingToUser).exec(function(err,user){
+            if(err){
+              return res.badRequest(err);
+            }
+            if(req.wantsJSON){
+              return res.ok(user[0]);
+            }
+            return res.ok({});
+          });
+        });
       });
     }
   },
@@ -142,7 +272,7 @@ module.exports = {
           if(req.wantsJSON){
             return res.ok(bank_account);
           }
-          res.ok(req.__('host-bank-ok'));
+          res.ok(host);
         });
       });
     });
@@ -227,15 +357,18 @@ module.exports = {
         if(host.bankId){
           hasAccount = true;
         }
-        host.checkGuideRequirement(function(err, pass){
+        host.checkVerification(function(err){
           if(err){
             return res.badRequest(err);
           }
-          return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount });
+          if(req.wantsJSON){
+            return res.ok(host);
+          }
+          return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, verification : host.verification });
         });
       });
     }else{
-      return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount });
+      return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, verification : null });
     }
   },
 

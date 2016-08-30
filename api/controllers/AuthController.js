@@ -39,11 +39,6 @@ module.exports = require('waterlock').waterlocked({
             req.session.user = s;
             req.session.authenticated = true;
             return res.ok(user);
-            //if(req.wantsJSON){
-            //  return res.ok(user);
-            //}else{
-            //  return res.view("home");
-            //}
           });
         });
       }

@@ -268,9 +268,11 @@ var refreshMenu = function(){
     delivery = 0;
   }
   $(".delivery").text("$" + delivery.toFixed(2));
-  $("#order .total").data("value",(subtotal+delivery).toFixed(2));
-  $("#order .total").html(" $" + (subtotal+delivery).toFixed(2));
-  $("#meal-confirm-container .total").text(" $" + (subtotal+delivery).toFixed(2));
+  var tax = parseFloat((subtotal+delivery) * 0.0875);
+  $("#order .tax").text(" $" + tax.toFixed(2));
+  $("#order .total").data("value",(subtotal+delivery+tax).toFixed(2));
+  $("#order .total").html(" $" + (subtotal+delivery+tax).toFixed(2));
+  $("#meal-confirm-container .total").text(" $" + (subtotal+delivery+tax).toFixed(2));
 }
 
 //render order view
@@ -357,6 +359,21 @@ function setup(){
     feedback : {
       success: "fa fa-check",
       error : "fa fa-remove"
+    },
+    custom : {
+      wantsImage : function($el){
+        var requiredImg = $el.data("wantsImage");
+        var ext = $el.value.match(/\.(.+)$/)[1];
+        if(requiredImg && ext != ('jpg'||'jpeg'||'png'||'gif'||'pdf')){
+          return jQuery.i18n.prop('imageTypeRequire');
+        }
+      },strictImage : function($el){
+        var requiredImg = $el.data("strictImage");
+        var ext = $el.value.match(/\.(.+)$/)[1];
+        if(requiredImg && ext != ('jpeg'||'png')){
+          return jQuery.i18n.prop('strictImageTypeRequire');
+        }
+      }
     }
   });
   $("input[type='tel']").inputmask({"mask": "(999) 999-9999"});
@@ -454,8 +471,8 @@ $(window).scroll(function () {
   var scrolltop = $(document).scrollTop();
   var difference = scrolltop-footertotop;
 
-  console.log("scrolling height: " + scrolltop);
-  console.log("header height: " + headerHeight);
+  // console.log("scrolling height: " + scrolltop);
+  // console.log("header height: " + headerHeight);
 
   if (scrolltop + fixedElementHeight > footertotop) {
     // $('.floater').css('top', '');

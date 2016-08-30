@@ -14,7 +14,7 @@ module.exports = function(agenda) {
     //disabled: false,
 
     // method can be 'every <interval>', 'schedule <when>' or now
-    frequency: 'every 5 seconds',
+    frequency: 'every 30 seconds',
 
     // Jobs options
     //options: {
@@ -31,7 +31,7 @@ module.exports = function(agenda) {
       var now = new Date();
 
       Order.find({ status : ["schedule","preparing"], isScheduled : false}).exec(function(err, orders){
-        if(err){
+        if(err || !orders){
           return done();
         }
 

@@ -198,7 +198,6 @@
 
                           <div class="form-group location">
                             <label><%= __('pickup-location')%></label>
-
                             <input type="text" class="form-control" value="<%= pickup.location || 'N/A'%>" <%= pickup.method == 'delivery' ? 'disabled' : ''%>>
                           </div>
 
@@ -214,6 +213,12 @@
                               <%}%>
                             </select>
                           </div>
+
+                          <div class="form-group phone">
+                            <label><%= __('phone')%></label>
+                            <input type="text" class="form-control" value="<%= pickup.phone || meal.phone%>">
+                          </div>
+
                         </div>
                       </div>
                       <%})}else{;%>
