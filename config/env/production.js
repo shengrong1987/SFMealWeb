@@ -35,6 +35,6 @@ module.exports = {
   //   level: "silent"
   // }
 
-  explicitHost : "http://ec2-52-43-218-65.us-west-2.compute.amazonaws.com"
+  explicitHost : "ec2-52-43-218-65.us-west-2.compute.amazonaws.com"
 
 };
