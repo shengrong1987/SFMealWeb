@@ -35,6 +35,6 @@ module.exports = {
   //   level: "silent"
   // }
 
-  explicitHost : "http://test.sfmeal.com"
+  explicitHost : "http://http://dualstack.sfmealdeployloadbalancer-896164411.us-west-2.elb.amazonaws.com"
 
 };
