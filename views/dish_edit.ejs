@@ -92,7 +92,14 @@
             </div>
 
             <div class="form-group">
-              <label for="categoryInput">4.<%= __('what-kind') %></label>
+              <label for="priceInput">4.<%= __('how-many-for-one') %></label>
+              <div class="input-group" style="width: 250px;">
+                <input type="text" class="form-control" id="quantityInput" placeholder="<%= __('fenliang') %>">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="categoryInput">5.<%= __('what-kind') %></label>
               <div class="dropdown">
                 <button class="btn btn-default dropdown-toggle btn-outline" type="button" id="categoryInput" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= dish.type%>" data-selected="true">
                   <% switch(dish.type){

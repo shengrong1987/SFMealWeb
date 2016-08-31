@@ -1297,6 +1297,7 @@ var DishView = Backbone.View.extend({
     var title = $("#mealTitleInput").val();
     var price = $("#priceInput").val();
     var category = $("#categoryInput").val();
+    var quantity = form.find("#quantityInput").val();
     var $this = this;
     if (dishId) {
       this.model.set({id: dishId});
@@ -1332,7 +1333,8 @@ var DishView = Backbone.View.extend({
             title : title,
             price : price,
             photos : photos,
-            type : category
+            type : category,
+            quantity : quantity
           });
 
           $this.model.save({},{

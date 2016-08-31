@@ -37,7 +37,7 @@ module.exports.waterlock = {
       name: 'waterlock-google-auth',
       clientId: '504050617477-f1ok77fo8dhogc9k5gososaovjqnk4u6.apps.googleusercontent.com',
       clientSecret: 'JbMmSyFjyHKMoKlox2VoXeJT',
-      //redirectUri : 'http://localhost:1337/auth/google_oauth2',
+      redirectUri : process.env.NODE_ENV === 'production' ? 'http://test.sfmeal.com/auth/google_oauth2' : 'http://localhost:1337/auth/google_oauth2',
       allow: ['*'],
       fieldMap : {
         email : 'email'
