@@ -5,7 +5,7 @@
       <img src="/images/homecover-1.jpg" class="relative middle">
     </div>
 
-    <div class="row absolute logo-container">
+    <div class="absolute logo-container">
 
       <div class="col-xs-4 relative text-left">
         <a href="/" class="logo"></a>
@@ -71,7 +71,7 @@
 
               <div class="row chef-cell vertical-align text-left">
                 <div class="col-md-2 col-xs-3">
-                  <img class="round_thumb size-small text-center cursor-pointer" onclick="javascript:location.href='/host/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/thumbnail.jpg" %>>
+                  <img class="round_thumb size-small text-center cursor-pointer" onclick="javascript:location.href='/host/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/profile_man.png" %>>
                 </div>
                 <div class="col-md-8 col-xs-8">
                   <h4 class="text-left text-dark" style="margin: 0 0 0 10px;"><%= meal.chef.shopName %><br><small><%= meal.chef.intro %></small></h4>
@@ -240,7 +240,7 @@
                             <i class="fa fa-star"></i>
                           </div>
                         </div>
-                        <h4 style="display: inline-block;"><small style="font-size: 16px;" class="text-grey" data-id=<%= review.user %>><%= review.username %> : <%= review.title%> ( $<%= review.price.toFixed(2)%> )</small></h4>
+                        <h4 style="display: inline-block;"><small style="font-size: 16px;" class="text-grey" data-id=<%= review.user %>><%= review.username %> : <%= review.title%> ( $<%= parseFloat(review.price).toFixed(2)%> )</small></h4>
                       </div>
                       <div class="col-sm-3">
                         <h3 class="text-right"><small><%= review.get_formatted_time() %></small></h3>

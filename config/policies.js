@@ -72,7 +72,8 @@ module.exports.policies = {
     'updateBank' : 'or(and(sessionAuth,isHost),isAdmin)',
     'verifyLicense' : 'isAdmin',
     'me' : ['sessionAuth','isHost'],
-    'apply' : ['sessionAuth']
+    'apply' : ['sessionAuth'],
+    'findOne' : ['sessionAuth']
   },
 
   PaymentController : {

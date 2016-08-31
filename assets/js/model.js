@@ -1559,11 +1559,11 @@ var HostProfileView = Backbone.View.extend({
       shopName : title,
       intro : intro,
       feature_dishes : feature_dishes,
-      license : JSON.stringify({
-        url : license
-      }),
       picture : shopPhoto
     });
+    if(license){
+      this.model.set(license, JSON.stringify({url : license}));
+    }
     var $this = this;
     this.model.save({},{
       success : function(){
@@ -1823,7 +1823,7 @@ var OrderView = Backbone.View.extend({
     if(method == "delivery"){
       var contacts = this.$el.find("#contact .regular-radio:checked + label + span").text().split("+");
       if(method && contacts.length < 2){
-        this.contactAlert.html(jQuery.i18n.prop('contactAndAddressEmpty'));
+        this.contactAlert.html(jQuery.i18n.prop('contactAndAddressEmptyError'));
         this.contactAlert.show();
         return;
       }
@@ -2005,7 +2005,7 @@ function uploadImage(modual,file,cb,error,index,name){
     data : {
       name : filename,
       type : file.type,
-      modual : modual
+      module : modual
     },
     type : 'POST',
     success : function(result){

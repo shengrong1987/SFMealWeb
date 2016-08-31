@@ -312,21 +312,31 @@ module.exports = require('waterlock').actions.user({
     });
   },
 
-  getSignedUrl : function(req, res){
-    var bucket = sails.config.aws.bucket;
-    var userId = req.session.user.id;
-    var params = {Key : "users/" + userId + "/" + name, Bucket : bucket, ContentType : type, Body : "", ACL : "public-read"};
-    var s3 = new AWS.S3({Bucket : sails.config.aws.bucket});
-    this.signedUrl(req,res,params,s3);
+  // getSignedUrl : function(req, res){
+  //   var bucket = sails.config.aws.bucket;
+  //   var userId = req.session.user.id;
+  //   var params = {Key : "users/" + userId + "/" + name, Bucket : bucket, ContentType : type, Body : "", ACL : "public-read"};
+  //   var s3 = new AWS.S3({Bucket : sails.config.aws.bucket});
+  //   this.signedUrl(req,res,params,s3);
+  // },
+
+  getMaxSize : function(module){
+    var s3 = sails.config.aws;
+    var maxSize = '1048576';
+    if(s3.maxSizes.hasOwnProperty(module)){
+      maxSize = s3.maxSizes[module];
+    }
+    return maxSize;
   },
 
   calculateSignature : function(req, res){
     var name = req.body.name;
+    var module = req.body.module;
     var userId = req.session.user.id;
     var s3 = sails.config.aws;
     var bucket = s3.bucket;
     var key = s3.key;
-    var filename = "users/" + userId + "/" + name
+    var filename = "users/" + userId + "/" + name;
     var expDate = new Date();
     expDate.setMinutes(expDate.getMinutes() + 5);
     expDate = expDate.toISOString();
@@ -334,14 +344,14 @@ module.exports = require('waterlock').actions.user({
     var date = "20151229T000000Z";
     var credential = s3.id + "/" + date + "/" + s3.region + "/s3/aws4_request";
     var url = "http://" + bucket + ".s3.amazonaws.com/";
-    //var aws4 = require('aws4');
+    var maxSize = this.getMaxSize(module);
     var signatureJSON = { "expiration": "2016-12-30T12:00:00.000Z",
       "conditions": [
         {"bucket": "sfmeal"},
         ["starts-with", "$key", "users/" + userId + "/"],
         {"acl": "public-read"},
         {"success_action_status": "201"},
-        ["content-length-range","0",s3.maxSize],
+        ["content-length-range","0",maxSize],
         ["starts-with", "$Content-Type", "image/"]
         //{"x-amz-meta-uuid": "14365123651274"},
         //{"x-amz-server-side-encryption": "AES256"},
@@ -398,78 +408,6 @@ module.exports = require('waterlock').actions.user({
           }
           return res.ok();
         });
-      }
-    });
-  },
-
-  signedUrl : function(req, res, params, s3){
-    var root = sails.config.aws.host;
-    var modual = req.body.modual;
-    var name = req.body.name;
-    var isDelete = req.body.isDelete;
-    var userId = req.session.user.id;
-    var path = "users/" + userId + "/" + name;
-    s3.getSignedUrl('putObject',params,function(err,url){
-      if(err){
-        return res.badRequest(err);
-      }
-      switch(modual){
-        case "thumbnail":
-          User.findOne(userId).exec(function(err,user){
-            if(err){
-              return res.badRequest(err);
-            }
-            user.picture = root + path;
-            user.save(function(err,result){
-              if(err){
-                return res.badRequest(err);
-              }
-              return res.ok({ S3URL:url, publicURL : root + path});
-            });
-          });
-          break;
-        case "license":
-          var host = req.session.user.host;
-          if(!host){
-            return res.badRequest(req.__('user-not-host'));
-          }
-          Host.findOne(host).exec(function(err,host){
-            if(err){
-              return res.badRequest(err);
-            }
-            host.license = root + path;
-            host.save(function(err,result){
-              if(err){
-                return res.badRequest(err);
-              }
-              return res.ok({ S3URL:url, publicURL : root + path});
-            });
-          });
-          break;
-        case "story":
-          var host = req.session.user.host;
-          if(!host){
-            return res.badRequest(req.__('user-not-host'));
-          }
-          Host.findOne(host).exec(function(err,host){
-            if(err){
-              return res.badRequest(err);
-            }
-            host.picture = root + path;
-            host.save(function(err,result){
-              if(err){
-                return res.badRequest(err);
-              }
-              return res.ok({ S3URL:url, publicURL : root + path});
-            });
-          });
-          break;
-        case "dish":
-          return res.ok({ S3URL:url, publicURL : root + path});
-          break;
-        default:
-          return res.badRequest(req.__('user-upload-need-module'));
-          break;
       }
     });
   },

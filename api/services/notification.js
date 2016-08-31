@@ -3,6 +3,7 @@
  */
 var nodemailer = require('nodemailer');
 var moment = require('moment');
+var util = require('./util');
 var transporter = nodemailer.createTransport("SMTP",{
   host : "smtp.office365.com",
   secureConnection : false,
@@ -63,7 +64,7 @@ var notification = {
     this.mergeI18N(model, action, req, locale, params);
 
     this.transitLocaleTimeZone(params);
-    this.calculateTax(params);
+    util.getTaxRate(params);
     params.recipientName = basicInfo.recipientName;
     params.senderName = "SFMeal.com";
 
@@ -305,20 +306,6 @@ var notification = {
         pickup.pickupTillTime = moment.tz(pickup.pickupTillTime, "America/Los_Angeles");
       });
     }
-  },
-
-  calculateTax : function(params){
-    var county = (params.host || params.chef).county;
-    var tax = 0.08;
-    switch(county){
-      case "San Francisco County":
-        tax = 0.0875;
-        break;
-      case "Sacramento County":
-        tax = 0.08;
-        break;
-    }
-    params.taxRate = tax;
   }
 }
 

@@ -5,6 +5,7 @@
 * @docs        :: http://sailsjs.org/#!documentation/models
 */
 
+var util = require('../services/util');
 module.exports = {
 
   attributes: {
@@ -99,6 +100,9 @@ module.exports = {
     },
     msg : {
       type : 'string'
+    },
+    getTaxRate : function(){
+      return util.getTaxRate(this);
     },
     statusText: function () {
       switch (this.status) {

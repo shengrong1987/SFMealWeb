@@ -129,16 +129,14 @@ module.exports = {
       params.delivery_fee = 0;
     }
 
-    if(meal.type == "preorder"){
-      if(!meal.pickups || params.pickupOption-1>=meal.pickups.length){
-        return false;
-      }
-      var pickupInfo = meal.pickups[params.pickupOption-1];
-      if(!pickupInfo || pickupInfo.method != params.method){
-        return false;
-      }
-      params.pickupInfo = pickupInfo;
+    if(!meal.pickups || params.pickupOption-1>=meal.pickups.length){
+      return false;
     }
+    var pickupInfo = meal.pickups[params.pickupOption-1];
+    if(!pickupInfo || pickupInfo.method != params.method){
+      return false;
+    }
+    params.pickupInfo = pickupInfo;
 
     return params;
   },

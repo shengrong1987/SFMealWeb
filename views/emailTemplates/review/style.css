@@ -7932,8 +7932,9 @@ input:focus {
 }
 /*logo*/
 .logo-container {
-  width: 100%;
   top: 0;
+  left: 0;
+  right: 0;
 }
 .search-container {
   text-align: center;
@@ -8845,7 +8846,6 @@ fieldset[disabled] .btn-red.active {
 }
 .static-floater {
   position: static;
-  width: 375px;
   margin-left: 0;
 }
 @media (min-width: 768px) {

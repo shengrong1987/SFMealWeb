@@ -106,9 +106,9 @@ module.exports = {
         }
         if(account.verification.fields_needed.length != 0){
           host.verification = account.verification;
-          return cb();
+          return cb(null,false);
         }
-        return cb();
+        return cb(null,true);
       });
     },
     //check all validation as host
@@ -117,13 +117,13 @@ module.exports = {
       if(this.full_address && this.dishes.length > 0 && this.dishes.some(function(dish){
           return dish.isVerified;
         }) && this.bankId){
-        this.checkVerification(function(valid, verification){
+        this.checkVerification(function(err, valid){
           host.passGuide = valid;
-          return cb(valid)
+          return cb(null,valid)
         });
       }else{
         host.passGuide = false;
-        return cb(false);
+        return cb(null,false);
       }
     },
     getDistance : function(userLat, userLong){

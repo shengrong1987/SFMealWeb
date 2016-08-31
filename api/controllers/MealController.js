@@ -13,7 +13,7 @@ module.exports = {
   new_form : function(req, res){
     var user = req.session.user;
     var hostId = user.host.id ? user.host.id : user.host;
-    Host.findOne(hostId).populate("dishes").exec(function(err,host){
+    Host.findOne(hostId).populate("dishes").populate('user').exec(function(err,host){
       if(err){
         return res.badRequest(err);
       }
@@ -289,7 +289,7 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
-              return res.ok(meal);
+              return res.redirect("/host/me#mymeal");
             });
           })
         });
@@ -415,9 +415,13 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          if(status == "on" && !meal.dishIsValid()){
-            console.log("meal contain unverified dishes");
-            return res.badRequest(req.__('meal-unverify-dish'));
+          if(status == "on"){
+            if(!meal.dishIsValid()){
+              console.log("meal contain unverified dishes");
+              return res.badRequest(req.__('meal-unverify-dish'));
+            }else if(!meal.chef.isValid(false)){
+              return res.badRequest(req.__('meal-chef-incomplete'));
+            }
           }
           $this.cancelMealJobs(mealId, function(err){
             if(err){

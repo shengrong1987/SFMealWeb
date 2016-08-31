@@ -361,15 +361,15 @@ function setup(){
       error : "fa fa-remove"
     },
     custom : {
-      wantsImage : function($el){
-        var requiredImg = $el.data("wantsImage");
-        var ext = $el.value.match(/\.(.+)$/)[1];
+      wantsimage : function($el){
+        var requiredImg = $el.data("wantsimage");
+        var ext = $el[0].value.match(/\.(.+)$/)[1];
         if(requiredImg && ext != ('jpg'||'jpeg'||'png'||'gif'||'pdf')){
           return jQuery.i18n.prop('imageTypeRequire');
         }
       },strictImage : function($el){
-        var requiredImg = $el.data("strictImage");
-        var ext = $el.value.match(/\.(.+)$/)[1];
+        var requiredImg = $el.data("strictimage");
+        var ext = $el[0].value.match(/\.(.+)$/)[1];
         if(requiredImg && ext != ('jpeg'||'png')){
           return jQuery.i18n.prop('strictImageTypeRequire');
         }
@@ -404,6 +404,10 @@ function setupLanguage(){
           $(this).data("match-error", jQuery.i18n.prop($(this).data("match-key")));
         }
       });
+
+      if(userBarView){
+        userBarView.getNotification();
+      }
 
       // We specified mode: 'both' so translated values will be
       // available as JS vars/functions and as a map

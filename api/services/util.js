@@ -76,6 +76,32 @@ module.exports = {
   minutesBefore : function(date, minutes){
     var mDate = moment(date).subtract(minutes, 'minute');
     return mDate._d;
+  },
+  calculateTax : function(subtotal, county){
+    var tax = 0.08;
+    switch(county){
+      case "San Francisco County":
+        tax = 0.0875;
+        break;
+      case "Sacramento County":
+        tax = 0.08;
+        break;
+    }
+    return (subtotal * (1 + tax)).toFixed(2);
+  },
+  getTaxRate : function(params){
+    var county = (params.host || params.chef).county;
+    var tax = 0.08;
+    switch(county){
+      case "San Francisco County":
+        tax = 0.0875;
+        break;
+      case "Sacramento County":
+        tax = 0.08;
+        break;
+    }
+    params.taxRate = tax;
+    return tax;
   }
 };
 
