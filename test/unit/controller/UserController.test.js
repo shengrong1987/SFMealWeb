@@ -28,15 +28,15 @@ describe('UsersController', function() {
 
     it('should not register with invalid password', function (done) {
       agent
-          .post('/auth/register')
-          .send({email : email, password : shortPassword})
-          .expect(500)
-          .end(function(err,res){
-            if(res.body.invalidAttributes.password.length == 0){
-              return done(Error("no password invalidation error was popped"));
-            }
-            done();
-          })
+        .post('/auth/register')
+        .send({email : email, password : shortPassword})
+        .expect(500)
+        .end(function(err,res){
+          if(res.body.invalidAttributes.password.length == 0){
+            return done(Error("no password invalidation error was popped"));
+          }
+          done();
+        })
     })
 
     //
@@ -117,14 +117,14 @@ describe('UsersController', function() {
 
     it('should become a host if logged in', function (done) {
       agent
-          .post('/user/becomeHost')
-          .expect(200)
-          .end(function(err,res){
-            if(res.body.user.host == undefined){
-              return done(Error("become host for a logged user doesn't work"));
-            }
-            done();
-          })
+        .post('/user/becomeHost')
+        .expect(200)
+        .end(function(err,res){
+          if(res.body.user.host == undefined){
+            return done(Error("become host for a logged user doesn't work"));
+          }
+          done();
+        })
     })
 
     it('should get forbidden error for a host trying to apply for host', function (done) {
