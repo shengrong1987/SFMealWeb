@@ -14,7 +14,7 @@ before(function(done) {
 
 describe('ReviewController', function() {
 
-  this.timeout(5000);
+  this.timeout(12000);
 
   describe('', function() {
 
@@ -108,13 +108,20 @@ describe('ReviewController', function() {
     var orderId;
     it('should order the meal', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = 1;
-      dishObj[dishId2] = 2;
-      dishObj[dishId3] = 0;
+      dishObj[dishId1] = 0;
+      dishObj[dishId2] = 1;
+      dishObj[dishId3] = 1;
       dishObj[dishId4] = 0;
       agent
         .post('/order')
-        .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : address, phone : phone, method : "delivery", mealId : mealId})
+        .send({
+          orders : dishObj,
+          subtotal : price2 + price3,
+          address : address,
+          phone : phone,
+          method : "delivery",
+          mealId : mealId
+        })
         .expect(200)
         .end(function(err,res){
           if(err){
@@ -176,13 +183,13 @@ describe('ReviewController', function() {
           .post('/review')
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
-          .send({meal : mealId, dish : dishId1, score : 4.0, review : "Very delicious could be more",user: guestId})
+          .send({meal : mealId, dish : dishId3, score : 4.0, review : "Very delicious could be more",user: guestId})
           .expect(200)
           .end(function(err, res){
             if(err){
               return done(err);
             }
-            if(res.body.meal.id != mealId || res.body.dish != dishId1){
+            if(res.body.meal.id != mealId || res.body.dish != dishId3){
               return done(Error('error reviewing dish'));
             }
             done();

@@ -1319,21 +1319,24 @@
                       <div class="fileinput-preview fileinput-exists thumbnail" style="max-height: 260px;" data-src="<%= user.host.license ? (user.host.license.url || null) : null%>">
                         <img class="cursor-pointer" src="<%= user.host.license ? (user.host.license.url || '/images/upload_default.png') : '/images/upload_default.png'%>" style="max-height: 250px;" onclick="$('#licenseUpload').trigger('click')">
                       </div>
-                      <div>
-                        <span class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span><input id="licenseUpload" type="file" data-wantsImage=true onchange="uploadLicense(event)" data-error-container=".license"></span>
-                          <!--<a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput">Remove</a>-->
+                      <div class="form-group">
+                        <span class="btn btn-default btn-file">
+                          <span class="fileinput-new"><%= __('select-image')%></span>
+                          <span class="fileinput-exists"><%= __('change')%></span>
+                          <input id="licenseUpload" type="file" data-wantsImage=true onchange="uploadLicense(event)" data-error-container=".license">
+                        </span>
                         <script>
                           $(".fileinput").on("clear.bs.fileinput",function(){
                             $("input[type='file']").data("isDelete",true);
                           });
                         </script>
+                        <div class="help-block with-errors"></div>
                       </div>
-                      <!--<button class="btn btn-green round" type="text" style="width:100px;" onclick="uploadLicense(event)" data-error-container=".license">上传执照</button>-->
                     </div>
                   </div>
                   <div class="col-xs-7">
-                    <label>您的食品操作证书: <span class="<%= user.host.license ? (user.host.license.valid ? "text-green" : "text-red") : "text-red"%>"><%= user.host.license ? (user.host.license.valid ? "通过" : "审核中") : "未上传"%></span></label>
-                    <p> 有效期至: <%= user.host.license ? (user.host.license.valid ? user.host.license.exp : "N/A") : "N/A"%></p>
+                    <label><%= __('your-license')%>: <span class="<%= user.host.license ? (user.host.license.valid ? "text-green" : "text-red") : "text-red"%>"><%= user.host.license ? (user.host.license.valid ? "通过" : "审核中") : "未上传"%></span></label>
+                    <p> <%= __('expBy')%>: <%= user.host.license ? (user.host.license.valid ? user.host.license.exp : "N/A") : "N/A"%></p>
                     <% if (!user.host.license || !user.host.license.valid){%>
                     <h2></h2>
                     <label><%= __('food-handling-license-help')%>: </label>
@@ -1379,28 +1382,28 @@
                   <div class="help-block with-errors"></div>
                   <label>(2) <%= __('host-photo')%> </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" data-placement="right" title="<%= __('photo-restrition')%>"></i></label>
 
-                  <div class="fileinput <%= user.host.picture ? 'fileinput-exists' : 'fileinput-new'%>" data-provides="fileinput" style="width: 100%;">
-                    <div class="fileinput-new thumbnail">
-                      <img class="cursor-pointer" src="/images/upload_default.png" onclick="$('storyUpload').trigger('click')">
-                    </div>
-                    <div class="fileinput-preview fileinput-exists thumbnail" style="max-height: 275px;" data-src="<%= user.host.picture || '/images/upload_default.png'%>">
-                      <img class="cursor-pointer" src="<%= user.host.picture ? user.host.picture : '/images/upload_default.png'%>" style="max-height: 265px;" onclick="$('#storyUpload').trigger('click')">
-                    </div>
-                    <div>
-                    <span class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
-                      <input name='story-pic' id="storyUpload" type="file" data-wantsImage=true onchange="uploadHostPhoto(event)" data-error-container=".story">
-                    </span>
-                      <!--<a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput">Remove</a>-->
+                  <div class="fileinput form-group <%= user.host.picture ? 'fileinput-exists' : 'fileinput-new'%>" data-provides="fileinput" style="width: 100%;">
+                    <div class="col-xs-12">
+                      <div class="fileinput-new thumbnail">
+                        <img class="cursor-pointer" src="/images/upload_default.png" onclick="$('storyUpload').trigger('click')">
+                      </div>
+                      <div class="fileinput-preview fileinput-exists thumbnail" style="max-height: 275px;" data-src="<%= user.host.picture || '/images/upload_default.png'%>">
+                        <img class="cursor-pointer" src="<%= user.host.picture ? user.host.picture : '/images/upload_default.png'%>" style="max-height: 265px;" onclick="$('#storyUpload').trigger('click')">
+                      </div>
+                      <span class="btn btn-default btn-file">
+                        <span class="fileinput-new"><%= __('select-image')%></span>
+                        <span class="fileinput-exists"><%= __('change')%></span>
+                        <input name='story-pic' id="storyUpload" type="file" data-strictImage=true onchange="uploadHostPhoto(event)">
+                      </span>
                       <script>
                         $(".fileinput").on("clear.bs.fileinput",function(){
                           $("input[type='file']").data("isDelete",true);
                         });
                       </script>
+                      <div class="help-block with-errors"></div>
                     </div>
                   </div>
-                  <div class="alert alert-danger" data-toggle="alert"></div>
                 </div>
-
                 <div class="col-sm-7">
                   <label>(3) <%= __('host-story-content')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
                   <textarea class="form-control" data-error="<%= __('host-story-content-max')%>" maxlength="300" name="story-intro" style="width: 100%;height: 360px;"><%if(typeof user.host.intro != 'undefined'){%><%= user.host.intro %><%}%></textarea>
@@ -1488,7 +1491,7 @@
               </div>
 
               <div class="row">
-                <div id="formAlert" class="alert alert-danger" data-toggle="alert"></div>
+                <div id="formAlert" class="alert alert-info text-center" data-toggle="alert"></div>
               </div>
 
               <div class="row text-center" style="margin-top: 20px;">
@@ -1505,7 +1508,7 @@
 </div>
 
 <script>
-  $("#myinfo form").validator({});
+//  $("#myinfo form").validator({});
   var hostProfileView = new HostProfileView( { el : $("#myinfo"), model : new Host()})
   new AddressView({ el : $("#hostAddressView"), model : new Host()})
   var orderView = new OrderView({ el : $("#myorder"), model : new Order()})

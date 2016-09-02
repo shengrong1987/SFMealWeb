@@ -3,6 +3,7 @@
  */
 
 var assert = require('assert'),
+    should = require('should'),
     sinon = require('sinon');
 request = require('supertest');
 var agent;
@@ -14,7 +15,7 @@ before(function(done) {
 
 describe('UsersController', function() {
 
-  this.timeout(5000);
+  this.timeout(10000);
 
   var newEmail = "shengrong1225" + new Date().getTime() + "@gmail.com"
 
@@ -23,23 +24,34 @@ describe('UsersController', function() {
     var email = "aimbebe.r@gmail.com";
     var password = "12345678";
     var shortPassword = "1234567";
+    var invalidPassword = "!1234567";
     var invalidEmail = "auth@gmail.com123";
     var userId = "";
 
-    it('should not register with invalid password', function (done) {
+    it('should not register with short password', function (done) {
       agent
         .post('/auth/register')
         .send({email : email, password : shortPassword})
         .expect(500)
         .end(function(err,res){
-          if(res.body.invalidAttributes.password.length == 0){
-            return done(Error("no password invalidation error was popped"));
-          }
+          res.body.should.have.property('invalidAttributes');
+          res.body.invalidAttributes.should.have.property('password').with.length(2,"password should fail at two restriction: one reg and one minLength");
           done();
         })
     })
 
-    //
+    it('should not register with invalid password', function (done) {
+      agent
+        .post('/auth/register')
+        .send({email : email, password : invalidPassword})
+        .expect(500)
+        .end(function(err,res){
+          res.body.should.have.property('invalidAttributes');
+          res.body.invalidAttributes.should.have.property('password').with.length(1,"password should fail at one restriction: reg");
+          done();
+        })
+    })
+
     it('should register if account not exist', function (done) {
       agent
           .post('/auth/register')
@@ -48,23 +60,20 @@ describe('UsersController', function() {
           .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err,res){
-            if(res.body.auth.email != email){
-              return done(Error("registration not being processed with the same email"))
-            }
+            res.body.should.have.property('auth');
+            res.body.auth.should.have.property('email',email);
             userId = res.body.id;
             done();
           })
     })
-    //
+
     it('should not register if account exist', function (done) {
       agent
           .post('/auth/register')
           .send({email : email, password: password})
           .expect(400)
           .end(function(err,res){
-            if(res.body.code != -1){
-             return done(Error("the error code is not -1 which is trying to register the existed user error"))
-            }
+            res.body.code.should.equal(-1, "should get account already exist error");
             done();
           })
     })
@@ -84,9 +93,7 @@ describe('UsersController', function() {
           .send({email : email, password: shortPassword})
           .expect(400)
           .end(function(err,res){
-            if(res.body.error != "Invalid email or password"){
-              return done(Error("it didn't pop the wrong credentials error"))
-            }
+            should.exist(res.body.error, "should get invalid email or password error");
             done();
           })
     })
@@ -120,9 +127,8 @@ describe('UsersController', function() {
         .post('/user/becomeHost')
         .expect(200)
         .end(function(err,res){
-          if(res.body.user.host == undefined){
-            return done(Error("become host for a logged user doesn't work"));
-          }
+          res.body.should.have.property("user");
+          should.exist(res.body.user.host);
           done();
         })
     })
@@ -138,9 +144,7 @@ describe('UsersController', function() {
           .post('/auth/logout')
           .expect(200)
           .end(function(err,res){
-            if(res.body.user != undefined){
-              return done(Error("logout not success"));
-            }
+            should.not.exist(res.body.user, "should logout the user");
             done();
           })
     })
@@ -193,9 +197,11 @@ describe('UsersController', function() {
           })
           .expect(200)
           .end(function(err,res){
-            if(Object.keys(res.body.address)[0].isDefault && !Object.keys(res.body.address)[1].isDefault && res.body.city != "San Francisco"){
-              return done(Error('error geocoding the address'));
-            }
+            console.log(res.body.address);
+            res.body.should.have.property("address").with.length(2);
+            should(res.body.address[0]).which.is.a.Object();
+            (true).should.be.equalOneOf(res.body.address[0].isDefault, res.body.address[1].isDefault);
+            res.body.city.should.be.equal("San Francisco");
             done();
           })
     })
@@ -211,9 +217,8 @@ describe('UsersController', function() {
           .send({email : anotherEmail, password: password})
           .expect(200)
           .end(function(err,res){
-            if(res.body.auth.email != anotherEmail){
-              return done(Error("registration not being processed with the same email"))
-            }
+            res.body.should.have.property('auth');
+            res.body.auth.email.should.equal(anotherEmail);
             anotherUserId = res.body.id;
             done();
           })
@@ -231,9 +236,7 @@ describe('UsersController', function() {
           .post('/auth/logout')
           .expect(200)
           .end(function(err,res){
-            if(res.body.user != undefined){
-              return done(Error("logout not success"));
-            }
+            should.not.exist(res.body.user);
             done();
           })
     })
@@ -273,9 +276,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          if(res.body.verification.length == 0){
-            return done("check stripe account verification data");
-          }
+          res.body.passGuide.should.be.false("should be an unverified account");
           hostId = res.body.id;
           done();
         })
@@ -300,10 +301,9 @@ describe('UsersController', function() {
             if(err){
               return done(err);
             }
-            console.log(res.body);
-            if(res.body.firstname != "sheng" || res.body.lastname != "rong" || new Date(res.body.birthday).getFullYear() != 1987){
-              return done(Error("error updating info from host to user"));
-            }
+            res.body.firstname.should.equal('sheng',"error updating firstname from host to user");
+            res.body.lastname.should.equal('rong',"error updating lastname from host to user");
+            new Date(res.body.birthday).should.which.is.a.Date();
             done();
           })
 
@@ -317,13 +317,10 @@ describe('UsersController', function() {
             if(err){
               return done(err);
             }
-            console.log(res.body.verification);
-            if(res.body.verification.some(function(field){
-              console.log(field);
-              return field == "legal_entity.first_name" || field == "legal_entity.last_name" || field == "legal_entity.dob.month";
-              })){
-              return done("Error updating managed account");
-            }
+            res.body.should.have.property('verification');
+            should('legal_entity.first_name').be.equalOneOf(res.body.verification);
+            should('legal_entity.last_name').be.equalOneOf(res.body.verification);
+            should('legal_entity.dob.month').be.equalOneOf(res.body.verification);
             done();
           });
       });
