@@ -3,7 +3,6 @@
  */
 
 var assert = require('assert'),
-    should = require('should'),
     sinon = require('sinon'),
     config = require('../../../config/stripe.js'),
     stripe = require('stripe')(config.StripeKeys.secretKey),
@@ -17,7 +16,7 @@ before(function(done) {
 
 describe('MealController', function() {
 
-  this.timeout(35000);
+  this.timeout(32000);
 
   describe('build a meal with dishes', function() {
 
@@ -40,7 +39,9 @@ describe('MealController', function() {
         .post('/user/becomeHost')
         .expect(200)
         .end(function(err,res){
-          res.body.user.host.should.be.ok();
+          if(res.body.user.host == undefined){
+            return done(Error("become host for a logged user doesn't work"));
+          }
           hostId = res.body.user.host;
           done();
         })
@@ -155,20 +156,7 @@ describe('MealController', function() {
       }
       agent
           .post('/meal')
-          .send({
-            provideFromTime: new Date(now.getTime() + 1000 * 60 * 11),
-            provideTillTime: new Date(now.getTime() + 1000 * 2 * 3600),
-            leftQty: leftQty,
-            totalQty: totalQty,
-            county : 'San Francisco County',
-            title : "私房面馆",
-            type : "order",
-            dishes : dishes,
-            cover : dish1,
-            minimalOrder : 5,
-            status : 'off',
-            isDelivery : false
-          })
+          .send({provideFromTime: new Date(now.getTime() + 1000 * 60 * 11), provideTillTime: new Date(now.getTime() + 1000 * 2 * 3600), leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "order", dishes : dishes, cover : dish1, minimalOrder : 5, status : 'off'})
           .expect(200)
           .end(function(err,res){
             if(err){
@@ -197,21 +185,7 @@ describe('MealController', function() {
       }];
       agent
           .post('/meal')
-          .send({
-            provideFromTime: now,
-            provideTillTime: new Date(now.getTime() + 1000 * 3600),
-            pickups : JSON.stringify(pickups),
-            isDelivery : true,
-            leftQty: leftQty,
-            totalQty: totalQty,
-            county : 'San Francisco County',
-            title : "私房面馆",
-            type : "preorder",
-            dishes : dishes,
-            status : "off",
-            cover : dish1,
-            minimalOrder : 1
-          })
+          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), pickups : JSON.stringify(pickups),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "off", cover : dish1, minimalOrder : 1})
           .expect(200)
           .end(function(err,res){
             if(res.body.chef != hostId){
@@ -264,64 +238,9 @@ describe('MealController', function() {
         })
     });
 
-    it('should not turn one meal on because missing account verifications', function (done) {
-      agent
-        .post('/meal/' + mealId + "/on")
-        .expect(302)
-        .end(done)
-    })
-
-    it('should update host legal_entity', function(done){
-      var legalObj = {
-        dob : {
-          day : 25,
-          month : 12,
-          year : 1987
-        },
-        first_name : "sheng",
-        last_name : "rong",
-        ssn_last_4 : "1234"
-      };
-      agent
-        .put('/host/' + hostId)
-        .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
-        // .field('Content-Type', 'multipart/form-data')
-        .field('legal_entity',JSON.stringify(legalObj))
-        .field('hasImage',"true")
-        .attach('image','/Users/shengrong/Documents/SFMealWeb/assets/images/dumplings.jpg')
-        .expect(200)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          done();
-        })
-    });
-
-    it('should update host legal_entity', function(done){
-      var legalObj = {
-        personal_id_number : "123456789"
-      };
-      agent
-        .put('/host/' + hostId)
-        .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
-        .field('legal_entity',JSON.stringify(legalObj))
-        .expect(200)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          done();
-        })
-    });
-
     it('should turn one meal on', function (done) {
       agent
         .post('/meal/' + mealId + "/on")
-        .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
         .expect(200)
         .toPromise()
         .delay(31000)
