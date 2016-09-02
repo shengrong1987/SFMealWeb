@@ -120,7 +120,7 @@ module.exports = {
           return "已完成";
         case "cancel":
           return "已取消";
-        case "adjusting":
+        case "adjust":
           return "调整中，待确认";
         case "cancelling":
           return "取消中，待确认";

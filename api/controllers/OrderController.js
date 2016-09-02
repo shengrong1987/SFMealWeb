@@ -35,6 +35,10 @@ module.exports = {
       return res.badRequest(req.__('meal-not-active'));
     }
 
+    if(!meal.isDelivery && params.method == 'delivery'){
+      return res.badRequest(req.__('order-invalid-method'));
+    }
+
     if(meal.dateIsValid()) {
       console.log("meal is valid");
       //check order is valid
@@ -52,6 +56,9 @@ module.exports = {
         for (var j = 0; j < meal.dishes.length; j++) {
           var mealDish = meal.dishes[j];
           if (dishId == mealDish.id) {
+            if(!mealDish.isVerified){
+              validDish = false;
+            }
             var diff = quantity - preQuantity;
             if (diff == 0 || diff <= meal.leftQty[dishId]) {
               validDish = true;
@@ -125,18 +132,33 @@ module.exports = {
     var dishes = meal.dishes;
     if(params.method == "delivery"){
       params.delivery_fee = parseFloat(meal.delivery_fee);
-    }else{
+    }else {
       params.delivery_fee = 0;
     }
 
-    if(!meal.pickups || params.pickupOption-1>=meal.pickups.length){
-      return false;
+    sails.log.debug(params, meal.type);
+
+    if(meal.type == 'preorder'){
+      if(!params.pickupOption || !meal.pickups || params.pickupOption-1>=meal.pickups.length){
+        return false;
+      }
+      var pickupInfo = meal.pickups[params.pickupOption-1];
+      if(!pickupInfo || pickupInfo.method != params.method){
+        return false;
+      }
+      params.pickupInfo = pickupInfo;
     }
-    var pickupInfo = meal.pickups[params.pickupOption-1];
-    if(!pickupInfo || pickupInfo.method != params.method){
-      return false;
+
+    if(meal.type == 'order' && params.method == 'pickup'){
+      if(!params.pickupOption || !meal.pickups || params.pickupOption-1>=meal.pickups.length){
+        return false;
+      }
+      var pickupInfo = meal.pickups[params.pickupOption-1];
+      if(!pickupInfo || pickupInfo.method != params.method){
+        return false;
+      }
+      params.pickupInfo = pickupInfo;
     }
-    params.pickupInfo = pickupInfo;
 
     return params;
   },
@@ -253,7 +275,7 @@ module.exports = {
                     });
                   });
                 } else {
-                  res.badRequest({ reponseText : req.__('order-unknown-error'), code : -7});
+                  res.badRequest({ reponseText : req.__('order-unknown-error'), code : -8});
                 }
               });
             });
@@ -277,7 +299,7 @@ module.exports = {
 
   adjust : function(req, res){
     var userId = req.session.user.id;
-    var hostId = req.session.user.host;
+    var hostId = req.session.user.host ? (req.session.user.host.id ? req.session.user.host.id : req.session.user.host) : null;
     var email = req.session.user.auth.email;
     var orderId = req.params.id;
     var params = req.body;

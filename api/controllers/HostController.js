@@ -338,7 +338,7 @@ module.exports = {
     var hasMeal = false;
     var hasAccount = false;
     if(user && user.host){
-      var hostId = user.host;
+      var hostId = user.host.id ? user.host.id : user.host;
       Host.findOne(hostId).populate("dishes").populate("meals").exec(function(err, host){
         if(err){
           return res.badRequest(err);
@@ -346,9 +346,7 @@ module.exports = {
         if(host.full_address){
           hasAddress = true;
         }
-        if(host.dishes.length > 0 && host.dishes.some(function(dish){
-            return dish.isVerified;
-          })){
+        if(host.dishes.length > 0){
           hasDish = true;
           if(host.meals.length > 0){
             hasMeal = true;
@@ -357,18 +355,18 @@ module.exports = {
         if(host.bankId){
           hasAccount = true;
         }
-        host.checkVerification(function(err){
+        host.checkGuideRequirement(function(err, valid){
           if(err){
             return res.badRequest(err);
           }
           if(req.wantsJSON){
             return res.ok(host);
           }
-          return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, verification : host.verification });
+          return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, verification : host.verification, passGuide : host.passGuide });
         });
       });
     }else{
-      return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, verification : null });
+      return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, verification : null, passGuide : false });
     }
   },
 

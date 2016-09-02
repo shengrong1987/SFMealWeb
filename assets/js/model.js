@@ -1222,7 +1222,7 @@ var DishView = Backbone.View.extend({
         if (exist) {
           if (delete1) {
             filename1 = exist;
-            form.find("#photoError").html(p1Input.data("error"));
+            form.find("#photoError").html(jQuery.i18n.prop('needPhoto'));
             return;
           } else {
             oldname1 = exist;
@@ -1238,7 +1238,7 @@ var DishView = Backbone.View.extend({
         }
       }
     }else{
-      form.find("#photoError").html(p1Input.data("error"));
+      form.find("#photoError").html(jQuery.i18n.prop('needPhoto'));
       return;
     }
 
@@ -1375,17 +1375,17 @@ var DishView = Backbone.View.extend({
               $this.formAlert.show();
             }
           });
-        },function(){
+        },function(error){
           $this.formAlert.show();
-          $this.formAlert.html("Dish" + jQuery.i18n.prop('saveError'))
+          $this.formAlert.html(error)
         },3,filename3,delete3)
-      },function(){
+      },function(error){
         $this.formAlert.show();
-        $this.formAlert.html("Dish" + jQuery.i18n.prop('saveError'))
+        $this.formAlert.html(error)
       },2,filename2,delete2);
-    },function(){
+    },function(error){
       $this.formAlert.show();
-      $this.formAlert.html("Dish" + jQuery.i18n.prop('saveError'))
+      $this.formAlert.html(error)
     },1,filename1,delete1);
   }
 });
@@ -1542,6 +1542,9 @@ var HostProfileView = Backbone.View.extend({
   },
   saveHostProfile : function(e){
     e.preventDefault();
+    if(this.$el.find("button[type='submit']").hasClass("disabled")){
+      return;
+    }
     var form = this.$el.find("form");
     var title = this.$el.find("input[name='story-title']").val();
     var intro = this.$el.find("textarea[name='story-intro']").val();
@@ -1996,7 +1999,7 @@ function uploadImage(modual,file,cb,error,index,name){
       break;
     case "dish":
       if(name && name!=""){
-        filename = name + "." + fileType;
+        filename = name;
       }
       break;
     default :

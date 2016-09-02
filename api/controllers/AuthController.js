@@ -19,9 +19,6 @@ module.exports = require('waterlock').waterlocked({
       def = waterlock.Auth.definition,
       criteria = { },
       scopeKey = 'email';
-    if(!params.password || !params.email){
-      return res.serverError('email and password needed');
-    }
     var attr = {
       password: params.password
     }
@@ -52,9 +49,9 @@ module.exports = require('waterlock').waterlocked({
     console.log("login success...");
     var auth = req.session.user.auth;
     if(auth.facebookId){
-      res.redirect("/user/me#myinfo");
+      res.redirect('back');
     }else if(auth.googleEmail){
-      res.redirect("/user/me#myinfo");
+      res.redirect('back');
     }else{
       res.ok(req.session.user);
     }

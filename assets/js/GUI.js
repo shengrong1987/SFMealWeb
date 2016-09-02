@@ -363,14 +363,14 @@ function setup(){
     custom : {
       wantsimage : function($el){
         var requiredImg = $el.data("wantsimage");
-        var ext = $el[0].value.match(/\.(.+)$/)[1];
-        if(requiredImg && ext != ('jpg'||'jpeg'||'png'||'gif'||'pdf')){
+        var ext = $el[0].value.match(/\.(.+)$/)[1].toLowerCase();
+        if(requiredImg && ext != 'jpg' && ext != 'jpeg' && ext != 'png' && ext !='gif'&& ext !='pdf'){
           return jQuery.i18n.prop('imageTypeRequire');
         }
-      },strictImage : function($el){
+      },strictimage : function($el){
         var requiredImg = $el.data("strictimage");
-        var ext = $el[0].value.match(/\.(.+)$/)[1];
-        if(requiredImg && ext != ('jpeg'||'png')){
+        var ext = $el[0].value.match(/\.(.+)$/)[1].toLowerCase();
+        if(requiredImg && ext != 'jpeg' && ext != 'png' && ext != 'jpg'){
           return jQuery.i18n.prop('strictImageTypeRequire');
         }
       }

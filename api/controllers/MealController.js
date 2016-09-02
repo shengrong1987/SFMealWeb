@@ -228,30 +228,35 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          if(!host.isValid(false)){
-            return res.badRequest(req.__('meal-chef-incomplete'));
-          }
-          if(!meal.dateIsValid()){
-            console.log("Date format of meal is not valid");
-            return res.badRequest(req.__('meal-invalid-date'));
-          }
-          if(!meal.dishIsValid()){
-            console.log("meal contain unverified dishes");
-            return res.badRequest(req.__('meal-unverify-dish'));
-          }
-          $this.cancelMealJobs( mealId, function(err){
+          host.checkGuideRequirement(function(err, valid) {
             if(err){
               return res.badRequest(err);
             }
-            meal.status = "on";
-            meal.isScheduled = false;
-            meal.save(function(err,result){
+            if(!valid){
+              return res.badRequest(req.__('meal-chef-incomplete'));
+            }
+            if(!meal.dateIsValid()){
+              console.log("Date format of meal is not valid");
+              return res.badRequest(req.__('meal-invalid-date'));
+            }
+            if(!meal.dishIsValid()){
+              console.log("meal contain unverified dishes");
+              return res.badRequest(req.__('meal-unverify-dish'));
+            }
+            $this.cancelMealJobs( mealId, function(err){
               if(err){
                 return res.badRequest(err);
               }
-              return res.ok(meal);
-            });
-          })
+              meal.status = "on";
+              meal.isScheduled = false;
+              meal.save(function(err,result){
+                if(err){
+                  return res.badRequest(err);
+                }
+                return res.ok(meal);
+              });
+            })
+          });
         });
       })
     }else{
@@ -261,37 +266,43 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        if(!host.isValid(false)){
-          return res.redirect("/apply");
-        }
-        Meal.findOne(mealId).populate("dishes").exec(function(err,meal){
+        host.checkGuideRequirement(function(err, valid){
           if(err){
             return res.badRequest(err);
           }
-          if(!meal.dateIsValid()){
-            console.log("Date format of meal is not valid");
-            return res.badRequest(req.__('meal-invalid-date'));
+          if(!valid){
+            return res.redirect("/apply");
           }
-          if(!meal.dishIsValid()){
-            console.log("meal contain unverified dishes");
-            return res.badRequest(req.__('meal-unverify-dish'));
-          }
-          if(meal.status == "on"){
-            return res.ok(meal);
-          }
-          $this.cancelMealJobs( mealId, function(err){
+          Meal.findOne(mealId).populate("dishes").exec(function(err,meal){
             if(err){
               return res.badRequest(err);
             }
-            meal.status = "on";
-            meal.isScheduled = false;
-            meal.save(function(err,result){
+            if(!meal.dateIsValid()){
+              console.log("Date format of meal is not valid");
+              return res.badRequest(req.__('meal-invalid-date'));
+            }
+            if(!meal.dishIsValid()){
+              console.log("meal contain unverified dishes");
+              return res.badRequest(req.__('meal-unverify-dish'));
+            }
+
+            $this.cancelMealJobs(mealId, function(err){
               if(err){
                 return res.badRequest(err);
               }
-              return res.redirect("/host/me#mymeal");
-            });
-          })
+              meal.status = "on";
+              meal.isScheduled = false;
+              meal.save(function(err,result){
+                if(err){
+                  return res.badRequest(err);
+                }
+                if(req.wantsJSON){
+                  return res.ok(meal);
+                }
+                return res.redirect("/host/me#mymeal");
+              });
+            })
+          });
         });
       });
     }
@@ -334,15 +345,29 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
-              if(req.body.status == 'on' && !host.isValid(true)){
-                return res.badRequest(req.__('meal-chef-incomplete'));
+              if(req.body.status == 'on'){
+                host.checkGuideRequirement(function(err, valid){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  if(!valid){
+                    return res.badRequest(req.__('meal-chef-incomplete'));
+                  }
+                  Meal.create(req.body).exec(function(err,meal){
+                    if(err){
+                      return res.badRequest(err);
+                    }
+                    return res.ok(meal);
+                  });
+                })
+              }else{
+                Meal.create(req.body).exec(function(err,meal){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  return res.ok(meal);
+                });
               }
-              Meal.create(req.body).exec(function(err,meal){
-                if(err){
-                  return res.badRequest(err);
-                }
-                return res.ok(meal);
-              });
             });
           }else{
             console.log("meal contain unverified dishes");
@@ -350,7 +375,7 @@ module.exports = {
           }
         });
       }else{
-        console.log("meal minimal requirement are not valid");
+        console.log("meal requirement are not valid");
         return res.badRequest(req.__('meal-invalid-requirement'));
       }
     }else{
@@ -410,48 +435,76 @@ module.exports = {
     var status = req.body.status;
     var $this = this;
     if(this.dateIsValid(req.body)){
-      if(this.requirementIsValid(req.body)){
-        Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,meal){
-          if(err){
-            return res.badRequest(err);
-          }
+      Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,meal){
+        if(err){
+          return res.badRequest(err);
+        }
+        if($this.requirementIsValid(req.body, meal)){
           if(status == "on"){
+            meal.chef.dishes = meal.dishes;
             if(!meal.dishIsValid()){
               console.log("meal contain unverified dishes");
               return res.badRequest(req.__('meal-unverify-dish'));
-            }else if(!meal.chef.isValid(false)){
-              return res.badRequest(req.__('meal-chef-incomplete'));
             }
-          }
-          $this.cancelMealJobs(mealId, function(err){
-            if(err){
-              return res.badRequest(err);
-            }
-            req.body.isScheduled = false;
-            req.body.chef = hostId;
-            Meal.update({id : mealId}, req.body).exec(function(err, result){
+            meal.chef.checkGuideRequirement(function(err, valid){
               if(err){
                 return res.badRequest(err);
               }
-              return res.ok(result);
-            });
-          })
-        });
-      }else{
-        console.log("meal minimal requirement are not valid");
-        return res.badRequest(req.__('meal-invalid-requirement'));
-      }
+              if(!valid){
+                return res.badRequest(req.__('meal-chef-incomplete'));
+              }
+              $this.cancelMealJobs(mealId, function(err){
+                if(err){
+                  return res.badRequest(err);
+                }
+                req.body.isScheduled = false;
+                req.body.chef = hostId;
+                Meal.update({id : mealId}, req.body).exec(function(err, result){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  return res.ok(result);
+                });
+              })
+            })
+          }else{
+            $this.cancelMealJobs(mealId, function(err){
+              if(err){
+                return res.badRequest(err);
+              }
+              req.body.isScheduled = false;
+              req.body.chef = hostId;
+              Meal.update({id : mealId}, req.body).exec(function(err, result){
+                if(err){
+                  return res.badRequest(err);
+                }
+                return res.ok(result);
+              });
+            })
+          }
+        }else{
+          console.log("meal minimal requirement are not valid");
+          return res.badRequest(req.__('meal-invalid-requirement'));
+        }
+      });
     }else{
       console.log("Date format of meal is not valid");
       return res.badRequest(req.__('meal-invalid-date'));
     }
   },
 
-  requirementIsValid : function(params){
+  requirementIsValid : function(params, meal){
     var minOrderNumber = parseInt(params.minimalOrder);
     var minOrderTotal = parseFloat(params.minimalTotal);
     if(!minOrderNumber && !minOrderTotal){
       console.log("minimal order number and minimal order bill amount are required(one of them)");
+      return false;
+    }
+    var type = meal ? meal.type : params.type;
+    if(params.isDelivery && type == 'preorder' && !JSON.parse(params.pickups).some(function(pickup){
+        return pickup.method == 'delivery';
+      })){
+      console.log("support delivery but no delivery time was added");
       return false;
     }
     return true;

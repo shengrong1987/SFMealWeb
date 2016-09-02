@@ -187,7 +187,7 @@ module.exports = {
         return false;
       }
       return this.dishes.every(function(dish){
-        return dish.isVerified
+        return dish.isVerified;
       });
     }
   },
