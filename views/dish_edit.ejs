@@ -51,7 +51,7 @@
                   </div>
                   <div>
                     <div class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
-                      <input id="photoInput-<%= i%>" class="form-control" type="file" data-wantsImage=true name="image" data-error="<%= __('need-photo') %>">
+                      <input id="photoInput-<%= i%>" class="form-control" type="file" data-strictImage=true name="image">
                     </div>
                     <a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput"><%= __('remove')%></a>
                     <script>
@@ -61,17 +61,16 @@
                       });
                     </script>
                   </div>
+                  <div class="help-block with-errors"></div>
                 </div>
               <%}else{%>
                 <div class="fileinput fileinput-new" data-provides="fileinput">
                   <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
                   </div>
-                  <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;">
-
-                  </div>
+                  <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
                   <div>
                     <div class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
-                      <input id="photoInput-<%= i%>" type="file" data-wantsImage=true data-error="<%= __('need-photo') %>">
+                      <input id="photoInput-<%= i%>" type="file" data-strictImage=true>
                     </div>
                     <a href="javascript:$(this).prev().find('input').data('delete',true);" class="btn btn-default fileinput-exists" data-dismiss="fileinput"><%= __('remove')%></a>
                   </div>

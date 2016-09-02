@@ -19,12 +19,10 @@ module.exports = {
     },
     firstname : {
       type : 'string',
-      maxLength : 15,
       regex : /^([A-z\ ]{1,15})$/
     },
     lastname : {
       type : 'string',
-      maxLength : 15,
       regex : /^([A-z\ ]{1,15})$/
     },
     status : {

@@ -221,7 +221,6 @@ module.exports = require('waterlock').actions.user({
         if(err){
           return res.badRequest(err);
         }
-        console.log(results.updateUser);
         req.session.user = results.updateUser;
         return res.ok(results.updateUser);
       })

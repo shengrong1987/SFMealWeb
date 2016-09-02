@@ -56,7 +56,14 @@
         var monthDic = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
         for(var i=0; i< orders.length; i++) {
           var meal = orders[i];
-          var mainDish = meal.dishes[0];
+          var featureDishId = meal.features;
+          if(!featureDishId){
+            var mainDish = meal.dishes[0];
+          }else{
+            var mainDish = meal.dishes.filter(function(dish){
+              return dish.id == featureDishId
+            })[0];
+          }
           if(mainDish){
         %>
 
@@ -67,9 +74,11 @@
               <img class="photo" src= "<%= meal.coverString %>" data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
             </div>
             <div class="col-md-6 basic-info">
-              <h3 class="text-red text-left">$<%= mainDish.price.toFixed(2) %><br>
-                <small class="text-black"><strong><%= meal.title %></strong></small>
-              </h3>
+              <div class="col-xs-12">
+                <h3 class="text-red text-left">$<%= mainDish.price.toFixed(2) %><br>
+                  <small><strong class="text-black"><%= mainDish.title %></strong> <span>( <%= mainDish.quantity || '1' + __('fen') %> )</span></small>
+                </h3>
+              </div>
             </div>
             <div class="col-md-6">
               <h3><small><%= __('left')%><%= meal.leftQty[mainDish.id] %><%= __('fen')%><br><%= __('order-nav-method')%></small></h3>
@@ -92,14 +101,21 @@
 
     <div class="row title">
       <h3><%= __('preorder-special')%><br><small>PREORDER SPECIAL</small></h3>
-      <button class="btn btn-default round red text-white relative"><%= __('whole-menu')%></button>
+      <button class="btn btn-default round red text-white relative" onclick="location.href='/meal'"><%= __('whole-menu')%></button>
     </div>
 
     <%
     var monthDic = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
     for(var i=0; i< preorders.length; i++) {
       var meal = preorders[i];
-      var mainDish = meal.dishes[0];
+      var featureDishId = meal.features;
+      if(!featureDishId){
+        var mainDish = meal.dishes[0];
+      }else{
+        var mainDish = meal.dishes.filter(function(dish){
+          return dish.id == featureDishId
+        })[0];
+      }
       if(mainDish){
     %>
 
@@ -130,7 +146,7 @@
                 <h3 class="text-left"><small class="text-black"><%= mainDish.title %></small></h3>
               </div>
               <div class="col-xs-3">
-                <h3><small><%= __('order-nav-method')%></small></h3>
+                <h3><small><%=  __('self-pickup') + (meal.isDelivery ? ("/" + __('delivery')) : '')%></small></h3>
               </div>
             </div>
 

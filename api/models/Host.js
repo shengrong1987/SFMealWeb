@@ -148,27 +148,6 @@ module.exports = {
         return this.intro.slice(0,30) + "...";
       }
       return this.intro;
-    },
-    isValid : function(creatingMeal){
-      if(!this.full_address){
-        console.log("need kitchen address");
-        return false;
-      }
-      if(!this.dishes.some(function(dish){
-        return dish.isVerified;
-      })){
-        console.log("no dish is verified");
-        return false;
-      }
-      if(!creatingMeal && this.meals.length == 0){
-        console.log("no meals created");
-        return false;
-      }
-      if(!this.bankId){
-        console.log("no bank account created");
-        return false;
-      }
-      return true;
     }
   }
 };
