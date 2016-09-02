@@ -14,11 +14,17 @@ module.exports = function(grunt) {
     //     'test/**/**/ReviewController.test.js'
 		// 	]
 		// }
-    build : {
-     options: {
-       reporter: 'spec'
-     },
-     src:['test/bootstrap.build.js','test/**/MealController.build.js']
+    // build : {
+    //  options: {
+    //    reporter: 'spec'
+    //  },
+    //  src:['test/bootstrap.build.js','test/**/MealController.build.js']
+    // },
+    usecase : {
+      options : {
+        reporter : 'spec'
+      },
+      src:['test/bootstrap.case.js','test/usecase/*.test.js']
     }
     // buildEmail : {
     //  options: {
