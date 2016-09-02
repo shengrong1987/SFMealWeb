@@ -30,14 +30,14 @@ describe('UsersController', function() {
 
     it('should not register with short password', function (done) {
       agent
-          .post('/auth/register')
-          .send({email : email, password : shortPassword})
-          .expect(500)
-          .end(function(err,res){
-            res.body.should.have.property('invalidAttributes');
-            res.body.invalidAttributes.should.have.property('password').with.length(2,"password should fail at two restriction: one reg and one minLength");
-            done();
-          })
+        .post('/auth/register')
+        .send({email : email, password : shortPassword})
+        .expect(500)
+        .end(function(err,res){
+          res.body.should.have.property('invalidAttributes');
+          res.body.invalidAttributes.should.have.property('password').with.length(2,"password should fail at two restriction: one reg and one minLength");
+          done();
+        })
     })
 
     it('should not register with invalid password', function (done) {
@@ -124,13 +124,13 @@ describe('UsersController', function() {
 
     it('should become a host if logged in', function (done) {
       agent
-          .post('/user/becomeHost')
-          .expect(200)
-          .end(function(err,res){
-            res.body.should.have.property("user");
-            should.exist(res.body.user.host);
-            done();
-          })
+        .post('/user/becomeHost')
+        .expect(200)
+        .end(function(err,res){
+          res.body.should.have.property("user");
+          should.exist(res.body.user.host);
+          done();
+        })
     })
 
     it('should get forbidden error for a host trying to apply for host', function (done) {
