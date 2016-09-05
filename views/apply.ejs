@@ -165,7 +165,7 @@
             <h4><small><%= __('step6-ongoing-tip')%></small></h4>
           </div>
           <form class="form" data-toggle="validator" role="form" enctype="multipart/form-data">
-          <% verification.fields_needed.forEach(function(field){%>
+          <% if(verification.fields_needed){ verification.fields_needed.forEach(function(field){%>
 
               <% if(field == 'external_account'){%>
                 <div class="form-group">
@@ -327,7 +327,7 @@
                   <div class="help-block with-errors"></div>
                 </div>
               <%}%>
-          <%})%>
+          <%})}%>
             <div id="additionalAlert" class="alert alert-danger"></div>
             <button id="additionalBtn" type="submit" class="btn btn-info"><%= __('save')%></button>
           </form>

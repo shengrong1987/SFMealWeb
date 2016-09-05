@@ -7,11 +7,11 @@ npm uninstall mimer
 npm uninstall es5-ext
 npm uninstall moment-timezone
 npm install sails-hook-jobs
+npm install -g grunt --save
 npm install
 npm install --save sails-hook-parametized-policies
-npm install -g grunt
 sudo grunt prod
 sudo chown -R $USER ./data
-sudo chown -R 501 ./data
-sudo chown -R 501 ./.tmp
-sudo chown -R 501 ./views
+sudo chmod -R 700 ./data
+sudo chmod -R 500 ./.tmp
+sudo chmod -R 500 ./views

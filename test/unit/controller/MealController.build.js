@@ -197,7 +197,7 @@ describe('MealController', function() {
         // .field('Content-Type', 'multipart/form-data')
         .field('legal_entity',JSON.stringify(legalObj))
         .field('hasImage',"true")
-        .attach('image','/Users/shengrong/Documents/SFMealWeb/assets/images/dumplings.jpg')
+        .attach('image','https://s3.amazonaws.com/sfmeal/dumplings.jpg')
         .expect(200)
         .end(function(err, res){
           if(err){

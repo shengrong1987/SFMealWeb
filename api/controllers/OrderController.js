@@ -32,7 +32,7 @@ module.exports = {
       return res.badRequest(req.__('meal-not-active'));
     }
 
-    if(now < params.provideFromTime || now > params.provideTillTime){
+    if(now < meal.provideFromTime || now > meal.provideTillTime){
       return res.badRequest(req.__('meal-not-active'));
     }
 

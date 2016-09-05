@@ -1,4 +1,4 @@
-@remoteHost : "http://ec2-52-39-170-17.us-west-2.compute.amazonaws.com:1337";
+@remoteHost : "http://test.sfmeal.com";
 @sfmeal_logo : %("%s/images/sfmeal_logo.png", @remoteHost);
 @fa-facebook : %("%s/images/fa-facebook.png", @remoteHost);
 @fa-instagram : %("%s/images/fa-instagram.png", @remoteHost);
@@ -106,9 +106,17 @@ input:focus{
 .round_thumb{
   border-radius:50%;
   overflow:hidden;
+  position: relative;
+  img{
+    position: absolute;
+    margin: auto;
+    top: -9999px;
+    bottom: -9999px;
+    left: -9999px;
+    right: -9999px;
+    height: 100%;
+  }
   .cursor-pointer;
-  //display: block;
-  //margin: auto;
 }
 
 @extra-small-size : 25px;
@@ -118,28 +126,16 @@ input:focus{
 .extra-small{
   width: @extra-small-size;
   height : @extra-small-size;
-  img{
-    width: @extra-small-size;
-    height: @extra-small-size;
-  }
 }
 
 .size-small{
   width: @small-size;
   height: @small-size;
-  img{
-    width: @small-size;
-    height: @small-size;
-  }
 }
 
 .size-large{
   width: @large-size;
   height: @large-size;
-  img{
-    width: @large-size;
-    height: @large-size;
-  }
 }
 
 //clear
@@ -254,7 +250,7 @@ input:focus{
 }
 
 .logo-sm{
-  left:80px;
+  left : 0;
   top: 0;
   width: 118px;
   height: 30px;
@@ -835,7 +831,7 @@ fieldset[disabled] .btn-red.active {
     }
   }
   .divider{
-    padding: none;
+    padding: 0;
   }
 }
 

@@ -122,6 +122,7 @@ module.exports = {
           return cb(null,valid)
         });
       }else{
+        host.verification = [];
         host.passGuide = false;
         return cb(null,false);
       }

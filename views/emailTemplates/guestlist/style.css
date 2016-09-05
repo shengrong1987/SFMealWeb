@@ -7844,13 +7844,19 @@ input:focus {
 .round_thumb {
   border-radius: 50%;
   overflow: hidden;
+  position: relative;
   cursor: pointer;
 }
-.extra-small {
-  width: 25px;
-  height: 25px;
+.round_thumb img {
+  position: absolute;
+  margin: auto;
+  top: -9999px;
+  bottom: -9999px;
+  left: -9999px;
+  right: -9999px;
+  height: 100%;
 }
-.extra-small img {
+.extra-small {
   width: 25px;
   height: 25px;
 }
@@ -7858,15 +7864,7 @@ input:focus {
   width: 50px;
   height: 50px;
 }
-.size-small img {
-  width: 50px;
-  height: 50px;
-}
 .size-large {
-  width: 100px;
-  height: 100px;
-}
-.size-large img {
   width: 100px;
   height: 100px;
 }
@@ -7941,16 +7939,16 @@ input:focus {
   text-align: center;
 }
 .fa-facebook-remote {
-  background: url("http://ec2-52-39-170-17.us-west-2.compute.amazonaws.com:1337/images/fa-facebook.png") no-repeat center / 70% auto;
+  background: url("http://test.sfmeal.com/images/fa-facebook.png") no-repeat center / 70% auto;
 }
 .fa-instagram-remote {
-  background: url("http://ec2-52-39-170-17.us-west-2.compute.amazonaws.com:1337/images/fa-instagram.png") no-repeat center / 70% auto;
+  background: url("http://test.sfmeal.com/images/fa-instagram.png") no-repeat center / 70% auto;
 }
 .fa-pinterest-remote {
-  background: url("http://ec2-52-39-170-17.us-west-2.compute.amazonaws.com:1337/images/fa-pinterest.png") no-repeat center / 70% auto;
+  background: url("http://test.sfmeal.com/images/fa-pinterest.png") no-repeat center / 70% auto;
 }
 .fa-twitter-remote {
-  background: url("http://ec2-52-39-170-17.us-west-2.compute.amazonaws.com:1337/images/fa-twitter.png") no-repeat center / 70% auto;
+  background: url("http://test.sfmeal.com/images/fa-twitter.png") no-repeat center / 70% auto;
 }
 .logo {
   background-image: url(../images/sfmeal_logo.png);
@@ -7965,11 +7963,11 @@ input:focus {
 }
 .logo-remote {
   padding: 30px 150px 50px 150px;
-  background: url("http://ec2-52-39-170-17.us-west-2.compute.amazonaws.com:1337/images/sfmeal_logo.png") no-repeat center / 100% auto;
+  background: url("http://test.sfmeal.com/images/sfmeal_logo.png") no-repeat center / 100% auto;
   background-color: transparent;
 }
 .logo-sm {
-  left: 80px;
+  left: 0;
   top: 0;
   width: 118px;
   height: 30px;
@@ -8406,7 +8404,7 @@ fieldset[disabled] .btn-red.active {
   color: black;
 }
 .dropdown-menu .divider {
-  padding: none;
+  padding: 0;
 }
 .mynavbar .navbar-header {
   margin-left: 10px;

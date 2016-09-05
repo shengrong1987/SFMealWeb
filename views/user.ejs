@@ -2,7 +2,7 @@
 <div class="container-fluid text-center" style="margin-top:-20px;">
   <div class="row">
     <div class="pure-banner vertical-align red">
-      <div style="width: 600px;" class="middle banner-text">
+      <div class="middle banner-text">
         <div class="row vertical-align" style="margin-bottom: 5px;">
           <div class="col-sm-3 cursor-pointer" onclick="location.href='/'">
             <a href="/" class="logo logo-sm"></a>
@@ -880,7 +880,7 @@
               <div class="col-md-6 text-left form-group">
                 <label>1. <%= __('upload-thumbnail')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('photo-restrition')%>"></i></label>
                 <div class="fileinput fileinput-exists" data-provides="fileinput">
-                  <div class="fileinput-new thumbnail size-large">
+                  <div class="fileinput-new thumbnail size-large round_thumb">
                   </div>
                   <div class="fileinput-preview fileinput-exists size-large round_thumb" data-src="<%= user.picture || ''%>">
                     <img src="<%= user.picture || '/images/profile_man.png'%>" onclick="$('#thumbnailUpload').trigger('click')">

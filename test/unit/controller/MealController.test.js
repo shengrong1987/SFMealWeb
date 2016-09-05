@@ -344,7 +344,6 @@ describe('MealController', function() {
         })
     })
 
-
     it('should search the meals in San Francisco and with a keyword of 菜式 with no results', function (done) {
       agent
         .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
