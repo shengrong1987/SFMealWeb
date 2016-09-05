@@ -32,11 +32,11 @@ module.exports.policies = {
     'login' : true,
     'register' : true,
     'reset' : true,
+    'facebook_oauth2' : true,
+    'google_oauth2' : true,
     'loginSuccess' : ['sessionAuth'],
     'logout' : ['sessionAuth'],
-    'admin' : 'isAdmin',
-    'facebook_oauth2' : true,
-    'google_oauth2' : true
+    'admin' : 'isAdmin'
   },
 
   UserController : {
@@ -82,13 +82,14 @@ module.exports.policies = {
     'newForm' : ['sessionAuth']
   },
 
-  OrderController :{
-    '*' : 'or(and(sessionAuth, isBelongToOrder), isAdmin)',
+  OrderController : {
+    '*' : 'or(and(sessionAuth, isBelongToOrder, isAuthorizedForAction), isAdmin)',
     'find' : 'or(and(sessionAuth, sessionSelf),isAdmin)',
     'create' : 'or(and(sessionAuth,isNotOwnerOfMeal),isAdmin)',
     'search' : 'isAdmin',
     'abort' : 'isAdmin',
-    'refund' : 'isAdmin'
+    'refund' : 'isAdmin',
+    'update' : 'or(and(sessionAuth, isOwnerOfOrder), isAdmin)'
   },
 
   DishController : {

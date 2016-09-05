@@ -3,8 +3,9 @@
  */
 
 var assert = require('assert'),
-    sinon = require('sinon');
-request = require('supertest');
+    sinon = require('sinon'),
+    should = require('should'),
+    request = require('supertest');
 var agent;
 
 before(function(done) {
@@ -14,7 +15,7 @@ before(function(done) {
 
 describe('OrderController', function() {
 
-  this.timeout(5000);
+  this.timeout(15000);
 
   describe('', function() {
 
@@ -265,6 +266,40 @@ describe('OrderController', function() {
           })
     })
 
+    it('should login host account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should not cancel the order at schedule as a host', function(done){
+      agent
+        .put('/order/' + orderId + '/cancel')
+        .expect(403)
+        .end(done)
+    });
+
+    it('should not adjust the order at schedule as a host', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = 0;
+      dishObj[dishId2] = 0;
+      dishObj[dishId3] = 1;
+      dishObj[dishId4] = 0;
+      agent
+        .post('/order/' + orderId + "/adjust")
+        .send({
+          orders : dishObj,
+          subtotal : price3,
+          mealId : mealId,
+          delivery_fee : 0
+        })
+        .expect(403)
+        .end(done)
+    });
+
     it('should change the order to preparing', function (done) {
       agent
           .put('/order/' + orderId)
@@ -284,20 +319,70 @@ describe('OrderController', function() {
 
     it('should request for cancelling', function (done) {
       agent
-          .post('/order/' + orderId + "/cancel")
-          .expect(200)
-          .end(function(err,res){
-            if(err){
-              return done(err);
-            }
-            done();
-          })
+        .post('/order/' + orderId + "/cancel")
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          // res.body.status.should.be.equal('cancelling');
+          // res.body.lastStatus.should.be.equal('preparing');
+          // res.body.isSendToHost.should.be.false();
+          done();
+        })
+    })
+
+    it('should not confirm an cancelling order', function (done) {
+      agent
+        .put('/order/' + orderId + "/confirm")
+        .expect(403)
+        .end(done)
+    });
+
+    it('should login a guest account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should reject an cancelling order', function (done) {
+      agent
+        .put('/order/' + orderId + "/reject")
+        .send({msg : "I am starving"})
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err)
+          }
+          // res.body.status.should.be.equal('preparing');
+          // res.body.lastStatus.should.be.equal('cancelling');
+          done();
+        })
+    });
+
+    it('should request for cancelling', function (done) {
+      agent
+        .post('/order/' + orderId + "/cancel")
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
     })
 
     var email = 'aimbebe.r@gmail.com';
     var password = '12345678';
 
-    it('should login or register an account', function (done) {
+    it('should login host account', function (done) {
       agent
         .post('/auth/login?type=local')
         .send({email : email, password: password})
@@ -308,12 +393,19 @@ describe('OrderController', function() {
 
     it('should reject an cancelling order', function (done) {
       agent
-          .put('/order/' + orderId + "/reject")
-          .send({msg:"The meal is being cooked, too late to cancel"})
-          .expect(200)
-          .end(function(err,res){
-            done();
-          })
+        .put('/order/' + orderId + "/reject")
+        .send({msg:"The meal is being cooked, too late to cancel"})
+        .set('Accept', 'application/json')
+        .send({msg : "I am starving"})
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          // res.body.status.should.be.equal("preparing");
+          // res.body.lastStatus.should.be.equal("cancelling");
+          done();
+        })
     });
 
     it('should login or register an account for guest', function (done) {
@@ -355,6 +447,128 @@ describe('OrderController', function() {
           })
     });
 
+    it('should login or register an account for guest', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    var mealId;
+    var dishId1;
+    var dishId2;
+    var dishId3;
+    var dishId4;
+    var price1;
+    var price2;
+    var price3;
+    it('should get a order meal ', function (done) {
+      agent
+        .get('/meal')
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            console.log(err);
+            return done(err);
+          }
+          if(res.body.meals.length == 0){
+            return done(Error("error getting any meal"));
+          }
+          var meal = res.body.meals[0];
+          mealId = meal.id;
+          dishId1 = meal.dishes[0].id;
+          dishId2 = meal.dishes[1].id;
+          dishId3 = meal.dishes[2].id;
+          dishId4 = meal.dishes[3].id;
+          price1 = meal.dishes[0].price;
+          price2 = meal.dishes[1].price;
+          price3 = meal.dishes[2].price;
+          done();
+        })
+    })
+
+    var orderId;
+    it('should not order the meal with delivery', function (done) {
+      var dishObj = {};
+      dishObj[dishId1] = 1;
+      dishObj[dishId2] = 2;
+      dishObj[dishId3] = 0;
+      dishObj[dishId4] = 0;
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 1 + price2 * 2,
+          phone : phone,
+          method : "delivery",
+          mealId : mealId
+        })
+        .expect(400)
+        .end(done)
+    })
+
+    it('should login or register an account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should update the meal with support delivery', function(done){
+      var now = new Date();
+      agent
+        .put('/meal/' + mealId)
+        .send({
+          provideFromTime : now,
+          provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
+          minimalOrder : 5,
+          isDelivery : true
+        })
+        .expect(200)
+        .end(done)
+    });
+
+    it('should login or register an account for guest', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should order the meal with delivery', function (done) {
+      var dishObj = {};
+      dishObj[dishId1] = 1;
+      dishObj[dishId2] = 1;
+      dishObj[dishId3] = 0;
+      dishObj[dishId4] = 0;
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 1 + price2 * 1,
+          phone : phone,
+          pickupOption : 1,
+          method : "delivery",
+          mealId : mealId,
+          address : address
+        })
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          if(res.body.customer != guestId){
+            return done(Error('error taking order'))
+          }
+          done()
+        })
+    })
   });
 
 });

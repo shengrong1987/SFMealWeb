@@ -10,8 +10,8 @@
 module.exports = function(req, res, next) {
   // User is allowed, proceed to the next policy,
   // or if this is the last policy, the controller
-  var hostId = req.session.user.host.id;
-  var orderId = req.param.id || req.body.order;
+  var hostId = req.session.user.host ? (req.session.user.host.id ? req.session.user.host.id : req.session.user.host) : "" ;
+  var orderId = req.params.id || (req.body ? req.body.order : "");
   Order.findOne(orderId).populate('host').exec(function(err,order){
     if(err){
       return res.badRequest(err);

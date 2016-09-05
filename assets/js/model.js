@@ -221,7 +221,7 @@ var UserBarView = Backbone.View.extend({
     var msg = "unknown notification";
     switch(verb){
       case "updated":
-        msg = jQuery.i18n.prop('orderUpdatedNotification',id, action);
+        msg = jQuery.i18n.prop('orderUpdatedNotification',id, jQuery.i18n.prop(action));
             break;
       case "destroyed":
         msg = jQuery.i18n.prop('orderCancelNotification',id);
@@ -232,15 +232,13 @@ var UserBarView = Backbone.View.extend({
     }
     var msgBtn = this.$el.find("#msgBtn");
     msgBtn.find(".badge").show();
-    if(msgBtn.attr("title") != ""){
-      msgBtn.attr("title",msgBtn.attr('title') + "<br/><br/>" + msg);
-      msgBtn.tooltip("fixTitle");
+    if(msgBtn.attr("data-original-title") != ""){
+      var newMsg = msgBtn.attr('data-original-title') + "<br/><br/>" + msg;
+      msgBtn.attr('data-original-title', newMsg)
+        .tooltip('show');
     }else{
-      msgBtn.attr("title", msg);
-      msgBtn.tooltip({
-        title : msg
-      });
-      msgBtn.tooltip("fixTitle");
+      msgBtn.attr('data-original-title', msg)
+        .tooltip('show');
     }
   },
 
@@ -266,11 +264,16 @@ var UserBarView = Backbone.View.extend({
     }
   },
 
-  clearBadges : function(isHost, type){
-    switch(type){
-      case "msg":
-        break;
-    }
+  clearBadges : function(){
+    var hostBadgeView = this.$el.find("#hostActionBtn .badge");
+    var userBadgeView = this.$el.find("#userActionBtn .badge");
+    hostBadgeView.data("badge",0);
+    userBadgeView.data("badge",0);
+    var orderBadgeView = this.$el.find("#userActionBtn").next().find("a").eq(0).find(".badge");
+    orderBadgeView.text("");
+    var msgBtn = this.$el.find("#msgBtn");
+    msgBtn.attr('data-original-title', "")
+      .tooltip('show');
   },
 
   clearMsgBadges : function(){
@@ -1771,7 +1774,11 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         BootstrapDialog.alert(result.responseText, function(){
-          reloadUrl("/host/me", "#myorder");
+          if(location.href.indexOf("host/me")==-1){
+            reloadUrl("/user/me", "#myorder");
+          }else{
+            reloadUrl("/host/me","#myorder");
+          }
         });
       },error : function(model, err){
         BootstrapDialog.alert(err.responseText);
@@ -1786,7 +1793,11 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         BootstrapDialog.alert(result.responseText, function(){
-          reloadUrl("/host/me", "#myorder");
+          if(location.href.indexOf("host/me")==-1){
+            reloadUrl("/user/me", "#myorder");
+          }else{
+            reloadUrl("/host/me","#myorder");
+          }
         });
       },error : function(model, err){
         BootstrapDialog.alert(err.responseText);

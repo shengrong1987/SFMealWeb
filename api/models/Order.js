@@ -60,6 +60,10 @@ module.exports = {
       type : 'string',
       required : true
     },
+    isSendToHost : {
+      type : 'boolean',
+      defaultsTo : true
+    },
     eta: {
       type: 'Date'
     },

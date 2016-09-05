@@ -5,8 +5,8 @@
 var assert = require('assert'),
     sinon = require('sinon');
 var config = require('../../../config/stripe.js'),
-    stripe = require('stripe')(config.StripeKeys.secretKey);
-request = require('supertest');
+    stripe = require('stripe')(config.StripeKeys.secretKey),
+    request = require('supertest');
 var agent;
 
 before(function(done) {
@@ -16,7 +16,7 @@ before(function(done) {
 
 describe('MealController', function() {
 
-  this.timeout(8000);
+  this.timeout(12000);
 
   describe('build a meal with dishes', function() {
 
@@ -179,6 +179,52 @@ describe('MealController', function() {
           })
     });
 
+    it('should update host legal_entity', function(done){
+      var legalObj = {
+        dob : {
+          day : 25,
+          month : 12,
+          year : 1987
+        },
+        first_name : "sheng",
+        last_name : "rong",
+        ssn_last_4 : "1234"
+      };
+      agent
+        .put('/host/' + hostId)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        // .field('Content-Type', 'multipart/form-data')
+        .field('legal_entity',JSON.stringify(legalObj))
+        .field('hasImage',"true")
+        .attach('image','/Users/shengrong/Documents/SFMealWeb/assets/images/dumplings.jpg')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    });
+
+    it('should update host legal_entity', function(done){
+      var legalObj = {
+        personal_id_number : "123456789"
+      };
+      agent
+        .put('/host/' + hostId)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .field('legal_entity',JSON.stringify(legalObj))
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    });
+
     var mealId;
     var leftQty = {};
     var totalQty = {};
@@ -238,7 +284,7 @@ describe('MealController', function() {
       }];
       agent
           .post('/meal')
-          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), pickups : JSON.stringify(pickups),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "on", cover : dish1, minimalOrder : 5, isDelivery : false})
+          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), pickups : JSON.stringify(pickups),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "on", cover : dish1, minimalOrder : 5, isDelivery : true})
           .expect(200)
           .end(function(err,res){
             if(res.body.chef != hostId){

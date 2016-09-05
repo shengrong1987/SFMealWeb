@@ -13,9 +13,9 @@
 
 <div class="green" style="padding: 25px;">
   <div class="box-email white relative middle text-left">
-    <h4 class="text-green"><%= user%><b><%= modify%></b><%= deorder%></h4>
+    <h4 class="text-green"><%= isSendToHost ? user : chef%><b><%= modify%></b><%= deorder%></h4>
     <p>Hi <%= recipientName%>,</p>
-    <p>Sheng<%= adjustordercontext%></p>
+    <p><%= isSendToHost ? adjustordercontext : adjustorderfromhostcontext %></p>
     <div class="divider" style="margin-bottom: 10px;margin-top: 5px"></div>
     <p><%= ordernumber%>: <%= id%></p>
     <table class="table table-email">

@@ -7792,6 +7792,7 @@ input:focus {
 }
 .tooltip-inner {
   text-align: left;
+  white-space: pre-wrap !important;
 }
 .divider {
   height: 1px;

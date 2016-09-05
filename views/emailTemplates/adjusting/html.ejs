@@ -13,9 +13,9 @@
 
 <div class="green" style="padding: 25px;">
   <div class="box-email white relative middle text-left">
-    <h4 class="text-green"><%= user%><b><%= applyadjust%></b><%= order%></h4>
+    <h4 class="text-green"><%= isSendToHost ? user : chef%><b><%= applyadjust%></b><%= order%><%= dingdan%></h4>
     <p>Hi <%= recipientName%>,</p>
-    <p>Sheng<%= applyadjustordercontext%><a class="text-green" href="http://www.sfmeal.com/host/me"><%= openorder%></a><%= confirmorreject%></p>
+    <p><%= isSendToHost ? applyadjustordercontext : applyadjustorderfromhostcontext%><a class="text-green" href="http://www.sfmeal.com/host/me"><%= openorder%></a><%= confirmorreject%></p>
     <div class="divider" style="margin-bottom: 10px;margin-top: 5px"></div>
     <p><%= ordernumber%>: <%= id%></p>
     <table class="table table-email">

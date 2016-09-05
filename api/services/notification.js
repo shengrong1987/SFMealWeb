@@ -234,10 +234,10 @@ var notification = {
           i18ns = i18ns.concat(['new-order-title','new-order-context','order-time','ready-time','order','preorder']);
           break;
         case "adjust":
-          i18ns = i18ns.concat(['adjust-order-context','modify','de-order','order-time','adjust-time']);
+          i18ns = i18ns.concat(['adjust-order-context','adjust-order-from-host-context','modify','de-order','order-time','adjust-time','chef']);
           break;
         case "adjusting":
-          i18ns = i18ns.concat(['apply-adjust','apply-adjust-order-context','confirm-or-reject','order-time','adjust-time','ready-time']);
+          i18ns = i18ns.concat(['apply-adjust','apply-adjust-order-context','apply-adjust-order-from-host-context','confirm-or-reject','order-time','adjust-time','ready-time','chef']);
           break;
         case "cancel":
           i18ns = i18ns.concat(['pity','cancel','de-order','cancel-order-context','order-time','preorder-end-time','cancel-time']);
@@ -249,13 +249,13 @@ var notification = {
           i18ns = [];
           break;
         case "confirm":
-          i18ns = i18ns.concat(['confirm-cancel','confirm-adjust','confirm-cancel-context','confirm-adjust-context','order-time','apply-cancel-time','apply-adjust-time','refund-method','default-card']);
+          i18ns = i18ns.concat(['confirm-cancel','confirm-adjust','confirm-cancel-context-by-user','confirm-cancel-context-by-host','confirm-adjust-context-by-user','confirm-adjust-context-by-host','order-time','apply-cancel-time','apply-adjust-time','refund-method','default-card']);
           break;
         case "ready":
           i18ns = i18ns.concat(['order-ready-title','order-pickup-ready-context','order-delivery-ready-context','pickup-method','self-pickup','delivery','pickup-location','order-time','complete-time','contact-phone']);
           break;
         case "reject":
-          i18ns = i18ns.concat(['cancel', 'adjust', 'get-reject','order-time','reject-reason',"order-cancel-reject-context","order-adjust-reject-context"]);
+          i18ns = i18ns.concat(['cancel', 'adjust', 'get-reject','order-time','reject-reason',"order-cancel-reject-context-by-host","order-cancel-reject-context-by-user","order-adjust-reject-context-by-host", "order-adjust-reject-context-by-user"]);
           break;
         case "review":
           i18ns = i18ns.concat(['review-order-title','review-order-context-1','review-order-context-2','review-dish','review-meal','scoreLabel','content','review-time','view-review']);

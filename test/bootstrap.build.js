@@ -10,7 +10,7 @@ var Sails = require('sails'),
 
 before(function(done) {
   // Increase the Mocha timeout so that Sails has enough time to lift.
-  this.timeout(5000);
+  this.timeout(10000);
 
   //fs.unlinkSync('/.tmp/myTestConnection.db');
 

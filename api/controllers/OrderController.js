@@ -18,6 +18,7 @@ var geocode = require("../services/geocode.js");
 //-5 : missing payment profile
 //-6 : address verification fail
 //-7 : pickup option not exist
+//-8 : host can't adjust order at schedule
 
 module.exports = {
 
@@ -227,7 +228,7 @@ module.exports = {
                 return res.badRequest(err);
               }
               stripe.charge({
-                amount : parseInt(total * 100),
+                amount : total,
                 email : email,
                 customerId : found.payment[0].customerId,
                 destination : m.chef.accountId,
@@ -255,7 +256,7 @@ module.exports = {
                   order.transfers = {};
                   order.transfers[charge.transfer] = charge.transfer;
                   order.charges = {};
-                  order.charges[charge.id] = charge.amount/100;
+                  order.charges[charge.id] = charge.amount;
                   m.save(function (err, result) {
                     if(err){
                       return res.badRequest(err);
@@ -299,7 +300,7 @@ module.exports = {
 
   adjust : function(req, res){
     var userId = req.session.user.id;
-    var hostId = req.session.user.host ? (req.session.user.host.id ? req.session.user.host.id : req.session.user.host) : null;
+    var hostId = req.session.user.host ? (req.session.user.host.id || req.session.user.host) : null;
     var email = req.session.user.auth.email;
     var orderId = req.params.id;
     var params = req.body;
@@ -309,9 +310,6 @@ module.exports = {
     Order.findOne(orderId).populate("meal").populate("dishes").populate("host").populate("customer").exec(function(err,order){
       if(err){
         return res.badRequest(err)
-      }
-      if(order.status != "schedule" && order.status != "preparing"){
-        return res.forbidden();
       }
 
       order.meal.dishes = order.dishes;
@@ -323,8 +321,9 @@ module.exports = {
           isSendToHost = false;
         }
         if(order.status == "schedule"){
+          //host cannot adjust the order at schedule
           //can update without permission of host or adjust by host
-          var diff = (subtotal - order.subtotal).toFixed(2);
+          var diff = $this.addTax(subtotal - order.subtotal, order.host.county);
           console.log("adjusting amount: " + diff);
           if(diff != 0){
             User.findOne(order.customer.id).populate('payment').exec(function (err, found) {
@@ -337,7 +336,7 @@ module.exports = {
               if(diff>0){
                 //create another charge
                 stripe.charge({
-                  amount : parseInt(diff * 100),
+                  amount : diff,
                   email : email,
                   customerId : found.payment[0].customerId,
                   destination : order.host.accountId,
@@ -361,7 +360,7 @@ module.exports = {
                       order.adjusting_subtotal = order.subtotal;
                       order.orders = params.orders;
                       order.subtotal = params.subtotal;
-                      order.charges[charge.id] = charge.amount/100;
+                      order.charges[charge.id] = charge.amount;
                       order.meal = m.id;
                       order.save(function(err,result){
                         if(err){
@@ -369,7 +368,7 @@ module.exports = {
                         }
                         //send notification
                         notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
-                        return res.ok({responseText : req.__('order-adjust-ok',charge.amount/100)});
+                        return res.ok({responseText : req.__('order-adjust-ok',charge.amount / 100)});
                       })
                     });
                   }
@@ -377,7 +376,6 @@ module.exports = {
               }else{
                 var totalRefund = Math.abs(diff);
                 diff = - diff;
-                console.log(order.charges);
                 var chargeIds = Object.keys(order.charges);
                 var refundCharges = [];
                 chargeIds.forEach(function(chargeId){
@@ -398,7 +396,7 @@ module.exports = {
                 async.each(refundCharges,function(charge, next){
                   stripe.refund({
                     id : charge.id,
-                    amount : charge.amount * 100
+                    amount : charge.amount
                   },function(err, refund){
                     if(err){
                       return next(err);
@@ -424,7 +422,7 @@ module.exports = {
                       }
                       //send notification
                       notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
-                      return res.ok({responseText : req.__('order-adjust-ok2',totalRefund)});
+                      return res.ok({responseText : req.__('order-adjust-ok2', totalRefund /100)});
                     })
                   });
                 });
@@ -445,6 +443,7 @@ module.exports = {
         }else if(order.status == "preparing"){
           order.lastStatus = order.status;
           order.status = "adjust";
+          order.isSendToHost = isSendToHost;
           order.adjusting_orders = params.orders;
           order.adjusting_subtotal = params.subtotal;
           order.meal = order.meal.id;
@@ -454,7 +453,11 @@ module.exports = {
             }
             //send notification
             notification.notificationCenter("Order", "adjusting", result, isSendToHost, false, req);
-            return res.ok({responseText : req.__('order-adjust-request')});
+            if(isSendToHost){
+              return res.ok({responseText : req.__('order-adjust-request-user')});
+            }else{
+              return res.ok({responseText : req.__('order-adjust-request-host')});
+            }
           });
         }
       }
@@ -526,7 +529,7 @@ module.exports = {
 
   cancel : function(req, res){
     var userId = req.session.user.id;
-    var hostId = req.session.user.host;
+    var hostId = req.session.user.host ? (req.session.user.host.id || req.session.user.host) : null;
     var email = req.session.user.auth.email;
     var orderId = req.params.id;
     var params = req.body;
@@ -536,12 +539,9 @@ module.exports = {
         return res.badRequest(err)
       }
 
-      if(order.status != "schedule" && order.status != "preparing"){
-        return res.forbidden();
-      }
-
       var isSendToHost = true;
-      if(hostId == order.host){
+      console.log(isSendToHost);
+      if(hostId == order.host.id){
         isSendToHost = false;
       }
 
@@ -612,6 +612,7 @@ module.exports = {
           })
         }
       }else if(order.status == "preparing"){
+        order.isSendToHost = isSendToHost;
         order.lastStatus = order.status;
         order.status = "cancelling";
         order.save(function(err,result){
@@ -620,7 +621,14 @@ module.exports = {
           }
           //send notification
           notification.notificationCenter("Order", "cancelling", result, isSendToHost, false, req);
-          return res.ok({responseText : req.__('order-cancel-request')});
+          // if(req.wantsJSON){
+          //   return res.ok(result);
+          // }
+          if(result.isSendToHost){
+            return res.ok({responseText : req.__('order-cancel-request-user')});
+          }else{
+            return res.ok({responseText : req.__('order-cancel-request-host')});
+          }
         });
       }
     });
@@ -639,7 +647,7 @@ module.exports = {
       if(order.status == "adjust"){
         var adjusting_subtotal = order.adjusting_subtotal;
         var adjusting_orders = order.adjusting_orders;
-        var diff = (parseFloat(adjusting_subtotal) - order.subtotal).toFixed(2);
+        var diff = $this.addTax(adjusting_subtotal - order.subtotal,order.host.county);
         var customerId = order.customer.id;
         if(diff != 0){
           User.findOne(customerId).populate('payment').exec(function (err, found) {
@@ -649,7 +657,7 @@ module.exports = {
             if(diff>0){
               //create another charge
               stripe.charge({
-                amount : parseInt(diff * 100),
+                amount : diff,
                 email : email,
                 customerId : found.payment[0].customerId,
                 destination : order.host.accountId,
@@ -675,72 +683,83 @@ module.exports = {
                     var tmpLastStatus = order.status;
                     order.status = order.lastStatus;
                     order.lastStatus = tmpLastStatus;
-                    order.charges[charge.id] = charge.amount / 100;
+                    order.charges[charge.id] = charge.amount;
                     order.meal = order.meal.id;
                     order.save(function(err,result){
                       if(err){
                         return res.badRequest(err);
                       }
-                      notification.notificationCenter("Order", "confirm", result, false, false, req);
-                      return res.ok({responseText : req.__('order-confirm')});
+                      notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);
+                      if(result.isSendToHost){
+                        return res.ok({responseText : req.__('order-confirm-user')});
+                      }else{
+                        return res.ok({responseText : req.__('order-confirm-host')});
+                      }
                     })
                   });
                 }
               });
-            }else{
-              diff = - diff;
+            }else {
+              diff = -diff;
               var chargeIds = Object.keys(order.charges);
               var refundCharges = [];
-              chargeIds.forEach(function(chargeId){
-                if(diff != 0){
+              chargeIds.forEach(function (chargeId) {
+                if (diff != 0) {
                   var chargeAmount = order.charges[chargeId];
-                  if(chargeAmount >= diff){
-                    refundCharges.push({amount:diff,id:chargeId});
-                    order.charges[chargeId] = chargeAmount - diff;
-                    diff = 0;
-                  }else if(chargeAmount != 0){
-                    diff -= chargeAmount;
-                    refundCharges.push({amount:chargeAmount,id:chargeId});
-                    order.charges[chargeId] = 0;
+                  if(chargeAmount != 0){
+                    if (chargeAmount > diff) {
+                      refundCharges.push({amount: diff, id: chargeId});
+                      order.charges[chargeId] = chargeAmount - diff;
+                      diff = 0;
+                    } else if(chargeAmount <= diff) {
+                      diff -= chargeAmount;
+                      refundCharges.push({amount: chargeAmount, id: chargeId});
+                      order.charges[chargeId] = 0;
+                    }
                   }
                 }
               });
-              for(var i=0; i < refundCharges.length; i++){
-                var charge = refundCharges[i];
+              async.each(refundCharges, function (charge, next) {
                 stripe.refund({
-                  id : charge.id,
-                  amount : charge.amount * 100
-                },function(err, refund){
-                  if(i==refundCharges.length){
-                    if(err){
+                  id: charge.id,
+                  amount: charge.amount
+                }, function (err, refund) {
+                  if (err) {
+                    return next(err);
+                  }
+                  next();
+                })
+              }, function (err) {
+                if (err) {
+                  return res.badRequest(err);
+                }
+                $this.updateMealLeftQty(order.meal, order.orders, adjusting_orders, function (err, m) {
+                  if (err) {
+                    return res.badRequest(err);
+                  }
+                  order.orders = adjusting_orders;
+                  order.subtotal = adjusting_subtotal;
+                  order.adjusting_orders = {};
+                  order.adjusting_subtotal = 0;
+                  var tmpLastStatus = order.status;
+                  order.status = order.lastStatus;
+                  order.lastStatus = tmpLastStatus;
+                  order.meal = order.meal.id;
+                  order.save(function (err, result) {
+                    if (err) {
                       return res.badRequest(err);
                     }
-                    $this.updateMealLeftQty(order.meal, order.orders, adjusting_orders, function(err, m){
-                      if(err){
-                        return res.badRequest(err);
-                      }
-                      order.orders = adjusting_orders;
-                      order.subtotal = adjusting_subtotal;
-                      order.adjusting_orders = {};
-                      order.adjusting_subtotal = 0;
-                      var tmpLastStatus = order.status;
-                      order.status = order.lastStatus;
-                      order.lastStatus = tmpLastStatus;
-                      //order.charges[result.id] = result.amount/100;
-                      order.meal = order.meal.id;
-                      order.save(function(err,result){
-                        if(err){
-                          return res.badRequest(err);
-                        }
-                        notification.notificationCenter("Order", "confirm", result, false, false, req);
-                        return res.ok({responseText : req.__('order-confirm')});
-                      })
-                    });
-                  }
+                    notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);
+                    if (result.isSendToHost) {
+                      return res.ok({responseText: req.__('order-confirm-user')});
+                    } else {
+                      return res.ok({responseText: req.__('order-confirm-host')});
+                    }
+                  })
                 });
-              }
+              })
             }
-          });
+          })
         }else{
           order.orders = adjusting_orders;
           order.subtotal = adjusting_subtotal;
@@ -754,56 +773,63 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            notification.notificationCenter("Order", "confirm", result, false, false, req);
-            return res.ok({responseText : req.__('order-confirm')});
+            notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);
+            if(result.isSendToHost){
+              return res.ok({responseText : req.__('order-confirm-user')});
+            }else{
+              return res.ok({responseText : req.__('order-confirm-host')});
+            }
           })
         }
       }else if(order.status == "cancelling"){
-        var amount = (order.subtotal + order.delivery_fee).toFixed(2);
+        var amount = order.subtotal + order.delivery_fee;
         if(amount > 0){
           User.findOne(userId).populate('payment').exec(function (err, found) {
             if (err) {
               return res.badRequest(err);
             }
             var refundCharges = Object.keys(order.charges);
-            var callOnce = false;
-            for(var i=0; i < refundCharges.length; i++) {
-              var charge = refundCharges[i];
+            async.each(refundCharges, function(chargeId, next){
+              if(order.charges[chargeId] == 0){
+                return next();
+              }
               stripe.refund({
-                id : charge
+                id : chargeId
               },function(err, refund){
-                if(!callOnce) {
-                  callOnce = true;
+                if(err){
+                  return next(err);
+                }
+                next();
+              });
+            },function(err){
+              if (err) {
+                return res.badRequest(err);
+              }
+              var curOrder = extend({}, order.orders);
+              Object.keys(curOrder).forEach(function (dishId) {
+                curOrder[dishId] = 0;
+              });
+              $this.updateMealLeftQty(order.meal, order.orders, curOrder, function (err, m) {
+                if (err) {
+                  return res.badRequest(err);
+                }
+                order.status = "cancel";
+                order.lastStatus = "cancelling";
+                order.meal = order.meal.id;
+                order.save(function (err, result) {
                   if (err) {
                     return res.badRequest(err);
                   }
-                  var curOrder = extend({}, order.orders);
-                  Object.keys(curOrder).forEach(function (dishId) {
-                    curOrder[dishId] = 0;
-                  });
-                  $this.updateMealLeftQty(order.meal, order.orders, curOrder, function (err, m) {
-                    if (err) {
+                  notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);
+                  $this.cancelOrderJob(result.id, function(err){
+                    if(err){
                       return res.badRequest(err);
                     }
-                    order.status = "cancel";
-                    order.lastStatus = "cancelling";
-                    order.meal = order.meal.id;
-                    order.save(function (err, result) {
-                      if (err) {
-                        return res.badRequest(err);
-                      }
-                      notification.notificationCenter("Order", "confirm", result, false, false, req);
-                      $this.cancelOrderJob(result.id, function(err){
-                        if(err){
-                          return res.badRequest(err);
-                        }
-                        return res.ok({responseText : req.__('order-confirm-cancel')});
-                      });
-                    })
+                    return res.ok({responseText : req.__('order-confirm-cancel')});
                   });
-                }
+                })
               });
-            }
+            })
           });
         }else{
           order.status = "cancel";
@@ -813,11 +839,11 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            notification.notificationCenter("Order", "confirm", result, false, false, req);
+            notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);
             $this.cancelOrderJob(result.id, function(err){
-              if(err){
-                return res.badRequest(err);
-              }
+              // if(err){
+              //   return res.badRequest(err);
+              // }
               return res.ok({responseText : req.__('order-confirm-cancel')});
             });
           })
@@ -844,7 +870,10 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        notification.notificationCenter("Order", "reject", result, false, false, req);
+        notification.notificationCenter("Order", "reject", result, !result.isSendToHost, false, req);
+        // if(req.wantsJSON){
+        //   return res.ok(result);
+        // }
         return res.ok({ responseText : req.__('order-reject-adjust')});
       });
     });
@@ -856,9 +885,6 @@ module.exports = {
     Order.findOne(orderId).populate("customer").populate("host").exec(function(err,order){
       if(err){
         return res.badRequest(err);
-      }
-      if(order.status != "preparing"){
-        return res.forbidden("order status error");
       }
       order.status = "ready";
       order.save(function(err,result){
@@ -882,9 +908,6 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(order.status != "ready"){
-        return res.forbidden("order status error");
-      }
       order.status = "review";
       order.reviewing_orders = Object.keys(order.orders).filter(function(orderId){
         return order.orders[orderId] > 0;
@@ -896,6 +919,16 @@ module.exports = {
         notification.notificationCenter("Order", "receive", result, false, false, req);
         return res.ok({responseText : req.__('order-receive')});
       });
+    });
+  },
+
+  update : function(req, res){
+    var orderId = req.params.id;
+    Order.update(orderId, req.body).exec(function(err, order){
+      if(err){
+        return res.badRequest(err);
+      }
+      return res.ok(order[0]);
     });
   },
 
@@ -919,8 +952,24 @@ module.exports = {
     })
   },
 
+  addTax : function(subtotal, county){
+    var tax;
+    switch (county){
+      case "San Francisco County":
+        tax = 1.0875;
+        break;
+      case "Sacramento County":
+        tax = 1.08;
+        break;
+      default:
+        tax = 1.08;
+    }
+    return Math.round(subtotal * tax * 100);
+  },
+
   calculateTotal : function(params, county){
     var total = params.subtotal;
+    var tax;
     switch (county){
       case "San Francisco County":
         tax = 1.0875;
@@ -936,7 +985,7 @@ module.exports = {
     if(params.delivery_fee){
       total += params.delivery_fee;
     }
-    return total.toFixed(2);
+    return Math.round(total * 100);
   }
 };
 

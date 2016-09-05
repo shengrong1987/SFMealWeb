@@ -43,7 +43,7 @@
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
           <li><a href="/user/me#mycollect"><i class="fa fa-heart"></i> <%= __('favourite') %></a></li>
           <li><a href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
-          <li><a id="msgBtn" data-toggle="tooltip" data-placement="bottom" href="javascript:void(0)"><i class="fa fa-envelope-o"></i> <%= __('notification') %> <span class="badge">New</span></a></li>
+          <li><a id="msgBtn" data-toggle="tooltip" data-html="true" data-placement="bottom" href="javascript:void(0)"><i class="fa fa-envelope-o"></i> <%= __('notification') %> <span class="badge">New</span></a></li>
           <li>
             <a id="userActionBtn" data-badge="0" href='/user/me' class="text-center dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <img class="extra-small round_thumb" style="display:inline-block;" src=<%= req.session.user.picture || "/images/profile_man.png"%>>

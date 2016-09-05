@@ -15,7 +15,7 @@
   <div class="box-email white relative middle text-left">
     <h4 class="text-red"><%= order%><%= dingdan%><b><%= lastStatus == 'cancelling' ? confirmcancel : confirmadjust%></b></h4>
     <p>Hi <%= recipientName%>,</p>
-    <p><%= lastStatus == 'cancelling' ? confirmcancelcontext : confirmadjustcontext%></p>
+    <p><%= lastStatus == 'cancelling' ? ( isSendtoHost ? confirmcancelcontextbyuser : confirmcancelcontextbyhost) : ( isSendToHost ? confirmadjustcontextbyuser : confirmadjustcontextbyhost)%></p>
     <div class="divider" style="margin-bottom: 10px;"></div>
     <p><%= ordernumber%>: <%= id%></p>
     <table class="table table-email">

@@ -37,13 +37,14 @@
               <div id="myorder-order" style="width: 90%;" class="tab-pane middle active">
                 <ul class="nav nav-tabs" style="margin-top: 20px;margin-bottom: 10px;">
                   <li class="active"><a data-toggle="tab" href="#order-all" class="btn-lg text-dark"><strong><%= __('order-nav-all')%></strong></a></li>
+                  <li><a data-toggle="tab" href="#order-holding" class="btn-lg text-dark"><strong><%= __('order-nav-waiting')%></strong></a></li>
                   <li><a data-toggle="tab" href="#order-schedule" class="btn-lg text-dark"><strong><%= __('order-nav-schedule')%></strong></a></li>
                   <li><a data-toggle="tab" href="#order-preparing" class="btn-lg text-dark"><strong><%= __('order-nav-preparing')%></strong></a></li>
                   <li><a data-toggle="tab" href="#order-ready" class="btn-lg text-dark"><strong><%= __('order-nav-prepared')%></strong></a></li>
                   <li><a data-toggle="tab" href="#order-review" class="btn-lg text-dark"><strong><%= __('nav-bar-review')%></strong></a></li>
                 </ul>
                 <div class="tab-content">
-                  <div id="order-all" style="width: 90%;" class="tab-pane middle active">
+                  <div id="order-all" class="tab-pane middle active">
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr>
@@ -79,18 +80,26 @@
                         <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price%></td>
-                        <td><%= number%></td>
+                        <td><% if(order.status=="adjust"){
+                            var adjustingNumber = order.adjusting_orders[key];
+                          if(adjustingNumber != number){%>
+                          <%= number%> to <strong><%= adjustingNumber%></strong>
+                          <%}else{%>
+                          <%= number%>
+                          <%}}else{%>
+                          <%= number%>
+                          <%}%></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <% if(order.status == "schedule"){ %>
+                          <% if(order.status == "schedule" || order.status == "preparing"){ %>
                           <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
                           <a href="#"><%= __('contact-chef')%></a>
-                          <%}else if(order.status == "preparing"){%>
-                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
-                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
+                          <%}else if(order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")) {%>
+                          <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
+                          <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-order"><%= __('reject')%></a><br/>
                           <a href="#"><%= __('contact-chef')%></a>
                           <%}else if(order.status == "ready"){
                           if(order.method == "pickup"){%>
@@ -114,7 +123,74 @@
                       </ul>
                     </nav>
                   </div>
-                  <div id="order-schedule" style="width: 90%;" class="tab-pane middle">
+
+                  <div id="order-holding" class="tab-pane middle">
+                    <table class="table table-bordered">
+                      <thead>
+                      <tr>
+                        <td><%= __('photo')%></td>
+                        <td><%= __('meal')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('quantity')%></td>
+                        <td><%= __('paid-amount')%></td>
+                        <td><%= __('status')%></td>
+                        <td><%= __('action')%></td>
+                      </tr>
+                      </thead>
+                      <%
+
+                      user.orders.forEach(function(order){
+                      if(order.type == "order" && !order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")){
+                      %>
+                      <tbody class="item">
+                      <tr class="active">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('chef')%>: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
+                      </tr>
+                      <%
+                        var list = Object.keys(order.orders);
+                        var dishes = order.dishes;
+                        var index = -1;
+                      list.forEach(function(key){
+                        var number = order.orders[key];
+                      dishes.forEach(function(dish){
+                      if(dish.id == key){
+                        index++;
+                      %>
+                      <tr>
+                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td><%= dish.title%></td>
+                        <td>$<%= dish.price.toFixed(2)%></td>
+                        <td><% if(order.status=="adjust"){
+                            var adjustingNumber = order.adjusting_orders[key];
+                          if(adjustingNumber != number){%>
+                          <%= number%> to <strong><%= adjustingNumber%></strong>
+                          <%}else{%>
+                          <%= number%>
+                          <%}}else{%>
+                          <%= number%>
+                          <%}%></td>
+                        <%if(index==0){%>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                          <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
+                          <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-order"><%= __('reject')%></a><br/>
+                          <a href="#"><%= __('contact-user')%></a>
+                        </td>
+                      </tr>
+                      <%}%>
+                      <%}})})%>
+                      </tbody>
+                      <%}})%>
+                    </table>
+                    <nav class="pull-right">
+                      <ul class="pagination pagination-green pagination-sm" data-trigger="pagination" data-target="#order-holding">
+                        <li class="active"><a href="javascript:void(0)">1</a></li>
+                      </ul>
+                    </nav>
+                  </div>
+
+                  <div id="order-schedule" class="tab-pane middle">
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
@@ -171,7 +247,7 @@
                     </nav>
                   </div>
 
-                  <div id="order-preparing" style="width: 90%;" class="tab-pane middle">
+                  <div id="order-preparing" class="tab-pane middle">
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
@@ -229,7 +305,7 @@
                   </div>
 
 
-                  <div id="order-ready" style="width: 90%;" class="tab-pane middle">
+                  <div id="order-ready" class="tab-pane middle">
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
@@ -288,7 +364,7 @@
                     </nav>
                   </div>
 
-                  <div id="order-review" style="width: 90%;" class="tab-pane middle">
+                  <div id="order-review" class="tab-pane middle">
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
@@ -348,13 +424,14 @@
               <div id="myorder-preorder" style="width: 90%;" class="tab-pane middle">
                 <ul class="nav nav-tabs" style="margin-top: 20px;margin-bottom: 10px;">
                   <li class="active"><a data-toggle="tab" href="#preorder-all" class="btn-lg text-dark"><strong><%= __('order-nav-all')%></strong></a></li>
+                  <li><a data-toggle="tab" href="#preorder-holding" class="btn-lg text-dark"><strong><%= __('order-nav-waiting')%></strong></a></li>
                   <li><a data-toggle="tab" href="#preorder-schedule" class="btn-lg text-dark"><strong><%= __('order-nav-schedule')%></strong></a></li>
                   <li><a data-toggle="tab" href="#preorder-preparing" class="btn-lg text-dark"><strong><%= __('order-nav-preparing')%></strong></a></li>
                   <li><a data-toggle="tab" href="#preorder-ready" class="btn-lg text-dark"><strong><%= __('order-nav-prepared')%></strong></a></li>
                   <li><a data-toggle="tab" href="#preorder-review" class="btn-lg text-dark"><strong><%= __('nav-bar-review')%></strong></a></li>
                 </ul>
                 <div class="tab-content">
-                  <div id="preorder-all" style="width: 90%;" class="tab-pane middle active">
+                  <div id="preorder-all" class="tab-pane middle active">
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
@@ -390,19 +467,27 @@
                         <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price%></td>
-                        <td><%= number%></td>
+                        <td><% if(order.status=="adjust"){
+                            var adjustingNumber = order.adjusting_orders[key];
+                          if(adjustingNumber != number){%>
+                          <%= number%> to <strong><%= adjustingNumber%></strong>
+                          <%}else{%>
+                          <%= number%>
+                          <%}}else{%>
+                          <%= number%>
+                          <%}%></td>
                         <% if(index==0){%>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                            <% if(order.status == "schedule"){ %>
+                            <% if(order.status == "schedule" || order.status == "preparing"){ %>
                             <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
                             <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
                             <a href="#"><%= __('contact-chef')%></a>
-                            <%}else if(order.status == "preparing"){%>
-                            <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a>
-                            <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
-                            <a href="#"><%= __('contact-chef')%></a>
+                            <%}else if(!order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")) {%>
+                            <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
+                            <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('reject')%></a><br/>
+                            <a href="#"><%= __('contact-user')%></a>
                             <%}else if(order.status == "ready"){
                             if(order.method == "pickup"){%>
                             <a href="#"><%= __('see-address')%></a>
@@ -424,7 +509,73 @@
                       </ul>
                     </nav>
                   </div>
-                  <div id="preorder-schedule" style="width: 90%;" class="tab-pane middle">
+
+                  <div id="preorder-holding" class="tab-pane middle">
+                    <table class="table table-bordered">
+                      <thead>
+                      <tr>
+                        <td><%= __('photo')%></td>
+                        <td><%= __('meal')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('quantity')%></td>
+                        <td><%= __('paid-amount')%></td>
+                        <td><%= __('status')%></td>
+                        <td><%= __('action')%></td>
+                      </tr>
+                      </thead>
+                      <%
+                      user.orders.forEach(function(order){
+                      if(order.type == "preorder" && !order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")){
+                      %>
+                      <tbody class="item">
+                      <tr class="active">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('chef')%>: <a href="/host/<%= order.host.id%>"><%= order.host.shopName%></a></td>
+                      </tr>
+                      <%
+                        var list = Object.keys(order.orders);
+                        var dishes = order.dishes;
+                        var index = -1;
+                      list.forEach(function(key){
+                        var number = order.orders[key];
+                      dishes.forEach(function(dish){
+                      if(dish.id == key){
+                        index++;
+                      %>
+                      <tr>
+                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td><%= dish.title%></td>
+                        <td>$<%= dish.price.toFixed(2)%></td>
+                        <td><% if(order.status=="adjust"){
+                            var adjustingNumber = order.adjusting_orders[key];
+                          if(adjustingNumber != number){%>
+                          <%= number%> to <strong><%= adjustingNumber%></strong>
+                          <%}else{%>
+                          <%= number%>
+                          <%}}else{%>
+                          <%= number%>
+                          <%}%></td>
+                        <%if(index==0){%>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                          <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
+                          <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-container="#myorder-preorder" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>"><%= __('reject')%></a><br/>
+                          <a href="#"><%= __('contact-user')%></a>
+                        </td>
+                      </tr>
+                      <%}%>
+                      <%}})})%>
+                      </tbody>
+                      <%}})%>
+                    </table>
+                    <nav class="pull-right">
+                      <ul class="pagination pagination-green pagination-sm" data-trigger="pagination" data-target="#preorder-holding">
+                        <li class="active"><a href="javascript:void(0)">1</a></li>
+                      </ul>
+                    </nav>
+                  </div>
+
+                  <div id="preorder-schedule" class="tab-pane middle">
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
@@ -481,7 +632,7 @@
                     </nav>
                   </div>
 
-                  <div id="preorder-preparing" style="width: 90%;" class="tab-pane middle">
+                  <div id="preorder-preparing" class="tab-pane middle">
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
@@ -537,7 +688,7 @@
                     </nav>
                   </div>
 
-                  <div id="preorder-ready" style="width: 90%;" class="tab-pane middle">
+                  <div id="preorder-ready" class="tab-pane middle">
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">
@@ -596,7 +747,7 @@
                     </nav>
                   </div>
 
-                  <div id="preorder-review" style="width: 90%;" class="tab-pane middle">
+                  <div id="preorder-review" class="tab-pane middle">
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead>
                       <tr class="item">

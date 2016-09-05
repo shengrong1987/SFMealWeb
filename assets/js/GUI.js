@@ -406,6 +406,7 @@ function setupLanguage(){
       });
 
       if(userBarView){
+        userBarView.clearBadges();
         userBarView.getNotification();
       }
 
