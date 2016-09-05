@@ -382,7 +382,6 @@ function setup(){
 
 function setupLanguage(){
   var language = window.navigator.userLanguage || window.navigator.language;
-  console.log(language);
   jQuery.i18n.properties({
     name:'Message',
     path:'/locale/',
@@ -390,6 +389,7 @@ function setupLanguage(){
     language:language,
     checkAvailableLanguages: true,
     async: true,
+    cache : true,
     callback: function() {
 
       $("[data-toggle='i18n']").each(function(){

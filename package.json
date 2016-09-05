@@ -55,9 +55,11 @@
   },
   "scripts": {
     "debug": "node debug app.js",
-    "start": "NODE_ENV=production node app.js",
+    "start": "NODE_ENV=production forever start app.js",
+    "stop" : "forever stopall",
     "install": "./bin/install.sh",
-    "uninstall": "./bin/uninstall.sh"
+    "uninstall": "./bin/uninstall.sh",
+    "test" : "sudo grunt mochaTest"
   },
   "main": "app.js",
   "repository": {
