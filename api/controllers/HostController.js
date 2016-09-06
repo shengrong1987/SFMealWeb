@@ -321,6 +321,7 @@ module.exports = {
       publicHost.intro = host.intro;
       publicHost.feature_dishes = host.feature_dishes;
       publicHost.shortIntro = host.shortIntro();
+      publicHost.license = host.license;
       Review.find({host : hostId}).exec(function(err, reviews){
         if(err){
           return res.badRequest(err);

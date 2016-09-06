@@ -28,6 +28,7 @@
           <div class="row">
             <div class="col-xs-12">
               <h4 class="text-dark"><strong><%= host.shopName %></strong><br/><br/><small><%= host.shortIntro %></small></h4>
+              <p><% if(host.license && host.license.valid){%><i class="fa fa-certificate fa-2x text-yellow"></i> 已获得食品操作安全证书<%}%></p>
             </div>
           </div>
           <div class="row">
