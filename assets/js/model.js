@@ -1570,7 +1570,7 @@ var HostProfileView = Backbone.View.extend({
       picture : shopPhoto
     });
     if(license){
-      this.model.set(license, JSON.stringify({url : license}));
+      this.model.set("license", JSON.stringify({url : license}));
     }
     var $this = this;
     this.model.save({},{
