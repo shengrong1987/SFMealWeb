@@ -745,7 +745,6 @@ fieldset[disabled] .btn-red.active {
 }
 
 .footer-nav{
-  padding-left: 25px;
   li{
     float: left;
     a{
@@ -1388,6 +1387,14 @@ fieldset[disabled] .btn-red.active {
   .mynavbar .navbar-header{
     margin-left: 100px;
   }
+
+  .footer .nav{
+    padding-left: 25px;
+  }
+
+  .footer .middle{
+    width: 430px;
+  }
 }
 
 @media (max-width : 1600px) {
@@ -1403,7 +1410,7 @@ fieldset[disabled] .btn-red.active {
 }
 
 
-@media (max-width: 992px){
+@media (max-width: 768px){
 
   .floater{
     position: static !important;
@@ -1419,6 +1426,14 @@ fieldset[disabled] .btn-red.active {
     width: 80%;
     position: relative;
     /*transition: all 5s ease-in-out;*/
+  }
+
+  .navbar-nav{
+    margin : 0;
+  }
+
+  .footer .nav li{
+    width: 14%;
   }
 
   .meal{

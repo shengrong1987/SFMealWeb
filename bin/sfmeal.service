@@ -1,0 +1,13 @@
+[Unit]
+Description=myapp
+After=network.target
+[Service]
+ExecStart=/my-app/app.js
+Restart=always
+User=nobody
+Group=nobody
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/my-app
+[Install]
+WantedBy=multi-user.target

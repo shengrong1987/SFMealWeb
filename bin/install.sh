@@ -11,7 +11,7 @@ npm install -g grunt --save
 npm install
 npm install --save sails-hook-parametized-policies
 sudo grunt prod
-sudo chown -R $USER ./data
 sudo chmod -R 700 ./data
+sudo chown -R $USER ./data
 sudo chmod -R 500 ./.tmp
 sudo chmod -R 500 ./views

@@ -8332,9 +8332,6 @@ fieldset[disabled] .btn-red.active {
   margin-bottom: 20px;
   min-height: 20px;
 }
-.footer-nav {
-  padding-left: 25px;
-}
 .footer-nav li {
   float: left;
 }
@@ -8851,6 +8848,12 @@ fieldset[disabled] .btn-red.active {
   .mynavbar .navbar-header {
     margin-left: 100px;
   }
+  .footer .nav {
+    padding-left: 25px;
+  }
+  .footer .middle {
+    width: 430px;
+  }
 }
 @media (max-width: 1600px) {
   #our-story {
@@ -8862,7 +8865,7 @@ fieldset[disabled] .btn-red.active {
     width: 90%;
   }
 }
-@media (max-width: 992px) {
+@media (max-width: 768px) {
   .floater {
     position: static !important;
     width: 100%;
@@ -8875,6 +8878,12 @@ fieldset[disabled] .btn-red.active {
     width: 80%;
     position: relative;
     /*transition: all 5s ease-in-out;*/
+  }
+  .navbar-nav {
+    margin: 0;
+  }
+  .footer .nav li {
+    width: 14%;
   }
   .meal .desc {
     top: 50px;
