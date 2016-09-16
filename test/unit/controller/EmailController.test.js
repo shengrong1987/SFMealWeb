@@ -1,6 +1,3 @@
-/**
- * Created by shengrong on 11/19/15.
- */
 
 var assert = require('assert'),
   sinon = require('sinon');

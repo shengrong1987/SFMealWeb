@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for blueprints/update.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">blueprints/</a> update.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">9.38% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>3/32</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/26</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/4</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">12% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>3/25</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Module dependencies
+ */
+var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUtil.js'),
+  _ = require('lodash');
+var util = require('util');
+&nbsp;
+&nbsp;
+/**
+ * Update One Record
+ *
+ * An API call to update a model instance with the specified `id`,
+ * treating the other unbound parameters as attributes.
+ *
+ * @param {Integer|String} id  - the unique id of the particular record you'd like to update  (Note: this param should be specified even if primary key is not `id`!!)
+ * @param *                    - values to set on the record
+ *
+ */
+module.exports = <span class="fstat-no" title="function not covered" >function updateOneRecord (req, res) {</span>
+&nbsp;
+  // Look up the model
+<span class="cstat-no" title="statement not covered" >  var Model = actionUtil.parseModel(req);</span>
+&nbsp;
+  // Locate and validate the required `id` parameter.
+<span class="cstat-no" title="statement not covered" >  var pk = actionUtil.requirePk(req);</span>
+&nbsp;
+  // Create `values` object (monolithic combination of all parameters)
+  // But omit the blacklisted params (like JSONP callback param, etc.)
+<span class="cstat-no" title="statement not covered" >  var values = actionUtil.parseValues(req);</span>
+&nbsp;
+  // Omit the path parameter `id` from values, unless it was explicitly defined
+  // elsewhere (body/query):
+<span class="cstat-no" title="statement not covered" >  var idParamExplicitlyIncluded = ((req.body &amp;&amp; req.body.id) || req.query.id);</span>
+<span class="cstat-no" title="statement not covered" >  if (!idParamExplicitlyIncluded) <span class="cstat-no" title="statement not covered" >delete values.id;</span></span>
+&nbsp;
+&nbsp;
+  // Find and update the targeted record.
+  //
+  // (Note: this could be achieved in a single query, but a separate `findOne`
+  //  is used first to provide a better experience for front-end developers
+  //  integrating with the blueprint API.)
+<span class="cstat-no" title="statement not covered" >  Model.findOne(pk).populateAll().exec(<span class="fstat-no" title="function not covered" >function found(err, matchingRecord) {</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (err) <span class="cstat-no" title="statement not covered" >return res.serverError(err);</span></span>
+<span class="cstat-no" title="statement not covered" >    if (!matchingRecord) <span class="cstat-no" title="statement not covered" >return res.notFound();</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    Model.update(pk, values).exec(<span class="fstat-no" title="function not covered" >function updated(err, records) {</span></span>
+&nbsp;
+      // Differentiate between waterline-originated validation errors
+      // and serious underlying issues. Respond with badRequest if a
+      // validation error is encountered, w/ validation info.
+<span class="cstat-no" title="statement not covered" >      if (err) <span class="cstat-no" title="statement not covered" >return res.negotiate(err);</span></span>
+&nbsp;
+&nbsp;
+      // Because this should only update a single record and update
+      // returns an array, just use the first item.  If more than one
+      // record was returned, something is amiss.
+<span class="cstat-no" title="statement not covered" >      if (!records || !records.length || records.length &gt; 1) {</span>
+<span class="cstat-no" title="statement not covered" >        req._sails.log.warn(</span>
+        util.format('Unexpected output from `%s.update`.', Model.globalId)
+        );
+      }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      var updatedRecord = records[0];</span>
+&nbsp;
+      // If we have the pubsub hook, use the Model's publish method
+      // to notify all subscribers about the update.
+<span class="cstat-no" title="statement not covered" >      if (req._sails.hooks.pubsub) {</span>
+<span class="cstat-no" title="statement not covered" >        if (req.isSocket) { <span class="cstat-no" title="statement not covered" >Model.subscribe(req, records); </span>}</span>
+<span class="cstat-no" title="statement not covered" >        Model.publishUpdate(pk, _.cloneDeep(values), !req.options.mirror &amp;&amp; req, {</span>
+          previous: matchingRecord.toJSON()
+        });
+      }
+&nbsp;
+      // Do a final query to populate the associations of the record.
+      //
+      // (Note: again, this extra query could be eliminated, but it is
+      //  included by default to provide a better interface for integrating
+      //  front-end developers.)
+<span class="cstat-no" title="statement not covered" >      var Q = Model.findOne(updatedRecord[Model.primaryKey]);</span>
+<span class="cstat-no" title="statement not covered" >      Q = actionUtil.populateEach(Q, req);</span>
+<span class="cstat-no" title="statement not covered" >      Q.exec(<span class="fstat-no" title="function not covered" >function foundAgain(err, populatedRecord) {</span></span>
+<span class="cstat-no" title="statement not covered" >        if (err) <span class="cstat-no" title="statement not covered" >return res.serverError(err);</span></span>
+<span class="cstat-no" title="statement not covered" >        if (!populatedRecord) <span class="cstat-no" title="statement not covered" >return res.serverError('Could not find record after updating!');</span></span>
+<span class="cstat-no" title="statement not covered" >        res.ok(populatedRecord);</span>
+      }); // &lt;/foundAgain&gt;
+    });// &lt;/updated&gt;
+  }); // &lt;/found&gt;
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Sep 16 2016 11:56:30 GMT-0700 (PDT)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

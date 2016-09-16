@@ -3,7 +3,8 @@
  */
 
 var assert = require('assert'),
-    sinon = require('sinon');
+    sinon = require('sinon'),
+    should = require('should'),
     request = require("supertest-as-promised");
 var config = require('../../../config/stripe.js'),
   stripe = require('stripe')(config.StripeKeys.secretKey);
@@ -16,7 +17,7 @@ before(function(done) {
 
 describe('EmailController', function() {
 
-  this.timeout(15000);
+  this.timeout(38000);
 
   describe('', function() {
 
@@ -35,13 +36,15 @@ describe('EmailController', function() {
 
     it('should login or register an account', function (done) {
       agent
-        .post('/auth/login?type=local')
+        .post('/auth/register')
         .send({email : hostEmail, password: password})
-        .expect(302)
+        .expect(200)
         .end(function(err, res){
           if(err){
             return done(err);
           }
+          res.body.should.have.property('auth');
+          res.body.auth.should.have.property('email',hostEmail);
           done();
         })
     });
@@ -149,6 +152,52 @@ describe('EmailController', function() {
         })
     });
 
+    it('should update host legal_entity', function(done){
+      var legalObj = {
+        dob : {
+          day : 25,
+          month : 12,
+          year : 1987
+        },
+        first_name : "sheng",
+        last_name : "rong",
+        ssn_last_4 : "1234"
+      };
+      agent
+        .put('/host/' + hostId)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        // .field('Content-Type', 'multipart/form-data')
+        .field('legal_entity',JSON.stringify(legalObj))
+        .field('hasImage',"true")
+        .attach('image',sails.config.appPath + '/assets/images/dumplings.jpg')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    });
+
+    it('should update host legal_entity', function(done){
+      var legalObj = {
+        personal_id_number : "123456789"
+      };
+      agent
+        .put('/host/' + hostId)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .field('legal_entity',JSON.stringify(legalObj))
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    });
+
 
     var mealId;
     var preorderMealId;
@@ -218,6 +267,55 @@ describe('EmailController', function() {
       var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
       var now = new Date();
       var thirtyMinutesLater = new Date(now.getTime() + 60 * 30 * 1000);
+      var thirtyOneMinutesLater = new Date(now.getTime() + 60 * 31 * 1000);
+      var onHourAndTwoMinuteLater = new Date(now.getTime() + 1000 * 60 * 62);
+      var twoHourLater = new Date(now.getTime() + 1000 * 3600 * 2);
+      var threeHourLater = new Date(now.getTime() + 1000 * 3600 * 3);
+      var pickups = [{
+        "pickupFromTime" : onHourAndTwoMinuteLater,
+        "pickupTillTime" : twoHourLater,
+        "location" : "1455 Market St, San Francisco, CA 94124",
+        "method" : "pickup",
+        "phone" : "(415)993-9993"
+      },{
+        "pickupFromTime" : thirtyOneMinutesLater,
+        "pickupTillTime" : onHourAndTwoMinuteLater,
+        "method" : "delivery",
+        "phone" : "(415)993-9993"
+      }];
+      agent
+        .post('/meal')
+        .send({
+          provideFromTime: now,
+          provideTillTime: thirtyMinutesLater,
+          pickups : JSON.stringify(pickups),
+          leftQty: leftQty,
+          totalQty: totalQty,
+          county : 'San Francisco County',
+          title : "私房面馆",
+          type : "preorder",
+          dishes : dishes,
+          status : "on",
+          cover : dish1,
+          minimalOrder : 1,
+          isDelivery : true
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(res.body.chef != hostId){
+            return done(Error("error creating meal"));
+          }
+          preorderMealId = res.body.id;
+          done();
+        })
+    })
+
+    it('should create an preorder type meal and '
+      + hostEmail
+      + ' should receive no order email 30 minutes later', function (done) {
+      var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
+      var now = new Date();
+      var thirtyMinutesLater = new Date(now.getTime() + 60 * 30 * 1000);
       var onHourAndTwoMinuteLater = new Date(now.getTime() + 1000 * 60 * 62);
       var twoHourLater = new Date(now.getTime() + 1000 * 3600 * 2);
       var threeHourLater = new Date(now.getTime() + 1000 * 3600 * 3);
@@ -255,7 +353,51 @@ describe('EmailController', function() {
           if(res.body.chef != hostId){
             return done(Error("error creating meal"));
           }
-          preorderMealId = res.body.id;
+          sails.log.warn("confirm whether no order email's order id match this id: " + res.body.id);
+          done();
+        })
+    })
+
+    var preorderMealFailId;
+    it('should create an preorder type meal and '
+      + hostEmail
+      + ' should receive two emails(cancelMeal and cancelOrder) 30 minutes later'
+      + guestEmail + ' should receive one email of cancel order 30 minutes later', function (done) {
+      var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
+      var now = new Date();
+      var thirtyMinutesLater = new Date(now.getTime() + 60 * 30 * 1000);
+      var twoHourLater = new Date(now.getTime() + 1000 * 3600 * 2);
+      var threeHourLater = new Date(now.getTime() + 1000 * 3600 * 3);
+      var pickups = [{
+        "pickupFromTime" : twoHourLater,
+        "pickupTillTime" : threeHourLater,
+        "location" : "1455 Market St, San Francisco, CA 94124",
+        "method" : "pickup",
+        "phone" : "(415)993-9993"
+      }];
+      agent
+        .post('/meal')
+        .send({
+          provideFromTime: now,
+          provideTillTime: thirtyMinutesLater,
+          pickups : JSON.stringify(pickups),
+          leftQty: leftQty,
+          totalQty: totalQty,
+          county : 'San Francisco County',
+          title : "私房面馆",
+          type : "preorder",
+          dishes : dishes,
+          status : "on",
+          cover : dish1,
+          minimalOrder : 5,
+          isDelivery : false
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(res.body.chef != hostId){
+            return done(Error("error creating meal"));
+          }
+          preorderMealFailId = res.body.id;
           done();
         })
     })
@@ -264,27 +406,18 @@ describe('EmailController', function() {
 
     it('should login or register an account for guest', function (done) {
       agent
-          .post('/auth/login?type=local')
+          .post('/auth/register')
           .send({email : guestEmail, password: password})
-          .expect(302)
-          .expect('Location','/auth/done')
-          .end(done)
-    });
-
-    it('should get guest id', function (done) {
-      agent
-        .get('/user/me')
-        .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
-        .expect(200)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          console.log(res.body);
-          guestId = res.body.id;
-          done();
-        })
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            res.body.should.have.property('auth');
+            res.body.auth.should.have.property('email',guestEmail);
+            guestId = res.body.id;
+            done();
+          })
     });
 
     it('should update user info', function (done) {
@@ -387,6 +520,36 @@ describe('EmailController', function() {
           })
     })
 
+    it('should order the meal and ' + hostEmail + " should receive a new order email and " + guestEmail + " should not receive pickup reminder email 1 hour later but should receive a cancel email", function (done) {
+      var dishObj = {};
+      dishObj[dish1] = 1;
+      dishObj[dish2] = 2;
+      dishObj[dish3] = 0;
+      dishObj[dish4] = 0;
+      var now = new Date();
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 1 + price2 * 2,
+          pickupOption : 1,
+          method : "pickup",
+          mealId : preorderMealFailId,
+          phone : phone
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          if(res.body.customer != guestId){
+            return done(Error("error making order"));
+          }
+          sails.log.warn("confirm no pickup reminder email is received for the order with id: " + res.body.id);
+          done();
+        })
+    })
+
     it('should adjust the dish successfully and ' + hostEmail + "should receive an adjust order email", function (done) {
       var dishObj = {};
       dishObj[dish1] = 1;
@@ -405,19 +568,29 @@ describe('EmailController', function() {
           })
     })
 
-    it('should cancel the meal at schedule successfully and '
+    it('should cancel the order at schedule successfully and '
       + hostEmail
       + "should receive a cancel order email "
       + "and should remove pickup reminder job", function (done) {
       agent
-          .post('/order/' + orderId + "/cancel")
-          .expect(200)
-          .end(function(err,res){
-            if(err){
-              return done(err);
-            }
-            done();
-          })
+        .post('/order/' + orderId + "/cancel")
+        .expect(200)
+        .toPromise()
+        .delay(31000)
+        .then(function(res){
+          agent
+            .get('/job?name=OrderPickupReminderJob&data.orderId=' + res.body.id)
+            .expect(200)
+            .then(function(res){
+              if(res.body.length != 0){
+                return done(Error('order pickup reminding jobs count not right'));
+              }
+              done();
+            })
+            .catch(function(err){
+              done(err)
+            })
+        });
     })
 
     //UC#2 order 'preorder' type meal and request for cancel
@@ -536,7 +709,7 @@ describe('EmailController', function() {
           })
     })
 
-    it('should login or register an account', function (done) {
+    it('should login an account', function (done) {
       agent
         .post('/auth/login?type=local')
         .send({email : hostEmail, password: password})
@@ -581,6 +754,7 @@ describe('EmailController', function() {
         .end(done)
     });
 
+    var orderWithPickupReminderId;
     it('should order the meal again and ' + guestEmail + " should receive pickup reminder 1 minutes later", function (done) {
       var dishObj = {};
       dishObj[dish1] = 1;
@@ -598,25 +772,16 @@ describe('EmailController', function() {
           mealId : preorderMealId
         })
         .expect(200)
-        .toPromise()
-        .delay(31000)
-        .then(function(res){
-          agent
-            .get('/job?name=OrderPickupReminderJob&data.orderId=' + res.body.id)
-            .expect(200)
-            .then(function(res){
-              if(res.body.length != 1){
-                return done(Error('order pickup reminding jobs count not right'));
-              }
-              done();
-            })
-            .catch(function(err){
-              done(err)
-            })
-        });
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          orderWithPickupReminderId = res.body.id;
+          done();
+        })
     })
 
-    it('should order the meal again with delivery and ' + hostEmail + " should receive delivery reminding job later at pickupFromTime", function (done) {
+    it('should order the meal again with delivery and ' + hostEmail + " should receive delivery reminding job two minutes later", function (done) {
       var dishObj = {};
       dishObj[dish1] = 0;
       dishObj[dish2] = 0;
@@ -626,7 +791,7 @@ describe('EmailController', function() {
         .post('/order')
         .send({
           orders : dishObj,
-          subtotal : price1 * 1 + price2 * 2,
+          subtotal : price3 * 1 + price4 * 1,
           phone : phone,
           address : address,
           pickupOption : 2,
@@ -644,7 +809,23 @@ describe('EmailController', function() {
               if(res.body.length != 1){
                 return done(Error('order delivery reminding jobs count not right'));
               }
-              done();
+              agent
+                .get('/job?name=OrderPickupReminderJob&data.orderId=' + orderWithPickupReminderId)
+                .expect(200)
+                .then(function(res){
+                  sails.log.warn(res.body);
+                  if(res.body.length != 1){
+                    return done(Error('order pickup reminding jobs count not right'));
+                  }
+                  sails.log.debug(
+                    hostEmail + " should receive three booking end emails(30 minutes later), one delivery reminder(31 minutes later) and one meal start reminder(1 minute later)" + "/n"
+                    + guestEmail + " should receive a cancel order email(30 minutes later) and a pickup reminder email(1 minute later)"
+                  );
+                  done();
+                })
+                .catch(function(err){
+                  done(err)
+                })
             })
             .catch(function(err){
               done(err)

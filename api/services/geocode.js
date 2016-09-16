@@ -32,7 +32,7 @@ module.exports = {
   },
 
   distance : function(address, location, cb){
-    console.log("geocoding " + address);
+    sails.log.info("geocoding " + address);
     var $this = this;
     geocoder.geocode({ address : address}, function(err, res){
       if (err) {

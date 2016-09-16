@@ -405,7 +405,7 @@ function setupLanguage(){
         }
       });
 
-      if(userBarView){
+      if(typeof userBarView != 'undefined' && userBarView){
         userBarView.clearBadges();
         userBarView.getNotification();
       }

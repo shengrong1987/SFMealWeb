@@ -19,6 +19,7 @@ module.exports = function(grunt) {
         { 'views/emailTemplates/adjust/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/adjusting/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/cancel/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/cancelMeal/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/cancelling/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/confirm/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/guestlist/style.css' : 'assets/styles/importer.less' },

@@ -95,7 +95,8 @@ module.exports.policies = {
   DishController : {
     '*' : 'or(and(sessionAuth, isHost),isAdmin)',
     'verify' : 'isAdmin',
-    'fail' : 'isAdmin'
+    'fail' : 'isAdmin',
+    'destroy' : 'or(and(sessionAuth, isHost, isOwnerOfDish), isAdmin)'
   },
 
   NotificationController : {
@@ -110,7 +111,10 @@ module.exports.policies = {
   },
 
   PocketController : {
-    '*' : ['isAdmin']
+    '*' : ['isAdmin'],
+    'getUserBalance' : 'or(and(sessionAuth), isAdmin)',
+    'getHostBalance' : 'or(and(sessionAuth, isHost), isAdmin)',
+    'getBalance' : 'sessionAuth'
   }
 
   /***************************************************************************

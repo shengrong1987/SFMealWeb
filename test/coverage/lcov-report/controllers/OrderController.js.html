@@ -1,0 +1,3044 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for controllers/OrderController.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">controllers/</a> OrderController.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">57% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>334/586</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">45.02% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>140/311</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">68.63% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>70/102</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">57% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>334/586</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
+565
+566
+567
+568
+569
+570
+571
+572
+573
+574
+575
+576
+577
+578
+579
+580
+581
+582
+583
+584
+585
+586
+587
+588
+589
+590
+591
+592
+593
+594
+595
+596
+597
+598
+599
+600
+601
+602
+603
+604
+605
+606
+607
+608
+609
+610
+611
+612
+613
+614
+615
+616
+617
+618
+619
+620
+621
+622
+623
+624
+625
+626
+627
+628
+629
+630
+631
+632
+633
+634
+635
+636
+637
+638
+639
+640
+641
+642
+643
+644
+645
+646
+647
+648
+649
+650
+651
+652
+653
+654
+655
+656
+657
+658
+659
+660
+661
+662
+663
+664
+665
+666
+667
+668
+669
+670
+671
+672
+673
+674
+675
+676
+677
+678
+679
+680
+681
+682
+683
+684
+685
+686
+687
+688
+689
+690
+691
+692
+693
+694
+695
+696
+697
+698
+699
+700
+701
+702
+703
+704
+705
+706
+707
+708
+709
+710
+711
+712
+713
+714
+715
+716
+717
+718
+719
+720
+721
+722
+723
+724
+725
+726
+727
+728
+729
+730
+731
+732
+733
+734
+735
+736
+737
+738
+739
+740
+741
+742
+743
+744
+745
+746
+747
+748
+749
+750
+751
+752
+753
+754
+755
+756
+757
+758
+759
+760
+761
+762
+763
+764
+765
+766
+767
+768
+769
+770
+771
+772
+773
+774
+775
+776
+777
+778
+779
+780
+781
+782
+783
+784
+785
+786
+787
+788
+789
+790
+791
+792
+793
+794
+795
+796
+797
+798
+799
+800
+801
+802
+803
+804
+805
+806
+807
+808
+809
+810
+811
+812
+813
+814
+815
+816
+817
+818
+819
+820
+821
+822
+823
+824
+825
+826
+827
+828
+829
+830
+831
+832
+833
+834
+835
+836
+837
+838
+839
+840
+841
+842
+843
+844
+845
+846
+847
+848
+849
+850
+851
+852
+853
+854
+855
+856
+857
+858
+859
+860
+861
+862
+863
+864
+865
+866
+867
+868
+869
+870
+871
+872
+873
+874
+875
+876
+877
+878
+879
+880
+881
+882
+883
+884
+885
+886
+887
+888
+889
+890
+891
+892
+893
+894
+895
+896
+897
+898
+899
+900
+901
+902
+903
+904
+905
+906
+907
+908
+909
+910
+911
+912
+913
+914
+915
+916
+917
+918
+919
+920
+921
+922
+923
+924
+925
+926
+927
+928
+929
+930
+931
+932
+933
+934
+935
+936
+937
+938
+939
+940
+941
+942
+943
+944
+945
+946
+947
+948
+949
+950
+951
+952
+953
+954
+955
+956
+957
+958
+959
+960
+961
+962
+963
+964
+965
+966
+967
+968
+969
+970
+971
+972
+973
+974
+975
+976
+977
+978
+979
+980
+981
+982
+983
+984
+985
+986
+987
+988
+989
+990
+991
+992
+993
+994</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">32×</span>
+<span class="cline-any cline-yes">32×</span>
+<span class="cline-any cline-yes">32×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">68×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">65×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * OrderController
+ *
+ * @description :: Server-side logic for managing Orders
+ * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
+ */
+&nbsp;
+var stripe = require("../services/stripe.js");
+var extend = require('util')._extend;
+var async = require('async');
+var notification = require("../services/notification");
+var geocode = require("../services/geocode.js");
+&nbsp;
+//-1 : quantity not enough
+//-2 : dish not valid
+//-3 : order total doesn't match
+//-4 : meal not valid
+//-5 : missing payment profile
+//-6 : address verification fail
+//-7 : pickup option not exist
+//-8 : host can't adjust order at schedule
+//-9 : order is empty
+//-10 : meal is not active
+//-11 : order's pickup method invalid
+&nbsp;
+&nbsp;
+module.exports = {
+&nbsp;
+  validate_meal : function(meal, orders, lastOrders, subtotal, req, cb) {
+    var now = new Date();
+    var params = req.body;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if(!orders || !subtotal){
+<span class="cstat-no" title="statement not covered" >      return cb({ responseText : req.__('order-empty'), code : -9});</span>
+    }
+    <span class="missing-if-branch" title="if path not taken" >I</span>if(meal.status === "off" || (now &lt; meal.provideFromTime || now &gt; meal.provideTillTime)){
+<span class="cstat-no" title="statement not covered" >      return cb({ responseText : req.__('meal-not-active'), code : -10});</span>
+    }
+&nbsp;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if(!meal.isDelivery &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >params.method == 'delivery')</span>{
+<span class="cstat-no" title="statement not covered" >      return cb({ responseText : req.__('order-invalid-method'), code : -11});</span>
+    }
+&nbsp;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if(!meal.dateIsValid()) {
+<span class="cstat-no" title="statement not covered" >      return cb({ responseText : req.__('order-invalid-meal'), code : -4});</span>
+    }
+&nbsp;
+    sails.log.debug("meal looks good so far, checking order items...");
+&nbsp;
+    var actual_subtotal = 0;
+    var validDish = false;
+&nbsp;
+    async.each(Object.keys(orders), function(dishId, next){
+      var qty = parseInt(orders[dishId]);
+      var lastQty = lastOrders ? parseInt(lastOrders[dishId]) : 0;
+      if(qty &gt; 0 || lastQty &gt; 0){
+        async.each(meal.dishes, function(dish, next2){
+          if(dish.id == dishId){
+            <span class="missing-if-branch" title="if path not taken" >I</span>if(!dish.isVerified){
+<span class="cstat-no" title="statement not covered" >              return next2({responseText : req.__('order-invalid-dish',dishId), code : -2});</span>
+            }
+            var diff = qty - lastQty;
+            if(diff &gt; meal.leftQty[dishId]){
+              return next2({responseText : req.__('order-dish-not-enough',dishId, qty), code : -1});
+            }
+            actual_subtotal += qty * dish.price;
+          }
+          next2();
+        }, function(err){
+          next(err);
+        });
+      }else{
+        next();
+      }
+    }, function(err){
+      if(err){
+        return cb(err);
+      }
+&nbsp;
+      sails.log.debug("dish is valid and enough, checking total price...");
+&nbsp;
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(actual_subtotal.toFixed(2) != subtotal) {
+<span class="cstat-no" title="statement not covered" >        return cb({responseText : req.__('order-total-not-match'), code : -3});</span>
+      }
+      return cb(null);
+    });
+  },
+&nbsp;
+  validateAddress : function(method, meal, address, cb){
+    if(method === "delivery"){
+      var host = meal.chef;
+      var location = {lat : host.lat, long : host.long};
+      var range = meal.delivery_range;
+      geocode.distance(address, location, function(err, distance){
+        if(err){
+          sails.log.error(err);
+          return cb(false);
+        }
+        if(distance &gt; range){
+          sails.log.error("distance verification failed");
+          return cb(false);
+        }
+        cb(true);
+      })
+    }else{
+      cb(true);
+    }
+  },
+&nbsp;
+  updateMealLeftQty : function(meal, lastorder, order, cb){
+    var leftQty = meal.leftQty;
+    Object.keys(lastorder).forEach(function(dishId){
+      var diff = lastorder[dishId] - order[dishId];
+      leftQty[dishId] += diff;
+    });
+    meal.leftQty = leftQty;
+    meal.save(function(err,result){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >        return cb(err);</span>
+      }
+      cb(err,result);
+    });
+  },
+&nbsp;
+  buildDeliveryData : function(params, meal){
+    var dishes = meal.dishes;
+    if(params.method == "delivery"){
+      params.delivery_fee = parseFloat(meal.delivery_fee);
+    }else {
+      params.delivery_fee = 0;
+    }
+&nbsp;
+    if(meal.type == 'preorder'){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(!params.pickupOption || !meal.pickups || params.pickupOption-1&gt;=meal.pickups.length){
+<span class="cstat-no" title="statement not covered" >        return false;</span>
+      }
+      var pickupInfo = meal.pickups[params.pickupOption-1];
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(!pickupInfo || pickupInfo.method != params.method){
+<span class="cstat-no" title="statement not covered" >        return false;</span>
+      }
+      params.pickupInfo = pickupInfo;
+    }
+&nbsp;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if(meal.type == 'order' &amp;&amp; params.method == 'pickup'){
+<span class="cstat-no" title="statement not covered" >      if(!params.pickupOption || !meal.pickups || params.pickupOption-1&gt;=meal.pickups.length){</span>
+<span class="cstat-no" title="statement not covered" >        return false;</span>
+      }
+<span class="cstat-no" title="statement not covered" >      var pickupInfo = meal.pickups[params.pickupOption-1];</span>
+<span class="cstat-no" title="statement not covered" >      if(!pickupInfo || pickupInfo.method != params.method){</span>
+<span class="cstat-no" title="statement not covered" >        return false;</span>
+      }
+<span class="cstat-no" title="statement not covered" >      params.pickupInfo = pickupInfo;</span>
+    }
+    sails.log.debug("building pickup data");
+&nbsp;
+    return params;
+  },
+&nbsp;
+	create : function(req, res){
+&nbsp;
+    var userId = req.session.user.id;
+    var orders = req.body.orders;
+    var mealId = req.body.mealId;
+    var email = req.session.user.auth.email;
+    var method = req.body.method;
+    var address = req.body.address;
+    var subtotal = parseFloat(req.body.subtotal);
+    req.body.customer = userId;
+&nbsp;
+    var $this = this;
+&nbsp;
+    Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,m) {
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
+      }
+      $this.validateAddress(method, m, address, function(valid){
+        if(!valid){
+          return res.badRequest({responseText : req.__('order-invalid-address'), code : -6});
+        }
+&nbsp;
+        $this.validate_meal(m, orders, undefined, subtotal, req , function(err){
+          if(err){
+            sails.log.error(err.responseText);
+            return res.badRequest(err);
+          }
+          //calculate pickup method and delivery fee
+          req.body = $this.buildDeliveryData(req.body, m);
+&nbsp;
+          <span class="missing-if-branch" title="if path not taken" >I</span>if(typeof req.body == "boolean" &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >req.body == false)</span>{
+<span class="cstat-no" title="statement not covered" >            return res.badRequest({responseText : req.__('order-pickup-option-error'), code : -7});</span>
+          }
+&nbsp;
+          //calculate ETA
+          var now = new Date();
+          req.body.eta = new Date(now.getTime() + m.prepareTime * 60 * 1000);
+&nbsp;
+          //calculate total
+          var total = $this.calculateTotal(req.body, m.chef.county);
+          sails.log.info("total is: " + total);
+&nbsp;
+          req.body.host = m.chef.id;
+          req.body.type = m.type;
+          req.body.dishes = m.dishes;
+          req.body.meal = m.id;
+          req.body.guestEmail = email;
+          req.body.hostEmail = m.chef.email;
+          User.findOne(userId).populate('payment').exec(function (err, found) {
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >              return res.badRequest(err);</span>
+            }
+            <span class="missing-if-branch" title="if path not taken" >I</span>if(!found.payment || found.payment.length == 0){
+<span class="cstat-no" title="statement not covered" >              return res.badRequest({ responseText : req.__('order-lack-payment'), code : -5});</span>
+            }
+            if(m.type == "order"){
+              req.body.status = "preparing";
+            }
+            <span class="missing-if-branch" title="if path not taken" >I</span>if(!found.phone &amp;&amp; !req.body.phone){
+<span class="cstat-no" title="statement not covered" >              return res.badRequest(req.__('order-lack-contact'));</span>
+            }
+            req.body.phone = found.phone || req.body.phone;
+&nbsp;
+            sails.log.debug("everything seems good, creating order...");
+&nbsp;
+            Order.create(req.body).exec(function (err, order) {
+              <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >                return res.badRequest(err);</span>
+              }
+              stripe.charge({
+                amount : total,
+                email : email,
+                customerId : found.payment[0].customerId,
+                destination : m.chef.accountId,
+                metadata : {
+                  mealId : m.id,
+                  hostId : m.chef.id,
+                  orderId : order.id,
+                  userId : userId
+                }
+              },function(err, charge){
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >                  Order.destroy(order.id).exec(<span class="fstat-no" title="function not covered" >function(err2){</span></span>
+<span class="cstat-no" title="statement not covered" >                    if(err2){</span>
+<span class="cstat-no" title="statement not covered" >                      return res.badRequest(err2);</span>
+                    }
+<span class="cstat-no" title="statement not covered" >                    return res.badRequest(err);</span>
+                  });
+                } else <span class="missing-if-branch" title="else path not taken" >E</span>if (charge.status == "succeeded") {
+&nbsp;
+                  sails.log.debug("charge succeed, gathering charging info for order");
+&nbsp;
+                  for (var i = 0; i &lt; m.dishes.length; i++) {
+                    var dishId = m.dishes[i].id;
+                    var quantity = parseInt(orders[dishId]);
+                    m.leftQty[dishId] -= quantity;
+                  }
+                  order.transfers = {};
+                  order.transfers[charge.transfer] = charge.transfer;
+                  order.charges = {};
+                  order.charges[charge.id] = charge.amount;
+                  m.save(function (err, result) {
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >                      return res.badRequest(err);</span>
+                    }
+                    order.save(function(err, o){
+                      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >                        return res.badRequest(err);</span>
+                      }
+                      o.chef = m.chef;
+                      o.dishes = m.dishes;
+                      notification.notificationCenter("Order", "new", o, true, false, req);
+                      //test only
+                      <span class="missing-if-branch" title="else path not taken" >E</span>if(req.wantsJSON){
+                        return res.ok(order);
+                      }
+<span class="cstat-no" title="statement not covered" >                      return res.ok({responseText : req.__('order-ok')});</span>
+                    });
+                  });
+                } else {
+<span class="cstat-no" title="statement not covered" >                  res.badRequest({ reponseText : req.__('order-unknown-error'), code : -8});</span>
+                }
+              });
+            });
+          });
+        });
+      });
+    });
+  },
+&nbsp;
+  adjust_order_form : <span class="fstat-no" title="function not covered" >function(req, res){</span>
+<span class="cstat-no" title="statement not covered" >    var userId = req.session.user.id;</span>
+<span class="cstat-no" title="statement not covered" >    var orderId = req.params.id;</span>
+<span class="cstat-no" title="statement not covered" >    var params = req.body;</span>
+<span class="cstat-no" title="statement not covered" >    Order.findOne(orderId).populate("customer").populate("meal").populate("dishes").exec(<span class="fstat-no" title="function not covered" >function(err,order){</span></span>
+<span class="cstat-no" title="statement not covered" >      if(err){</span>
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
+      }
+<span class="cstat-no" title="statement not covered" >      return res.view("order_adjust",{layout:false,order : order});</span>
+    });
+  },
+&nbsp;
+  adjust : function(req, res){
+    var userId = req.session.user.id;
+    var hostId = req.session.user.host ? (<span class="branch-0 cbranch-no" title="branch not covered" >req.session.user.host.id || req.session.user.host)</span> : null;
+    var email = req.session.user.auth.email;
+    var orderId = req.params.id;
+    var params = req.body;
+    var subtotal = parseFloat(params.subtotal);
+    var delivery_fee = parseFloat(params.delivery_fee);
+    var $this = this;
+    Order.findOne(orderId).populate("meal").populate("dishes").populate("host").populate("customer").exec(function(err,order){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(err)</span>
+      }
+&nbsp;
+      order.meal.dishes = order.dishes;
+      $this.validate_meal(order.meal, params.orders, order.orders, subtotal, req, function(err){
+        if(err){
+          sails.log.error(err.responseText);
+          return res.badRequest(err);
+        }
+        var isSendToHost = true;
+        <span class="missing-if-branch" title="if path not taken" >I</span>if(hostId == order.host.id){
+<span class="cstat-no" title="statement not covered" >          isSendToHost = false;</span>
+        }
+        <span class="missing-if-branch" title="else path not taken" >E</span>if(order.status == "schedule"){
+          //host cannot adjust the order at schedule
+          //can update without permission of host or adjust by host
+          var diff = $this.addTax(subtotal - order.subtotal, order.host.county);
+&nbsp;
+          sails.log.info("adjusting amount: " + diff);
+&nbsp;
+          <span class="missing-if-branch" title="else path not taken" >E</span>if(diff != 0){
+            User.findOne(order.customer.id).populate('payment').exec(function (err, found) {
+              <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >                return res.badRequest(err);</span>
+              }
+              <span class="missing-if-branch" title="if path not taken" >I</span>if(!found.payment || found.payment.length == 0){
+<span class="cstat-no" title="statement not covered" >                return res.badRequest({responseText : req.__('order-lack-payment'), code : -5});</span>
+              }
+              if(diff&gt;0){
+                //create another charge
+                stripe.charge({
+                  amount : diff,
+                  email : email,
+                  customerId : found.payment[0].customerId,
+                  destination : order.host.accountId,
+                  metadata : {
+                    mealId : order.meal.id,
+                    hostId : order.host.id,
+                    orderId : order.id,
+                    userId : userId
+                  }
+                },function(err, charge){
+                  <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >                    sails.log.error(err);</span>
+<span class="cstat-no" title="statement not covered" >                    return res.badRequest(err);</span>
+                  }
+                  <span class="missing-if-branch" title="else path not taken" >E</span>if(charge.status == "succeeded") {
+                    $this.updateMealLeftQty(order.meal, order.orders, params.orders, function(err, m){
+                      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >                        return res.badRequest(err);</span>
+                      }
+                      order.adjusting_orders = order.orders;
+                      order.adjusting_subtotal = order.subtotal;
+                      order.orders = params.orders;
+                      order.subtotal = params.subtotal;
+                      order.charges[charge.id] = charge.amount;
+                      order.meal = m.id;
+                      order.save(function(err,result){
+                        <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >                          return res.badRequest(err);</span>
+                        }
+                        //send notification
+                        notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
+                        return res.ok({responseText : req.__('order-adjust-ok',charge.amount / 100)});
+                      })
+                    });
+                  }
+                });
+              }else{
+                var totalRefund = Math.abs(diff);
+                diff = - diff;
+                var chargeIds = Object.keys(order.charges);
+                var refundCharges = [];
+                chargeIds.forEach(function(chargeId){
+                  <span class="missing-if-branch" title="else path not taken" >E</span>if(diff != 0){
+                    var chargeAmount = order.charges[chargeId];
+                    <span class="missing-if-branch" title="else path not taken" >E</span>if(chargeAmount &gt;= diff){
+                      refundCharges.push({amount:diff,id:chargeId});
+                      order.charges[chargeId] = chargeAmount - diff;
+                      diff = 0;
+                    }else <span class="cstat-no" title="statement not covered" >if(chargeAmount != 0){</span>
+<span class="cstat-no" title="statement not covered" >                      diff -= chargeAmount;</span>
+<span class="cstat-no" title="statement not covered" >                      refundCharges.push({amount:chargeAmount,id:chargeId});</span>
+<span class="cstat-no" title="statement not covered" >                      order.charges[chargeId] = 0;</span>
+                    }
+                  }
+                });
+&nbsp;
+                async.each(refundCharges,function(charge, next){
+                  stripe.refund({
+                    id : charge.id,
+                    amount : charge.amount
+                  },function(err, refund){
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >                      return next(err);</span>
+                    }
+                    next();
+                  })
+                },function(err){
+                  <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >                    return res.badRequest(err);</span>
+                  }
+                  $this.updateMealLeftQty(order.meal, order.orders, params.orders, function(err, m){
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >                      return res.badRequest(err);</span>
+                    }
+                    order.adjusting_orders = order.orders;
+                    order.adjusting_subtotal = order.subtotal;
+                    order.orders = params.orders;
+                    order.subtotal = params.subtotal;
+                    order.meal = m.id;
+                    order.save(function(err,result){
+                      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >                        return res.badRequest(err);</span>
+                      }
+                      //send notification
+                      notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
+                      return res.ok({responseText : req.__('order-adjust-ok2', totalRefund /100)});
+                    })
+                  });
+                });
+              }
+            });
+          }else{
+<span class="cstat-no" title="statement not covered" >            order.orders = params.orders;</span>
+<span class="cstat-no" title="statement not covered" >            order.subtotal = params.subtotal;</span>
+<span class="cstat-no" title="statement not covered" >            order.meal = order.meal.id;</span>
+<span class="cstat-no" title="statement not covered" >            order.save(<span class="fstat-no" title="function not covered" >function(err,result){</span></span>
+<span class="cstat-no" title="statement not covered" >              if(err){</span>
+<span class="cstat-no" title="statement not covered" >                return res.badRequest(err);</span>
+              }
+<span class="cstat-no" title="statement not covered" >              notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);</span>
+<span class="cstat-no" title="statement not covered" >              return res.ok({responseText :req.__('order-adjust-ok3')});</span>
+            })
+          }
+        }else <span class="cstat-no" title="statement not covered" >if(order.status == "preparing"){</span>
+<span class="cstat-no" title="statement not covered" >          order.lastStatus = order.status;</span>
+<span class="cstat-no" title="statement not covered" >          order.status = "adjust";</span>
+<span class="cstat-no" title="statement not covered" >          order.isSendToHost = isSendToHost;</span>
+<span class="cstat-no" title="statement not covered" >          order.adjusting_orders = params.orders;</span>
+<span class="cstat-no" title="statement not covered" >          order.adjusting_subtotal = params.subtotal;</span>
+<span class="cstat-no" title="statement not covered" >          order.meal = order.meal.id;</span>
+<span class="cstat-no" title="statement not covered" >          order.save(<span class="fstat-no" title="function not covered" >function(err,result){</span></span>
+<span class="cstat-no" title="statement not covered" >            if(err){</span>
+<span class="cstat-no" title="statement not covered" >              return res.badRequest(err);</span>
+            }
+            //send notification
+<span class="cstat-no" title="statement not covered" >            notification.notificationCenter("Order", "adjusting", result, isSendToHost, false, req);</span>
+<span class="cstat-no" title="statement not covered" >            if(isSendToHost){</span>
+<span class="cstat-no" title="statement not covered" >              return res.ok({responseText : req.__('order-adjust-request-user')});</span>
+            }else{
+<span class="cstat-no" title="statement not covered" >              return res.ok({responseText : req.__('order-adjust-request-host')});</span>
+            }
+          });
+        }
+      })
+    });
+  },
+&nbsp;
+  abort : <span class="fstat-no" title="function not covered" >function(req, res){</span>
+<span class="cstat-no" title="statement not covered" >    var orderId = req.params.id;</span>
+<span class="cstat-no" title="statement not covered" >    var $this = this;</span>
+<span class="cstat-no" title="statement not covered" >    Order.findOne(orderId).populate("meal").populate("host").populate('customer').exec(<span class="fstat-no" title="function not covered" >function(err,order) {</span></span>
+<span class="cstat-no" title="statement not covered" >      if (err) {</span>
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(err)</span>
+      }
+<span class="cstat-no" title="statement not covered" >      if (order.status === "complete" || order.status === "cancel") {</span>
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(req.__('order-abort-complete'));</span>
+      }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      order.status = "cancel";</span>
+<span class="cstat-no" title="statement not covered" >      order.msg = "Order aborted by admin, please see email for detail, order id:" + order.id;</span>
+<span class="cstat-no" title="statement not covered" >      order.save(<span class="fstat-no" title="function not covered" >function(err, result){</span></span>
+<span class="cstat-no" title="statement not covered" >        if(err){</span>
+<span class="cstat-no" title="statement not covered" >          return res.badRequest(err);</span>
+        }
+<span class="cstat-no" title="statement not covered" >        notification.notificationCenter("Order", "cancel", result, false, true, req);</span>
+<span class="cstat-no" title="statement not covered" >        $this.cancelOrderJob(result.id, <span class="fstat-no" title="function not covered" >function(err){</span></span>
+<span class="cstat-no" title="statement not covered" >          if(err){</span>
+<span class="cstat-no" title="statement not covered" >            return res.badRequest(err);</span>
+          }
+<span class="cstat-no" title="statement not covered" >          return res.ok(order);</span>
+        });
+      })
+    });
+  },
+&nbsp;
+  refund : <span class="fstat-no" title="function not covered" >function(req, res){</span>
+<span class="cstat-no" title="statement not covered" >    var orderId = req.params.id;</span>
+<span class="cstat-no" title="statement not covered" >    Order.findOne(orderId).populate("meal").populate("host").populate('customer').exec(<span class="fstat-no" title="function not covered" >function(err,order) {</span></span>
+<span class="cstat-no" title="statement not covered" >      if (err) {</span>
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(err)</span>
+      }
+<span class="cstat-no" title="statement not covered" >      if(!order.charges || order.charges.length == 0){</span>
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(req.__('order-refund-fail'));</span>
+      }
+<span class="cstat-no" title="statement not covered" >      var refundCharges = Object.keys(order.charges);</span>
+<span class="cstat-no" title="statement not covered" >      async.each(refundCharges, <span class="fstat-no" title="function not covered" >function(chargeId,next){</span></span>
+<span class="cstat-no" title="statement not covered" >        stripe.refund({</span>
+          id : chargeId
+        },<span class="fstat-no" title="function not covered" >function(err, refund){</span>
+<span class="cstat-no" title="statement not covered" >          if(err){</span>
+<span class="cstat-no" title="statement not covered" >            return next(err);</span>
+          }
+<span class="cstat-no" title="statement not covered" >          next();</span>
+        });
+      },<span class="fstat-no" title="function not covered" >function(err){</span>
+<span class="cstat-no" title="statement not covered" >        if(err){</span>
+<span class="cstat-no" title="statement not covered" >          return res.badRequest(err);</span>
+        }
+<span class="cstat-no" title="statement not covered" >        order.msg = "Order refunded by admin, please see email for detail, order id:" + order.id;</span>
+<span class="cstat-no" title="statement not covered" >        order.save(<span class="fstat-no" title="function not covered" >function(err, result){</span></span>
+<span class="cstat-no" title="statement not covered" >          if(err){</span>
+<span class="cstat-no" title="statement not covered" >            return res.badRequest(err);</span>
+          }
+<span class="cstat-no" title="statement not covered" >          return res.ok(order);</span>
+        })
+      })
+&nbsp;
+    });
+  },
+&nbsp;
+  cancel : function(req, res){
+    var userId = req.session.user.id;
+    var hostId = req.session.user.host ? (req.session.user.host.id || req.session.user.host) : null;
+    var email = req.session.user.auth.email;
+    var orderId = req.params.id;
+    var params = req.body;
+    var $this = this;
+    Order.findOne(orderId).populate("meal").populate("host").populate("dishes").populate("customer").exec(function(err,order){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(err)</span>
+      }
+&nbsp;
+      var isSendToHost = true;
+      if(hostId == order.host.id){
+        isSendToHost = false;
+      }
+&nbsp;
+      if(order.status == "schedule"){
+        //can cancel without permission of host
+        var amount = (order.subtotal + order.delivery_fee).toFixed(2);
+        <span class="missing-if-branch" title="else path not taken" >E</span>if(amount &gt; 0){
+          User.findOne(order.customer.id).populate('payment').exec(function (err, found) {
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (err || !found.payment || found.payment.length == 0) {
+<span class="cstat-no" title="statement not covered" >              return res.badRequest(err);</span>
+            }
+            var refundCharges = Object.keys(order.charges);
+            async.each(refundCharges, function(chargeId, next){
+              stripe.refund({
+                id : chargeId
+              },function(err, refund) {
+                <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >                  return next(err);</span>
+                }
+                next();
+              });
+            },function(err){
+              <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >                sails.log.error("refund error: " + err);</span>
+<span class="cstat-no" title="statement not covered" >                return res.badRequest(err);</span>
+              }
+              var curOrder = extend({}, order.orders);
+              Object.keys(curOrder).forEach(function (dishId) {
+                curOrder[dishId] = 0;
+              });
+              $this.updateMealLeftQty(order.meal, order.orders, curOrder, function(err, m) {
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >                  return res.badRequest(err);</span>
+                }
+                order.status = "cancel";
+                order.meal = m.id;
+                order.subtotal = 0;
+                order.save(function (err, result) {
+                  <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >                    return res.badRequest(err);</span>
+                  }
+                  //send notification
+                  notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
+                  $this.cancelOrderJob(result.id, function(err){
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >                      return res.badRequest(err);</span>
+                    }
+                    return res.ok({responseText : req.__('order-cancel-ok')});
+                  });
+                })
+              });
+            });
+          });
+        }else{
+<span class="cstat-no" title="statement not covered" >          order.status = "cancel";</span>
+<span class="cstat-no" title="statement not covered" >          order.save(<span class="fstat-no" title="function not covered" >function(err,result){</span></span>
+<span class="cstat-no" title="statement not covered" >            if(err){</span>
+<span class="cstat-no" title="statement not covered" >              return res.badRequest(err);</span>
+            }
+            //send notification
+<span class="cstat-no" title="statement not covered" >            notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);</span>
+<span class="cstat-no" title="statement not covered" >            $this.cancelOrderJob(result.id, <span class="fstat-no" title="function not covered" >function(err){</span></span>
+<span class="cstat-no" title="statement not covered" >              if(err){</span>
+<span class="cstat-no" title="statement not covered" >                return res.badRequest(err);</span>
+              }
+<span class="cstat-no" title="statement not covered" >              return res.ok({responseText : req.__('order-cancel-ok')});</span>
+            });
+          })
+        }
+      }else <span class="missing-if-branch" title="else path not taken" >E</span>if(order.status == "preparing"){
+        order.isSendToHost = isSendToHost;
+        order.lastStatus = order.status;
+        order.status = "cancelling";
+        order.save(function(err,result){
+          <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >            return res.badRequest(err);</span>
+          }
+          //send notification
+          notification.notificationCenter("Order", "cancelling", result, isSendToHost, false, req);
+          // if(req.wantsJSON){
+          //   return res.ok(result);
+          // }
+          if(result.isSendToHost){
+            return res.ok({responseText : req.__('order-cancel-request-user')});
+          }else{
+            return res.ok({responseText : req.__('order-cancel-request-host')});
+          }
+        });
+      }
+    });
+  },
+&nbsp;
+  confirm : function(req, res){
+    var userId = req.session.user.id;
+    var email = req.session.user.auth.email;
+    var orderId = req.params.id;
+    var params = req.body;
+    var $this = this;
+    Order.findOne(orderId).populate("meal").populate("host").populate("customer").exec(function(err,order){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
+      }
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(order.status == "adjust"){
+<span class="cstat-no" title="statement not covered" >        var adjusting_subtotal = order.adjusting_subtotal;</span>
+<span class="cstat-no" title="statement not covered" >        var adjusting_orders = order.adjusting_orders;</span>
+<span class="cstat-no" title="statement not covered" >        var diff = $this.addTax(adjusting_subtotal - order.subtotal,order.host.county);</span>
+<span class="cstat-no" title="statement not covered" >        var customerId = order.customer.id;</span>
+<span class="cstat-no" title="statement not covered" >        if(diff != 0){</span>
+<span class="cstat-no" title="statement not covered" >          User.findOne(customerId).populate('payment').exec(<span class="fstat-no" title="function not covered" >function (err, found) {</span></span>
+<span class="cstat-no" title="statement not covered" >            if (err || !found.payment || found.payment.length == 0) {</span>
+<span class="cstat-no" title="statement not covered" >              return res.badRequest(err);</span>
+            }
+<span class="cstat-no" title="statement not covered" >            if(diff&gt;0){</span>
+              //create another charge
+<span class="cstat-no" title="statement not covered" >              stripe.charge({</span>
+                amount : diff,
+                email : email,
+                customerId : found.payment[0].customerId,
+                destination : order.host.accountId,
+                metadata : {
+                  mealId : order.meal.id,
+                  hostId : order.host.id,
+                  orderId : order.id,
+                  userId : userId
+                }
+              },<span class="fstat-no" title="function not covered" >function(err, charge){</span>
+<span class="cstat-no" title="statement not covered" >                if (err) {</span>
+<span class="cstat-no" title="statement not covered" >                  return res.badRequest(err);</span>
+                }
+<span class="cstat-no" title="statement not covered" >                if(charge.status == "succeeded") {</span>
+<span class="cstat-no" title="statement not covered" >                  $this.updateMealLeftQty(order.meal, order.orders, adjusting_orders, <span class="fstat-no" title="function not covered" >function(err, m){</span></span>
+<span class="cstat-no" title="statement not covered" >                    if(err){</span>
+<span class="cstat-no" title="statement not covered" >                      return res.badRequest(err);</span>
+                    }
+<span class="cstat-no" title="statement not covered" >                    order.orders = adjusting_orders;</span>
+<span class="cstat-no" title="statement not covered" >                    order.subtotal = adjusting_subtotal;</span>
+<span class="cstat-no" title="statement not covered" >                    order.adjusting_orders = {};</span>
+<span class="cstat-no" title="statement not covered" >                    order.adjusting_subtotal = 0;</span>
+<span class="cstat-no" title="statement not covered" >                    var tmpLastStatus = order.status;</span>
+<span class="cstat-no" title="statement not covered" >                    order.status = order.lastStatus;</span>
+<span class="cstat-no" title="statement not covered" >                    order.lastStatus = tmpLastStatus;</span>
+<span class="cstat-no" title="statement not covered" >                    order.charges[charge.id] = charge.amount;</span>
+<span class="cstat-no" title="statement not covered" >                    order.meal = order.meal.id;</span>
+<span class="cstat-no" title="statement not covered" >                    order.save(<span class="fstat-no" title="function not covered" >function(err,result){</span></span>
+<span class="cstat-no" title="statement not covered" >                      if(err){</span>
+<span class="cstat-no" title="statement not covered" >                        return res.badRequest(err);</span>
+                      }
+<span class="cstat-no" title="statement not covered" >                      notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);</span>
+<span class="cstat-no" title="statement not covered" >                      if(result.isSendToHost){</span>
+<span class="cstat-no" title="statement not covered" >                        return res.ok({responseText : req.__('order-confirm-user')});</span>
+                      }else{
+<span class="cstat-no" title="statement not covered" >                        return res.ok({responseText : req.__('order-confirm-host')});</span>
+                      }
+                    })
+                  });
+                }
+              });
+            }else {
+<span class="cstat-no" title="statement not covered" >              diff = -diff;</span>
+<span class="cstat-no" title="statement not covered" >              var chargeIds = Object.keys(order.charges);</span>
+<span class="cstat-no" title="statement not covered" >              var refundCharges = [];</span>
+<span class="cstat-no" title="statement not covered" >              chargeIds.forEach(<span class="fstat-no" title="function not covered" >function (chargeId) {</span></span>
+<span class="cstat-no" title="statement not covered" >                if (diff != 0) {</span>
+<span class="cstat-no" title="statement not covered" >                  var chargeAmount = order.charges[chargeId];</span>
+<span class="cstat-no" title="statement not covered" >                  if(chargeAmount != 0){</span>
+<span class="cstat-no" title="statement not covered" >                    if (chargeAmount &gt; diff) {</span>
+<span class="cstat-no" title="statement not covered" >                      refundCharges.push({amount: diff, id: chargeId});</span>
+<span class="cstat-no" title="statement not covered" >                      order.charges[chargeId] = chargeAmount - diff;</span>
+<span class="cstat-no" title="statement not covered" >                      diff = 0;</span>
+                    } else <span class="cstat-no" title="statement not covered" >if(chargeAmount &lt;= diff) {</span>
+<span class="cstat-no" title="statement not covered" >                      diff -= chargeAmount;</span>
+<span class="cstat-no" title="statement not covered" >                      refundCharges.push({amount: chargeAmount, id: chargeId});</span>
+<span class="cstat-no" title="statement not covered" >                      order.charges[chargeId] = 0;</span>
+                    }
+                  }
+                }
+              });
+<span class="cstat-no" title="statement not covered" >              async.each(refundCharges, <span class="fstat-no" title="function not covered" >function (charge, next) {</span></span>
+<span class="cstat-no" title="statement not covered" >                stripe.refund({</span>
+                  id: charge.id,
+                  amount: charge.amount
+                }, <span class="fstat-no" title="function not covered" >function (err, refund) {</span>
+<span class="cstat-no" title="statement not covered" >                  if (err) {</span>
+<span class="cstat-no" title="statement not covered" >                    return next(err);</span>
+                  }
+<span class="cstat-no" title="statement not covered" >                  next();</span>
+                })
+              }, <span class="fstat-no" title="function not covered" >function (err) {</span>
+<span class="cstat-no" title="statement not covered" >                if (err) {</span>
+<span class="cstat-no" title="statement not covered" >                  return res.badRequest(err);</span>
+                }
+<span class="cstat-no" title="statement not covered" >                $this.updateMealLeftQty(order.meal, order.orders, adjusting_orders, <span class="fstat-no" title="function not covered" >function (err, m) {</span></span>
+<span class="cstat-no" title="statement not covered" >                  if (err) {</span>
+<span class="cstat-no" title="statement not covered" >                    return res.badRequest(err);</span>
+                  }
+<span class="cstat-no" title="statement not covered" >                  order.orders = adjusting_orders;</span>
+<span class="cstat-no" title="statement not covered" >                  order.subtotal = adjusting_subtotal;</span>
+<span class="cstat-no" title="statement not covered" >                  order.adjusting_orders = {};</span>
+<span class="cstat-no" title="statement not covered" >                  order.adjusting_subtotal = 0;</span>
+<span class="cstat-no" title="statement not covered" >                  var tmpLastStatus = order.status;</span>
+<span class="cstat-no" title="statement not covered" >                  order.status = order.lastStatus;</span>
+<span class="cstat-no" title="statement not covered" >                  order.lastStatus = tmpLastStatus;</span>
+<span class="cstat-no" title="statement not covered" >                  order.meal = order.meal.id;</span>
+<span class="cstat-no" title="statement not covered" >                  order.save(<span class="fstat-no" title="function not covered" >function (err, result) {</span></span>
+<span class="cstat-no" title="statement not covered" >                    if (err) {</span>
+<span class="cstat-no" title="statement not covered" >                      return res.badRequest(err);</span>
+                    }
+<span class="cstat-no" title="statement not covered" >                    notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);</span>
+<span class="cstat-no" title="statement not covered" >                    if (result.isSendToHost) {</span>
+<span class="cstat-no" title="statement not covered" >                      return res.ok({responseText: req.__('order-confirm-user')});</span>
+                    } else {
+<span class="cstat-no" title="statement not covered" >                      return res.ok({responseText: req.__('order-confirm-host')});</span>
+                    }
+                  })
+                });
+              })
+            }
+          })
+        }else{
+<span class="cstat-no" title="statement not covered" >          order.orders = adjusting_orders;</span>
+<span class="cstat-no" title="statement not covered" >          order.subtotal = adjusting_subtotal;</span>
+<span class="cstat-no" title="statement not covered" >          order.adjusting_orders = {};</span>
+<span class="cstat-no" title="statement not covered" >          order.adjusting_subtotal = 0;</span>
+<span class="cstat-no" title="statement not covered" >          var tmpLastStatus = order.status;</span>
+<span class="cstat-no" title="statement not covered" >          order.status = order.lastStatus;</span>
+<span class="cstat-no" title="statement not covered" >          order.lastStatus = tmpLastStatus;</span>
+<span class="cstat-no" title="statement not covered" >          order.meal = order.meal.id;</span>
+<span class="cstat-no" title="statement not covered" >          order.save(<span class="fstat-no" title="function not covered" >function(err,result){</span></span>
+<span class="cstat-no" title="statement not covered" >            if(err){</span>
+<span class="cstat-no" title="statement not covered" >              return res.badRequest(err);</span>
+            }
+<span class="cstat-no" title="statement not covered" >            notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);</span>
+<span class="cstat-no" title="statement not covered" >            if(result.isSendToHost){</span>
+<span class="cstat-no" title="statement not covered" >              return res.ok({responseText : req.__('order-confirm-user')});</span>
+            }else{
+<span class="cstat-no" title="statement not covered" >              return res.ok({responseText : req.__('order-confirm-host')});</span>
+            }
+          })
+        }
+      }else <span class="missing-if-branch" title="else path not taken" >E</span>if(order.status == "cancelling"){
+        var amount = order.subtotal + order.delivery_fee;
+        <span class="missing-if-branch" title="else path not taken" >E</span>if(amount &gt; 0){
+          User.findOne(userId).populate('payment').exec(function (err, found) {
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >              return res.badRequest(err);</span>
+            }
+            var refundCharges = Object.keys(order.charges);
+            async.each(refundCharges, function(chargeId, next){
+              <span class="missing-if-branch" title="if path not taken" >I</span>if(order.charges[chargeId] == 0){
+<span class="cstat-no" title="statement not covered" >                return next();</span>
+              }
+              stripe.refund({
+                id : chargeId
+              },function(err, refund){
+                <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >                  return next(err);</span>
+                }
+                next();
+              });
+            },function(err){
+              <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >                return res.badRequest(err);</span>
+              }
+              var curOrder = extend({}, order.orders);
+              Object.keys(curOrder).forEach(function (dishId) {
+                curOrder[dishId] = 0;
+              });
+              $this.updateMealLeftQty(order.meal, order.orders, curOrder, function (err, m) {
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >                  return res.badRequest(err);</span>
+                }
+                order.status = "cancel";
+                order.lastStatus = "cancelling";
+                order.meal = order.meal.id;
+                order.save(function (err, result) {
+                  <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >                    return res.badRequest(err);</span>
+                  }
+                  notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);
+                  $this.cancelOrderJob(result.id, function(err){
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >                      return res.badRequest(err);</span>
+                    }
+                    return res.ok({responseText : req.__('order-confirm-cancel')});
+                  });
+                })
+              });
+            })
+          });
+        }else{
+<span class="cstat-no" title="statement not covered" >          order.status = "cancel";</span>
+<span class="cstat-no" title="statement not covered" >          order.lastStatus = "cancelling";</span>
+<span class="cstat-no" title="statement not covered" >          order.meal = order.meal.id;</span>
+<span class="cstat-no" title="statement not covered" >          order.save(<span class="fstat-no" title="function not covered" >function(err,result){</span></span>
+<span class="cstat-no" title="statement not covered" >            if(err){</span>
+<span class="cstat-no" title="statement not covered" >              return res.badRequest(err);</span>
+            }
+<span class="cstat-no" title="statement not covered" >            notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);</span>
+<span class="cstat-no" title="statement not covered" >            $this.cancelOrderJob(result.id, <span class="fstat-no" title="function not covered" >function(err){</span></span>
+              // if(err){
+              //   return res.badRequest(err);
+              // }
+<span class="cstat-no" title="statement not covered" >              return res.ok({responseText : req.__('order-confirm-cancel')});</span>
+            });
+          })
+        }
+      }
+    });
+  },
+&nbsp;
+  reject : function(req, res){
+    var userId = req.session.user.id;
+    var email = req.session.user.auth.email;
+    var orderId = req.params.id;
+    var params = req.body;
+    var $this = this;
+    Order.findOne(orderId).populate("customer").populate("host").exec(function(err,order){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
+      }
+      var lastStatus = order.lastStatus;
+      order.lastStatus = order.status;
+      order.status = lastStatus;
+      order.msg = params.msg;
+      order.save(function(err,result){
+        <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >          return res.badRequest(err);</span>
+        }
+        notification.notificationCenter("Order", "reject", result, !result.isSendToHost, false, req);
+        // if(req.wantsJSON){
+        //   return res.ok(result);
+        // }
+        return res.ok({ responseText : req.__('order-reject-adjust')});
+      });
+    });
+  },
+&nbsp;
+  ready : function(req, res){
+    var orderId = req.params.id;
+    var email = req.session.user.auth.email;
+    Order.findOne(orderId).populate("customer").populate("host").exec(function(err,order){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
+      }
+      order.status = "ready";
+      order.save(function(err,result){
+        <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >          return res.badRequest(err);</span>
+        }
+        notification.notificationCenter("Order", "ready", result, false, false, req);
+        <span class="missing-if-branch" title="if path not taken" >I</span>if(order.method == "pickup"){
+<span class="cstat-no" title="statement not covered" >          return res.ok({responseText : req.__('order-ready')});</span>
+        }else{
+          return res.ok({responseText : req.__('order-ready2')});
+        }
+      });
+    });
+  },
+&nbsp;
+  receive : function(req, res){
+    var orderId = req.params.id;
+    var email = req.session.user.auth.email;
+    Order.findOne(orderId).populate("customer").populate("host").exec(function(err,order){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
+      }
+      order.status = "review";
+      order.reviewing_orders = Object.keys(order.orders).filter(function(orderId){
+        return order.orders[orderId] &gt; 0;
+      });
+      order.save(function(err,result){
+        <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >          return res.badRequest(err);</span>
+        }
+        notification.notificationCenter("Order", "receive", result, false, false, req);
+        return res.ok({responseText : req.__('order-receive')});
+      });
+    });
+  },
+&nbsp;
+  update : function(req, res){
+    var orderId = req.params.id;
+    Order.update(orderId, req.body).exec(function(err, order){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
+      }
+      return res.ok(order[0]);
+    });
+  },
+&nbsp;
+  search : <span class="fstat-no" title="function not covered" >function(req, res){</span>
+<span class="cstat-no" title="statement not covered" >    Order.find(req.query).populate('customer').populate('meal').populate('host').exec(<span class="fstat-no" title="function not covered" >function(err, orders){</span></span>
+<span class="cstat-no" title="statement not covered" >      if(err){</span>
+<span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
+      }
+<span class="cstat-no" title="statement not covered" >      return res.ok(orders);</span>
+    })
+  },
+&nbsp;
+  cancelOrderJob : function(orderId, cb){
+    Jobs.cancel({ 'data.orderId' : orderId }, function(err, numberRemoved){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >        sails.log.error(err);</span>
+<span class="cstat-no" title="statement not covered" >        return cb(err);</span>
+      }
+      sails.log.debug(numberRemoved + " order jobs of order : " + orderId +  " removed");
+      cb();
+    })
+  },
+&nbsp;
+  addTax : function(subtotal, county){
+    var tax;
+    switch (county){
+      case "San Francisco County":
+        tax = 1.0875;
+        break;
+<span class="branch-1 cbranch-no" title="branch not covered" >      case "Sacramento County":</span>
+<span class="cstat-no" title="statement not covered" >        tax = 1.08;</span>
+<span class="cstat-no" title="statement not covered" >        break;</span>
+<span class="branch-2 cbranch-no" title="branch not covered" >      default:</span>
+<span class="cstat-no" title="statement not covered" >        tax = 1.08;</span>
+    }
+    return Math.round(subtotal * tax * 100);
+  },
+&nbsp;
+  calculateTotal : function(params, county){
+    var total = params.subtotal;
+    var tax;
+    switch (county){
+      case "San Francisco County":
+        tax = 1.0875;
+            break;
+<span class="branch-1 cbranch-no" title="branch not covered" >      case "Sacramento County":</span>
+<span class="cstat-no" title="statement not covered" >        tax = 1.08;</span>
+<span class="cstat-no" title="statement not covered" >        break;</span>
+<span class="branch-2 cbranch-no" title="branch not covered" >      default:</span>
+<span class="cstat-no" title="statement not covered" >        tax = 1.08;</span>
+    }
+    tax = tax || <span class="branch-1 cbranch-no" title="branch not covered" >1.08;</span>
+    total = total * tax;
+    if(params.delivery_fee){
+      total += params.delivery_fee;
+    }
+    return Math.round(total * 100);
+  }
+};
+&nbsp;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Sep 16 2016 11:56:30 GMT-0700 (PDT)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

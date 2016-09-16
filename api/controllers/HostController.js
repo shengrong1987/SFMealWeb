@@ -21,39 +21,45 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        host.checkGuideRequirement(function(err, pass){
+        host.locale = req.getLocale();
+        host.save(function(err, h){
           if(err){
             return res.badRequest(err);
           }
-          //construct orders for host
-          async.each(host.orders,function(order, next){
-            Order.findOne(order.id).populate("meal").exec(function(err, o){
-              if(err){
-                return next(err);
-              }
-              order = o;
-              next();
-            });
-          },function(err){
+          host.checkGuideRequirement(function(err, pass){
             if(err){
               return res.badRequest(err);
             }
-            host.host_orders = host.orders;
-            host.adjusting_orders = host.adjusting_orders;
-            host.host_dishes = host.dishes;
-            Notification.destroy({host : hostId}).exec(function(err){
+            //construct orders for host
+            async.each(host.orders,function(order, next){
+              Order.findOne(order.id).populate("meal").exec(function(err, o){
+                if(err){
+                  return next(err);
+                }
+                order = o;
+                next();
+              });
+            },function(err){
               if(err){
-                console.log(err);
+                return res.badRequest(err);
               }
+              host.host_orders = host.orders;
+              host.adjusting_orders = host.adjusting_orders;
+              host.host_dishes = host.dishes;
+              Notification.destroy({host : hostId}).exec(function(err){
+                if(err){
+                  console.log(err);
+                }
+              });
+              var u = user[0];
+              u.host = host;
+              if(req.wantsJSON){
+                return res.ok(u);
+              }
+              return res.view('host',{user: u});
             });
-            var u = user[0];
-            u.host = host;
-            if(req.wantsJSON){
-              return res.ok(u);
-            }
-            return res.view('host',{user: u});
-          });
-        })
+          })
+        });
       });
     });
   },
@@ -177,73 +183,79 @@ module.exports = {
         var hasImage = params.hasImage;
         delete params.hasImage;
       }
-      if(params.license){
-        params.license = JSON.parse(params.license);
-        params.license.valid = false;
-      }
-      Host.update({id: hostId}, params).exec(function(err,host){
+      Host.findOne(hostId).populate('user').exec(function(err,host){
         if(err){
           return res.badRequest(err);
         }
-        host = host[0];
-        async.auto({
-          uploadDocument : function(cb){
-            if(!hasImage){
-              return cb();
-            }
-            req.file("image").upload(function(err, files){
-              var file = files[0];
-              stripe.uploadFile({
-                purpose : 'identity_document',
-                file : {
-                  data : fs.readFileSync(file.fd),
-                  name : file.filename,
-                  type: 'application/octet-stream'
-                }
-              }, host.accountId, function(err, data){
-                if(err){
-                  return cb(err);
-                }
-                legal_entity.verification = {document : data.id};
-                cb();
-            });
-           });
-          },
-          updateAccount : ['uploadDocument', function(cb){
-            if(!legal_entity){
-              return cb();
-            }
-            stripe.updateManagedAccount(host.accountId, {legal_entity : legal_entity},function(err, result){
-              if(err){
-                return cb(err)
-              }
-              cb();
-            });
-          }]
-        }, function(err, result){
+        if(params.license){
+          params.license = JSON.parse(params.license);
+          params.license.valid = false;
+          params.license.issuedTo = host.user.firstname + " " + host.user.lastname;
+        }
+        Host.update({id : hostId}, params).exec(function (err, host) {
           if(err){
             return res.badRequest(err);
           }
-          var updatingToUser = {};
-          if(!legal_entity){
-            return res.ok({});
-          }
-          if(legal_entity.dob){
-            updatingToUser.birthday = new Date(legal_entity.dob.year,legal_entity.dob.month-1,legal_entity.dob.day);
-          }if(legal_entity.first_name && legal_entity.last_name){
-            updatingToUser.firstname = legal_entity.first_name;
-            updatingToUser.lastname = legal_entity.last_name;
-          }
-          User.update(userId,updatingToUser).exec(function(err,user){
+          host = host[0];
+          async.auto({
+            uploadDocument : function(cb){
+              if(!hasImage){
+                return cb();
+              }
+              req.file("image").upload(function(err, files){
+                var file = files[0];
+                stripe.uploadFile({
+                  purpose : 'identity_document',
+                  file : {
+                    data : fs.readFileSync(file.fd),
+                    name : file.filename,
+                    type: 'application/octet-stream'
+                  }
+                }, host.accountId, function(err, data){
+                  if(err){
+                    return cb(err);
+                  }
+                  legal_entity.verification = {document : data.id};
+                  cb();
+                });
+              });
+            },
+            updateAccount : ['uploadDocument', function(cb){
+              if(!legal_entity){
+                return cb();
+              }
+              stripe.updateManagedAccount(host.accountId, {legal_entity : legal_entity},function(err, result){
+                if(err){
+                  return cb(err)
+                }
+                cb();
+              });
+            }]
+          }, function(err, result){
             if(err){
               return res.badRequest(err);
             }
-            if(req.wantsJSON){
-              return res.ok(user[0]);
+            var updatingToUser = {};
+            if(!legal_entity){
+              return res.ok({});
             }
-            return res.ok({});
+            if(legal_entity.dob){
+              updatingToUser.birthday = new Date(legal_entity.dob.year,legal_entity.dob.month-1,legal_entity.dob.day);
+            }if(legal_entity.first_name && legal_entity.last_name){
+              updatingToUser.firstname = legal_entity.first_name;
+              updatingToUser.lastname = legal_entity.last_name;
+            }
+            User.update(userId,updatingToUser).exec(function(err,user){
+              if(err){
+                return res.badRequest(err);
+              }
+              if(req.wantsJSON){
+                return res.ok(user[0]);
+              }
+              return res.ok({});
+            });
           });
-        });
+        })
       });
     }
   },
@@ -310,9 +322,6 @@ module.exports = {
       if(!host){
         return res.notFound();
       }
-      if(req.wantsJSON){
-        return res.ok(host);
-      }
       var publicHost = {};
       publicHost.dishes = host.dishes;
       publicHost.meals = host.meals;
@@ -327,6 +336,9 @@ module.exports = {
           return res.badRequest(err);
         }
         publicHost.reviews = reviews;
+        if(req.wantsJSON){
+          return res.ok(publicHost);
+        }
         res.view("profile",{host : publicHost});
       });
     });

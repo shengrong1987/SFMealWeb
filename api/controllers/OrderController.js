@@ -11,7 +11,7 @@ var async = require('async');
 var notification = require("../services/notification");
 var geocode = require("../services/geocode.js");
 
-//-1 : quantity now enough
+//-1 : quantity not enough
 //-2 : dish not valid
 //-3 : order total doesn't match
 //-4 : meal not valid
@@ -19,76 +19,70 @@ var geocode = require("../services/geocode.js");
 //-6 : address verification fail
 //-7 : pickup option not exist
 //-8 : host can't adjust order at schedule
+//-9 : order is empty
+//-10 : meal is not active
+//-11 : order's pickup method invalid
+
 
 module.exports = {
 
-  validate_meal : function(meal, orders, preorders, subtotal, res, req) {
+  validate_meal : function(meal, orders, lastOrders, subtotal, req, cb) {
     var now = new Date();
     var params = req.body;
     if(!orders || !subtotal){
-      return res.badRequest(req.__('order-empty'));
+      return cb({ responseText : req.__('order-empty'), code : -9});
     }
-    if(meal.status === "off"){
-      return res.badRequest(req.__('meal-not-active'));
-    }
-
-    if(now < meal.provideFromTime || now > meal.provideTillTime){
-      return res.badRequest(req.__('meal-not-active'));
+    if(meal.status === "off" || (now < meal.provideFromTime || now > meal.provideTillTime)){
+      return cb({ responseText : req.__('meal-not-active'), code : -10});
     }
 
     if(!meal.isDelivery && params.method == 'delivery'){
-      return res.badRequest(req.__('order-invalid-method'));
+      return cb({ responseText : req.__('order-invalid-method'), code : -11});
     }
 
-    if(meal.dateIsValid()) {
-      console.log("meal is valid");
-      //check order is valid
-      //check amount is correct base on the dish price
-      var actual_subtotal = 0;
-      var dishes = Object.keys(orders);
-      for (var i = 0; i < dishes.length; i++) {
-        var dishId = dishes[i];
-        var quantity = parseInt(orders[dishId]);
-        var preQuantity = 0
-        if(preorders){
-          preQuantity = parseInt(preorders[dishId]);
-        }
-        var validDish = false;
-        for (var j = 0; j < meal.dishes.length; j++) {
-          var mealDish = meal.dishes[j];
-          if (dishId == mealDish.id) {
-            if(!mealDish.isVerified){
-              validDish = false;
-            }
-            var diff = quantity - preQuantity;
-            if (diff == 0 || diff <= meal.leftQty[dishId]) {
-              validDish = true;
-              actual_subtotal += quantity * mealDish.price;
-            } else {
-              console.log("dish: " + dishId + " is not enough for " + quantity);
-              res.badRequest({responseText : req.__('order-dish-not-enough',dishId, quantity), code : -1});
-              return false;
-            }
-          }
-        }
-        if (!validDish) {
-          console.log("dish: " + dishId + " is not valid");
-          res.badRequest({responseText : req.__('order-invalid-dish',dishId), code : -2});
-          return false;
-        }
-      }
-      console.log("dish is valid");
-      if (actual_subtotal.toFixed(2) != subtotal) {
-        console.log("calculate subtotal is: " + actual_subtotal + "submit subtotal is :" + subtotal + "order subtotal is not correct");
-        res.badRequest({responseText : req.__('order-total-not-match'), code : -3});
-        return false;
-      }
-      return true;
-    }else{
-      console.log("meal is not a valid meal");
-      res.badRequest({ responseText : req.__('order-invalid-meal'), code : -4});
-      return false;
+    if(!meal.dateIsValid()) {
+      return cb({ responseText : req.__('order-invalid-meal'), code : -4});
     }
+
+    sails.log.debug("meal looks good so far, checking order items...");
+
+    var actual_subtotal = 0;
+    var validDish = false;
+
+    async.each(Object.keys(orders), function(dishId, next){
+      var qty = parseInt(orders[dishId]);
+      var lastQty = lastOrders ? parseInt(lastOrders[dishId]) : 0;
+      if(qty > 0 || lastQty > 0){
+        async.each(meal.dishes, function(dish, next2){
+          if(dish.id == dishId){
+            if(!dish.isVerified){
+              return next2({responseText : req.__('order-invalid-dish',dishId), code : -2});
+            }
+            var diff = qty - lastQty;
+            if(diff > meal.leftQty[dishId]){
+              return next2({responseText : req.__('order-dish-not-enough',dishId, qty), code : -1});
+            }
+            actual_subtotal += qty * dish.price;
+          }
+          next2();
+        }, function(err){
+          next(err);
+        });
+      }else{
+        next();
+      }
+    }, function(err){
+      if(err){
+        return cb(err);
+      }
+
+      sails.log.debug("dish is valid and enough, checking total price...");
+
+      if(actual_subtotal.toFixed(2) != subtotal) {
+        return cb({responseText : req.__('order-total-not-match'), code : -3});
+      }
+      return cb(null);
+    });
   },
 
   validateAddress : function(method, meal, address, cb){
@@ -98,11 +92,11 @@ module.exports = {
       var range = meal.delivery_range;
       geocode.distance(address, location, function(err, distance){
         if(err){
-          console.log(err);
+          sails.log.error(err);
           return cb(false);
         }
         if(distance > range){
-          console.log("distance verification failed");
+          sails.log.error("distance verification failed");
           return cb(false);
         }
         cb(true);
@@ -114,11 +108,9 @@ module.exports = {
 
   updateMealLeftQty : function(meal, lastorder, order, cb){
     var leftQty = meal.leftQty;
-    var dishes = Object.keys(lastorder);
-    dishes.forEach(function(dishId){
+    Object.keys(lastorder).forEach(function(dishId){
       var diff = lastorder[dishId] - order[dishId];
       leftQty[dishId] += diff;
-      //console.log("dish: " + dishId + " left: " + leftQty[dishId]);
     });
     meal.leftQty = leftQty;
     meal.save(function(err,result){
@@ -136,8 +128,6 @@ module.exports = {
     }else {
       params.delivery_fee = 0;
     }
-
-    sails.log.debug(params, meal.type);
 
     if(meal.type == 'preorder'){
       if(!params.pickupOption || !meal.pickups || params.pickupOption-1>=meal.pickups.length){
@@ -160,6 +150,7 @@ module.exports = {
       }
       params.pickupInfo = pickupInfo;
     }
+    sails.log.debug("building pickup data");
 
     return params;
   },
@@ -184,9 +175,13 @@ module.exports = {
       $this.validateAddress(method, m, address, function(valid){
         if(!valid){
           return res.badRequest({responseText : req.__('order-invalid-address'), code : -6});
-        }else if($this.validate_meal(m, orders, undefined, subtotal, res, req)){
-          console.log("order pass meal validation");
+        }
 
+        $this.validate_meal(m, orders, undefined, subtotal, req , function(err){
+          if(err){
+            sails.log.error(err.responseText);
+            return res.badRequest(err);
+          }
           //calculate pickup method and delivery fee
           req.body = $this.buildDeliveryData(req.body, m);
 
@@ -200,7 +195,7 @@ module.exports = {
 
           //calculate total
           var total = $this.calculateTotal(req.body, m.chef.county);
-          console.log("total is: " + total);
+          sails.log.info("total is: " + total);
 
           req.body.host = m.chef.id;
           req.body.type = m.type;
@@ -222,7 +217,9 @@ module.exports = {
               return res.badRequest(req.__('order-lack-contact'));
             }
             req.body.phone = found.phone || req.body.phone;
-            console.log("everything seems good, creating order...");
+
+            sails.log.debug("everything seems good, creating order...");
+
             Order.create(req.body).exec(function (err, order) {
               if (err) {
                 return res.badRequest(err);
@@ -247,7 +244,9 @@ module.exports = {
                     return res.badRequest(err);
                   });
                 } else if (charge.status == "succeeded") {
-                  console.log("charge succeed, gathering charing info for order");
+
+                  sails.log.debug("charge succeed, gathering charging info for order");
+
                   for (var i = 0; i < m.dishes.length; i++) {
                     var dishId = m.dishes[i].id;
                     var quantity = parseInt(orders[dishId]);
@@ -281,7 +280,7 @@ module.exports = {
               });
             });
           });
-        }
+        });
       });
     });
   },
@@ -313,9 +312,11 @@ module.exports = {
       }
 
       order.meal.dishes = order.dishes;
-      if($this.validate_meal(order.meal, params.orders, order.orders, subtotal, res, req)){
-
-        console.log("pass meal validation");
+      $this.validate_meal(order.meal, params.orders, order.orders, subtotal, req, function(err){
+        if(err){
+          sails.log.error(err.responseText);
+          return res.badRequest(err);
+        }
         var isSendToHost = true;
         if(hostId == order.host.id){
           isSendToHost = false;
@@ -324,7 +325,9 @@ module.exports = {
           //host cannot adjust the order at schedule
           //can update without permission of host or adjust by host
           var diff = $this.addTax(subtotal - order.subtotal, order.host.county);
-          console.log("adjusting amount: " + diff);
+
+          sails.log.info("adjusting amount: " + diff);
+
           if(diff != 0){
             User.findOne(order.customer.id).populate('payment').exec(function (err, found) {
               if (err) {
@@ -348,7 +351,7 @@ module.exports = {
                   }
                 },function(err, charge){
                   if (err) {
-                    console.log(err);
+                    sails.log.error(err);
                     return res.badRequest(err);
                   }
                   if(charge.status == "succeeded") {
@@ -460,7 +463,7 @@ module.exports = {
             }
           });
         }
-      }
+      })
     });
   },
 
@@ -540,7 +543,6 @@ module.exports = {
       }
 
       var isSendToHost = true;
-      console.log(isSendToHost);
       if(hostId == order.host.id){
         isSendToHost = false;
       }
@@ -565,7 +567,7 @@ module.exports = {
               });
             },function(err){
               if (err) {
-                console.log("refund error: " + err);
+                sails.log.error("refund error: " + err);
                 return res.badRequest(err);
               }
               var curOrder = extend({}, order.orders);
@@ -944,10 +946,10 @@ module.exports = {
   cancelOrderJob : function(orderId, cb){
     Jobs.cancel({ 'data.orderId' : orderId }, function(err, numberRemoved){
       if(err){
-        console.log(err);
+        sails.log.error(err);
         return cb(err);
       }
-      console.log(numberRemoved + " order jobs removed");
+      sails.log.debug(numberRemoved + " order jobs of order : " + orderId +  " removed");
       cb();
     })
   },

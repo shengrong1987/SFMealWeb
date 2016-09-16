@@ -17,7 +17,7 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      return res.ok(dish);
+      return res.ok(dish[0]);
     });
   },
 
@@ -27,7 +27,7 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      return res.ok(dish);
+      return res.ok(dish[0]);
     });
   },
 

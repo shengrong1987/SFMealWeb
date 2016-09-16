@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for services/notification.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">services/</a> notification.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">64.74% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>112/173</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">55.21% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>53/96</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">78.57% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>11/14</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">64.74% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>112/173</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">313×</span>
+<span class="cline-any cline-yes">313×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Created by shengrong on 12/3/15.
+ */
+var nodemailer = require('nodemailer');
+var moment = require('moment');
+var util = require('./util');
+var transporter = nodemailer.createTransport("SMTP",{
+  host : "smtp.office365.com",
+  secureConnection : false,
+  port : 587,
+  auth : {
+    user : "admin@sfmeal.com",
+    pass : "Rs89030659!"
+  },
+  tls : {
+    ciphers : 'SSLv3'
+  }
+});
+&nbsp;
+var mailOptions = {
+  from: '"SFMeal" &lt;admin@sfmeal.com&gt;', // sender address
+  to: '', // list of receivers
+  subject: 'Hello ✔', // Subject line
+  text: 'Hello world 🐴', // plaintext body
+  html: '&lt;b&gt;Hello world 🐴&lt;/b&gt;' // html body
+};
+&nbsp;
+var notification = {
+  /*
+    publish event method
+    @params
+    model : the event model
+    action : the action of the event
+    params : model data
+    isSendToHost : if the event is sent to host
+    isAdminAction : if the event is post by admin
+   */
+  notificationCenter : function(model, action, params, isSendToHost, isAdminAction, req){
+&nbsp;
+    isSendToHost = isSendToHost || false;
+    isAdminAction = isAdminAction || false;
+    params.isAdminAction = isAdminAction;
+&nbsp;
+    this.publishEvent(model, action, params, isSendToHost, isAdminAction);
+&nbsp;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if(isAdminAction){
+      //send emails to both chef and guest as it's modified by admin
+<span class="cstat-no" title="statement not covered" >      params.isSendToHost = true;</span>
+<span class="cstat-no" title="statement not covered" >      notification.sendEmail(model, action, params, req);</span>
+<span class="cstat-no" title="statement not covered" >      params.isSendToHost = false;</span>
+<span class="cstat-no" title="statement not covered" >      notification.sendEmail(model, action, params, req);</span>
+    }
+    else{
+      params.isSendToHost = isSendToHost;
+      notification.sendEmail(model, action, params, req);
+    }
+  },
+&nbsp;
+  sendEmail : function(model, action, params, req){
+&nbsp;
+    var basicInfo = this.inquireBasicInfo(params.isSendToHost, params);
+    var template = this.inquireTemplate(model,action);
+    var locale = req ? (params.isSendToHost ? params.host.locale : params.customer.locale) : <span class="branch-1 cbranch-no" title="branch not covered" >'';</span>
+&nbsp;
+    this.mergeI18N(model, action, req, locale, params);
+&nbsp;
+    this.transitLocaleTimeZone(params);
+    util.getTaxRate(params);
+    params.recipientName = basicInfo.recipientName;
+    params.senderName = "SFMeal.com";
+&nbsp;
+    //juice it using email-template
+    sails.hooks.email.send(template,params,{
+      to : basicInfo.recipientEmail,
+      subject : "SFMeal.com"
+    },function(err){
+&nbsp;
+      console.log(basicInfo.recipientEmail, err || "It worked!");
+    })
+  },
+&nbsp;
+  publishEvent : function(model, action, params, isSendToHost, isAdminAction){
+    var verb = "updated";
+    <span class="missing-if-branch" title="else path not taken" >E</span>if(model === "Order"){
+      switch(action){
+        case "new":
+          Order.publishCreate({id : params.id, host : params.host});
+          verb = "created";
+          break;
+        case "adjust":
+          Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
+          break;
+<span class="branch-2 cbranch-no" title="branch not covered" >        case "adjusting":</span>
+<span class="cstat-no" title="statement not covered" >          Order.publishUpdate( params.id, { id : params.id, action : "requested for adjust", host : params.host});</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+        case "cancel":
+          verb = "destroyed";
+          Order.publishDestroy( params.id, undefined, {host : params.host} );
+          break;
+<span class="branch-4 cbranch-no" title="branch not covered" >        case "abort":</span>
+<span class="cstat-no" title="statement not covered" >          verb = "destroyed";</span>
+<span class="cstat-no" title="statement not covered" >          Order.publishDestroy( params.id, undefined, {host : params.host} );</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+        case "cancelling":
+          Order.publishUpdate( params.id, { id : params.id, action : "requested for cancel", host : params.host});
+          break;
+        case "confirm":
+          Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
+          break;
+        case "ready":
+          Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
+          break;
+        case "receive":
+          Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});
+          break;
+        case "reject":
+          Order.publishUpdate( params.id, { id : params.id, action : "changes are rejected", host : params.host});
+          break;
+<span class="branch-10 cbranch-no" title="branch not covered" >        case "reminder":</span>
+<span class="cstat-no" title="statement not covered" >          Order.publishUpdate( params.id, { id : params.id, action : action, host : params.host});</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+        case "review":
+          Order.publishUpdate( params.id, { id : params.id, action : "has an new review!", host : params.host});
+          break;
+      }
+    }else <span class="cstat-no" title="statement not covered" >if(model == "Meal"){</span>
+<span class="cstat-no" title="statement not covered" >      switch(action){</span>
+        case "mealScheduleEnd":
+<span class="cstat-no" title="statement not covered" >          Meal.publishUpdate( params.id, { id : params.id, action: "mealScheduleEnd", host: params.host || params.chef });</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+        case "start":
+<span class="cstat-no" title="statement not covered" >          Meal.publishUpdate( params.id, { id : params.id, action: "mealStart", host: params.host || params.chef });</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+      }
+    }
+&nbsp;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if(isAdminAction){
+<span class="cstat-no" title="statement not covered" >      Notification.create({ recordId : params.id, host : params.host, action : action, model : model, verb : verb }).exec(<span class="fstat-no" title="function not covered" >function(err, noti){</span></span>
+<span class="cstat-no" title="statement not covered" >        if(err){</span>
+<span class="cstat-no" title="statement not covered" >          console.log(err);</span>
+<span class="cstat-no" title="statement not covered" >          return;</span>
+        }
+      });
+<span class="cstat-no" title="statement not covered" >      Notification.create({ recordId : params.id, user : params.customer, action : action, model : model, verb : verb}).exec(<span class="fstat-no" title="function not covered" >function(err, noti){</span></span>
+<span class="cstat-no" title="statement not covered" >        if(err){</span>
+<span class="cstat-no" title="statement not covered" >          console.log(err);</span>
+<span class="cstat-no" title="statement not covered" >          return;</span>
+        }
+      });
+    }else if(isSendToHost){
+      Notification.create({ recordId : params.id, host : params.host, action : action, model : model, verb : verb }).exec(function(err, noti){
+        <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >          console.log(err);</span>
+<span class="cstat-no" title="statement not covered" >          return;</span>
+        }
+      });
+    }else{
+      Notification.create({ recordId : params.id, user : params.customer, action : action, model : model, verb : verb}).exec(function(err, noti){
+        <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >          console.log(err);</span>
+<span class="cstat-no" title="statement not covered" >          return;</span>
+        }
+      });
+    }
+  },
+&nbsp;
+  inquireBasicInfo : function(isSendToHost, params){
+    var info = {};
+    if(isSendToHost){
+      info.recipientEmail = params.hostEmail;
+      info.recipientName = (params.host || <span class="branch-1 cbranch-no" title="branch not covered" >params.chef)</span>.shopName;
+    }else{
+      info.recipientEmail = params.guestEmail;
+      info.recipientName = params.customer.firstname;
+    }
+    return info;
+  },
+&nbsp;
+  inquireTemplate : function(model,action){
+    var template = "";
+    <span class="missing-if-branch" title="else path not taken" >E</span>if(model == "Order"){
+      switch(action){
+        case "new":
+          template = "new";
+          break;
+        case "adjust":
+          template = "adjust";
+          break;
+<span class="branch-2 cbranch-no" title="branch not covered" >        case "adjusting":</span>
+<span class="cstat-no" title="statement not covered" >          template = "adjusting";</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+        case "cancel":
+          template = "cancel";
+          break;
+        case "cancelling":
+          template = "cancelling";
+          break;
+<span class="branch-5 cbranch-no" title="branch not covered" >        case "abort":</span>
+<span class="cstat-no" title="statement not covered" >          template = "cancel";</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+        case "confirm":
+          template = "confirm";
+          break;
+        case "ready":
+          template = "ready";
+          break;
+        case "reject":
+          template = "reject";
+          break;
+        case "review":
+          template = "review";
+          break;
+<span class="branch-10 cbranch-no" title="branch not covered" >        case "reminder":</span>
+<span class="cstat-no" title="statement not covered" >          template = "reminder";</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+      }
+    }else <span class="cstat-no" title="statement not covered" >if(model == "Meal"){</span>
+<span class="cstat-no" title="statement not covered" >      switch(action){</span>
+        case "mealScheduleEnd":
+<span class="cstat-no" title="statement not covered" >          template = "guestlist";</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+        case "start":
+<span class="cstat-no" title="statement not covered" >          template = "start";</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+        case "cancel":
+<span class="cstat-no" title="statement not covered" >          template = "cancel" + model;</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+      }
+    }
+    return template;
+  },
+&nbsp;
+  mergeI18N : function(model, action, req, locale, params){
+    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','tax'];
+    <span class="missing-if-branch" title="else path not taken" >E</span>if(model == "Order"){
+      switch(action){
+        case "new":
+          i18ns = i18ns.concat(['new-order-title','new-order-context','order-time','ready-time','order','preorder']);
+          break;
+        case "adjust":
+          i18ns = i18ns.concat(['adjust-order-context','adjust-order-from-host-context','modify','de-order','order-time','adjust-time','chef']);
+          break;
+<span class="branch-2 cbranch-no" title="branch not covered" >        case "adjusting":</span>
+<span class="cstat-no" title="statement not covered" >          i18ns = i18ns.concat(['apply-adjust','apply-adjust-order-context','apply-adjust-order-from-host-context','confirm-or-reject','order-time','adjust-time','ready-time','chef']);</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+        case "cancel":
+          i18ns = i18ns.concat(['pity','cancel','de-order','cancel-order-context','order-time','preorder-end-time','cancel-time','cancel-order-admin-context','cancel-order-admin-title','cancel-reason']);
+          break;
+        case "cancelling":
+          i18ns = i18ns.concat(['apply-cancel','cancelling-order-title','cancelling-order-context','cancel-reason','order-time','apply-cancel-time','confirm-or-reject']);
+          break;
+<span class="branch-5 cbranch-no" title="branch not covered" >        case "abort":</span>
+<span class="cstat-no" title="statement not covered" >          i18ns = [];</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+        case "confirm":
+          i18ns = i18ns.concat(['confirm-cancel','confirm-adjust','confirm-cancel-context-by-user','confirm-cancel-context-by-host','confirm-adjust-context-by-user','confirm-adjust-context-by-host','order-time','apply-cancel-time','apply-adjust-time','refund-method','default-card']);
+          break;
+        case "ready":
+          i18ns = i18ns.concat(['order-ready-title','order-pickup-ready-context','order-delivery-ready-context','pickup-method','self-pickup','delivery','pickup-location','order-time','complete-time','contact-phone']);
+          break;
+        case "reject":
+          i18ns = i18ns.concat(['cancel', 'adjust', 'get-reject','order-time','reject-reason',"order-cancel-reject-context-by-host","order-cancel-reject-context-by-user","order-adjust-reject-context-by-host", "order-adjust-reject-context-by-user"]);
+          break;
+        case "review":
+          i18ns = i18ns.concat(['review-order-title','review-order-context-1','review-order-context-2','review-dish','review-meal','scoreLabel','content','review-time','view-review']);
+          break;
+<span class="branch-10 cbranch-no" title="branch not covered" >        case "reminder":</span>
+<span class="cstat-no" title="statement not covered" >          i18ns = i18ns.concat(['order-pickup-reminder-title','order-pickup-reminder-hourly-context','order-pickup-reminder-daily-context','order-arrive-reminder-title','order-arrive-reminder-context','pickup-location','pickup-time','contact-phone','delivery-location']);</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+      }
+    }else <span class="cstat-no" title="statement not covered" >if(model == "Meal"){</span>
+<span class="cstat-no" title="statement not covered" >      switch(action){</span>
+        case "mealScheduleEnd":
+<span class="cstat-no" title="statement not covered" >          i18ns = i18ns.concat(['guest-list-title','guest-list-context','guest-list-no-title','guest-list-no-context','guest-list-no-tips','delivery-location','delivery-time','pickup-time','pickup-location','print-list','content','contact','comment','open-meal']);</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+        case "start":
+<span class="cstat-no" title="statement not covered" >          i18ns = i18ns.concat(['meal-name','meal-number','meal-order-start-title','meal-order-start-context','step2','provide-time','ready-time','min']);</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+        case "cancel":
+<span class="cstat-no" title="statement not covered" >          i18ns = i18ns.concat(['pity','cancel','de-order','cancel-meal-title','meal-create-time','preorder-start-time','preorder-end-time','cancel-meal-context','meal-fail-requirement','open-meal','preorder-end-time','cancel-time','meal-number',"qty","left","cancel-reason"]);</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+      }
+    }
+&nbsp;
+    i18ns.forEach(function(keyword){
+      <span class="missing-if-branch" title="else path not taken" >E</span>if(req){
+        params[keyword.replace(/\-/g,'')] = req.__(keyword);
+      }else{
+<span class="cstat-no" title="statement not covered" >        params[keyword.replace(/\-/g,'')] = sails.__({</span>
+          phrase : keyword,
+          locale : locale
+        });
+      }
+    });
+  },
+&nbsp;
+  transitLocaleTimeZone : function(params){
+    moment.tz.add('America/Los_Angeles|PST PDT|80 70|0101|1Lzm0 1zb0 Op0');
+    if(params.pickupInfo){
+      params.pickupInfo.pickupFromTime = moment.tz(params.pickupInfo.pickupFromTime, "America/Los_Angeles");
+      params.pickupInfo.pickupTillTime = moment.tz(params.pickupInfo.pickupTillTime, "America/Los_Angeles");
+    }
+    if(params.eta){
+      params.eta = moment.tz(params.eta,"America/Los_Angeles");
+    }
+    <span class="missing-if-branch" title="else path not taken" >E</span>if(params.meal){
+      params.meal.provideFromTime = moment.tz(params.meal.provideFromTime, "America/Los_Angeles");
+      params.meal.provideTillTime = moment.tz(params.meal.provideTillTime, "America/Los_Angeles");
+    }
+    <span class="missing-if-branch" title="if path not taken" >I</span>if(params.pickups){
+<span class="cstat-no" title="statement not covered" >      params.pickups.forEach(<span class="fstat-no" title="function not covered" >function(pickup){</span></span>
+<span class="cstat-no" title="statement not covered" >        pickup.pickupFromTime = moment.tz(pickup.pickupFromTime, "America/Los_Angeles");</span>
+<span class="cstat-no" title="statement not covered" >        pickup.pickupTillTime = moment.tz(pickup.pickupTillTime, "America/Los_Angeles");</span>
+      });
+    }
+  }
+}
+&nbsp;
+module.exports = notification;
+&nbsp;
+&nbsp;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Sep 16 2016 11:56:30 GMT-0700 (PDT)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

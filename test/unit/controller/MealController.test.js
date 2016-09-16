@@ -1,6 +1,3 @@
-/**
- * Created by shengrong on 11/19/15.
- */
 
 var assert = require('assert'),
     should = require('should'),
@@ -10,7 +7,7 @@ var assert = require('assert'),
     request = require("supertest-as-promised");
 var agent;
 
-before(function(done) {
+before(function(done){
   agent = request.agent(sails.hooks.http.app);
   done();
 })
@@ -23,6 +20,9 @@ describe('MealController', function() {
 
     var hostId;
     var email = 'aimbebe.r@gmail.com';
+    var adminEmail = 'admin@sfmeal.com';
+    var user2Email = "user2@sfmeal.com";
+    var password2 = "123456789";
     var password = '12345678';
     var address = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : "(415)802-3853"};
 
@@ -35,41 +35,20 @@ describe('MealController', function() {
         .end(done)
     });
 
-    it('should become a host if is not one', function (done) {
+    it('should get host id', function (done) {
       agent
-        .post('/user/becomeHost')
+        .get('/host/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
-          res.body.user.host.should.be.ok();
-          hostId = res.body.user.host;
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('host');
+          hostId = res.body.host.id;
           done();
         })
-    });
-
-    it('should create bank info for host', function (done) {
-      stripe.tokens.create({
-        bank_account: {
-          country: 'US',
-          currency: 'usd',
-          routing_number: '110000000',
-          account_number: '000123456789'
-        }
-      }, function(err, token) {
-        agent
-          .post("/bank")
-          .set('Accept', 'application/json')
-          .expect('Content-Type', /json/)
-          .send({
-            token : token.id
-          })
-          .expect(200)
-          .end(function(err, res){
-            if(res.body.bank_name != "STRIPE TEST BANK"){
-              return done(Error("error creating bank, bank name doesen't match(STRIPE TEST BANK)"));
-            }
-            done();
-          })
-      });
     });
 
     var dish1;
@@ -79,7 +58,7 @@ describe('MealController', function() {
     it('should create couple dishes', function (done) {
       agent
           .post('/dish')
-          .send({title : '韭菜盒子',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId, isVerified : true})
+          .send({title : '韭菜盒子',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
           .expect(200)
           .end(function(err,res){
             if(res.body.id == undefined){
@@ -90,7 +69,7 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '猪肉馅饼',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId, isVerified : true})
+          .send({title : '猪肉馅饼',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
           .expect(200)
           .end(function(err,res){
             if(res.body.id == undefined){
@@ -101,7 +80,7 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '五彩面',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'entree', chef : hostId, isVerified : true})
+          .send({title : '五彩面',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'entree', chef : hostId})
           .expect(200)
           .end(function(err,res){
             if(res.body.id == undefined){
@@ -112,7 +91,7 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '糖水',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'dessert', chef : hostId, isVerified : true})
+          .send({title : '糖水',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'dessert', chef : hostId})
           .expect(200)
           .end(function(err,res){
             if(res.body.id == undefined){
@@ -122,7 +101,6 @@ describe('MealController', function() {
             done();
           })
     });
-
 
     var mealId;
     var preorderMealId;
@@ -222,6 +200,46 @@ describe('MealController', function() {
           })
     })
 
+    it('should not create an active preorder type meal', function (done) {
+      var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
+      var now = new Date();
+      var pickups = [{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+        "location" : "1455 Market St, San Francisoc, CA 94124",
+        "method" : "pickup"
+      },{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
+        "method" : "delivery"
+      }];
+      agent
+        .post('/meal')
+        .send({
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          pickups : JSON.stringify(pickups),
+          isDelivery : true,
+          leftQty: leftQty,
+          totalQty: totalQty,
+          county : 'San Francisco County',
+          title : "私房面馆",
+          type : "preorder",
+          dishes : dishes,
+          status : "on",
+          cover : dish1,
+          minimalOrder : 1
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-7);
+          done();
+        })
+    })
+
     it('should search the meals in San Francisco and with a keyword of 菜式 but no records are found', function (done) {
       agent
           .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
@@ -315,6 +333,142 @@ describe('MealController', function() {
           }
           done();
         })
+    });
+
+    it('should not turn meal on for invalid host because none dish is verified', function(done){
+      agent
+        .post('/meal/' + mealId + "/on")
+        .expect(302)
+        .end(done)
+    });
+
+    it('should login as administrator', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : adminEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should verify dish1', function(done){
+      agent
+        .post('/dish/' + dish1 + '/verify')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('isVerified');
+          res.body.isVerified.should.be.true();
+          done();
+        })
+    });
+
+    it('should login as host', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should not turn meal on because meal contains unverified dish', function(done){
+      agent
+        .post('/meal/' + mealId + "/on")
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('code');
+          res.body.code.should.be.equal(-8);
+          done();
+        })
+    });
+
+    it('should login as administrator', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : adminEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should unverify dish1', function(done){
+      agent
+        .post('/dish/' + dish1 + '/fail')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.isVerified.should.not.be.true();
+          done();
+        })
+    });
+
+    it('should verify dish1', function(done){
+      agent
+        .post('/dish/' + dish1 + '/verify')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.isVerified.should.be.true();
+          done();
+        })
+    });
+
+    it('should verify dish2', function(done){
+      agent
+        .post('/dish/' + dish2 + '/verify')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.isVerified.should.be.true();
+          done();
+        })
+    });
+
+    it('should verify dish3', function(done){
+      agent
+        .post('/dish/' + dish3 + '/verify')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.isVerified.should.be.true();
+          done();
+        })
+    });
+
+    it('should verify dish4', function(done){
+      agent
+        .post('/dish/' + dish4 + '/verify')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.isVerified.should.be.true();
+          done();
+        })
+    });
+
+    it('should login as host', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     });
 
     it('should turn one meal on', function (done) {
@@ -442,6 +596,153 @@ describe('MealController', function() {
           })
     })
 
+    it('should search the meals in San Francisco with keyword,county and zipcode', function (done) {
+      agent
+        .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County&zipcode=94124'))
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err,res){
+          res.body.meals.should.have.length(2);
+          res.body.should.have.property('anchor');
+          done();
+        })
+    })
+
+    it('should turn another meal off and cancel meal job', function (done) {
+      agent
+        .post('/meal/' + preorderMealId + "/off")
+        .expect(302)
+        .toPromise()
+        .delay(31000)
+        .then(function(res){
+          agent
+            .get('/job?data.mealId=' + preorderMealId)
+            .expect(200)
+            .then(function(res){
+              res.body.should.have.length(0);
+              done();
+            })
+            .catch(function(err){
+              done(err)
+            })
+        })
+        .catch(done)
+    })
+
+    it('should search the meals in San Francisco without just one result', function (done) {
+      agent
+        .get(encodeURI('/meal/search?county=San Francisco County&keyword='))
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err,res){
+          res.body.meals.should.have.length(1);
+          done();
+        })
+    })
+
+    it('should turn another meal on and schedule preorder schedule end job', function (done) {
+      agent
+        .post('/meal/' + preorderMealId + "/on")
+        .expect(200)
+        .end(done)
+    })
+
+    it('should not delete a dish which is serving', function(done){
+      agent
+        .delete('/dish/' + dish1)
+        .expect(400)
+        .end(done)
+    })
+
+    var dishToTestDeleteId;
+    it('should create more dishes', function (done) {
+      agent
+        .post('/dish')
+        .send({
+          title: '韭菜盒子',
+          price: 4,
+          photos: '[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
+          type: 'appetizer',
+          chef: hostId
+        })
+        .expect(200)
+        .end(function (err, res) {
+          if (err) {
+            return done(err);
+          }
+          should.exist(res.body.id);
+          dishToTestDeleteId = res.body.id;
+          done();
+        })
+    });
+
+    it('should create a order type meal ', function (done) {
+      var now = new Date();
+      var dishes = dishToTestDeleteId;
+      var leftQty = {};
+      leftQty[dishToTestDeleteId] = 1;
+      var totalQty = leftQty;
+      agent
+        .post('/meal')
+        .send({
+          provideFromTime: new Date(now.getTime() + 1000 * 60 * 11),
+          provideTillTime: new Date(now.getTime() + 1000 * 2 * 3600),
+          leftQty: leftQty,
+          totalQty: totalQty,
+          county : 'San Francisco County',
+          title : "私房面馆",
+          type : "order",
+          dishes : dishes,
+          cover : dish1,
+          minimalOrder : 5,
+          status : 'off',
+          isDelivery : false
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          if(res.body.chef != hostId){
+            return done(Error("error creating meal"));
+          }
+          done();
+        })
+    })
+
+    it('should login as another host', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({email : user2Email, password: password2})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
+    it('should not be able to delete a dish', function(done){
+      agent
+        .delete('/dish/' + dishToTestDeleteId)
+        .expect(403)
+        .end(done)
+    });
+
+    it('should login as host', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
+    it('should be able to delete a dish', function(done){
+      agent
+        .delete('/dish/' + dishToTestDeleteId)
+        .expect(200)
+        .end(done)
+    });
   });
 
 });

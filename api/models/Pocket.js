@@ -11,6 +11,9 @@ module.exports = {
     user : {
       model : 'User'
     },
+    host : {
+      model : 'Host'
+    },
     //in cents
     balance : {
       type : 'float',

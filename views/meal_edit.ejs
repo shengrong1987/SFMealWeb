@@ -232,7 +232,7 @@
                             <div class='input-group date' data-toggle="dateTimePicker">
                               <span class="input-group-addon">From</span>
                               <input type='text' class="form-control" />
-                            <span class="input-group-addon">
+                              <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
                             </span>
                             </div>
@@ -242,7 +242,7 @@
                             <div class='input-group date' data-toggle="dateTimePicker">
                               <span class="input-group-addon">&nbsp;&nbsp;To&nbsp;&nbsp;</span>
                               <input type='text' class="form-control"/>
-                            <span class="input-group-addon">
+                              <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
                             </span>
                             </div>
@@ -252,12 +252,26 @@
                             <label><%= __('pickup-location')%></label>
                             <input type="text" class="form-control">
                           </div>
+
+                          <div class="form-group method">
+                            <label><%= __('pickup-method')%></label>
+                            <select class="form-control">
+                              <option value="delivery"><%= __('delivery')%></option>
+                              <option value="pickup" selected="true"><%= __('self-pickup')%></option>
+                            </select>
+                          </div>
+
+                          <div class="form-group phone">
+                            <label><%= __('phone')%></label>
+                            <input type="text" class="form-control" value="<%= meal.phone || ''%>">
+                          </div>
+
                         </div>
                       </div>
                       <%}%>
                     </div>
 
-                    <div id="pickupAlert" class="alert alert-danger" data-toggle="alert"><%= __('need-one-pikcup-location')%></div>
+                    <div id="pickupAlert" class="alert alert-danger" data-toggle="alert"><%= __('need-one-pickup-location')%></div>
 
                     <button id="addNewPickupBtn" class="btn btn-info pull-right"><%= __('add-new-pickup')%></button>
                     <button id="removeNewPickupBtn" class="btn btn-danger pull-right" style="margin-right:10px;"><%= __('remove-pickup')%></button>

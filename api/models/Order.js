@@ -103,7 +103,8 @@ module.exports = {
       type : 'json'
     },
     msg : {
-      type : 'string'
+      type : 'string',
+      defaultsTo : ''
     },
     getTaxRate : function(){
       return util.getTaxRate(this);

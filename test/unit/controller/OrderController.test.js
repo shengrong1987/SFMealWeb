@@ -1,6 +1,3 @@
-/**
- * Created by shengrong on 11/19/15.
- */
 
 var assert = require('assert'),
     sinon = require('sinon'),
@@ -211,7 +208,7 @@ describe('OrderController', function() {
           })
     })
 
-    it('should cancel the dish at schedule successfully', function (done) {
+    it('should cancel the order at schedule successfully', function (done) {
       agent
           .post('/order/' + orderId + "/cancel")
           .expect(200)
@@ -447,127 +444,185 @@ describe('OrderController', function() {
           })
     });
 
-    it('should login or register an account for guest', function (done) {
-      agent
-        .post('/auth/login?type=local')
-        .send({email : guestEmail, password: password})
-        .expect(302)
-        .expect('Location','/auth/done')
-        .end(done)
-    });
+    describe('order with delivery option', function(){
+      it('should login or register an account for guest', function (done) {
+        agent
+          .post('/auth/login?type=local')
+          .send({email : guestEmail, password: password})
+          .expect(302)
+          .expect('Location','/auth/done')
+          .end(done)
+      });
 
-    var mealId;
-    var dishId1;
-    var dishId2;
-    var dishId3;
-    var dishId4;
-    var price1;
-    var price2;
-    var price3;
-    it('should get a order meal ', function (done) {
-      agent
-        .get('/meal')
-        .expect(200)
-        .end(function(err,res){
-          if(err){
-            console.log(err);
-            return done(err);
-          }
-          if(res.body.meals.length == 0){
-            return done(Error("error getting any meal"));
-          }
-          var meal = res.body.meals[0];
-          mealId = meal.id;
-          dishId1 = meal.dishes[0].id;
-          dishId2 = meal.dishes[1].id;
-          dishId3 = meal.dishes[2].id;
-          dishId4 = meal.dishes[3].id;
-          price1 = meal.dishes[0].price;
-          price2 = meal.dishes[1].price;
-          price3 = meal.dishes[2].price;
-          done();
-        })
+      var mealId;
+      var dishId1;
+      var dishId2;
+      var dishId3;
+      var dishId4;
+      var price1;
+      var price2;
+      var price3;
+      it('should get a order meal ', function (done) {
+        agent
+          .get('/meal')
+          .expect(200)
+          .end(function(err,res){
+            if(err){
+              console.log(err);
+              return done(err);
+            }
+            if(res.body.meals.length == 0){
+              return done(Error("error getting any meal"));
+            }
+            var meal = res.body.meals[0];
+            mealId = meal.id;
+            dishId1 = meal.dishes[0].id;
+            dishId2 = meal.dishes[1].id;
+            dishId3 = meal.dishes[2].id;
+            dishId4 = meal.dishes[3].id;
+            price1 = meal.dishes[0].price;
+            price2 = meal.dishes[1].price;
+            price3 = meal.dishes[2].price;
+            done();
+          })
+      })
+
+      var orderId;
+      it('should not order the meal with delivery', function (done) {
+        var dishObj = {};
+        dishObj[dishId1] = 1;
+        dishObj[dishId2] = 2;
+        dishObj[dishId3] = 0;
+        dishObj[dishId4] = 0;
+        agent
+          .post('/order')
+          .send({
+            orders : dishObj,
+            subtotal : price1 * 1 + price2 * 2,
+            phone : phone,
+            method : "delivery",
+            mealId : mealId
+          })
+          .expect(400)
+          .end(done)
+      })
+
+      it('should login or register an account', function (done) {
+        agent
+          .post('/auth/login?type=local')
+          .send({email : email, password: password})
+          .expect(302)
+          .expect('Location','/auth/done')
+          .end(done)
+      });
+
+      it('should update the meal with support delivery', function(done){
+        var now = new Date();
+        agent
+          .put('/meal/' + mealId)
+          .send({
+            provideFromTime : now,
+            provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
+            minimalOrder : 5,
+            isDelivery : true
+          })
+          .expect(200)
+          .end(done)
+      });
+
+      it('should login or register an account for guest', function (done) {
+        agent
+          .post('/auth/login?type=local')
+          .send({email : guestEmail, password: password})
+          .expect(302)
+          .expect('Location','/auth/done')
+          .end(done)
+      });
+
+      it('should order the meal with delivery', function (done) {
+        var dishObj = {};
+        dishObj[dishId1] = 1;
+        dishObj[dishId2] = 1;
+        dishObj[dishId3] = 0;
+        dishObj[dishId4] = 0;
+        agent
+          .post('/order')
+          .send({
+            orders : dishObj,
+            subtotal : price1 * 1 + price2 * 1,
+            phone : phone,
+            pickupOption : 1,
+            method : "delivery",
+            mealId : mealId,
+            address : address
+          })
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            if(res.body.customer != guestId){
+              return done(Error('error taking order'))
+            }
+            done()
+          })
+      })
     })
 
-    var orderId;
-    it('should not order the meal with delivery', function (done) {
+    describe('update dish number on active meal', function(){
+
       var dishObj = {};
-      dishObj[dishId1] = 1;
-      dishObj[dishId2] = 2;
-      dishObj[dishId3] = 0;
-      dishObj[dishId4] = 0;
-      agent
-        .post('/order')
-        .send({
-          orders : dishObj,
-          subtotal : price1 * 1 + price2 * 2,
-          phone : phone,
-          method : "delivery",
-          mealId : mealId
-        })
-        .expect(400)
-        .end(done)
-    })
+      it('should login or register an account', function (done) {
+        agent
+          .post('/auth/login?type=local')
+          .send({email : email, password: password})
+          .expect(302)
+          .expect('Location','/auth/done')
+          .end(done)
+      });
 
-    it('should login or register an account', function (done) {
-      agent
-        .post('/auth/login?type=local')
-        .send({email : email, password: password})
-        .expect(302)
-        .expect('Location','/auth/done')
-        .end(done)
-    });
+      it('should be able to set dish that is not ordered to 0', function(done){
+        var now = new Date();
+        dishObj[dishId1] = 5;
+        dishObj[dishId2] = 5;
+        dishObj[dishId3] = 5;
+        dishObj[dishId4] = 1;
+        agent
+          .put("/meal/" + mealId)
+          .send({
+            provideFromTime : now,
+            provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
+            totalQty : dishObj,
+            minimalOrder : 5
+          })
+          .expect(200)
+          .end(done);
+      });
 
-    it('should update the meal with support delivery', function(done){
-      var now = new Date();
-      agent
-        .put('/meal/' + mealId)
-        .send({
-          provideFromTime : now,
-          provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
-          minimalOrder : 5,
-          isDelivery : true
-        })
-        .expect(200)
-        .end(done)
-    });
-
-    it('should login or register an account for guest', function (done) {
-      agent
-        .post('/auth/login?type=local')
-        .send({email : guestEmail, password: password})
-        .expect(302)
-        .expect('Location','/auth/done')
-        .end(done)
-    });
-
-    it('should order the meal with delivery', function (done) {
-      var dishObj = {};
-      dishObj[dishId1] = 1;
-      dishObj[dishId2] = 1;
-      dishObj[dishId3] = 0;
-      dishObj[dishId4] = 0;
-      agent
-        .post('/order')
-        .send({
-          orders : dishObj,
-          subtotal : price1 * 1 + price2 * 1,
-          phone : phone,
-          pickupOption : 1,
-          method : "delivery",
-          mealId : mealId,
-          address : address
-        })
-        .expect(200)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          if(res.body.customer != guestId){
-            return done(Error('error taking order'))
-          }
-          done()
-        })
+      it('should not set dish number lower than ordered number', function(done){
+        var now = new Date();
+        dishObj[dishId1] = 0;
+        dishObj[dishId2] = 0;
+        dishObj[dishId3] = 1;
+        dishObj[dishId4] = 1;
+        agent
+          .put("/meal/" + mealId)
+          .send({
+            provideFromTime : now,
+            provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
+            totalQty : dishObj,
+            minimalOrder : 5,
+          })
+          .expect(400)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            res.body.should.have.property("code");
+            res.body.code.should.be.equal(-9);
+            done();
+          });
+      });
     })
   });
 

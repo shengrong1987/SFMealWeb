@@ -110,6 +110,10 @@ module.exports = {
     isDelivery : {
       type : 'boolean'
     },
+    msg : {
+      type : 'string',
+      defaultsTo : ''
+    },
     isFull : function(){
       var $this = this;
       var isFull = true;

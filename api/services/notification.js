@@ -39,6 +39,7 @@ var notification = {
 
     isSendToHost = isSendToHost || false;
     isAdminAction = isAdminAction || false;
+    params.isAdminAction = isAdminAction;
 
     this.publishEvent(model, action, params, isSendToHost, isAdminAction);
 
@@ -124,11 +125,11 @@ var notification = {
       }
     }else if(model == "Meal"){
       switch(action){
-        case "scheduleEnd":
-          Meal.publishUpdate( params.id, { id : params.id, action: "Your meal book time is over", host: params.host });
+        case "mealScheduleEnd":
+          Meal.publishUpdate( params.id, { id : params.id, action: "mealScheduleEnd", host: params.host || params.chef });
           break;
         case "start":
-          Meal.publishUpdate( params.id, { id : params.id, action: "Your meal will start in 10 minutes.", host: params.host });
+          Meal.publishUpdate( params.id, { id : params.id, action: "mealStart", host: params.host || params.chef });
           break;
       }
     }
@@ -221,6 +222,9 @@ var notification = {
         case "start":
           template = "start";
           break;
+        case "cancel":
+          template = "cancel" + model;
+          break;
       }
     }
     return template;
@@ -240,7 +244,7 @@ var notification = {
           i18ns = i18ns.concat(['apply-adjust','apply-adjust-order-context','apply-adjust-order-from-host-context','confirm-or-reject','order-time','adjust-time','ready-time','chef']);
           break;
         case "cancel":
-          i18ns = i18ns.concat(['pity','cancel','de-order','cancel-order-context','order-time','preorder-end-time','cancel-time']);
+          i18ns = i18ns.concat(['pity','cancel','de-order','cancel-order-context','order-time','preorder-end-time','cancel-time','cancel-order-admin-context','cancel-order-admin-title','cancel-reason']);
           break;
         case "cancelling":
           i18ns = i18ns.concat(['apply-cancel','cancelling-order-title','cancelling-order-context','cancel-reason','order-time','apply-cancel-time','confirm-or-reject']);
@@ -271,6 +275,9 @@ var notification = {
           break;
         case "start":
           i18ns = i18ns.concat(['meal-name','meal-number','meal-order-start-title','meal-order-start-context','step2','provide-time','ready-time','min']);
+          break;
+        case "cancel":
+          i18ns = i18ns.concat(['pity','cancel','de-order','cancel-meal-title','meal-create-time','preorder-start-time','preorder-end-time','cancel-meal-context','meal-fail-requirement','open-meal','preorder-end-time','cancel-time','meal-number',"qty","left","cancel-reason"]);
           break;
       }
     }

@@ -1,8 +1,3 @@
-/**
- * Created by shengrong on 11/19/15.
- */
-
-//process.chdir('..');
 
 var Sails = require('sails'),
     rc = require('rc'),
@@ -10,13 +5,13 @@ var Sails = require('sails'),
 
 before(function(done) {
   // Increase the Mocha timeout so that Sails has enough time to lift.
-  this.timeout(8000);
+  this.timeout(12000);
 
   //fs.unlinkSync('/.tmp/myTestConnection.db');
 
   Sails.lift({
     // configuration for testing purposes
-    log: { level: 'debug' },
+    log: { level: 'verbose' },
     connections: {
       someMongodbServer : {
         database : 'test'

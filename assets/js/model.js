@@ -195,21 +195,36 @@ var UserBarView = Backbone.View.extend({
     if(hostId){
       io.socket.get("/host/" + hostId +  "/orders");
       io.socket.get("/user/" + userId + "/orders");
+      io.socket.get("/user/" + userId + "/meals");
+      io.socket.get("/host/" + hostId + "/meals");
       io.socket.on("order", function(result){
-        console.log(result);
-        $this.handleNotification(result.verb, result.data.action, result.id);
+        $this.handleNotification(result.verb, result.data.action, result.id, "order");
         if(result.data.host && result.data.host.id == hostId){
           $this.handleBadge(true, "order");
         }else{
           $this.handleBadge(false, "order");
         }
       });
+      io.socket.on("meal", function(result){
+        $this.handleNotification(result.verb, result.data.action, result.id, "meal");
+        if(result.data.host && result.data.host.id == hostId){
+          $this.handleBadge(true, "meal");
+        }else{
+          $this.handleBadge(false, "meal");
+        }
+      });
     }else if(userId){
       io.socket.get("/user/" + userId + "/orders");
+      io.socket.get("/user/" + userId + "/meals");
       io.socket.on("order", function(result){
         console.log(result);
-        $this.handleNotification(result.verb, result.data.action, result.id);
+        $this.handleNotification(result.verb, result.data.action, result.id, "order");
         $this.handleBadge(false, "order");
+      });
+      io.socket.on("meal", function(result){
+        console.log(result);
+        $this.handleNotification(result.verb, result.data.action, result.id, "meal");
+        $this.handleBadge(false, "meal");
       });
     }
     this.getNotification();
@@ -217,12 +232,17 @@ var UserBarView = Backbone.View.extend({
   applyForHost : function(e){
     location.href = "/apply";
   },
-  handleNotification : function(verb, action, id){
+  handleNotification : function(verb, action, id, model){
+    model = model.toLowerCase();
     var msg = "unknown notification";
     switch(verb){
       case "updated":
-        msg = jQuery.i18n.prop('orderUpdatedNotification',id, jQuery.i18n.prop(action));
-            break;
+        if(model == "order"){
+          msg = jQuery.i18n.prop('orderUpdatedNotification',id, jQuery.i18n.prop(action));
+        }else if(model == "meal"){
+          msg = jQuery.i18n.prop('mealUpdatedNotification',id, jQuery.i18n.prop(action));
+        }
+        break;
       case "destroyed":
         msg = jQuery.i18n.prop('orderCancelNotification',id);
             break;
@@ -249,7 +269,7 @@ var UserBarView = Backbone.View.extend({
     if(userId){
       $.ajax("/user/" + userId + "/notifications").done(function(data){
         data.forEach(function(notification){
-          $this.handleNotification(notification.verb, notification.action, notification.recordId);
+          $this.handleNotification(notification.verb, notification.action, notification.recordId, notification.model);
           $this.handleBadge(false, notification.model);
         });
       });
@@ -257,7 +277,7 @@ var UserBarView = Backbone.View.extend({
     if(hostId){
       $.ajax("/host/" + hostId + "/notifications").done(function(data){
         data.forEach(function(notification){
-          $this.handleNotification(notification.verb, notification.action, notification.recordId);
+          $this.handleNotification(notification.verb, notification.action, notification.recordId, notification.model);
           $this.handleBadge(true, notification.model);
         });
       });
@@ -946,7 +966,7 @@ var MealView = Backbone.View.extend({
   addNewPickup : function(e){
     e.preventDefault();
     this.$el.find("#pickupAlert").hide();
-    var pickupView = '<div class="well form-group pickup"> <div class="col-xs-4"> <label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> <div class="col-xs-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">From</span> <input type="text" class="form-control" /> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">&nbsp;&nbsp;To&nbsp;&nbsp;</span> <input type="text" class="form-control"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div> <div class="form-group location"> <label data-toggle="i18n" data-key="pickupAddress"></label> <input type="text" class="form-control"> </div><div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div> </div> </div>';
+    var pickupView = '<div class="well form-group pickup"> <div class="col-xs-4"> <label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> <div class="col-xs-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">From</span> <input type="text" class="form-control" /> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">&nbsp;&nbsp;To&nbsp;&nbsp;</span> <input type="text" class="form-control"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div> <div class="form-group location"> <label data-toggle="i18n" data-key="pickupAddress"></label> <input type="text" class="form-control"> </div><div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div><div class="form-group phone"> <label data-toggle="i18n" data-key="telephone"></label> <input type="tel" class="form-control"> </div> </div> </div>';
     this.$el.find(".pickup_container").append(pickupView);
     this.$el.find("[data-toggle='dateTimePicker']").datetimepicker({
       icons:{
@@ -962,6 +982,7 @@ var MealView = Backbone.View.extend({
       showTodayButton : true,
     });
     setupLanguage();
+    $("input[type='tel']").inputmask({"mask": "(999) 999-9999"});
   },
   removeNewPickup : function(e){
     e.preventDefault();
@@ -1177,7 +1198,7 @@ var MealView = Backbone.View.extend({
           })
         }
       },error : function(model, err){
-        $this.formAlert.html(err.responseText);
+        $this.formAlert.html(err.responseJSON.responseText);
       }
     });
   }
@@ -1442,12 +1463,12 @@ var BankView = Backbone.View.extend({
             dismissModal();
             if(form.data("updating")){
               BootstrapDialog.alert(jQuery.i18n.prop('bankUpdated'), function(){
-                reloadUrl("/user/pocket","#mypurse");
+                reloadUrl("/pocket/user/me","#mypurse");
               });
             }else{
               if(response.passGuide){
                 BootstrapDialog.alert(jQuery.i18n.prop('bankCreated'), function(){
-                  reloadUrl("/user/pocket","#mypurse");
+                  reloadUrl("/pocket/user/,e","#mypurse");
                 });
               }else{
                 BootstrapDialog.show({

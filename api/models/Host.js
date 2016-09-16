@@ -96,6 +96,10 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
+    pocket : {
+      model : 'Pocket',
+      via : 'user'
+    },
     //check stripe verification, return verification object if not there's field_needed
     checkVerification : function(cb){
       var host = this;

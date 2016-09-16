@@ -62,6 +62,10 @@ module.exports = {
     isVerified : {
       type : 'boolean',
       defaultsTo : false
+    },
+    beforeCreate : function(values, cb){
+      values.isVerified = false;
+      cb();
     }
   }
 };

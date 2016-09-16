@@ -45082,6 +45082,7 @@ module.exports = TableHeader;
 
 var React = require('react/addons'),
   SFMealAPI = require('../helpers/SFMealAPI'),
+  ActionCreators = require('../actions/ActionCreators'),
   _ = require('lodash');
 
 var TableItem = React.createClass({displayName: "TableItem",
@@ -45139,10 +45140,12 @@ var TableItem = React.createClass({displayName: "TableItem",
     var day = target.find("~input[name='day']").val();
     var year = target.find("~input[name='year']").val();
     if(!month || !day || !year){
+      ActionCreators.badRequest("need expiration date");
       return;
     }
     var date = new Date(year, month-1, day);
     if(date.getTime() < new Date().getTime()){
+      ActionCreators.badRequest("expiration date should be in the future");
       return;
     }
     var data = {
@@ -45256,7 +45259,7 @@ var TableItem = React.createClass({displayName: "TableItem",
 
 module.exports = TableItem;
 
-},{"../helpers/SFMealAPI":193,"lodash":7,"react/addons":8}],189:[function(require,module,exports){
+},{"../actions/ActionCreators":181,"../helpers/SFMealAPI":193,"lodash":7,"react/addons":8}],189:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */

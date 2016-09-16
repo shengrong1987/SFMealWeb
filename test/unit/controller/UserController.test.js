@@ -1,6 +1,3 @@
-/**
- * Created by shengrong on 11/19/15.
- */
 
 var assert = require('assert'),
     should = require('should'),
@@ -17,12 +14,29 @@ describe('UsersController', function() {
 
   this.timeout(10000);
 
-  var newEmail = "shengrong1225" + new Date().getTime() + "@gmail.com"
+  var newEmail = "shengrong1225" + new Date().getTime() + "@gmail.com";
+  var password = "12345678";
+
+  describe('register admin', function(){
+    var adminEmail = "admin@sfmeal.com";
+    it('should register admin account', function (done) {
+      agent
+        .post('/auth/register')
+        .send({email : adminEmail, password: password})
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err,res){
+          res.body.should.have.property('auth');
+          res.body.auth.should.have.property('email',adminEmail);
+          done();
+        })
+    })
+  })
 
   describe('user login', function() {
 
     var email = "aimbebe.r@gmail.com";
-    var password = "12345678";
     var user2Email = "user2@sfmeal.com";
     var user3Email = "user3@sfmeal.com";
     var user4Email = "user4@sfmeal.com";
@@ -194,38 +208,6 @@ describe('UsersController', function() {
         .end(done)
     })
 
-    it('should register if account not exist', function (done) {
-      agent
-        .post('/auth/register')
-        .send({email : newEmail, password: password})
-        .expect(200)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          res.body.should.have.property('auth');
-          res.body.auth.email.should.be.equal(newEmail, "register email does not match user email")
-          done();
-        })
-    })
-
-    it('should become a host if logged in', function (done) {
-      agent
-        .post('/user/becomeHost')
-        .expect(200)
-        .end(function(err,res){
-          res.body.should.have.property("user");
-          should.exist(res.body.user.host);
-          done();
-        })
-    })
-
-    it('should get forbidden error for a host trying to apply for host', function (done) {
-      agent
-          .post('/user/becomeHost')
-          .expect(403,done)
-    })
-
     it('should logged out a logged in user', function (done) {
       agent
           .post('/auth/logout')
@@ -259,6 +241,17 @@ describe('UsersController', function() {
           if (err) {
             return done(err);
           }
+          done();
+        })
+    })
+
+    it('should become a host if logged in', function (done) {
+      agent
+        .post('/user/becomeHost')
+        .expect(200)
+        .end(function(err,res){
+          res.body.should.have.property("user");
+          should.exist(res.body.user.host);
           done();
         })
     })
@@ -428,85 +421,7 @@ describe('UsersController', function() {
           .send({address : "1974 palou ave, San Francisco"})
           .expect(403, done)
     })
-
   });
-
-  describe('user managed account verification', function() {
-
-    var password = "12345678";
-    var fields_need = [];
-    var hostId;
-    var firstname = "sheng";
-    var lastname = "rong";
-    it('should login a host account', function(done){
-      agent
-        .post('/auth/login?type=local')
-        .send({email : newEmail, password : password})
-        .expect(302)
-        .expect("Location","/auth/done")
-        .end(done)
-    });
-
-    it('should be an unverified account', function(done){
-      agent
-        .get('/apply')
-        .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
-        .expect(200)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          res.body.passGuide.should.be.false("should be an unverified account");
-          hostId = res.body.id;
-          done();
-        })
-    });
-
-    it('should update name and save to manged account', function(done){
-        agent
-          .put('/host/' + hostId)
-          .set('Accept', 'application/json')
-          .expect('Content-Type', /json/)
-          .send({legal_entity : JSON.stringify({
-            first_name : "sheng",
-            last_name : "rong",
-            dob : {
-              month : 12,
-              day : 25,
-              year : 1987
-            }
-          })})
-          .expect(200)
-          .end(function(err, res){
-            if(err){
-              return done(err);
-            }
-            res.body.firstname.should.equal('sheng',"error updating firstname from host to user");
-            res.body.lastname.should.equal('rong',"error updating lastname from host to user");
-            new Date(res.body.birthday).should.which.is.a.Date();
-            done();
-          })
-
-      it('should get the updated managed account', function(done){
-        agent
-          .get("/apply")
-          .set('Accept', 'application/json')
-          .expect('Content-Type', /json/)
-          .expect(200)
-          .end(function(err, res){
-            if(err){
-              return done(err);
-            }
-            res.body.should.have.property('verification');
-            should('legal_entity.first_name').be.equalOneOf(res.body.verification);
-            should('legal_entity.last_name').be.equalOneOf(res.body.verification);
-            should('legal_entity.dob.month').be.equalOneOf(res.body.verification);
-            done();
-          });
-      });
-    });
-  });
-    //need manual test for facebook and google login
+  //need manual test for facebook and google login
 
 });

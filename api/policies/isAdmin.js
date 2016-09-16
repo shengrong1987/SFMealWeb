@@ -13,7 +13,7 @@ module.exports = function(req, res, next) {
   if(req.session.authenticated){
     var email = req.session.user.auth.email;
     if(email == "admin@sfmeal.com"){
-      console.log("passed admin policy");
+      sails.log.info("accessing admin api");
       next();
     }else{
       return res.forbidden('You are not permitted to perform this action.');

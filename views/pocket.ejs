@@ -71,8 +71,8 @@
 
             <div id="transaction_container">
               <%
-              user.pocket.transactions_history = user.pocket.transactions_history || [];
-              user.pocket.transactions_history.sort(function(a,b){
+              user.pocket.transactions = user.pocket.transactions || [];
+              user.pocket.transactions.sort(function(a,b){
                 return a.created < b.created;
               });
               %>
@@ -84,7 +84,7 @@
               </div>
 
               <%
-              user.pocket.transactions_history.forEach(function(tranObj){
+              user.pocket.transactions.forEach(function(tranObj){
               if(tranObj.status == "pending"){
               %>
               <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
@@ -106,7 +106,8 @@
               </div>
 
               <%
-              user.pocket.transactions_history.forEach(function(tranObj){
+              user.pocket.transactions = user.pocket.transactions || [];
+              user.pocket.transactions.forEach(function(tranObj){
               if(tranObj.status == "paid" || tranObj.status == "succeeded"){
               %>
               <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
@@ -137,12 +138,12 @@
 
         <div id="mypurse" style="width: 90%;" class="tab-pane middle">
           <div class="box box-shadow white">
-            <% if(user.host){%>
+            <% if(typeof host != 'undefined' && host){%>
             <h4 class="text-left"><%= __('pocket-my-bank')%>: <small class="bank_name"></small>
-              <% if (user.host.bankId){%>
-              <small><a toggle="modal" data-updating="true" data-host="<%= user.host.id%>" data-target="#myModal" data-href="/templates/user/bank.html" href="javascript:void(0)" onclick="toggleModal(event,enterHostInfo)">  <%= __('bank-update')%> </a></small><i class="fa fa-question-circle text-grey cursor-pointer"></i>
+              <% if (host.bankId){%>
+              <small><a toggle="modal" data-updating="true" data-host="<%= host.id%>" data-target="#myModal" data-href="/templates/user/bank.html" href="javascript:void(0)" onclick="toggleModal(event,enterHostInfo)">  <%= __('bank-update')%> </a></small><i class="fa fa-question-circle text-grey cursor-pointer"></i>
               <%}else{%>
-              <small><a toggle="modal" data-updating="false" data-host="<%= user.host.id%>" data-target="#myModal" data-href="/templates/user/bank.html" href="javascript:void(0)" onclick="toggleModal(event,enterHostInfo)">  <%= __('bank-new')%> </a></small><i class="fa fa-question-circle text-grey cursor-pointer"></i>
+              <small><a toggle="modal" data-updating="false" data-host="<%= host.id%>" data-target="#myModal" data-href="/templates/user/bank.html" href="javascript:void(0)" onclick="toggleModal(event,enterHostInfo)">  <%= __('bank-new')%> </a></small><i class="fa fa-question-circle text-grey cursor-pointer"></i>
               <%}%>
             </h4>
             <h4 class="text-left"><%= __('pocket-my-balance')%>:</h4>

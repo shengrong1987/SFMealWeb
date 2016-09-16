@@ -27,7 +27,7 @@ module.exports = function(agenda) {
 
     // execute job
     run: function(job, done) {
-      console.log("Meal check executed");
+      sails.log.info("Meal check executed");
       var now = new Date();
 
       Meal.find({status : 'on', isScheduled : false}).exec(function(err, meals){

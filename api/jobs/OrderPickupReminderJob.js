@@ -26,6 +26,7 @@ module.exports = function(agenda) {
 
     // execute job
     run: function(job, done) {
+      sails.log.info("running order pickup reminder");
       var orderId = job.attrs.data.orderId;
       var period = job.attrs.data.period;
       Order.findOne(orderId).populate('host').populate('dishes').populate("customer").exec(function(err, order){
@@ -36,14 +37,14 @@ module.exports = function(agenda) {
           if(order.method == "pickup"){
             notification.notificationCenter("Order","ready",order,false,false,null);
           }else{
-            console.log("dispatching delivery for the pickup");
+            sails.log.info("dispatching delivery for the pickup");
           }
         }else{
           if(order.method == "pickup"){
             order.period = period;
             notification.notificationCenter("Order","reminder",order,false,false,null);
           }else{
-            console.log("dispatching delivery for the pickup");
+            sails.log.info("dispatching delivery for the pickup");
           }
         }
         done();

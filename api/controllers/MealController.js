@@ -8,6 +8,17 @@
 var GeoCoder = require("../services/geocode.js");
 var moment = require("moment");
 
+/*
+ error
+ * -5 : meal invalid date
+ * -6 : meal invalid requirement
+ * -7 : chef incomplete profile
+ * -8 : meal contain unverified dish
+ * -9 : fail to decrease totalQty because of the dish has been ordered
+ * -10 : fail to add/remove dish on active meal
+ * -11 : dish can not be empty
+ */
+
 module.exports = {
 
   new_form : function(req, res){
@@ -233,15 +244,15 @@ module.exports = {
               return res.badRequest(err);
             }
             if(!valid){
-              return res.badRequest(req.__('meal-chef-incomplete'));
+              return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
             }
             if(!meal.dateIsValid()){
               console.log("Date format of meal is not valid");
-              return res.badRequest(req.__('meal-invalid-date'));
+              return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
             }
             if(!meal.dishIsValid()){
               console.log("meal contain unverified dishes");
-              return res.badRequest(req.__('meal-unverify-dish'));
+              return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
             }
             $this.cancelMealJobs( mealId, function(err){
               if(err){
@@ -279,11 +290,11 @@ module.exports = {
             }
             if(!meal.dateIsValid()){
               console.log("Date format of meal is not valid");
-              return res.badRequest(req.__('meal-invalid-date'));
+              return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
             }
             if(!meal.dishIsValid()){
               console.log("meal contain unverified dishes");
-              return res.badRequest(req.__('meal-unverify-dish'));
+              return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
             }
 
             $this.cancelMealJobs(mealId, function(err){
@@ -351,7 +362,7 @@ module.exports = {
                     return res.badRequest(err);
                   }
                   if(!valid){
-                    return res.badRequest(req.__('meal-chef-incomplete'));
+                    return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
                   }
                   Meal.create(req.body).exec(function(err,meal){
                     if(err){
@@ -371,16 +382,16 @@ module.exports = {
             });
           }else{
             console.log("meal contain unverified dishes");
-            return res.badRequest(req.__('meal-unverify-dish'));
+            return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
           }
         });
       }else{
         console.log("meal requirement are not valid");
-        return res.badRequest(req.__('meal-invalid-requirement'));
+        return res.badRequest({responseText : req.__('meal-invalid-requirement'), code : -6});
       }
     }else{
       console.log("Date format of meal is not valid");
-      return res.badRequest(req.__('meal-invalid-date'));
+      return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
     }
   },
 
@@ -392,7 +403,7 @@ module.exports = {
         return res.badRequest(err);
       }
       if(meal.status == 'on'){
-        return res.badRequest(req.__('meal-active-update-dish'));
+        return res.badRequest({responseText : req.__('meal-active-update-dish'), code : -10});
       }
       meal.dishes.add(dishId);
       meal.save(function(err, result){
@@ -412,12 +423,12 @@ module.exports = {
         return res.badRequest(err);
       }
       if(meal.status == 'on'){
-        return res.badRequest(req.__('meal-active-update-dish'));
+        return res.badRequest({responseText : req.__('meal-active-update-dish'), code : -10});
       }
       if(meal.dishes.filter(function(dish){
         return dish.id != dishId;
       }) == 0){
-        return res.badRequest(req.__('meal-dishes-empty'));
+        return res.badRequest({responseText : req.__('meal-dishes-empty'), code : -11});
       }
       meal.dishes.remove(dishId);
       meal.save(function(err, result){
@@ -427,6 +438,20 @@ module.exports = {
         return res.ok({});
       });
     });
+  },
+
+  updateDishQty : function(leftQty, oldTotalQty, newTotalQty){
+    if(!newTotalQty){
+      return leftQty;
+    }
+    Object.keys(leftQty).forEach(function(dishId){
+      leftQty[dishId] = parseInt(leftQty[dishId]) + parseInt(newTotalQty[dishId]) - parseInt(oldTotalQty[dishId]);
+      if(leftQty[dishId] < 0){
+        leftQty = false;
+        return;
+      }
+    });
+    return leftQty;
   },
 
   update : function(req, res){
@@ -440,19 +465,38 @@ module.exports = {
           return res.badRequest(err);
         }
         if($this.requirementIsValid(req.body, meal)){
-          if(status == "on"){
-            meal.chef.dishes = meal.dishes;
-            if(!meal.dishIsValid()){
-              console.log("meal contain unverified dishes");
-              return res.badRequest(req.__('meal-unverify-dish'));
-            }
-            meal.chef.checkGuideRequirement(function(err, valid){
-              if(err){
-                return res.badRequest(err);
+          req.body.leftQty = $this.updateDishQty(meal.leftQty, meal.totalQty, req.body.totalQty);
+          if(!req.body.leftQty){
+            return res.badRequest({responseText : req.__('meal-adjust-qty-fail'), code : -9});
+          }else{
+            if(status == "on"){
+              meal.chef.dishes = meal.dishes;
+              if(!meal.dishIsValid()){
+                console.log("meal contain unverified dishes");
+                return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
               }
-              if(!valid){
-                return res.badRequest(req.__('meal-chef-incomplete'));
-              }
+              meal.chef.checkGuideRequirement(function(err, valid){
+                if(err){
+                  return res.badRequest(err);
+                }
+                if(!valid){
+                  return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
+                }
+                $this.cancelMealJobs(mealId, function(err){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  req.body.isScheduled = false;
+                  req.body.chef = hostId;
+                  Meal.update({id : mealId}, req.body).exec(function(err, result){
+                    if(err){
+                      return res.badRequest(err);
+                    }
+                    return res.ok(result);
+                  });
+                })
+              })
+            }else{
               $this.cancelMealJobs(mealId, function(err){
                 if(err){
                   return res.badRequest(err);
@@ -466,30 +510,16 @@ module.exports = {
                   return res.ok(result);
                 });
               })
-            })
-          }else{
-            $this.cancelMealJobs(mealId, function(err){
-              if(err){
-                return res.badRequest(err);
-              }
-              req.body.isScheduled = false;
-              req.body.chef = hostId;
-              Meal.update({id : mealId}, req.body).exec(function(err, result){
-                if(err){
-                  return res.badRequest(err);
-                }
-                return res.ok(result);
-              });
-            })
+            }
           }
         }else{
           console.log("meal minimal requirement are not valid");
-          return res.badRequest(req.__('meal-invalid-requirement'));
+          return res.badRequest({responseText : req.__('meal-invalid-requirement'), code : -6});
         }
       });
     }else{
       console.log("Date format of meal is not valid");
-      return res.badRequest(req.__('meal-invalid-date'));
+      return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
     }
   },
 
@@ -570,7 +600,7 @@ module.exports = {
       if(err){
         return cb(err);
       }
-      console.log(numberRemoved + " meal jobs removed");
+      sails.log.debug(numberRemoved + " order jobs of meal : " + mealId +  " removed");
       return cb();
     })
   }

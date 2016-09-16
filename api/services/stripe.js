@@ -120,7 +120,7 @@ module.exports = {
   },
 
   refund : function(attr, cb){
-    console.log("refunding customer : " + attr.amount);
+    sails.log.debug("refunding customer : " + attr.amount || "fully");
     stripe.refunds.create({
       charge : attr.id,
       amount : attr.amount,

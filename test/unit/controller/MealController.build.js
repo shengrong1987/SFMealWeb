@@ -433,7 +433,9 @@ describe('MealController', function() {
           .post('/order/' + orderId + '/adjust')
           .send({
             orders : orders,
-            subtotal : newSubtotal
+            subtotal : newSubtotal,
+            mealId : preorderMealId,
+            delivery_fee : 0
           })
           .expect(200)
           .end(function(err,res){
