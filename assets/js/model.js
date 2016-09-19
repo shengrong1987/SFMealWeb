@@ -1148,15 +1148,12 @@ var MealView = Backbone.View.extend({
       }
     }
 
-    var min_order = form.find("#min-order").val();
-    var min_total;
-    if(!min_order || min_order == ""){
-      min_total = form.find("#min-total").val();
-      if(!min_total || min_total==""){
-        form.find(".order-require .alert").show();
-        form.find(".order-require .alert").html(form.find("#min-order").data("error"));
-        return;
-      }
+    var min_order = form.find("#min-order").val() || null;
+    var min_total = form.find("#min-total").val() || null;
+    if(!min_order && !min_total){
+      form.find(".order-require .alert").show();
+      form.find(".order-require .alert").html(form.find("#min-order").data("error"));
+      return;
     }
 
     var status = this.isActivate? "on" : "off";
@@ -1197,7 +1194,7 @@ var MealView = Backbone.View.extend({
           })
         }
       },error : function(model, err){
-        $this.formAlert.html(err.responseJSON.responseText);
+        $this.formAlert.html(err.responseText);
       }
     });
   }
