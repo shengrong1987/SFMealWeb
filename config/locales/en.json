@@ -41,6 +41,7 @@
   "step6-success" : "收款账户验证已通过",
   "step6-success-tip" : "额外信息已完整, 您的账户已开启, 可以接受吃货付款。",
   "step6-under-verification-tip" : "所有信息已完整, 只需等待您的菜式审批完成(48小时内)即可上线菜单",
+  "step6-pre-not-complete-tip" : "请先完成前面的步骤",
   "step6-ongoing" : "您的信息不完整, 我们需要更多的信息来验证您的收款账号",
   "step6-ongoing-tip" : "我们需要以下信息来完善您的账号, 以便能尽快地让你的账号成功接受吃货付款。",
   "food-handling-license-help" : "申请流程",

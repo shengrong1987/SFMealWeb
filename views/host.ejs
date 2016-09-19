@@ -22,6 +22,10 @@
       <div class="col-xs-12 box">
         <div class="alert alert-info"><%= __('host-guide-title')%><a class="btn btn-info" style="margin-left:10px;" href="/apply"><%= __('host-guide-btn')%></a></div>
       </div>
+      <%}else if(!user.host.dishVerifying){%>
+      <div class="col-xs-12 box">
+        <div class="alert alert-info"><%= __('host-guide-title2')%></div>
+      </div>
       <%}%>
       <ul class="nav nav-tab-green nav-justified" style="padding: 20px;">
         <li class="active"><a data-toggle="tab" href="#myorder"><h4><strong><%= __('host-nav-order')%></strong></h4></a></li>
@@ -1248,57 +1252,59 @@
         <div id="mydish" style="width: 90%;" class="tab-pane middle">
           <div class="row">
             <div class="col-md-8" style="margin-bottom: 20px;">
-              <div class="box box-shadow white">
-                <div class="col-xs-12">
-                  <div class="middle vertical-align">
-                    <button class="btn btn-green btn-lg round middle" onclick="location.href='/host/me/createDish'"><strong style="font-size: 16px;"><%= __('meal-add')%></strong></button>
-                    <i class="fa fa-question-circle fa-2x text-lightgrey cursor-pointer"></i>
+              <div class="box box-compact box-shadow white" style="overflow:scroll;">
+                <div class="row">
+                  <div class="col-xs-12">
+                    <div class="middle vertical-align">
+                      <button class="btn btn-green btn-lg round middle" onclick="location.href='/host/me/createDish'"><strong style="font-size: 16px;"><%= __('meal-add')%></strong></button>
+                      <i class="fa fa-question-circle fa-2x text-lightgrey cursor-pointer"></i>
+                    </div>
                   </div>
-                </div>
-                <div class="col-xs-12" style="margin-top: 20px;">
-                  <table id="dish-content" class="table" style="width: 100%;">
-                    <thead>
-                    <tr>
-                      <td><%= __('photo')%></td>
-                      <td><%= __('status')%></td>
-                      <td><%= __('review')%></td>
-                      <td><%= __('price')%></td>
-                      <td><%= __('sold')%><i class="fa fa-question-circle text-lightgrey"></i></td>
-                      <td><%= __('action')%><i class="fa fa-question-circle text-lightgrey"></i></td>
-                    </tr>
-                    </thead>
-                    <%
-                    var dishes = user.host.dishes;
-                    if(dishes && dishes.length > 0) {
+                  <div class="col-xs-12" style="margin-top: 20px;">
+                    <table id="dish-content" class="table" style="width: 100%;">
+                      <thead>
+                      <tr>
+                        <td><%= __('photo')%></td>
+                        <td><%= __('status')%></td>
+                        <td><%= __('review')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('sold')%><i class="fa fa-question-circle text-lightgrey"></i></td>
+                        <td><%= __('action')%><i class="fa fa-question-circle text-lightgrey"></i></td>
+                      </tr>
+                      </thead>
+                      <%
+                      var dishes = user.host.dishes;
+                      if(dishes && dishes.length > 0) {
                       for(var i=0; i < dishes.length; i++){
                         var dish = dishes[i];
-                    %>
-                    <tbody class="item">
-                    <tr class="active" data-id="<%= dish.id%>">
-                      <td><%= dish.title%></td>
-                      <td colspan="5"><%= __('created-at')%><%= dish.createdAt%></td>
-                    </tr>
-                    <tr>
-                      <td><img style="width: 150px;max-height: 150px;" src="<%= dish.photos[0].v%>"></td>
-                      <td style="vertical-align: middle;"><%= dish.isVerified ? __('passed') : __('ongoing') %></td>
-                      <td style="vertical-align: middle;"><i class="fa fa-star-o"></i> <%= dish.score.toFixed(1) %></td>
-                      <td style="vertical-align: middle;">$<%= dish.price.toFixed(2)%></td>
-                      <td style="vertical-align: middle;"><%= dish.numberOfReviews%></td>
-                      <td style="vertical-align: middle;">
-                        <a href="/dish/<%= dish.id%>?edit=true"><%= __('modify')%></a><br/>
-                        <a href="javascript:void(0)" data-toggle="alert-button" data-container="#mydish" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:deleteDish" data-error-container="#dish-error-<%= i%>"  data-argument="<%= dish.id%>"><%= __('delete')%></a><br/>
-                      </td>
-                    </tr>
-                    <tr><td colspan="6" data-toggle="alert" id="dish-error-<%= i%>" class="alert alert-warning"></td></tr>
-                    </tbody>
-                    <%}}%>
+                      %>
+                      <tbody class="item">
+                      <tr class="active" data-id="<%= dish.id%>">
+                        <td><%= dish.title%></td>
+                        <td colspan="5"><%= __('created-at')%><%= dish.createdAt%></td>
+                      </tr>
+                      <tr>
+                        <td><img style="width: 150px;max-height: 150px;" src="<%= dish.photos[0].v%>"></td>
+                        <td style="vertical-align: middle;"><%= dish.isVerified ? __('passed') : __('ongoing') %></td>
+                        <td style="vertical-align: middle;"><i class="fa fa-star-o"></i> <%= dish.score.toFixed(1) %></td>
+                        <td style="vertical-align: middle;">$<%= dish.price.toFixed(2)%></td>
+                        <td style="vertical-align: middle;"><%= dish.numberOfReviews%></td>
+                        <td style="vertical-align: middle;">
+                          <a href="/dish/<%= dish.id%>?edit=true"><%= __('modify')%></a><br/>
+                          <a href="javascript:void(0)" data-toggle="alert-button" data-container="#mydish" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:deleteDish" data-error-container="#dish-error-<%= i%>"  data-argument="<%= dish.id%>"><%= __('delete')%></a><br/>
+                        </td>
+                      </tr>
+                      <tr><td colspan="6" data-toggle="alert" id="dish-error-<%= i%>" class="alert alert-warning"></td></tr>
+                      </tbody>
+                      <%}}%>
 
-                  </table>
-                  <nav class="pull-right">
-                    <ul class="pagination pagination-green pagination-sm" data-trigger="pagination" data-target="#dish-content">
-                      <li class="active"><a href="javascript:void(0)">1</a></li>
-                    </ul>
-                  </nav>
+                    </table>
+                    <nav class="pull-right">
+                      <ul class="pagination pagination-green pagination-sm" data-trigger="pagination" data-target="#dish-content">
+                        <li class="active"><a href="javascript:void(0)">1</a></li>
+                      </ul>
+                    </nav>
+                  </div>
                 </div>
               </div>
             </div>

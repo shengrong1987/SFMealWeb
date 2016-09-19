@@ -118,18 +118,16 @@ module.exports = {
     //check all validation as host
     checkGuideRequirement : function(cb){
       var host = this;
-      if(this.full_address && this.dishes.length > 0 && this.dishes.some(function(dish){
+      this.checkVerification(function(err, valid){
+        if(err){
+          return cb(err);
+        }
+        host.passGuide = host.full_address && host.dishes.length > 0 && host.bankId && valid;
+        host.dishVerifying = host.dishes.some(function(dish){
           return dish.isVerified;
-        }) && this.bankId){
-        this.checkVerification(function(err, valid){
-          host.passGuide = valid;
-          return cb(null,valid)
         });
-      }else{
-        host.verification = [];
-        host.passGuide = false;
-        return cb(null,false);
-      }
+        return cb(null);
+      });
     },
     getDistance : function(userLat, userLong){
       function deg2rad(deg) {

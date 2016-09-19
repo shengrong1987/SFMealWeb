@@ -368,18 +368,18 @@ module.exports = {
         if(host.bankId){
           hasAccount = true;
         }
-        host.checkGuideRequirement(function(err, valid){
+        host.checkGuideRequirement(function(err){
           if(err){
             return res.badRequest(err);
           }
           if(req.wantsJSON){
             return res.ok(host);
           }
-          return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, verification : host.verification, passGuide : host.passGuide });
+          return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, verification : host.verification, passGuide: host.passGuide, dishVerifying : host.dishVerifying });
         });
       });
     }else{
-      return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, verification : null, passGuide : false });
+      return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, passGuide: host.passGuide, verification : null});
     }
   },
 

@@ -151,10 +151,12 @@
           <% if( !verification ){%>
           <div class="well">
             <label><%= __('step6-success')%></label>
-            <% if(user.host && hasAddress && hasDish && hasMeal && hasAccount && !passGuide){%>
+            <% if(!dishVerifying && passGuide){%>
               <h4><small><%= __('step6-under-verification-tip')%></small></h4>
+            <%}else if(!dishVerifying){%>
+            <h4><small><%= __('step6-pre-not-complete-tip')%></small></h4>
             <%}else{%>
-              <h4><small><%= __('step6-success-tip')%></small></h4>
+            <h4><small><%= __('step6-success-tip')%></small></h4>
             <%}%>
           </div>
           <icon class="fa fa-check text-green"></icon>

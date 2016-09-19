@@ -8846,6 +8846,9 @@ fieldset[disabled] .btn-red.active {
   /*-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);*/
   /*box-shadow: inset 0 1px 1px rgba(0,0,0,.05);*/
 }
+.box-compact {
+  padding: 20px 0 20px 0;
+}
 .popup .popline {
   width: 90%;
 }
