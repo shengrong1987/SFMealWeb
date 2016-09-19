@@ -115,7 +115,6 @@ var RegisterView = Backbone.View.extend({
   events : {
     "submit form" : "register",
     "click #FBBtn" : "FBLogin",
-    "click #FBBtn" : "FBLogin",
     "click #GoogleBtn" : "GoogleLogin"
   },
   initialize : function(){

@@ -2,8 +2,8 @@
 <div class="container-fluid text-center" style="margin-top:-20px;">
   <div class="row">
     <div class="pure-banner vertical-align green">
-      <div style="width: 600px;" class="middle banner-text">
-        <div class="row vertical-align" style="margin-bottom: 5px;">
+      <div class="middle banner-text">
+        <div class="vertical-align" style="margin-bottom: 5px;">
           <div class="col-sm-3 relative text-left">
             <a href="/" class="logo logo-sm"></a>
           </div>
@@ -93,7 +93,7 @@
             <div class="form-group">
               <label for="priceInput">4.<%= __('how-many-for-one') %></label>
               <div class="input-group" style="width: 250px;">
-                <input type="text" class="form-control" id="quantityInput" placeholder="<%= __('fenliang') %>">
+                <input type="text" class="form-control" id="quantityInput" placeholder="<%= __('fenliang') %>" value="<%= dish.quantity || ''%>">
               </div>
             </div>
 

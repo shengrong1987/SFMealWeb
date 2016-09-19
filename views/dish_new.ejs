@@ -2,8 +2,8 @@
 <div class="container-fluid text-center" style="margin-top:-20px;">
   <div class="row">
     <div class="pure-banner vertical-align green">
-      <div style="width: 600px;" class="middle banner-text">
-        <div class="row vertical-align" style="margin-bottom: 5px;">
+      <div class="middle banner-text">
+        <div class="vertical-align" style="margin-bottom: 5px;">
           <div class="col-sm-3 relative text-left">
             <a href="/" class="logo logo-sm"></a>
           </div>
@@ -29,7 +29,7 @@
         <div class="box box-shadow box-primary white text-left">
           <h4 class="text-green"><%= __('new-dish') %></h4>
           <h1></h1>
-          <form data-id="<%= user.id %>" data-toggle="validator">
+          <form data-id="<%= user.id %>" data-toggle="validator" data-err-container=".submit">
             <div class="form-group">
               <label for="mealTitleInput">1.<%= __('dish-name') %></label>
               <input id="mealTitleInput" class="form-control" type="text" placeholder="<%= __('full-name') %>" maxlength="7" data-error="<%= __('full-name') %>" required>
@@ -109,9 +109,10 @@
               </div>
             </div>
 
-            <div class="form-group text-center">
-              <button type="submit" class="btn btn-default btn-lg round text-white green"><%= __('save-and-submit') %></button>
+            <div class="form-group text-center submit">
+              <button type="submit" class="btn btn-green btn-lg round"><%= __('save-and-submit') %></button>
               <div class="help-block with-errors"><%= __('24hours') %></div>
+              <div class="alert alert-danger" data-toggle="alert"></div>
             </div>
 
           </form>
