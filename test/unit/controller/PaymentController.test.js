@@ -162,31 +162,40 @@ describe('PaymentController', function() {
       var expYear = 2020;
       var cvv = 123;
       agent
-          .put('/payment/' + cardId)
-          .send({
-            user : userId,
-            street : street,
-            city : city,
-            state : state,
-            postal : postal,
-            country : newCountry,
-            cardholder : cardHolderName,
-            cardNumber : number,
-            expMonth : expMonth,
-            expYear : expYear,
-            CVV : cvv,
-            isDefaultPayment : true
-          })
-          .expect(200)
-          .end(function(err,res){
-            if(err){
-              return done(err);
-            }
-            if(res.body.country != newCountry){
-              return done(Error("error updating card"))
-            }
-            done();
-          })
+        .put('/payment/' + cardId)
+        .send({
+          user : userId,
+          street : street,
+          city : city,
+          state : state,
+          postal : postal,
+          country : newCountry,
+          cardholder : cardHolderName,
+          cardNumber : number,
+          expMonth : expMonth,
+          expYear : expYear,
+          CVV : cvv,
+          isDefaultPayment : true
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          if(res.body.country != newCountry){
+            return done(Error("error updating card"))
+          }
+          done();
+        })
     })
-    });
+
+    it('should not remove last card', function (done) {
+      agent
+        .delete('/payment/' + cardId)
+        .expect(403)
+        .end(done)
+    })
+
+
+  });
 });
