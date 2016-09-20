@@ -886,7 +886,7 @@ var MealSelectionView = Backbone.View.extend({
     var origin = {lat: this.$el.data("lat"), lng: this.$el.data("long")};
     var uLat = this.$el.data("user-lat");
     var uLong = this.$el.data("user-long");
-    if(!uLat || !uLong){
+    if(!uLat || uLat == 'undefined' || !uLong || uLong == 'undefined'){
       return;
     }
     var range = this.$el.data("range") * 1609.34;
@@ -1210,8 +1210,11 @@ var DishView = Backbone.View.extend({
   },
   initialize : function(){
     var form = this.$el.find("form");
-    var formAlert = form.find(form.data("err-container") + " .alert");
+    var formAlert = form.find(form.data("err-container") + " .alert.alert-danger");
+    var progressAlert = form.find(form.data("err-container") + " .alert.alert-info");
+    progressAlert.hide();
     formAlert.hide();
+    this.progressAlert = progressAlert;
     this.formAlert = formAlert;
   },
   saveDish : function(e) {
@@ -1222,6 +1225,8 @@ var DishView = Backbone.View.extend({
       return;
     }
     form.find("#photoError").html("");
+    this.formAlert.hide();
+    this.progressAlert.hide();
 
     var dishTitle = form.find("#mealTitleInput").val();
     var now = Date.now();
@@ -1309,10 +1314,6 @@ var DishView = Backbone.View.extend({
         }
       }
     }
-
-    this.formAlert.show();
-    this.formAlert.html(jQuery.i18n.prop('saving'));
-
     var dishId = form.data("dish-id");
     var title = $("#mealTitleInput").val();
     var price = $("#priceInput").val();
@@ -1323,9 +1324,9 @@ var DishView = Backbone.View.extend({
       this.model.set({id: dishId});
     }
     //update dish
-    imageHandler('dish',file1,function(filename1){
-      imageHandler('dish',file2,function(filename2){
-        imageHandler('dish',file3,function(filename3){
+    imageHandler('dish',file1,$this.progressAlert,function(filename1){
+      imageHandler('dish',file2,$this.progressAlert,function(filename2){
+        imageHandler('dish',file3,$this.progressAlert,function(filename3){
           var photos = [];
           if(file1){
             photos[0] = {v:filename1};
@@ -1360,8 +1361,8 @@ var DishView = Backbone.View.extend({
           $this.model.save({},{
             success : function(model, response){
               if(dishId){
-                $this.formAlert.html("Dish" + jQuery.i18n.prop('updatedComplete'));
-                $this.formAlert.show();
+                $this.progressAlert.html("Dish" + jQuery.i18n.prop('updatedComplete'));
+                $this.progressAlert.show();
               }else{
                 if(!response.host.passGuide){
                   BootstrapDialog.show({
@@ -1391,19 +1392,23 @@ var DishView = Backbone.View.extend({
                 }
               }
             },error : function(model, err){
+              $this.progressAlert.hide();
               $this.formAlert.html(err.responseText);
               $this.formAlert.show();
             }
           });
         },function(error){
+          $this.progressAlert.hide();
           $this.formAlert.show();
           $this.formAlert.html(error)
         },3,filename3,delete3)
       },function(error){
+        $this.progressAlert.hide();
         $this.formAlert.show();
         $this.formAlert.html(error)
       },2,filename2,delete2);
     },function(error){
+      $this.progressAlert.hide();
       $this.formAlert.show();
       $this.formAlert.html(error)
     },1,filename1,delete1);
@@ -1975,7 +1980,7 @@ function deleteHandler(id, module, alertView){
   })
 }
 
-function imageHandler(modual,file,cb,error,index,name,isDelete){
+function imageHandler(modual,file,progressBar,cb,error,index,name,isDelete){
   if(isDelete){
     deleteImage(name,modual,function(){
       return cb();
@@ -1983,7 +1988,7 @@ function imageHandler(modual,file,cb,error,index,name,isDelete){
       return error();
     });
   }else{
-    uploadImage(modual,file,function(url){
+    uploadImage(modual,file,progressBar,function(url){
       cb(url);
     },function(err){
       error(err);
@@ -2009,7 +2014,7 @@ function deleteImage(filename,modual,cb,error){
   });
 }
 
-function uploadImage(modual,file,cb,error,index,name){
+function uploadImage(modual,file,progressBar,cb,error,index,name){
   if(!file){
     return cb();
   }
@@ -2051,35 +2056,37 @@ function uploadImage(modual,file,cb,error,index,name){
       fd.append('AWSAccessKeyId',result.AWSAccessKeyId);
       fd.append('success_action_status','201');
       fd.append('signature', result.signature);
-      //fd.append('x-amz-signature', result.signature);
-      //fd.append('x-amz-date',result.date);
-      //fd.append('x-amz-algorithm', 'AWS4-HMAC-SHA256');
-      //fd.append('x-amz-credential', result.credential);
-      //fd.append('x-amz-meta-uuid', '14365123651274');
       fd.append("file", file);
       $.ajax({
+        xhr: function() {
+          var xhr = new window.XMLHttpRequest();
+
+          // Upload progress
+          progressBar.show();
+          xhr.upload.addEventListener("progress", function(evt){
+            if (evt.lengthComputable) {
+              var percentComplete = ((evt.loaded / evt.total) * 100).toFixed(2);
+              //Do something with upload progress
+              progressBar.html(jQuery.i18n.prop('fileUploading') + percentComplete + "%");
+            }
+          }, false);
+
+          // Download progress
+          // xhr.addEventListener("progress", function(evt){
+          //   if (evt.lengthComputable) {
+          //     var percentComplete = evt.loaded / evt.total;
+          //     // Do something with download progress
+          //     console.log(percentComplete);
+          //   }
+          // }, false);
+
+          return xhr;
+        },
         type : 'POST',
         url : result.url,
         data : fd,
         processData: false,
         contentType: false,
-        beforeSend: function (request)
-        {
-          //request.setRequestHeader('Authorization', result.opts.headers.Authorization);
-          //request.setRequestHeader('Host', result.opts.headers.Host);
-          //request.setRequestHeader('X-Amz-Date', result.opts.headers["X-Amz-Date"]);
-          //request.setRequestHeader('Content-Type', result.opts.headers["Content-Type"]);
-          //request.setRequestHeader('Content-Length', result.opts.headers["Content-Length"]);
-          //request.setRequestHeader('X-Amz-Content-Sha256', result.opts.headers["X-Amz-Content-Sha256"]);
-          //request.setRequestHeader('Content-Type', file.type);
-          //request.setRequestHeader('x-amz-acl', 'public-read');
-          ////request.setRequestHeader('x-amz-meta-uuid','14365123651274');
-          //request.setRequestHeader('X-Amz-Credential',result.credential);
-          //request.setRequestHeader('X-Amz-Algorithm','AWS4-HMAC-SHA256');
-          //request.setRequestHeader('X-Amz-Date',result.date);
-          ////request.setRequestHeader('Policy',result.policy);
-          //request.setRequestHeader('X-Amz-Signature',result.signature);
-        },
         success : function(){
           cb(result.url + result.key);
         },
@@ -2099,8 +2106,10 @@ function uploadImage(modual,file,cb,error,index,name){
 function uploadHostPhoto(e){
   var $this = $(e.currentTarget);
   var error_container = $($this.data("error-container"));
-  var alertView = error_container.find(".alert");
+  var alertView = error_container.find(".alert.alert-danger");
+  var progressView = error_container.find(".alert.alert-info");
   alertView.hide();
+  progressView.hide();
   var files = $("#myinfo input[name='story-pic']")[0].files;
   var file = files[0];
   if(!files || files.length==0){
@@ -2108,12 +2117,13 @@ function uploadHostPhoto(e){
     alertView.show();
     return;
   }
-  uploadImage("story",file,function(url){
+  uploadImage("story",file,progressView,function(url){
     $("#myinfo .story .fileinput-preview").data("src", url);
-    alertView.html(jQuery.i18n.prop('imageUploadComplete'));
-    alertView.show();
+    progressView.html(jQuery.i18n.prop('imageUploadComplete'));
+    progressView.show();
     hostProfileView.saveHostProfile(new Event("click"));
   },function(err){
+    progressView.hide();
     alertView.html(err);
     alertView.show();
   });
@@ -2122,8 +2132,10 @@ function uploadHostPhoto(e){
 function uploadLicense(e){
   var $this = $(e.currentTarget);
   var error_container = $($this.data("error-container"));
-  var alertView = error_container.find(".alert");
+  var progressView = error_container.find(".alert.alert-info");
+  var alertView = error_container.find(".alert.alert-danger");
   alertView.hide();
+  progressView.hide();
   var files = $("#myinfo .license input[type='file']")[0].files;
   var file = files[0];
   if(!files || files.length==0){
@@ -2131,12 +2143,13 @@ function uploadLicense(e){
     alertView.show();
     return;
   }
-  uploadImage("license",file,function(url){
+  uploadImage("license",file,progressView,function(url){
     $("#myinfo .license .fileinput-preview").data("src",url);
     hostProfileView.saveHostProfile(new Event("click"));
-    alertView.html(jQuery.i18n.prop('imageUploadComplete'));
-    alertView.show();
+    progressView.html(jQuery.i18n.prop('imageUploadComplete'));
+    progressView.show();
   },function(err){
+    progressView.hide();
     alertView.html(err);
     alertView.show();
   });
@@ -2145,32 +2158,32 @@ function uploadLicense(e){
 function uploadThumbnail(){
   $("#myinfo .alert").hide();
   var files = $("#myinfo input[type='file']")[0].files;
-  var alert_block = $("#myinfo .alert:eq(0)");
+  var errorAlert = $("#myinfo .thumbnail .alert.alert-danger");
+  errorAlert.removeClass('hide').hide();
+  var progressView = $("#myinfo .thumbnail .alert.alert-info");
   var file = files[0];
   if(!files || files.length==0){
-    alert_block.html(jQuery.i18n.prop('fileNotExistedError'));
-    alert_block.show();
+    errorAlert.html(jQuery.i18n.prop('fileNotExistedError'));
+    errorAlert.show();
     return;
   }
   var isDelete = $("#myinfo input[type='file']").data("isDelete");
-  imageHandler("thumbnail",file,function(url){
+  imageHandler("thumbnail",file,progressAlert,function(url){
     if(!isDelete){
       $("#myinfo .fileinput-preview").data("src", url);
       var e = jQuery.Event("click");
       e.data = {update : true};
       userProfileView.saveProfile(e);
-      alert_block.removeClass('hide');
-      alert_block.html(jQuery.i18n.prop('imageUploadComplete'));
-      alert_block.show();
+      progressView.html(jQuery.i18n.prop('imageUploadComplete'));
+      progressView.show();
     }else{
       $("#myinfo .fileinput-preview").data("src", '');
-      alert_block.removeClass('hide');
-      alert_block.html(jQuery.i18n.prop('imageRemoveComplete'));
-      alert_block.show();
+      progressView.html(jQuery.i18n.prop('imageRemoveComplete'));
+      progressView.show();
     }
   },function(err){
-    alert_block.removeClass('hide');
-    alert_block.html(err);
-    alert_block.show();
+    progressView.hide();
+    errorAlert.html(err);
+    errorAlert.show();
   },0,"thumbnail",isDelete);
 }

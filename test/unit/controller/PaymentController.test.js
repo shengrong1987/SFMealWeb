@@ -192,7 +192,7 @@ describe('PaymentController', function() {
     it('should not remove last card', function (done) {
       agent
         .delete('/payment/' + cardId)
-        .expect(403)
+        .expect(400)
         .end(done)
     })
 

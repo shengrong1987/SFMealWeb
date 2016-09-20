@@ -239,11 +239,11 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          host.checkGuideRequirement(function(err, valid) {
+          host.checkGuideRequirement(function(err) {
             if(err){
               return res.badRequest(err);
             }
-            if(!valid){
+            if(!host.passGuide){
               return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
             }
             if(!meal.dateIsValid()){
@@ -277,11 +277,11 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        host.checkGuideRequirement(function(err, valid){
+        host.checkGuideRequirement(function(err){
           if(err){
             return res.badRequest(err);
           }
-          if(!valid){
+          if(!host.passGuide || !host.dishVerifying){
             return res.redirect("/apply");
           }
           Meal.findOne(mealId).populate("dishes").exec(function(err,meal){
@@ -357,11 +357,11 @@ module.exports = {
                 return res.badRequest(err);
               }
               if(req.body.status == 'on'){
-                host.checkGuideRequirement(function(err, valid){
+                host.checkGuideRequirement(function(err){
                   if(err){
                     return res.badRequest(err);
                   }
-                  if(!valid){
+                  if(!host.passGuide){
                     return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
                   }
                   Meal.create(req.body).exec(function(err,meal){
@@ -475,11 +475,11 @@ module.exports = {
                 console.log("meal contain unverified dishes");
                 return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
               }
-              meal.chef.checkGuideRequirement(function(err, valid){
+              meal.chef.checkGuideRequirement(function(err){
                 if(err){
                   return res.badRequest(err);
                 }
-                if(!valid){
+                if(!meal.chef.passGuide){
                   return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
                 }
                 $this.cancelMealJobs(mealId, function(err){

@@ -34,9 +34,9 @@
         <li><a data-toggle="tab" href="#myinfo"><h4><strong><%= __('host-nav-info')%></strong></h4></a></li>
       </ul>
 
-      <div class="tab-content" style="padding-top: 20px;padding-bottom: 60px;">
+      <div class="tab-content" style="padding-top: 20px;padding-bottom: 60px;min-height:500px;">
         <div id="myorder" style="width: 90%;" class="tab-pane middle active">
-          <div class="box box-shadow white">
+          <div class="box box-base box-shadow white">
             <ul class="nav nav-justified nav-tab-green" style="padding: 20px;">
               <li class="active"><a data-toggle="tab" href="#myorder-order"><h4><strong><%= __('order-nav-order')%></strong></h4></a></li>
               <li><a data-toggle="tab" href="#myorder-preorder"><h4><strong><%= __('order-nav-preorder')%></strong></h4></a></li>
@@ -1375,6 +1375,7 @@
                 <div class="row">
                   <div class="col-xs-12">
                     <div class="alert alert-danger" data-toggle="alert"></div>
+                    <div class="alert alert-info" data-toggle="alert"></div>
                   </div>
                 </div>
               </div>
@@ -1419,14 +1420,15 @@
                       <span class="btn btn-default btn-file">
                         <span class="fileinput-new"><%= __('select-image')%></span>
                         <span class="fileinput-exists"><%= __('change')%></span>
-                        <input name='story-pic' id="storyUpload" type="file" data-strictImage=true onchange="uploadHostPhoto(event)">
+                        <input name='story-pic' id="storyUpload" type="file" data-strictImage=true onchange="uploadHostPhoto(event)" data-error-container=".story">
                       </span>
                       <script>
                         $(".fileinput").on("clear.bs.fileinput",function(){
                           $("input[type='file']").data("isDelete",true);
                         });
                       </script>
-                      <div class="help-block with-errors"></div>
+                      <div class="alert alert-danger" data-toggle="alert"></div>
+                      <div class="alert alert-info" data-toggle="alert"></div>
                     </div>
                   </div>
                 </div>

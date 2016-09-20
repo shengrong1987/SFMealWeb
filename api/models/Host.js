@@ -122,7 +122,11 @@ module.exports = {
         if(err){
           return cb(err);
         }
-        host.passGuide = host.full_address && host.dishes.length > 0 && host.bankId && valid;
+        if(host.full_address && host.dishes.length > 0 && host.bankId && valid){
+          host.passGuide = true;
+        }else{
+          host.passGuide = false;
+        }
         host.dishVerifying = host.dishes.some(function(dish){
           return dish.isVerified;
         });

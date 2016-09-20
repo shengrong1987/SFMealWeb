@@ -355,6 +355,10 @@ function setup(){
   // dishSelectorSetup();
   adjustLayout();
   $('[data-toggle="popover"]').popover();
+  $(document).delegate('*[data-toggle="lightbox"]', 'click', function(event) {
+    event.preventDefault();
+    $(this).ekkoLightbox();
+  });
   $('[data-toggle="validator"]').validator({
     feedback : {
       success: "fa fa-check",
