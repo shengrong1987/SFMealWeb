@@ -31,19 +31,20 @@ module.exports = {
               return res.badRequest(err);
             }
             //construct orders for host
+            var fullOrders = [];
             async.each(host.orders,function(order, next){
-              Order.findOne(order.id).populate("meal").exec(function(err, o){
+              Order.findOne(order.id).populate("meal").populate('customer').exec(function(err, o){
                 if(err){
                   return next(err);
                 }
-                order = o;
+                fullOrders.push(o);
                 next();
               });
             },function(err){
               if(err){
                 return res.badRequest(err);
               }
-              host.host_orders = host.orders;
+              host.host_orders = fullOrders;
               host.adjusting_orders = host.adjusting_orders;
               host.host_dishes = host.dishes;
               Notification.destroy({host : hostId}).exec(function(err){

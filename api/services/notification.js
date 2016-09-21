@@ -168,10 +168,10 @@ var notification = {
     var info = {};
     if(isSendToHost){
       info.recipientEmail = params.hostEmail;
-      info.recipientName = (params.host || params.chef).shopName;
+      info.recipientName = (params.host || params.chef).shopName || '';
     }else{
       info.recipientEmail = params.guestEmail;
-      info.recipientName = params.customer.firstname;
+      info.recipientName = params.customer.firstname || '';
     }
     return info;
   },
@@ -312,6 +312,10 @@ var notification = {
         pickup.pickupFromTime = moment.tz(pickup.pickupFromTime, "America/Los_Angeles");
         pickup.pickupTillTime = moment.tz(pickup.pickupTillTime, "America/Los_Angeles");
       });
+    }
+    if(params.createdAt && params.updatedAt){
+      params.createdAt = moment.tz(params.createdAt, "America/Los_Angeles");
+      params.updatedAt = moment.tz(params.updatedAt, "America/Los_Angeles");
     }
   }
 }

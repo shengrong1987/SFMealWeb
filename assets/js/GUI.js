@@ -357,7 +357,10 @@ function setup(){
   $('[data-toggle="popover"]').popover();
   $(document).delegate('*[data-toggle="lightbox"]', 'click', function(event) {
     event.preventDefault();
-    $(this).ekkoLightbox();
+    $(this).ekkoLightbox({
+      left_arrow_class : ".glyphicon-chevron-left .fa .fa-arrow-left",
+      right_arrow_class : ".glyphicon-chevron-right .fa .fa-arrow-right"
+    });
   });
   $('[data-toggle="validator"]').validator({
     feedback : {

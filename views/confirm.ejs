@@ -83,7 +83,7 @@
                   var i = 0;
                   keys.forEach(function(key){
                     var addressObj = addresses[key];
-                    var address = addressObj.street + ", " + addressObj.city + " " + addressObj.zip + ", +" + addressObj.phone;
+                    var address = addressObj.street + ", " + addressObj.city + ", CA " + addressObj.zip + ", +" + addressObj.phone;
                   %>
                   <label class="btn btn-default fixed-label vertical-align" style="text-align: left;">
                     <input type="radio" id="radio-2-<%= i%>" name="radio-2-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="radio-2-<%= i%>"></label>

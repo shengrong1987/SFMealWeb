@@ -455,7 +455,7 @@ describe('MealController', function() {
           .send({
             orders : orders,
             subtotal : newSubtotal,
-            address : address1.street + address1.city + "CA" + address1.zip,
+            address : address1.street + ", " + address1.city + ", " + "CA " + address1.zip,
             method : "delivery",
             mealId : mealId,
             phone : address1.phone,

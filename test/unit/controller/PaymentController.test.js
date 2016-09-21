@@ -195,7 +195,5 @@ describe('PaymentController', function() {
         .expect(400)
         .end(done)
     })
-
-
   });
 });

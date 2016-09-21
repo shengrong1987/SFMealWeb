@@ -116,7 +116,7 @@ module.exports = {
         case "preparing":
           return "准备中";
         case "ready":
-          if(this.type == "order"){
+          if(this.method == "delivery"){
             return "送餐中";
           }else{
             return "待自取";

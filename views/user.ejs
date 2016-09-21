@@ -96,19 +96,22 @@
                           <% if(order.status == "schedule" || order.status == "preparing"){ %>
                           <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
-                          <a href="#"><%= __('contact-chef')%></a>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                           <%}else if(order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")) {%>
                           <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-order"><%= __('reject')%></a><br/>
-                          <a href="#"><%= __('contact-chef')%></a>
-                          <%}else if(order.status == "ready"){
-                          if(order.method == "pickup"){%>
-                          <a href="#"><%= __('see-address')%></a>
-                          <%}else{%>
-                          <a href="#"><%= __('see-delivery')%></a>
-                          <%}%>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
+                          <%}else if(order.status == "ready"){%>
+                            <% if(order.method == 'pickup'){%>
+                              <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.host.full_address %>"><%= __('see-address')%></a><br/>
+                            <%}%>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                           <%}else if(order.status == "review"){%>
-                          <a href="#myreview"><%= __('review')%></a>
+                            <% if(order.method == 'pickup'){%>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.host.full_address%>"><%= __('see-address')%></a><br/>
+                            <%}%>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a><br/>
+                            <a href="#myreview"><%= __('review')%></a>
                           <%}%>
                         </td>
                       </tr>
@@ -175,7 +178,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-order"><%= __('reject')%></a><br/>
-                          <a href="#"><%= __('contact-user')%></a>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                         </td>
                       </tr>
                       <%}%>
@@ -233,7 +236,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
-                          <a href="#"><%= __('contact-chef')%></a>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                         </td>
                       </tr>
                       <%}}})})%>
@@ -290,7 +293,7 @@
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                             <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
                             <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
-                            <a href="#"><%= __('contact-chef')%></a>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                           </td>
                       </tr>
                       <%}}})})%>
@@ -346,11 +349,10 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <% if(order.method == "pickup"){%>
-                          <a href="#"><%= __('see-address')%></a>
-                          <%}else{%>
-                          <a href="#"><%= __('see-delivery')%></a>
+                          <% if(order.method == 'pickup'){%>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.host.full_address%>"><%= __('see-address')%></a><br/>
                           <%}%>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                         </td>
                       </tr>
                       <%}}})})%>
@@ -405,6 +407,10 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                          <% if(order.method == 'pickup'){%>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.host.full_address %>"><%= __('see-address')%></a><br/>
+                          <%}%>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a><br/>
                           <a href="#myreview"><%= __('review')%></a>
                         </td>
                       </tr>
@@ -470,6 +476,7 @@
                         <td><% if(order.status=="adjust"){
                             var adjustingNumber = order.adjusting_orders[key];
                           if(adjustingNumber != number){%>
+
                           <%= number%> to <strong><%= adjustingNumber%></strong>
                           <%}else{%>
                           <%= number%>
@@ -483,18 +490,21 @@
                             <% if(order.status == "schedule" || order.status == "preparing"){ %>
                             <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
                             <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
-                            <a href="#"><%= __('contact-chef')%></a>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                             <%}else if(!order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")) {%>
                             <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
                             <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('reject')%></a><br/>
-                            <a href="#"><%= __('contact-user')%></a>
-                            <%}else if(order.status == "ready"){
-                            if(order.method == "pickup"){%>
-                            <a href="#"><%= __('see-address')%></a>
-                            <%}else{%>
-                            <a href="#"><%= __('see-delivery')%></a>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
+                            <%}else if(order.status == "ready"){%>
+                            <% if(order.method == 'pickup'){%>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.host.full_address%>"><%= __('see-address')%></a><br/>
                             <%}%>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                             <%}else if(order.status == "review"){%>
+                            <% if(order.method == 'pickup'){%>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.host.full_address%>"><%= __('see-address')%></a><br/>
+                            <%}%>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a><br/>
                             <a href="#myreview"><%= __('review')%></a>
                             <%}%>
                           </td>
@@ -560,7 +570,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-container="#myorder-preorder" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>"><%= __('reject')%></a><br/>
-                          <a href="#"><%= __('contact-user')%></a>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                         </td>
                       </tr>
                       <%}%>
@@ -618,7 +628,7 @@
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                             <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
                             <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
-                            <a href="#"><%= __('contact-chef')%></a>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                           </td>
                       </tr>
                       <%}}})})%>
@@ -674,7 +684,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
-                          <a href="#"><%= __('contact-chef')%></a>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                         </td>
                       </tr>
                       <%}}})})%>
@@ -729,11 +739,10 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <% if(order.method == "pickup"){%>
-                          <a href="#"><%= __('see-address')%></a>
-                          <%}else{%>
-                          <a href="#"><%= __('see-delivery')%></a>
+                          <% if(order.method == 'pickup'){%>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.address%>"><%= __('see-address')%></a><br/>
                           <%}%>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                         </td>
                       </tr>
                       <%}}})})%>
@@ -789,6 +798,10 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                          <% if(order.method == 'pickup'){%>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.host.full_address%>"><%= __('see-address')%></a><br/>
+                          <%}%>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a><br/>
                           <a href="#myreview"><%= __('review')%></a>
                         </td>
                       </tr>
@@ -1100,7 +1113,7 @@
                     <a href="#" class="round_thumb size-small">
                       <img src="<%= order.host.picture || "/images/profile_man.png" %>">
                     </a>
-                    <h4 class="text-left text-lightgrey" style="margin-top: 15px;margin-left:10px;"><%= order.meal.chef.shopName %><br><small><%= order.meal.chef.intro %></small></h4>
+                    <h4 class="text-left text-lightgrey" style="margin-top: 15px;margin-left:10px;"><%= order.host.shopName %><br><small><%= order.host.intro %></small></h4>
                   </div>
                   <div class="row">
                     <div class="col-xs-12">
