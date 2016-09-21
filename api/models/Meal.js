@@ -72,7 +72,7 @@ module.exports = {
     },
     county : {
       type : 'string',
-      enum : ['San Francisco County','San Mateo County','Los Angela','Sacramento County']
+      enum : ['San Francisco County','Sacramento County']
     },
     chef : {
       model : 'Host'

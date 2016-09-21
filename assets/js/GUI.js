@@ -175,7 +175,7 @@ function search(target){
     query += "&zip=" + zip;
     $.ajax({
       url: "http://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURI(zip)
-      + "&sensor=false",
+      + "&sensor=false&language=en",
       success: function (response) {
         if (response.results.length == 0) {
           alert(jQuery.i18n.prop('zipcodeGeoError'));
