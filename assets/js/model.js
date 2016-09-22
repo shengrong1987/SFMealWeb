@@ -2181,7 +2181,7 @@ function uploadThumbnail(){
     return;
   }
   var isDelete = $("#myinfo input[type='file']").data("isDelete");
-  imageHandler("thumbnail",file,progressAlert,function(url){
+  imageHandler("thumbnail",file,progressView,function(url){
     if(!isDelete){
       $("#myinfo .fileinput-preview").data("src", url);
       var e = jQuery.Event("click");

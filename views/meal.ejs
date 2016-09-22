@@ -33,7 +33,7 @@
       <div class="col-md-8">
         <div class="box white">
           <div class="row">
-            <div class="col-xs-6">
+            <div class="col-xs-12 col-sm-6">
               <div class="row vertical-align-base">
                 <div class="col-xs-9">
                   <h2 class="text-left"><%= meal.title %>  <small class="text-orange"><% if(meal.type=='order'){ __('order') }else if(meal.type=='preorder'){ __('preorder') } %> <i class="fa fa-question-circle text-lightgrey"></i><%= meal.isFull()? __('full'): "" %></small></h2>
@@ -127,7 +127,7 @@
               </div>
             </div>
 
-            <div class="col-xs-6">
+            <div class="col-xs-12 col-sm-6">
               <div class="vertical-align">
                 <h4><small><%= __('share-to-all')%></small></h4>
                 <div id="social-share"></div>
