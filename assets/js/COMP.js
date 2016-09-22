@@ -272,11 +272,11 @@
       var datePicker = $(this);
       Plugin.call(datePicker,datePicker.data());
     });
-    $('[data-toggle="dropdown"][data-selected="true"]').next().find("li").click(function(e){
+    $('[data-toggle="dropdown"][data-selected="true"]').next().find("li a").click(function(e){
       //e.preventDefault();
       var text = $(this).text();
-      var value = $(this).find("a").attr("value");
-      var parent = $(this).parent().prev();
+      var value = $(this).attr("value");
+      var parent = $(this).closest('.dropdown-menu').prev();
       parent.html(text + "&nbsp;<span class='caret'></span>");
       parent.attr("value",value);
       parent.trigger("click.after");
