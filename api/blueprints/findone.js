@@ -47,7 +47,7 @@ module.exports = function findOneRecord (req, res) {
       actionUtil.subscribeDeep(req, matchingRecord);
     }
 
-    if(req.wantsJSON){
+    if(req.wantsJSON && sails.config.environment === 'development'){
      res.ok(matchingRecord);
     }else if(Model.adapter.identity == "meal"){
       if(isEditMode){

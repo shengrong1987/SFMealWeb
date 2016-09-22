@@ -348,7 +348,6 @@ function setup(){
   tooltipSetup();
   //setup mutual exclusive selectors(etc. signature dish select)
   selectorSetup();
-  // dishSelectorSetup();
   adjustLayout();
   $('[data-toggle="popover"]').popover();
   $(document).delegate('*[data-toggle="lightbox"]', 'click', function(event) {
@@ -381,6 +380,9 @@ function setup(){
   });
   $("input[type='tel']").inputmask({"mask": "(999) 999-9999"});
   $('#meal-container').mixItUp();
+  $('.lazyload').each(function(){
+    $(this).attr('src', $(this).data('src'));
+  });
 }
 
 function setupLanguage(){
