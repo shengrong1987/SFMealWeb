@@ -180,7 +180,8 @@ var Host = Backbone.Model.extend({
 var UserBarView = Backbone.View.extend({
   events : {
     "click #applyToHostBtn" : "applyForHost",
-    "mouseover #msgBtn" : "clearMsgBadges"
+    "mouseover #msgBtn" : "clearMsgBadges",
+    "click.after #citySelector [data-toggle='dropdown']" : "switchCounty"
   },
   initialize : function(){
     var userId = this.$el.data("user");
@@ -216,12 +217,10 @@ var UserBarView = Backbone.View.extend({
       io.socket.get("/user/" + userId + "/orders");
       io.socket.get("/user/" + userId + "/meals");
       io.socket.on("order", function(result){
-        console.log(result);
         $this.handleNotification(result.verb, result.data.action, result.id, "order");
         $this.handleBadge(false, "order");
       });
       io.socket.on("meal", function(result){
-        console.log(result);
         $this.handleNotification(result.verb, result.data.action, result.id, "meal");
         $this.handleBadge(false, "meal");
       });
@@ -230,6 +229,20 @@ var UserBarView = Backbone.View.extend({
   },
   applyForHost : function(e){
     location.href = "/apply";
+  },
+  switchCounty : function(e){
+    e.preventDefault();
+    var currentCountyValue = readCookie('county-value');
+    if(!$(e.currentTarget).attr("value") || currentCountyValue == $(e.currentTarget).attr("value")){
+      return;
+    }
+    createCookie("county",$(e.currentTarget).text(),30);
+    createCookie("county-value",$(e.currentTarget).attr("value"),30);
+    if(location.href.indexOf('search') != -1){
+      search($(".search-container .searchBtn")[0]);
+    }else{
+      location.reload();
+    }
   },
   handleNotification : function(verb, action, id, model){
     model = model.toLowerCase();

@@ -75,10 +75,6 @@ function getCountyInfo(){
     $("#citySelector>a").html(county + "&nbsp;<span class='caret'></span>");
     $("#citySelector>a").attr("value",county_value);
   }
-  $('#citySelector [data-toggle="dropdown"]').on("click.after",function(){
-    createCookie("county",$(this).text(),30);
-    createCookie("county-value",$(this).attr("value"),30);
-  });
   return county_value || "San Francisco County";
 }
 
@@ -166,8 +162,8 @@ function enterAddressInfo(event){
 //on user search action - redirect
 function search(target){
   var searchContainer = $(target).parent();
-  var keyword = searchContainer.find("input[name='keyword']").val();
-  var zip = searchContainer.find("input[name='zipcode']").val();
+  var keyword = searchContainer.find("input[name='keyword']").val() || '';
+  var zip = searchContainer.find("input[name='zipcode']").val() || '';
   var county = getCountyInfo();
   var query = "keyword=" + keyword;
   //check zip's county

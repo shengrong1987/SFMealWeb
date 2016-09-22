@@ -34,7 +34,7 @@ module.exports = {
 
   feature : function(req, res){
     var now = new Date();
-    var county = req.param('county');
+    var county = req.cookies['county-value'];
     county = county || "San Francisco County";
     Meal.find({county : county, type : 'order', status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
       if(err){
