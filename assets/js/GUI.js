@@ -383,6 +383,7 @@ function setup(){
   $('.lazyload').each(function(){
     $(this).attr('src', $(this).data('src'));
   });
+  $('body').on('touchstart.dropdown', '.dropdown-menu', function (e) { e.stopPropagation(); });
 }
 
 function setupLanguage(){
