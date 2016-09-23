@@ -380,7 +380,7 @@ module.exports = {
         });
       });
     }else{
-      return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, passGuide: host.passGuide, verification : null});
+      return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, passGuide: false, verification : null});
     }
   },
 
