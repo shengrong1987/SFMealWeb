@@ -32,6 +32,7 @@ module.exports.policies = {
     'login' : true,
     'register' : true,
     'reset' : true,
+    'resetForm' : true,
     'facebook_oauth2' : true,
     'google_oauth2' : true,
     'loginSuccess' : ['sessionAuth'],

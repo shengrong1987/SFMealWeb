@@ -56,8 +56,8 @@
         <h2>
         	<% if (typeof error!== 'undefined') { %>
           <%= error %>
-          <% } else { %>
-          The page you were trying to reach doesn't exist.
+          <% } else { var keywords = ['土豆','白菜猪肉饺子','姜撞奶','韭菜盒子','猪手','担担面','扬州炒饭']; var draft = Math.floor(Math.random() * keywords.length);%>
+          <%= __('404Error')%><a href="/meal/search?keyword=<%= keywords[draft]%>">'<%= keywords[draft]%>'</a><%= __('404Error2')%>
           <% } %>
         </h2>
         <p class="help">
@@ -65,10 +65,10 @@
         </p>
       </div>
 
-      <div class="logo">
-        <a href="http://sailsjs.org">
-          <img src="http://sailsjs.org/images/logo.png">
-        </a>
+      <div class="box-compact text-center">
+        <btn class="grey btn-outline cursor-pointer" style="display: inline-block;padding: 5px;" onclick="javascript:location.href='/'">
+          <div class="logo-simple"></div>
+        </btn>
       </div>
     </div>
 

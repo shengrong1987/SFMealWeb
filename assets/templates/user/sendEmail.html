@@ -1,17 +1,17 @@
 
 <div id="sendEmailView">
   <div class="popup box middle signin" style="width: 350px;">
-    <h4 data-toggle="18n" data-key="enterEmail"></h4>
+    <h4 data-toggle="i18n" data-key="enterEmail"></h4>
 
-    <form id="sendEmailForm" class="text-center" data-toggle="validator" role="form">
+    <form class="text-center" data-toggle="validator" role="form">
       <div class="form-group" data-toggle="validator" role="form">
-        <label class="sr-only" for="emailInput" data-toggle="18n" data-key="email"></label>
+        <label class="sr-only" for="emailInput" data-toggle="i18n" data-key="email"></label>
         <input type="email" class="form-control" id="emailInput" placeholder="email" required data-error="bad format">
         <div class="help-block with-errors"></div>
       </div>
 
       <div class="form-group">
-        <button type="submit" class="btn btn-danger btn-lg round red popline" data-toggle="18n" data-key="sendResetEmail"></button>
+        <button id="sendEmailBtn" type="button" class="btn btn-danger btn-lg round red popline" data-toggle="i18n" data-key="sendResetEmail"></button>
       </div>
       <div class="alert alert-success hide"></div>
       <div class="alert alert-danger hide" data-toggle="i18n" data-key="emailNotExistError"></div>

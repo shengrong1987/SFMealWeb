@@ -21,8 +21,8 @@ var LoginView = Backbone.View.extend({
     "submit form" : "login",
     "click #FBBtn" : "FBLogin",
     "click #GoogleBtn" : "GoogleLogin",
-    "submit #sendEmailForm" : "sendEmail",
-    "submit #resetPasswordForm" : "resetPassword"
+    "click #sendEmailBtn" : "sendEmail",
+    "click #resetPasswordBtn" : "resetPassword"
   },
   initialize : function(){
     var errorView = this.$el.find(".alert-danger");
@@ -97,15 +97,16 @@ var LoginView = Backbone.View.extend({
     $this = this;
     this.model.save({},{
       success : function(model, result){
-        if(result=="200"){
-          $this.successView.html(jQuery.i18n.prop('resetPasswordSuccess'));
-          $this.successView.show();
+        if(result != "404") {
+          BootstrapDialog.alert(jQuery.i18n.prop('resetPasswordSuccess'), function(){
+            location.href = "/";
+          });
         }else{
-          $this.errorView.html(result.responseText);
           $this.errorView.show();
         }
       },error : function(model, err){
-
+        $this.errorView.html(err.responseText);
+        $this.errorView.show();
       }
     })
   }
@@ -1224,7 +1225,7 @@ var DishView = Backbone.View.extend({
   initialize : function(){
     var form = this.$el.find("form");
     var formAlert = form.find(form.data("err-container") + " .alert.alert-danger");
-    var progressAlert = form.find(form.data("err-container") + " .alert.alert-info");
+    var progressAlert = form.find(form.data("err-container") + " .alert.alert-success");
     progressAlert.hide();
     formAlert.hide();
     this.progressAlert = progressAlert;
@@ -1332,6 +1333,7 @@ var DishView = Backbone.View.extend({
     var price = $("#priceInput").val();
     var category = $("#categoryInput").val();
     var quantity = form.find("#quantityInput").val();
+    var desc = form.find("#descriptionInput").val();
     var $this = this;
     if (dishId) {
       this.model.set({id: dishId});
@@ -1368,7 +1370,8 @@ var DishView = Backbone.View.extend({
             price : price,
             photos : photos,
             type : category,
-            quantity : quantity
+            quantity : quantity,
+            description : desc
           });
 
           $this.model.save({},{

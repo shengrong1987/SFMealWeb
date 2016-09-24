@@ -121,7 +121,6 @@ module.exports = require('waterlock').actions.user({
 
     async.auto({
       handleAddress : function(cb){
-        console.log("handling address");
         if(!params.address){
           return cb();
         }
@@ -192,7 +191,6 @@ module.exports = require('waterlock').actions.user({
         })
       },
       updateUser : ['handleAddress',function(cb, results){
-        console.log("updating info");
         if(results && results.handleAddress) {
           results.handleAddress.save(function(err, u){
             if(err){

@@ -286,6 +286,7 @@
             <%= __('dish-out-tips')%>
           </div>
           <%}%>
+          <button type="button" class="btn btn-red" onclick="location.href += '/confirm'"><%= __('next-step')%></button>
           <table id="order" class="table" data-err-container="#order-alert">
             <thead>
             <tr>
@@ -349,7 +350,6 @@
             </tr>
             </tbody>
           </table>
-          <button type="button" class="btn btn-red" onclick="location.href += '/confirm'"><%= __('next-step')%></button>
 
           <div style="max-height: 200px;overflow: -moz-scrollbars-vertical;overflow: auto;">
             <table id="confirm-order" class="table text-grey" style="margin-top: 10px;">

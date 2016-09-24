@@ -39,7 +39,7 @@
       }).length;
     %>
     <% if (typeof search != 'undefined' && search ){ %>
-      <h4><%= __('search-result', (typeof keyword === 'undefined' ? keyword : ''), (zipcode ? zipcode + __('nearby') : ""), numberOfOrder,numberOfPreorder)%></h4>
+      <h4><%= __('search-result', (typeof keyword !== 'undefined' ? keyword : ''), (zipcode ? zipcode + __('nearby') : ""), numberOfOrder,numberOfPreorder)%></h4>
     <% } %>
     <div class="row middle" style="margin-bottom: 20px;margin-top: 20px;">
       <div class="btn-set" data-toggle="btn-set">
@@ -63,12 +63,12 @@
       var monthDic = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
       for(var i=0; i< meals.length; i++) {
         var meal = meals[i];
-        var featureDishId = meal.features;
-        if(!featureDishId){
+        var cover = meal.cover;
+        if(!cover){
           var mainDish = meal.dishes[0];
         }else{
           var mainDish = meal.dishes.filter(function(dish){
-            return dish.id == featureDishId
+            return dish.id == cover;
           })[0];
         }
         if(!mainDish){

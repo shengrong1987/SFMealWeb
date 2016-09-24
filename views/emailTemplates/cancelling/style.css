@@ -7961,6 +7961,13 @@ input:focus {
   background-size: 225px 60px;
   cursor: pointer;
 }
+.logo-simple {
+  background-image: url(../images/sfmeal_logo.png);
+  display: block;
+  width: 225px;
+  height: 60px;
+  background-size: 225px 60px;
+}
 .logo-remote {
   padding: 30px 150px 50px 150px;
   background: url("http://test.sfmeal.com/images/sfmeal_logo.png") no-repeat center / 100% auto;

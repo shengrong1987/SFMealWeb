@@ -130,7 +130,7 @@ module.exports = {
         host.dishVerifying = host.dishes.some(function(dish){
           return dish.isVerified;
         });
-        return cb(null);
+        host.save(cb);
       });
     },
     getDistance : function(userLat, userLong){
