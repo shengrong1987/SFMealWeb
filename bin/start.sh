@@ -2,7 +2,7 @@
 
 USER="root"
 NODE_ENV="production"
-PORT="3000"
+PORT="1337"
 APP_DIR="/home/ec2-user/my-app"
 NODE_APP="app.js"
 CONFIG_DIR="$APP_DIR"
@@ -52,8 +52,10 @@ start_it() {
     chown $USER:$USER "$PID_DIR"
     mkdir -p "$LOG_DIR"
     chown $USER:$USER "$LOG_DIR"
+    chown -R $USER:$USER "$APP_DIR/data"
 
     echo "Starting $APP_NAME ..."
+    echo "mongod --dbpath data --smallfiles"
     echo "cd $APP_DIR && PORT=$PORT NODE_ENV=$NODE_ENV NODE_CONFIG_DIR=$CONFIG_DIR $NODE_EXEC $APP_DIR/$NODE_APP 1>$LOG_FILE 2>&1 & echo \$! > $PID_FILE" | sudo -i -u $USER
     echo "$APP_NAME started with pid $(get_pid)"
 }
