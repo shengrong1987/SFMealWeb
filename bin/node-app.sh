@@ -57,9 +57,6 @@ start_it() {
     mkdir -p "$LOG_DIR"
     chown $USER:$USER "$LOG_DIR"
 
-    echo "Starting mongodb ..."
-    mongod --dbpath data --smallfiles
-
     echo "Starting $APP_NAME ..."
     echo "cd $APP_DIR && PORT=$PORT NODE_ENV=$NODE_ENV NODE_CONFIG_DIR=$CONFIG_DIR $NODE_EXEC $APP_DIR/$NODE_APP 1>$LOG_FILE 2>&1 & echo \$! > $PID_FILE" | sudo -i -u $USER
     echo "$APP_NAME started with pid $(get_pid)"
