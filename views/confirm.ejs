@@ -157,6 +157,7 @@
               <%= __('no-meal-left') %>
             </div>
           <%}%>
+          <button type="button" data-action="takeOrder" class="btn btn-danger red"><%= __('placeorder') %></button>
           <table id="order" class="table" data-meal="<%= meal.id%>" data-err-container="#alert-order">
             <thead>
             <tr>
@@ -226,7 +227,7 @@
             </tbody>
           </table>
 
-          <button type="button" data-action="takeOrder" class="btn btn-danger red"><%= __('bill-check') %></button>
+          <button type="button" data-action="takeOrder" class="btn btn-danger red"><%= __('placeorder') %></button>
         </div>
       </div>
 

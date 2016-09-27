@@ -73,7 +73,7 @@
               <i class="fa fa-heart fa-2x fav text-white" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
               <img class="photo" src= "<%= meal.coverString %>" data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
             </div>
-            <div class="col-md-6 basic-info">
+            <div class="col-md-7 basic-info">
               <div class="col-xs-12">
                 <h3 class="text-red text-left">$<%= mainDish.price.toFixed(2) %><br>
                   <small><strong class="text-black"><%= mainDish.title %></strong> <span>( <%= mainDish.quantity || '1' + __('fen') %> )</span></small>
