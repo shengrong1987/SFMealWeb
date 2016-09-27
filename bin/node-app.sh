@@ -10,7 +10,7 @@ PID_DIR="$APP_DIR/pid"
 PID_FILE="$PID_DIR/app.pid"
 LOG_DIR="$APP_DIR/log"
 LOG_FILE="$LOG_DIR/app.log"
-NODE_EXEC=$(which node)
+NODE_EXEC=/usr/local/bin/node
 APP_NAME="SFMealWeb"
 
 ###############
@@ -35,7 +35,7 @@ USAGE="Usage: $0 {start|stop|restart|status} [--force]"
 FORCE_OP=false
 
 mongodb_running(){
-    ps -ax | grep -v grep | grep mongo
+   ! [ -z "$(ps -edaf | grep -v grep | grep mongod)" ]
 }
 
 pid_file_exists() {
@@ -57,6 +57,16 @@ start_it() {
     mkdir -p "$LOG_DIR"
     chown $USER:$USER "$LOG_DIR"
 
+	  COUNTER=0
+    grep -q 'waiting for connections on port' /var/log/mongodb.log
+    while [[ $? -ne 0 && $COUNTER -lt 60 ]] ; do
+        sleep 2
+        let COUNTER+=2
+        echo "Waiting for mongo to initialize... ($COUNTER seconds so far)"
+        grep -q 'waiting for connections on port' /var/log/mongodb.log
+    done
+
+
     echo "Starting $APP_NAME ..."
     echo "cd $APP_DIR && PORT=$PORT NODE_ENV=$NODE_ENV NODE_CONFIG_DIR=$CONFIG_DIR $NODE_EXEC $APP_DIR/$NODE_APP 1>$LOG_FILE 2>&1 & echo \$! > $PID_FILE" | sudo -i -u $USER
     echo "$APP_NAME started with pid $(get_pid)"
@@ -74,25 +84,25 @@ remove_pid_file() {
 }
 
 start_app() {
-    if pid_file_exists
-    then
-        if is_running
-        then
-            PID=$(get_pid)
-            echo "$APP_NAME already running with pid $PID"
-            exit 1
-        else
-            echo "$APP_NAME stopped, but pid file exists"
-            if [ $FORCE_OP = true ]
-            then
-                echo "Forcing start anyways"
-                remove_pid_file
-                start_it
-            fi
-        fi
-    else
-        start_it
-    fi
+   if pid_file_exists
+   then
+      if is_running
+      then
+         PID=$(get_pid)
+         echo "$APP_NAME already running with pid $PID"
+         exit 1
+      else
+         echo "$APP_NAME stopped, but pid file exists"
+         if [ $FORCE_OP = true ]
+         then
+            echo "Forcing start anyways"
+            remove_pid_file
+            start_it
+         fi
+      fi
+   else
+      start_it
+   fi
 }
 
 stop_app() {
@@ -106,14 +116,10 @@ stop_app() {
             echo "$APP_NAME stopped"
         else
             echo "$APP_NAME already stopped, but pid file exists"
-            if [ $FORCE_OP = true ]
-            then
-                echo "Forcing stop anyways ..."
-                remove_pid_file
-                echo "$APP_NAME stopped"
-            else
-                exit 1
-            fi
+            echo "Forcing stop anyways ..."
+            remove_pid_file
+            echo "$APP_NAME stopped"
+            exit 1
         fi
     else
         echo "$APP_NAME already stopped, pid file does not exist"

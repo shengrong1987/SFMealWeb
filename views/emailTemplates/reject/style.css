@@ -8151,6 +8151,9 @@ input:focus {
   border: solid 1px transparent !important;
   height: 35px;
 }
+.btn-mixitup {
+  padding: 6px 12px !important;
+}
 .btn-lg,
 .btn-group-lg > .btn {
   height: 50px;

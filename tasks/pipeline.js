@@ -28,11 +28,11 @@ var jsFilesToInject = [
   'js/dependencies/sails.io.js',
 
   //load jquery then
-  'js/dependencies/jquey/*.js',
+  'js/dependencies/jquery/*.js',
 
   // Dependencies like jQuery, or Angular are brought in here
   'js/dependencies/**/*.js',
-  
+
   'js/bootstrap/bootstrap.js',
 
   // All of the rest of your client-side js files

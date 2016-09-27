@@ -379,7 +379,12 @@ function setup(){
     }
   });
   $("input[type='tel']").inputmask({"mask": "(999) 999-9999"});
-  $('#meal-container').mixItUp();
+  $('#meal-container').mixItUp({
+    pagination: {
+      limit: 8,
+      pagerClass : 'btn btn-mixitup'
+    }
+  });
   $('.lazyload').each(function(){
     $(this).attr('src', $(this).data('src'));
   });

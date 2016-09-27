@@ -92,14 +92,14 @@
               <h1 class="desc absolute text-white middle text-shadow font-elegant"><strong><%= meal.provideFromTime.getDate() %><br><%= monthDic[meal.provideFromTime.getMonth()] %><br><%= meal.provideFromTime.getFullYear() %></strong></h1>
             <%}%>
           </div>
-          <div class="col-md-6 basic-info">
+          <div class="col-md-7 basic-info">
             <div class="col-xs-12">
               <h3 class="text-red text-left">$<%= mainDish.price.toFixed(2) %><br>
                 <small><strong class="text-black"><%= mainDish.title %></strong> <span>(<%= mainDish.quantity || '1' + __('fen')%>)</span></small>
               </h3>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-5">
             <h3><small><%= __('left')%><%= meal.leftQty[mainDish.id] + __('fen')%><br><%=  __('self-pickup') + (meal.isDelivery ? ("/" + __('delivery')) : '')%></small></h3>
           </div>
           <div class="divider"></div>
@@ -114,14 +114,11 @@
         </div>
       </div>
       <% } %>
-
     </div>
   </div>
 
   <nav>
-    <ul class="pagination pagination-lg" data-trigger="pagination" data-target="#meal-container" data-npp="10">
-      <li class="active"><a href="javascript:void(0)">1</a></li>
-    </ul>
+    <div class="pager-list"></div>
   </nav>
 
 </div>

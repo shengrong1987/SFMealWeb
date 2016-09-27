@@ -1,4 +1,6 @@
 #!/bin/bash
+
+APP_DIR="/home/ec2-user/my-app"
 #
 # mongodb     Startup script for the mongodb server
 #
@@ -16,13 +18,14 @@ if [ -f /etc/sysconfig/mongodb ]; then
 fi
 
 prog="mongod"
-mongod="/usr/local/mongodb/bin/mongod"
+mongod="mongod"
 RETVAL=0
 
 start() {
 	echo -n $"Starting $prog: "
 	chown -R $USER:$USER "$APP_DIR/data"
-	daemon $mongod -dbpath data --smallfiles "--fork --logpath /var/log/mongodb.log --logappend 2>&1 >>/var/log/mongodb.log"
+	truncate -s 0 /var/log/mongodb.log
+	daemon $mongod -dbpath "$APP_DIR/data" --smallfiles "--fork --logpath /var/log/mongodb.log --logappend 2>&1 >>/var/log/mongodb.log"
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$prog
@@ -35,6 +38,7 @@ stop() {
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$prog
+	truncate -s 0 /var/log/mongodb.log
 	return $RETVAL
 }
 
