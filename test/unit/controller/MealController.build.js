@@ -117,7 +117,7 @@ describe('MealController', function() {
     it('should update address info for host', function (done) {
         agent
           .put('/host/' + hostId)
-          .send({address:[address1], picture: picture, shopName : shopName})
+          .send({address:[address1], picture: picture, shopName : shopName, phone : '(415)802-3853'})
           .expect(200)
           .end(function(err,res){
             if(res.body.city != "San Francisco"){

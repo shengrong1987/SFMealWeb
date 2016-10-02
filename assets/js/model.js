@@ -233,12 +233,11 @@ var UserBarView = Backbone.View.extend({
   },
   switchCounty : function(e){
     e.preventDefault();
-    var currentCountyValue = readCookie('county-value');
+    var currentCountyValue = readCookie('county');
     if(!$(e.currentTarget).attr("value") || currentCountyValue == $(e.currentTarget).attr("value")){
       return;
     }
-    createCookie("county",$(e.currentTarget).text(),30);
-    createCookie("county-value",$(e.currentTarget).attr("value"),30);
+    createCookie("county",$(e.currentTarget).attr("value"),30);
     if(location.href.indexOf('search') != -1){
       search($(".search-container .searchBtn")[0]);
     }else{
@@ -277,7 +276,7 @@ var UserBarView = Backbone.View.extend({
 
   getNotification : function(){
     var userId = this.$el.data("user");
-    var hostId = this.$el.data("host");
+    var hostId = this.$el.data("host").id ? this.$el.data("host").id : this.$el.data("host");
     var $this = this;
     if(userId){
       $.ajax("/user/" + userId + "/notifications").done(function(data){
@@ -380,6 +379,26 @@ var ApplyView = Backbone.View.extend({
         }
       }else{
         stopHere = true;
+      }
+    });
+    var birthMonth = this.$el.find("#bMonthInput").attr('value');
+    var birthDay = this.$el.find("#bDayInput").attr('value');
+    var birthYear = this.$el.find("#bYearInput").attr('value');
+    this.$el.find("#bMonthInput option").each(function(){
+      if(parseInt($(this).val()) == birthMonth){
+        $(this).attr('selected', true);
+      }
+    });
+
+    this.$el.find("#bDayInput option").each(function(){
+      if(parseInt($(this).val()) == birthDay){
+        $(this).attr('selected', true);
+      }
+    });
+
+    this.$el.find("#bYearInput option").each(function(){
+      if(parseInt($(this).val()) == birthYear){
+        $(this).attr('selected', true);
       }
     });
     $('[href="#step'+curStep+'"]').tab('show');
@@ -538,6 +557,13 @@ var ApplyView = Backbone.View.extend({
     if(!shopName){
       var alert1 = this.$el.find("#step1 .alert");
       alert1.text(jQuery.i18n.prop('shopnameEmptyError'));
+      alert1.show();
+      return;
+    }
+    var phone = this.$el.find("input[name='phone']").val();
+    if(!phone){
+      var alert1 = this.$el.find("#step1 .alert");
+      alert1.text(jQuery.i18n.prop('phoneEmptyError'));
       alert1.show();
       return;
     }
@@ -942,9 +968,12 @@ var MealView = Backbone.View.extend({
   },
   initialize : function(){
     var form = this.$el.find("form");
-    var formAlert = form.find(form.data("err-container") + " .alert");
+    var formAlert = form.find(form.data("err-container") + " .alert.alert-danger");
     formAlert.hide();
     this.formAlert = formAlert;
+    var successAlert = form.find(form.data("err-container") + " .alert.alert-success");
+    successAlert.hide();
+    this.successAlert = successAlert;
     var scheduleAlert = form.find("#scheduleAlert");
     scheduleAlert.hide();
     this.scheduleAlert = scheduleAlert;
@@ -1022,6 +1051,7 @@ var MealView = Backbone.View.extend({
     var form = this.$el.find("form");
     var mealId = form.data("meal-id");
     var hostId = form.data("host-id");
+    this.successAlert.hide();
     this.formAlert.hide();
     this.scheduleAlert.hide();
     this.dishAlert.hide();
@@ -1143,7 +1173,7 @@ var MealView = Backbone.View.extend({
       var endBookingDatePicker = form.find("#order .end-booking [data-toggle='dateTimePicker']");
       var endBookingDate = endBookingDatePicker.data("DateTimePicker").date();
 
-      if(!startBookingDate._d || !endBookingDate._d){
+      if(!startBookingDate || !endBookingDate){
         this.scheduleAlert.show();
         this.scheduleAlert.html(jQuery.i18n.prop('provideTimeNotError'));
         return
@@ -1177,8 +1207,9 @@ var MealView = Backbone.View.extend({
       dishes = undefined;
     }
 
-    this.formAlert.show();
-    this.formAlert.html(jQuery.i18n.prop('saving'));
+    this.successAlert.show();
+    this.successAlert.html(jQuery.i18n.prop('saving'));
+
     this.model.unset("chef");
     this.model.set({
       dishes : dishes,
@@ -1201,13 +1232,15 @@ var MealView = Backbone.View.extend({
     this.model.save({},{
       success : function(){
         if(mealId) {
-          $this.formAlert.html("Meal" + jQuery.i18n.prop('updatedComplete'));
+          $this.successAlert.html("Meal" + jQuery.i18n.prop('updatedComplete'));
         }else{
           BootstrapDialog.alert("Meal" + jQuery.i18n.prop('createdComplete'), function(){
             reloadUrl("/host/me#","mymeal");
           })
         }
       },error : function(model, err){
+        $this.successAlert.hide();
+        $this.formAlert.show();
         $this.formAlert.html(err.responseText);
       }
     });
@@ -1522,8 +1555,34 @@ var UserProfileView = Backbone.View.extend({
     alertView.hide();
     this.alertView = alertView;
 
+    var successView = this.$el.find(".alert.alert-success");
+    successView.removeClass("hide");
+    successView.hide();
+    this.sucessView = successView;
+
     var colorSelector = this.$el.find("div[name='template_color']");
     colorSelector.find(".color-block[data-color='" + colorSelector.data('color') + "']").addClass("active");
+
+    var birthMonth = this.$el.find("#bMonthInput").attr('value');
+    var birthDay = this.$el.find("#bDayInput").attr('value');
+    var birthYear = this.$el.find("#bYearInput").attr('value');
+    this.$el.find("#bMonthInput option").each(function(){
+      if(parseInt($(this).val()) == birthMonth){
+        $(this).attr('selected', true);
+      }
+    });
+
+    this.$el.find("#bDayInput option").each(function(){
+      if(parseInt($(this).val()) == birthDay){
+        $(this).attr('selected', true);
+      }
+    });
+
+    this.$el.find("#bYearInput option").each(function(){
+      if(parseInt($(this).val()) == birthYear){
+        $(this).attr('selected', true);
+      }
+    });
   },
   chooseColor : function(e){
     var target = $(e.currentTarget);
@@ -1534,8 +1593,12 @@ var UserProfileView = Backbone.View.extend({
   },
   saveProfile : function(e){
     e.preventDefault();
-    this.alertView.html(jQuery.i18n.prop('saving'));
-    this.alertView.show();
+    if(this.$el.find("button[type='submit']").hasClass("disabled")){
+      return;
+    }
+    this.alertView.hide();
+    this.sucessView.html(jQuery.i18n.prop('saving'));
+    this.sucessView.show();
     var lastname = this.$el.find("input[name='lastname']").val();
     var firstname = this.$el.find("input[name='firstname']").val();
     var color = this.$el.find("div[name='template_color'] .active").data('color');
@@ -1543,6 +1606,10 @@ var UserProfileView = Backbone.View.extend({
     var picture = this.$el.find(".fileinput-preview").data("src");
     var phone = this.$el.find("#phoneInput").val();
     var zipcode = this.$el.find("#zipcodeInput").val();
+    var bMonth = parseInt(this.$el.find("#bMonthInput").val());
+    var bDay = parseInt(this.$el.find("#bDayInput").val());
+    var bYear = parseInt(this.$el.find("#bYearInput").val());
+    var birthDate = new Date(bYear,bMonth-1,bDay);
     this.model.set({
       id : this.$el.data("id"),
       firstname : firstname,
@@ -1551,9 +1618,12 @@ var UserProfileView = Backbone.View.extend({
       color : color,
       picture : picture,
       phone : phone,
-      zipcode : zipcode
+      zipcode : zipcode,
+      birthDate : birthDate
     });
     var $this = this;
+    this.model.unset('auth');
+    this.model.unset('address');
     this.model.save({},{
       success : function(){
         if(e.data && e.data.update){
@@ -1561,10 +1631,12 @@ var UserProfileView = Backbone.View.extend({
             reloadUrl("/user/me","myinfo");
           });
         }else{
-          $this.alertView.html(jQuery.i18n.prop('profileUpdated'));
+          $this.sucessView.html(jQuery.i18n.prop('profileUpdated'));
         }
       },error : function(model, err){
+        $this.sucessView.hide();
         $this.alertView.html(jQuery.i18n.prop('saveError'))
+        $this.alertView.show();
       }
     });
   }

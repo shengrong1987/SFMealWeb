@@ -76,7 +76,9 @@ module.exports.routes = {
   '/email/adjust' : { view : 'emailTemplates/adjust/html', locals : {layout : false}},
   '/email/reject' : { view : 'emailTemplates/reject/html', locals : {layout : 'email_layout'}},
   '/email/adjusting' : { view : 'emailTemplates/adjusting/html', locals : {layout : 'email_layout'}},
-  '/email/ready' : { view : 'emailTemplates/ready/html', locals : {layout : 'email_layout'}}
+  '/email/ready' : { view : 'emailTemplates/ready/html', locals : {layout : 'email_layout'}},
+  '/notification/msg' : 'NotificationController.sendMessage',
+  '/job/dashboard' : 'JobNotification.dashboard'
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

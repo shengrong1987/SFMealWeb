@@ -28,12 +28,14 @@ module.exports = require('waterlock').actions.user({
 
   becomeHost : function(req, res){
     var userId = req.session.user.id;
+    var user = req.session.user;
     var email = req.session.user.auth.email;
     var shopName = req.query.shopName;
     var params = {};
     params.user = userId;
     params.email = email;
     params.shopName = shopName;
+    params.phone = user.phone || "";
     if(req.session.user.host){
       return res.badRequest(req.__('user-already-host'));
     }
@@ -89,6 +91,7 @@ module.exports = require('waterlock').actions.user({
               if(err){
                 res.badRequest(err);
               }
+              console.log(user);
               req.session.user = user[0];
               res.ok({user:user[0]});
             });
@@ -151,7 +154,7 @@ module.exports = require('waterlock').actions.user({
               if(result.length==0){
                 return next(req.__('meal-error-address2'));
               }
-              if(addObj.isDefault) {
+              if(addObj.isDefault){
                 user.address.forEach(function (one) {
                   one.isDefault = false;
                 });
@@ -201,8 +204,19 @@ module.exports = require('waterlock').actions.user({
               if (err) {
                 return cb(err);
               }
-              user[0].auth = auth;
-              cb(null, user[0]);
+              if(user[0].host && user[0].phone){
+                var hostId = user[0].host.id || user[0].host;
+                Host.update(hostId, {phone : user[0].phone}).exec(function(err, host){
+                  if(err){
+                    return cb(err);
+                  }
+                  user[0].auth = auth;
+                  cb(null, user[0]);
+                })
+              }else{
+                user[0].auth = auth;
+                cb(null, user[0]);
+              }
             });
           })
         }else{
@@ -211,8 +225,19 @@ module.exports = require('waterlock').actions.user({
             if (err) {
               return cb(err);
             }
-            user[0].auth = auth;
-            cb(null, user[0]);
+            if(user[0].host && user[0].phone){
+              var hostId = user[0].host.id || user[0].host;
+              Host.update(hostId, {phone : user[0].phone}).exec(function(err, host){
+                if(err){
+                  return cb(err);
+                }
+                user[0].auth = auth;
+                cb(null, user[0]);
+              })
+            }else{
+              user[0].auth = auth;
+              cb(null, user[0]);
+            }
           });
         }
       }]}, function(err, results){

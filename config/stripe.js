@@ -15,6 +15,13 @@ config.StripeKeys = {
   secretKey: "sk_test_SK41ektWZVeEs6dcrw32Qn4Z"
 };
 
+config.TwilioKeys = {
+    sid : 'ACa4db80bc98379abaea2ab0bdebe42a0a',
+    token : '51ec952b53bc76bb4d8bc356999dc250'
+  // sid : 'SK967bb4598c38cc0f31f4e5b8155d59d1',
+  // token : 'oSgFCmwfwawAfImFS6xnxSQf8r479m9c'
+}
+
 // mailgun keys
 // Add as env variables
 // export "mailgunUsername=GET_YOUR_OWN"

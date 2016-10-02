@@ -30,7 +30,12 @@ module.exports.waterlock = {
       appSecret: process.env.NODE_ENV === 'production' ? "02f7b4b026d9d2029c2f372f84cbc9ed" : "d0bda6a62210efa8483e9a8b10ce3aa8",
       fieldMap : {
         'email' : 'email',
-        'username' : 'name'
+        'name' : 'name',
+        'gender' : 'gender',
+        'picture' : 'picture',
+        'age_range' : 'age_range',
+        'location' : 'location',
+        'hometown' : 'hometown'
       }
     },
     {

@@ -21,6 +21,12 @@ module.exports = {
     });
   },
 
+  geocodeCity : function(city, cb){
+    geocoder.geocode(city, function(err, data){
+      cb(err, data);
+    });
+  },
+
   geocodeAdvance : function(zipCode, cb){
     geocoder.geocode({zipcode : zipCode, address : "USA", country : "USA"}, function(err, res) {
       if(err){

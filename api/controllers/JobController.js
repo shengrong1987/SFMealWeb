@@ -6,9 +6,7 @@
  *
  * @docs        :
  */
-
 module.exports = {
-
   find : function(req, res){
     Jobs.jobs(req.query,function(err, jobs){
       if(err){

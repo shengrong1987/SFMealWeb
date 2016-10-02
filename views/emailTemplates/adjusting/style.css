@@ -8488,7 +8488,7 @@ fieldset[disabled] .btn-red.active {
   width: 30%;
 }
 .banner {
-  height: 550px;
+  height: 580px;
 }
 .banner .img-wrapper {
   height: 400px;
@@ -8598,10 +8598,6 @@ fieldset[disabled] .btn-red.active {
 }
 #address-form[data-host='true'] span {
   color: #22b571 !important;
-}
-#our-story {
-  width: 50%;
-  top: 250px;
 }
 #meal-container .mix {
   display: none;
@@ -8808,6 +8804,9 @@ fieldset[disabled] .btn-red.active {
   margin: auto;
   padding: 20px;
 }
+.box-scroll {
+  overflow: scroll;
+}
 .box-base {
   min-height: 400px;
 }
@@ -8865,6 +8864,14 @@ fieldset[disabled] .btn-red.active {
 .popup .popline {
   width: 90%;
 }
+#our-story {
+  width: 50%;
+  top: 250px;
+  max-height: 330px;
+}
+#our-story .cover {
+  max-height: 330px;
+}
 .rating {
   unicode-bidi: bidi-override;
   direction: rtl;
@@ -8915,6 +8922,18 @@ fieldset[disabled] .btn-red.active {
   .footer .middle {
     width: 430px;
   }
+  #myorder {
+    width: 90%;
+  }
+  #mymeal {
+    width: 90%;
+  }
+  #mydish {
+    width: 90%;
+  }
+  #myinfo {
+    width: 90%;
+  }
 }
 @media (max-width: 1600px) {
   #our-story {
@@ -8926,7 +8945,27 @@ fieldset[disabled] .btn-red.active {
     width: 90%;
   }
 }
+@media (max-width: 992px) {
+  #our-story .context {
+    padding: 50px 25px 50px 75px;
+  }
+}
 @media (max-width: 768px) {
+  #myorder {
+    width: 100%;
+  }
+  #mymeal {
+    width: 100%;
+  }
+  #mydish {
+    width: 100%;
+  }
+  #myinfo {
+    width: 100%;
+  }
+  #our-story img {
+    display: none;
+  }
   .gs-reactions {
     text-align: center !important;
   }

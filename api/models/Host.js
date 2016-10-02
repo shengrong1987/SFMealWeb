@@ -34,6 +34,9 @@ module.exports = {
       required : true,
       unique : true
     },
+    phone : {
+      type : 'string'
+    },
     //[{"dish1": id}, {"dish2":id}, {"dish3":id}]
     feature_dishes : {
       type : 'json'
@@ -122,7 +125,7 @@ module.exports = {
         if(err){
           return cb(err);
         }
-        if(host.full_address && host.dishes.length > 0 && host.bankId && valid){
+        if(host.phone && host.full_address && host.dishes.length > 0 && host.bankId && valid){
           host.passGuide = true;
         }else{
           host.passGuide = false;

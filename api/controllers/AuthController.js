@@ -51,6 +51,10 @@ module.exports = require('waterlock').waterlocked({
   loginSuccess : function(req, res){
     console.log("login success...");
     var auth = req.session.user.auth;
+    var county = req.session.user.county;
+    if(county && (!req.cookies['county'] || req.cookies['county'] == 'undefined')){
+      res.cookie('county',county);
+    }
     if(auth.facebookId){
       res.redirect('back');
     }else if(auth.googleEmail){

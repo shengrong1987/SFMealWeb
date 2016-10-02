@@ -367,7 +367,8 @@ describe('UsersController', function() {
           .send({
             address : addresses,
             firstname : firstname,
-            lastname : lastname
+            lastname : lastname,
+            phone : '(415)802-3853'
           })
           .expect(200)
           .end(function(err,res){

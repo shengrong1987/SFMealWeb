@@ -70,12 +70,12 @@ function getZipCode(){
 
 function getCountyInfo(){
   var county = readCookie("county");
-  var county_value = readCookie("county-value");
   if(county){
-    $("#citySelector>a").html(county + "&nbsp;<span class='caret'></span>");
-    $("#citySelector>a").attr("value",county_value);
+    var countyName = $("#citySelector ul a[value='" + county  + "']").text();
+    $("#citySelector>a").html(countyName + "&nbsp;<span class='caret'></span>");
+    $("#citySelector>a").attr("value",county);
   }
-  return county_value || "San Francisco County";
+  return county || "San Francisco County";
 }
 
 //UI Components setup

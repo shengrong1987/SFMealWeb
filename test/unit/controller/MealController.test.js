@@ -269,7 +269,10 @@ describe('MealController', function() {
     it('should update address info for host', function (done) {
       agent
         .put('/host/' + hostId)
-        .send({address:[address]})
+        .send({
+          address:[address],
+          phone : "(415)802-3853"
+        })
         .expect(200)
         .end(function(err,res){
           if(err){

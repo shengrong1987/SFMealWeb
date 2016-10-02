@@ -51,7 +51,8 @@ module.exports.policies = {
   },
 
   JobController : {
-    '*' : 'true'
+    '*' : 'true',
+    'dash': 'agendash'
   },
 
   MealController : {
@@ -101,7 +102,7 @@ module.exports.policies = {
   },
 
   NotificationController : {
-    '*' : true
+    'msg' : 'isAdmin'
   },
 
   ReviewController : {

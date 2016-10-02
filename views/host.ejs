@@ -35,14 +35,14 @@
       </ul>
 
       <div class="tab-content" style="padding-top: 20px;padding-bottom: 60px;min-height:500px;">
-        <div id="myorder" style="width: 90%;" class="tab-pane middle active">
+        <div id="myorder" class="tab-pane middle active">
           <div class="box box-base box-shadow white">
             <ul class="nav nav-justified nav-tab-green" style="padding: 20px;">
               <li class="active"><a data-toggle="tab" href="#myorder-order"><h4><strong><%= __('order-nav-order')%></strong></h4></a></li>
               <li><a data-toggle="tab" href="#myorder-preorder"><h4><strong><%= __('order-nav-preorder')%></strong></h4></a></li>
             </ul>
             <div class="tab-content">
-              <div id="myorder-order" style="width: 90%;" class="tab-pane middle active">
+              <div id="myorder-order" class="tab-pane middle active">
                 <ul class="nav nav-tabs" style="margin-top: 20px;margin-bottom: 10px;">
                   <li class="active"><a data-toggle="tab" href="#order-all" class="btn-lg text-dark"><strong><%= __('order-nav-all')%></strong></a></li>
                   <li><a data-toggle="tab" href="#order-holding" class="btn-lg text-dark"><strong><%= __('order-nav-waiting')%></strong></a></li>
@@ -52,7 +52,7 @@
                   <li><a data-toggle="tab" href="#order-delivered" class="btn-lg text-dark"><strong><%= __('order-nav-delivered')%></strong></a></li>
                   <li><a data-toggle="tab" href="#order-reviewed" class="btn-lg text-dark"><strong><%= __('order-nav-reviewed')%></strong></a></li>
                 </ul>
-                <div class="tab-content">
+                <div class="tab-content box-scroll">
                   <div id="order-all" class="tab-pane middle active">
                     <table class="table table-bordered" style="width: 100%;">
                       <thead>
@@ -500,7 +500,7 @@
                 </div>
               </div>
 
-              <div id="myorder-preorder" style="width: 90%;" class="tab-pane middle">
+              <div id="myorder-preorder" class="tab-pane middle">
                 <ul class="nav nav-tabs" style="margin-top: 20px;margin-bottom: 10px;">
                   <li class="active"><a data-toggle="tab" href="#preorder-all" class="btn-lg text-dark"><strong><%= __('order-nav-all')%></strong></a></li>
                   <li><a data-toggle="tab" href="#preorder-holding" class="btn-lg text-dark"><strong><%= __('order-nav-waiting')%></strong></a></li>
@@ -510,7 +510,7 @@
                   <li><a data-toggle="tab" href="#preorder-delivered" class="btn-lg text-dark"><strong><%= __('order-nav-delivered')%></strong></a></li>
                   <li><a data-toggle="tab" href="#preorder-reviewed" class="btn-lg text-dark"><strong><%= __('order-nav-reviewed')%></strong></a></li>
                 </ul>
-                <div class="tab-content">
+                <div class="tab-content box-scroll">
                   <div id="preorder-all" class="tab-pane middle active">
                     <table class="table table-bordered" style="width: 100%;">
                       <thead>
@@ -617,7 +617,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('chef')%>: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer.firstname || __('user')%> <%= order.customer.lastname || ''%></a></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -679,11 +679,11 @@
                       <%
                       var host = user.host;
                           host.host_orders.forEach(function(order){
-                      if(order.type == "preorder" && order.status == "preparing"){
+                      if(order.type == "preorder" && order.status == "schedule"){
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('chef')%>: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer.firstname || __('user')%> <%= order.customer.lastname || ''%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -704,8 +704,6 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
-                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customer.firstname || __('user')%>" data-placement="bottom" data-content="<%= order.customer.phone %>"><%= __('contact-user')%></a>
                         </td>
                       </tr>
@@ -741,7 +739,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('chef')%>: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer.firstname || __('user')%> <%= order.customer.lastname || ''%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -799,7 +797,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('chef')%>: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer.firstname || __('user')%> <%= order.customer.lastname || ''%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -859,7 +857,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('chef')%>: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer.firstname || __('user')%> <%= order.customer.lastname || ''%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -918,7 +916,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('chef')%>: <a href="/host/<%= host.id%>"><%= host.shopName%></a></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer.firstname || __('user')%> <%= order.customer.lastname || ''%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -960,7 +958,7 @@
           </div>
         </div>
 
-        <div id="mymeal" style="width: 90%;" class="tab-pane middle">
+        <div id="mymeal" class="tab-pane middle">
           <div class="box box-shadow white">
             <div class="row">
               <div class="col-xs-12 vertical-align">
@@ -974,8 +972,8 @@
               <li><a data-toggle="tab" href="#ongoingmeals" class="btn-lg text-dark"><strong><%= __('meal-nav-waiting')%></strong></a></li>
               <li><a data-toggle="tab" href="#offmeals" class="btn-lg text-dark"><strong><%= __('meal-nav-offline')%></strong></a></li>
             </ul>
-            <div class="tab-content" style="padding-top: 20px;padding-bottom: 60px;">
-              <div id="allmeals" style="width: 90%;" class="tab-pane middle active">
+            <div class="box-scroll tab-content" style="padding-top: 20px;padding-bottom: 60px;">
+              <div id="allmeals" class="tab-pane middle active">
                 <table id="allmeals-content" class="table table-bordered" style="width: 100%;">
                   <thead>
                   <tr>
@@ -1277,10 +1275,10 @@
           </div>
         </div>
 
-        <div id="mydish" style="width: 90%;" class="tab-pane middle">
+        <div id="mydish" class="tab-pane middle">
           <div class="row">
             <div class="col-md-8" style="margin-bottom: 20px;">
-              <div class="box box-compact box-shadow white" style="overflow:scroll;">
+              <div class="box box-compact box-shadow box-scroll white">
                 <div class="row">
                   <div class="col-xs-12">
                     <div class="middle vertical-align">
@@ -1358,7 +1356,7 @@
           </div>
         </div>
 
-        <div id="myinfo" style="width: 90%;" class="tab-pane middle">
+        <div id="myinfo" class="tab-pane middle">
           <div class="box box-shadow white">
             <form class="form-horizontal text-left" data-toggle="validator" data-id="<%= user.host.id%>" data-err-container="#formAlert">
 

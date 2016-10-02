@@ -62,6 +62,10 @@
               <label><%= __('apply-shopname')%></label>
               <input class="form-control middle" name="shopName" style="width: 200px;" type="text" required>
             </div>
+          <div class="form-group">
+            <label><%= __('phone')%></label>
+            <input class="form-control middle" name="phone" style="width: 200px;" type="text" value="<%= user.phone || ''%>" required>
+          </div>
             <button id="applyBtn" class="btn btn-info round"><%= __('step1-action-btn')%></button>
             <h2></h2>
             <div class="alert alert-danger" data-toggle="alert"></div>
@@ -200,7 +204,7 @@
               <%}else if(field == 'legal_entity.dob.day'){%>
               <div class="form-group form-inline">
               <label><%= __('needed')%>: <%= __('birthday')%></label>
-              <select id="bMonthInput" class="form-control" required>
+              <select id="bMonthInput" class="form-control" required value="<%= user.birthDate ? (new Date(user.birthDate).getMonth() + 1) : '' %>">
                 <option>01</option>
                 <option>02</option>
                 <option>03</option>
@@ -214,7 +218,7 @@
                 <option>11</option>
                 <option>12</option>
               </select>
-              <select id="bDayInput"  class="form-control" required>
+              <select id="bDayInput"  class="form-control" required value="<%= user.birthDate ? new Date(user.birthDate).getDate() : '' %>">
                 <option>01</option>
                 <option>02</option>
                 <option>03</option>
@@ -248,7 +252,7 @@
                 <option>30</option>
                 <option>31</option>
               </select>
-              <select id="bYearInput" class="form-control" required>
+              <select id="bYearInput" class="form-control" required value="<%= user.birthDate ? new Date(user.birthDate).getFullYear() : '' %>">
                 <option>1940</option>
                 <option>1941</option>
                 <option>1942</option>

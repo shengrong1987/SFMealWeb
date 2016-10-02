@@ -2,6 +2,7 @@
  * Created by shengrong on 12/3/15.
  */
 var nodemailer = require('nodemailer');
+var message = require('./message');
 var moment = require('moment');
 var util = require('./util');
 var transporter = nodemailer.createTransport("SMTP",{
@@ -53,6 +54,115 @@ var notification = {
     else{
       params.isSendToHost = isSendToHost;
       notification.sendEmail(model, action, params, req);
+      notification.sendMsg(model, action, params, req);
+    }
+  },
+
+  sendMsg : function(model, action, params, req){
+    this.transitLocaleTimeZone(params);
+    var locale = req ? (params.isSendToHost ? params.host.locale : params.customer.locale) : '';
+    var phone = params.isSendToHost ? (params.host ? params.host.phone : params.chef.phone) : params.customer.phone;
+    var content = "";
+    if(model === "Order"){
+      switch(action){
+        case "new":
+          content = sails.__({
+            phrase : 'newOrderMessage',
+            locale : locale
+          }, params.meal.title);
+          message.sendMessage(phone, content);
+          break;
+        case "adjust":
+          content = sails.__({
+            phrase : 'orderAdjustMessageToHost',
+            locale : locale
+          }, params.id);
+          message.sendMessage(phone, content);
+          break;
+        case "adjusting":
+          content = params.isSendToHost ? sails.__({
+            phrase : 'orderAdjustRequestMessageToHost',
+            locale : locale
+          }, params.id) : sails.__({
+            phrase : 'orderAdjustRequestMessageToGuest',
+            locale : locale
+          }, params.id);
+          message.sendMessage(phone, content);
+          break;
+        case "cancel":
+          content = sails.__({
+            phrase : 'orderCancelMessageToHost',
+            locale : locale
+          }, params.id);
+          message.sendMessage(phone, content);
+          break;
+        case "cancelling":
+          content = params.isSendToHost ? sails.__({
+            phrase : 'orderCancelRequestMessageToHost',
+            locale : locale
+          }, params.id) : sails.__({
+            phrase : 'orderCancelRequestMessageToGuest',
+            locale : locale
+          }, params.id);
+          message.sendMessage(phone, content);
+          break;
+        case "confirm":
+          content = params.isSendToHost ? sails.__({
+            phrase : 'orderConfirmMessageToHost',
+            locale : locale
+          }, params.id) : sails.__({
+            phrase : 'orderConfirmMessageToGuest',
+            locale : locale
+          }, params.id);
+          message.sendMessage(phone, content);
+          break;
+        case "ready":
+          content = params.method == 'pickup' ? sails.__({
+            phrase : 'orderReadyPickupReminderMessageToGuest',
+            locale : locale
+          }, params.id, params.pickupInfo.location, params.pickupInfo.phone, new Date(params.pickupInfo.pickupFromTime) + ' - ' + new Date(params.pickupInfo.pickupTillTime)) : sails.__({
+            phrase : 'orderArriveReminderMessageToGuest',
+            locale : locale
+          }, params.phone);
+          message.sendMessage(phone, content);
+          break;
+        case "reject":
+          content = params.isSendToHost ? sails.__({
+            phrase : 'orderRejectMessageToHost',
+            locale : locale
+          }, params.id, params.msg) : sails.__({
+            phrase : 'orderRejectMessageToGuest',
+            locale : locale
+          }, params.id, params.msg);
+          message.sendMessage(phone, content);
+          break;
+        case "reminder":
+          if(params.method == 'pickup' && params.period == 'hour'){
+            content = sails.__({
+              phrase : 'orderPickupReminderMessageToGuestInHour',
+              locale : locale
+            }, params.id, params.pickupInfo.location, params.pickupInfo.phone);
+            message.sendMessage(phone, content);
+          }
+          break;
+      }
+    }else if(model == "Meal"){
+      switch(action){
+        case "mealScheduleEnd":
+          content = sails.__({
+            phrase : 'mealScheduleEndToHost',
+            locale : locale
+          }, params.id);
+          message.sendMessage(phone, content);
+          break;
+        case "start":
+          content = sails.__({
+            phrase : 'mealStartToHost',
+            locale : locale
+          }, params.id);
+          message.sendMessage(phone, content);
+          break;
+      }
     }
   },
 

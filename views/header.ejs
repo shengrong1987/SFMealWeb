@@ -1,4 +1,4 @@
-<nav id="myUserBar" class="navbar navbar-inverse mynavbar" data-host="<%= req.session.user ? (req.session.user.host ? req.session.user.host : null) : null%>" data-user="<%= req.session.user ? req.session.user.id : null%>">
+<nav id="myUserBar" class="navbar navbar-inverse mynavbar" data-host="<%= req.session.user ? (req.session.user.host.id ? req.session.user.host.id : req.session.user.host) : null%>" data-user="<%= req.session.user ? req.session.user.id : null%>">
   <div>
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavBar">

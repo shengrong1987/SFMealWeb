@@ -7,6 +7,7 @@
  */
 
 var async = require('async');
+var geocode = require('../services/geocode');
 
 module.exports = {
 
@@ -32,8 +33,10 @@ module.exports = {
     },
     desc : {
       type : 'string',
-      maxLength : 140,
-      defaultsTo : "我是吃货，我爱吃柠檬芝士蛋糕。"
+      maxLength : 140
+    },
+    hometown : {
+      type : 'string'
     },
     gender : {
       type : 'string',
@@ -124,9 +127,46 @@ module.exports = {
     delete user.auth.password;
     delete data.password;
     delete data.id;
-    Object.keys(data).forEach(function(key){
-      user[key] = data[key];
+    delete data.email;
+    delete data.facebookId;
+    async.each(Object.keys[data], function(key, next){
+      if(typeof user[key] != 'undefined' || user[key]) {
+        return next();
+      }
+      if(key == 'name'){
+        var names = data[key].split(' ');
+        if(names.length > 1){
+          user['firstname'] = user['firstname'] || names[0];
+          user['lastname'] = user['lastname'] || names[1];
+        }
+        next();
+      }else if(key == 'picture'){
+        user[key] = data[key].data.url;
+        next();
+      }else if(key == 'hometown'){
+        user[key] = data[key].name;
+        if(!user['desc']){
+          user['desc'] = "我是来自" + data[key].name + "的吃货";
+        }
+        next();
+      }else if(key == 'location'){
+        geocode.geocodeCity(data[key].name, function(err, result){
+          if(err){
+            console.log("err geocoding city:" + data[key].name);
+            return next(err);
+          }
+          user['county'] = result[0].administrativeLevels.level2long;
+          next();
+        });
+      }else{
+        user[key] = data[key];
+        next();
+      }
+    }, function(err){
+      if(err){
+        return cb(err);
+      }
+      user.save(cb);
     });
-    user.save(cb);
   }
 };
