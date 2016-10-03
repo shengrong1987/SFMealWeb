@@ -56,7 +56,11 @@ module.exports = require('waterlock').waterlocked({
       res.cookie('county',county);
     }
     if(auth.facebookId){
-      res.redirect('back');
+      if(req.query.state){
+        res.redirect(req.query.state);
+      }else{
+        res.redirect('back');
+      }
     }else if(auth.googleEmail){
       res.redirect('back');
     }else{

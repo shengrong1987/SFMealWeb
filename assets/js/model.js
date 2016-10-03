@@ -6,7 +6,7 @@ var Auth = Backbone.Model.extend({
   urlRoot : "/auth",
   url : function(){
     if(this.type == "login"){
-      return this.urlRoot + "/login?type=" + this.method;
+      return this.urlRoot + "/login?type=" + this.method + '&originUrl=' + encodeURI(this.originUrl);
     }else{
       return this.urlRoot + "/" + this.type;
     }
@@ -62,6 +62,7 @@ var LoginView = Backbone.View.extend({
     this.errorView.hide();
     this.model.type = "login";
     this.model.method = "facebook";
+    this.model.originUrl = location.href;
     location.href = this.model.url();
   },
   GoogleLogin : function(e){
@@ -69,6 +70,7 @@ var LoginView = Backbone.View.extend({
     this.errorView.hide();
     this.model.type = "login";
     this.model.method = "google";
+    this.model.originUrl = location.href;
     var $this = this;
     location.href = this.model.url();
   },
@@ -164,12 +166,14 @@ var RegisterView = Backbone.View.extend({
     this.alertView.hide();
     this.model.type = "login";
     this.model.method = "facebook";
+    this.model.originUrl = location.href;
     location.href = this.model.url();
   },
   GoogleLogin : function(){
     this.alertView.hide();
     this.model.type = "login";
     this.model.method = "google";
+    this.model.originUrl = location.href;
     location.href = this.model.url();
   }
 });
@@ -276,7 +280,7 @@ var UserBarView = Backbone.View.extend({
 
   getNotification : function(){
     var userId = this.$el.data("user");
-    var hostId = this.$el.data("host").id ? this.$el.data("host").id : this.$el.data("host");
+    var hostId = this.$el.data("host") ? ( this.$el.data("host").id ? this.$el.data("host").id : this.$el.data("host")) : null;
     var $this = this;
     if(userId){
       $.ajax("/user/" + userId + "/notifications").done(function(data){
