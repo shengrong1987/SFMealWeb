@@ -1,0 +1,221 @@
+<div class="container-fluid default-container text-center relative" style="margin-top:-20px;background-color: #f2f2f2;">
+
+  <div id="wrapper">
+    <div id="sidebar-wrapper">
+      <ul class="sidebar-nav">
+        <li class="sidebar-brand">
+          <a class="sidenav-item" href="#">
+            帮助中心
+          </a>
+        </li>
+        <li><a href="#menu-toggle" class="btn btn-default" data-toggle="menu-toggle"><%= __('help-menu-collapse')%></a></li>
+        <li><span class="divider"></span></li>
+        <li>
+          <a class="sidenav-item" href="#general">常规帮助</a>
+        </li>
+        <li>
+          <a class="sidenav-item" href="#terms">服务条款</a>
+        </li>
+        <li>
+          <a class="sidenav-item" href="#privacy">隐私政策</a>
+        </li>
+        <li>
+          <a class="sidenav-item" href="#trust">厨师审批与守则</a>
+        </li>
+        <li>
+          <a class="sidenav-item" href="#aboutUs">关于我们</a>
+        </li>
+      </ul>
+    </div>
+
+    <div id="page-content-wrapper">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 text-left">
+            <div id="general">
+              <h2>常规帮助</h2>
+              <a href="#menu-toggle" class="btn btn-default" data-toggle="menu-toggle"><%= __('help-menu')%></a>
+              <div class="divider"></div>
+              <div id="order">
+                <p>1. 点餐流程</p>
+                <p>你可以通过邮箱或Facebook,Google+来注册成为吃货<a href="#register"> (如何注册?) </a>, 然后只需填写个人资料<a href="#updateUserInfo">  (如何填写?) </a>就可以开始选取或预定你喜欢吃的东西了。</p>
+                <p>点击进入选定好的菜单, 在对应的菜式中选取数量<a href="#takeOrder"> (如何选取?) </a>, 然后点击'去结账'按钮, 接着选择希望的取货方式(自取或送餐), '自取'选项可能会有多个自取时间和地点, '送餐'选项需要输入您的地址和联系电话。</p>
+                <p>初次下订单我们会要求你添加您的支付信息, 在选择取货方式下方添加您的信用卡信息。</p>
+                <p>查看您的订单数量和金额(加税)是否正确, 然后付款下单!</p>
+              </div>
+
+              <div class="divider"></div>
+              <div id="pickup">
+                <p>2. 取餐流程</p>
+                <p>您可以在登录后点击右上角个人头像 -> 吃货订单 查看您下的订单<a href="#checkOrder"> (查看订单?)。</a></p>
+                <p>订单准备好后您会收到通知(邮箱和短信), 选择送餐的吃货会收到您的订单已在路上的通知, 只需留意手机并等待美食就可以啦<a href="#contactChef"> (联系司机?)</a>。
+                <p>选择自取的吃货会在15分钟前收到即点订单的自取通知, 或1小时及1天前收到预定订单自取通知 (菜单类型?)。</p>
+                <p>您也可以在吃货订单中随时查看订单的取货时间,地点和联系电话。</p>
+              </div>
+
+              <div class="divider"></div>
+              <div id="register">
+                <p>3. 注册/登录流程</p>
+                <p>您可以在网页右上角点击"注册" -> "邮箱注册", 填写姓名、邮箱、密码、电话和生日, 请记住您的邮箱和密码以用于登录。</p>
+                <p>您也可以选择用Facebook或Google+进行登录, 注意无法使用相同的邮箱重复注册 (可能您社交账号的邮箱已经被注册了)。</p>
+                <p>点击网页右上角"登录"按钮, 输入您之前注册的邮箱和密码进行登录, 或者使用社交账号直接登录 (无需注册)。</p>
+              </div>
+
+              <div class="divider"></div>
+              <div id="updateUserInfo">
+                <p>4. 填写个人信息</p>
+                <p>您可以在登录后点击右上角个人头像 -> 修改个人资料 上传个人头像, 填写姓名、个人简介、手机(获取订单提醒),邮编和生日。</p>
+                <p>名字采用实名制, 只能输入英文字母, 中文则输入拼音字母。(我们绝不会公开展示您的全名!)</p>
+                <p>点击'保存'保存修改。</p>
+              </div>
+
+              <div class="divider"></div>
+              <div id="takeOrder">
+                <p>5. 选取菜式</p>
+                <p>您可以在菜单页里菜式图片下进行点餐或取消点餐, 点击"点一份"增加一份, 点击"-"减少一份, 在结账窗口也可以查看和修改您的订单数量。</p>
+                <p>注意:如果该菜式已卖完, 则会在结账窗口提示已售罄, 您将无法增加该菜式的订单数量。</p>
+              </div>
+
+              <div class="divider"></div>
+              <div id="checkOrder">
+                <p>5. 查看订单</p>
+                <p>您可以在登陆后点击右上角个人头像 -> 吃货订单查看您的订单。订单分为两种, 你可以在订单栏中切换即点订单和预定订单。</p>
+                <p>在"所有订单"可以查看包括历史和正在进行中的订单, 你也可以根据订单的不同状态查看。</p>
+                <p><i>"待确认"</i>: 正在等待您或者厨师确认的订单(订单申请调整/取消中), 调整/取消订单是可以双向的。</p>
+                <p><i>"待煮"</i>: 还未截止预定的预定订单, 您可以直接调整/取消订单。</p>
+                <p><i>"烹饪中"</i>: 正在准备中的订单, 您可以申请调整/取消订单。</p>
+                <p><i>"等自取/送餐中"</i>: 已经准备好的订单, 您可以查看自取地址和厨师/联系人联系电话。</p>
+                <p><i>"待评价"</i>: 成功收货还未评价的订单, 您可以评价你点的菜式。</p>
+              </div>
+
+              <div class="divider"></div>
+              <div id="contactChef">
+                <p>6. 联系司机</p>
+                <p>在吃货订单中找到您下的订单<a href="#checkOrder"> (查看订单?)</a></p>
+                <p>点击"交易操作"栏中的"联系厨师", 您会看到厨房名和联系电话。</p>
+              </div>
+            </div>
+
+            <div id="terms">
+              <h2>服务条款</h2>
+              <p>
+                IN PARTICULAR, HOSTS SHOULD UNDERSTAND HOW THE LAWS WORK IN THEIR RESPECTIVE CITIES. SOME CITIES HAVE LAWS THAT RESTRICT THEIR ABILITY TO HOST PAYING GUESTS FOR SHORT PERIODS. THESE LAWS ARE OFTEN PART OF A CITY'S ZONING OR ADMINISTRATIVE CODES. IN MANY CITIES, HOSTS MUST REGISTER, GET A PERMIT, OR OBTAIN A LICENSE BEFORE LISTING A PROPERTY OR ACCEPTING GUESTS. CERTAIN TYPES OF SHORT-TERM BOOKINGS MAY BE PROHIBITED ALTOGETHER. LOCAL GOVERNMENTS VARY GREATLY IN HOW THEY ENFORCE THESE LAWS. PENALTIES MAY INCLUDE FINES OR OTHER ENFORCEMENT. HOSTS SHOULD REVIEW LOCAL LAWS BEFORE LISTING A SPACE ON AIRBNB.
+
+                Last Updated: Oct 4, 2016
+
+                Key Terms
+
+                Contacting SFMeal.com
+
+                If you have any questions about these Terms, please contact SFMeal.com
+              </p>
+            </div>
+
+            <div id="privacy">
+              <h2>隐私政策</h2>
+              <p>Last Updated: October 4, 2016</p>
+              <p>
+                <div class='innerText'>This privacy policy has been compiled to better serve those who are concerned with how their 'Personally Identifiable Information' (PII) is being used online. PII, as described in US privacy law and information security, is information that can be used on its own or with other information to identify, contact, or locate a single person, or to identify an individual in context. Please read our privacy policy carefully to get a clear understanding of how we collect, use, protect or otherwise handle your Personally Identifiable Information in accordance with our website.<br></div><span id='infoCo'></span><br>
+                <div class='grayText'><strong>What personal information do we collect from the people that visit our blog, website or app?</strong></div><br />
+                <div class='innerText'>When ordering or registering on our site, as appropriate, you may be asked to enter your name, email address, mailing address, phone number, credit card information, social security number  or other details to help you with your experience.</div><br>
+                <div class='grayText'><strong>When do we collect information?</strong></div><br />
+                <div class='innerText'>We collect information from you when you register on our site, place an order, fill out a form or enter information on our site.</div><br>Provide us with feedback on our products or services  <span id='infoUs'></span><br>
+                <div class='grayText'><strong>How do we use your information? </strong></div><br />
+                <div class='innerText'> We may use the information we collect from you when you register, make a purchase, sign up for our newsletter, respond to a survey or marketing communication, surf the website, or use certain other site features in the following ways:<br><br></div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> To personalize your experience and to allow us to deliver the type of content and product offerings in which you are most interested.</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> To improve our website in order to better serve you.</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> To allow us to better service you in responding to your customer service requests.</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> To administer a contest, promotion, survey or other site feature.</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> To quickly process your transactions.</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> To ask for ratings and reviews of services or products</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> To follow up with them after correspondence (live chat, email or phone inquiries)</div><span id='infoPro'></span><br>
+                <div class='grayText'><strong>How do we protect your information?</strong></div><br /><div class='innerText'>Our website is scanned on a regular basis for security holes and known vulnerabilities in order to make your visit to our site as safe as possible.<br><br></div>
+                <div class='innerText'>We use regular Malware Scanning.<br><br></div>
+                <div class='innerText'>Your personal information is contained behind secured networks and is only accessible by a limited number of persons who have special access rights to such systems, and are required to keep the information confidential. In addition, all sensitive/credit information you supply is encrypted via Secure Socket Layer (SSL) technology. </div><br>
+                <div class='innerText'>We implement a variety of security measures when a user places an order  to maintain the safety of your personal information.</div><br>
+                <div class='innerText'>All transactions are processed through a gateway provider and are not stored or processed on our servers.</div><span id='coUs'></span><br>
+                <div class='grayText'><strong>Do we use 'cookies'?</strong></div><br /><div class='innerText'>Yes. Cookies are small files that a site or its service provider transfers to your computer's hard drive through your Web browser (if you allow) that enables the site's or service provider's systems to recognize your browser and capture and remember certain information. For instance, we use cookies to help us remember and process the items in your shopping cart. They are also used to help us understand your preferences based on previous or current site activity, which enables us to provide you with improved services. We also use cookies to help us compile aggregate data about site traffic and site interaction so that we can offer better site experiences and tools in the future.</div>
+                <div class='innerText'><br><strong>We use cookies to:</strong></div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Help remember and process the items in the shopping cart.</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Understand and save user's preferences for future visits.</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Compile aggregate data about site traffic and site interactions in order to offer better site experiences and tools in the future. We may also use trusted third-party services that track this information on our behalf.</div>
+                <div class='innerText'><br>You can choose to have your computer warn you each time a cookie is being sent, or you can choose to turn off all cookies. You do this through your browser settings. Since browser is a little different, look at your browser's Help Menu to learn the correct way to modify your cookies.<br></div>
+                <div class='innerText'><br><strong>If users disable cookies in their browser:</strong></div><br>
+                <div class='innerText'>If you turn cookies off, some features will be disabled. Some of the features that make your site experience more efficient and may not function properly.</div><br>
+                <div class='innerText'>However, you will still be able to place orders <div class='innerText'>Continuing your unfinished order and remember your current location</div>.</div><br><span id='trDi'></span><br>
+                <div class='grayText'><strong>Third-party disclosure</strong></div><br />
+                <div class='innerText'>We do not sell, trade, or otherwise transfer to outside parties your Personally Identifiable Information unless we provide users with advance notice. This does not include website hosting partners and other parties who assist us in operating our website, conducting our business, or serving our users, so long as those parties agree to keep this information confidential. We may also release information when it's release is appropriate to comply with the law, enforce our site policies, or protect ours or others' rights, property or safety. <br><br> However, non-personally identifiable visitor information may be provided to other parties for marketing, advertising, or other uses. </div><span id='trLi'></span><br>
+                <div class='grayText'><strong>Third-party links</strong></div><br />
+                <div class='innerText'>Occasionally, at our discretion, we may include or offer third-party products or services on our website. These third-party sites have separate and independent privacy policies. We therefore have no responsibility or liability for the content and activities of these linked sites. Nonetheless, we seek to protect the integrity of our site and welcome any feedback about these sites.</div><span id='gooAd'></span><br>
+                <div class='blueText'><strong>Google</strong></div><br /><div class='innerText'>Google's advertising requirements can be summed up by Google's Advertising Principles. They are put in place to provide a positive experience for users. https://support.google.com/adwordspolicy/answer/1316548?hl=en <br><br></div>
+                <div class='innerText'>We have not enabled Google AdSense on our site but we may do so in the future.</div><span id='calOppa'></span><br><div class='blueText'><strong>California Online Privacy Protection Act</strong></div><br />
+                <div class='innerText'>CalOPPA is the first state law in the nation to require commercial websites and online services to post a privacy policy.  The law's reach stretches well beyond California to require any person or company in the United States (and conceivably the world) that operates websites collecting Personally Identifiable Information from California consumers to post a conspicuous privacy policy on its website stating exactly the information being collected and those individuals or companies with whom it is being shared. -  See more at: http://consumercal.org/california-online-privacy-protection-act-caloppa/#sthash.0FdRbT51.dpuf<br></div>
+                <div class='innerText'><br><strong>According to CalOPPA, we agree to the following:</strong><br></div>
+                <div class='innerText'>Users can visit our site anonymously.</div>
+                <div class='innerText'>Once this privacy policy is created, we will add a link to it on our home page or as a minimum, on the first significant page after entering our website.<br></div>
+                <div class='innerText'>Our Privacy Policy link includes the word 'Privacy' and can easily be found on the page specified above.</div>
+                <div class='innerText'><br>You will be notified of any Privacy Policy changes:</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> On our Privacy Policy Page<br></div>
+                <div class='innerText'>Can change your personal information:</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> By logging in to your account</div>
+                <div class='innerText'><br><strong>How does our site handle Do Not Track signals?</strong><br></div>
+                <div class='innerText'>We don't honor Do Not Track signals and Do Not Track, plant cookies, or use advertising when a Do Not Track (DNT) browser mechanism is in place. We don't honor them because:<br></div>
+                <div class='innerText'>To provide essential in-site experience for all registered users.</div>
+                <div class='innerText'><br><strong>Does our site allow third-party behavioral tracking?</strong><br></div>
+                <div class='innerText'>It's also important to note that we allow third-party behavioral tracking</div><span id='coppAct'></span><br>
+                <div class='blueText'><strong>COPPA (Children Online Privacy Protection Act)</strong></div><br />
+                <div class='innerText'>When it comes to the collection of personal information from children under the age of 13 years old, the Children's Online Privacy Protection Act (COPPA) puts parents in control.  The Federal Trade Commission, United States' consumer protection agency, enforces the COPPA Rule, which spells out what operators of websites and online services must do to protect children's privacy and safety online.<br><br></div>
+                <div class='innerText'>We do not specifically market to children under the age of 13 years old.</div><span id='ftcFip'></span><br>
+                <div class='blueText'><strong>Fair Information Practices</strong></div><br />
+                <div class='innerText'>The Fair Information Practices Principles form the backbone of privacy law in the United States and the concepts they include have played a significant role in the development of data protection laws around the globe. Understanding the Fair Information Practice Principles and how they should be implemented is critical to comply with the various privacy laws that protect personal information.<br><br></div>
+                <div class='innerText'><strong>In order to be in line with Fair Information Practices we will take the following responsive action, should a data breach occur:</strong></div>
+                <div class='innerText'>We will notify you via email</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Within 7 business days</div><div class='innerText'><br>We also agree to the Individual Redress Principle which requires that individuals have the right to legally pursue enforceable rights against data collectors and processors who fail to adhere to the law. This principle requires not only that individuals have enforceable rights against data users, but also that individuals have recourse to courts or government agencies to investigate and/or prosecute non-compliance by data processors.</div><span id='canSpam'></span><br>
+                <div class='blueText'><strong>CAN SPAM Act</strong></div><br />
+                <div class='innerText'>The CAN-SPAM Act is a law that sets the rules for commercial email, establishes requirements for commercial messages, gives recipients the right to have emails stopped from being sent to them, and spells out tough penalties for violations.<br><br></div>
+                <div class='innerText'><strong>We collect your email address in order to:</strong></div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Send information, respond to inquiries, and/or other requests or questions</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Process orders and to send information and updates pertaining to orders.</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Send you additional information related to your product and/or service</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Market to our mailing list or continue to send emails to our clients after the original transaction has occurred.</div>
+                <div class='innerText'><br><strong>To be in accordance with CANSPAM, we agree to the following:</strong></div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Not use false or misleading subjects or email addresses.</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Identify the message as an advertisement in some reasonable way.</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Include the physical address of our business or site headquarters.</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Monitor third-party email marketing services for compliance, if one is used.</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Honor opt-out/unsubscribe requests quickly.</div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Allow users to unsubscribe by using the link at the bottom of each email.</div>
+                <div class='innerText'><strong><br>If at any time you would like to unsubscribe from receiving future emails, you can email us at</strong></div>
+                <div class='innerText'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>&bull;</strong> Follow the instructions at the bottom of each email.</div> and we will promptly remove you from <strong>ALL</strong> correspondence.<br><span id='ourCon'></span><br>
+                <div id="contactUs" class='blueText'><strong>Contacting Us</strong></div><br />
+                <div class='innerText'>If there are any questions regarding this privacy policy, you may contact us using the information below.<br><br></div>
+                <div class='innerText'>www.sfmeal.com</div>San Francisco, California 94124 <div class='innerText'>United States</div>
+                <div class='innerText'>admin@sfmeal.com</div>
+              </p>
+            </div>
+
+            <div id="trust">
+              <h2>厨师审批与守则</h2>
+              <p>1.What's a chef on SFMeal?</p>
+              <p>A chef is a person who love to cook and love to share the happiness of cooking.</p>
+            </div>
+
+            <div id="aboutUs">
+              <h2>关于我们</h2>
+              <p>SFMeal is a platform that allow users to taste bits of mother and grandmother's dishes.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  $("[data-toggle='menu-toggle']").click(function(e) {
+    e.preventDefault();
+    $("#wrapper").toggleClass("toggled");
+  });
+
+</script>

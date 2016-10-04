@@ -1,4 +1,5 @@
 @charset "UTF-8";
+@import "css/simple-sidebar.css";
 /**
  * importer.less
  *
@@ -8020,7 +8021,7 @@ input:focus {
   background-color: #22b571 !important;
 }
 .pink {
-  background: #ff7bac !important;
+  background-color: #ff7bac !important;
 }
 .purple {
   background-color: #662e91 !important;
@@ -8922,6 +8923,9 @@ fieldset[disabled] .btn-red.active {
   .footer .middle {
     width: 430px;
   }
+  .footer .footer-text {
+    margin-left: 20px;
+  }
   #myorder {
     width: 90%;
   }
@@ -8987,6 +8991,12 @@ fieldset[disabled] .btn-red.active {
   }
   .footer .nav li {
     width: 14%;
+  }
+  .footer .footer-text {
+    margin-left: 0;
+  }
+  .footer .footer-text .nav li {
+    width: 25%;
   }
   .meal .desc {
     top: 50px;

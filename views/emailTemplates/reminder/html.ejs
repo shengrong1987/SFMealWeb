@@ -15,7 +15,7 @@
   <div class="box-email white relative middle text-left">
     <h4 class="text-green"><%= method == 'pickup' ? orderpickupremindertitle : orderarriveremindertitle%></h4>
     <p>Hi <%= recipientName%>,</p>
-    <p><%= method == 'pickup' ? (period == "hour" ? orderpickupreminderhourlycontext : orderpickupreminderdailycontext) : orderarriveremindercontext%></p>
+    <p><%= method == 'pickup' ? (period == "hour" ? orderpickupreminderhourlycontext : ( period == 'day' ? orderpickupreminderdailycontext : orderpickupreminderminutecontext)) : orderarriveremindercontext%></p>
     <div class="divider" style="margin-bottom: 10px;"></div>
     <p><%= ordernumber%>: <%= id%></p>
     <table class="table table-email">

@@ -42,9 +42,9 @@ module.exports = function(agenda) {
               return cb(err);
             }
             if(order.type == "order"){
-              var tenMinutesBeforePickup = util.minutesBefore(order.eta, 10);
-              console.log("scheduling pickup reminding Job at: " + tenMinutesBeforePickup);
-              Jobs.schedule(tenMinutesBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "minute"});
+              var fifteenMinutesBeforePickup = util.minutesBefore(order.eta, 15);
+              console.log("scheduling pickup reminding Job at: " + fifteenMinutesBeforePickup);
+              Jobs.schedule(fifteenMinutesBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "minute"});
             }else{
               if(order.method == "pickup"){
                 var oneHourBeforePickup = new Date(util.oneHourBefore(order.pickupInfo.pickupFromTime));

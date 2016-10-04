@@ -374,7 +374,9 @@
   "review-warning" : "您尚未给菜品评分。",
   "review-switch" : "换一款",
   "review-done" : "评好了!",
-  "footer-bar-contact" : "联系我们",
+  "contact-us" : "联系我们",
+  "privacy" : "隐私政策",
+  "about-us" : "关于我们",
   "footer-bar-info" : "©2015 SFMeal.com - 私房菜分享平台",
   "delivery-out-of-range-error" : "地址超出送餐范围",
   "meal-error-address" : "地址解析错误,请刷新再试.",
@@ -456,6 +458,7 @@
   "order-arrive-reminder-context" : "您的预定订单现在已经在送餐途中,请准备好享受美食吧。",
   "order-pickup-reminder-hourly-context" : "您的预定订单将于一小时后自取, 领取时请核对订单号",
   "order-pickup-reminder-daily-context" : "您的预定订单将于一天后自取, 领取时请核对订单号",
+  "order-pickup-reminder-minute-context" : "您的预定订单将于15分钟后自取, 领取时请核对订单号",
   "meal-order-start-title" : "即点订单开始提醒。",
   "meal-order-start-context" : "您的即点订单将于10分钟后开始,请做好准备。",
   "review-order-title" : "恭喜!你有新的评价!",
@@ -526,5 +529,7 @@
   "orderRejectMessageToGuest" : "厨师拒绝了调整或取消申请, 订单号: %s, 拒绝原因: %s, http://test.sfmeal.com/user#myorder",
   "orderArriveReminderMessageToGuest" : "您的订单已在送餐中, 请准备好享受美食, 联系电话: %s",
   "orderPickupReminderMessageToGuestInHour" : "您的预定订单将于一小时后自取, 领取时请核对订单号: %s, 地址: %s, 联系电话: %s, http://test.sfmeal.com/user#myorder",
-  "orderReadyPickupReminderMessageToGuest" : "您之前在SFMeal下的订单已准备好了, 领取时请核对订单号: %s, 地址: %s, 联系电话: %s, 领取时间: %s, http://test.sfmeal.com/user#myorder"
+  "orderReadyPickupReminderMessageToGuest" : "您之前在SFMeal下的订单已准备好了, 领取时请核对订单号: %s, 地址: %s, 联系电话: %s, 领取时间: %s, http://test.sfmeal.com/user#myorder",
+  "help-menu" : "帮助列表",
+  "help-menu-collapse" : "隐藏列表"
 }
