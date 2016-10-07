@@ -55,7 +55,7 @@ module.exports = {
     },
     phone : {
       type : 'string',
-      regex : /^\d{10,}$/
+      regex : /^\((\d{3})\)\s{0,1}\d{3}-\d{4}$/
     },
     full_address : {
       type : 'string'
@@ -129,7 +129,7 @@ module.exports = {
     delete data.id;
     delete data.email;
     delete data.facebookId;
-    async.each(Object.keys(data), function(key, next){
+    async.each(Object.keys[data], function(key, next){
       if(typeof user[key] != 'undefined' || user[key]) {
         return next();
       }
