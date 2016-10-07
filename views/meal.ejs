@@ -169,7 +169,7 @@
             <div class="col-xs-12">
               <div class="round-container dish" data-id=<%= dish.id %>>
                 <% dish.photos.forEach(function(photo, index){if(photo.v){%>
-                <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.title%>" data-footer="<%= dish.description%>" data-gallery="<%= dish.id%>" data-type="image" style="display: <%= index==0?'block':'none'%>">
+                <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.title%>" data-footer="<%= dish.description%>" data-gallery="<%= dish.id%>" data-type="<%= (photo.v && photo.v.indexOf('instagram') != "-1") ? 'instagram' : 'image' %>" style="display: <%= index==0?'block':'none'%>">
                   <img src="<%= index==0?photo.v:''%>" style="width:100%;" class="<%= index!=0?'lazyload':''%>" data-src=<%= photo.v%>>
                 </a>
                 <%}});%>

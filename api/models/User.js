@@ -33,7 +33,8 @@ module.exports = {
     },
     desc : {
       type : 'string',
-      maxLength : 140
+      maxLength : 140,
+      defaultsTo : '我是来自San Francisco, California的吃货,最喜欢吃的是'
     },
     hometown : {
       type : 'string'
@@ -146,7 +147,7 @@ module.exports = {
       }else if(key == 'hometown'){
         user[key] = data[key].name;
         if(!user['desc']){
-          user['desc'] = "我是来自" + data[key].name + "的吃货";
+          user['desc'] = "我是来自" + data[key].name + "的吃货, 最喜欢吃的是";
         }
         next();
       }else if(key == 'location'){
