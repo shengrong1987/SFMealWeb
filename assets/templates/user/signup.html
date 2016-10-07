@@ -20,7 +20,7 @@
 
       <button class="popline btn btn-lg btn-danger round red light next-step" data-step="1" onclick="nextStep(event)" data-toggle="i18n" data-key="emailRegister">邮箱注册</button>
 
-      <h6 class="text-center" data-toggle="i18n" data-key="registerAgreement"></h6>
+      <h6 class="text-center" data-toggle="i18n" data-key="registerAgreement"></h6><a href="/help#terms" data-toggle="i18n" data-key="terms"></a>
 
       <span class="divider popline"></span>
 
@@ -75,8 +75,8 @@
         </div>
 
         <div class="form-group">
-          <label class="sr-only" for="phoneInput" data-toggle="i18n" data-key="phone"></label>
-          <input type="tel" class="form-control" data-minlength="14" id="phoneInput" placeholder="电话 (Phone)" data-toggle="i18n" data-key="needPhone" data-error="need phone" data-pattern-key="phoneNotValid" data-pattern-error="bad format" required>
+          <label class="sr-only" for="phoneInput" data-toggle="i18n" data-key="phone" type="tel"></label>
+          <input type="tel" class="form-control" data-minlength="10" id="phoneInput" placeholder="电话 (Phone)" data-toggle="i18n" data-key="needPhone" data-error="need phone" data-pattern-key="phoneNotValid" data-pattern-error="bad format" required>
           <div class="help-block with-errors"></div>
         </div>
 
@@ -209,10 +209,9 @@
         </div>
       </form>
 
-      <h6 class="text-center" data-toggle="i18n" data-key="registerAgreement"></h6>
+      <h6 class="text-center" data-toggle="i18n" data-key="registerAgreement"></h6><a href="/help#terms" data-toggle="i18n" data-key="terms"></a>
       <span class="divider popline"></span>
       <h6><span data-toggle="i18n" data-key="alreadyMember">已经是我们一员?请点击这里,</span><a toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)" data-toggle="i18n" data-key="login">账号登录</a></h6>
-
     </div>
 
   </div>

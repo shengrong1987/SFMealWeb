@@ -94,6 +94,14 @@
                 <p>在吃货订单中找到您下的订单<a href="#checkOrder"> (查看订单?)</a></p>
                 <p>点击"交易操作"栏中的"联系厨师", 您会看到厨房名和联系电话。</p>
               </div>
+
+              <div class="divider"></div>
+              <div id="applyAsChef">
+                <p>7. 如何申请厨师</p>
+                <p>登录<a href="#register"> (如何注册?) </a>后点击顶部"我做私房菜"按钮, 根据流程完成厨师申请。</p>
+                <p>请准备好您的ID证件, 手机号, 厨房地址, 收款银行, 社会安全号等资料(仅将用于联系用途以及收款账号的设立)。</p>
+                <p>申请过程中您将创建菜式和菜单以供我们审查, 请准备好真实, 同等份量的菜式图片和填写菜式名/价钱/份量。</p>
+              </div>
             </div>
 
             <div id="terms">
@@ -195,14 +203,28 @@
             </div>
 
             <div id="trust">
-              <h2>厨师审批与守则</h2>
-              <p>1.What's a chef on SFMeal?</p>
-              <p>A chef is a person who love to cook and love to share the happiness of cooking.</p>
+              <h2><%= __('chef-guide')%></h2>
+              <p>1. <%= __('chef-guide-title-1')%></p>
+              <p><%= __('chef-guide-context-1')%></p>
+              <div class="divider"></div>
+              <p>2. <%= __('chef-guide-title-2')%></p>
+              <p><%= __('chef-guide-context-2')%><a href="#fdl"> (如何获取?)</a></p>
+              <p><%= __('chef-guide-context-2-2')%></p>
+              <p><%= __('chef-guide-context-2-3')%></p>
+              <div class="divider"></div>
+              <p>3. <%= __('chef-guide-title-3')%></p>
+              <p><%= __('chef-guide-context-3')%></p>
+              <p><%= __('chef-guide-context-3-2')%></p>
+              <p><%= __('chef-guide-context-3-3')%> <a href="/trust"><%= __('trust')%></a>。</p>
             </div>
 
             <div id="aboutUs">
-              <h2>关于我们</h2>
-              <p>SFMeal is a platform that allow users to taste bits of mother and grandmother's dishes.</p>
+              <h2><%= __('about-us')%></h2>
+              <p><%= __('about-us-context-1')%></p>
+
+              <p><%= __('about-us-context-2')%></p>
+
+              <p><%= __('about-us-context-3')%></p>
             </div>
           </div>
         </div>

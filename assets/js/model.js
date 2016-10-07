@@ -519,7 +519,8 @@ var ApplyView = Backbone.View.extend({
     e.preventDefault();
     var address_form = $("#addressDetailView form");
     var submit_btn = address_form.find("[type='submit']");
-    if (submit_btn.hasClass('disabled')) {
+    var phone = address_form.find("#phoneInput").val();
+    if (submit_btn.hasClass('disabled') || !phone) {
       return;
     }
     var alert_block = address_form.find(".alert");
@@ -530,7 +531,6 @@ var ApplyView = Backbone.View.extend({
     var street = address_form.find("#streetInput").val();
     var city = address_form.find("#cityInput").val();
     var zip = address_form.find("#zipcodeInput").val();
-    var phone = address_form.find("#phoneInput").val();
     var isDefault = address_form.find("#isDefault").prop("checked");
     var url = "";
     if (address_form.data("host")) {
@@ -845,8 +845,9 @@ var AddressView = Backbone.View.extend({
   saveAddress : function(e) {
     e.preventDefault();
     var address_form = $("#addressDetailView form");
+    var phone = address_form.find("#phoneInput").val();
     var submit_btn = address_form.find("[type='submit']");
-    if (submit_btn.hasClass('disabled')) {
+    if (submit_btn.hasClass('disabled') || !phone) {
       return;
     }
     var alert_block = address_form.find(".alert");

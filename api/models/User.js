@@ -55,7 +55,7 @@ module.exports = {
     },
     phone : {
       type : 'string',
-      regex : /^\((\d{3})\)\s{0,1}\d{3}-\d{4}$/
+      regex : /^\d{10,}$/
     },
     full_address : {
       type : 'string'
