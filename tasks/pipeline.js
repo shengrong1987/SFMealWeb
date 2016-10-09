@@ -29,15 +29,14 @@ var jsFilesToInject = [
 
   //load jquery then
   'js/dependencies/jquery/*.js',
+  'js/bootstrap/bootstrap.js',
 
   // Dependencies like jQuery, or Angular are brought in here
   'js/dependencies/**/*.js',
 
-  'js/bootstrap/bootstrap.js',
-
   // All of the rest of your client-side js files
   // will be injected here in no particular order.
-  'js/**/*.js',
+  'js/**/*.js'
 
   // Use the "exclude" operator to ignore files
   // '!js/ignore/these/files/*.js'
