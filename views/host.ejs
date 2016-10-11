@@ -73,7 +73,7 @@
                       %>
                       <tbody class="item">
                         <tr class="active">
-                          <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer.firstname || __('user')%> <%= order.customer.lastname || ''%></td>
+                          <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                         </tr>
                       <%
                           var list = Object.keys(order.orders);
@@ -160,7 +160,7 @@
                       %>
                       <tbody class="item">
                       <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer.firstname || __('user')%> <%= order.customer.lastname || ''%></td>
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ? order.customer.firstname : __('user') %> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);

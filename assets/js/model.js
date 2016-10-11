@@ -1372,6 +1372,7 @@ var DishView = Backbone.View.extend({
     var category = $("#categoryInput").val();
     var quantity = form.find("#quantityInput").val();
     var desc = form.find("#descriptionInput").val();
+    var instagram = form.find("#instagramInput").val();
     var $this = this;
     if (dishId) {
       this.model.set({id: dishId});
@@ -1409,7 +1410,8 @@ var DishView = Backbone.View.extend({
             photos : photos,
             type : category,
             quantity : quantity,
-            description : desc
+            description : desc,
+            video : instagram
           });
 
           $this.model.save({},{
