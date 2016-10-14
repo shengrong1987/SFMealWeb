@@ -44628,9 +44628,9 @@ var ActionsCreators = {
   getTransactions : function (records){
     AppDispatcher.handleServerAction({
       type: ActionTypes.GET_TRANSACTIONS,
-      transactions: records.transactions,
-      totalBalance : records.totalBalance,
-      pendingBalance : records.pendingBalance
+      transactions: records.pocket.transactions,
+      totalBalance : records.pocket.totalBalance,
+      pendingBalance : records.pocket.pending_balances
     });
   },
 

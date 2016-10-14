@@ -89,7 +89,6 @@ module.exports = {
         }
         cb(null, transactions);
       });
-      //cb(null, transactions);
     });
   },
 

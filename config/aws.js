@@ -6,10 +6,10 @@ module.exports.aws = {
   key : 'oDBdanXO9nnM41gEuHXkn+lDQxMx4rmcp0k7Tw4q',
   bucket : 'sfmeal',
   maxSizes :{
-    thumbnail : '1048576',
-    story : '1048576',
-    dish : '2097152',
-    license : '1048576'
+    thumbnail : '5242880',
+    story : '5242880',
+    dish : '5242880',
+    license : '5242880'
   },
   host : 'https://sfmeal.s3.amazonaws.com/',
   acl : "public-read",

@@ -28,7 +28,7 @@ module.exports = function(agenda) {
 
     // execute job
     run: function(job, done) {
-      console.log("preorder end booking, check meal requirement...");
+      sails.log.info("preorder end booking, check meal requirement...");
       var mealId = job.attrs.data.mealId;
 
       var cancelOrders = function(mealId, done){

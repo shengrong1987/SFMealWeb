@@ -61,7 +61,8 @@ module.exports = {
     if(req.session.user.auth.email != "admin@sfmeal.com" && req.params.id){
       return res.forbidden();
     }
-    var userId = req.session.user.id;
+    var isAdmin = req.session.user.auth.email == "admin@sfmeal.com";
+    var userId = isAdmin ? req.params.id : req.session.user.id;
     User.findOne(userId).populate("orders").populate('pocket').exec(function(err, user) {
       if (err) {
         return res.badRequest(err);
@@ -141,7 +142,8 @@ module.exports = {
     if(req.session.user.auth.email != "admin@sfmeal.com" && req.params.id){
       return res.forbidden();
     }
-    var hostId = (req.session.user.host.id || req.session.user.host) || req.params.id;
+    var isAdmin = req.session.user.auth.email == "admin@sfmeal.com";
+    var hostId = isAdmin ? req.params.id : (req.session.user.host.id ? req.session.user.host.id : req.session.user.host);
     Host.findOne(hostId).populate("orders").populate('user').populate('pocket').exec(function(err, host){
       if(err || !host){
         return res.badRequest(err);

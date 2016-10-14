@@ -62,7 +62,7 @@ module.exports = require('waterlock').actions.user({
           },
           transfer_schedule : {
             interval : "weekly",
-            weekly_anchor : "monday"
+            weekly_anchor : "wednesday"
           }
         }
         if(user.firstname){
@@ -344,7 +344,7 @@ module.exports = require('waterlock').actions.user({
 
   getMaxSize : function(module){
     var s3 = sails.config.aws;
-    var maxSize = '1048576';
+    var maxSize = '5242880';
     if(s3.maxSizes.hasOwnProperty(module)){
       maxSize = s3.maxSizes[module];
     }

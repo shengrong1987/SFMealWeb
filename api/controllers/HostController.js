@@ -8,8 +8,8 @@
 var stripe = require("../services/stripe.js");
 var async = require('async');
 var fs = require("fs");
-module.exports = {
 
+module.exports = {
   me : function(req, res){
     var userId = req.session.user.id;
     var hostId = req.session.user.host.id ? req.session.user.host.id : req.session.user.host;

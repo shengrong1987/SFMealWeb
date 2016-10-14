@@ -33,8 +33,10 @@ var notification = {
     model : the event model
     action : the action of the event
     params : model data
-    isSendToHost : if the event is sent to host
-    isAdminAction : if the event is post by admin
+      @isSendToHost : if the event is sent to host
+      @isAdminAction : if the event is post by admin
+      @hostEmail : email to send to host
+      @guestEmail : email to send to guest
    */
   notificationCenter : function(model, action, params, isSendToHost, isAdminAction, req){
 
@@ -184,7 +186,6 @@ var notification = {
       to : basicInfo.recipientEmail,
       subject : "SFMeal.com"
     },function(err){
-
       console.log(basicInfo.recipientEmail, err || "It worked!");
     })
   },
@@ -336,6 +337,12 @@ var notification = {
           template = "cancel" + model;
           break;
       }
+    }else if(model == "Host"){
+      switch(action){
+        case "summary":
+          template = "summary";
+          break;
+      }
     }
     return template;
   },
@@ -388,6 +395,12 @@ var notification = {
           break;
         case "cancel":
           i18ns = i18ns.concat(['pity','cancel','de-order','cancel-meal-title','meal-create-time','preorder-start-time','preorder-end-time','cancel-meal-context','meal-fail-requirement','open-meal','preorder-end-time','cancel-time','meal-number',"qty","left","cancel-reason"]);
+          break;
+      }
+    }else if(model == "Host"){
+      switch(action){
+        case "summary":
+          i18ns = i18ns.concat([]);
           break;
       }
     }
