@@ -13,8 +13,8 @@ module.exports = function(agenda) {
     // Job name will be the file name or subfolder.filename (without .js)
     //name: 'Foo',
 
-    // set true to disabled this hob
-    //disabled: false,
+    // set true to disabled this job
+    disabled: true,
 
     // method can be 'every <interval>', 'schedule <when>' or now
     frequency: 'every 1 week',

@@ -157,7 +157,7 @@ var RegisterView = Backbone.View.extend({
       success : function(){
         location.href='/meal';
       },error : function(model,err){
-        alertView.html(err.responseText);
+        alertView.html(err.responseJSON ? err.responseJSON.text : err.responseText);
         alertView.show();
       }
     })
@@ -576,7 +576,7 @@ var ApplyView = Backbone.View.extend({
       success : function(){
         location.reload();
       },error : function(model,err){
-        BootstrapDialog.alert(err.responseText);
+        BootstrapDialog.alert(err.responseJSON ? err.responseJSON.text : err.responseText);
       }
     });
   }
@@ -668,7 +668,7 @@ var PaymentView = Backbone.View.extend({
         if(err.status == 200){
           location.reload();
         }else{
-          $this.alertView.html(err.responseText);
+          $this.alertView.html(err.responseJSON ? err.responseJSON.text : err.responseText);
           $this.alertView.show();
         }
       }
@@ -701,7 +701,7 @@ var PaymentView = Backbone.View.extend({
       success: function () {
         location.reload();
       }, error: function (err) {
-        $this.alertView.html(err.responseText);
+        $this.alertView.html(err.responseJSON ? err.responseJSON.text : err.responseText);
         $this.alertView.show();
       }
     });
@@ -881,7 +881,7 @@ var AddressView = Backbone.View.extend({
         location.reload();
         //reloadUrl("/user/me","#myaddress");
       }, error: function (model, err) {
-        alert_block.html(err.responseText);
+        alert_block.html(err.responseJSON ? err.responseJSON.text : err.responseText);
         alert_block.show();
       }
     });
@@ -969,7 +969,9 @@ var MealView = Backbone.View.extend({
     "click #addNewPickupBtn" : "addNewPickup",
     "click #removeNewPickupBtn" : "removeNewPickup",
     "click #isDelivery" : "toggleDelivery",
-    "change .method select" : "changeMethod"
+    "change .method select" : "changeMethod",
+    "click #orderTypeBtn" : "switchMealType",
+    "click #preorderTypeBtn" : 'switchMealType'
   },
   initialize : function(){
     var form = this.$el.find("form");
@@ -985,6 +987,17 @@ var MealView = Backbone.View.extend({
     var dishesAlert = form.find("#dish-selector .alert");
     dishesAlert.hide();
     this.dishAlert = dishesAlert;
+  },
+  switchMealType : function(e){
+    var targetHref = $(e.currentTarget).data('href');
+    $(targetHref).parent().find('.tab-pane').hide();
+    $(targetHref).show();
+    if(targetHref == "#order"){
+      this.$el.find(".order-require input").prop('disabled', true);
+      this.$el.find(".order-require input").val('1');
+    }else{
+      this.$el.find(".order-require input").prop('disabled', false);
+    }
   },
   changeMethod : function(e){
     var select = $(e.target);
@@ -1013,7 +1026,7 @@ var MealView = Backbone.View.extend({
   addNewPickup : function(e){
     e.preventDefault();
     this.$el.find("#pickupAlert").hide();
-    var pickupView = '<div class="well form-group pickup"> <div class="col-xs-4"> <label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> <div class="col-xs-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">From</span> <input type="text" class="form-control" /> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon">&nbsp;&nbsp;To&nbsp;&nbsp;</span> <input type="text" class="form-control"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div> <div class="form-group location"> <label data-toggle="i18n" data-key="pickupAddress"></label> <input type="text" class="form-control"> </div><div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div><div class="form-group phone"> <label data-toggle="i18n" data-key="telephone"></label> <input type="tel" class="form-control"> </div> </div> </div>';
+    var pickupView = '<div class="well form-group pickup"> <div class="col-sm-4"> <label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> <div class="col-sm-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="from"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="end"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div> <div class="form-group location"> <label data-toggle="i18n" data-key="pickupAddress"></label> <input type="text" class="form-control"> </div><div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div><div class="form-group phone"> <label data-toggle="i18n" data-key="telephone"></label> <input type="tel" class="form-control"> </div> </div> </div>';
     this.$el.find(".pickup_container").append(pickupView);
     this.$el.find("[data-toggle='dateTimePicker']").datetimepicker({
       icons:{
@@ -1246,7 +1259,7 @@ var MealView = Backbone.View.extend({
       },error : function(model, err){
         $this.successAlert.hide();
         $this.formAlert.show();
-        $this.formAlert.html(err.responseText);
+        $this.formAlert.html(err.responseJSON ? err.responseJSON.text : err.responseText);
       }
     });
   }
@@ -1449,7 +1462,7 @@ var DishView = Backbone.View.extend({
               }
             },error : function(model, err){
               $this.progressAlert.hide();
-              $this.formAlert.html(err.responseText);
+              $this.formAlert.html(err.responseJSON ? err.responseJSON.text : err.responseText);
               $this.formAlert.show();
             }
           });
@@ -1542,7 +1555,7 @@ var BankView = Backbone.View.extend({
 
             }
           },error : function(model, err){
-            $this.alertForm.html(err.responseJSON);
+            $this.alertForm.html(err.responseJSON ? err.responseJSON.text : err.responseText);
             $this.alertForm.show();
           }
         });
@@ -1761,7 +1774,7 @@ var ReviewView = Backbone.View.extend({
       success : function(){
         reloadUrl("/user/me","#myreview");
       },error : function(model, err){
-        alertView.html(err.responseText);
+        alertView.html(err.responseJSON ? err.responseJSON.text : err.responseText);
         alertView.show();
       }
     })
@@ -2070,7 +2083,7 @@ function deleteHandler(id, module, alertView){
       location.reload();
     },error : function(err){
       alertView.show();
-      alertView.html(err.responseText);
+      alertView.html(err.responseJSON ? err.responseJSON.text : err.responseText);
     }
   })
 }

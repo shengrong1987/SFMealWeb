@@ -3,6 +3,8 @@
  *
  * @description :: Server-side logic for managing Dishes
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
+ * @error       :: -1 dish can not be deleted on active meal
+ *                 -2 dish can not be updated on active meal
  */
 
 module.exports = {
@@ -28,6 +30,32 @@ module.exports = {
         return res.badRequest(err);
       }
       return res.ok(dish[0]);
+    });
+  },
+
+  update : function(req, res){
+    var dishId = req.params.id;
+    var hostId = req.session.user.host.id ? req.session.user.host.id : req.session.user.host;
+    Meal.find({chef : hostId}).populate("dishes").exec(function(err, meals){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(!meals.every(function(meal){
+          if(meal.status == "off"){
+            return true;
+          }
+          return meal.dishes.every(function(dish){
+            return dish.id != dishId;
+          });
+        })){
+        return res.badRequest({ code : -2, text : req.__("meal-active-update-dish")});
+      }
+      Dish.update(dishId, req.params).exec(function(err, dish){
+        if(err){
+          return res.badRequest(err);
+        }
+        return res.ok({dishId : dish.id});
+      })
     });
   },
 
@@ -84,7 +112,7 @@ module.exports = {
             return dish.id != dishId;
           });
       })){
-        return res.badRequest(req.__("meal-active-delete-dish"));
+        return res.badRequest({ code : -1, text : req.__("meal-active-delete-dish")});
       }
       Dish.destroy(dishId).exec(function(err, dish){
         if(err){

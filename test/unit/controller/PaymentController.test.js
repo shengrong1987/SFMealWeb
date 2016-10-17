@@ -103,7 +103,7 @@ describe('PaymentController', function() {
       });
     });
 
-    it('should not create an exist card', function (done) {
+    it('should not create an existing card', function (done) {
       var number = "4242424242424242";
       var street = "1974 palou ave";
       var city = "San Francisco";
@@ -129,24 +129,31 @@ describe('PaymentController', function() {
         }
       }, function(err, token){
         agent
-            .post('/payment')
-            .send({
-              stripeToken : token.id,
-              brand : token.card.brand,
-              user : userId,
-              street : street,
-              city : city,
-              state : state,
-              postal : postal,
-              country : country,
-              cardholder : cardHolderName,
-              cardNumber : number,
-              expMonth : expMonth,
-              expYear : expYear,
-              CVV : cvv,
-              isDefaultPayment : true
-            })
-            .expect(400,done);
+          .post('/payment')
+          .send({
+            stripeToken : token.id,
+            brand : token.card.brand,
+            user : userId,
+            street : street,
+            city : city,
+            state : state,
+            postal : postal,
+            country : country,
+            cardholder : cardHolderName,
+            cardNumber : number,
+            expMonth : expMonth,
+            expYear : expYear,
+            CVV : cvv,
+            isDefaultPayment : true
+          })
+          .expect(400)
+          .end(function (err, res) {
+            if(err){
+              console.log(err);
+            }
+            res.body.code.should.be.equal(-1);
+            done();
+          })
       });
     });
 
@@ -193,7 +200,14 @@ describe('PaymentController', function() {
       agent
         .delete('/payment/' + cardId)
         .expect(400)
-        .end(done)
+        .end(function(err, res){
+          if(err){
+            console.log(err);
+            return done(err)
+          }
+          res.body.code.should.be.equal(-2);
+          done()
+        })
     })
   });
 });

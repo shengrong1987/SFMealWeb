@@ -3,6 +3,8 @@
  *
  * @description :: Server-side logic for managing Reviews
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
+ * @error       :: -1 no order is available for review
+ *              :: -2 invalid review
  */
 
 var Notification = require("../services/notification.js");
@@ -25,7 +27,7 @@ module.exports = {
       });
       if(orders.length == 0){
         console.log("no available orders for review");
-        return res.forbidden(req.__('review-no-available'));
+        return res.forbidden({ code : -1, text : req.__('review-no-available')});
       }
       if(reviews && reviews.length > 0){
         async.each(reviews, function(review, next){
@@ -71,7 +73,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            console.log("review done, results: " + results);
+            sails.log.info("successfully leave a review");
             return res.ok(results);
           });
         }, req);
@@ -84,7 +86,7 @@ module.exports = {
     async.auto({
       checkReviewForMeal : function(cb){
         if(!mealId) {
-          return cb(Error(req.__('review-invalid')));
+          return cb({code : -2, text : req.__('review-invalid')});
         }
         if(dishId){
           return cb();
@@ -98,7 +100,7 @@ module.exports = {
           return false;
         });
         if(!isValidReview){
-          cb(Error(req.__('review-invalid')))
+          cb({code : -2, text : req.__('review-invalid')})
         }else{
           cb();
         }
@@ -107,19 +109,20 @@ module.exports = {
         if(!dishId){
           return cb();
         }
-        orders.forEach(function(order){
+        isValidReview = orders.some(function(order){
           if(order.reviewing_orders.indexOf(dishId) != -1){
             order.reviewing_orders.splice(order.reviewing_orders.indexOf(dishId),1);
             if(order.reviewing_orders.length == 0){
               order.status = "complete";
             }
-            isValidReview = true;
-            return cb();
+            return true;
           }
-        });
+          return false;
+        })
         if(!isValidReview){
-          cb(Error(req.__('review-invalid')))
+          return cb({code : -2, text : req.__('review-invalid')})
         }
+        cb();
       },
       getDish : function(cb){
         if(!dishId){
@@ -169,9 +172,9 @@ module.exports = {
             review.dish = dish;
             review.hostEmail = host.email;
           }else{
-            return cb(Error('no data for review'))
+            return cb({code : -2, text : req.__('review-invalid')})
           }
-          console.log("sending review email");
+          sails.log.info("sending review email");
           Notification.notificationCenter("Order", "review", review, true, false, req);
           cb(null,review);
         });

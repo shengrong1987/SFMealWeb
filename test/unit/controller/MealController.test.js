@@ -25,6 +25,7 @@ describe('MealController', function() {
     var password2 = "123456789";
     var password = '12345678';
     var address = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : "(415)802-3853"};
+    var invalidAddress = {"street" : "1", "city" : '', "zip" : 0, "phone" : ""};
 
     it('should login or register an account', function (done) {
       agent
@@ -265,6 +266,22 @@ describe('MealController', function() {
           done();
         })
     })
+
+    it('should not update invalid address info for host', function (done) {
+      agent
+        .put('/host/' + hostId)
+        .send({
+          address:[invalidAddress]
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-2);
+          done();
+        })
+    });
 
     it('should update address info for host', function (done) {
       agent
@@ -514,6 +531,22 @@ describe('MealController', function() {
           done();
         })
     })
+
+    it('should not update dish on active meal', function(done){
+      agent
+        .put('/dish/' + dish1)
+        .send({
+          price : 5.0
+        })
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-2);
+          done();
+        })
+    });
 
     it('should update the meals provideFromTime to now and appear in the search results', function(done){
       var now = new Date()

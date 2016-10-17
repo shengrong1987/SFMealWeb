@@ -6,6 +6,7 @@
  *                 actions used to make waterlock work.
  *
  * @docs        :: http://waterlock.ninja/documentation
+ * @error       :: -1, already is a host
  */
 
 var AWS = require('aws-sdk');
@@ -37,7 +38,7 @@ module.exports = require('waterlock').actions.user({
     params.shopName = shopName;
     params.phone = user.phone || "";
     if(req.session.user.host){
-      return res.badRequest(req.__('user-already-host'));
+      return res.badRequest({ code : -1, text : req.__('user-already-host')});
     }
     Host.create(params).exec(function(err, host){
       if(err){
@@ -91,7 +92,6 @@ module.exports = require('waterlock').actions.user({
               if(err){
                 res.badRequest(err);
               }
-              console.log(user);
               req.session.user = user[0];
               res.ok({user:user[0]});
             });

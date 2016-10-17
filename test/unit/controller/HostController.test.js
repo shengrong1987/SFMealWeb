@@ -102,7 +102,6 @@ describe('UsersController', function() {
         .post('/user/becomeHost')
         .expect(403,done)
     })
-
   });
 
   describe('update host info', function(){

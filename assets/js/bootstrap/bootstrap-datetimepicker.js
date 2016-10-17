@@ -2432,7 +2432,7 @@
             vertical: 'auto'
         },
         widgetParent: null,
-        ignoreReadonly: false,
+        ignoreReadonly: true,
         keepOpen: false,
         focusOnShow: true,
         inline: false,

@@ -10,7 +10,7 @@ module.exports = function(agenda) {
     //name: 'Foo',
 
     // set true to disabled this hob
-    //disabled: false,
+    disabled: true,
 
     // method can be 'every <interval>', 'schedule <when>' or now
     frequency: 'now',

@@ -10,9 +10,14 @@
 
 module.exports = require('waterlock').waterlocked({
   /* e.g.
-    action: function(req, res){
-
-    }
+   error
+   * -1 : user already exist
+   * -2 : user email or password needed
+   * -3 : chef incomplete profile
+   * -8 : meal contain unverified dish
+   * -9 : fail to decrease totalQty because of the dish has been ordered
+   * -10 : fail to add/remove dish on active meal
+   * -11 : dish can not be empty
   */
   register: function(req, res) {
     var params = req.params.all(),
@@ -20,7 +25,7 @@ module.exports = require('waterlock').waterlocked({
       criteria = { },
       scopeKey = 'email';
     if(!params.password || !params.email){
-      return res.serverError('email and password needed');
+      return res.serverError({code : -2, text : req.__('user-credential-needed')});
     }
     var attr = {
       password: params.password
@@ -29,7 +34,7 @@ module.exports = require('waterlock').waterlocked({
     criteria[scopeKey] = attr[scopeKey];
     waterlock.engine.findAuth(criteria, function(err, user) {
       if(user){
-        return res.badRequest({code : -1, text : "User already exists"});
+        return res.badRequest({code : -1, text : req.__('user-exist-error')});
       }else{
         waterlock.engine.findOrCreateAuth(criteria, attr, function(err, user) {
           if(err){

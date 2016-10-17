@@ -3,6 +3,8 @@
  *
  * @description :: Server-side logic for managing hosts
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
+ * @error       :: -1 address decode error
+ *                 -2 address not found
  */
 
 var stripe = require("../services/stripe.js");
@@ -131,11 +133,11 @@ module.exports = {
       var cellphone = params.address.phone;
       require('../services/geocode').geocode(actual_address,function(err,result){
         if(err){
-          console.log(err);
-          return res.badRequest(req.__('meal-error-address'));
+          sails.log.error(err);
+          return res.badRequest({code : -1, text : req.__('meal-error-address')});
         }else{
           if(result.length == 0){
-            return res.badRequest(req.__('meal-error-address2'));
+            return res.badRequest({ code : -2, text : req.__('meal-error-address2')});
           }
           var administration= result[0].administrativeLevels;
           params.county = administration.level2long;

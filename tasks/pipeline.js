@@ -32,6 +32,7 @@ var jsFilesToInject = [
   'js/bootstrap/bootstrap.js',
 
   // Dependencies like jQuery, or Angular are brought in here
+  'js/dependencies/mixitup/*.js',
   'js/dependencies/**/*.js',
 
   // All of the rest of your client-side js files

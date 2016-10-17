@@ -114,6 +114,9 @@ module.exports = {
         if(account.verification.fields_needed.length != 0){
           host.verification = account.verification;
           return cb(null,false);
+        }else{
+          host.verification = null;
+          return cb(null, true);
         }
         return cb(null,true);
       });

@@ -216,7 +216,14 @@ describe('ReviewController', function() {
         .post('/review')
         .send({meal : mealId, dish : dishId2, score : 4.5, review : "Very delicious could be more",user: guestId})
         .expect(403)
-        .end(done)
+        .end(function(err, res){
+          if(err){
+            console.log(err);
+            return done(err);
+          }
+          res.body.code.should.be.equal(-1);
+          done();
+        })
     })
 
     it('should not be able to leave a review for the already reviewed meal', function (done) {
@@ -227,6 +234,7 @@ describe('ReviewController', function() {
         .send({meal : mealId, dish : dishId1, score : 5, review : "Very delicious could be more",user: guestId})
         .expect(403)
         .end(function(err,res){
+          res.body.code.should.be.equal(-1);
           done();
         })
     })

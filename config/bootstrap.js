@@ -13,6 +13,14 @@ module.exports.bootstrap = function(cb) {
 
   // It's very important to trigger this callback method when you are finished
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
-  Jobs.schedule("next tuesday", 'HostPaymentSummaryJob');
-  cb();
+  Jobs.jobs({ name : 'HostPaymentSummaryJob'}, function(err, jobs){
+    if(err){
+      sails.log.error(err);
+      return cb();
+    }
+    if(jobs.length == 0){
+      Jobs.schedule("next tuesday", 'HostPaymentSummaryJob');
+    }
+    cb();
+  })
 };

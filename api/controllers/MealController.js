@@ -10,6 +10,10 @@ var moment = require("moment");
 
 /*
  error
+ * -1 : geo service not available
+ * -2 : address not valid
+ * -3 : meal not found
+ * -4 : meal have orders can not offline
  * -5 : meal invalid date
  * -6 : meal invalid requirement
  * -7 : chef incomplete profile
@@ -130,10 +134,10 @@ module.exports = {
       if(typeof zipcode !== 'undefined' && zipcode && zipcode !== 'undefined' && typeof county !== 'undefined' && county && county !== 'undefined'){
         GeoCoder.geocode(zipcode, function(err, result){
           if (err) {
-            return res.badRequest(req.__('meal-error-address'));
+            return res.badRequest({ code : -1, text : req.__('meal-error-address')});
           }  else {
             if(result.length==0){
-              return res.badRequest(req.__('meal-error-address2'));
+              return res.badRequest({ code : -2, text : req.__('meal-error-address2')});
             }
             var location = { lat : result[0].latitude, long : result[0].longitude };
             found = found.filter(function(meal){
@@ -185,7 +189,7 @@ module.exports = {
         return res.badRequest(err);
       }
       if(m.length==0){
-        return res.badRequest(req.__('meal-not-found'));
+        return res.badRequest({ code : -3, text : req.__('meal-not-found')});
       }
       User.find(userId).populate("payment").exec(function(err,user){
         res.view("confirm",{meal : m[0], user : user[0]});
@@ -204,7 +208,7 @@ module.exports = {
       }
 
       if(orders.length > 0) {
-        return res.badRequest(req.__('meal-active-error'));
+        return res.badRequest({ code : -4, text : req.__('meal-active-error')});
       }
 
       Meal.update({id : mealId},{status : "off", isScheduled : false}).exec(function(err, meal){
