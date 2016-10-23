@@ -11,6 +11,7 @@ var React = require('react/addons'),
   DishStore = require('../stores/DishStore'),
   OrderStore = require('../stores/OrderStore'),
   TransactionStore = require('../stores/TransactionStore'),
+  JobStore = require('../stores/JobStore'),
   TableItem = require('./TableItem');
 
 var Table = React.createClass({
@@ -52,6 +53,9 @@ var Table = React.createClass({
       case "Transaction":
         return {data : TransactionStore.getAllTransactions(), headData : TransactionStore.getBalance(), detail : TransactionStore.isShowDetail()};
         break;
+      case "Job":
+        return {data : JobStore.getAllJobs(), detail : JobStore.isShowDetail()};
+        break;
     }
   },
 
@@ -70,6 +74,7 @@ var Table = React.createClass({
     DishStore.addChangeListener(this._onChange);
     OrderStore.addChangeListener(this._onChange);
     TransactionStore.addChangeListener(this._onChange);
+    JobStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount: function () {
@@ -79,6 +84,7 @@ var Table = React.createClass({
     DishStore.removeChangeListener(this._onChange);
     OrderStore.removeChangeListener(this._onChange);
     TransactionStore.removeChangeListener(this._onChange);
+    JobStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function () {

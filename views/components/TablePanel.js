@@ -72,6 +72,11 @@ var TablePanel = React.createClass({
         details = {id : 'Tran ID', 'metadata.userId' : 'User ID', 'metadata.hostId' : 'Host ID', 'metadata.mealId' : 'meal ID', amount : 'Amount', amount_refunded : 'Refunded', application_fee : 'SFMeal Fee', type : 'Type', month : 'month', day : 'Date',  status : 'Status', receipt_email : 'receiptEmail',dispute : 'Dispute', failure_message : 'failMsg', fraud_details : 'fraud',  command : 'Command'};
         criterias = ['id','hostId','userId'];
         break;
+      case "Job":
+        headers = {_id : 'Job ID', name : 'name', "nextRunAt" : 'nextRunAt', "lastFinishedAt" : "lastFinishedAt", data : "data" };
+        details = {_id : 'Job ID', name : 'name', "nextRunAt" : 'nextRunAt', "lastFinishedAt" : "lastFinishedAt", data : "data", lastRunAt : "lastRunAt", command : 'Command'} ;
+        criterias = ['id', 'name', 'orderId', 'mealId'];
+        break;
     }
 
     return (

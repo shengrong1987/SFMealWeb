@@ -21,7 +21,7 @@ module.exports = function(req, res, next) {
         req.session.user = user;
         return next();
       }else{
-        return res.forbidden('You are not permitted to perform this action.');
+        return res.forbidden('You are not a host');
       }
     });
   }

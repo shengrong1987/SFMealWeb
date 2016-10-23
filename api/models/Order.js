@@ -95,6 +95,10 @@ module.exports = {
       enum: ['schedule', 'preparing', 'ready', 'adjust', 'cancelling', 'cancel', 'review', 'complete'],
       defaultsTo : 'schedule'
     },
+    isPaid : {
+      type : 'boolean',
+      defaultsTo : 'false'
+    },
     lastStatus : {
       type : 'string',
       enum: ['schedule', 'preparing', 'ready', 'adjust', 'cancelling', 'cancel', 'review', 'complete']

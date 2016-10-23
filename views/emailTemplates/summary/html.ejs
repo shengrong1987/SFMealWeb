@@ -14,31 +14,63 @@
 <div class="green" style="padding: 25px;">
 
   <div class="box-email white relative middle">
-    <div class="row">
+    <div class="row" style="height: 25px;">
       <div class="col-xs-6 text-left text-green">Payment Summary</div>
-      <div class="col-xs-6 text-right">Mon, Oct 03 - Mon, Oct 10</div>
+      <div class="col-xs-6 text-right">Mon, <%= host.showDates[0].date%> - Mon, <%= host.showDates[6].date%></div>
     </div>
-    <h3 class="text-center">$365.83</h3>
-    <p class="text-grey text-center">Total Payout</p>
+    <div class="well">
+      <h3 class="text-center">$<%= (host.totalBalance.amount / 100).toFixed(2)%></h3>
+      <p class="text-grey text-center">Total Payout</p>
 
-    <div class="row text-center">
-      <div class="col-xs-2"></div>
-      <div class="col-xs-2">4.8<br/><span class="text-grey">Current Rating</span></div>
-      <div class="col-xs-1">|</div>
-      <div class="col-xs-2">3<br/><span class="text-grey">Meals Online</span></div>
-      <div class="col-xs-1">|</div>
-      <div class="col-xs-2">35<br/><span class="text-grey">Trips</span></div>
-      <div class="col-xs-2"></div>
+      <div class="row text-center" style="height: 50px;">
+        <div class="col-xs-2"></div>
+        <div class="col-xs-2"><%= host.score.toFixed(2)%><br/><span class="text-grey">Current Rating</span></div>
+        <div class="col-xs-1">|</div>
+        <div class="col-xs-2"><%= host.numberOfMeal%><br/><span class="text-grey">Meals Online</span></div>
+        <div class="col-xs-1">|</div>
+        <div class="col-xs-2"><%= host.orders.length%><br/><span class="text-grey">Orders</span></div>
+        <div class="col-xs-2"></div>
+      </div>
     </div>
 
-    <table>
-      <tr></tr>
+    <table class="table table-email">
+      <thead>
+      <tr>
+        <td><strong>Day</strong></td>
+        <td><strong>Orders</strong></td>
+        <td><strong>Income</strong></td>
+        <td><strong>SFMeal Fees</strong></td>
+        <td><strong>Payment</strong></td>
+      </tr>
+      </thead>
+      <tbody>
+      <% for(var i=0 ; i < 7; i++){
+        var datasets = host.showDates[i];
+      %>
+      <tr>
+        <td><%= datasets.date%></td>
+        <td><%= datasets.number%></td>
+        <td>$<%= (datasets.income / 100).toFixed(2)%></td>
+        <td>$<%= (datasets.fee / 100).toFixed(2)%></td>
+        <td>$<%= ((datasets.income - datasets.fee) / 100).toFixed(2)%></td>
+      </tr>
+      <%}%>
+
+      <tr>
+        <td colspan="3"></td>
+        <td>Other:</td>
+        <td>$<%= ((host.totalBalance.amount - host.orderTotalPayment) / 100).toFixed(2)%></td>
+      </tr>
+      <tr class="active">
+        <td colspan="4"><strong>Total Payout</strong></td>
+        <td><strong>$<%= (host.totalBalance.amount / 100).toFixed(2)%></strong></td>
+      </tr>
+      </tbody>
     </table>
 
     <div class="row text-center">
       <a class="btn btn-green btn-inline" href="http://www.sfmeal.com/host/me#myorder">打开订单</a>
     </div>
-
   </div>
 
 </div>

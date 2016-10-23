@@ -14,7 +14,7 @@ before(function(done){
 
 describe('MealController', function() {
 
-  this.timeout(35000);
+  this.timeout(61000);
 
   describe('build a meal with dishes', function() {
 
@@ -498,15 +498,13 @@ describe('MealController', function() {
         .expect('Content-Type', /json/)
         .expect(200)
         .toPromise()
-        .delay(31000)
+        .delay(60000)
         .then(function(res){
           agent
             .get('/job?name=MealStartJob&data.mealId=' + mealId)
             .expect(200)
             .then(function(res){
-              if(res.body.length != 1){
-                return done(Error('meal start reminding jobs count not right'));
-              }
+              res.body.should.have.length(1);
               done();
             })
             .catch(function(err){
@@ -525,9 +523,7 @@ describe('MealController', function() {
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
-          if(res.body.meals.length != 0){
-            return done(Error("meal should be not active yet"));
-          }
+          res.body.should.have.property('meals').with.length(0);
           done();
         })
     })
@@ -560,7 +556,7 @@ describe('MealController', function() {
         })
         .expect(200)
         .toPromise()
-        .delay(31000)
+        .delay(60000)
         .then(function(res){
           agent
             .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
@@ -600,15 +596,13 @@ describe('MealController', function() {
         .post('/meal/' + preorderMealId + "/on")
         .expect(200)
         .toPromise()
-        .delay(31000)
+        .delay(60000)
         .then(function(res){
           agent
             .get('/job?name=MealScheduleEndJob&data.mealId=' + preorderMealId)
             .expect(200)
             .then(function(res){
-              if(res.body.length != 1){
-                return done(Error('meal shedule end jobs not get scheduled correctly'));
-              }
+              res.body.should.have.length(1);
               done();
             })
             .catch(function(err){
@@ -650,7 +644,7 @@ describe('MealController', function() {
         .post('/meal/' + preorderMealId + "/off")
         .expect(302)
         .toPromise()
-        .delay(31000)
+        .delay(60000)
         .then(function(res){
           agent
             .get('/job?data.mealId=' + preorderMealId)

@@ -236,7 +236,7 @@
                     var curPage = 1;
                     for(var j=0; j < reviews.length; j++){
                       var review = reviews[j];
-                      if(review.dish == dish.id){
+                      if(review.dish == dish.id && review.isPublic){
                         number++;
                   %>
                   <div class="item">

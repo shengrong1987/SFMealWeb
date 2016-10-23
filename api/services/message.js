@@ -20,8 +20,6 @@ module.exports = {
       from: "+14159936325",
       body : content
     }, function (err, message) {
-      console.log(message);
-      // cb(err,message);
     });
   }
 }

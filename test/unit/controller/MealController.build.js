@@ -105,7 +105,6 @@ describe('MealController', function() {
             })
             .expect(200)
             .end(function(err, res){
-              console.log(res.body);
               if(res.body.bank_name != "STRIPE TEST BANK"){
                 return done(Error("error creating bank, bank name doesen't match(STRIPE TEST BANK)"));
               }

@@ -37,7 +37,7 @@ module.exports = function(req, res, next) {
       if(guestOfMeal){
         next();
       }else{
-        res.forbidden("You are not permitted to perform this action.");
+        res.forbidden("You are not guests of the meal.");
       }
     });
   });

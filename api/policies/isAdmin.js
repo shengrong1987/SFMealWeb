@@ -16,9 +16,9 @@ module.exports = function(req, res, next) {
       sails.log.info("accessing admin api");
       next();
     }else{
-      return res.forbidden('You are not permitted to perform this action.');
+      return res.forbidden('You are not admin');
     }
   }else{
-    return res.forbidden('You are not permitted to perform this action.');
+    return res.forbidden('You are not admin');
   }
 };

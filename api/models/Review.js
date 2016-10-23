@@ -36,6 +36,10 @@ module.exports = {
     username : {
       type : 'string'
     },
+    isPublic : {
+      type : 'boolean',
+      defaultsTo : true
+    },
     get_formatted_time : function(){
       var month = this.updatedAt.getMonth()+1;
       var date = this.updatedAt.getDate();

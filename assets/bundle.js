@@ -44634,6 +44634,20 @@ var ActionsCreators = {
     });
   },
 
+  getJob : function(records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_JOB,
+      records: records
+    });
+  },
+
+  getJobs : function (records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_JOBS,
+      records: records
+    });
+  },
+
   switchTab : function(tab){
     AppDispatcher.handleViewAction({
       type : ActionTypes.TAB_CHANGE,
@@ -44687,7 +44701,7 @@ var AdminPanel = React.createClass({displayName: "AdminPanel",
   },
 
   render: function () {
-    var tabs = ['User', 'Host', 'Meal','Dish','Order','Transaction'];
+    var tabs = ['User', 'Host', 'Meal','Dish','Order','Transaction', 'Job'];
 
     return (
       React.createElement("div", {className: "box"}, 
@@ -44701,7 +44715,7 @@ var AdminPanel = React.createClass({displayName: "AdminPanel",
 
 module.exports = AdminPanel;
 
-},{"../actions/ActionCreators":181,"../stores/UserStore":202,"./Tab":185,"./TablePanel":189,"react":180}],183:[function(require,module,exports){
+},{"../actions/ActionCreators":181,"../stores/UserStore":203,"./Tab":185,"./TablePanel":189,"react":180}],183:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -44824,7 +44838,7 @@ var Search = React.createClass({displayName: "Search",
 
 module.exports = Search;
 
-},{"../helpers/SFMealAPI":193,"../stores/SearchStore":199,"react/addons":8}],185:[function(require,module,exports){
+},{"../helpers/SFMealAPI":193,"../stores/SearchStore":200,"react/addons":8}],185:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -44899,7 +44913,7 @@ var Tab = React.createClass({displayName: "Tab",
 
 module.exports = Tab;
 
-},{"../helpers/SFMealAPI":193,"../stores/TabStore":200,"react/addons":8}],186:[function(require,module,exports){
+},{"../helpers/SFMealAPI":193,"../stores/TabStore":201,"react/addons":8}],186:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -44913,6 +44927,7 @@ var React = require('react/addons'),
   DishStore = require('../stores/DishStore'),
   OrderStore = require('../stores/OrderStore'),
   TransactionStore = require('../stores/TransactionStore'),
+  JobStore = require('../stores/JobStore'),
   TableItem = require('./TableItem');
 
 var Table = React.createClass({displayName: "Table",
@@ -44954,6 +44969,9 @@ var Table = React.createClass({displayName: "Table",
       case "Transaction":
         return {data : TransactionStore.getAllTransactions(), headData : TransactionStore.getBalance(), detail : TransactionStore.isShowDetail()};
         break;
+      case "Job":
+        return {data : JobStore.getAllJobs(), detail : JobStore.isShowDetail()};
+        break;
     }
   },
 
@@ -44972,6 +44990,7 @@ var Table = React.createClass({displayName: "Table",
     DishStore.addChangeListener(this._onChange);
     OrderStore.addChangeListener(this._onChange);
     TransactionStore.addChangeListener(this._onChange);
+    JobStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount: function () {
@@ -44981,6 +45000,7 @@ var Table = React.createClass({displayName: "Table",
     DishStore.removeChangeListener(this._onChange);
     OrderStore.removeChangeListener(this._onChange);
     TransactionStore.removeChangeListener(this._onChange);
+    JobStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function () {
@@ -45029,7 +45049,7 @@ var Table = React.createClass({displayName: "Table",
 
 module.exports = Table;
 
-},{"../stores/DishStore":195,"../stores/HostStore":196,"../stores/MealStore":197,"../stores/OrderStore":198,"../stores/TransactionStore":201,"../stores/UserStore":202,"./TableHeader":187,"./TableItem":188,"react/addons":8}],187:[function(require,module,exports){
+},{"../stores/DishStore":195,"../stores/HostStore":196,"../stores/JobStore":197,"../stores/MealStore":198,"../stores/OrderStore":199,"../stores/TransactionStore":202,"../stores/UserStore":203,"./TableHeader":187,"./TableItem":188,"react/addons":8}],187:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -45156,6 +45176,11 @@ var TableItem = React.createClass({displayName: "TableItem",
     SFMealAPI.command(target.data('model'),target.data('id'),'verifyLicense',this.props.detail, data);
   },
 
+  _run : function(event){
+    var target = $(event.target);
+    SFMealAPI.command(target.data('model'), target.data('id'), 'run', this.props.detail);
+  },
+
   _unverifyLicense : function(event){
     var target = $(event.target);
     SFMealAPI.command(target.data('model'),target.data('id'),'unverifyLicense',this.props.detail);
@@ -45205,6 +45230,9 @@ var TableItem = React.createClass({displayName: "TableItem",
               }
             }
             break;
+          case "Job":
+            rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['name'], onClick: this._run}, "Run")
+            break;
         }
       }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){
         rowContent = React.createElement("img", {src: rowContent, width: "100"})
@@ -45224,6 +45252,12 @@ var TableItem = React.createClass({displayName: "TableItem",
         rowContent = Object.keys(rowContent).map(function(key){
           return React.createElement("p", null, key, " : ", rowContent[key]);
         });
+      }else if(typeof rowContent === 'string' && new Date(rowContent) !== 'Invalid Date' && !isNaN(new Date(rowContent))){
+        if(col == 'nextRunAt' && new Date(rowContent).getTime() <= new Date().getTime()){
+          rowContent = 'null';
+        }else{
+          rowContent = new Date(rowContent).toLocaleString();
+        }
       }
     }
     return rowContent;
@@ -45334,6 +45368,11 @@ var TablePanel = React.createClass({displayName: "TablePanel",
         details = {id : 'Tran ID', 'metadata.userId' : 'User ID', 'metadata.hostId' : 'Host ID', 'metadata.mealId' : 'meal ID', amount : 'Amount', amount_refunded : 'Refunded', application_fee : 'SFMeal Fee', type : 'Type', month : 'month', day : 'Date',  status : 'Status', receipt_email : 'receiptEmail',dispute : 'Dispute', failure_message : 'failMsg', fraud_details : 'fraud',  command : 'Command'};
         criterias = ['id','hostId','userId'];
         break;
+      case "Job":
+        headers = {_id : 'Job ID', name : 'name', "nextRunAt" : 'nextRunAt', "lastFinishedAt" : "lastFinishedAt", data : "data" };
+        details = {_id : 'Job ID', name : 'name', "nextRunAt" : 'nextRunAt', "lastFinishedAt" : "lastFinishedAt", data : "data", lastRunAt : "lastRunAt", command : 'Command'} ;
+        criterias = ['id', 'name', 'orderId', 'mealId'];
+        break;
     }
 
     return (
@@ -45352,7 +45391,7 @@ var TablePanel = React.createClass({displayName: "TablePanel",
 
 module.exports = TablePanel;
 
-},{"../stores/TabStore":200,"./Search":184,"./Table":186,"react/addons":8}],190:[function(require,module,exports){
+},{"../stores/TabStore":201,"./Search":184,"./Table":186,"react/addons":8}],190:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -45388,6 +45427,8 @@ module.exports = {
     GET_DISH : null,
     GET_TRANSACTIONS : null,
     GET_TRANSACTION : null,
+    GET_JOBS : null,
+    GET_JOB : null,
     TAB_CHANGE : null,
     SEARCH_CHANGE : null,
     NO_RESULT : null,
@@ -45622,6 +45663,35 @@ module.exports = {
     });
   },
 
+  getJob : function(id){
+    $.ajax({
+      url: '/job/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getJob(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getJobs : function(criteria, value){
+    if(criteria && value){
+      var url = "/job?" + criteria + "=" + value;
+    }else{
+      var url = "/job";
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getJobs(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
   command : function(model, id, action, detail, data){
     var url = '/' + model.toLowerCase() + '/' + id + '/' + action;
     $.ajax({
@@ -45718,6 +45788,13 @@ module.exports = {
           this.getTransaction(content);
         }else{
           this.getTransactions(criteria,content);
+        }
+        break;
+      case "Job":
+        if(criteria == "id" && content){
+          this.getJob(content);
+        }else{
+          this.getJobs(criteria, content);
         }
         break;
     }
@@ -45906,6 +45983,84 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
 
 var CHANGE_EVENT = 'change';
 
+var _jobs = [];
+var _showDetail = false;
+
+var JobStore = _.assign({}, EventEmitter.prototype, {
+  getAllJobs: function () {
+    return _jobs;
+  },
+
+  isShowDetail : function(){
+    return _showDetail;
+  },
+
+  emitChange: function () {
+    this.emit(CHANGE_EVENT);
+  },
+
+  addChangeListener: function (callback) {
+    this.on(CHANGE_EVENT, callback);
+  },
+
+  removeChangeListener: function (callback) {
+    this.removeListener(CHANGE_EVENT, callback);
+  }
+});
+
+// Register callback to handle all updates
+AppDispatcher.register(function (payload) {
+  var action = payload.action;
+
+  switch (action.type) {
+    case ActionTypes.GET_JOBS:
+      if(!Array.isArray(action.records)){
+        _jobs = [action.records];
+      }else{
+        _jobs = action.records;
+      }
+      _showDetail = false;
+      JobStore.emitChange();
+      break;
+
+    case ActionTypes.GET_JOB:
+      if(!Array.isArray(action.records)){
+        _jobs = [action.records];
+      }else{
+        _jobs = action.records;
+      }
+      _showDetail = true;
+      JobStore.emitChange();
+      break;
+
+    case ActionTypes.NO_RESULT:
+      _jobs = [];
+      _showDetail = false;
+      JobStore.emitChange();
+      break;
+
+    default:
+      // no op
+  }
+});
+
+module.exports = JobStore;
+
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],198:[function(require,module,exports){
+/*
+ * RecordStore
+ */
+
+'use strict';
+
+var AppDispatcher = require('../dispatcher/AppDispatcher'),
+  EventEmitter = require('events').EventEmitter,
+  AppConstants = require('../constants/AppConstants'),
+  ActionTypes = AppConstants.ActionTypes,
+  _ = require('lodash');
+
+var CHANGE_EVENT = 'change';
+
 var _meals = [];
 var _showDetail = false;
 
@@ -45970,7 +46125,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = MealStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],198:[function(require,module,exports){
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],199:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -46048,7 +46203,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = OrderStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],199:[function(require,module,exports){
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],200:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -46114,7 +46269,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = SearchStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],200:[function(require,module,exports){
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],201:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -46166,7 +46321,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = TabStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],201:[function(require,module,exports){
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],202:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -46256,7 +46411,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = TransactionStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],202:[function(require,module,exports){
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],203:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -46334,4 +46489,4 @@ AppDispatcher.register(function (payload) {
 
 module.exports = UserStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}]},{},[181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202]);
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}]},{},[181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203]);

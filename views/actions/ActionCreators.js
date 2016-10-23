@@ -97,6 +97,20 @@ var ActionsCreators = {
     });
   },
 
+  getJob : function(records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_JOB,
+      records: records
+    });
+  },
+
+  getJobs : function (records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_JOBS,
+      records: records
+    });
+  },
+
   switchTab : function(tab){
     AppDispatcher.handleViewAction({
       type : ActionTypes.TAB_CHANGE,

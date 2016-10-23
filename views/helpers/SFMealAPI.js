@@ -193,6 +193,35 @@ module.exports = {
     });
   },
 
+  getJob : function(id){
+    $.ajax({
+      url: '/job/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getJob(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getJobs : function(criteria, value){
+    if(criteria && value){
+      var url = "/job?" + criteria + "=" + value;
+    }else{
+      var url = "/job";
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getJobs(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
   command : function(model, id, action, detail, data){
     var url = '/' + model.toLowerCase() + '/' + id + '/' + action;
     $.ajax({
@@ -289,6 +318,13 @@ module.exports = {
           this.getTransaction(content);
         }else{
           this.getTransactions(criteria,content);
+        }
+        break;
+      case "Job":
+        if(criteria == "id" && content){
+          this.getJob(content);
+        }else{
+          this.getJobs(criteria, content);
         }
         break;
     }

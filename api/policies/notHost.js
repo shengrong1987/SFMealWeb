@@ -16,7 +16,7 @@ module.exports = function(req, res, next) {
     if(!host){
       return next();
     }else{
-      return res.forbidden('You are not permitted to perform this action.');
+      return res.forbidden('You are a host.');
     }
   });
 };

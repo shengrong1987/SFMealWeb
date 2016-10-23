@@ -20,7 +20,7 @@ module.exports = function(req, res, next) {
     if(order.customer.id == userId || order.host.id == hostId){
       next();
     }else{
-      res.forbidden('You are not permitted to perform this action.');
+      res.forbidden('You are not permitted to perform action on this order.');
     }
   });
 };

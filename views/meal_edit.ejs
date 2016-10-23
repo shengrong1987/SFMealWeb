@@ -82,7 +82,7 @@
                           <div class="col-xs-4 vertical-align" style="height:52px;padding-top: -10px;">
                             <div class="input-group amount-input" data-toggle="amount-input">
                               <div class="input-group-addon minus">-</div>
-                              <input class="form-control" type="number" value="<%= quantity%>" style="min-width: 75px;">
+                              <input class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" value="<%= quantity%>" style="min-width: 75px;">
                               <div class="input-group-addon add">+</div>
                             </div>
                           </div>
@@ -327,27 +327,33 @@
                   <label>4.<%= __('delivery-option')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
                 </div>
                 <div class="col-xs-12">
-                  <label class="checkbox-inline" style="padding-bottom: 15px;"><input id="isDelivery" type="checkbox" <%= meal.isDelivery ? "checked=''" : ""%>><%= __('delivery-available')%></label>
+                  <div class="box-compact vertical-align">
+                    <input type="checkbox" id="isDelivery" class="regular-checkbox" <%= meal.isDelivery ? "checked=''" : ""%> >
+                    <label for="isDelivery"></label>
+                    <span style="margin-left: 10px;"><%= __('delivery-available')%></span>
+                  </div>
                 </div>
-                <div class="row">
-                  <div class="col-sm-12 col-md-10 col-lg-8">
-                    <div class="col-sm-6">
-                      <div class="input-group">
-                        <div class="input-group-addon"><%= __('delivery-fee')%>: $</div>
-                        <input id="deliveryFeeInput" class="form-control" type="number" placeholder="5.0" value="<%= meal.delivery_fee%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
-                      </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12 col-md-10 col-lg-8">
+                  <div class="col-sm-6">
+                    <div class="input-group">
+                      <div class="input-group-addon"><%= __('delivery-fee')%>: $</div>
+                      <input id="deliveryFeeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="5" value="<%= meal.delivery_fee%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
                     </div>
-                    <div class=col-sm-6>
-                      <div class="input-group">
-                        <div class="input-group-addon"><%= __('delivery-range')%>:</div>
-                        <input id="deliveryRangeInput" class="form-control" type="number" placeholder="5.0" value="<%= meal.delivery_range%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
-                        <div class="input-group-addon">Miles</div>
-                      </div>
+                  </div>
+                  <div class=col-sm-6>
+                    <div class="input-group">
+                      <div class="input-group-addon"><%= __('delivery-range')%>:</div>
+                      <input id="deliveryRangeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="5" value="<%= meal.delivery_range%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
+                      <div class="input-group-addon">Miles</div>
                     </div>
                   </div>
                 </div>
-                <div class="help-block with-errors"></div>
               </div>
+
+              <div class="help-block with-errors"></div>
             </div>
 
             <div class="form-group" style="margin-top: 40px;">

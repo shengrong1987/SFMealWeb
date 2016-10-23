@@ -16,6 +16,8 @@ module.exports = {
     GET_DISH : null,
     GET_TRANSACTIONS : null,
     GET_TRANSACTION : null,
+    GET_JOBS : null,
+    GET_JOB : null,
     TAB_CHANGE : null,
     SEARCH_CHANGE : null,
     NO_RESULT : null,

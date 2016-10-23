@@ -79,6 +79,11 @@ var TableItem = React.createClass({
     SFMealAPI.command(target.data('model'),target.data('id'),'verifyLicense',this.props.detail, data);
   },
 
+  _run : function(event){
+    var target = $(event.target);
+    SFMealAPI.command(target.data('model'), target.data('id'), 'run', this.props.detail);
+  },
+
   _unverifyLicense : function(event){
     var target = $(event.target);
     SFMealAPI.command(target.data('model'),target.data('id'),'unverifyLicense',this.props.detail);
@@ -128,6 +133,9 @@ var TableItem = React.createClass({
               }
             }
             break;
+          case "Job":
+            rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['name']} onClick={this._run}>Run</button>
+            break;
         }
       }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){
         rowContent = <img src={rowContent} width="100"/>
@@ -147,6 +155,12 @@ var TableItem = React.createClass({
         rowContent = Object.keys(rowContent).map(function(key){
           return <p>{key} : {rowContent[key]}</p>;
         });
+      }else if(typeof rowContent === 'string' && new Date(rowContent) !== 'Invalid Date' && !isNaN(new Date(rowContent))){
+        if(col == 'nextRunAt' && new Date(rowContent).getTime() <= new Date().getTime()){
+          rowContent = 'null';
+        }else{
+          rowContent = new Date(rowContent).toLocaleString();
+        }
       }
     }
     return rowContent;

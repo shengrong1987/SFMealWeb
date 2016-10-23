@@ -10,6 +10,7 @@
 var Notification = require("../services/notification.js");
 var async = require('async');
 module.exports = {
+
   create : function(req, res){
     var async = require('async');
     var userId = req.session.user.id;
@@ -145,9 +146,14 @@ module.exports = {
         })
       },
       createReview : ['getDish','getMeal', function(cb, results){
-        console.log("creating review");
+        sails.log.info("creating review");
         var dish = results.getDish;
         var meal = results.getMeal;
+        if(score <= 1){
+          var isPublic = false;
+        }else{
+          isPublic = true;
+        }
         Review.create({
           dish : dish ? dish.id : null,
           title : dish ? dish.title : meal.title,
@@ -157,7 +163,8 @@ module.exports = {
           review : content,
           user : user.id,
           host : dish ? dish.chef.id : meal.chef.id,
-          username : user.firstname
+          username : user.firstname,
+          isPublic : isPublic
         }).exec(function(err, review){
           if(err){
             console.log(err);

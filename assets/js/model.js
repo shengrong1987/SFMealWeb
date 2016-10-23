@@ -1758,8 +1758,42 @@ var ReviewView = Backbone.View.extend({
         reviews.push(reviewObj);
       });
     }
+    var $this = this;
     if(score == 0 || scoreNotRated){
       alertView.show();
+      return;
+    }
+    if(score <= 1){
+      BootstrapDialog.show({
+        title: jQuery.i18n.prop('tip'),
+        message : jQuery.i18n.prop('reviewPrivate'),
+        buttons: [{
+          label: jQuery.i18n.prop('submitReview'),
+          action: function() {
+            $this.model.set({
+              meal : mealId,
+              dish : dishId,
+              score : score,
+              host : hostId,
+              reviews : reviews,
+              review : content
+            });
+            $this.model.save({},{
+              success : function(){
+                reloadUrl("/user/me","#myreview");
+              },error : function(model, err){
+                alertView.html(err.responseJSON ? err.responseJSON.text : err.responseText);
+                alertView.show();
+              }
+            })
+          }
+        }, {
+          label: jQuery.i18n.prop('cancel'),
+          action: function(dialog) {
+            dialog.close();
+          }
+        }]
+      });
       return;
     }
     this.model.set({

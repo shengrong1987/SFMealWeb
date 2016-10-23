@@ -55,6 +55,7 @@ describe('ReviewController', function() {
     var price1;
     var price2;
     var price3;
+    var price4;
     it('should get a meal ', function (done) {
       agent
           .get('/meal')
@@ -72,6 +73,7 @@ describe('ReviewController', function() {
             price1 = meal.dishes[0].price;
             price2 = meal.dishes[1].price;
             price3 = meal.dishes[2].price;
+            price4 = meal.dishes[3].price;
             done();
           })
     })
@@ -108,12 +110,12 @@ describe('ReviewController', function() {
       dishObj[dishId1] = 0;
       dishObj[dishId2] = 1;
       dishObj[dishId3] = 1;
-      dishObj[dishId4] = 0;
+      dishObj[dishId4] = 1;
       agent
         .post('/order')
         .send({
           orders : dishObj,
-          subtotal : price2 + price3,
+          subtotal : price2 + price3 + price4,
           address : address,
           phone : phone,
           method : "delivery",
@@ -173,6 +175,25 @@ describe('ReviewController', function() {
         .expect('Location','/auth/done')
         .end(done)
     });
+
+    it('should leave a private review for one dish of the meal', function (done) {
+      agent
+        .post('/review')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .send({meal : mealId, dish : dishId4, score : 1.0, review : "not so good.",user: guestId})
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('meal');
+          res.body.meal.id.should.be.equal(mealId);
+          res.body.dish.should.be.equal(dishId4);
+          res.body.isPublic.should.be.false();
+          done();
+        })
+    })
 
 
     it('should leave a review for one dish of the meal', function (done) {

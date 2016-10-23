@@ -14,7 +14,7 @@ module.exports = function(req, res, next) {
   var meal = req.body.mealId;
   Meal.findOne(meal).populate("chef").exec(function(err,m){
     if(hostId && hostId == m.chef.id){
-      return res.forbidden("Oops,you can't book your own meal");
+      return res.forbidden("You are owner of the meal.");
     }
     return next();
   });

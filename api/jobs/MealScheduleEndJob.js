@@ -12,10 +12,10 @@ module.exports = function(agenda) {
     //name: 'Foo',
 
     // set true to disabled this hob
-    disabled: true,
+    disabled: false,
 
     // method can be 'every <interval>', 'schedule <when>' or now
-    frequency: 'now',
+    // frequency: 'now',
 
     // Jobs options
     //options: {

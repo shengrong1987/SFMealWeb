@@ -11,7 +11,7 @@ before(function(done) {
 
   Sails.lift({
     // configuration for testing purposes
-    log: { level: 'info' },
+    log: { level: 'verbose' },
     connections: {
       someMongodbServer : {
         database : 'test'

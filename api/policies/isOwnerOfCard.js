@@ -22,7 +22,7 @@ module.exports = function(req, res, next) {
     if(userId == p.user){
       return next();
     }else{
-      return res.forbidden('You are not permitted to perform this action.');
+      return res.forbidden('You are not owner of the card');
     }
   });
 };

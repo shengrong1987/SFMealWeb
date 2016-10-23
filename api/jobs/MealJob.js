@@ -42,7 +42,7 @@ module.exports = function(agenda) {
               if(err){
                 return cb(err);
               }
-              console.log("scheduling meal schedule end Job at: " + meal.provideTillTime);
+              sails.log.info("scheduling meal book end Job at: " + meal.provideTillTime);
               Jobs.schedule(meal.provideTillTime, 'MealScheduleEndJob', { mealId : meal.id });
               cb();
             });
@@ -54,7 +54,7 @@ module.exports = function(agenda) {
                 if(err){
                   return cb(err);
                 }
-                console.log("scheduling meal start reminder Job at: " + util.minutesBefore(meal.provideFromTime,10));
+                sails.log.info("scheduling meal start reminder Job at: " + util.minutesBefore(meal.provideFromTime,10));
                 Jobs.schedule(util.minutesBefore(meal.provideFromTime,10), 'MealStartJob', { mealId : result.id });
                 cb();
               });
