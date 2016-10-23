@@ -2,7 +2,7 @@
 
 USER="root"
 NODE_ENV="production"
-PORT="1337"
+PORT="80"
 APP_DIR="/home/ec2-user/my-app"
 NODE_APP="app.js"
 CONFIG_DIR="$APP_DIR"
