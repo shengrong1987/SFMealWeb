@@ -51,9 +51,6 @@ module.exports = {
       type : 'string',
       required : true
     },
-    CVV : {
-      type : 'string'
-    },
     brand : {
       type : 'string'
     },
@@ -63,14 +60,14 @@ module.exports = {
     }
   },
 
-  afterUpdate : function(payment,cb){
-    delete  payment.CVV;
-    cb(null,payment);
+  beforeUpdate : function(params,cb){
+    delete  params.CVV;
+    cb();
   },
 
-  afterCreate : function(payment,cb){
-    delete  payment.CVV;
-    cb(null,payment);
+  beforeCreate : function(params,cb){
+    delete  params.CVV;
+    cb();
   }
 };
 

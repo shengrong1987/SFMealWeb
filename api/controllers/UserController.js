@@ -365,7 +365,7 @@ module.exports = require('waterlock').actions.user({
     //var date = new Date().toISOString().replace(/-|\:|\./g, '');
     var date = "20151229T000000Z";
     var credential = s3.id + "/" + date + "/" + s3.region + "/s3/aws4_request";
-    var url = "http://" + bucket + ".s3.amazonaws.com/";
+    var url = "https://" + bucket + ".s3.amazonaws.com/";
     var maxSize = this.getMaxSize(module);
     var signatureJSON = { "expiration": "2016-12-30T12:00:00.000Z",
       "conditions": [
