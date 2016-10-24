@@ -32,7 +32,7 @@ APP_NAME="SFMealWeb"
 ###############
 
 USAGE="Usage: $0 {start|stop|restart|status} [--force]"
-FORCE_OP=false
+FORCE_OP=true
 
 mongodb_running(){
    ! [ -z "$(ps -edaf | grep -v grep | grep mongod)" ]
