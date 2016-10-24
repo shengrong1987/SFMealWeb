@@ -55,8 +55,8 @@ module.exports.http = {
 
     redirectToHttps: function (req, res, next) {
       if(process.env.NODE_ENV == 'production'){
-        console.log(req.get('X-Forwarded-Proto'), "is secure:" + !req.secure, "is socket:" + req.socket);
-        if((!req.secure) && (req.get('X-Forwarded-Proto') && req.get('X-Forwarded-Proto') !== 'https') && !req.socket) {
+        console.log(req.get('X-Forwarded-Proto'), "is socket:" + req.isSocket);
+        if((req.get('X-Forwarded-Proto') && req.get('X-Forwarded-Proto') !== 'https') && !req.isSocket) {
           console.log("redirecting to https");
           res.redirect('https://' + req.get('Host') + req.url);
         }else{
