@@ -20,7 +20,7 @@ module.exports.http = {
    *                                                                           *
    ****************************************************************************/
 
-  // middleware: {
+  middleware: {
 
     /***************************************************************************
      *                                                                          *
@@ -29,23 +29,23 @@ module.exports.http = {
      *                                                                          *
      ***************************************************************************/
 
-    // order: [
-    //   'startRequestTimer',
-    //   'cookieParser',
-    //   'session',
-    //   'myRequestLogger',
-    //   'bodyParser',
-    //   'handleBodyParserError',
-    //   'compress',
-    //   'methodOverride',
-    //   'poweredBy',
-    //   '$custom',
-    //   'router',
-    //   'www',
-    //   'favicon',
-    //   '404',
-    //   '500'
-    // ],
+    order: [
+      'startRequestTimer',
+      'cookieParser',
+      'session',
+      'redirectToHttps',
+      'bodyParser',
+      'handleBodyParserError',
+      'compress',
+      'methodOverride',
+      'poweredBy',
+      '$custom',
+      'router',
+      'www',
+      'favicon',
+      '404',
+      '500'
+    ],
 
     /****************************************************************************
      *                                                                           *
@@ -53,12 +53,18 @@ module.exports.http = {
      *                                                                           *
      ****************************************************************************/
 
-    // myRequestLogger: function (req, res, next) {
-    //     console.log("Requested :: ", req.method, req.url);
-    //     return next();
-    // }
-
-
+    redirectToHttps: function (req, res, next) {
+      if(process.env.NODE_ENV == 'production'){
+        if((!req.secure) && (req.get('X-Forwarded-Proto') && req.get('X-Forwarded-Proto') !== 'https') && !req.socket) {
+          console.log("redirecting to https");
+          res.redirect('https://' + req.get('Host') + req.url);
+        }else{
+          next();
+        }
+      }else{
+        next();
+      }
+    }
 
     /***************************************************************************
      *                                                                          *
@@ -84,5 +90,5 @@ module.exports.http = {
      ***************************************************************************/
 
     // cache: 31557600000
-  // }
+  }
 };
