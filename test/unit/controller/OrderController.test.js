@@ -12,7 +12,7 @@ before(function(done) {
 
 describe('OrderController', function() {
 
-  this.timeout(15000);
+  this.timeout(20000);
 
   describe('', function() {
 
@@ -80,10 +80,10 @@ describe('OrderController', function() {
 
     it('should order the meal with out of range error', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = 1;
-      dishObj[dishId2] = 2;
-      dishObj[dishId3] = 0;
-      dishObj[dishId4] = 0;
+      dishObj[dishId1] = { number : 1};
+      dishObj[dishId2] = { number : 2};
+      dishObj[dishId3] = { number : 0};
+      dishObj[dishId4] = { number : 0};
       agent
         .post('/order')
         .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : farAddress, phone : phone, method : "delivery", mealId : mealId})
@@ -103,10 +103,10 @@ describe('OrderController', function() {
     var orderId;
     it('should order the meal', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = 1;
-      dishObj[dishId2] = 2;
-      dishObj[dishId3] = 0;
-      dishObj[dishId4] = 0;
+      dishObj[dishId1] = { number : 1};
+      dishObj[dishId2] = { number : 2};
+      dishObj[dishId3] = { number : 0};
+      dishObj[dishId4] = { number : 0};
       agent
           .post('/order')
           .send({
@@ -132,10 +132,10 @@ describe('OrderController', function() {
 
     it('should order the full dish and get not enough quantity error', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = 1;
-      dishObj[dishId2] = 2;
-      dishObj[dishId3] = 0;
-      dishObj[dishId4] = 0;
+      dishObj[dishId1] = { number : 1};
+      dishObj[dishId2] = { number : 2};
+      dishObj[dishId3] = { number : 0};
+      dishObj[dishId4] = { number : 0};
       agent
           .post('/order')
           .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : address, phone : phone, method : "delivery", mealId : mealId, delivery_fee : 0})
@@ -153,10 +153,10 @@ describe('OrderController', function() {
 
     it('should adjust the full dish and get not enough quantity error', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = 2;
-      dishObj[dishId2] = 2;
-      dishObj[dishId3] = 0;
-      dishObj[dishId4] = 0;
+      dishObj[dishId1] = { number : 2};
+      dishObj[dishId2] = { number : 2};
+      dishObj[dishId3] = { number : 0};
+      dishObj[dishId4] = { number : 0};
       agent
           .post('/order/' + orderId + "/adjust")
           .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, mealId : mealId, delivery_fee : 0})
@@ -174,10 +174,10 @@ describe('OrderController', function() {
 
     it('should adjust the dish successfully', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = 1;
-      dishObj[dishId2] = 0;
-      dishObj[dishId3] = 0;
-      dishObj[dishId4] = 0;
+      dishObj[dishId1] = { number : 1};
+      dishObj[dishId2] = { number : 0};
+      dishObj[dishId3] = { number : 0};
+      dishObj[dishId4] = { number : 0};
       agent
           .post('/order/' + orderId + "/adjust")
           .send({orders : dishObj, subtotal : price1 * 1, mealId : mealId, delivery_fee : 0})
@@ -192,10 +192,10 @@ describe('OrderController', function() {
 
     it('should adjust the dish again successfully', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = 1;
-      dishObj[dishId2] = 2;
-      dishObj[dishId3] = 3;
-      dishObj[dishId4] = 0;
+      dishObj[dishId1] = { number : 1};
+      dishObj[dishId2] = { number : 2};
+      dishObj[dishId3] = { number : 3};
+      dishObj[dishId4] = { number : 0};
       agent
           .post('/order/' + orderId + "/adjust")
           .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2 + price3 * 3, mealId : mealId, delivery_fee : 0})
@@ -234,10 +234,10 @@ describe('OrderController', function() {
 
     it('should order the meal again', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = 1;
-      dishObj[dishId2] = 2;
-      dishObj[dishId3] = 0;
-      dishObj[dishId4] = 0;
+      dishObj[dishId1] = { number : 1};
+      dishObj[dishId2] = { number : 2};
+      dishObj[dishId3] = { number : 0};
+      dishObj[dishId4] = { number : 0};
       agent
           .post('/order')
           .send({
@@ -281,10 +281,10 @@ describe('OrderController', function() {
 
     it('should not adjust the order at schedule as a host', function(done){
       var dishObj = {};
-      dishObj[dishId1] = 0;
-      dishObj[dishId2] = 0;
-      dishObj[dishId3] = 1;
-      dishObj[dishId4] = 0;
+      dishObj[dishId1] = { number : 0};
+      dishObj[dishId2] = { number : 0};
+      dishObj[dishId3] = { number : 1};
+      dishObj[dishId4] = { number : 0};
       agent
         .post('/order/' + orderId + "/adjust")
         .send({
@@ -490,10 +490,10 @@ describe('OrderController', function() {
       var orderId;
       it('should not order the meal with delivery', function (done) {
         var dishObj = {};
-        dishObj[dishId1] = 1;
-        dishObj[dishId2] = 2;
-        dishObj[dishId3] = 0;
-        dishObj[dishId4] = 0;
+        dishObj[dishId1] = { number : 1};
+        dishObj[dishId2] = { number : 2};
+        dishObj[dishId3] = { number : 0};
+        dishObj[dishId4] = { number : 0};
         agent
           .post('/order')
           .send({
@@ -541,10 +541,10 @@ describe('OrderController', function() {
 
       it('should order the meal with delivery', function (done) {
         var dishObj = {};
-        dishObj[dishId1] = 1;
-        dishObj[dishId2] = 1;
-        dishObj[dishId3] = 0;
-        dishObj[dishId4] = 0;
+        dishObj[dishId1] = { number : 1, preference : 'make it super hot, plz'};
+        dishObj[dishId2] = { number : 1};
+        dishObj[dishId3] = { number : 0};
+        dishObj[dishId4] = { number : 0};
         agent
           .post('/order')
           .send({

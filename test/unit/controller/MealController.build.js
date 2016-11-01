@@ -362,18 +362,7 @@ describe('MealController', function() {
             .post('/payment')
             .send({
               stripeToken : token.id,
-              brand : token.card.brand,
-              user : guestId,
-              street : street,
-              city : city,
-              state : state,
-              postal : postal,
-              country : country,
-              cardholder : cardHolderName,
               cardNumber : number,
-              expMonth : expMonth,
-              expYear : expYear,
-              CVV : cvv,
               isDefaultPayment : true
             })
             .expect(200)
@@ -394,10 +383,10 @@ describe('MealController', function() {
     var orderId;
 
     it('should order a meal as a user', function(done){
-      orders[dish1] = 0;
-      orders[dish2] = 1;
-      orders[dish3] = 1;
-      orders[dish4] = 0;
+      orders[dish1] = { number : 0, preference : ''};
+      orders[dish2] = { number : 1, preference : ''};
+      orders[dish3] = { number : 1, preference : ''};
+      orders[dish4] = { number : 0, preference : ''};
       agent
           .post('/order')
           .set('Accept', 'application/json')
@@ -424,10 +413,10 @@ describe('MealController', function() {
     })
     var newSubtotal = 4;
     it('should adjust an order as a user', function(done){
-      orders[dish1] = 0;
-      orders[dish2] = 1;
-      orders[dish3] = 0;
-      orders[dish4] = 0;
+      orders[dish1] = { number : 0};
+      orders[dish2] = { number : 1};
+      orders[dish3] = { number : 0};
+      orders[dish4] = { number : 0};
       agent
           .post('/order/' + orderId + '/adjust')
           .send({

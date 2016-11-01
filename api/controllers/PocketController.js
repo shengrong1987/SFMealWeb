@@ -63,7 +63,7 @@ module.exports = {
     }
     var isAdmin = req.session.user.auth.email == "admin@sfmeal.com";
     var userId = isAdmin ? req.params.id : req.session.user.id;
-    User.findOne(userId).populate("orders").populate('pocket').exec(function(err, user) {
+    User.findOne(userId).populate("orders").populate('pocket').populate('payment').exec(function(err, user) {
       if (err) {
         return res.badRequest(err);
       }
@@ -201,7 +201,7 @@ module.exports = {
             pocket.pending_balances = pendingBalance;
             pocket.transactions = transactions;
 
-            User.findOne(host.user.id).populate('orders').exec(function(err, user){
+            User.findOne(host.user.id).populate('orders').populate('payment').exec(function(err, user){
               if(err){
                 return res.badRequest(err);
               }
@@ -240,6 +240,7 @@ module.exports = {
                   return res.ok({pocket : pocket});
                 }
                 host.user.pocket = pocket;
+                host.user.payment = user.payment;
                 res.view('pocket', {user : host.user, host : host});
               });
             })

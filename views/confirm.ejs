@@ -129,7 +129,7 @@
               var cards = user.payment;
               for(var j=0; j < cards.length; j++){
                 var card = cards[j];
-                var last4 = card.cardNumber.slice(-4);
+                var last4 = card.last4;
             %>
             <button class="btn btn-disable btn-fat btn-lg<%if(card.isDefaultPayment){%> active<%}%>" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
             <%}%>
@@ -176,7 +176,7 @@
               var dish = dishes[i];
             %>
             <tr class="success item" data-id=<%= dish.id %> data-left-amount=<%= meal.leftQty[dish.id] %>>
-              <td><%= dish.title %></td>
+              <td><%= dish.title %><br/><span class="preference"></span> </td>
               <td class="price" value=<%= dish.price %>>$<%= dish.price %></td>
               <td>
                 <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1)">-</button>

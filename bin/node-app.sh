@@ -119,11 +119,9 @@ stop_app() {
             echo "Forcing stop anyways ..."
             remove_pid_file
             echo "$APP_NAME stopped"
-            exit 1
         fi
     else
         echo "$APP_NAME already stopped, pid file does not exist"
-        exit 1
     fi
 }
 

@@ -117,6 +117,9 @@ module.exports = {
       collection : 'Dish',
       defaultsTo : []
     },
+    customerId : {
+      type : 'string'
+    },
     isCollect : function(mealId){
       return this.collects.some(function(meal){
         return meal.id == mealId;

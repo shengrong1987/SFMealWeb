@@ -11,45 +11,11 @@ module.exports = {
     user : {
       model : 'User'
     },
-    customerId : {
+    cardId : {
       type : 'string'
     },
-    street : {
-      type : 'string',
-      required : true
-    },
-    city : {
-      type : 'string',
-      required : true
-    },
-    state : {
-      type : 'string',
-      required : true
-    },
-    postal: {
-      type : 'string',
-      required : true
-    },
-    country : {
-      type : 'string',
-      required : true,
-      defaultsTo : 'US'
-    },
-    cardholder : {
-      type : 'string',
-      required : true
-    },
-    cardNumber : {
-      type : 'string',
-      required : true
-    },
-    expMonth : {
-      type : 'string',
-      required : true
-    },
-    expYear : {
-      type : 'string',
-      required : true
+    last4 : {
+      type : 'string'
     },
     brand : {
       type : 'string'
@@ -58,16 +24,6 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     }
-  },
-
-  beforeUpdate : function(params,cb){
-    delete  params.CVV;
-    cb();
-  },
-
-  beforeCreate : function(params,cb){
-    delete  params.CVV;
-    cb();
   }
 };
 

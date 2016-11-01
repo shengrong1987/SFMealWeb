@@ -13,6 +13,8 @@ var config = {};
 config.StripeKeys = {
   publishableKey: "pk_test_ztZDHzxIInBmBRrkuEKBee8G",
   secretKey: "sk_test_SK41ektWZVeEs6dcrw32Qn4Z"
+  // publishableKey: "sk_live_MfM8kqdPNs2JvzqIy52tEuxk",
+  // secretKey: "pk_live_AUWn3rb2SLc92lXsocPCDUcw"
 };
 
 config.TwilioKeys = {

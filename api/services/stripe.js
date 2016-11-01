@@ -133,7 +133,7 @@ module.exports = {
     });
   },
 
-  payment : function(attr, cb){
+  newCustomerWithCard : function(attr, cb){
     stripe.customers.create({
       source : attr.token,
       email : attr.email
@@ -145,20 +145,53 @@ module.exports = {
     });
   },
 
-  updatePayment : function(attr, cb){
-    stripe.customers.update(attr.id,{
+  newPaymentSource : function(attr, cb){
+    stripe.customers.createSource(attr.id,{
       source : attr.token,
       email : attr.email
-    },function(err, customer){
+    },function(err, card){
       if(err){
         return cb(err);
       }
-      cb(null,customer);
+      cb(null,card);
     })
   },
 
-  deleteProfile : function(attr, cb){
-    stripe.customers.del(attr.id, function(err,confirmation){
+  updateCard : function(attr, cb){
+    stripe.customers.updateCard(attr.id, attr.cardId, attr.params, function(err, card){
+      if(err){
+        return cb(err);
+      }
+      cb(null, card);
+    });
+  },
+
+  updateDefaultSource : function(attr, cb){
+    stripe.customers.update(attr.id, {
+      default_source : attr.cardId
+    }, function(err, customer){
+      return cb(err, customer);
+    })
+  },
+
+  retrieveCard : function(attr, cb){
+    stripe.customers.retrieveCard(attr.id, attr.cardId, function(err, card){
+      return cb(err, card);
+    });
+  },
+
+  retrieveCustomer : function(attr, cb){
+    stripe.customers.retrieve(
+      attr.id, function(err, customer){
+        if(err){
+          return cb(err);
+        }
+        cb(null,customer);
+    })
+  },
+
+  deleteCard : function(attr, cb){
+    stripe.customers.deleteCard(attr.id, attr.cardId, function(err,confirmation){
       if(err){
         return cb(err);
       }

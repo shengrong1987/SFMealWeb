@@ -28,6 +28,16 @@ module.exports = {
       type : 'json',
       required : true
     },
+    /*
+      {
+        sweetness : [s1, s2],
+        icy : [i1, i2]
+      }
+     */
+    preference : {
+      type : "json",
+      defaultsTo : {}
+    },
     sold : {
       type : 'integer',
       defaultsTo : 0

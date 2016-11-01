@@ -14,7 +14,7 @@ before(function(done){
 
 describe('MealController', function() {
 
-  this.timeout(61000);
+  this.timeout(12000);
 
   describe('build a meal with dishes', function() {
 
@@ -132,6 +132,10 @@ describe('MealController', function() {
             break;
         }
       }
+      var preference = {
+        "spicy" : ["mild", "very-spicy"],
+        "meat" : ["white", "brown"]
+      }
       agent
           .post('/meal')
           .send({
@@ -146,7 +150,8 @@ describe('MealController', function() {
             cover : dish1,
             minimalOrder : 5,
             status : 'off',
-            isDelivery : false
+            isDelivery : false,
+            preference : preference
           })
           .expect(200)
           .end(function(err,res){
@@ -497,23 +502,7 @@ describe('MealController', function() {
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
         .expect(200)
-        .toPromise()
-        .delay(60000)
-        .then(function(res){
-          agent
-            .get('/job?name=MealStartJob&data.mealId=' + mealId)
-            .expect(200)
-            .then(function(res){
-              res.body.should.have.length(1);
-              done();
-            })
-            .catch(function(err){
-              done(err)
-            })
-        })
-        .catch(function(err){
-          done(err);
-        })
+        .end(done)
     })
 
     it('should search the meals in San Francisco and with a keyword of 菜式 with no results', function (done) {
@@ -556,7 +545,6 @@ describe('MealController', function() {
         })
         .expect(200)
         .toPromise()
-        .delay(60000)
         .then(function(res){
           agent
             .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
@@ -575,41 +563,27 @@ describe('MealController', function() {
         })
     })
 
-    it('should cancel the meal starting reminder and should not start a new one because start time less than 10 minutes', function(done){
-      agent
-        .get('/job?data.mealId=' + mealId)
-        .expect(200)
-        .then(function(res){
-          if(res.body.length != 0){
-            return done(Error('meal start reminding jobs count not right'));
-          }
-          done();
-        })
-        .catch(function(err){
-          done(err)
-        })
-    })
+    // it('should cancel the meal starting reminder and should not start a new one because start time less than 10 minutes', function(done){
+    //   agent
+    //     .get('/job?data.mealId=' + mealId)
+    //     .expect(200)
+    //     .then(function(res){
+    //       if(res.body.length != 0){
+    //         return done(Error('meal start reminding jobs count not right'));
+    //       }
+    //       done();
+    //     })
+    //     .catch(function(err){
+    //       done(err)
+    //     })
+    // })
 
 
     it('should turn another meal on and schedule preorder schedule end job', function (done) {
       agent
         .post('/meal/' + preorderMealId + "/on")
         .expect(200)
-        .toPromise()
-        .delay(60000)
-        .then(function(res){
-          agent
-            .get('/job?name=MealScheduleEndJob&data.mealId=' + preorderMealId)
-            .expect(200)
-            .then(function(res){
-              res.body.should.have.length(1);
-              done();
-            })
-            .catch(function(err){
-              done(err)
-            })
-        })
-        .catch(done)
+        .end(done)
     })
 
     it('should search the meals in San Francisco and with a keyword of 菜式 again', function (done) {
@@ -643,21 +617,7 @@ describe('MealController', function() {
       agent
         .post('/meal/' + preorderMealId + "/off")
         .expect(302)
-        .toPromise()
-        .delay(60000)
-        .then(function(res){
-          agent
-            .get('/job?data.mealId=' + preorderMealId)
-            .expect(200)
-            .then(function(res){
-              res.body.should.have.length(0);
-              done();
-            })
-            .catch(function(err){
-              done(err)
-            })
-        })
-        .catch(done)
+        .end(done)
     })
 
     it('should search the meals in San Francisco without just one result', function (done) {

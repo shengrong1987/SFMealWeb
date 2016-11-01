@@ -128,8 +128,83 @@
               </div>
             </div>
 
+            <div class="form-group variation">
+              <label for="dishVariationInput">7.<%= __('dish-variation') %></label>
+              <div class="currentVar">
+                <% var variations = Object.keys(dish.preference).forEach(function(variation){ var props = dish.preference[variation]; %>
+                <div class="row option" data-value="<%= variation%>">
+                  <div class="col-xs-3">
+                    <h3><%= __(variation)%></h3>
+                    <a class="deleteBtn" href="javascript:void(0);" data-value=<%= variation%>><%= __('delete')%></a>
+                  </div>
+                  <div class="col-xs-9">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr class="active">
+                          <td><%= __('property')%></td>
+                          <td><%= __('price')%></td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <div class="dropdown">
+                              <a class="btn btn-default btn-outline dropdown-toggle property" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="">
+                                <span data-toggle="i18n" data-key="addVariation"></span>
+                                <span class="caret"></span>
+                              </a>
+                              <ul class="dropdown-menu" aria-labelledby="dLabel">
+                                <%
+                                  var varSets = {
+                                    "spicy" : ['mild', 'littleSpicy','regularSpicy','verySpicy','insaneSpicy'],
+                                    "sweetness" : ['noSugar','halfSugar','regularSugar','extraSugar'],
+                                    "icy" : ['noIce', 'halfIce', 'regularIce', 'extraIce'],
+                                    "ingredient" : [],
+                                    "wellness" : ['rare','mediumRare','medium','mediumWell', 'wellDone']
+                                  }
+                                  if(varSets[variation] && varSets[variation].length > 0 ) { varSets[variation].forEach(function (option) { %>
+                                    <li><a href="javascript:void(0);" data-toggle="i18n" data-key="<%= option%>" value="<%= option%>"></a></li>
+                                <%});} %>
+                                <li class="disabled"><a><%= __('noOption')%></a></li>
+                                <li><a href="javascript:void(0);" value="custom"><%= __('customizedOption')%></a></li>
+                              </ul>
+                            </div>
+                          </td>
+                          <td>
+                            <% props.forEach(function(property){ %>
+                              <tr class="customProperty">
+                                <td><%= property%><i class="fa fa-close reset cursor-pointer" data-value="<%= property%>" style="float: right;" href="javascript:void(0)"></i></td>
+                                <td></td>
+                              </tr>
+                            <% });%>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <% })%>
+              </div>
+              <div class="dropdown">
+                <a id="dishVariationInput" class="btn btn-default btn-outline dropdown-toggle" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="">
+                  <span><%= __('add-variation')%></span>
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dLabel">
+                  <li><a href="javascript:void(0);" value="spicy"><%= __('spicy') %></a></li>
+                  <li><a href="javascript:void(0);" value="sweetness"><%= __('sweetness') %></a></li>
+                  <li><a href="javascript:void(0);" value="icy"><%= __('icy') %></a></li>
+                  <li><a href="javascript:void(0);" value="ingredient"><%= __('ingredient') %></a></li>
+                  <li><a href="javascript:void(0);" value="wellness"><%= __('wellness') %></a></li>
+                  <li class="disabled"><a><%= __('cant-find-option')%></a></li>
+                  <li><a href="javascript:void(0);" value="custom"><%= __('add-custom-option')%></a></li>
+                </ul>
+              </div>
+              <div class="customVar"></div>
+            </div>
+
             <div class="form-group">
-              <label for="instagramInput">7.<%= __('dish-instagram') %></label>
+              <label for="instagramInput">8.<%= __('dish-instagram') %></label>
               <input type="text" id="instagramInput" class="form-control" value="<%= dish.video || ''%>">
             </div>
 
@@ -150,5 +225,5 @@
 </div>
 
 <script>
-  new DishView({ el : $("#dishEditView"), model : new Dish()})
+  var dishView = new DishView({ el : $("#dishEditView"), model : new Dish()})
 </script>

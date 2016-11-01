@@ -21,7 +21,7 @@
       var list = order.orders;
       order.dishes.forEach(function(dish){
         var dishId = dish.id;
-        var number = list[dishId];
+        var number = list[dishId].number;
       %>
       <tr class="success item" data-id=<%= dish.id%> data-left-amount=<%= order.meal.leftQty[dish.id] %>>
         <td colspan="3"><%= dish.title%></td>

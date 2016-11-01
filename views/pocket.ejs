@@ -161,7 +161,7 @@
             var cards = user.payment;
             for(var j=0; j < cards.length; j++){
               var card = cards[j];
-              var last4 = card.cardNumber.slice(-4);
+              var last4 = card.last4;
             if(card.isDefaultPayment){
             %>
             <button class="btn btn-disable blue btn-fat btn-lg active" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/<%= card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>

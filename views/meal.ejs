@@ -114,7 +114,6 @@
                       <label>
                         <input type="checkbox">
                         <small class="font-small">
-                          <!--<span class="text-black"><% __('self-pickup')%> </span>-->
                           <b><%= __('location') + count %>:</b> <%= pickupMethod.location || 'N/A'%>，<br/><br/>
                           <b><%= __('time')%></b> <span data-toggle="time-span" data-format="date" data-from="<%= pickupMethod.pickupFromTime%>" data-to="<%= pickupMethod.pickupTillTime%>"></span><br/><br/>
                           <b><%= __('pickup-method')%>: <%= pickupMethod.method == 'delivery' ? __('delivery') : __('self-pickup') %></b>
@@ -210,6 +209,24 @@
                   </div>
 
                   <div class="col-sm-4" style="padding-top: 25px;">
+                    <% if(dish.preference){%>
+                    <a class="btn btn-default btn-outline dropdown-toggle" type="button" data-toggle="dropdown" data-submenu aria-haspopup="true" aria-expanded="true" value="">
+                      <span><%= __('addVariation')%></span>
+                      <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu text-center" aria-labelledby="dLabel">
+                      <% Object.keys(dish.preference).forEach(function(key){%>
+                        <li class="dropdown-submenu variation">
+                          <a tabindex="0" data-submenu data-dish=<%= dish.id%> data-variation=<%= key%> data-selected="true"><%= __(key)%></a>
+                          <ul class="dropdown-menu">
+                            <% var properties = dish.preference[key]; properties.forEach(function(prop){%>
+                              <li tabindex="0"><a value=<%= prop%> href="javascript:void(0);"><%= prop%></a></li>
+                            <%});%>
+                          </ul>
+                        </li>
+                      <%});%>
+                    </ul>
+                    <% } %>
                     <button class="btn btn-red round take-order" data-toggle="i18n" data-key="orderOne" onclick="javascript:orderFood('<%= dish.id %>',1)"><%= __('order-one')%></button>
                     <button class="btn btn-red round untake-order" onclick="javascript:orderFood('<%= dish.id %>',-1)" style="width: 50px;display: none;">-</button>
                     <div class="getsocial gs-reaction-button" style="margin-top: 25px;"></div>
@@ -310,7 +327,7 @@
                 var dish = dishes[i];
             %>
             <tr class="success item" data-id=<%= dish.id %> data-left-amount=<%= meal.leftQty[dish.id] %>>
-              <td><%= dish.title %></td>
+              <td><%= dish.title %><br/><span class="preference"></span> </td>
               <td class="price" value=<%= dish.price %>>$<%= dish.price %></td>
               <td>
                 <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1)">-</button>

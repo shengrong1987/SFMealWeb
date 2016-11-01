@@ -83,7 +83,8 @@
                           var dishes = host.host_dishes;
                           var index = -1;
                           list.forEach(function(key){
-                            var number = order.orders[key];
+                            var number = order.orders[key].number;
+                            var preference = order.orders[key].preference;
                             dishes.forEach(function(dish){
                               if(dish.id == key){
                                 index++;
@@ -93,14 +94,14 @@
                           <td><%= dish.title%></td>
                           <td>$<%= dish.price.toFixed(2)%></td>
                           <td><% if(order.status=="adjust"){
-                              var adjustingNumber = order.adjusting_orders[key];
+                              var adjustingNumber = order.adjusting_orders[key].number;
                               if(adjustingNumber != number){%>
                             <%= number%> to <strong><%= adjustingNumber%></strong>
                             <%}else{%>
                             <%= number%>
                             <%}}else{%>
                             <%= number%>
-                            <%}%></td>
+                            <%}%><br/><span class="preference"><%= preference || ''%></span></td>
                           <%if(index==0){%>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -170,7 +171,8 @@
                         var dishes = host.host_dishes;
                         var index = -1;
                           list.forEach(function(key){
-                          var number = order.orders[key];
+                          var number = order.orders[key].number;
+                          var preference = order.orders[key].preference;
                           dishes.forEach(function(dish){
                             if(dish.id == key){
                             index++;
@@ -180,14 +182,15 @@
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><% if(order.status=="adjust"){
-                            var adjustingNumber = order.adjusting_orders[key];
+                            var adjustingNumber = order.adjusting_orders[key].number
+                              ;
                           if(adjustingNumber != number){%>
                           <%= number%> to <strong><%= adjustingNumber%></strong>
                           <%}else{%>
                           <%= number%>
                           <%}}else{%>
                           <%= number%>
-                          <%}%></td>
+                          <%}%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -236,7 +239,8 @@
                         var dishes = host.host_dishes;
                         var index = -1;
                           list.forEach(function(key){
-                            var number = order.orders[key];
+                            var number = order.orders[key].number;
+                            var preference = order.orders[key].preference;
                             dishes.forEach(function(dish){
                             if(dish.id == key){
                               index++;
@@ -245,7 +249,7 @@
                         <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
-                        <td><%= number%></td>
+                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -294,7 +298,8 @@
                         var dishes = host.host_dishes;
                         var index = -1;
                           list.forEach(function(key){
-                        var number = order.orders[key];
+                          var number = order.orders[key].number;
+                          var preference = order.orders[key].preference;
                           dishes.forEach(function(dish){
                       if(dish.id == key){
                         index++;
@@ -303,7 +308,7 @@
                         <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
-                        <td><%= number%></td>
+                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -352,7 +357,8 @@
                         var dishes = host.host_dishes;
                         var index = -1;
                           list.forEach(function(key){
-                            var number = order.orders[key];
+                            var number = order.orders[key].number;
+                            var preference = order.orders[key].preference;
                             dishes.forEach(function(dish){
                             if(dish.id == key){
                               index++;
@@ -361,7 +367,7 @@
                         <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
-                        <td><%= number%></td>
+                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -421,7 +427,7 @@
                         <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
-                        <td><%= number%></td>
+                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -471,7 +477,8 @@
                         var dishes = host.host_dishes;
                         var index = -1;
                           list.forEach(function(key){
-                            var number = order.orders[key];
+                            var number = order.orders[key].number;
+                            var preference = order.orders[key].preference;
                             dishes.forEach(function(dish){
                               if(dish.id == key){
                                 index++;
@@ -480,7 +487,7 @@
                         <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
-                        <td><%= number%></td>
+                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -541,7 +548,8 @@
                         var dishes = host.host_dishes;
                         var index = -1;
                           list.forEach(function(key){
-                        var number = order.orders[key];
+                          var number = order.orders[key].number;
+                          var preference = order.orders[key].preference;
                           dishes.forEach(function(dish){
                       if(dish.id == key){
                         index++;
@@ -551,14 +559,14 @@
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><% if(order.status=="adjust"){
-                            var adjustingNumber = order.adjusting_orders[key];
+                            var adjustingNumber = order.adjusting_orders[key].number;
                           if(adjustingNumber != number){%>
                           <%= number%> to <strong><%= adjustingNumber%></strong>
                           <%}else{%>
                           <%= number%>
                           <%}}else{%>
                           <%= number%>
-                          <%}%></td>
+                          <%}%><br/><span class="preference"><%= preference || ""%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -627,7 +635,8 @@
                         var dishes = host.host_dishes;
                         var index = -1;
                           list.forEach(function(key){
-                        var number = order.orders[key];
+                          var number = order.orders[key].number;
+                          var preference = order.orders[key].preference;
                           dishes.forEach(function(dish){
                       if(dish.id == key){
                         index++;
@@ -637,14 +646,14 @@
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><% if(order.status=="adjust"){
-                            var adjustingNumber = order.adjusting_orders[key];
+                            var adjustingNumber = order.adjusting_orders[key].number;
                           if(adjustingNumber != number){%>
                           <%= number%> to <strong><%= adjustingNumber%></strong>
                           <%}else{%>
                           <%= number%>
                           <%}}else{%>
                           <%= number%>
-                          <%}%></td>
+                          <%}%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -693,7 +702,8 @@
                         var dishes = host.host_dishes;
                         var index = -1;
                           list.forEach(function(key){
-                        var number = order.orders[key];
+                          var number = order.orders[key].number;
+                          var preference = order.orders[key].preference;
                           dishes.forEach(function(dish){
                       if(dish.id == key){
                         index++;
@@ -702,7 +712,7 @@
                         <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
-                        <td><%= number%></td>
+                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -749,7 +759,8 @@
                         var dishes = host.host_dishes;
                         var index = -1;
                           list.forEach(function(key){
-                        var number = order.orders[key];
+                          var number = order.orders[key].number;
+                          var preference = order.orders[key].preference;
                           dishes.forEach(function(dish){
                       if(dish.id == key){
                         index++;
@@ -758,7 +769,7 @@
                         <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
-                        <td><%= number%></td>
+                        <td><%= number%><br/><span class="preference"><%= preference || ""%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -807,7 +818,8 @@
                         var dishes = host.host_dishes;
                         var index = -1;
                           list.forEach(function(key){
-                        var number = order.orders[key];
+                          var number = order.orders[key].number;
+                          var preference = order.orders[key].preference;
                           dishes.forEach(function(dish){
                       if(dish.id == key){
                         index++;
@@ -816,7 +828,7 @@
                         <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
-                        <td><%= number%></td>
+                        <td><%= number%><br/><span class="preference"><%= preference || ""%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -867,7 +879,8 @@
                         var dishes = host.host_dishes;
                         var index = -1;
                           list.forEach(function(key){
-                        var number = order.orders[key];
+                          var number = order.orders[key].number;
+                          var preference = order.orders[key].preference;
                           dishes.forEach(function(dish){
                       if(dish.id == key){
                         index++;
@@ -876,7 +889,7 @@
                         <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
-                        <td><%= number%></td>
+                        <td><%= number%><br/><span class="preference"><%= preference || ""%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
@@ -926,7 +939,8 @@
                         var dishes = host.host_dishes;
                         var index = -1;
                           list.forEach(function(key){
-                        var number = order.orders[key];
+                          var number = order.orders[key].number;
+                          var preference = order.orders[key].preference;
                           dishes.forEach(function(dish){
                       if(dish.id == key){
                         index++;
@@ -935,7 +949,7 @@
                         <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
-                        <td><%= number%></td>
+                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>

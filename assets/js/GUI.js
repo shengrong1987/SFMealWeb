@@ -49,8 +49,12 @@ function dismissModal(cb){
 }
 
 function reloadUrl(url, tag){
+  var hash = location.hash;
   if(location.href.indexOf(url)==-1){
     location.href = url + tag;
+  }else if(tag != hash){
+    location.href = url + tag;
+    location.reload();
   }else{
     location.reload();
   }
@@ -199,11 +203,17 @@ function loadOrder(fromCahce){
   $("#order .item").each(function(){
     var dishId = $(this).data("id");
     if(fromCahce){
-      localOrders[dishId] = parseInt(readCookie(dishId)) || 0;
-      $(this).data("left-amount",$(this).data("left-amount") - localOrders[dishId]);
+      var localDish = readCookie(dishId);
+      if(localDish){
+        localDish = JSON.parse(localDish);
+      }else{
+        localDish = {number : 0, preference : ""};
+      }
+      localOrders[dishId] = localDish;
+      $(this).data("left-amount",$(this).data("left-amount") - localOrders[dishId].number);
       refreshOrder(dishId);
     }else{
-      localOrders[dishId] = $(this).find(".amount").data("value");
+      localOrders[dishId] = { number : $(this).find(".amount").data("value")};
     }
   });
   refreshMenu();
@@ -215,25 +225,25 @@ function orderFood(id,number){
   var alertView = $($("#order").data("err-container"));
   alertView.removeClass("hide");
   alertView.hide();
-  localOrders[id] = localOrders[id]?localOrders[id]:0;
-  localOrders[id] += number;
+  localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : ''};
+  localOrders[id].number += number;
   if(number < 0){
-    if(localOrders[id]<0){
-      localOrders[id]=0;
+    if(localOrders[id].number<0){
+      localOrders[id].number = 0;
       return;
     }
     item.data("left-amount", item.data("left-amount") + 1);
   }else{
     var left = item.data("left-amount");
     if(left<=0 && number > 0){
-      localOrders[id] -= number;
+      localOrders[id].number -= number;
       alertView.show();
       return;
     }
     left -= number;
     item.data("left-amount",left);
   }
-  createCookie(id,localOrders[id],1);
+  createCookie(id,JSON.stringify(localOrders[id]),1);
   refreshOrder(id);
   refreshMenu();
 }
@@ -241,7 +251,7 @@ function orderFood(id,number){
 //render menu view
 var refreshMenu = function(){
   for(var key in localOrders){
-    if(localOrders[key]==0){
+    if(localOrders[key].number==0){
       $("#meal-detail-container .dish[data-id=" + key + "]").find(".untake-order").hide('slow');
     }else{
       $("#meal-detail-container .dish[data-id=" + key + "]").find(".untake-order").show('slow');
@@ -275,7 +285,8 @@ var refreshMenu = function(){
 function refreshOrder(id){
   var item = $("#order .item[data-id=" + id + "]");
   var left = item.data("left-amount");
-  item.find(".amount").html(localOrders[id]);
+  item.find(".amount").html(localOrders[id].number);
+  item.find(".preference").html(localOrders[id].preference);
   $("#meal-detail-container .dish[data-id=" + id + "]").find(".left-amount span").attr("value",left);
   $("#meal-detail-container .dish[data-id=" + id + "]").find(".left-amount span").html(left);
 }
@@ -287,7 +298,7 @@ function tapController(){
   }
 }
 
-function selectorSetup(){
+function setupDishSelector(){
   $("#myinfo .dishes a").each(function(){
     if($(this).data("toggle")=="dropdown"){
       $(this).next().find("li").click(function(){
@@ -335,8 +346,28 @@ function adjustLayout(){
   }
 }
 
-function tooltipSetup(){
+function setupTooltip(){
   $('[data-toggle="tooltip"]').tooltip();
+}
+
+function setupDropdownMenu(){
+  $('[data-toggle="dropdown"][data-selected="true"]').next().find("li a").off("click");
+  $('[data-toggle="dropdown"][data-selected="true"]').next().find("li a").click(function(e){
+    //e.preventDefault();
+    if($(this).attr('disabled')){
+      return;
+    }
+    var text = $(this).text();
+    var value = $(this).attr("value");
+    var parent = $(this).closest('.dropdown-menu').prev();
+    var previousValue = parent.attr('value');
+    if(!value){
+      return;
+    }
+    parent.html(text + "&nbsp;<span class='caret'></span>");
+    parent.attr("value",value);
+    parent.trigger("change");
+  });
 }
 
 function setup(){
@@ -345,11 +376,63 @@ function setup(){
   stepContainer();
   getCountyInfo();
   loadOrder(true);
-  tooltipSetup();
-  //setup mutual exclusive selectors(etc. signature dish select)
-  selectorSetup();
+  setupTooltip();
+  setupMixin();
+  setupDishSelector();
   adjustLayout();
+  setupDropdownMenu();
+  setupSubmenu();
+  setupLightBox();
+  setupPopover();
+  setupValidator();
+  setupCountrySelector();
+  setupSelector();
+  $('.lazyload').each(function(){
+    $(this).attr('src', $(this).data('src'));
+  });
+  $('body').on('touchstart.dropdown', '.dropdown-menu', function (e) { e.stopPropagation(); });
+}
+
+function setupSelector(){
+  $('[data-toggle="select"]').on('change', function(e){
+    e.preventDefault();
+    var val = $(this).find("option:selected").attr('value');
+    $(this).attr('value', val);
+  });
+}
+
+function setupSubmenu(){
+  $('[data-submenu]').submenupicker();
+  $('[data-submenu][data-selected="true"]').next().find("li a").on("click", function(e){
+    if($(this).attr('disabled')){
+      return;
+    }
+    var text = $(this).text();
+    var value = $(this).attr("value");
+    var parent = $(this).closest('.dropdown-menu').prev();
+    var previousValue = parent.attr('value');
+    if(value){
+      parent.attr("value",value);
+      parent.html(text);
+    }
+    parent.trigger("change");
+  })
+}
+
+function setupPopover(){
   $('[data-toggle="popover"]').popover();
+}
+
+function setupMixin() {
+  $('#meal-container').mixItUp({
+    pagination: {
+      limit: 8,
+      pagerClass : 'btn btn-mixitup'
+    }
+  });
+}
+
+function setupLightBox(){
   $(document).delegate('*[data-toggle="lightbox"]', 'click', function(event) {
     event.preventDefault();
     $(this).ekkoLightbox({
@@ -357,6 +440,9 @@ function setup(){
       right_arrow_class : ".glyphicon-chevron-right .fa .fa-arrow-right"
     });
   });
+}
+
+function setupValidator(){
   $('[data-toggle="validator"]').validator({
     feedback : {
       success: "fa fa-check",
@@ -379,16 +465,15 @@ function setup(){
     }
   });
   $("input[type='tel']").inputmask({"mask": "(999) 999-9999"});
-  $('#meal-container').mixItUp({
-    pagination: {
-      limit: 8,
-      pagerClass : 'btn btn-mixitup'
-    }
+}
+
+function setupCountrySelector(){
+  $('.flagstrap').flagStrap({
+    onSelect : function(value, ele){
+      $('.flagstrap').data('selected-country', value);
+    },
+    buttonType : 'btn-info'
   });
-  $('.lazyload').each(function(){
-    $(this).attr('src', $(this).data('src'));
-  });
-  $('body').on('touchstart.dropdown', '.dropdown-menu', function (e) { e.stopPropagation(); });
 }
 
 function setupLanguage(){

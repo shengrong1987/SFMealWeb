@@ -38,8 +38,7 @@ module.exports = {
 
   feature : function(req, res){
     var now = new Date();
-    var county = req.cookies['county'];
-    county = county || "San Francisco County";
+    var county = req.cookies['county'] || "San Francisco County";
     Meal.find({county : county, type : 'order', status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
       if(err){
         return res.badRequest(err);
@@ -123,10 +122,19 @@ module.exports = {
   search : function(req, res){
     var keyword = req.param('keyword');
     var zipcode = req.param('zipcode');
-    var county = req.param('county');
+    var county = req.param('county') || req.cookies['county'];
+    var type = req.param('type');
     var now = new Date();
-    Meal.find({ county : county,status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}
-    }).populate('dishes').populate('chef').exec(function(err,found){
+    var params = {
+      status : 'on',
+      provideFromTime : {'<' : now},
+      provideTillTime : {'>' : now},
+      county : county
+    }
+    if(type){
+      params.type = type;
+    }
+    Meal.find(params).populate('dishes').populate('chef').exec(function(err,found){
       if(err){
         return res.badRequest(err);
       }

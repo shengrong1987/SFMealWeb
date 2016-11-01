@@ -39,6 +39,10 @@ input:hover{
 input:focus{
   border: solid 1px @orange !important;
 }
+
+.inline-block{
+  display: inline-block;
+}
 //tooltip
 .tooltip-inner {
   text-align: left;
@@ -833,6 +837,16 @@ fieldset[disabled] .btn-red.active {
   border-radius: 5px;
 }
 
+/* dropdown menu*/
+.dropdown-menu > .disabled{
+  cursor: not-allowed;
+}
+
+/* The real magic ;) */
+.dropdown-menu > .disabled > a{
+  pointer-events: none;
+}
+
 /*nav*/
 
 .nav-email{
@@ -1193,6 +1207,12 @@ fieldset[disabled] .btn-red.active {
   min-height: 550px;
 }
 
+.container-elegant{
+  h1, h2, h3, h4, h5, p{
+    font-weight: normal;
+  }
+}
+
 .base_container{
   min-height: 650px;
 }
@@ -1332,7 +1352,6 @@ fieldset[disabled] .btn-red.active {
 /*container*/
 .round-container{
   border-radius: 10px;
-  overflow: hidden;
   border: solid 1px lightgray;
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
   box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
@@ -1356,7 +1375,6 @@ fieldset[disabled] .btn-red.active {
 
 .box {
   border-radius: 6px;
-  overflow: hidden;
   margin: auto;
   padding: 20px;
 }
@@ -1396,7 +1414,6 @@ fieldset[disabled] .btn-red.active {
 .box-primary{
   padding: 50px;
   border-radius: 10px;
-  overflow: hidden;
 }
 
 .box-email{
@@ -1486,6 +1503,7 @@ fieldset[disabled] .btn-red.active {
   position: fixed;
   padding-right: 15px;
   padding-left: 15px;
+  width: 30%;
 }
 
 .static-floater{
@@ -1564,6 +1582,12 @@ fieldset[disabled] .btn-red.active {
   #our-story .context{
     padding: 50px 25px 50px 75px;
   }
+
+  .floater{
+    position: static !important;
+    width:100%;
+    margin-top: 10px;
+  }
 }
 
 
@@ -1601,12 +1625,6 @@ fieldset[disabled] .btn-red.active {
   }
   .gs-reactions{
     text-align: center !important;
-  }
-
-  .floater{
-    position: static !important;
-    width:100%;
-    margin-top: 10px;
   }
 
   .popup {

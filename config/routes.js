@@ -80,7 +80,8 @@ module.exports.routes = {
   '/email/summary' : { view : 'emailTemplates/summary/html'},
   '/notification/msg' : 'NotificationController.sendMessage',
   '/job/:name/run' : 'JobController.run',
-  '/help' : { view : 'help'}
+  '/help' : { view : 'help'},
+  '/trust' : { view : 'trust'}
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

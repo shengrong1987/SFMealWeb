@@ -33,44 +33,83 @@
 
 
 -->
-<html>
+<html xmlns="http://www.w3.org/1999/html">
   <head>
     <title>Page Not Found</title>
     <!--<link href='http://sailsjs.org/styles/fonts.css' rel='stylesheet'/>-->
-    <style>
-      /* Styles included inline since you'll probably be deleting this page anyway */
-      html,body{text-align:left;font-size:1em}html,body,img,form,textarea,input,fieldset,div,p,div,ul,li,ol,dl,dt,dd,h1,h2,h3,h4,h5,h6,pre,code{margin:0;padding:0}ul,li{list-style:none}img{display:block}a img{border:0}a{text-decoration:none;font-weight:normal;font-family:inherit}*:active,*:focus{outline:0;-moz-outline-style:none}h1,h2,h3,h4,h5,h6,h7{font-weight:normal;font-size:1em}.clearfix:after{clear:both;content:".";display:block;font-size:0;height:0;line-height:0;visibility:hidden}.fourohfour .ocean{background:url('http://sailsjs.com/images/waves.png') #0c8da0 no-repeat center 0;height:315px}.fourohfour .ocean img{margin-right:auto;margin-left:auto}.fourohfour .waves{display:block;padding-top:25px;margin-right:auto;margin-left:auto}.fourohfour .main{display:block;margin-top:90px}.fourohfour .logo{width:150px;margin-top:3.5em;margin-left:auto;margin-right:auto}.fourohfour .fishy{display:block;padding-top:27px}.fourohfour .help{padding-top:2em}.fourohfour h1{font-family:"Open Sans","Myriad Pro",Arial,sans-serif;font-weight:bold;font-size:1.7em;color:#001c20;text-align:center}.fourohfour h2{font-family:"Open Sans","Myriad Pro",Arial,sans-serif;font-weight:300;font-size:1.5em;color:#001c20;text-align:center}.fourohfour p{font-family:"Open Sans","Myriad Pro",Arial,sans-serif;font-size:1.25em;color:#001c20;text-align:center}.fourohfour a{color:#118798}.fourohfour a:hover{color:#b1eef7}
-    </style>
   </head>
   <body>
+    <div class="default-container">
+      <div class="fourohfour text-center">
+        <div class="main">
+          <h1>
+            <%= __('pageNotFoundError')%><br/>
+            <small><%= __('pageNotFoundSubtitle')%></small>
+          </h1>
+          <div class="row vertical-align">
+            <div class="col-xs-5">
+              <div class="divider"></div>
+            </div>
+            <div class="col-xs-2">
+              <%= __('today-special')%>
+            </div>
+            <div class="col-xs-5">
+              <div class="divider"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="box-email white">
+                <img class="cursor-pointer" src="/images/404_1.jpg" style="width: 100%;" onclick="javascript:location.href='/meal/search?keyword=appetizer&type=order'">
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="box-email white">
+                <img class="cursor-pointer" src="/images/404_2.jpg" style="width: 100%;" onclick="javascript:location.href='/meal/search?keyword=entree&type=order'">
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="box-email white">
+                <img class="cursor-pointer" src="/images/404_3.jpg" style="width: 100%;" onclick="javascript:location.href='/meal/search?keyword=dessert&type=order'">
+              </div>
+            </div>
+          </div>
+          <div class="row vertical-align">
+            <div class="col-xs-5">
+              <div class="divider"></div>
+            </div>
+            <div class="col-xs-2">
+              <%= __('next-week-preorder')%>
+            </div>
+            <div class="col-xs-5">
+              <div class="divider"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="box-email white">
+                <img class="cursor-pointer" src="/images/404_4.jpg" style="width: 100%;" onclick="javascript:location.href='/meal/search?keyword=appetizer&type=preorder'">
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="box-email white">
+                <img class="cursor-pointer" src="/images/404_5.jpg" style="width: 100%;" onclick="javascript:location.href='/meal/search?keyword=entree&type=preorder'">
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="box-email white">
+                <img class="cursor-pointer" src="/images/404_6.jpg" style="width: 100%;" onclick="javascript:location.href='/meal/search?keyword=dessert&type=preorder'">
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <div class="fourohfour">
-      <div class="ocean">
-        <img class="fishy" src="http://sailsjs.org/images/fishy4.png">
-      </div>
-
-      <div class="main">
-        <h1>
-          Something's fishy here.
-        </h1>
-        <h2>
-        	<% if (typeof error!== 'undefined') { %>
-          <%= error %>
-          <% } else { var keywords = ['土豆','白菜猪肉饺子','姜撞奶','韭菜盒子','猪手','担担面','扬州炒饭']; var draft = Math.floor(Math.random() * keywords.length);%>
-          <%= __('404Error')%><a href="/meal/search?keyword=<%= keywords[draft]%>">'<%= keywords[draft]%>'</a><%= __('404Error2')%>
-          <% } %>
-        </h2>
-        <p class="help">
-          <a href="http://en.wikipedia.org/wiki/HTTP_404">Why</a> might this be happening?
-        </p>
-      </div>
-
-      <div class="box-compact text-center">
-        <btn class="grey btn-outline cursor-pointer" style="display: inline-block;padding: 5px;" onclick="javascript:location.href='/'">
-          <div class="logo-simple"></div>
-        </btn>
+        <div class="box-compact text-center">
+          <btn class="grey btn-outline cursor-pointer" style="display: inline-block;padding: 5px;" onclick="javascript:location.href='/'">
+            <div class="logo-simple"></div>
+          </btn>
+        </div>
       </div>
     </div>
-
   </body>
 </html>

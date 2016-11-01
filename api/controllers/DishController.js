@@ -50,7 +50,7 @@ module.exports = {
         })){
         return res.badRequest({ code : -2, text : req.__("meal-active-update-dish")});
       }
-      Dish.update(dishId, req.params).exec(function(err, dish){
+      Dish.update(dishId, req.body).exec(function(err, dish){
         if(err){
           return res.badRequest(err);
         }

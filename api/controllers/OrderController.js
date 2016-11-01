@@ -50,8 +50,8 @@ module.exports = {
     var validDish = false;
 
     async.each(Object.keys(orders), function(dishId, next){
-      var qty = parseInt(orders[dishId]);
-      var lastQty = lastOrders ? parseInt(lastOrders[dishId]) : 0;
+      var qty = parseInt(orders[dishId].number);
+      var lastQty = lastOrders ? parseInt(lastOrders[dishId].number) : 0;
       if(qty > 0 || lastQty > 0){
         async.each(meal.dishes, function(dish, next2){
           if(dish.id == dishId){
@@ -79,6 +79,7 @@ module.exports = {
       sails.log.debug("dish is valid and enough, checking total price...");
 
       if(actual_subtotal.toFixed(2) != subtotal) {
+        sails.log.debug("subtotal supposed to be " + actual_subtotal.toFixed(2) + ", but get " + subtotal)
         return cb({responseText : req.__('order-total-not-match'), code : -3});
       }
       return cb(null);
@@ -109,7 +110,7 @@ module.exports = {
   updateMealLeftQty : function(meal, lastorder, order, cb){
     var leftQty = meal.leftQty;
     Object.keys(lastorder).forEach(function(dishId){
-      var diff = lastorder[dishId] - order[dishId];
+      var diff = lastorder[dishId].number - order[dishId].number;
       leftQty[dishId] += diff;
     });
     meal.leftQty = leftQty;
@@ -249,7 +250,7 @@ module.exports = {
 
                   for (var i = 0; i < m.dishes.length; i++) {
                     var dishId = m.dishes[i].id;
-                    var quantity = parseInt(orders[dishId]);
+                    var quantity = parseInt(orders[dishId].number);
                     m.leftQty[dishId] -= quantity;
                   }
                   order.transfers = {};
@@ -572,7 +573,7 @@ module.exports = {
               }
               var curOrder = extend({}, order.orders);
               Object.keys(curOrder).forEach(function (dishId) {
-                curOrder[dishId] = 0;
+                curOrder[dishId] = { number : 0};
               });
               $this.updateMealLeftQty(order.meal, order.orders, curOrder, function(err, m) {
                 if (err) {
@@ -809,7 +810,7 @@ module.exports = {
               }
               var curOrder = extend({}, order.orders);
               Object.keys(curOrder).forEach(function (dishId) {
-                curOrder[dishId] = 0;
+                curOrder[dishId] = { number : 0};
               });
               $this.updateMealLeftQty(order.meal, order.orders, curOrder, function (err, m) {
                 if (err) {
@@ -912,7 +913,7 @@ module.exports = {
       }
       order.status = "review";
       order.reviewing_orders = Object.keys(order.orders).filter(function(orderId){
-        return order.orders[orderId] > 0;
+        return order.orders[orderId].number > 0;
       });
       order.save(function(err,result){
         if(err){

@@ -186,7 +186,7 @@ var UserBarView = Backbone.View.extend({
   events : {
     "click #applyToHostBtn" : "applyForHost",
     "mouseover #msgBtn" : "clearMsgBadges",
-    "click.after #citySelector [data-toggle='dropdown']" : "switchCounty"
+    "change #citySelector [data-toggle='dropdown']" : "switchCounty"
   },
   initialize : function(){
     var userId = this.$el.data("user");
@@ -607,55 +607,50 @@ var PaymentView = Backbone.View.extend({
     e.preventDefault();
 
     if (!Stripe.card.validateCVC(this.$el.find("#cvv").val())) {
-      this.$el.find("#cvv").find(".help-block.with-errors").html($("#cvv").data("error"));
+      this.$el.find("#cvv").next().html($("#cvv").data("error"));
       return;
     }
+
     var $this = this;
-    Stripe.card.createToken({
-      number: this.$el.find("input[name='cardNumber']").val(),
-      cvc: this.$el.find("#cvv").val(),
-      exp_month: this.$el.find("select[name='month']").val(),
-      exp_year: this.$el.find("select[name='year']").val(),
-      name: this.$el.find("input[name='cardholdername']").val(),
-      address_line1: this.$el.find("input[name='street']").val(),
-      address_city: this.$el.find("input[name='city']").val(),
-      address_zip: this.$el.find("input[name='postal']").val(),
-      address_state: this.$el.find("input[name='state']").val(),
-      address_country: this.$el.find("input[name='country']").val()
-    }, function(status, response){
-      if (response.error) {
-        $this.alertView.html(response.error.message);
-        $this.alertView.show();
-      } else {
-        var form = $this.$el.find("form");
-        var token = response['id'];
-        var brandInput = form.find("input[name='brand']");
-        var brand = response['card']['brand'];
-        switch (brand) {
-          case "MasterCard":
-            brand = "master";
-            break;
-          case "American Express":
-            brand = "AE";
-            break;
-          case "Diners Club":
-            brand = "DC"
-            break;
-        }
-        if (brandInput.length == 0) {
-          form.append("<input type='hidden' name='brand' value='" + brand + "' />");
+    var paymentId = this.$el.find("form").data("id");
+    if(paymentId){
+      this.updatePaymentProfile();
+    }else{
+      Stripe.card.createToken({
+        number: this.$el.find("input[name='cardNumber']").val(),
+        cvc: this.$el.find("#cvv").val(),
+        exp_month: this.$el.find("select[name='month']").attr('value'),
+        exp_year: this.$el.find("select[name='year']").attr('value'),
+        name: this.$el.find("input[name='cardholdername']").val(),
+        address_line1: this.$el.find("input[name='street']").val(),
+        address_city: this.$el.find("input[name='city']").val(),
+        address_zip: this.$el.find("input[name='zip']").val(),
+        address_state: this.$el.find("input[name='state']").val(),
+        address_country: this.$el.find(".flagstrap").data('selected-country')
+      }, function(status, response){
+        if (response.error) {
+          $this.alertView.html(response.error.message);
+          $this.alertView.show();
         } else {
-          brandInput.attr("value", brand);
+          var form = $this.$el.find("form");
+          var token = response['id'];
+          var brandInput = form.find("input[name='brand']");
+          var brand = response['card']['brand'];
+          if (brandInput.length == 0) {
+            form.append("<input type='hidden' name='brand' value='" + brand + "' />");
+          } else {
+            brandInput.attr("value", brand);
+          }
+          var stripeTokenInput = form.find("input[name='stripeToken']");
+          if (stripeTokenInput.length == 0) {
+            form.append("<input type='hidden' name='stripeToken' value='" + token + "' />");
+          } else {
+            stripeTokenInput.attr("value", token);
+          }
+          $this.createPaymentProfile();
         }
-        var stripeTokenInput = form.find("input[name='stripeToken']");
-        if (stripeTokenInput.length == 0) {
-          form.append("<input type='hidden' name='stripeToken' value='" + token + "' />");
-        } else {
-          stripeTokenInput.attr("value", token);
-        }
-        $this.createOrUpdatePaymentProfile();
-      }
-    });
+      });
+    }
   },
 
   deleteProfile : function(e){
@@ -663,7 +658,7 @@ var PaymentView = Backbone.View.extend({
     var $this = this;
     this.model.destroy({
       success : function(model, response){
-        location.reload();
+        reloadUrl('/pocket/me','#mypayment');
       },error : function(model,err){
         if(err.status == 200){
           location.reload();
@@ -681,26 +676,46 @@ var PaymentView = Backbone.View.extend({
     this.$el.find("form").validator({}).submit();
   },
 
-  createOrUpdatePaymentProfile: function () {
+  updatePaymentProfile : function(){
     var $this = this;
     this.model.set({
-      stripeToken: this.$el.find("input[name='stripeToken']").val(),
-      brand: this.$el.find("input[name='brand']").val(),
-      street: this.$el.find("input[name='street']").val(),
-      city: this.$el.find("input[name='city']").val(),
-      state: this.$el.find("input[name='state']").val(),
-      postal: this.$el.find("input[name='zip']").val(),
-      country: this.$el.find("input[name='country']").val(),
-      cardholder: this.$el.find("input[name='cardholdername']").val(),
-      cardNumber: this.$el.find("input[name='cardNumber']").val(),
-      expMonth: this.$el.find("select[name='month']").val(),
-      expYear: this.$el.find("select[name='year']").val(),
+      id : this.$el.find("form").data("id"),
+      name: this.$el.find("input[name='cardholdername']").val(),
+      exp_month: this.$el.find("select[name='month']").attr('value'),
+      exp_year: this.$el.find("select[name='year']").attr('value'),
+      cvc : this.$el.find("#cvc").val(),
+      address_line1 : this.$el.find("input[name='street']").val(),
+      address_city : this.$el.find("input[name='city']").val(),
+      address_state : this.$el.find("input[name='state']").val(),
+      address_zip : this.$el.find("input[name='zip']").val(),
+      address_country: this.$el.find(".flagstrap").data('selected-country'),
       isDefaultPayment: this.isSetToDefault
     });
     this.model.save({}, {
       success: function () {
-        location.reload();
-      }, error: function (err) {
+        if(location.href.indexOf('/pocket/me') != -1){
+          reloadUrl('/pocket/me','#mypayment');
+        }else{
+          location.reload();
+        }
+      }, error: function (model, err) {
+        $this.alertView.html(err.responseJSON ? err.responseJSON.text : err.responseText);
+        $this.alertView.show();
+      }
+    });
+  },
+
+  createPaymentProfile: function () {
+    var $this = this;
+    this.model.set({
+      stripeToken: this.$el.find("input[name='stripeToken']").val(),
+      cardNumber: this.$el.find("input[name='cardNumber']").val(),
+      isDefaultPayment: this.isSetToDefault
+    });
+    this.model.save({}, {
+      success: function () {
+        reloadUrl('/pocket/me','#mypayment');
+      }, error: function (model, err) {
         $this.alertView.html(err.responseJSON ? err.responseJSON.text : err.responseText);
         $this.alertView.show();
       }
@@ -895,7 +910,8 @@ var Meal = Backbone.Model.extend({
 
 var MealSelectionView = Backbone.View.extend({
   events : {
-    "click #calculateBtn" : "calculateDelivery"
+    "click #calculateBtn" : "calculateDelivery",
+    "change .variation a" : "changePreference"
   },
   initialize : function(){
 
@@ -923,6 +939,30 @@ var MealSelectionView = Backbone.View.extend({
       center: center,
       radius: range
     });
+  },
+  changePreference : function(e){
+    var preference;
+    this.$el.find(".variation").each(function(){
+      var value = $(this).find("a").attr("value");
+      if(value){
+        preference = preference || "(";
+        preference += value;
+      }
+    });
+    if(preference){
+      preference += ")";
+    }
+    var dishId = $(e.currentTarget).data("dish");
+    var dishItem = this.$el.find("#order .item[data-id='" + dishId + "']");
+    dishItem.find(".preference").text(preference);
+    var localDish = readCookie(dishId);
+    if(localDish){
+      var localDishObj = JSON.parse(localDish);
+      localDishObj.preference = preference;
+    }else{
+      var localDishObj = { number : 0, preference : preference};
+    }
+    createCookie(dishId, JSON.stringify(localDishObj), 1);
   },
   calculateDelivery : function(e){
     var $this = this;
@@ -1271,7 +1311,15 @@ var Dish = Backbone.Model.extend({
 
 var DishView = Backbone.View.extend({
   events : {
-    "submit form" : "saveDish"
+    "submit form" : "saveDish",
+    "change #dishVariationInput" : "addVariation",
+    "change .variation .property" : "addProperty",
+    "click .variation .currentVar .deleteBtn" : "removeVariation",
+    "click .variation .currentVar .reset" : "removeProperty",
+    "click .customVar .continue" : "addCustomVariation",
+    "click .customProperty .continue" : "addCustomerProperty",
+    "click .customVar .reset" : "resetCustomVariation",
+    "click .customProperty .reset" : "resetCustomProperty"
   },
   initialize : function(){
     var form = this.$el.find("form");
@@ -1281,6 +1329,174 @@ var DishView = Backbone.View.extend({
     formAlert.hide();
     this.progressAlert = progressAlert;
     this.formAlert = formAlert;
+  },
+  addCustomerProperty : function(e){
+    e.preventDefault();
+    var btn = $(e.currentTarget);
+    var property = btn.closest(".customProperty").find("input[name='property']").val();
+    var variation = btn.closest(".option").data("value");
+    if(!property){
+      btn.addClass("disabled");
+      return;
+    }else{
+      btn.removeClass('disabled');
+    }
+    this.addPropertyView(property,variation);
+    setupLanguage();
+  },
+  addCustomVariation : function(e){
+    e.preventDefault();
+    var btn = $(e.currentTarget);
+    var variation = this.$el.find(".customVar input[name='variation']").val();
+    if(!variation){
+      btn.addClass("disabled");
+      return;
+    }else{
+      btn.removeClass('disabled');
+    }
+    this.addOptionView(variation,variation);
+    setupLanguage();
+  },
+  resetCustomProperty : function(e){
+    e.preventDefault();
+    var target = $(e.currentTarget);
+    target.closest('.option').find(".property").next().find("li").each(function(){
+      if($(this).find("a").attr('value') == "custom"){
+        $(this).removeClass('disabled');
+        return;
+      }
+    });
+    target.closest('.customProperty').remove();
+  },
+  resetCustomVariation : function(e){
+    e.preventDefault();
+    this.$el.find(".customVar").empty();
+    $("#dishVariationInput").next().find("li").each(function(){
+      if($(this).find("a").attr('value') == "custom"){
+        $(this).removeClass('disabled');
+        return;
+      }
+    });
+  },
+  addVariation : function(e){
+    e.preventDefault();
+    var variation = $(e.currentTarget).attr("value");
+    var variationText = $(e.currentTarget).text();
+    console.log("add new variation : " + variation);
+    $(e.currentTarget).next().find("li").each(function(){
+      if($(this).find("a").attr('value') == variation){
+        $(this).addClass('disabled');
+        return;
+      }
+    });
+    if(variation == "custom"){
+      var $this = this;
+      this.addCustomInput();
+    }else{
+      this.addOptionView(variation, variationText);
+    }
+    setupDropdownMenu();
+    setupLanguage();
+  },
+  addProperty : function(e){
+    e.preventDefault();
+    var target = $(e.currentTarget);
+    var property = target.attr("value");
+    var propertyText = target.text();
+    var variation = target.closest(".option").data("value");
+    console.log("add new property : " + property + "within variation :" + variation);
+    $(e.currentTarget).next().find("li").each(function(){
+      if($(this).find("a").attr('value') == property){
+        $(this).addClass('disabled');
+        return;
+      }
+    });
+    if(property == "custom"){
+      var $this = this;
+      this.addCustomPropertyInput(variation);
+    }else{
+      this.addPropertyView(propertyText, variation);
+    }
+    setupLanguage();
+  },
+  addCustomInput : function(){
+    var container = this.$el.find(".variation .customVar");
+    var section = '<div class="row vertical-align"><div class="col-sm-3 col-xs-5">'
+    +  '<input name="variation" class="form-control" type="text" placeholder="Property name" required></div> <div class="col-sm-2 col-xs-5">'
+    +  '<button class="btn btn-default btn-outline continue" data-toggle="i18n" data-key="continueBtn"></button> </div> <div class="col-sm-1 col-xs-2">'
+    +  '<a class="reset" href="javascript:void(0)" data-toggle="i18n" data-key="resetBtn"></a> </div> </div>';
+    container.append(section);
+  },
+  addCustomPropertyInput : function(variation){
+    var container = this.$el.find(".currentVar .option[data-value='" + variation + "'] table tbody");
+    var section = '<tr class="customProperty"><td>'
+      + '<input name="property" class="form-control" type="text" placeholder="Property name" required></td> '
+      + '<td><button class="btn btn-default btn-outline continue" data-toggle="i18n" data-key="continueBtn"></button>'
+      + '<a class="reset" style="margin-left:10px;" href="javascript:void(0)" data-toggle="i18n" data-key="resetBtn"></a> </td> </tr>';
+    container.append(section);
+  },
+  addPropertyView : function(property, variation){
+    var container = this.$el.find(".currentVar .option[data-value='" + variation + "'] table tbody");
+    property = property.toString().trim();
+    var section = '<tr class="customProperty">'
+      + '<td>' + property + '<i class="fa fa-close reset cursor-pointer" data-value="' + property + '" style="float: right;" href="javascript:void(0)"></i></td> '
+      + '<td></td> </tr>';
+    container.append(section);
+  },
+  addOptionView : function(variation, text){
+    var varSets = {
+      "spicy" : ['mild', 'littleSpicy','regularSpicy','verySpicy','insaneSpicy'],
+      "sweetness" : ['noSugar','halfSugar','regularSugar','extraSugar'],
+      "icy" : ['noIce', 'halfIce', 'regularIce', 'extraIce'],
+      "ingredient" : [],
+      "wellness" : ['rare','mediumRare','medium','mediumWell', 'wellDone']
+    }
+    var container = this.$el.find(".variation .currentVar");
+    var section = '<div class="row option" data-value="' + variation + '"> <div class="col-xs-3">'
+      + '<h3>' + text + '</h3>'
+      + '<a class="deleteBtn" href="javascript:void(0);" data-value="' + variation + '" data-toggle="i18n" data-key="deleteBtn"></a>'
+      + '</div> <div class="col-xs-9"><table class="table table-bordered"> <thead>'
+      + '<tr class="active"> <td data-toggle="i18n" data-key="property"></td> <td data-toggle="i18n" data-key="price"></td> </tr> </thead>'
+      + '<tbody> <tr> <td> <div class="dropdown">'
+      + '<a class="btn btn-default btn-outline dropdown-toggle property" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="">'
+      + '<span data-toggle="i18n" data-key="addVariation"></span> <span class="caret"></span> </a>'
+      + '<ul class="dropdown-menu" aria-labelledby="dLabel">'
+      + '</ul> </div> </td> <td></td> </tr> </tbody> </table> </div> </div>';
+    container.append(section);
+    var dropDownMenu = container.find(".option[data-value='" + variation + "'] .dropdown-menu");
+    if(varSets[variation] && varSets[variation].length > 0 ){
+      varSets[variation].forEach(function(option){
+        dropDownMenu.append('<li><a href="javascript:void(0);" data-toggle="i18n" data-key="' + option + '" value="' + option + '"></a></li>');
+      });
+      dropDownMenu.append('<li class="disabled"><a data-toggle="i18n" data-key="noOption"></a></li>');
+    }
+    dropDownMenu.append('<li><a href="javascript:void(0);" data-toggle="i18n" data-key="customizedOption" value="custom"></a></li>');
+  },
+  removeProperty : function(e){
+    var target = $(e.currentTarget).closest(".option");
+    var property = $(e.currentTarget).data("value") || "custom";
+    property = property.toString();
+    console.log("removing property : " + property);
+    target.find(".property").next().find("li").each(function(){
+      if((property=="custom" && $(this).find("a").attr('value') == property) || $(this).find("a").text() == property.trim()){
+        $(this).removeClass('disabled');
+        return;
+      }
+    });
+    $(e.currentTarget).closest(".customProperty").remove();
+  },
+  removeVariation : function(e){
+    var variation = $(e.currentTarget).data("value");
+    console.log("remove new variation : " + variation);
+    $("#dishVariationInput").next().find("li").each(function(){
+      if($(this).find("a").attr('value') == variation){
+        $(this).removeClass('disabled');
+        return;
+      }
+    });
+    //remove option section
+    var container = this.$el.find(".variation .currentVar");
+    container.find(".option[data-value='" + variation + "']").remove();
   },
   saveDish : function(e) {
     e.preventDefault();
@@ -1386,6 +1602,18 @@ var DishView = Backbone.View.extend({
     var quantity = form.find("#quantityInput").val();
     var desc = form.find("#descriptionInput").val();
     var instagram = form.find("#instagramInput").val();
+    var preference = {};
+    form.find(".variation .currentVar .option").each(function(){
+      var properties = [];
+      var variationValue = $(this).data("value");
+      $(this).find(".customProperty").each(function(){
+        var property = $(this).find(".reset").data("value");
+        if (property){
+          properties.push(property.toString().trim());
+        }
+      });
+      preference[variationValue] = properties;
+    });
     var $this = this;
     if (dishId) {
       this.model.set({id: dishId});
@@ -1424,7 +1652,8 @@ var DishView = Backbone.View.extend({
             type : category,
             quantity : quantity,
             description : desc,
-            video : instagram
+            video : instagram,
+            preference : preference
           });
 
           $this.model.save({},{

@@ -41,17 +41,19 @@
 
     <div class="page" style="text-align: center;">
 
-      <div class="main">
+      <div class="main" style="min-height: 500px;">
         <h1>
-          Forbidden
+          <%= __('forbidden')%>
         </h1>
         <h2>
           <% if (typeof error !== 'undefined') { %>
           <%= error %>
           <% } else { %>
-          <%= __('authorizedError')%>
+          <%= data || __('authorizedError')%>
           <% } %>
         </h2>
+
+        <% if(!login){%>
 
         <div id="loginView">
           <div class="alert alert-danger hide" data-toggle="i18n" data-key="userSignInError"></div>
@@ -95,6 +97,7 @@
 
           </div>
         </div>
+        <%}%>
       </div>
 
       <div class="box-compact text-center">

@@ -1,7 +1,7 @@
 <div id="paymentView">
   <div class="popup box middle">
 
-    <form class="form-horizontal" data-id="<%if(typeof payment !='undefined'){%><%=payment.id%><%}%>" data-url="<%if(typeof payment != 'undefined'){%>/payment/<%=payment.id%><%}else{%>/payment<%}%>">
+    <form class="form-horizontal" data-id="<%if(typeof id !='undefined'){%><%=id%><%}%>" data-url="<%if(typeof id != 'undefined'){%>/payment/<%=id%><%}else{%>/payment<%}%>">
       <div class="row row-centered">
         <div class="col-xs-12">
           <div class="page-header">
@@ -14,7 +14,7 @@
           <div class="form-group">
             <label class="col-sm-4 control-label" for="textinput"><%= __('street')%></label>
             <div class="col-sm-6">
-              <input type="text" name="street" placeholder="Street" class="address form-control" value="<%if(typeof payment != 'undefined'){%><%=payment.street%><%}%>" required>
+              <input type="text" name="street" placeholder="Street" class="address form-control" value="<%if(typeof payment != 'undefined'){%><%=payment.address_line1%><%}%>" required>
             </div>
           </div>
 
@@ -22,7 +22,7 @@
           <div class="form-group">
             <label class="col-sm-4 control-label" for="textinput"><%= __('city')%></label>
             <div class="col-sm-6">
-              <input type="text" name="city" placeholder="City" class="city form-control" value="<%if(typeof payment != 'undefined'){%><%=payment.city%><%}%>" required>
+              <input type="text" name="city" placeholder="City" class="city form-control" value="<%if(typeof payment != 'undefined'){%><%=payment.address_city%><%}%>" required>
             </div>
           </div>
 
@@ -30,7 +30,7 @@
           <div class="form-group">
             <label class="col-sm-4 control-label" for="textinput"><%= __('state')%></label>
             <div class="col-sm-6">
-              <input type="text" name="state" maxlength="65" placeholder="State" class="state form-control" value="<%if(typeof payment != 'undefined'){%><%=payment.state%><%}%>" required>
+              <input type="text" name="state" maxlength="65" placeholder="State" class="state form-control" value="<%if(typeof payment != 'undefined'){%><%=payment.address_state%><%}%>" required>
               <div class="help-block with-errors"></div>
             </div>
           </div>
@@ -39,7 +39,7 @@
           <div class="form-group">
             <label class="col-sm-4 control-label" for="textinput"><%= __('zipcode')%></label>
             <div class="col-sm-6">
-              <input type="text" name="zip" maxlength="9" placeholder="Postal Code" class="zip form-control" value="<%if(typeof payment != 'undefined'){%><%=payment.postal%><%}%>" required>
+              <input type="text" name="zip" maxlength="9" placeholder="Postal Code" class="zip form-control" value="<%if(typeof payment != 'undefined'){%><%=payment.address_zip%><%}%>" required>
               <div class="help-block with-errors"></div>
             </div>
           </div>
@@ -48,8 +48,7 @@
           <div class="form-group">
             <label class="col-sm-4 control-label" for="textinput"><%= __('country')%></label>
             <div class="col-sm-6">
-              <!--<input type="text" name="country" placeholder="Country" class="country form-control">-->
-              <div class="country bfh-selectbox bfh-countries" name="country" placeholder="Select Country" data-flags="true" data-filter="true" data-country="<%if(typeof payment != 'undefined'){%><%=payment.country%><%}else{%>US<%}%>"> </div>
+              <div class="flagstrap" name="country" data-input-name="country" data-selected-country="<%= typeof payment != 'undefined' ? payment.address_country:'US' %>"></div>
             </div>
           </div>
           </fieldset>
@@ -61,15 +60,15 @@
             <div class="form-group">
               <label class="col-sm-4 control-label"  for="textinput"><%= __('card-holder')%></label>
               <div class="col-sm-6">
-                <input type="text" name="cardholdername" maxlength="70" placeholder="Card Holder Name" class="card-holder-name form-control" required value="<%if(typeof payment != 'undefined'){%><%=payment.cardholder%><%}%>">
+                <input type="text" name="cardholdername" maxlength="70" placeholder="Card Holder Name" class="card-holder-name form-control" required value="<%if(typeof payment != 'undefined'){%><%=payment.name%><%}%>">
               </div>
             </div>
 
             <!-- Card Number -->
             <div class="form-group">
-              <label class="col-sm-4 control-label" for="textinput"><%= __('card-number')%></label>
+              <label class="col-sm-4 control-label" for="textinput"><%= typeof id !='undefined' ? __('card-number-last4') : __('card-number')%></label>
               <div class="col-sm-6">
-                <input type="text" id="cardnumber" name="cardNumber" maxlength="19" placeholder="Card Number" class="card-number form-control" required value="<%if(typeof payment != 'undefined'){%><%=payment.cardNumber%><%}%>">
+                <input type="text" id="cardnumber" name="cardNumber" maxlength="19" placeholder="Card Number" class="card-number form-control" required value="<%if(typeof payment != 'undefined'){%><%=payment.last4%><%}%>" <%= typeof id != 'undefined' ? 'disabled'   : ''%>>
                 <div class="help-block with-errors"></div>
               </div>
             </div>
@@ -79,7 +78,7 @@
               <label class="col-sm-4 control-label" for="textinput"><%= __('card-exp')%></label>
               <div class="col-sm-6">
                 <div class="form-inline">
-                  <select name="month" data-stripe="exp-month" class="card-expiry-month stripe-sensitive required form-control" value=<%if(typeof payment != 'undefined'){%><%=payment.expMonth%><%}%>>
+                  <select name="month" data-toggle="select" data-stripe="exp-month" class="card-expiry-month stripe-sensitive required form-control" value=<%= typeof payment != 'undefined' ? payment.exp_month : '1'%>>
                     <option value="1" selected="selected">01</option>
                     <option value="2">02</option>
                     <option value="3">03</option>
@@ -94,7 +93,7 @@
                     <option value="12">12</option>
                   </select>
                   <span> / </span>
-                  <select name="year" data-stripe="exp-year" class="card-expiry-year stripe-sensitive required form-control" value=<%if(typeof payment != 'undefined'){%><%=payment.expYear%><%}%>>
+                  <select name="year" data-toggle="select" data-stripe="exp-year" class="card-expiry-year stripe-sensitive required form-control" value=<%= typeof payment != 'undefined' ? payment.exp_year : '2016'%>>
                   </select>
                   <script type="text/javascript">
                     var select = $(".card-expiry-year"),
@@ -161,6 +160,6 @@
 </div>
 
 <script>
-  $("#payment-form").validator({});
+  setup();
   new PaymentView({ el : $("#paymentView"), model : new Payment()})
 </script>
