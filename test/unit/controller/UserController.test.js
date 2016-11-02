@@ -179,7 +179,7 @@ describe('UsersController', function() {
           .send({email : email, password: shortPassword})
           .expect(400)
           .end(function(err,res){
-            should.exist(res.body.error, "should get invalid email or password error");
+            should.exist(res.body, "should get invalid email or password error");
             done();
           })
     })

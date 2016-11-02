@@ -13,7 +13,7 @@ module.exports.waterlock = {
   //
   // used by auth methods for callback URI's using oauth and for password
   // reset links.
-  baseUrl:  process.env.NODE_ENV === 'production' ? 'http://test.sfmeal.com' : 'http://localhost:1337',
+  baseUrl:  process.env.NODE_ENV === 'production' ? process.env.BASE_URL : 'http://localhost:1337',
 
   pluralizeEndpoints: false,
 
@@ -26,8 +26,8 @@ module.exports.waterlock = {
   authMethod: [
     {
       name: "waterlock-facebook-auth",
-      appId: process.env.NODE_ENV === 'production' ? "556466254501032" : "602141733266817",
-      appSecret: process.env.NODE_ENV === 'production' ? "02f7b4b026d9d2029c2f372f84cbc9ed" : "d0bda6a62210efa8483e9a8b10ce3aa8",
+      appId: process.env.NODE_ENV === 'production' ? process.env.FB_PRODUCTION_ID : process.env.FB_TEST_ID,
+      appSecret: process.env.NODE_ENV === 'production' ? process.env.FB_PRODUCTION_KEY : process.env.FB_TEST_KEY,
       fieldMap : {
         'email' : 'email',
         'name' : 'name',
@@ -40,9 +40,9 @@ module.exports.waterlock = {
     },
     {
       name: 'waterlock-google-auth',
-      clientId: '504050617477-f1ok77fo8dhogc9k5gososaovjqnk4u6.apps.googleusercontent.com',
-      clientSecret: 'JbMmSyFjyHKMoKlox2VoXeJT',
-      redirectUri : process.env.NODE_ENV === 'production' ? 'http://test.sfmeal.com/auth/google_oauth2' : 'http://localhost:1337/auth/google_oauth2',
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_KEY,
+      redirectUri : process.env.NODE_ENV === 'production' ? process.env.BASE_URL + '/auth/google_oauth2' : 'http://localhost:1337/auth/google_oauth2',
       allow: ['*'],
       fieldMap : {
         email : 'email'
@@ -55,13 +55,18 @@ module.exports.waterlock = {
         mail: {
           protocol: 'SMTP',
           options:{
-            service: 'Gmail',
+            host : "smtp.office365.com",
+            secureConnection : false,
+            port : 587,
             auth: {
-              user: 'aimbebe.r@gmail.com',
-              pass: 'rs89030659'
+              user: process.env.ADMIN_EMAIL,
+              pass: process.env.ADMIN_EMAIL_PWD
+            },
+            tls : {
+              ciphers : 'SSLv3'
             }
           },
-          from: 'no-reply@domain.com',
+          from: 'SFMeal Admin',
           subject: 'Your password reset!',
           forwardUrl: '/auth/resetForm'
         },

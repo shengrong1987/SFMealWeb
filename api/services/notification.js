@@ -5,18 +5,6 @@ var nodemailer = require('nodemailer');
 var message = require('./message');
 var moment = require('moment');
 var util = require('./util');
-var transporter = nodemailer.createTransport("SMTP",{
-  host : "smtp.office365.com",
-  secureConnection : false,
-  port : 587,
-  auth : {
-    user : "admin@sfmeal.com",
-    pass : "Rs89030659!"
-  },
-  tls : {
-    ciphers : 'SSLv3'
-  }
-});
 
 var mailOptions = {
   from: '"SFMeal" <admin@sfmeal.com>', // sender address

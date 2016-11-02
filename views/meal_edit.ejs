@@ -202,6 +202,11 @@
                             <input type="text" class="form-control" value="<%= pickup.location || 'N/A'%>" <%= pickup.method == 'delivery' ? 'disabled' : ''%>>
                           </div>
 
+                          <div class="form-group public-location">
+                            <label><%= __('pickup-public-location')%></label>
+                            <input type="text" class="form-control" value="<%= pickup.public_location || 'N/A'%>" <%= pickup.method == 'delivery' ? 'disabled' : ''%>>
+                          </div>
+
                           <div class="form-group method">
                             <label><%= __('pickup-method')%></label>
                             <select class="form-control" value="<%= pickup.method%>">

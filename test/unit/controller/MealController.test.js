@@ -103,6 +103,25 @@ describe('MealController', function() {
           })
     });
 
+    it('should update a dish with preference', function(done){
+      agent
+        .put('/dish/' + dish1)
+        .send({
+          preference : {
+            "馅料" : ["猪肉","素"]
+          }
+        })
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.have.property("dishId");
+          res.body.dishId.should.be.equal(dish1);
+          done();
+        })
+    });
+
     var mealId;
     var preorderMealId;
     var leftQty = {};
@@ -173,6 +192,7 @@ describe('MealController', function() {
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "location" : "1455 Market St, San Francisoc, CA 94124",
+        "publicLocation" : "Around Uber HQ on market st",
         "method" : "pickup"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
@@ -201,6 +221,8 @@ describe('MealController', function() {
             if(res.body.chef != hostId){
               return done(Error("error creating meal"));
             }
+            res.body.should.have.property('pickups').with.length(2);
+            res.body.pickups[0].publicLocation.should.be.equal("Around Uber HQ on market st");
             preorderMealId = res.body.id;
             done();
           })

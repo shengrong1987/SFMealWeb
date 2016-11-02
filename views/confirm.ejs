@@ -59,7 +59,12 @@
                     <input type="radio" id="radio-1-<%= i%>" data-index="<%= i%>" name="radio-1-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="radio-1-<%= i%>"></label>
                     <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"><%= __('time') %><span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
                     <br/>
-                    <label class="location" data-value="<%= pickup.location%>" style="margin-left: 23px;"><span><%= __('location') %>&nbsp; <%= pickup.location%></span></label>
+                    <% if( (user && user.orders.some(function(order){ return order.meal == meal.id})) || (user && user.host == meal.chef.id)){%>
+                      <label class="location" data-value="<%= pickup.location%>" style="margin-left: 23px;"><span><%= __('location') %>&nbsp; <%= pickup.location%></span></label>
+                    <%}else{%>
+                      <label class="location" data-value="<%= pickup.publicLocation%>" style="margin-left: 23px;"><span><%= __('location') %>&nbsp; <%= pickup.publicLocation%></span></label><%= __('pickup-location-after-order')%>
+                    <%}%>
+
                   </label>
                   <%}i++;})}; %>
                 </div>
@@ -118,7 +123,7 @@
                 <h4 class="text-right col-xs-12 delivery"><%= __('meal-delivery-fee') %><%= meal.delivery_fee%></h4>
               </div>
             </div>
-            <div id="contact-error" style="margin-top: 40px;" class="alert alert-warning"></div>
+            <div id="contact-error" style="margin-top: 40px;" class="alert alert-danger"></div>
           </div>
 
           <h1 class="text-red text-left">Step3:<strong><%= __('payment-method') %></strong></h1>

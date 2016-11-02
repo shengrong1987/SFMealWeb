@@ -199,7 +199,10 @@ module.exports = {
       if(m.length==0){
         return res.badRequest({ code : -3, text : req.__('meal-not-found')});
       }
-      User.find(userId).populate("payment").exec(function(err,user){
+      User.find(userId).populate("payment").populate("orders").exec(function(err,user){
+        user[0].orders = user[0].orders.filter(function(order){
+          return order.status == "schedule" || order.status == "preparing";
+        })
         res.view("confirm",{meal : m[0], user : user[0]});
       });
     });

@@ -2,8 +2,8 @@
  * Created by shengrong on 12/15/15.
  */
 module.exports.aws = {
-  id : 'AKIAIH52X3XDSHQSZVJA',
-  key : 'oDBdanXO9nnM41gEuHXkn+lDQxMx4rmcp0k7Tw4q',
+  id : process.env.AWS_S3_ID,
+  key : process.env.AWS_S3_KEY,
   bucket : 'sfmeal',
   maxSizes :{
     thumbnail : '5242880',

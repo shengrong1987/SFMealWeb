@@ -114,7 +114,13 @@
                       <label>
                         <input type="checkbox">
                         <small class="font-small">
-                          <b><%= __('location') + count %>:</b> <%= pickupMethod.location || 'N/A'%>，<br/><br/>
+                          <b><%= __('location') + count %>:</b>
+                          <% if( orders && orders.some(function(order){ if(!user){return false}; return order.customer == user.id}) || (user && user.host == meal.chef.id)){%>
+                            <%= pickupMethod.location%>
+                          <%}else{%>
+                            <%= pickupMethod.publicLocation%><br/><%= __('pickup-location-after-order')%>
+                          <%}%>
+                          <br/><br/>
                           <b><%= __('time')%></b> <span data-toggle="time-span" data-format="date" data-from="<%= pickupMethod.pickupFromTime%>" data-to="<%= pickupMethod.pickupTillTime%>"></span><br/><br/>
                           <b><%= __('pickup-method')%>: <%= pickupMethod.method == 'delivery' ? __('delivery') : __('self-pickup') %></b>
                         </small>

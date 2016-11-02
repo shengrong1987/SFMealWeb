@@ -20,14 +20,14 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">55.92% </span>
+        <span class="strong">56.13% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>85/152</span>
+        <span class='fraction'>87/155</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">49.35% </span>
+        <span class="strong">48.75% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>38/77</span>
+        <span class='fraction'>39/80</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">65.79% </span>
@@ -35,9 +35,9 @@
         <span class='fraction'>25/38</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">55.92% </span>
+        <span class="strong">56.13% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>85/152</span>
+        <span class='fraction'>87/155</span>
       </div>
     </div>
   </div>
@@ -293,7 +293,10 @@
 248
 249
 250
-251</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+251
+252
+253
+254</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -359,6 +362,7 @@
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2×</span>
@@ -436,6 +440,7 @@
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
@@ -532,6 +537,7 @@
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -606,8 +612,9 @@ module.exports = {
     <span class="missing-if-branch" title="if path not taken" >I</span>if(req.session.user.auth.email != "admin@sfmeal.com" &amp;&amp; req.params.id){
 <span class="cstat-no" title="statement not covered" >      return res.forbidden();</span>
     }
-    var userId = req.session.user.id;
-    User.findOne(userId).populate("orders").populate('pocket').exec(function(err, user) {
+    var isAdmin = req.session.user.auth.email == "admin@sfmeal.com";
+    var userId = isAdmin ? <span class="branch-0 cbranch-no" title="branch not covered" >req.params.id </span>: req.session.user.id;
+    User.findOne(userId).populate("orders").populate('pocket').populate('payment').exec(function(err, user) {
       <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
 <span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
       }
@@ -686,7 +693,8 @@ module.exports = {
     <span class="missing-if-branch" title="if path not taken" >I</span>if(req.session.user.auth.email != "admin@sfmeal.com" &amp;&amp; req.params.id){
 <span class="cstat-no" title="statement not covered" >      return res.forbidden();</span>
     }
-    var hostId = (req.session.user.host.id || req.session.user.host) || <span class="branch-2 cbranch-no" title="branch not covered" >req.params.id;</span>
+    var isAdmin = req.session.user.auth.email == "admin@sfmeal.com";
+    var hostId = isAdmin ? <span class="branch-0 cbranch-no" title="branch not covered" >req.params.id </span>: (req.session.user.host.id ? <span class="branch-0 cbranch-no" title="branch not covered" >req.session.user.host.id </span>: req.session.user.host);
     Host.findOne(hostId).populate("orders").populate('user').populate('pocket').exec(function(err, host){
       <span class="missing-if-branch" title="if path not taken" >I</span>if(err || !host){
 <span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
@@ -744,7 +752,7 @@ module.exports = {
             pocket.pending_balances = pendingBalance;
             pocket.transactions = transactions;
 &nbsp;
-            User.findOne(host.user.id).populate('orders').exec(function(err, user){
+            User.findOne(host.user.id).populate('orders').populate('payment').exec(function(err, user){
               <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
 <span class="cstat-no" title="statement not covered" >                return res.badRequest(err);</span>
               }
@@ -783,6 +791,7 @@ module.exports = {
                   return res.ok({pocket : pocket});
                 }
 <span class="cstat-no" title="statement not covered" >                host.user.pocket = pocket;</span>
+<span class="cstat-no" title="statement not covered" >                host.user.payment = user.payment;</span>
 <span class="cstat-no" title="statement not covered" >                res.view('pocket', {user : host.user, host : host});</span>
               });
             })
@@ -799,7 +808,7 @@ module.exports = {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Sep 16 2016 11:56:30 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Nov 01 2016 15:26:24 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

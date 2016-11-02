@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">57% </span>
+        <span class="strong">56.9% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>334/586</span>
+        <span class='fraction'>334/587</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">45.02% </span>
@@ -35,9 +35,9 @@
         <span class='fraction'>70/102</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">57% </span>
+        <span class="strong">56.9% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>334/586</span>
+        <span class='fraction'>334/587</span>
       </div>
     </div>
   </div>
@@ -1036,7 +1036,8 @@
 991
 992
 993
-994</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+994
+995</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1091,23 +1092,23 @@
 <span class="cline-any cline-yes">32×</span>
 <span class="cline-any cline-yes">32×</span>
 <span class="cline-any cline-yes">32×</span>
-<span class="cline-any cline-yes">17×</span>
-<span class="cline-any cline-yes">68×</span>
-<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">72×</span>
+<span class="cline-any cline-yes">18×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">17×</span>
-<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
 <span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">14×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">65×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">17×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">69×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8×</span>
@@ -1117,6 +1118,7 @@
 <span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6×</span>
@@ -2081,8 +2083,8 @@ module.exports = {
     var validDish = false;
 &nbsp;
     async.each(Object.keys(orders), function(dishId, next){
-      var qty = parseInt(orders[dishId]);
-      var lastQty = lastOrders ? parseInt(lastOrders[dishId]) : 0;
+      var qty = parseInt(orders[dishId].number);
+      var lastQty = lastOrders ? parseInt(lastOrders[dishId].number) : 0;
       if(qty &gt; 0 || lastQty &gt; 0){
         async.each(meal.dishes, function(dish, next2){
           if(dish.id == dishId){
@@ -2110,6 +2112,7 @@ module.exports = {
       sails.log.debug("dish is valid and enough, checking total price...");
 &nbsp;
       <span class="missing-if-branch" title="if path not taken" >I</span>if(actual_subtotal.toFixed(2) != subtotal) {
+<span class="cstat-no" title="statement not covered" >        sails.log.debug("subtotal supposed to be " + actual_subtotal.toFixed(2) + ", but get " + subtotal)</span>
 <span class="cstat-no" title="statement not covered" >        return cb({responseText : req.__('order-total-not-match'), code : -3});</span>
       }
       return cb(null);
@@ -2140,7 +2143,7 @@ module.exports = {
   updateMealLeftQty : function(meal, lastorder, order, cb){
     var leftQty = meal.leftQty;
     Object.keys(lastorder).forEach(function(dishId){
-      var diff = lastorder[dishId] - order[dishId];
+      var diff = lastorder[dishId].number - order[dishId].number;
       leftQty[dishId] += diff;
     });
     meal.leftQty = leftQty;
@@ -2280,7 +2283,7 @@ module.exports = {
 &nbsp;
                   for (var i = 0; i &lt; m.dishes.length; i++) {
                     var dishId = m.dishes[i].id;
-                    var quantity = parseInt(orders[dishId]);
+                    var quantity = parseInt(orders[dishId].number);
                     m.leftQty[dishId] -= quantity;
                   }
                   order.transfers = {};
@@ -2302,7 +2305,7 @@ module.exports = {
                       <span class="missing-if-branch" title="else path not taken" >E</span>if(req.wantsJSON){
                         return res.ok(order);
                       }
-<span class="cstat-no" title="statement not covered" >                      return res.ok({responseText : req.__('order-ok')});</span>
+<span class="cstat-no" title="statement not covered" >                      return res.ok({});</span>
                     });
                   });
                 } else {
@@ -2603,7 +2606,7 @@ module.exports = {
               }
               var curOrder = extend({}, order.orders);
               Object.keys(curOrder).forEach(function (dishId) {
-                curOrder[dishId] = 0;
+                curOrder[dishId] = { number : 0};
               });
               $this.updateMealLeftQty(order.meal, order.orders, curOrder, function(err, m) {
                 <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
@@ -2840,7 +2843,7 @@ module.exports = {
               }
               var curOrder = extend({}, order.orders);
               Object.keys(curOrder).forEach(function (dishId) {
-                curOrder[dishId] = 0;
+                curOrder[dishId] = { number : 0};
               });
               $this.updateMealLeftQty(order.meal, order.orders, curOrder, function (err, m) {
                 <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
@@ -2943,7 +2946,7 @@ module.exports = {
       }
       order.status = "review";
       order.reviewing_orders = Object.keys(order.orders).filter(function(orderId){
-        return order.orders[orderId] &gt; 0;
+        return order.orders[orderId].number &gt; 0;
       });
       order.save(function(err,result){
         <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
@@ -3028,7 +3031,7 @@ module.exports = {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Sep 16 2016 11:56:30 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Nov 01 2016 15:26:24 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

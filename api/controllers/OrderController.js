@@ -272,7 +272,7 @@ module.exports = {
                       if(req.wantsJSON){
                         return res.ok(order);
                       }
-                      return res.ok({responseText : req.__('order-ok')});
+                      return res.ok({});
                     });
                   });
                 } else {

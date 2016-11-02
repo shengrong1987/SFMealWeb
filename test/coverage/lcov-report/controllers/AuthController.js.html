@@ -20,14 +20,14 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">64.29% </span>
+        <span class="strong">54.55% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>18/28</span>
+        <span class='fraction'>18/33</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">64.29% </span>
+        <span class="strong">42.86% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>9/14</span>
+        <span class='fraction'>9/21</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">57.14% </span>
@@ -35,9 +35,9 @@
         <span class='fraction'>4/7</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">64.29% </span>
+        <span class="strong">54.55% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>18/28</span>
+        <span class='fraction'>18/33</span>
       </div>
     </div>
   </div>
@@ -115,7 +115,20 @@
 70
 71
 72
-73</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -126,6 +139,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -171,6 +189,14 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -199,9 +225,14 @@
 &nbsp;
 module.exports = require('waterlock').waterlocked({
   /* e.g.
-    action: function(req, res){
-&nbsp;
-    }
+   error
+   * -1 : user already exist
+   * -2 : user email or password needed
+   * -3 : chef incomplete profile
+   * -8 : meal contain unverified dish
+   * -9 : fail to decrease totalQty because of the dish has been ordered
+   * -10 : fail to add/remove dish on active meal
+   * -11 : dish can not be empty
   */
   register: function(req, res) {
     var params = req.params.all(),
@@ -209,7 +240,7 @@ module.exports = require('waterlock').waterlocked({
       criteria = { },
       scopeKey = 'email';
     if(!params.password || !params.email){
-      return res.serverError('email and password needed');
+      return res.serverError({code : -2, text : req.__('user-credential-needed')});
     }
     var attr = {
       password: params.password
@@ -218,7 +249,7 @@ module.exports = require('waterlock').waterlocked({
     criteria[scopeKey] = attr[scopeKey];
     waterlock.engine.findAuth(criteria, function(err, user) {
       if(user){
-        return res.badRequest({code : -1, text : "User already exists"});
+        return res.badRequest({code : -1, text : req.__('user-exist-error')});
       }else{
         waterlock.engine.findOrCreateAuth(criteria, attr, function(err, user) {
           if(err){
@@ -240,8 +271,16 @@ module.exports = require('waterlock').waterlocked({
   loginSuccess : <span class="fstat-no" title="function not covered" >function(req, res){</span>
 <span class="cstat-no" title="statement not covered" >    console.log("login success...");</span>
 <span class="cstat-no" title="statement not covered" >    var auth = req.session.user.auth;</span>
+<span class="cstat-no" title="statement not covered" >    var county = req.session.user.county;</span>
+<span class="cstat-no" title="statement not covered" >    if(county &amp;&amp; (!req.cookies['county'] || req.cookies['county'] == 'undefined')){</span>
+<span class="cstat-no" title="statement not covered" >      res.cookie('county',county);</span>
+    }
 <span class="cstat-no" title="statement not covered" >    if(auth.facebookId){</span>
-<span class="cstat-no" title="statement not covered" >      res.redirect('back');</span>
+<span class="cstat-no" title="statement not covered" >      if(req.query.state){</span>
+<span class="cstat-no" title="statement not covered" >        res.redirect(req.query.state);</span>
+      }else{
+<span class="cstat-no" title="statement not covered" >        res.redirect('back');</span>
+      }
     }else <span class="cstat-no" title="statement not covered" >if(auth.googleEmail){</span>
 <span class="cstat-no" title="statement not covered" >      res.redirect('back');</span>
     }else{
@@ -265,7 +304,7 @@ module.exports = require('waterlock').waterlocked({
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Sep 16 2016 11:56:30 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Nov 01 2016 15:26:24 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

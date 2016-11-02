@@ -81,7 +81,8 @@ module.exports.routes = {
   '/notification/msg' : 'NotificationController.sendMessage',
   '/job/:name/run' : 'JobController.run',
   '/help' : { view : 'help'},
-  '/trust' : { view : 'trust'}
+  '/trust' : { view : 'trust'},
+  '/terms' : {view : 'terms'}
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

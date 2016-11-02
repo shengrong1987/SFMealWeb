@@ -20,14 +20,14 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">60.61% </span>
+        <span class="strong">63.89% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>20/33</span>
+        <span class='fraction'>23/36</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">71.43% </span>
+        <span class="strong">76.47% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>10/14</span>
+        <span class='fraction'>13/17</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">75% </span>
@@ -35,9 +35,9 @@
         <span class='fraction'>6/8</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">60.61% </span>
+        <span class="strong">63.89% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>20/33</span>
+        <span class='fraction'>23/36</span>
       </div>
     </div>
   </div>
@@ -202,7 +202,15 @@
 157
 158
 159
-160</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+160
+161
+162
+163
+164
+165
+166
+167
+168</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -306,33 +314,41 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6×</span>
-<span class="cline-any cline-yes">6×</span>
-<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
 <span class="cline-any cline-yes">6×</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">13×</span>
 <span class="cline-any cline-yes">13×</span>
-<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">7×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6×</span>
-<span class="cline-any cline-yes">6×</span>
-<span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">22×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7×</span>
-<span class="cline-any cline-yes">7×</span>
-<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">13×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -396,6 +412,9 @@ module.exports = {
       type : 'email',
       required : true,
       unique : true
+    },
+    phone : {
+      type : 'string'
     },
     //[{"dish1": id}, {"dish2":id}, {"dish3":id}]
     feature_dishes : {
@@ -471,28 +490,33 @@ module.exports = {
 <span class="cstat-no" title="statement not covered" >          console.log(err);</span>
 <span class="cstat-no" title="statement not covered" >          return cb(err);</span>
         }
-        <span class="missing-if-branch" title="if path not taken" >I</span>if(account.verification.fields_needed.length != 0){
-<span class="cstat-no" title="statement not covered" >          host.verification = account.verification;</span>
-<span class="cstat-no" title="statement not covered" >          return cb(null,false);</span>
+        if(account.verification.fields_needed.length != 0){
+          host.verification = account.verification;
+          return cb(null,false);
+        }else{
+          host.verification = null;
+          return cb(null, true);
         }
-        return cb(null,true);
+<span class="cstat-no" title="statement not covered" >        return cb(null,true);</span>
       });
     },
     //check all validation as host
     checkGuideRequirement : function(cb){
       var host = this;
-      if(this.full_address &amp;&amp; this.dishes.length &gt; 0 &amp;&amp; this.dishes.some(function(dish){
+      this.checkVerification(function(err, valid){
+        <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >          return cb(err);</span>
+        }
+        if(host.phone &amp;&amp; host.full_address &amp;&amp; host.dishes.length &gt; 0 &amp;&amp; host.bankId &amp;&amp; valid){
+          host.passGuide = true;
+        }else{
+          host.passGuide = false;
+        }
+        host.dishVerifying = host.dishes.some(function(dish){
           return dish.isVerified;
-        }) &amp;&amp; this.bankId){
-        this.checkVerification(function(err, valid){
-          host.passGuide = valid;
-          return cb(null,valid)
         });
-      }else{
-        host.verification = [];
-        host.passGuide = false;
-        return cb(null,false);
-      }
+        host.save(cb);
+      });
     },
     getDistance : <span class="fstat-no" title="function not covered" >function(userLat, userLong){</span>
 <span class="fstat-no" title="function not covered" >      function deg2rad(deg) {</span>
@@ -526,7 +550,7 @@ module.exports = {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Sep 16 2016 11:56:30 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Nov 01 2016 15:26:24 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

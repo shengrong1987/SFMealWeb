@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">48.04% </span>
+        <span class="strong">48.21% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>172/358</span>
+        <span class='fraction'>175/363</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">43.78% </span>
+        <span class="strong">44% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>95/217</span>
+        <span class='fraction'>99/225</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">56.94% </span>
+        <span class="strong">56.16% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>41/72</span>
+        <span class='fraction'>41/73</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">48.04% </span>
+        <span class="strong">48.21% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>172/358</span>
+        <span class='fraction'>175/363</span>
       </div>
     </div>
   </div>
@@ -654,7 +654,22 @@
 609
 610
 611
-612</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+612
+613
+614
+615
+616
+617
+618
+619
+620
+621
+622
+623
+624
+625
+626
+627</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -675,6 +690,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -694,7 +713,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -778,7 +796,16 @@
 <span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -844,6 +871,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1277,6 +1307,10 @@ var moment = require("moment");
 &nbsp;
 /*
  error
+ * -1 : geo service not available
+ * -2 : address not valid
+ * -3 : meal not found
+ * -4 : meal have orders can not offline
  * -5 : meal invalid date
  * -6 : meal invalid requirement
  * -7 : chef incomplete profile
@@ -1301,8 +1335,7 @@ module.exports = {
 &nbsp;
   feature : <span class="fstat-no" title="function not covered" >function(req, res){</span>
 <span class="cstat-no" title="statement not covered" >    var now = new Date();</span>
-<span class="cstat-no" title="statement not covered" >    var county = req.param('county');</span>
-<span class="cstat-no" title="statement not covered" >    county = county || "San Francisco County";</span>
+<span class="cstat-no" title="statement not covered" >    var county = req.cookies['county'] || "San Francisco County";</span>
 <span class="cstat-no" title="statement not covered" >    Meal.find({county : county, type : 'order', status : "on", provideFromTime : {'&lt;' : now}, provideTillTime : {'&gt;' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(<span class="fstat-no" title="function not covered" >function(err,orders){</span></span>
 <span class="cstat-no" title="statement not covered" >      if(err){</span>
 <span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
@@ -1386,10 +1419,19 @@ module.exports = {
   search : function(req, res){
     var keyword = req.param('keyword');
     var zipcode = req.param('zipcode');
-    var county = req.param('county');
+    var county = req.param('county') || <span class="branch-1 cbranch-no" title="branch not covered" >req.cookies['county'];</span>
+    var type = req.param('type');
     var now = new Date();
-    Meal.find({ county : county,status : "on", provideFromTime : {'&lt;' : now}, provideTillTime : {'&gt;' : now}
-    }).populate('dishes').populate('chef').exec(function(err,found){
+    var params = {
+      status : 'on',
+      provideFromTime : {'&lt;' : now},
+      provideTillTime : {'&gt;' : now},
+      county : county
+    }
+    <span class="missing-if-branch" title="if path not taken" >I</span>if(type){
+<span class="cstat-no" title="statement not covered" >      params.type = type;</span>
+    }
+    Meal.find(params).populate('dishes').populate('chef').exec(function(err,found){
       <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
 <span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
       }
@@ -1397,10 +1439,10 @@ module.exports = {
       if(typeof zipcode !== 'undefined' &amp;&amp; zipcode &amp;&amp; zipcode !== 'undefined' &amp;&amp; typeof county !== 'undefined' &amp;&amp; county &amp;&amp; county !== 'undefined'){
         GeoCoder.geocode(zipcode, function(err, result){
           <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
-<span class="cstat-no" title="statement not covered" >            return res.badRequest(req.__('meal-error-address'));</span>
+<span class="cstat-no" title="statement not covered" >            return res.badRequest({ code : -1, text : req.__('meal-error-address')});</span>
           }  else {
             <span class="missing-if-branch" title="if path not taken" >I</span>if(result.length==0){
-<span class="cstat-no" title="statement not covered" >              return res.badRequest(req.__('meal-error-address2'));</span>
+<span class="cstat-no" title="statement not covered" >              return res.badRequest({ code : -2, text : req.__('meal-error-address2')});</span>
             }
             var location = { lat : result[0].latitude, long : result[0].longitude };
             found = found.filter(function(meal){
@@ -1452,9 +1494,12 @@ module.exports = {
 <span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
       }
 <span class="cstat-no" title="statement not covered" >      if(m.length==0){</span>
-<span class="cstat-no" title="statement not covered" >        return res.badRequest(req.__('meal-not-found'));</span>
+<span class="cstat-no" title="statement not covered" >        return res.badRequest({ code : -3, text : req.__('meal-not-found')});</span>
       }
-<span class="cstat-no" title="statement not covered" >      User.find(userId).populate("payment").exec(<span class="fstat-no" title="function not covered" >function(err,user){</span></span>
+<span class="cstat-no" title="statement not covered" >      User.find(userId).populate("payment").populate("orders").exec(<span class="fstat-no" title="function not covered" >function(err,user){</span></span>
+<span class="cstat-no" title="statement not covered" >        user[0].orders = user[0].orders.filter(<span class="fstat-no" title="function not covered" >function(order){</span></span>
+<span class="cstat-no" title="statement not covered" >          return order.status == "schedule" || order.status == "preparing";</span>
+        })
 <span class="cstat-no" title="statement not covered" >        res.view("confirm",{meal : m[0], user : user[0]});</span>
       });
     });
@@ -1471,7 +1516,7 @@ module.exports = {
       }
 &nbsp;
       <span class="missing-if-branch" title="if path not taken" >I</span>if(orders.length &gt; 0) {
-<span class="cstat-no" title="statement not covered" >        return res.badRequest(req.__('meal-active-error'));</span>
+<span class="cstat-no" title="statement not covered" >        return res.badRequest({ code : -4, text : req.__('meal-active-error')});</span>
       }
 &nbsp;
       Meal.update({id : mealId},{status : "off", isScheduled : false}).exec(function(err, meal){
@@ -1506,11 +1551,11 @@ module.exports = {
 <span class="cstat-no" title="statement not covered" >          if(err){</span>
 <span class="cstat-no" title="statement not covered" >            return res.badRequest(err);</span>
           }
-<span class="cstat-no" title="statement not covered" >          host.checkGuideRequirement(<span class="fstat-no" title="function not covered" >function(err, valid) {</span></span>
+<span class="cstat-no" title="statement not covered" >          host.checkGuideRequirement(<span class="fstat-no" title="function not covered" >function(err) {</span></span>
 <span class="cstat-no" title="statement not covered" >            if(err){</span>
 <span class="cstat-no" title="statement not covered" >              return res.badRequest(err);</span>
             }
-<span class="cstat-no" title="statement not covered" >            if(!valid){</span>
+<span class="cstat-no" title="statement not covered" >            if(!host.passGuide){</span>
 <span class="cstat-no" title="statement not covered" >              return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});</span>
             }
 <span class="cstat-no" title="statement not covered" >            if(!meal.dateIsValid()){</span>
@@ -1544,11 +1589,11 @@ module.exports = {
         <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
 <span class="cstat-no" title="statement not covered" >          return res.badRequest(err);</span>
         }
-        host.checkGuideRequirement(function(err, valid){
+        host.checkGuideRequirement(function(err){
           <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
 <span class="cstat-no" title="statement not covered" >            return res.badRequest(err);</span>
           }
-          if(!valid){
+          if(!host.passGuide || !host.dishVerifying){
             return res.redirect("/apply");
           }
           Meal.findOne(mealId).populate("dishes").exec(function(err,meal){
@@ -1624,11 +1669,11 @@ module.exports = {
 <span class="cstat-no" title="statement not covered" >                return res.badRequest(err);</span>
               }
               if(req.body.status == 'on'){
-                host.checkGuideRequirement(function(err, valid){
+                host.checkGuideRequirement(function(err){
                   <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
 <span class="cstat-no" title="statement not covered" >                    return res.badRequest(err);</span>
                   }
-                  <span class="missing-if-branch" title="else path not taken" >E</span>if(!valid){
+                  <span class="missing-if-branch" title="else path not taken" >E</span>if(!host.passGuide){
                     return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
                   }
 <span class="cstat-no" title="statement not covered" >                  Meal.create(req.body).exec(<span class="fstat-no" title="function not covered" >function(err,meal){</span></span>
@@ -1742,11 +1787,11 @@ module.exports = {
 <span class="cstat-no" title="statement not covered" >                console.log("meal contain unverified dishes");</span>
 <span class="cstat-no" title="statement not covered" >                return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});</span>
               }
-              meal.chef.checkGuideRequirement(function(err, valid){
+              meal.chef.checkGuideRequirement(function(err){
                 <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
 <span class="cstat-no" title="statement not covered" >                  return res.badRequest(err);</span>
                 }
-                <span class="missing-if-branch" title="if path not taken" >I</span>if(!valid){
+                <span class="missing-if-branch" title="if path not taken" >I</span>if(!meal.chef.passGuide){
 <span class="cstat-no" title="statement not covered" >                  return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});</span>
                 }
                 $this.cancelMealJobs(mealId, function(err){
@@ -1882,7 +1927,7 @@ module.exports = {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Sep 16 2016 11:56:30 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Nov 01 2016 15:26:24 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

@@ -55,6 +55,7 @@ process.chdir(__dirname);
   }
 
   // Start server
+  require('dotenv').config()
   if (process.env.NODE_ENV === 'production'){
     sails.lift(rc('sails', {hooks:{grunt:false}}));
   }

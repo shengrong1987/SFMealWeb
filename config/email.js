@@ -16,13 +16,13 @@ module.exports.email = {
     secureConnection : false,
     port : 587,
     auth : {
-      user : "admin@sfmeal.com",
-      pass : "Rs89030659!"
+      user : process.env.ADMIN_EMAIL,
+      pass : process.env.ADMIN_EMAIL_PWD
     },
     tls : {
       ciphers : 'SSLv3'
     }
   },
-  from : "admin@sfmeal.com",
+  from : "SFMeal Admin",
   testMode : false
 };

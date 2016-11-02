@@ -90,7 +90,7 @@ module.exports = function findOneRecord (req, res) {
         matchingRecord.userId = user.id;
         res.view('dish_edit',{dish : matchingRecord});
       }else{
-        res.view('dish',{dish : matchingRecord});
+        res.ok(matchingRecord);
       }
     }else{
       res.ok(matchingRecord);
