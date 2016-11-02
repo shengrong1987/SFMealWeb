@@ -524,7 +524,7 @@ function setupLanguage(){
 
 $("document").ready(function(){
   if(typeof Stripe != 'undefined'){
-    Stripe.setPublishableKey('pk_test_ztZDHzxIInBmBRrkuEKBee8G');
+    Stripe.setPublishableKey('pk_live_AUWn3rb2SLc92lXsocPCDUcw');
   }
   setup();
 });
