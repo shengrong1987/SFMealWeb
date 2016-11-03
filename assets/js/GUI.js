@@ -4,6 +4,63 @@
 
 //utility
 
+var autocomplete;
+var googleAPILoaded;
+function geolocate() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var geolocation = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+      var circle = new google.maps.Circle({
+        center: geolocation,
+        radius: position.coords.accuracy
+      });
+      if(autocomplete){
+        autocomplete.setBounds(circle.getBounds());
+      }
+    });
+  }
+}
+function initAutoComplete(){
+  var componentForm = {
+    "street_number" : "#streetInput",
+    "route" : "#streetInput",
+    "locality" : "#cityInput",
+    "postal_code" : "#postalInput"
+  };
+  var options = {
+    componentRestrictions : { country : 'us'},
+    type : ['geocode']
+  }
+  autocomplete = new google.maps.places.Autocomplete(
+    /** @type {!HTMLInputElement} */($("#streetInput")[0]),
+    options);
+  autocomplete.addListener('place_changed', function() {
+    var place = autocomplete.getPlace();
+    if(!place.address_components){
+      return;
+    }
+    for (var component in componentForm) {
+      $(componentForm[component]).val("");
+      $(componentForm[component]).attr("disabled",false);
+    }
+    // Get each component of the address from the place details
+    // and fill the corresponding field on the form.
+    for(var i=0; i<place.address_components.length;i++){
+      var addressType = place.address_components[i].types[0];
+      if(componentForm[addressType]){
+        var val = place.address_components[i].long_name;
+        if($(componentForm[addressType]).val() != ""){
+          val = $(componentForm[addressType]).val() + " " + val;
+        }
+        $(componentForm[addressType]).val(val);
+      }
+    }
+  });
+}
+
 //Modal open/switch
 function toggleModal(event,cb){
   var target = event.currentTarget?event.currentTarget:event;
@@ -387,6 +444,22 @@ function setup(){
   setupValidator();
   setupCountrySelector();
   setupSelector();
+  $(function(){
+    var keyStop = {
+      8: ":not(input:text, textarea, input:file, input:password)", // stop backspace = back
+      13: "input:text, input:password", // stop enter = submit
+
+      end: null
+    };
+    $(document).bind("keydown", function(event){
+      var selector = keyStop[event.which];
+
+      if(selector !== undefined && $(event.target).is(selector)) {
+        event.preventDefault(); //stop event
+      }
+      return true;
+    });
+  });
   $('.lazyload').each(function(){
     $(this).attr('src', $(this).data('src'));
   });

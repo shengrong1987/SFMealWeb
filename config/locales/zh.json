@@ -247,7 +247,7 @@
   "Ex-meal-title" : "艾米私房羊肉",
   "need-photo" : "必须上传封面相片",
   "need-name" : "必须填写名字",
-  "need-three-photos" : "最好拍三张不同角度的照片, 图片支持jpg,png,jpeg,大小最大不超过2M",
+  "need-three-photos" : "最好拍三张不同角度的照片, 图片支持jpg,png,jpeg,大小最大不超过5M",
   "need-minimal-requirement" : "最少份数或最少金额须填写一项",
   "need-one-pickup-location" : "必须有至少一个取餐选项.",
   "need-one-dish" : "请先至少选择一款菜式",

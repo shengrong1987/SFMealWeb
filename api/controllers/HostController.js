@@ -155,14 +155,22 @@ module.exports = {
             return res.badRequest(err);
           }
           var host = host[0];
+          var addressObj = {};
+          if(host.city){
+            addressObj["city"] = host.city;
+          }
+          if(host.street){
+            addressObj["line1"] = host.street;
+          }
+          if(host.zip){
+            addressObj["postal_code"] = host.zip;
+          }
+          if(host.state){
+            addressObj["state"] = host.state;
+          }
           stripe.updateManagedAccount(host.accountId, {
               legal_entity: {
-                address: {
-                  city: host.city,
-                  line1: host.street,
-                  postal_code: host.zip,
-                  state : host.state
-                }
+                address: addressObj
               }
             },function(err, result){
               if(err){

@@ -54,7 +54,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        return res.ok({dishId : dish.id});
+        return res.ok({dishId : dish[0].id});
       })
     });
   },

@@ -116,7 +116,7 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          res.body.have.property("dishId");
+          res.body.should.have.property("dishId");
           res.body.dishId.should.be.equal(dish1);
           done();
         })

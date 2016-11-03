@@ -208,6 +208,7 @@
   "delivery-available" : "是否提供送餐服务",
   "miles" : "英里",
   "pickup-location" : "取餐地点",
+  "pickup-public-location" : " 取餐大概地址（公开显示）",
   "click-to-cal" : "点我算一下",
   "order-one" : "点一份",
   "user-review" : "吃货评价",
@@ -219,7 +220,7 @@
   "time" : "时间:",
   "location" : "地点",
   "share-to-all" : "分享给大家:",
-  "pickup-location-after-order" : "取餐地点: (付款后就可以看到具体地址)",
+  "pickup-location-after-order" : "(付款后就可以看到具体地址)",
   "meal-delivery-fee" : "送餐费小计: ",
   "delivery-fee-explain" : "输入收餐地址后，系统会自动计算送餐费用。",
   "delivery-location" : "收餐地址",
@@ -246,7 +247,7 @@
   "Ex-meal-title" : "艾米私房羊肉",
   "need-photo" : "必须上传封面相片",
   "need-name" : "必须填写名字",
-  "need-three-photos" : "最好拍三张不同角度的照片, 图片支持jpg,png,jpeg,大小最大不超过2M",
+  "need-three-photos" : "最好拍三张不同角度的照片, 图片支持jpg,png,jpeg,大小最大不超过5M",
   "need-minimal-requirement" : "最少份数或最少金额须填写一项",
   "need-one-pickup-location" : "必须有至少一个取餐选项.",
   "need-one-dish" : "请先至少选择一款菜式",
@@ -576,5 +577,9 @@
   "noOption" : "找不到选项?",
   "customizedOption" : "自定义选项",
   "addVariation" : "添加口味",
-  "forbidden" : "禁止访问"
+  "forbidden" : "禁止访问",
+  "terms-title" : "服务条款和隐私政策",
+  "terms" : "服务条款",
+  "privacy-policy" : "隐私政策",
+  "cancellationPolicy" : "取消与退款政策"
 }

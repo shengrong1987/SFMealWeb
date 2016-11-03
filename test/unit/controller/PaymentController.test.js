@@ -1,9 +1,7 @@
 
 var assert = require('assert'),
     sinon = require('sinon');
-var config = require('../../../config/stripe.js'),
-    stripe = require('stripe')(config.StripeKeys.secretKey);
-request = require('supertest');
+var config,stripe,request = require('supertest');
 var agent;
 
 before(function(done) {
@@ -46,6 +44,8 @@ describe('PaymentController', function() {
 
     var cardId;
     it('should create a new card', function (done) {
+      config = require('../../../config/stripe.js');
+      stripe = require('stripe')(config.StripeKeys.secretKey);
       var number = "4242424242424242";
       var street = "1974 palou ave";
       var city = "San Francisco";

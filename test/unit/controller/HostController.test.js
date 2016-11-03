@@ -2,8 +2,7 @@
 var assert = require('assert'),
     should = require('should'),
     sinon = require('sinon'),
-    config = require('../../../config/stripe.js'),
-    stripe = require('stripe')(config.StripeKeys.secretKey),
+    config, stripe,
     request = require('supertest');
 var agent;
 
@@ -48,6 +47,8 @@ describe('UsersController', function() {
     var bankAccountId;
 
     it('should create bank info for host', function (done) {
+      config = require('../../../config/stripe.js');
+      stripe = require('stripe')(config.StripeKeys.secretKey);
       stripe.tokens.create({
         bank_account: {
           country: 'US',
@@ -56,6 +57,10 @@ describe('UsersController', function() {
           account_number: '000123456789'
         }
       }, function(err, token) {
+        if(err){
+          console.log(err);
+          return done(err);
+        }
         agent
           .post("/bank")
           .set('Accept', 'application/json')

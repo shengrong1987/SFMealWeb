@@ -530,7 +530,7 @@ var ApplyView = Backbone.View.extend({
     var id = address_form.data("id");
     var street = address_form.find("#streetInput").val();
     var city = address_form.find("#cityInput").val();
-    var zip = address_form.find("#zipcodeInput").val();
+    var zip = address_form.find("#postalInput").val();
     var isDefault = address_form.find("#isDefault").prop("checked");
     var url = "";
     if (address_form.data("host")) {
@@ -739,6 +739,7 @@ var AddressView = Backbone.View.extend({
     "click [data-action='updateFromOrder']" : "updateAddressFromOrder",
     "click .newAddress" : "newAddress",
     "submit form" : "saveAddress",
+    "keydown" : "onKeyDown",
     "click #contact input[type='radio']" : "switchAddress",
     "click #method button" : "switchDelivery"
   },
@@ -754,6 +755,9 @@ var AddressView = Backbone.View.extend({
       this.$el.find("#contact-error").show();
       contactView.data("has-error", true);
     }
+  },
+  onKeyDown : function(e){
+    if(e.which == 13) e.preventDefault();
   },
   switchDelivery : function(e){
     var curMethod = $(e.target).attr("value");
@@ -854,7 +858,7 @@ var AddressView = Backbone.View.extend({
     }
     address_form.find("#streetInput").val(street);
     address_form.find("#cityInput").val(city);
-    address_form.find("#zipcodeInput").val(zip);
+    address_form.find("#postalInput").val(zip);
     address_form.find("#phoneInput").val(phone);
   },
   saveAddress : function(e) {
@@ -873,7 +877,7 @@ var AddressView = Backbone.View.extend({
     var address_id = address_form.data("address-id");
     var street = address_form.find("#streetInput").val();
     var city = address_form.find("#cityInput").val();
-    var zip = address_form.find("#zipcodeInput").val();
+    var zip = address_form.find("#postalInput").val();
     var phone = address_form.find("#phoneInput").val();
     var isDefault = address_form.find("#isDefault").prop("checked");
     var url = "";
@@ -896,7 +900,11 @@ var AddressView = Backbone.View.extend({
         location.reload();
         //reloadUrl("/user/me","#myaddress");
       }, error: function (model, err) {
-        alert_block.html(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+        if(err && err.responseJSON && err.responseJSON.invalidAttributes.county && err.responseJSON.invalidAttributes.county.length > 0){
+          alert_block.html(jQuery.i18n.prop('countyNotInServiceError'));
+        }else{
+          alert_block.html(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+        }
         alert_block.show();
       }
     });
@@ -1361,6 +1369,7 @@ var DishView = Backbone.View.extend({
     }
     this.addOptionView(variation,variation);
     setupLanguage();
+    setupDropdownMenu();
   },
   resetCustomProperty : function(e){
     e.preventDefault();
@@ -1859,7 +1868,7 @@ var UserProfileView = Backbone.View.extend({
     var desc = this.$el.find("textarea[name='desc']").val().trim();
     var picture = this.$el.find(".fileinput-preview").data("src");
     var phone = this.$el.find("#phoneInput").val();
-    var zipcode = this.$el.find("#zipcodeInput").val();
+    var zipcode = this.$el.find("#postalInput").val();
     var bMonth = parseInt(this.$el.find("#bMonthInput").val());
     var bDay = parseInt(this.$el.find("#bDayInput").val());
     var bYear = parseInt(this.$el.find("#bYearInput").val());

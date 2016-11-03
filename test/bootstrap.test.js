@@ -8,7 +8,7 @@ before(function(done) {
   this.timeout(12000);
 
   //fs.unlinkSync('/.tmp/myTestConnection.db');
-
+  require('dotenv').config();
   Sails.lift({
     // configuration for testing purposes
     log: { level: 'debug' },
