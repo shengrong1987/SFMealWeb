@@ -265,7 +265,12 @@ module.exports = require('waterlock').actions.user({
           if(err){
             return res.badRequest(err);
           }
-          return res.view('user', {user: found});
+          Notification.destroy({user : userId}).exec(function(err){
+            if(err){
+              console.log(err);
+            }
+            return res.view('user', {user: found});
+          });
         })
       }else{
         async.each(found.orders, function(order,next){

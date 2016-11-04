@@ -185,6 +185,24 @@ describe('UsersController', function() {
         })
     })
 
+    it('should login out', function (done) {
+      agent
+        .post('/auth/logout')
+        .expect(200)
+        .end(function(err,res){
+          should.not.exist(res.body.user, "should logout the user");
+          done();
+        })
+    })
+
+    it('should login an admin account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .end(done)
+    })
+
     it('should get host public profile', function(done){
       agent
         .get('/host/' + hostId)

@@ -29,7 +29,8 @@ module.exports = function(grunt) {
         { 'views/emailTemplates/review/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/start/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/reminder/style.css' : 'assets/styles/importer.less' },
-        { 'views/emailTemplates/summary/style.css' : 'assets/styles/importer.less' }
+        { 'views/emailTemplates/summary/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/licenseUpdated/style.css' : 'assets/styles/importer.less' }
       ]
 		}
 	});

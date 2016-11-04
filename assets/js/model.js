@@ -221,6 +221,7 @@ var UserBarView = Backbone.View.extend({
     }else if(userId){
       io.socket.get("/user/" + userId + "/orders");
       io.socket.get("/user/" + userId + "/meals");
+      io.socket.get("/user/" + userId);
       io.socket.on("order", function(result){
         $this.handleNotification(result.verb, result.data.action, result.id, "order");
         $this.handleBadge(false, "order");
@@ -229,6 +230,10 @@ var UserBarView = Backbone.View.extend({
         $this.handleNotification(result.verb, result.data.action, result.id, "meal");
         $this.handleBadge(false, "meal");
       });
+      io.socket.on("user", function(result){
+        $this.handleNotification(result.verb, result.data.action, result.data.id, "user");
+        $this.handleBadge(false, "user");
+      })
     }
     this.getNotification();
   },
@@ -257,6 +262,8 @@ var UserBarView = Backbone.View.extend({
           msg = jQuery.i18n.prop('orderUpdatedNotification',id, jQuery.i18n.prop(action));
         }else if(model == "meal"){
           msg = jQuery.i18n.prop('mealUpdatedNotification',id, jQuery.i18n.prop(action));
+        }else if(model == "user"){
+          msg = jQuery.i18n.prop('userUpdatedNotification',id, jQuery.i18n.prop(action));
         }
         break;
       case "destroyed":

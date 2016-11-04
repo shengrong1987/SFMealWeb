@@ -23,6 +23,6 @@ module.exports.email = {
       ciphers : 'SSLv3'
     }
   },
-  from : "SFMeal Admin",
+  from : process.env.ADMIN_EMAIL,
   testMode : false
 };

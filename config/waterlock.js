@@ -66,7 +66,7 @@ module.exports.waterlock = {
               ciphers : 'SSLv3'
             }
           },
-          from: 'SFMeal Admin',
+          from: process.env.ADMIN_EMAIL,
           subject: 'Your password reset!',
           forwardUrl: '/auth/resetForm'
         },

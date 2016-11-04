@@ -90,7 +90,8 @@ module.exports = {
     return (subtotal * (1 + tax)).toFixed(2);
   },
   getTaxRate : function(params){
-    var county = (params.host || params.chef).county;
+    var host = (params.host || params.chef) || params;
+    var county = host.county;
     var tax = 0.08;
     switch(county){
       case "San Francisco County":

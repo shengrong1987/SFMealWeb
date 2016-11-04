@@ -10,6 +10,7 @@
 var stripe = require("../services/stripe.js");
 var async = require('async');
 var fs = require("fs");
+var notification = require('../services/notification');
 
 module.exports = {
   me : function(req, res){
@@ -203,6 +204,8 @@ module.exports = {
           params.license.valid = false;
           params.license.issuedTo = host.user.firstname + " " + host.user.lastname;
         }
+        host.admin = "581bce5a28f2161558473296";
+        notification.notificationCenter("User","licenseUpdated",host,false,false,req,true);
         Host.update({id : hostId}, params).exec(function (err, host) {
           if(err){
             return res.badRequest(err);

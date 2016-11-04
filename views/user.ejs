@@ -1114,37 +1114,41 @@
         <!-- info end -->
         <div id="myaddress" style="width: 90%;" class="tab-pane middle" data-id="<%= user.id %>">
           <div class="box box-shadow white text-left">
-            <label>1.<%= __('delivery-location')%></label>
-            <div class="address_blocks">
-              <%
-              var addresses = user.address;
-              var keys = Object.keys(addresses);
-              keys.forEach(function(key){
-                var address= addresses[key];
-              %>
-              <div class="text-left box-grid">
-                <div class="address_block" data-id="<%= user.id %>" data-address-id="<%= address.id%>" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>">
-                  <div class="row vertical-align">
-                    <div class="col-xs-2 text-center">
-                      <% if(address.isDefault){ %>
-                      <label class="text-red default"><%= __('default')%></label>
-                      <%}%>
-                    </div>
-                    <div class="col-xs-6">
-                      <label class="actual_address"><%= address.street%>, &nbsp;<%= address.city%> <%= address.zip%> <br/>+<%= address.phone%></label>
-                    </div>
-                    <div class="col-xs-4">
-                      <a class="text-red cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">&nbsp;&nbsp;<%= __('modify')%></a>
-                      <a class="text-red cursor-pointer deleteBtn" style="margin-left: 5px;" href="javascript:void(0)">&nbsp;<%= __('delete')%></a>
+            <div class="row">
+              <div class="col-xs-12">
+                <label>1.<%= __('delivery-location')%></label>
+                <div class="address_blocks">
+                  <%
+                  var addresses = user.address;
+                  var keys = Object.keys(addresses);
+                  keys.forEach(function(key){
+                    var address= addresses[key];
+                  %>
+                  <div class="text-left box-grid">
+                    <div class="address_block" data-id="<%= user.id %>" data-address-id="<%= address.id%>" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>">
+                      <div class="row vertical-align">
+                        <div class="col-xs-2 text-center">
+                          <% if(address.isDefault){ %>
+                          <label class="text-red default"><%= __('default')%></label>
+                          <%}%>
+                        </div>
+                        <div class="col-xs-6">
+                          <label class="actual_address"><%= address.street%>, &nbsp;<%= address.city%> <%= address.zip%> <br/>+<%= address.phone%></label>
+                        </div>
+                        <div class="col-xs-4">
+                          <a class="text-red cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">&nbsp;&nbsp;<%= __('modify')%></a>
+                          <a class="text-red cursor-pointer deleteBtn" style="margin-left: 5px;" href="javascript:void(0)">&nbsp;<%= __('delete')%></a>
+                        </div>
+                      </div>
                     </div>
                   </div>
+                  <%})%>
+                </div>
+
+                <div class="text-left address_block" data-id="<%= user.id%>">
+                  <button style="margin: 10px 0 10px 0;" class="btn btn-red round newAddress" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html"><%= __('new-location-phone')%></button>
                 </div>
               </div>
-              <%})%>
-            </div>
-
-            <div class="col-xs-12 text-left address_block" data-id="<%= user.id%>">
-              <button style="margin: 10px 0 10px 0;" class="btn btn-red round newAddress" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html"><%= __('new-location-phone')%></button>
             </div>
 
             <% if (typeof (user.host) != 'undefined'){ %>

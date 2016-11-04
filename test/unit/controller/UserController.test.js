@@ -372,7 +372,6 @@ describe('UsersController', function() {
           })
           .expect(200)
           .end(function(err,res){
-            console.log(res.body.address);
             res.body.should.have.property("address").with.length(2);
             should(res.body.address[0]).which.is.a.Object();
             (true).should.be.equalOneOf(res.body.address[0].isDefault, res.body.address[1].isDefault);

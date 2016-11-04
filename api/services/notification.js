@@ -26,13 +26,13 @@ var notification = {
       @hostEmail : email to send to host
       @guestEmail : email to send to guest
    */
-  notificationCenter : function(model, action, params, isSendToHost, isAdminAction, req){
+  notificationCenter : function(model, action, params, isSendToHost, isAdminAction, req, isSendToAdmin){
 
     isSendToHost = isSendToHost || false;
     isAdminAction = isAdminAction || false;
     params.isAdminAction = isAdminAction;
 
-    this.publishEvent(model, action, params, isSendToHost, isAdminAction);
+    this.publishEvent(model, action, params, isSendToHost, isAdminAction, isSendToAdmin);
 
     if(isAdminAction){
       //send emails to both chef and guest as it's modified by admin
@@ -40,8 +40,10 @@ var notification = {
       notification.sendEmail(model, action, params, req);
       params.isSendToHost = false;
       notification.sendEmail(model, action, params, req);
-    }
-    else{
+    }else if(isSendToAdmin){
+      params.isSendToAdmin = true;
+      notification.sendEmail(model, action, params, req);
+    }else{
       params.isSendToHost = isSendToHost;
       notification.sendEmail(model, action, params, req);
       notification.sendMsg(model, action, params, req);
@@ -158,9 +160,14 @@ var notification = {
 
   sendEmail : function(model, action, params, req){
 
-    var basicInfo = this.inquireBasicInfo(params.isSendToHost, params);
+    var basicInfo = this.inquireBasicInfo(params.isSendToHost, params.isSendToAdmin, params);
     var template = this.inquireTemplate(model,action);
-    var locale = req ? (params.isSendToHost ? params.host.locale : params.customer.locale) : '';
+
+    if(params.isSendToAdmin){
+      var locale = params.locale;
+    }else{
+      var locale = req ? (params.isSendToHost ? params.host.locale : params.customer.locale) : '';
+    }
 
     this.mergeI18N(model, action, req, locale, params);
 
@@ -178,7 +185,7 @@ var notification = {
     })
   },
 
-  publishEvent : function(model, action, params, isSendToHost, isAdminAction){
+  publishEvent : function(model, action, params, isSendToHost, isAdminAction, isSendToAdmin){
     var verb = "updated";
     if(model === "Order"){
       switch(action){
@@ -231,6 +238,12 @@ var notification = {
           Meal.publishUpdate( params.id, { id : params.id, action: "mealStart", host: params.host || params.chef });
           break;
       }
+    }else if(model == "User"){
+      switch(action){
+        case "licenseUpdated":
+          User.publishUpdate( params.admin, { id : params.id, action: "licenseUpdated"});
+          break;
+      }
     }
 
     if(isAdminAction){
@@ -253,21 +266,35 @@ var notification = {
           return;
         }
       });
+    }else if(isSendToAdmin){
+      if(model == "User"){
+        Notification.create({ recordId : params.id, user : params.admin, action : action, model : model, verb : verb}).exec(function(err, noti){
+          if(err){
+            console.log(err);
+            return;
+          }
+        });
+      }
     }else{
-      Notification.create({ recordId : params.id, user : params.customer, action : action, model : model, verb : verb}).exec(function(err, noti){
-        if(err){
-          console.log(err);
-          return;
-        }
-      });
+      if(model == "Order"){
+        Notification.create({ recordId : params.id, user : params.customer, action : action, model : model, verb : verb}).exec(function(err, noti){
+          if(err){
+            console.log(err);
+            return;
+          }
+        });
+      }
     }
   },
 
-  inquireBasicInfo : function(isSendToHost, params){
+  inquireBasicInfo : function(isSendToHost, isSendToAdmin, params){
     var info = {};
     if(isSendToHost){
       info.recipientEmail = params.hostEmail;
       info.recipientName = (params.host || params.chef).shopName || '';
+    }else if(isSendToAdmin){
+      info.recipientEmail = "admin@sfmeal.com";
+      info.recipientName = "SFMeal.com";
     }else{
       info.recipientEmail = params.guestEmail;
       info.recipientName = params.customer.firstname || '';
@@ -331,6 +358,12 @@ var notification = {
           template = "summary";
           break;
       }
+    }else if(model == "User"){
+      switch (action){
+        case "licenseUpdated":
+          template = "licenseUpdated";
+          break;
+      }
     }
     return template;
   },
@@ -389,6 +422,12 @@ var notification = {
       switch(action){
         case "summary":
           i18ns = i18ns.concat([]);
+          break;
+      }
+    }else if(model == "User"){
+      switch (action){
+        case "licenseUpdated":
+          i18ns = i18ns.concat(['open-admin']);
           break;
       }
     }
