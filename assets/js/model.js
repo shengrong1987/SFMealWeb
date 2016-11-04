@@ -1911,10 +1911,14 @@ var HostProfileView = Backbone.View.extend({
   },
   initialize : function(){
     var form = this.$el.find("form");
-    var alertView = form.find(form.data("err-container"));
+    var alertView = form.find(form.data("err-container")).find(".alert-danger");
     alertView.removeClass("hide");
     alertView.hide();
     this.alertView = alertView;
+    var successView = form.find(form.data("err-container")).find(".alert-success");
+    successView.removeClass("hide");
+    successView.hide();
+    this.successView = successView;
   },
   saveHostProfile : function(e){
     e.preventDefault();
@@ -1933,8 +1937,9 @@ var HostProfileView = Backbone.View.extend({
       feature_dish_obj["dish" + index] = {"id": $(this).data("value"), "title" : $(this).text()};
       feature_dishes.push(feature_dish_obj);
     });
-    this.alertView.html(jQuery.i18n.prop('saving'));
-    this.alertView.show();
+    this.successView.html(jQuery.i18n.prop('saving'));
+    this.successView.show();
+    this.alertView.hide();
     this.model.set({
       id : form.data("id"),
       shopName : title,
@@ -1948,8 +1953,11 @@ var HostProfileView = Backbone.View.extend({
     var $this = this;
     this.model.save({},{
       success : function(){
-        $this.alertView.html(jQuery.i18n.prop('profileUpdated'));
+        $this.alertView.hide();
+        $this.successView.html(jQuery.i18n.prop('profileUpdated'));
       },error : function(model, err){
+        $this.alertView.show();
+        $this.successView.hide();
         $this.alertView.html(jQuery.i18n.prop('saveError'));
       }
     });
