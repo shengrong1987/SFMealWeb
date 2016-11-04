@@ -326,6 +326,7 @@ module.exports = {
 
   findOne : function(req, res){
     var hostId = req.params.id;
+    var isAdmin = req.session.user.auth.email === 'admin@sfmeal.com';
     Host.findOne(hostId).populate("dishes").populate("meals").exec(function(err, host){
       if(err){
         return res.badRequest(err);
@@ -333,24 +334,32 @@ module.exports = {
       if(!host){
         return res.notFound();
       }
-      var publicHost = {};
-      publicHost.dishes = host.dishes;
-      publicHost.meals = host.meals;
-      publicHost.shopName = host.shopName;
-      publicHost.picture = host.picture;
-      publicHost.intro = host.intro;
-      publicHost.feature_dishes = host.feature_dishes;
-      publicHost.shortIntro = host.shortIntro();
-      publicHost.license = host.license;
       Review.find({host : hostId}).exec(function(err, reviews){
         if(err){
           return res.badRequest(err);
         }
-        publicHost.reviews = reviews;
-        if(req.wantsJSON){
-          return res.ok(publicHost);
+        if(!isAdmin){
+          var publicHost = {};
+          publicHost.dishes = host.dishes;
+          publicHost.meals = host.meals;
+          publicHost.shopName = host.shopName;
+          publicHost.picture = host.picture;
+          publicHost.intro = host.intro;
+          publicHost.feature_dishes = host.feature_dishes;
+          publicHost.shortIntro = host.shortIntro();
+          publicHost.license = host.license;
+          publicHost.reviews = reviews;
+          if(req.wantsJSON){
+            return res.ok(publicHost);
+          }
+          return res.view("profile",{host : publicHost});
         }
-        res.view("profile",{host : publicHost});
+        host.reviews = reviews;
+        if(req.wantsJSON && isAdmin){
+          return res.ok(host);
+        }else{
+          return res.ok();
+        }
       });
     });
   },

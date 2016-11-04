@@ -45274,7 +45274,10 @@ var TableItem = React.createClass({displayName: "TableItem",
         }else{
           var tmpItem = Object.assign({}, item);
           attrs.map(function(attr){
-            tmpItem = tmpItem[attr]?tmpItem[attr]:tmpItem;
+            if(!tmpItem){
+              return;
+            }
+            tmpItem = tmpItem[attr]?tmpItem[attr]:null;
           },this);
           var rowContent = this._renderRow(tmpItem, col, null);
         }
