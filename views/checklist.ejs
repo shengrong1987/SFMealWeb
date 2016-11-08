@@ -1,0 +1,61 @@
+
+<div class="container-fluid text-center" style="margin-top:-20px;">
+  <div class="row">
+    <div class="pure-banner vertical-align green">
+      <div class="middle banner-text">
+        <div class="vertical-align" style="margin-bottom: 5px;">
+          <div class="col-sm-3">
+            <a href="/" class="logo logo-sm"></a>
+          </div>
+          <div class="col-sm-9">
+            <h4 class="text-white"><strong><%= __('welcome')%></strong></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box-primary" id="checkListView" data-id="<%= checklist.id%>">
+    <h3>厨房检查清单</h3>
+    <ul class="list-group checked-list-box text-left">
+      <% Object.keys(checklist).forEach(function(checkKey){ if(checkKey == "createdAt" || checkKey == "updatedAt"){return;} var checkObj = checklist[checkKey]; if(typeof checkObj == 'object'){%>
+        <li class="list-group-item" style="height: 240px;">
+          <div class="checkbox vertical-align">
+            <input class="list-checkbox" type="checkbox" <%= checkObj.status=='valid'?'checked':''%>>
+            <label style="margin-right: 10px;" for="checkbox">
+              <%= __(checkKey)%>
+            </label>
+            <div class="inline-block" style="width: 50%;">
+              <i class="icon fa fa-question-circle fa-2x" data-toggle="tooltip" title="<%= __(checkKey + "-req")%>"></i>
+              <span class="info"><%= __(checkKey + "-req")%></span>
+            </div>
+            <div class="pull-right action-buttons">
+              <label style="margin-right: 5px;"><%= __('status')%>:<%= __(checkObj.status)%>  <%= checkObj.status == "fail" ? (__('reason') + ":" + checkObj.message) : ""%></label>
+              <div class="fileinput <%= checkObj.url ? 'fileinput-exist' : 'fileinput-new'%>" data-provides="fileinput" data-key="<%= checkKey%>">
+                <% if(checkObj.url){%>
+                  <div class="fileinput-exists thumbnail" style="max-height: 150px;max-width: 300px;" data-src="<%= checkObj.url || ''%>">
+                    <img src="<%= checkObj.url || ''%>">
+                  </div>
+                <% }else{%>
+                  <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"></div>
+                <%}%>
+                <div>
+                  <span class="btn btn-info btn-file"><span class="fileinput-new"><%= __('upload-photo')%></span><span class="fileinput-exists"><%= __('change')%></span>
+                    <input type="file" name="...">
+                  </span>
+                  <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput"><%= __('remove')%></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+      <%}})%>
+    </ul>
+    <div class="alert alert-success hide"></div>
+    <div class="alert alert-danger hide"></div>
+  </div>
+</div>
+
+<script>
+  new CheckListView({ el : $("#checkListView"), model : new Checklist()});
+</script>

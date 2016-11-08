@@ -203,9 +203,9 @@ module.exports = {
           params.license = JSON.parse(params.license);
           params.license.valid = false;
           params.license.issuedTo = host.user.firstname + " " + host.user.lastname;
+          host.admin = "581bce5a28f2161558473296";
+          notification.notificationCenter("User","licenseUpdated",host,false,false,req,true);
         }
-        host.admin = "581bce5a28f2161558473296";
-        notification.notificationCenter("User","licenseUpdated",host,false,false,req,true);
         Host.update({id : hostId}, params).exec(function (err, host) {
           if(err){
             return res.badRequest(err);

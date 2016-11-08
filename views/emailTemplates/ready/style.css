@@ -8297,6 +8297,14 @@ label {
   left: 4px;
   top: 4px;
 }
+/* list group*/
+.checkbox input[type=checkbox].list-checkbox {
+  margin-left: 0px;
+}
+.checkbox input[type=checkbox]:checked + label {
+  text-decoration: line-through;
+  color: #8090a0;
+}
 /*label*/
 .fixed-label {
   white-space: nowrap;
@@ -9100,6 +9108,12 @@ fieldset[disabled] .btn-red.active {
   .footer .footer-text {
     margin-left: 20px;
   }
+  #checkListView .icon {
+    display: none;
+  }
+  #checkListView .info {
+    display: block;
+  }
   #dishEditView {
     width: 90%;
   }
@@ -9184,6 +9198,12 @@ fieldset[disabled] .btn-red.active {
   }
   .gs-reactions {
     text-align: center !important;
+  }
+  #checkListView .icon {
+    display: block;
+  }
+  #checkListView .info {
+    display: none;
   }
   .popup {
     padding: 20px;

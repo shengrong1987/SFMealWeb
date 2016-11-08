@@ -12,6 +12,7 @@ var React = require('react/addons'),
   OrderStore = require('../stores/OrderStore'),
   TransactionStore = require('../stores/TransactionStore'),
   JobStore = require('../stores/JobStore'),
+  CheckListStore = require('../stores/CheckListStore'),
   TableItem = require('./TableItem');
 
 var Table = React.createClass({
@@ -56,6 +57,9 @@ var Table = React.createClass({
       case "Job":
         return {data : JobStore.getAllJobs(), detail : JobStore.isShowDetail()};
         break;
+      case "Checklist":
+        return {data : CheckListStore.getAllChecklist(), detail : CheckListStore.isShowDetail()};
+        break;
     }
   },
 
@@ -75,6 +79,7 @@ var Table = React.createClass({
     OrderStore.addChangeListener(this._onChange);
     TransactionStore.addChangeListener(this._onChange);
     JobStore.addChangeListener(this._onChange);
+    CheckListStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount: function () {
@@ -85,6 +90,7 @@ var Table = React.createClass({
     OrderStore.removeChangeListener(this._onChange);
     TransactionStore.removeChangeListener(this._onChange);
     JobStore.removeChangeListener(this._onChange);
+    CheckListStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function () {

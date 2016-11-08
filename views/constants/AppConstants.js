@@ -18,6 +18,8 @@ module.exports = {
     GET_TRANSACTION : null,
     GET_JOBS : null,
     GET_JOB : null,
+    GET_CHECKLISTS : null,
+    GET_CHECKLIST : null,
     TAB_CHANGE : null,
     SEARCH_CHANGE : null,
     NO_RESULT : null,

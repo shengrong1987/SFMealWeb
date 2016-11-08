@@ -133,7 +133,7 @@ module.exports = {
     delete data.id;
     delete data.email;
     delete data.facebookId;
-    async.each(Object.keys[data], function(key, next){
+    async.each(Object.keys(data), function(key, next){
       if(typeof user[key] != 'undefined' || user[key]) {
         return next();
       }

@@ -116,6 +116,15 @@ module.exports.policies = {
     'getUserBalance' : 'or(and(sessionAuth), isAdmin)',
     'getHostBalance' : 'or(and(sessionAuth, isHost), isAdmin)',
     'getBalance' : 'sessionAuth'
+  },
+
+  ChecklistController : {
+    'findByHost' : 'or(and(sessionAuth,sessionSelf,isHost), isAdmin)',
+    'update' : 'or(and(sessionAuth,sessionSelf,isHost), isAdmin)',
+    'find' : 'isAdmin',
+    'findOne' : 'isAdmin',
+    "verify" : "isAdmin",
+    "unVerify" : "isAdmin"
   }
 
   /***************************************************************************

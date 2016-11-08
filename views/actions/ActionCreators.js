@@ -111,6 +111,20 @@ var ActionsCreators = {
     });
   },
 
+  getCheckList : function(records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_CHECKLIST,
+      records: records
+    });
+  },
+
+  getCheckLists : function (records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_CHECKLISTS,
+      records: records
+    });
+  },
+
   switchTab : function(tab){
     AppDispatcher.handleViewAction({
       type : ActionTypes.TAB_CHANGE,

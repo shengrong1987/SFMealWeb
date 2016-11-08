@@ -49,6 +49,7 @@ module.exports.routes = {
   '/host/me' : 'HostController.me',
   '/host/me/createDish' : 'DishController.new_form',
   '/host/me/createMeal' : 'MealController.new_form',
+  '/host/:id/checklist' : 'ChecklistController.findByHost',
   '/host/:id/verifyLicense' : "HostController.verifyLicense",
   '/host/:id/unverifyLicense' : "HostController.unverifyLicense",
   '/meal/:id/off' : 'MealController.off',
@@ -66,9 +67,6 @@ module.exports.routes = {
   '/order/:id/refund' : 'OrderController.refund',
   '/auth/resetForm' : "AuthController.resetForm",
   "/apply" : "HostController.apply",
-  //'PUT /meal/:mealId/dish' : 'MealController.addNewDishes',
-  //'DELETE /meal/:mealId/dish/:dishId' : 'MealController.removeDish',
-  //'DELETE /meal/:mealId/dish' : 'MealController.removeAllDishes'
   '/email/new' : { view : 'emailTemplates/new/html', locals : {layout : 'email_layout'}},
   '/email/cancel' : { view : 'emailTemplates/cancel/html', locals : {layout : 'email_layout'}},
   '/email/confirm' : { view : 'emailTemplates/confirm/html', locals : {layout : 'email_layout'}},
@@ -82,7 +80,9 @@ module.exports.routes = {
   '/job/:name/run' : 'JobController.run',
   '/help' : { view : 'help'},
   '/trust' : { view : 'trust'},
-  '/terms' : {view : 'terms'}
+  '/terms' : {view : 'terms'},
+  '/checklist/:id/verify' : 'ChecklistController.verify',
+  '/checklist/:id/unVerify' : 'ChecklistController.unVerify'
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

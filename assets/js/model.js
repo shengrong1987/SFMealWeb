@@ -497,7 +497,7 @@ var ApplyView = Backbone.View.extend({
       cache: false,
       contentType: false,
       success : function(){
-        reloadUrl("/apply#","step6");
+        reloadUrl("/apply","#step6");
       },error : function(model,err){
         $this.alertView.html(err.responseText);
         $this.alertView.show();
@@ -917,6 +917,84 @@ var AddressView = Backbone.View.extend({
     });
   }
 });
+
+var Checklist = Backbone.Model.extend({
+  urlRoot : '/checklist'
+});
+
+var CheckListView = Backbone.View.extend({
+  events:{
+    "change.bs.fileinput .fileinput" : "upload",
+    "clear.bs.fileinput .fileinput" : "remove"
+  },
+  initialize : function(){
+    var successView = this.$el.find(".alert-success");
+    successView.removeClass("hide");
+    successView.hide();
+    this.successView = successView;
+    var errorView = this.$el.find(".alert-danger");
+    errorView.removeClass("hide");
+    errorView.hide();
+    this.errorView = errorView;
+  },
+  upload : function(e){
+    e.preventDefault();
+    var target = $(e.currentTarget);
+    var name = target.data("key");
+    var id = this.$el.data("id");
+    var file = target.find("input[type='file']")[0].files[0];
+    var $this = this;
+    imageHandler("checklist",file,this.successView,function(url){
+      if(id){
+        $this.model.set({ id : id});
+      }
+      var checkObj = {url : url};
+      var modelObj = {};
+      modelObj[name] = JSON.stringify(checkObj);
+      $this.model.set(modelObj);
+      $this.model.save({},{
+        success : function (model) {
+          location.reload();
+        }, error: function (model, err) {
+          $this.errorView.html(err);
+          $this.errorView.show();
+        }
+      });
+    }, function(err){
+      $this.errorView.html(err);
+      $this.errorView.show();
+      return;
+    },0,name);
+  },
+  remove : function(e){
+    e.preventDefault();
+    var target = $(e.currentTarget);
+    var name = target.data("key");
+    var id = this.$el.data("id");
+    var $this = this;
+    imageHandler("checklist",null,this.successView,function(url){
+      if(id){
+        $this.model.set({ id : id});
+      }
+      var checkObj = {url : url};
+      var modelObj = {};
+      modelObj[name] = JSON.stringify(checkObj);
+      $this.model.set(modelObj);
+      $this.model.save({},{
+        success : function (model) {
+          location.reload();
+        }, error: function (model, err) {
+          $this.errorView.html(err);
+          $this.errorView.show();
+        }
+      });
+    }, function(err){
+      $this.errorView.html(err);
+      $this.errorView.show();
+      return;
+    },0,name,true);
+  }
+})
 
 
 var Meal = Backbone.Model.extend({
@@ -1889,7 +1967,7 @@ var UserProfileView = Backbone.View.extend({
       picture : picture,
       phone : phone,
       zipcode : zipcode,
-      birthDate : birthDate
+      birthday : birthDate
     });
     var $this = this;
     this.model.unset('auth');
@@ -2439,6 +2517,9 @@ function uploadImage(modual,file,progressBar,cb,error,index,name){
         filename = name;
       }
       break;
+    case "checklist":
+      filename = name + "." + fileType;
+      break;
     default :
       break;
   }
@@ -2474,15 +2555,6 @@ function uploadImage(modual,file,progressBar,cb,error,index,name){
               progressBar.html(jQuery.i18n.prop('fileUploading') + percentComplete + "%");
             }
           }, false);
-
-          // Download progress
-          // xhr.addEventListener("progress", function(evt){
-          //   if (evt.lengthComputable) {
-          //     var percentComplete = evt.loaded / evt.total;
-          //     // Do something with download progress
-          //     console.log(percentComplete);
-          //   }
-          // }, false);
 
           return xhr;
         },

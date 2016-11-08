@@ -15,7 +15,7 @@
     </div>
   </div>
 
-  <div id="applyView" data-host-id="<%= user.host ? user.host : '' %>" class="default-container">
+  <div id="applyView" data-host-id="<%= user.host ? (user.host.id ? user.host.id : user.host) : '' %>" class="default-container">
     <div class="box white">
       <h4 class="text-green"><%= __('apply-title') %></h4>
 

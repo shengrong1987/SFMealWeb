@@ -57,6 +57,26 @@ var TableItem = React.createClass({
     SFMealAPI.command(target.data('model'),target.data('id'),'refund',this.props.detail);
   },
 
+  _verifyPhoto : function(event){
+    var target = $(event.target);
+    var key = target.find("~input[name='key']").val();
+    if(!key){
+      ActionCreators.badRequest("need key");
+      return;
+    }
+    SFMealAPI.command(target.data('model'),target.data('id'),'verify',this.props.detail, { key : key});
+  },
+
+  _unVerifyPhoto : function(event){
+    var target = $(event.target);
+    var key = target.find("~input[name='key']").val();
+    if(!key){
+      ActionCreators.badRequest("need key");
+      return;
+    }
+    SFMealAPI.command(target.data('model'),target.data('id'),'unVerify',this.props.detail, { key : key});
+  },
+
   _verifyLicense : function(event){
     var target = $(event.target);
     var month = target.find("~input[name='month']").val();
@@ -134,7 +154,14 @@ var TableItem = React.createClass({
             }
             break;
           case "Job":
-            rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['name']} onClick={this._run}>Run</button>
+            {
+              rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['name']} onClick={this._run}>Run</button>
+            }
+            break;
+          case "Checklist":
+            {
+              rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._verifyPhoto}>VerifyPhoto</button><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._unVerifyPhoto}>UnVerifyPhoto</button><input name="key" type="text"/></div>
+            }
             break;
         }
       }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){

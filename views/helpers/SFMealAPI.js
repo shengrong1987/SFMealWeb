@@ -222,6 +222,35 @@ module.exports = {
     });
   },
 
+  getCheckList : function(id){
+    $.ajax({
+      url: '/checkList/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getCheckList(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getCheckLists : function(criteria, value){
+    if(criteria && value){
+      var url = "/checkList?" + criteria + "=" + value;
+    }else{
+      var url = "/checkList";
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getCheckLists(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
   command : function(model, id, action, detail, data){
     var url = '/' + model.toLowerCase() + '/' + id + '/' + action;
     $.ajax({
@@ -264,6 +293,13 @@ module.exports = {
             ActionCreators.getOrder(data);
           }else{
             ActionCreators.getOrders(data);
+          }
+          break;
+        case "Checklist":
+          if(detail){
+            ActionCreators.getCheckList(data);
+          }else{
+            ActionCreators.getCheckLists(data);
           }
           break;
       }
@@ -325,6 +361,13 @@ module.exports = {
           this.getJob(content);
         }else{
           this.getJobs(criteria, content);
+        }
+        break;
+      case "Checklist":
+        if(criteria == "id" && content){
+          this.getCheckList(content);
+        }else{
+          this.getCheckLists(criteria, content);
         }
         break;
     }

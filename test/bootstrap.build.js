@@ -13,10 +13,10 @@ before(function(done) {
   this.timeout(10000);
 
   //fs.unlinkSync('/.tmp/myTestConnection.db');
-
+  require('dotenv').config();
   Sails.lift({
     // configuration for testing purposes
-    log: { level: 'info' },
+    log: { level: 'verbose' },
     //connections: {
     //  someMongodbServer : {
     //    database : 'test'

@@ -446,7 +446,7 @@ function setup(){
   setupSelector();
   $(function(){
     var keyStop = {
-      8: ":not(input:text, textarea, input:file, input:password)", // stop backspace = back
+      // 8: ":not(input:text, textarea, input:file, input:password)", // stop backspace = back
       13: "input:text, input:password", // stop enter = submit
 
       end: null
@@ -530,7 +530,14 @@ function setupValidator(){
         }
       },strictimage : function($el){
         var requiredImg = $el.data("strictimage");
-        var ext = $el[0].value.match(/\.(.+)$/)[1].toLowerCase();
+        var exts = $el[0].value.match(/\.(.+)$/);
+        if(!exts){
+          return "";
+        }
+        if(exts.length < 1){
+          return jQuery.i18n.prop('strictImageTypeRequire');
+        }
+        var ext = exts[1].toLowerCase();
         if(requiredImg && ext != 'jpeg' && ext != 'png' && ext != 'jpg'){
           return jQuery.i18n.prop('strictImageTypeRequire');
         }

@@ -3,10 +3,7 @@
  */
 
 var assert = require('assert'),
-    sinon = require('sinon');
-var config = require('../../../config/stripe.js'),
-    stripe = require('stripe')(config.StripeKeys.secretKey),
-    request = require('supertest');
+    sinon = require('sinon'),config, stripe,request = require('supertest');
 var agent;
 
 before(function(done) {
@@ -86,6 +83,8 @@ describe('MealController', function() {
     });
 
     it('should create bank info for host', function (done) {
+      config = require('../../../config/stripe.js');
+      stripe = require('stripe')(config.StripeKeys.secretKey);
       stripe.tokens.create({
         bank_account: {
           country: 'US',
@@ -96,6 +95,10 @@ describe('MealController', function() {
           account_number: '000123456789'
         }
       }, function(err, token) {
+        if(err){
+          console.log(err);
+          return done(err);
+        }
         agent
             .post("/bank")
             .set('Accept', 'application/json')
@@ -344,6 +347,8 @@ describe('MealController', function() {
       var expMonth = 2;
       var expYear = 2020;
       var cvv = 123;
+      config = require('../../../config/stripe.js');
+      stripe = require('stripe')(config.StripeKeys.secretKey);
       stripe.tokens.create({
         card:{
           number: number,

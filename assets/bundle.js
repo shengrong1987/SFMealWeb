@@ -44648,6 +44648,20 @@ var ActionsCreators = {
     });
   },
 
+  getCheckList : function(records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_CHECKLIST,
+      records: records
+    });
+  },
+
+  getCheckLists : function (records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_CHECKLISTS,
+      records: records
+    });
+  },
+
   switchTab : function(tab){
     AppDispatcher.handleViewAction({
       type : ActionTypes.TAB_CHANGE,
@@ -44701,7 +44715,7 @@ var AdminPanel = React.createClass({displayName: "AdminPanel",
   },
 
   render: function () {
-    var tabs = ['User', 'Host', 'Meal','Dish','Order','Transaction', 'Job'];
+    var tabs = ['User', 'Host', 'Meal','Dish','Order','Transaction', 'Job', 'Checklist'];
 
     return (
       React.createElement("div", {className: "box"}, 
@@ -44715,7 +44729,7 @@ var AdminPanel = React.createClass({displayName: "AdminPanel",
 
 module.exports = AdminPanel;
 
-},{"../actions/ActionCreators":181,"../stores/UserStore":203,"./Tab":185,"./TablePanel":189,"react":180}],183:[function(require,module,exports){
+},{"../actions/ActionCreators":181,"../stores/UserStore":204,"./Tab":185,"./TablePanel":189,"react":180}],183:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -44838,7 +44852,7 @@ var Search = React.createClass({displayName: "Search",
 
 module.exports = Search;
 
-},{"../helpers/SFMealAPI":193,"../stores/SearchStore":200,"react/addons":8}],185:[function(require,module,exports){
+},{"../helpers/SFMealAPI":193,"../stores/SearchStore":201,"react/addons":8}],185:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -44913,7 +44927,7 @@ var Tab = React.createClass({displayName: "Tab",
 
 module.exports = Tab;
 
-},{"../helpers/SFMealAPI":193,"../stores/TabStore":201,"react/addons":8}],186:[function(require,module,exports){
+},{"../helpers/SFMealAPI":193,"../stores/TabStore":202,"react/addons":8}],186:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -44928,6 +44942,7 @@ var React = require('react/addons'),
   OrderStore = require('../stores/OrderStore'),
   TransactionStore = require('../stores/TransactionStore'),
   JobStore = require('../stores/JobStore'),
+  CheckListStore = require('../stores/CheckListStore'),
   TableItem = require('./TableItem');
 
 var Table = React.createClass({displayName: "Table",
@@ -44972,6 +44987,9 @@ var Table = React.createClass({displayName: "Table",
       case "Job":
         return {data : JobStore.getAllJobs(), detail : JobStore.isShowDetail()};
         break;
+      case "Checklist":
+        return {data : CheckListStore.getAllChecklist(), detail : CheckListStore.isShowDetail()};
+        break;
     }
   },
 
@@ -44991,6 +45009,7 @@ var Table = React.createClass({displayName: "Table",
     OrderStore.addChangeListener(this._onChange);
     TransactionStore.addChangeListener(this._onChange);
     JobStore.addChangeListener(this._onChange);
+    CheckListStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount: function () {
@@ -45001,6 +45020,7 @@ var Table = React.createClass({displayName: "Table",
     OrderStore.removeChangeListener(this._onChange);
     TransactionStore.removeChangeListener(this._onChange);
     JobStore.removeChangeListener(this._onChange);
+    CheckListStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function () {
@@ -45049,7 +45069,7 @@ var Table = React.createClass({displayName: "Table",
 
 module.exports = Table;
 
-},{"../stores/DishStore":195,"../stores/HostStore":196,"../stores/JobStore":197,"../stores/MealStore":198,"../stores/OrderStore":199,"../stores/TransactionStore":202,"../stores/UserStore":203,"./TableHeader":187,"./TableItem":188,"react/addons":8}],187:[function(require,module,exports){
+},{"../stores/CheckListStore":195,"../stores/DishStore":196,"../stores/HostStore":197,"../stores/JobStore":198,"../stores/MealStore":199,"../stores/OrderStore":200,"../stores/TransactionStore":203,"../stores/UserStore":204,"./TableHeader":187,"./TableItem":188,"react/addons":8}],187:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -45154,6 +45174,26 @@ var TableItem = React.createClass({displayName: "TableItem",
     SFMealAPI.command(target.data('model'),target.data('id'),'refund',this.props.detail);
   },
 
+  _verifyPhoto : function(event){
+    var target = $(event.target);
+    var key = target.find("~input[name='key']").val();
+    if(!key){
+      ActionCreators.badRequest("need key");
+      return;
+    }
+    SFMealAPI.command(target.data('model'),target.data('id'),'verify',this.props.detail, { key : key});
+  },
+
+  _unVerifyPhoto : function(event){
+    var target = $(event.target);
+    var key = target.find("~input[name='key']").val();
+    if(!key){
+      ActionCreators.badRequest("need key");
+      return;
+    }
+    SFMealAPI.command(target.data('model'),target.data('id'),'unVerify',this.props.detail, { key : key});
+  },
+
   _verifyLicense : function(event){
     var target = $(event.target);
     var month = target.find("~input[name='month']").val();
@@ -45231,7 +45271,14 @@ var TableItem = React.createClass({displayName: "TableItem",
             }
             break;
           case "Job":
-            rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['name'], onClick: this._run}, "Run")
+            {
+              rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['name'], onClick: this._run}, "Run")
+            }
+            break;
+          case "Checklist":
+            {
+              rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._verifyPhoto}, "VerifyPhoto"), React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._unVerifyPhoto}, "UnVerifyPhoto"), React.createElement("input", {name: "key", type: "text"}))
+            }
             break;
         }
       }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){
@@ -45376,6 +45423,11 @@ var TablePanel = React.createClass({displayName: "TablePanel",
         details = {_id : 'Job ID', name : 'name', "nextRunAt" : 'nextRunAt', "lastFinishedAt" : "lastFinishedAt", data : "data", lastRunAt : "lastRunAt", command : 'Command'} ;
         criterias = ['id', 'name', 'orderId', 'mealId'];
         break;
+      case "Checklist":
+        headers = {id : 'checklist ID', 'host.id' : 'host', kitchen : 'kitchen', surface : 'surface', utensil : 'utensil', dishes : 'dishes', refrigerator : 'refrigerator', sourceStorage : 'sourceStorage', dryFoodStorage : 'dryFoodStorage', water : 'water', command : 'Command' };
+        details = {id : 'checklist ID', 'host.id' : 'host', kitchen : 'kitchen', surface : 'surface', utensil : 'utensil', dishes : 'dishes', refrigerator : 'refrigerator', sourceStorage : 'sourceStorage', dryFoodStorage : 'dryFoodStorage', water : 'water', command : 'Command' };
+        criterias = ['id', 'host', 'key'];
+        break;
     }
 
     return (
@@ -45394,7 +45446,7 @@ var TablePanel = React.createClass({displayName: "TablePanel",
 
 module.exports = TablePanel;
 
-},{"../stores/TabStore":201,"./Search":184,"./Table":186,"react/addons":8}],190:[function(require,module,exports){
+},{"../stores/TabStore":202,"./Search":184,"./Table":186,"react/addons":8}],190:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -45432,6 +45484,8 @@ module.exports = {
     GET_TRANSACTION : null,
     GET_JOBS : null,
     GET_JOB : null,
+    GET_CHECKLISTS : null,
+    GET_CHECKLIST : null,
     TAB_CHANGE : null,
     SEARCH_CHANGE : null,
     NO_RESULT : null,
@@ -45695,6 +45749,35 @@ module.exports = {
     });
   },
 
+  getCheckList : function(id){
+    $.ajax({
+      url: '/checkList/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getCheckList(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getCheckLists : function(criteria, value){
+    if(criteria && value){
+      var url = "/checkList?" + criteria + "=" + value;
+    }else{
+      var url = "/checkList";
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getCheckLists(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
   command : function(model, id, action, detail, data){
     var url = '/' + model.toLowerCase() + '/' + id + '/' + action;
     $.ajax({
@@ -45737,6 +45820,13 @@ module.exports = {
             ActionCreators.getOrder(data);
           }else{
             ActionCreators.getOrders(data);
+          }
+          break;
+        case "Checklist":
+          if(detail){
+            ActionCreators.getCheckList(data);
+          }else{
+            ActionCreators.getCheckLists(data);
           }
           break;
       }
@@ -45800,6 +45890,13 @@ module.exports = {
           this.getJobs(criteria, content);
         }
         break;
+      case "Checklist":
+        if(criteria == "id" && content){
+          this.getCheckList(content);
+        }else{
+          this.getCheckLists(criteria, content);
+        }
+        break;
     }
     ActionCreators.search(criteria, content);
   }
@@ -45816,6 +45913,84 @@ var TableMixin = {};
 module.exports = TableMixin;
 
 },{}],195:[function(require,module,exports){
+/*
+ * RecordStore
+ */
+
+'use strict';
+
+var AppDispatcher = require('../dispatcher/AppDispatcher'),
+  EventEmitter = require('events').EventEmitter,
+  AppConstants = require('../constants/AppConstants'),
+  ActionTypes = AppConstants.ActionTypes,
+  _ = require('lodash');
+
+var CHANGE_EVENT = 'change';
+
+var _checkList = [];
+var _showDetail = false;
+
+var CheckListStore = _.assign({}, EventEmitter.prototype, {
+  getAllChecklist: function () {
+    return _checkList;
+  },
+
+  isShowDetail : function(){
+    return _showDetail;
+  },
+
+  emitChange: function () {
+    this.emit(CHANGE_EVENT);
+  },
+
+  addChangeListener: function (callback) {
+    this.on(CHANGE_EVENT, callback);
+  },
+
+  removeChangeListener: function (callback) {
+    this.removeListener(CHANGE_EVENT, callback);
+  }
+});
+
+// Register callback to handle all updates
+AppDispatcher.register(function (payload) {
+  var action = payload.action;
+
+  switch (action.type) {
+    case ActionTypes.GET_CHECKLISTS:
+      if(!Array.isArray(action.records)){
+        _checkList = [action.records];
+      }else{
+        _checkList = action.records;
+      }
+      _showDetail = false;
+      CheckListStore.emitChange();
+      break;
+
+    case ActionTypes.GET_CHECKLIST:
+      if(!Array.isArray(action.records)){
+        _checkList = [action.records];
+      }else{
+        _checkList = action.records;
+      }
+      _showDetail = true;
+      CheckListStore.emitChange();
+      break;
+
+    case ActionTypes.NO_RESULT:
+      _checkList = [];
+      _showDetail = false;
+      CheckListStore.emitChange();
+      break;
+
+    default:
+      // no op
+  }
+});
+
+module.exports = CheckListStore;
+
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],196:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -45893,7 +46068,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = DishStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],196:[function(require,module,exports){
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],197:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -45971,7 +46146,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = HostStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],197:[function(require,module,exports){
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],198:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -46049,7 +46224,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = JobStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],198:[function(require,module,exports){
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],199:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -46128,7 +46303,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = MealStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],199:[function(require,module,exports){
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],200:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -46206,7 +46381,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = OrderStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],200:[function(require,module,exports){
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],201:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -46272,7 +46447,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = SearchStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],201:[function(require,module,exports){
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],202:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -46324,7 +46499,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = TabStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],202:[function(require,module,exports){
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],203:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -46414,7 +46589,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = TransactionStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],203:[function(require,module,exports){
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}],204:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -46492,4 +46667,4 @@ AppDispatcher.register(function (payload) {
 
 module.exports = UserStore;
 
-},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}]},{},[181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203]);
+},{"../constants/AppConstants":191,"../dispatcher/AppDispatcher":192,"events":1,"lodash":7}]},{},[181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204]);
