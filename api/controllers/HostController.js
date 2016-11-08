@@ -218,6 +218,7 @@ module.exports = {
               }
               req.file("image").upload(function(err, files){
                 var file = files[0];
+                sails.log.error(file.filename);
                 stripe.uploadFile({
                   purpose : 'identity_document',
                   file : {
@@ -227,6 +228,7 @@ module.exports = {
                   }
                 }, host.accountId, function(err, data){
                   if(err){
+                    sails.log.error(err);
                     return cb(err);
                   }
                   legal_entity.verification = {document : data.id};
