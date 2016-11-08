@@ -213,12 +213,16 @@ module.exports = {
           host = host[0];
           async.auto({
             uploadDocument : function(cb){
+              sails.log.error("have image? " + hasImage);
               if(!hasImage){
                 return cb();
               }
               req.file("image").upload(function(err, files){
+                if(err){
+                  sails.log.error(err);
+                  return cb(err);
+                }
                 var file = files[0];
-                sails.log.error(file.filename);
                 stripe.uploadFile({
                   purpose : 'identity_document',
                   file : {
@@ -434,7 +438,6 @@ module.exports = {
               }
               //for testing only
               res.ok(transfer);
-              //res.ok("Your money is transferring to your bank!");
             });
           });
     });

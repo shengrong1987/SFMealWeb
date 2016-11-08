@@ -48,7 +48,7 @@ module.exports = {
             return dish.id != dishId;
           });
         })){
-        return res.badRequest({ code : -2, text : req.__("meal-active-update-dish")});
+        return res.badRequest({ code : -2, responseText : req.__("meal-active-update-dish")});
       }
       Dish.update(dishId, req.body).exec(function(err, dish){
         if(err){
@@ -112,7 +112,7 @@ module.exports = {
             return dish.id != dishId;
           });
       })){
-        return res.badRequest({ code : -1, text : req.__("meal-active-delete-dish")});
+        return res.badRequest({ code : -1, responseText : req.__("meal-active-delete-dish")});
       }
       Dish.destroy(dishId).exec(function(err, dish){
         if(err){

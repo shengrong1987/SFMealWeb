@@ -15,7 +15,7 @@
     </div>
   </div>
 
-  <div class="box-primary" id="checkListView" data-id="<%= checklist.id%>">
+  <div class="box-primary" id="checkListView" data-id="<%= checklist ? checklist.id || ''%>">
     <h3>厨房检查清单</h3>
     <ul class="list-group checked-list-box text-left">
       <% Object.keys(checklist).forEach(function(checkKey){ if(checkKey == "createdAt" || checkKey == "updatedAt"){return;} var checkObj = checklist[checkKey]; if(typeof checkObj == 'object'){%>
