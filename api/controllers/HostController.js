@@ -187,12 +187,14 @@ module.exports = {
         });
       });
     }else{
+      var legal_entity;
       if(params.legal_entity){
-        var legal_entity = JSON.parse(params.legal_entity);
+        legal_entity = JSON.parse(params.legal_entity);
         delete params.legal_entity;
       }
+      var hasImage;
       if(params.hasImage){
-        var hasImage = params.hasImage;
+        hasImage = params.hasImage;
         delete params.hasImage;
       }
       Host.findOne(hostId).populate('user').exec(function(err,host){
@@ -213,13 +215,11 @@ module.exports = {
           host = host[0];
           async.auto({
             uploadDocument : function(cb){
-              sails.log.error("have image? " + hasImage);
               if(!hasImage){
                 return cb();
               }
               req.file("image").upload(function(err, files){
                 if(err){
-                  sails.log.error(err);
                   return cb(err);
                 }
                 var file = files[0];
@@ -232,7 +232,6 @@ module.exports = {
                   }
                 }, host.accountId, function(err, data){
                   if(err){
-                    sails.log.error(err);
                     return cb(err);
                   }
                   legal_entity.verification = {document : data.id};
