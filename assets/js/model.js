@@ -484,11 +484,11 @@ var ApplyView = Backbone.View.extend({
     if(idNumber){
       legalObj.personal_id_number = idNumber;
     }
-    formData.append('legal_entity', JSON.stringify(legalObj));
     if(document){
-      formData.append('hasImage', true);
       formData.append('image',document[0]);
+      formData.append('hasImage', true);
     }
+    formData.append('legal_entity', JSON.stringify(legalObj));
 
     var $this = this;
     this.model.save({},{
