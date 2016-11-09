@@ -193,6 +193,7 @@ module.exports = {
         delete params.legal_entity;
       }
       var hasImage;
+      sails.log.error(params, params.hasImage);
       if(params.hasImage){
         hasImage = params.hasImage;
         delete params.hasImage;
@@ -215,6 +216,7 @@ module.exports = {
           host = host[0];
           async.auto({
             uploadDocument : function(cb){
+              sails.log.error("has image? " + hasImage);
               if(!hasImage){
                 return cb();
               }
