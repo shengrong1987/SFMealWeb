@@ -466,8 +466,9 @@ var ApplyView = Backbone.View.extend({
     var document = this.$el.find("#documentInput").length > 0 ? this.$el.find("#documentInput")[0].files : null;
     var formData = new FormData(this.$el.find("form")[0]);
     this.model.set('id',hostId);
-    var legalObj = {};
+    var legalObj;
     if(bDay && bMonth && bYear){
+      legalObj = legalObj || {};
       legalObj.dob = {
         day : bDay,
         month : bMonth,
@@ -475,21 +476,24 @@ var ApplyView = Backbone.View.extend({
       }
     }
     if(firstname && lastname){
+      legalObj = legalObj || {};
       legalObj.first_name = firstname;
       legalObj.last_name = lastname;
     }
     if(ssnLast4){
+      legalObj = legalObj || {};
       legalObj.ssn_last_4 = ssnLast4;
     }
     if(idNumber){
+      legalObj = legalObj || {};
       legalObj.personal_id_number = idNumber;
+    }
+    if(legalObj){
+      formData.append('legal_entity', JSON.stringify(legalObj));
     }
     if(document){
       formData.append('image',document[0]);
-      formData.append('hasImage', true);
     }
-    formData.append('legal_entity', JSON.stringify(legalObj));
-
     var $this = this;
     this.model.save({},{
       data : formData,

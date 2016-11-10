@@ -192,12 +192,6 @@ module.exports = {
         legal_entity = JSON.parse(params.legal_entity);
         delete params.legal_entity;
       }
-      var hasImage;
-      sails.log.error(params, params.hasImage);
-      if(params.hasImage){
-        hasImage = params.hasImage;
-        delete params.hasImage;
-      }
       Host.findOne(hostId).populate('user').exec(function(err,host){
         if(err){
           return res.badRequest(err);
@@ -216,13 +210,12 @@ module.exports = {
           host = host[0];
           async.auto({
             uploadDocument : function(cb){
-              sails.log.error("has image? " + hasImage);
-              if(!hasImage){
-                return cb();
-              }
               req.file("image").upload(function(err, files){
                 if(err){
                   return cb(err);
+                }
+                if(files.length == 0){
+                  return cb();
                 }
                 var file = files[0];
                 stripe.uploadFile({
@@ -236,6 +229,7 @@ module.exports = {
                   if(err){
                     return cb(err);
                   }
+                  legal_entity = legal_entity || {};
                   legal_entity.verification = {document : data.id};
                   cb();
                 });
