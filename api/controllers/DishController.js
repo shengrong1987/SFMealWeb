@@ -7,6 +7,7 @@
  *                 -2 dish can not be updated on active meal
  */
 
+var notification = require("../services/notification");
 module.exports = {
 	new_form : function(req, res){
     var user = req.session.user;
@@ -15,12 +16,21 @@ module.exports = {
 
   verify : function(req, res){
     var dishId = req.params.id;
-    Dish.update(dishId, { isVerified : true}).exec(function(err, dish){
+    Dish.findOne(dishId).populate("chef").exec(function(err, dish){
       if(err){
         return res.badRequest(err);
       }
-      return res.ok(dish[0]);
-    });
+      if(!dish.chef.dishVerifying){
+        notification.sendEmail("Host","congrat",{ host : dish.chef, hostEmail : dish.chef.email, isSendToHost : true});
+      }
+      dish.isVerified = true;
+      dish.save(function(err, result){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(result);
+      });
+    })
   },
 
   fail : function(req, res){

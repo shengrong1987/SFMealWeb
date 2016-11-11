@@ -376,7 +376,7 @@ module.exports = {
                   if(err){
                     return res.badRequest(err);
                   }
-                  if(!host.passGuide){
+                  if(!host.passGuide || !host.dishVerifying){
                     return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
                   }
                   Meal.create(req.body).exec(function(err,meal){

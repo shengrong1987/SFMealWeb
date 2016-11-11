@@ -306,70 +306,33 @@ var notification = {
     var template = "";
     if(model == "Order"){
       switch(action){
-        case "new":
-          template = "new";
-          break;
-        case "adjust":
-          template = "adjust";
-          break;
-        case "adjusting":
-          template = "adjusting";
-          break;
-        case "cancel":
-          template = "cancel";
-          break;
-        case "cancelling":
-          template = "cancelling";
-          break;
         case "abort":
           template = "cancel";
           break;
-        case "confirm":
-          template = "confirm";
-          break;
-        case "ready":
-          template = "ready";
-          break;
-        case "reject":
-          template = "reject";
-          break;
-        case "review":
-          template = "review";
-          break;
-        case "reminder":
-          template = "reminder";
-          break;
+        default:
+          template = action;
       }
     }else if(model == "Meal"){
       switch(action){
         case "mealScheduleEnd":
           template = "guestlist";
           break;
-        case "start":
-          template = "start";
-          break;
         case "cancel":
           template = "cancel" + model;
           break;
+        default:
+          template = "start";
       }
     }else if(model == "Host"){
-      switch(action){
-        case "summary":
-          template = "summary";
-          break;
-      }
+      template = action;
     }else if(model == "User"){
-      switch (action){
-        case "licenseUpdated":
-          template = "licenseUpdated";
-          break;
-      }
+      template = action;
     }
     return template;
   },
 
   mergeI18N : function(model, action, req, locale, params){
-    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','tax'];
+    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','tax','question-email','click-enter-info','click-upload-info','click-apply'];
     if(model == "Order"){
       switch(action){
         case "new":
@@ -422,6 +385,12 @@ var notification = {
       switch(action){
         case "summary":
           i18ns = i18ns.concat([]);
+          break;
+        case "welcome":
+          i18ns = i18ns.concat(['welcome-title','welcome-context','before-start','chef-identity-verification','chef-identity-verification-context','kitchen-verification','kitchen-verification-context','food-handler-license-verification','food-handler-license-verification-context']);
+          break;
+        case "congrat":
+          i18ns = i18ns.concat(['congrat-context','congrat-good-luck','view-dish','publish-meal','view-dish-context','publish-meal-context','manage-dish','manage-meal']);
           break;
       }
     }else if(model == "User"){

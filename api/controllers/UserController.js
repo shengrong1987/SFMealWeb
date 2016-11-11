@@ -16,6 +16,7 @@ var stripe = require("../services/stripe.js");
 var crypto = require("crypto");
 var moment = require("moment");
 var async = require('async');
+var notification = require('../services/notification');
 
 module.exports = require('waterlock').actions.user({
   /* e.g.
@@ -32,11 +33,12 @@ module.exports = require('waterlock').actions.user({
     var user = req.session.user;
     var email = req.session.user.auth.email;
     var shopName = req.query.shopName;
+    var phone = req.query.phone;
     var params = {};
     params.user = userId;
     params.email = email;
     params.shopName = shopName;
-    params.phone = user.phone || "";
+    params.phone = phone || (user.phone || '');
     if(req.session.user.host){
       return res.badRequest({ code : -1, text : req.__('user-already-host')});
     }
@@ -96,6 +98,7 @@ module.exports = require('waterlock').actions.user({
                 if(err){
                   res.badRequest(err);
                 }
+                notification.sendEmail("Host","welcome",{ host : host, hostEmail : host.email, isSendToHost : true});
                 req.session.user = user[0];
                 res.ok({user:user[0]});
               });

@@ -582,7 +582,7 @@ var ApplyView = Backbone.View.extend({
       alert1.show();
       return;
     }
-    this.model.url = "/user/becomeHost?shopName=" + shopName;
+    this.model.url = "/user/becomeHost?shopName=" + shopName + '&phone=' + phone;
     this.model.fetch({
       success : function(){
         location.reload();
