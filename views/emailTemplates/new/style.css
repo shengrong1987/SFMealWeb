@@ -8090,6 +8090,9 @@ input:focus {
 .meal-icon-remote {
   background: url("https://www.sfmeal.com/images/SFMeal_email_icon4.jpg") no-repeat center / 70% auto;
 }
+.license-icon-remote {
+  background: url("https://www.sfmeal.com/image/SFMeal_email_icon0.jpg") no-repeat center / 70% auto;
+}
 .logo {
   background-image: url(../images/sfmeal_logo.png);
   display: block;
