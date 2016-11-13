@@ -459,8 +459,8 @@ module.exports = {
     if(!newTotalQty){
       return leftQty;
     }
-    Object.keys(leftQty).forEach(function(dishId){
-      leftQty[dishId] = parseInt(leftQty[dishId]) + parseInt(newTotalQty[dishId]) - parseInt(oldTotalQty[dishId]);
+    Object.keys(newTotalQty).forEach(function(dishId){
+      leftQty[dishId] = parseInt(leftQty[dishId] || 0) + parseInt(newTotalQty[dishId]) - parseInt(oldTotalQty[dishId]);
       if(leftQty[dishId] < 0){
         leftQty = false;
         return;
@@ -507,7 +507,7 @@ module.exports = {
                     if(err){
                       return res.badRequest(err);
                     }
-                    return res.ok(result);
+                    return res.ok(result[0]);
                   });
                 })
               })
@@ -522,7 +522,7 @@ module.exports = {
                   if(err){
                     return res.badRequest(err);
                   }
-                  return res.ok(result);
+                  return res.ok(result[0]);
                 });
               })
             }
