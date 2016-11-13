@@ -524,7 +524,8 @@ describe('OrderController', function() {
             provideFromTime : now,
             provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
             minimalOrder : 5,
-            isDelivery : true
+            isDelivery : true,
+            status : 'on'
           })
           .expect(200)
           .end(done)
@@ -593,7 +594,8 @@ describe('OrderController', function() {
             provideFromTime : now,
             provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
             totalQty : dishObj,
-            minimalOrder : 5
+            minimalOrder : 5,
+            status : 'on'
           })
           .expect(200)
           .end(done);
@@ -612,6 +614,7 @@ describe('OrderController', function() {
             provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
             totalQty : dishObj,
             minimalOrder : 5,
+            status : 'on'
           })
           .expect(400)
           .end(function(err, res){

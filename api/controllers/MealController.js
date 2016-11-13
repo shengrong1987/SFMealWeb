@@ -480,14 +480,25 @@ module.exports = {
           return res.badRequest(err);
         }
         if($this.requirementIsValid(req.body, meal)){
-          req.body.leftQty = $this.updateDishQty(meal.leftQty, meal.totalQty, req.body.totalQty);
-          if(!req.body.leftQty){
-            return res.badRequest({responseText : req.__('meal-adjust-qty-fail'), code : -9});
-          }else{
-            if(status == "on"){
+          if(status == "on" && meal.status == "on"){
+            async.auto({
+              updateQty : function(cb){
+                if(!req.body.totalQty){
+                  return cb();
+                }
+                req.body.leftQty = $this.updateDishQty(meal.leftQty, meal.totalQty, req.body.totalQty);
+                if(!req.body.leftQty){
+                  return cb({responseText : req.__('meal-adjust-qty-fail'), code : -9});
+                }
+                cb();
+              }
+            }, function(err){
+              if(err){
+                return res.badRequest(err);
+              }
               meal.chef.dishes = meal.dishes;
               if(!meal.dishIsValid()){
-                console.log("meal contain unverified dishes");
+                sails.log.debug("meal contain unverified dishes");
                 return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
               }
               meal.chef.checkGuideRequirement(function(err){
@@ -511,21 +522,24 @@ module.exports = {
                   });
                 })
               })
-            }else{
-              $this.cancelMealJobs(mealId, function(err){
+            });
+          }else{
+            $this.cancelMealJobs(mealId, function(err){
+              if(err){
+                return res.badRequest(err);
+              }
+              if(req.body.totalQty){
+                req.body.leftQty = req.body.totalQty;
+              }
+              req.body.isScheduled = false;
+              req.body.chef = hostId;
+              Meal.update({id : mealId}, req.body).exec(function(err, result){
                 if(err){
                   return res.badRequest(err);
                 }
-                req.body.isScheduled = false;
-                req.body.chef = hostId;
-                Meal.update({id : mealId}, req.body).exec(function(err, result){
-                  if(err){
-                    return res.badRequest(err);
-                  }
-                  return res.ok(result[0]);
-                });
-              })
-            }
+                return res.ok(result[0]);
+              });
+            })
           }
         }else{
           console.log("meal minimal requirement are not valid");
