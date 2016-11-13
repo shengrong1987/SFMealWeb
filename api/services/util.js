@@ -101,6 +101,7 @@ module.exports = {
         tax = 0.08;
         break;
     }
+    tax = 0;
     params.taxRate = tax;
     return tax;
   }

@@ -331,7 +331,8 @@ var refreshMenu = function(){
     delivery = 0;
   }
   $(".delivery").text("$" + delivery.toFixed(2));
-  var tax = parseFloat(subtotal * 0.0875);
+  // var tax = parseFloat(subtotal * 0.0875);
+  var tax = 0;
   $("#order .tax").text(" $" + tax.toFixed(2));
   $("#order .total").data("value",(subtotal+delivery+tax).toFixed(2));
   $("#order .total").html(" $" + (subtotal+delivery+tax).toFixed(2));

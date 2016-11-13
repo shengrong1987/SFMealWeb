@@ -983,7 +983,8 @@ module.exports = {
       default:
         tax = 1.08;
     }
-    tax = tax || 1.08;
+    // tax = tax || 1.08;
+    tax = 1;
     total = total * tax;
     if(params.delivery_fee){
       total += params.delivery_fee;
