@@ -39,28 +39,52 @@ module.exports = {
   feature : function(req, res){
     var now = new Date();
     var county = req.cookies['county'] || "San Francisco County";
-    Meal.find({county : county, type : 'order', status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
-      if(err){
-        return res.badRequest(err);
-      }
-      Meal.find({county : county, type : 'preorder',status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>=' : now}}).sort('score DESC').limit(6).populate('dishes').populate('chef').exec(function(err, preorders){
+    var user = req.session.user;
+    if(req.session.authenticated){
+      Meal.find({county : county, type : 'order', status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
         if(err){
           return res.badRequest(err);
         }
-        var user = req.session.user;
-        if(user){
-          var userId = user.id;
-          User.findOne(userId).populate("collects").exec(function(err,u){
+        Meal.find({county : county, type : 'preorder',status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>=' : now}}).sort('score DESC').limit(6).populate('dishes').populate('chef').exec(function(err, preorders){
+          if(err){
+            return res.badRequest(err);
+          }
+
+          User.findOne(user.id).populate("collects").exec(function(err,u){
             if(err){
               return res.badRequest(err);
             }
             return res.view('meals',{meals : orders.concat(preorders), user : u});
           });
-        }else {
-          return res.view('home',{orders : orders, preorders : preorders, user : user});
+        })
+      });
+    }else{
+      Host.find({ passGuide : true, intro :{ '!' : ''}}).populate("orders").populate("meals").exec(function(err, hosts){
+        if(err){
+          return res.badRequest(err);
         }
-      })
-    });
+        var publicHosts = [];
+        hosts.filter(function(host){
+          var _host = {};
+          var popularHost = host.orders.length >= 0;
+          var highScore = host.meals.every(function(meal){
+            if(meal.score >= 4.8){
+              _host.score = meal.score;
+              return true;
+            }
+            return false;
+          })
+          if(popularHost && highScore){
+            _host.intro = host.intro;
+            _host.shopName = host.shopName;
+            _host.picture = host.picture;
+            _host.id = host.id;
+            publicHosts.push(_host);
+          }
+        })
+        return res.view('home',{user : user, hosts : publicHosts});
+      });
+    }
   },
 
 	current : function(req, res){
@@ -148,18 +172,20 @@ module.exports = {
               return res.badRequest({ code : -2, text : req.__('meal-error-address2')});
             }
             var location = { lat : result[0].latitude, long : result[0].longitude };
-            found = found.filter(function(meal){
-              var dishes = meal.dishes;
-              var valid = false;
-              for(var i=0; i < dishes.length; i++){
-                var dish = dishes[i];
-                if(meal.title.indexOf(keyword) != -1 || dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
-                  valid = true;
-                  break;
+            if(keyword){
+              found = found.filter(function(meal){
+                var dishes = meal.dishes;
+                var valid = false;
+                for(var i=0; i < dishes.length; i++){
+                  var dish = dishes[i];
+                  if(meal.title.indexOf(keyword) != -1 || dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
+                    valid = true;
+                    break;
+                  }
                 }
-              }
-              return valid;
-            });
+                return valid;
+              });
+            }
             if(req.wantsJSON) {
               res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, anchor : location});
             }else{
@@ -168,18 +194,20 @@ module.exports = {
           }
         });
       }else{
-        found = found.filter(function(meal){
-          var dishes = meal.dishes;
-          var valid = false;
-          for(var i=0; i < dishes.length; i++){
-            var dish = dishes[i];
-            if(meal.title.indexOf(keyword) != -1 || dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
-              valid = true;
-              break;
+        if(keyword){
+          found = found.filter(function(meal){
+            var dishes = meal.dishes;
+            var valid = false;
+            for(var i=0; i < dishes.length; i++){
+              var dish = dishes[i];
+              if(meal.title.indexOf(keyword) != -1 || dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
+                valid = true;
+                break;
+              }
             }
-          }
-          return valid;
-        });
+            return valid;
+          });
+        }
         if(req.wantsJSON) {
           res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : null, anchor : null});
         }else{
