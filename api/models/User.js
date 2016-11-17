@@ -113,9 +113,9 @@ module.exports = {
       collection : 'Notification',
       via : 'user'
     },
-    featureDishes : {
-      collection : 'Dish',
-      defaultsTo : []
+    //[{"dish1": id}, {"dish2":id}, {"dish3":id}]
+    feature_dishes : {
+      type : 'json'
     },
     customerId : {
       type : 'string'

@@ -16,7 +16,8 @@ describe('OrderController', function() {
 
   describe('', function() {
 
-    var guestEmail = 'enjoymyself1987@gmail.com'
+    var guestEmail = 'enjoymyself1987@gmail.com';
+    var adminEmail = 'admin@sfmeal.com';
     var password = '12345678';
     var guestId = "";
     var address = "1455 Market St, San Francisco";
@@ -297,6 +298,15 @@ describe('OrderController', function() {
         .end(done)
     });
 
+    it('should login as administrator', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : adminEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
     it('should change the order to preparing', function (done) {
       agent
           .put('/order/' + orderId)
@@ -314,6 +324,15 @@ describe('OrderController', function() {
           })
     })
 
+    it('should login as guest', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
     it('should request for cancelling', function (done) {
       agent
         .post('/order/' + orderId + "/cancel")
@@ -324,9 +343,6 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          // res.body.status.should.be.equal('cancelling');
-          // res.body.lastStatus.should.be.equal('preparing');
-          // res.body.isSendToHost.should.be.false();
           done();
         })
     })

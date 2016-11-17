@@ -268,6 +268,21 @@ describe('MealController', function() {
         })
     })
 
+    it('should not update meals with certain fields', function(done){
+      var now = new Date();
+      agent
+        .put('/meal/' + preorderMealId)
+        .send({
+          score : "5.0",
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          minimalOrder : 1,
+          status : 'off'
+        })
+        .expect(403)
+        .end(done)
+    });
+
     it('should search the meals in San Francisco and with a keyword of 菜式 but no records are found', function (done) {
       agent
           .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))

@@ -47,11 +47,12 @@ module.exports.policies = {
     'pocket' : 'or(sessionAuth,isAdmin)',
     'me' : ['sessionAuth'],
     'search' : 'isAdmin',
-    'deleteObject' : 'or(sessionAuth,isAdmin)'
+    'deleteObject' : 'or(sessionAuth,isAdmin)',
+    'update' : 'or(and(sessionAuth, sessionSelf, isNotFields("status","pocket","host","customerId")),isAdmin)'
   },
 
   JobController : {
-    '*' : true
+    '*' : 'isAdmin'
   },
 
   MealController : {
@@ -64,7 +65,8 @@ module.exports.policies = {
     'search' : true,
     'confirm' : 'sessionAuth',
     'findAll' : 'isAdmin',
-    'searchAll' : 'isAdmin'
+    'searchAll' : 'isAdmin',
+    'update' : 'or(and(sessionAuth,isHost,isOwnerOfMeal,isNotFields("isScheduled","chef","score","numberOfReviews","msg")),isAdmin)'
   },
 
   HostController : {
@@ -74,13 +76,15 @@ module.exports.policies = {
     'verifyLicense' : 'isAdmin',
     'me' : ['sessionAuth','isHost'],
     'apply' : ['sessionAuth'],
-    'findOne' : ['sessionAuth']
+    'findOne' : ['sessionAuth'],
+    'update' : 'or(and(sessionAuth, sessionSelf, isNotFields("user","accountId","bankId","long","lat","city","street","passGuide","pocket")), isAdmin)'
   },
 
   PaymentController : {
     '*' : 'or(and(sessionAuth, isOwnerOfCard),isAdmin)',
     'create' : 'or(sessionAuth,isAdmin)',
-    'newForm' : ['sessionAuth']
+    'newForm' : ['sessionAuth'],
+    "update" : 'or(and(sessionAuth, isOwnerOfCard, isNotFields("user")), isAdmin)'
   },
 
   OrderController : {
@@ -90,29 +94,30 @@ module.exports.policies = {
     'search' : 'isAdmin',
     'abort' : 'isAdmin',
     'refund' : 'isAdmin',
-    'update' : 'or(and(sessionAuth, isOwnerOfOrder), isAdmin)'
+    'update' : 'isAdmin'
   },
 
   DishController : {
     '*' : 'or(and(sessionAuth, isHost),isAdmin)',
     'verify' : 'isAdmin',
     'fail' : 'isAdmin',
-    'destroy' : 'or(and(sessionAuth, isHost, isOwnerOfDish), isAdmin)'
+    'destroy' : 'or(and(sessionAuth, isHost, isOwnerOfDish), isAdmin)',
+    'update' : 'or(and(sessionAuth, isHost, isOwnerOfDish, isNotFields("sold","numberOfReviews","score","chef", "isFeature", "isVerified")), isAdmin)',
   },
 
   NotificationController : {
-    'msg' : 'isAdmin'
+    'sendMessage' : 'isAdmin'
   },
 
   ReviewController : {
     '*' : ['sessionAuth'],
     'create' : ['sessionAuth', 'isGuestOfMeal'],
-    'delete' : ['isAdmin'],
-    'update' : ['isAdmin']
+    'delete' : 'isAdmin',
+    'update' : 'isAdmin'
   },
 
   PocketController : {
-    '*' : ['isAdmin'],
+    '*' : 'isAdmin',
     'getUserBalance' : 'or(and(sessionAuth), isAdmin)',
     'getHostBalance' : 'or(and(sessionAuth, isHost), isAdmin)',
     'getBalance' : 'sessionAuth'
@@ -120,7 +125,7 @@ module.exports.policies = {
 
   ChecklistController : {
     'findByHost' : 'or(and(sessionAuth,sessionSelf,isHost), isAdmin)',
-    'update' : 'or(and(sessionAuth,sessionSelf,isHost), isAdmin)',
+    'update' : 'or(and(sessionAuth,sessionSelf,isHost,isNotFields("host")), isAdmin)',
     'find' : 'isAdmin',
     'findOne' : 'isAdmin',
     "verify" : "isAdmin",

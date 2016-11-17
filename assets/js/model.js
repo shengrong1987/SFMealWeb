@@ -1362,6 +1362,7 @@ var MealView = Backbone.View.extend({
 
     var status = this.isActivate? "on" : "off";
     var title = form.find("#meal_title").val();
+    this.model.clear();
     if(mealId){
       this.model.set({id : mealId});
       dishes = undefined;

@@ -508,10 +508,10 @@ module.exports = {
           return res.badRequest(err);
         }
         if($this.requirementIsValid(req.body, meal)){
-          if(status == "on" && meal.status == "on"){
+          if(status == "on"){
             async.auto({
               updateQty : function(cb){
-                if(!req.body.totalQty){
+                if(!req.body.totalQty && meal.status != "on"){
                   return cb();
                 }
                 req.body.leftQty = $this.updateDishQty(meal.leftQty, meal.totalQty, req.body.totalQty);
