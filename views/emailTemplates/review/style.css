@@ -8564,6 +8564,9 @@ label {
 .btn-outline-blue {
   border: solid 1px #3fa9f5 !important;
 }
+.btn-outline-red {
+  border: solid 1px #ff4001 !important;
+}
 .btn-outline-light {
   border: solid 1px #e6e6e6 !important;
 }
@@ -8890,7 +8893,23 @@ fieldset[disabled] .btn-red.active {
   width: 30%;
 }
 .banner .img-wrapper {
+  height: 600px;
+  position: relative;
   overflow: hidden;
+}
+.banner .img-wrapper img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 100%;
+  width: auto;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+.banner .img-wrapper img.portrait {
+  width: 100%;
+  height: auto;
 }
 .banner .img-wrapper img {
   min-height: 250px;

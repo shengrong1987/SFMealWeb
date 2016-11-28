@@ -29,6 +29,10 @@
       <div class="tab-content" style="padding-top: 20px;padding-bottom: 60px;min-height: 500px;">
         <div id="myorder" style="width: 90%;" class="tab-pane middle active">
           <div class="box box-shadow white">
+            <% var orders = user.orders;if(orders.length == 0){%>
+            <h3><small><%= __('no-order-tip')%><br/><a href="/meal"><%= __('browse')%></a></small></h3>
+            <div class="divider"></div>
+            <%}else{%>
             <ul class="nav nav-justified nav-tab-cute" style="padding: 20px;">
               <li class="active"><a data-toggle="tab" href="#myorder-order"><h4><strong><%= __('my-order')%></strong></h4></a></li>
               <li><a data-toggle="tab" href="#myorder-preorder"><h4><strong><%= __('my-preorder')%></strong></h4></a></li>
@@ -59,7 +63,7 @@
                       </thead>
                       <%
                       var orders = user.orders;
-                          orders.forEach(function(order){
+                      orders.forEach(function(order){
                       if(order.type == "order"){
                       %>
                       <tbody class="item" style="vertical-align: middle;">
@@ -845,6 +849,7 @@
                 </div>
               </div>
             </div>
+            <%}%>
           </div>
         </div>
 

@@ -1378,185 +1378,214 @@
             <form class="form-horizontal text-left" data-toggle="validator" data-id="<%= user.host.id%>" data-err-container="#formAlert">
 
               <div class="license">
-                <label>1. <%= __('host-license')%> </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" data-placement="right" title="<%= __('photo-restrition')%>"></i></label>
-                <div class="text-left row license">
-                  <div class="col-xs-5">
-                    <div class="fileinput <%= user.host.license? 'fileinput-exists' : 'fileinput-new'%>" data-provides="fileinput">
-                      <div class="fileinput-new thumbnail text-center">
-                        <img class="cursor-pointer" src="/images/upload_default.png" onclick="$('#licenseUpload').trigger('click')">
-                      </div>
-                      <div class="fileinput-preview fileinput-exists thumbnail" style="max-height: 260px;" data-src="<%= user.host.license ? (user.host.license.url || null) : null%>">
-                        <img class="cursor-pointer" src="<%= user.host.license ? (user.host.license.url || '/images/upload_default.png') : '/images/upload_default.png'%>" style="max-height: 250px;" onclick="$('#licenseUpload').trigger('click')">
-                      </div>
-                      <div class="form-group">
+                <div class="form-group">
+                  <div class="col-xs-12">
+                    <label>1. <%= __('host-license')%> </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" data-placement="right" title="<%= __('photo-restrition')%>"></i></label>
+                  </div>
+                  <div class="col-xs-12" style="margin-top:15px;">
+                    <div class="text-left row license">
+                      <div class="col-xs-5">
+                        <div class="fileinput <%= user.host.license? 'fileinput-exists' : 'fileinput-new'%>" data-provides="fileinput">
+                          <div class="fileinput-new thumbnail text-center">
+                            <img class="cursor-pointer" src="/images/upload_default.png" onclick="$('#licenseUpload').trigger('click')">
+                          </div>
+                          <div class="fileinput-preview fileinput-exists thumbnail" style="max-height: 260px;" data-src="<%= user.host.license ? (user.host.license.url || null) : null%>">
+                            <img class="cursor-pointer" src="<%= user.host.license ? (user.host.license.url || '/images/upload_default.png') : '/images/upload_default.png'%>" style="max-height: 250px;" onclick="$('#licenseUpload').trigger('click')">
+                          </div>
+                          <div class="form-group">
                         <span class="btn btn-default btn-file">
                           <span class="fileinput-new"><%= __('select-image')%></span>
                           <span class="fileinput-exists"><%= __('change')%></span>
                           <input id="licenseUpload" type="file" data-wantsImage=true onchange="uploadLicense(event)" data-error-container=".license">
                         </span>
-                        <script>
-                          $(".fileinput").on("clear.bs.fileinput",function(){
-                            $("input[type='file']").data("isDelete",true);
-                          });
-                        </script>
-                        <div class="help-block with-errors"></div>
+                            <script>
+                              $(".fileinput").on("clear.bs.fileinput",function(){
+                                $("input[type='file']").data("isDelete",true);
+                              });
+                            </script>
+                            <div class="help-block with-errors"></div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-xs-7">
+                        <label><%= __('your-license')%>: <span class="<%= user.host.license ? (user.host.license.valid ? "text-green" : "text-red") : "text-red"%>"><%= user.host.license ? (user.host.license.valid ? "通过" : "审核中") : "未上传"%></span></label>
+                        <p> <%= __('expBy')%>: <%= user.host.license ? (user.host.license.valid ? user.host.license.exp : "N/A") : "N/A"%></p>
+                        <% if (!user.host.license || !user.host.license.valid){%>
+                        <h2></h2>
+                        <label><%= __('food-handling-license-help')%>: </label>
+                        <p>1.<%= __('goto')%><a target="_blank" href="http://www.premierfoodsafety.com/california-food-handler-card?registrationSourceID=4631&gclid=Cj0KEQjwi_W9BRD_3uio_Jz-p8UBEiQANU80vl4WQnvSgkliztbO5S0gCcYDF4WiMfv1OBNAwz7hj_caAkSV8P8HAQ">premierfoodsafety.com/CAFoodHandler</a><%= __('food-handling-license-1')%></p>
+                        <p>2.<%= __('food-handling-license-2')%></p>
+                        <p>3.<%= __('food-handling-license-3')%></p>
+                        <%}%>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-xs-12">
+                        <div class="alert alert-danger" data-toggle="alert"></div>
+                        <div class="alert alert-success" data-toggle="alert"></div>
                       </div>
                     </div>
                   </div>
-                  <div class="col-xs-7">
-                    <label><%= __('your-license')%>: <span class="<%= user.host.license ? (user.host.license.valid ? "text-green" : "text-red") : "text-red"%>"><%= user.host.license ? (user.host.license.valid ? "通过" : "审核中") : "未上传"%></span></label>
-                    <p> <%= __('expBy')%>: <%= user.host.license ? (user.host.license.valid ? user.host.license.exp : "N/A") : "N/A"%></p>
-                    <% if (!user.host.license || !user.host.license.valid){%>
-                    <h2></h2>
-                    <label><%= __('food-handling-license-help')%>: </label>
-                    <p>1.<%= __('goto')%><a target="_blank" href="http://www.premierfoodsafety.com/california-food-handler-card?registrationSourceID=4631&gclid=Cj0KEQjwi_W9BRD_3uio_Jz-p8UBEiQANU80vl4WQnvSgkliztbO5S0gCcYDF4WiMfv1OBNAwz7hj_caAkSV8P8HAQ">premierfoodsafety.com/CAFoodHandler</a><%= __('food-handling-license-1')%></p>
-                    <p>2.<%= __('food-handling-license-2')%></p>
-                    <p>3.<%= __('food-handling-license-3')%></p>
-                    <%}%>
                   </div>
                 </div>
-                <div class="row">
-                  <div class="col-xs-12">
-                    <div class="alert alert-danger" data-toggle="alert"></div>
-                    <div class="alert alert-success" data-toggle="alert"></div>
+
+              <h1></h1>
+
+              <div class="form-group">
+                <div class="col-xs-12">
+                  <label>2. <%= __('host-address')%> </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                </div>
+                <div class="col-xs-12">
+                  <h5 class="text-left"><%= __('host-current-address')%></h5>
+                </div>
+                <div class="col-xs-12">
+                  <div id="hostAddressView" class="text-left box-grid">
+                    <div class="address_block" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street || ""%>" data-city="<%= user.host.city || ""%>" data-zip="<%= user.host.zip || ""%>" data-phone="<%=user.phone || ""%>">
+                      <div class="row vertical-align">
+                        <div class="col-xs-2 text-center">
+                          <label class="text-green"><%= __('kitchen')%></label>
+                        </div>
+                        <div class="col-xs-6">
+                          <label><%= user.host.full_address || __('please-enter-address') %><br/> <%= user.phone %></label>
+                        </div>
+                        <div class="col-xs-2">
+                          <a class="text-green cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html"><%= __('modify')%></a>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <h1></h1>
-              <label>2. <%= __('host-address')%> </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-              <h5 class="text-left"><%= __('host-current-address')%></h5>
-              <div id="hostAddressView" class="text-left box-grid">
-                <div class="address_block" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street || ""%>" data-city="<%= user.host.city || ""%>" data-zip="<%= user.host.zip || ""%>" data-phone="<%=user.phone || ""%>">
-                  <div class="row vertical-align">
-                    <div class="col-xs-2 text-center">
-                      <label class="text-green"><%= __('kitchen')%></label>
-                    </div>
-                    <div class="col-xs-6">
-                      <label><%= user.host.full_address || __('please-enter-address') %><br/> <%= user.phone %></label>
-                    </div>
-                    <div class="col-xs-2">
-                      <a class="text-green cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html"><%= __('modify')%></a>
-                    </div>
-                  </div>
+
+              <div class="form-group">
+                <div class="col-xs-12">
+                  <label>3. <%= __('host-story')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
                 </div>
-              </div>
+                <div class="col-xs-12" style="margin-top:15px;">
+                  <div class="story" >
+                    <div class="col-sm-5">
+                      <label>(1) <%= __('host-story')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                      <input class="form-control" data-error="<%= __('max-title-7')%>" name="story-title" maxlength="7" type="text" class="form-control" placeholder="<% if(typeof user.host.shopName == 'undefined'){%>标题最多七个字<%}else{%><%= user.host.shopName %><%}%>" value="<% if(typeof user.host.shopName == 'undefined'){%><%}else{%><%= user.host.shopName %><%}%>">
+                      <div class="help-block with-errors"></div>
+                      <label>(2) <%= __('host-photo')%> </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" data-placement="right" title="<%= __('photo-restrition')%>"></i></label>
 
-              <h1></h1>
-
-              <label>3. <%= __('host-story')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-              <div class="row story">
-                <div class="col-sm-5">
-                  <label>(1) <%= __('host-story')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                  <input class="form-control" data-error="<%= __('max-title-7')%>" name="story-title" maxlength="7" type="text" class="form-control" placeholder="<% if(typeof user.host.shopName == 'undefined'){%>标题最多七个字<%}else{%><%= user.host.shopName %><%}%>" value="<% if(typeof user.host.shopName == 'undefined'){%><%}else{%><%= user.host.shopName %><%}%>">
-                  <div class="help-block with-errors"></div>
-                  <label>(2) <%= __('host-photo')%> </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" data-placement="right" title="<%= __('photo-restrition')%>"></i></label>
-
-                  <div class="fileinput form-group <%= user.host.picture ? 'fileinput-exists' : 'fileinput-new'%>" data-provides="fileinput" style="width: 100%;">
-                    <div class="col-xs-12">
-                      <div class="fileinput-new thumbnail">
-                        <img class="cursor-pointer" src="/images/upload_default.png" onclick="$('storyUpload').trigger('click')">
-                      </div>
-                      <div class="fileinput-preview fileinput-exists thumbnail" style="max-height: 275px;" data-src="<%= user.host.picture || '/images/upload_default.png'%>">
-                        <img class="cursor-pointer" src="<%= user.host.picture ? user.host.picture : '/images/upload_default.png'%>" style="max-height: 265px;" onclick="$('#storyUpload').trigger('click')">
-                      </div>
-                      <span class="btn btn-default btn-file">
+                      <div class="fileinput form-group <%= user.host.picture ? 'fileinput-exists' : 'fileinput-new'%>" data-provides="fileinput" style="width: 100%;">
+                        <div class="col-xs-12">
+                          <div class="fileinput-new thumbnail">
+                            <img class="cursor-pointer" src="/images/upload_default.png" onclick="$('storyUpload').trigger('click')">
+                          </div>
+                          <div class="fileinput-preview fileinput-exists thumbnail" style="max-height: 275px;" data-src="<%= user.host.picture || '/images/upload_default.png'%>">
+                            <img class="cursor-pointer" src="<%= user.host.picture ? user.host.picture : '/images/upload_default.png'%>" style="max-height: 265px;" onclick="$('#storyUpload').trigger('click')">
+                          </div>
+                          <span class="btn btn-default btn-file">
                         <span class="fileinput-new"><%= __('select-image')%></span>
                         <span class="fileinput-exists"><%= __('change')%></span>
                         <input name='story-pic' id="storyUpload" type="file" data-strictImage=true onchange="uploadHostPhoto(event)" data-error-container=".story">
                       </span>
-                      <script>
-                        $(".fileinput").on("clear.bs.fileinput",function(){
-                          $("input[type='file']").data("isDelete",true);
-                        });
-                      </script>
-                      <div class="alert alert-danger" data-toggle="alert"></div>
-                      <div class="alert alert-success" data-toggle="alert"></div>
+                          <script>
+                            $(".fileinput").on("clear.bs.fileinput",function(){
+                              $("input[type='file']").data("isDelete",true);
+                            });
+                          </script>
+                          <div class="alert alert-danger" data-toggle="alert"></div>
+                          <div class="alert alert-success" data-toggle="alert"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-7">
+                      <label>(3) <%= __('host-story-content')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                      <textarea class="form-control" data-error="<%= __('host-story-content-max')%>" maxlength="300" name="story-intro" style="width: 100%;height: 360px;"><%if(typeof user.host.intro != 'undefined'){%><%= user.host.intro %><%}%></textarea>
+                      <div class="help-block with-errors"></div>
                     </div>
                   </div>
-                </div>
-                <div class="col-sm-7">
-                  <label>(3) <%= __('host-story-content')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                  <textarea class="form-control" data-error="<%= __('host-story-content-max')%>" maxlength="300" name="story-intro" style="width: 100%;height: 360px;"><%if(typeof user.host.intro != 'undefined'){%><%= user.host.intro %><%}%></textarea>
-                  <div class="help-block with-errors"></div>
                 </div>
               </div>
 
-              <label>4. <%= __('choose-signature-dish')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-              <div class="row dishes">
-                <div class="col-xs-4">
-                  <div class="dropdown" style="margin-bottom: 10px;">
-                    <a class="btn btn-default btn-outline dropdown-toggle text-dark" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" data-value="<%var features = user.host.feature_dishes;if( typeof features != 'undefined' && features[0].dish1.id != ""){ %><%= features[0].dish1.id %><%}else{%>0<%} %>">
-                      <div style="width: 100px;display: inline-block;">
-                        <%
-                        var features = user.host.feature_dishes;
-                        if( typeof features != 'undefined' && features[0].dish1.id != "0"){
-                        %>
-                        <%= features[0].dish1.title %>
-                        <%}else{__('first-dish')} %>
-                      </div>
-                      <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu signatureDish" aria-labelledby="dropdownMenu1">
-                      <%
-                        var dishes = user.host.dishes;
-                        var count = dishes.length;
-                        for(var i=0; i < count; i++){
-                          var dish = dishes[i];
-                      %>
-                      <li><a href="javascript:void(0)" data-value="<%= dish.id%>"><%=dish.title%></a></li>
-                      <%}%>
-                    </ul>
-                  </div>
+              <div class="form-group">
+                <div class="col-xs-12">
+                  <label>4. <%= __('choose-signature-dish')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
                 </div>
-                <div class="col-xs-4">
-                  <div class="dropdown" style="margin-bottom: 10px;">
-                    <a class="btn btn-default btn-outline dropdown-toggle text-dark" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" data-value="<%var features = user.host.feature_dishes;if( typeof features != 'undefined' && features[1].dish2.id != ""){ %><%= features[1].dish2.id %><%}else{%>0<%}%>">
-                      <div style="width: 100px;display: inline-block;">
-                        <%
-                        var features = user.host.feature_dishes;
-                        if( typeof features != 'undefined' && features[1].dish2.id != "0"){
-                        %>
-                        <%= features[1].dish2.title %>
-                        <%}else{__('second-dish')} %>
+                <div class="col-xs-12" style="margin-top:15px;">
+                  <div class="dishes">
+                    <div class="inline-block" style="width:150px;">
+                      <div class="dropdown" style="margin-bottom: 10px;">
+                        <a class="btn btn-default btn-outline dropdown-toggle text-dark" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" data-value="<%var features = user.host.feature_dishes;if( typeof features != 'undefined' && features[0].dish1.id != ""){ %><%= features[0].dish1.id %><%}else{%>0<%} %>">
+                          <div style="width: 100px;display: inline-block;">
+                            <%
+                            var features = user.host.feature_dishes;
+                            if( typeof features != 'undefined' && features[0].dish1.id != "0"){
+                            %>
+                            <%= features[0].dish1.title %>
+                            <%}else{__('first-dish')} %>
+                          </div>
+                          <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu signatureDish" aria-labelledby="dropdownMenu1">
+                          <%
+                          var dishes = user.host.dishes;
+                          var count = dishes.length;
+                          for(var i=0; i < count; i++){
+                            var dish = dishes[i];
+                          %>
+                          <li><a href="javascript:void(0)" data-value="<%= dish.id%>"><%=dish.title%></a></li>
+                          <%}%>
+                        </ul>
                       </div>
-                      <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                      <%
-                      var dishes = user.host.dishes;
-                      var count = dishes.length;
-                      for(var i=0; i < count; i++){
-                        var dish = dishes[i];
-                      %>
-                      <li><a href="javascript:void(0)" data-value="<%= dish.id%>"><%=dish.title%></a></li>
-                      <%}%>
-                    </ul>
-                  </div>
-                </div>
-                <div class="col-xs-4">
-                  <div class="dropdown">
-                    <a class="btn btn-default btn-outline dropdown-toggle text-dark" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" data-value="<%var features = user.host.feature_dishes;if( typeof features != 'undefined' && features[2].dish3.id != ""){ %><%= features[2].dish3.id %><%}else{%>0<%} %>">
-                    <div style="width: 100px;display: inline-block;">
-                      <%
-                        var features = user.host.feature_dishes;
-                        if( typeof features != 'undefined' && features[2].dish3.id != "0"){
-                      %>
-                      <%= features[2].dish3.title %>
-                      <%}else{__('third-dish')} %>
                     </div>
-                      <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                      <%
-                      var dishes = user.host.dishes;
-                      var count = dishes.length;
-                      for(var i=0; i < count; i++){
-                        var dish = dishes[i];
-                      %>
-                      <li><a href="javascript:void(0)" data-value="<%= dish.id%>"><%=dish.title%></a></li>
-                      <%}%>
-                    </ul>
+
+                    <div class="inline-block" style="width:150px;">
+                      <div class="dropdown" style="margin-bottom: 10px;">
+                        <a class="btn btn-default btn-outline dropdown-toggle text-dark" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" data-value="<%var features = user.host.feature_dishes;if( typeof features != 'undefined' && features[1].dish2.id != ""){ %><%= features[1].dish2.id %><%}else{%>0<%}%>">
+                          <div style="width: 100px;display: inline-block;">
+                            <%
+                            var features = user.host.feature_dishes;
+                            if( typeof features != 'undefined' && features[1].dish2.id != "0"){
+                            %>
+                            <%= features[1].dish2.title %>
+                            <%}else{__('second-dish')} %>
+                          </div>
+                          <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                          <%
+                          var dishes = user.host.dishes;
+                          var count = dishes.length;
+                          for(var i=0; i < count; i++){
+                            var dish = dishes[i];
+                          %>
+                          <li><a href="javascript:void(0)" data-value="<%= dish.id%>"><%=dish.title%></a></li>
+                          <%}%>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div class="inline-block" style="width:150px;">
+                      <div class="dropdown">
+                        <a class="btn btn-default btn-outline dropdown-toggle text-dark" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" data-value="<%var features = user.host.feature_dishes;if( typeof features != 'undefined' && features[2].dish3.id != ""){ %><%= features[2].dish3.id %><%}else{%>0<%} %>">
+                          <div style="width: 100px;display: inline-block;">
+                            <%
+                            var features = user.host.feature_dishes;
+                            if( typeof features != 'undefined' && features[2].dish3.id != "0"){
+                            %>
+                            <%= features[2].dish3.title %>
+                            <%}else{__('third-dish')} %>
+                          </div>
+                          <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                          <%
+                          var dishes = user.host.dishes;
+                          var count = dishes.length;
+                          for(var i=0; i < count; i++){
+                            var dish = dishes[i];
+                          %>
+                          <li><a href="javascript:void(0)" data-value="<%= dish.id%>"><%=dish.title%></a></li>
+                          <%}%>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
