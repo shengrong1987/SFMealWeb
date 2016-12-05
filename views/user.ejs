@@ -99,7 +99,7 @@
                         </td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.status == "schedule" || order.status == "preparing"){ %>
                           <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
@@ -115,6 +115,7 @@
                             <% if(order.method == 'pickup'){%>
                               <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.host.full_address %>"><%= __('see-address')%></a><br/>
                             <%}%>
+                            <a href="javascript:void(0)"><%= __('Track-order')%></a><br/>
                             <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                           <%}else if(order.status == "review"){%>
                             <% if(order.method == 'pickup'){%>
@@ -188,7 +189,7 @@
                         </td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(!order.isSendToHost){%>
                           <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
@@ -249,7 +250,7 @@
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><%= __(order.method)%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
@@ -307,7 +308,7 @@
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <% if(index==0){%>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                          <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                          <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                             <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
                             <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
@@ -366,11 +367,12 @@
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'pickup'){%>
                             <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.host.full_address%>"><%= __('see-address')%></a><br/>
                           <%}%>
+                          <a href="javascript:void(0)"><%= __('Track-order')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                         </td>
                       </tr>
@@ -425,7 +427,7 @@
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'pickup'){%>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.host.full_address %>"><%= __('see-address')%></a><br/>
@@ -509,7 +511,7 @@
                         </td>
                         <% if(index==0){%>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                          <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                          <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                             <% if(order.status == "schedule" || order.status == "preparing"){ %>
                             <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
@@ -523,6 +525,7 @@
                             <% if(order.method == 'pickup'){%>
                             <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.host.full_address%>"><%= __('see-address')%></a><br/>
                             <%}%>
+                            <a href="javascript:void(0)"><%= __('Track-order')%></a><br/>
                             <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                             <%}else if(order.status == "review"){%>
                             <% if(order.method == 'pickup'){%>
@@ -593,7 +596,7 @@
                           <span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-container="#myorder-preorder" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>"><%= __('reject')%></a><br/>
@@ -652,7 +655,7 @@
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <% if(index==0){%>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                          <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                          <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                           <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                             <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
                             <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
@@ -710,7 +713,7 @@
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
@@ -767,11 +770,12 @@
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'pickup'){%>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.address%>"><%= __('see-address')%></a><br/>
                           <%}%>
+                          <a href="javascript:void(0)"><%= __('Track-order')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                         </td>
                       </tr>
@@ -827,7 +831,7 @@
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= (order.subtotal + order.delivery_fee).toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= order.statusText()%></td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'pickup'){%>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.host.full_address%>"><%= __('see-address')%></a><br/>
