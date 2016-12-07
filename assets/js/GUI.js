@@ -405,7 +405,9 @@ function adjustLayout(){
 }
 
 function setupTooltip(){
-  $('[data-toggle="tooltip"]').tooltip();
+  $('[data-toggle="tooltip"]').tooltip({
+    trigger : 'hover focus'
+  });
 }
 
 function setupDropdownMenu(){
