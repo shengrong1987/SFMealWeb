@@ -1103,7 +1103,18 @@
                       <div class="help-block with-errors"></div>
                     </div>
                   </div>
+                  <% if(!user.receivedEmail){%>
+                  <div class="text-left">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" id="receivedEmailCheckbox">
+                        <span for="receivedEmailCheckbox"><%= __('receiveCoupon')%></span>
+                      </label>
+                    </div>
+                  </div>
+                  <%}%>
                 </div>
+
               </div>
 
               <div class="row">

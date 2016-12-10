@@ -1960,11 +1960,13 @@ var UserProfileView = Backbone.View.extend({
     var desc = this.$el.find("textarea[name='desc']").val().trim();
     var picture = this.$el.find(".fileinput-preview").data("src");
     var phone = this.$el.find("#phoneInput").val();
-    var zipcode = this.$el.find("#postalInput").val();
+    var zipcode = this.$el.find("#zipcodeInput").val();
     var bMonth = parseInt(this.$el.find("#bMonthInput").val());
     var bDay = parseInt(this.$el.find("#bDayInput").val());
     var bYear = parseInt(this.$el.find("#bYearInput").val());
     var birthDate = new Date(bYear,bMonth-1,bDay);
+    var isReceiveEmail = this.$el.find("#receivedEmailCheckbox").is(":visible") && this.$el.find("#receivedEmailCheckbox")[0].checked;
+    this.model.clear();
     this.model.set({
       id : this.$el.data("id"),
       firstname : firstname,
@@ -1974,11 +1976,10 @@ var UserProfileView = Backbone.View.extend({
       picture : picture,
       phone : phone,
       zipcode : zipcode,
-      birthday : birthDate
+      birthday : birthDate,
+      isReceivedEmail : isReceiveEmail
     });
     var $this = this;
-    this.model.unset('auth');
-    this.model.unset('address');
     this.model.save({},{
       success : function(){
         if(e.data && e.data.update){

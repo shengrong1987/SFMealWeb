@@ -560,7 +560,7 @@ function setupCountrySelector(){
 }
 
 function setupLanguage(){
-  var language = window.navigator.userLanguage || window.navigator.language;
+  var language = navigator.languages ? navigator.languages[0] : (window.navigator.userLanguage || window.navigator.language);
   jQuery.i18n.properties({
     name:'Message',
     path:'/locale/',

@@ -37,6 +37,7 @@
     "keymirror": "~0.1.0",
     "less": "~v2.6.1",
     "lodash": "~3.10.1",
+    "mailchimp-api-v3": "^1.6.0",
     "mimer": "~0.2.1",
     "miner": "^0.2.1",
     "moment": "~2.12.0",

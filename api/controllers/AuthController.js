@@ -8,6 +8,8 @@
  * @docs        :: http://waterlock.ninja/documentation
  */
 
+var mailChimp = require("../services/mailchimp");
+
 module.exports = require('waterlock').waterlocked({
   /* e.g.
    error
@@ -40,6 +42,8 @@ module.exports = require('waterlock').waterlocked({
           if(err){
             return res.serverError(err);
           }
+          var typeOfUser = params.receivedEmail ? "subscriber" : "member";
+          mailChimp.addMemberToList({ email : params.email, firstname : params.firstname, lastname : params.lastname, language : req.getLocale() }, typeOfUser);
           User.cloneToUser(user,params,function(err,s){
             if(err){
               return res.badRequest(err);

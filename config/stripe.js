@@ -13,4 +13,8 @@ config.TwilioKeys = {
     token : process.env.NODE_ENV === 'production' ? process.env.TWILIO_LIVE_KEY : process.env.TWILIO_TEST_KEY
 }
 
+config.mailChimp = {
+  apiKey : process.env.MAILCHIMP_KEY
+}
+
 module.exports = config;

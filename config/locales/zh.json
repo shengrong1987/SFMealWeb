@@ -501,6 +501,7 @@
   "user-exist-error" : "该用户已存在, 请使用邮箱登录",
   "user-credential-needed" : "需要输入邮箱和密码",
   "enter-website" : "进入网站",
+  "our-mailing-address" : "我们的邮寄地址是",
   "footer-send-by" : "这封电邮是由SFMeal.com发送的.遇到问题? SFMeal客户服务邮箱:",
   "de-order" : "了订单",
   "adjust-order-context" : "修改了他/她的订单",
@@ -646,5 +647,8 @@
   "view-order" : "查看即点菜单",
   "view-preorder" : "查看预定菜单",
   "see-more" : "查看更多",
-  "landing-sfmeal" : "SFMEAL.COM 是一个美食分享平台，不是美食售卖平台。所有货币标示是建议的打赏额（捐款）。我们鼓励吃货和私房厨师以分享及欣赏美食为目的使用该平台。我们支持和帮助烹饪美食爱好者找到他们的知音人。加入我们分享私房菜吧！"
+  "landing-sfmeal" : "SFMEAL.COM 是一个美食分享平台，不是美食售卖平台。所有货币标示是建议的打赏额（捐款）。我们鼓励吃货和私房厨师以分享及欣赏美食为目的使用该平台。我们支持和帮助烹饪美食爱好者找到他们的知音人。加入我们分享私房菜吧！",
+  "subscribe" : "订阅",
+  "subscribe-title" : "输入邮箱获取最火私房菜信息",
+  "receiveCoupon" : "我想通过邮箱来接受SFMeal的最新消息和优惠。"
 }

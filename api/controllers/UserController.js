@@ -17,6 +17,7 @@ var crypto = require("crypto");
 var moment = require("moment");
 var async = require('async');
 var notification = require('../services/notification');
+var mailChimp = require("../services/mailchimp");
 
 module.exports = require('waterlock').actions.user({
   /* e.g.
@@ -98,7 +99,8 @@ module.exports = require('waterlock').actions.user({
                 if(err){
                   res.badRequest(err);
                 }
-                notification.sendEmail("Host","welcome",{ host : host, hostEmail : host.email, isSendToHost : true});
+                // notification.sendEmail("Host","welcome",{ host : host, hostEmail : host.email, isSendToHost : true});
+                mailChimp.addMemberToList({ email : host.email, shopName : shopName, firstname : user[0].firstname, lastname : user[0].lastname, language : req.getLocale() }, "chef");
                 req.session.user = user[0];
                 res.ok({user:user[0]});
               });
@@ -131,76 +133,84 @@ module.exports = require('waterlock').actions.user({
     var userId = req.params.id;
 
     async.auto({
-      handleAddress : function(cb){
+      handleSubscription : function(cb){
+        User.findOne(userId).populate("auth").exec(function(err, user) {
+          if (err) {
+            return cb(err);
+          }
+          if(params.isReceivedEmail && !user.receivedEmail){
+            mailChimp.addMemberToList({ email : user.auth.email, firstname : user.firstname, lastname: user.lastname, language : req.getLocale()}, "subscriber");
+            user.receivedEmail = true;
+          }
+          cb(null, user);
+        });
+      },
+      handleAddress : ['handleSubscription', function(cb, result){
+        var user = result.handleSubscription;
         if(!params.address){
-          return cb();
+          return cb(null, user);
         }
         var addresses = params.address;
-        User.findOne(userId).exec(function(err, user){
+        async.each(addresses, function(addObj, next){
+          if(addObj.delete){
+            if(user.address.length == 1){
+              return next(req.__('user-only-address'));
+            }
+            var deletingAdd = user.address.filter(function(one){
+              return one.id == addObj.id;
+            })[0];
+            user.address.splice(user.address.indexOf(deletingAdd),1);
+            if(deletingAdd.isDefault){
+              user.address[0].isDefault = true;
+            }
+            return next(null, user);
+          }
+          var actualAddress = addObj.street + " " + addObj.city;
+          require('../services/geocode').geocode(actualAddress, function (err, result) {
+            if (err) {
+              return next(req.__('meal-error-address'));
+            }
+            if(result.length==0){
+              return next(req.__('meal-error-address2'));
+            }
+            if(addObj.isDefault){
+              user.address.forEach(function (one) {
+                one.isDefault = false;
+              });
+              var administration = result[0].administrativeLevels;
+              user.county = administration.level2long;
+              user.city = result[0].city;
+              user.full_address = result[0].formattedAddress;
+              user.lat = result[0].latitude;
+              user.long = result[0].longitude;
+              user.zip = result[0].zipcode;
+            }
+
+            addObj.street = result[0].streetNumber + " " + result[0].streetName;
+            addObj.city = result[0].city;
+            addObj.zip = result[0].zipcode;
+
+            if(addObj.id && addObj.id != 'undefined'){
+              user.address.forEach(function(add, index){
+                if(add.id == addObj.id){
+                  user.address[index] = addObj;
+                }
+              });
+            }else{
+              var id = new Date().getTime();
+              addObj.id = id;
+              user.address.push(addObj);
+            }
+            return next();
+          });
+        },function(err){
           if(err){
             return cb(err);
           }
-          async.each(addresses, function(addObj, next){
-            if(addObj.delete){
-              if(user.address.length == 1){
-                return next(req.__('user-only-address'));
-              }
-              var deletingAdd = user.address.filter(function(one){
-                return one.id == addObj.id;
-              })[0];
-              user.address.splice(user.address.indexOf(deletingAdd),1);
-              if(deletingAdd.isDefault){
-                user.address[0].isDefault = true;
-              }
-              return next(null, user);
-            }
-            var actualAddress = addObj.street + " " + addObj.city;
-            require('../services/geocode').geocode(actualAddress, function (err, result) {
-              if (err) {
-                return next(req.__('meal-error-address'));
-              }
-              if(result.length==0){
-                return next(req.__('meal-error-address2'));
-              }
-              if(addObj.isDefault){
-                user.address.forEach(function (one) {
-                  one.isDefault = false;
-                });
-                var administration = result[0].administrativeLevels;
-                user.county = administration.level2long;
-                user.city = result[0].city;
-                user.full_address = result[0].formattedAddress;
-                user.lat = result[0].latitude;
-                user.long = result[0].longitude;
-                user.zip = result[0].zipcode;
-              }
-
-              addObj.street = result[0].streetNumber + " " + result[0].streetName;
-              addObj.city = result[0].city;
-              addObj.zip = result[0].zipcode;
-
-              if(addObj.id && addObj.id != 'undefined'){
-                user.address.forEach(function(add, index){
-                  if(add.id == addObj.id){
-                    user.address[index] = addObj;
-                  }
-                });
-              }else{
-                var id = new Date().getTime();
-                addObj.id = id;
-                user.address.push(addObj);
-              }
-              return next();
-            });
-          },function(err){
-            if(err){
-              return cb(err);
-            }
-            delete params.address;
-            cb(null, user);
-          });
-        })
-      },
+          delete params.address;
+          cb(null, user);
+        });
+      }],
       updateUser : ['handleAddress',function(cb, results){
         if(results && results.handleAddress) {
           results.handleAddress.save(function(err, u){

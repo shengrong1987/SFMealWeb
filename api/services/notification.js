@@ -332,7 +332,7 @@ var notification = {
   },
 
   mergeI18N : function(model, action, req, locale, params){
-    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','tax','question-email','click-enter-info','click-upload-info','click-apply'];
+    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','our-mailing-address','tax','question-email','click-enter-info','click-upload-info','click-apply'];
     if(model == "Order"){
       switch(action){
         case "new":

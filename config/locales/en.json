@@ -501,6 +501,7 @@
   "user-exist-error": "The user already exists, please use the email to logon",
   "user-credential-needed": "You need email and password to login",
   "enter-website": "Enter the website",
+  "our-mailing-address" : "Our mailing address is",
   "footer-send-by": "This email was sent by SFMeal.com. If you have problems, please contact SFMeal Customer Service Email:",
   "de-order": "'s order",
   "adjust-order-context": "Change his / her order",
@@ -646,5 +647,8 @@
   "view-order": "Check meals",
   "view-preorder": "Check preorder meals",
   "see-more": "Read more",
-  "landing-sfmeal": "SFMEAL.COM is a platform of sharing delicious food, not platform of selling food. All currencies designation is suggested to paid as money reward (donate). We encourage foodie and private chef to share and enjoy the food for the purpose of using this platform. We support and help cooking food lovers find their soul mate. Join us to share private kitchens!"
+  "landing-sfmeal": "SFMEAL.COM is a platform of sharing delicious food, not platform of selling food. All currencies designation is suggested to paid as money reward (donate). We encourage foodie and private chef to share and enjoy the food for the purpose of using this platform. We support and help cooking food lovers find their soul mate. Join us to share private kitchens!",
+  "subscribe" : "Subscribe",
+  "subscribe-title" : "Get home food by Email",
+  "receiveCoupon" : "I want to receive email for promotions and latest updates from SFMeal.com."
 }
