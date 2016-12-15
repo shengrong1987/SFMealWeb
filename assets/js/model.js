@@ -1161,12 +1161,17 @@ var MealView = Backbone.View.extend({
   changeMethod : function(e){
     var select = $(e.target);
     var method = select.val();
-    var locationInput = select.closest('.method').prev().find('input');
+    var locationInput = select.closest('.method').parent().find('.location input');
+    var publicLocation = select.closest('.method').parent().find('.public-location input');
     if(method == 'delivery'){
       locationInput.prop('disabled',true);
+      publicLocation.prop('disabled',true);
       locationInput.val('N/A');
+      publicLocation.val('N/A');
     }else{
       locationInput.removeAttr('disabled');
+      publicLocation.removeAttr('disabled');
+      publicLocation.val('');
       locationInput.val('');
     }
   },
@@ -1199,14 +1204,17 @@ var MealView = Backbone.View.extend({
     var deliveryFeeInput = this.$el.find("#deliveryFeeInput");
     var deliveryRangeInput = this.$el.find("#deliveryRangeInput");
     var deliveryBySysCheckbox = this.$el.find("#isDeliveryBySystem");
+    var deliveryCenterInput = form.find("#deliveryCenterInput");
     if(checkbox.prop("checked")){
       deliveryBySysCheckbox.prop("disabled", false);
       deliveryFeeInput.prop('disabled', false);
       deliveryRangeInput.prop('disabled', false);
+      deliveryCenterInput.prop('disabled',false);
     }else{
       deliveryBySysCheckbox.prop("disabled", true);
       deliveryFeeInput.prop('disabled', true);
       deliveryRangeInput.prop('disabled', true);
+      deliveryCenterInput.prop('disabled',true);
     }
   },
   addNewPickup : function(e){

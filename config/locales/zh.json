@@ -450,6 +450,8 @@
   "delivery-out-of-range-error" : "地址超出送餐范围",
   "meal-error-address" : "地址解析错误,请刷新再试.",
   "meal-error-address2" : "地址格式不对或地址不存在.",
+  "meal-delivery-conflict" : "如果想要使用系统配送服务必须先勾选'提供送餐'",
+  "meal-delivery-lack-of-method" : "以勾选送餐服务，但缺少送餐时间",
   "meal-not-found" : "没有找到任何Meal",
   "meal-active-error" : "目前有正在进行中的订单,无法下线这个Meal.",
   "meal-chef-incomplete" : "厨师信息未完整或菜式审核中, 请点击'预览但不发布'按钮",

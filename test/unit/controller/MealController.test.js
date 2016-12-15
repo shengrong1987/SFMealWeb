@@ -302,7 +302,7 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          res.body.code.should.be.equal(-6);
+          res.body.code.should.be.equal(-12);
           done();
         })
     })

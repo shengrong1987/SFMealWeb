@@ -21,6 +21,8 @@ var moment = require("moment");
  * -9 : fail to decrease totalQty because of the dish has been ordered
  * -10 : fail to add/remove dish on active meal
  * -11 : dish can not be empty
+ * -12 : system delivery provided but delivery option is off
+ * -13 : support delivery but no delivery time was added
  */
 
 module.exports = {
@@ -390,10 +392,14 @@ module.exports = {
   create : function(req, res){
     var hostId = req.session.user.host.id? req.session.user.host.id : req.session.user.host;
     req.body.chef = hostId;
+    var $this = this;
 
     if(this.dateIsValid(req.body)){
-      if(this.requirementIsValid(req.body)){
-        this.dishIsValid(req.body, function(valid){
+      this.requirementIsValid(req.body, null, req, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        $this.dishIsValid(req.body, function(valid){
           if(valid){
             Host.findOne(hostId).populate("meals").populate("dishes").exec(function(err, host){
               if(err){
@@ -431,10 +437,7 @@ module.exports = {
             return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
           }
         });
-      }else{
-        console.log("meal requirement are not valid");
-        return res.badRequest({responseText : req.__('meal-invalid-requirement'), code : -6});
-      }
+      });
     }else{
       console.log("Date format of meal is not valid");
       return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
@@ -510,7 +513,10 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        if($this.requirementIsValid(req.body, meal)){
+        $this.requirementIsValid(req.body, meal, req, function (err) {
+          if(err){
+            return res.badRequest(err);
+          }
           if(status == "on"){
             async.auto({
               updateQty : function(cb){
@@ -572,10 +578,7 @@ module.exports = {
               });
             })
           }
-        }else{
-          console.log("meal minimal requirement are not valid");
-          return res.badRequest({responseText : req.__('meal-invalid-requirement'), code : -6});
-        }
+        });
       });
     }else{
       console.log("Date format of meal is not valid");
@@ -583,26 +586,26 @@ module.exports = {
     }
   },
 
-  requirementIsValid : function(params, meal){
+  requirementIsValid : function(params, meal, req, cb){
     var minOrderNumber = parseInt(params.minimalOrder);
     var minOrderTotal = parseFloat(params.minimalTotal);
     if(!minOrderNumber && !minOrderTotal){
       console.log("minimal order number and minimal order bill amount are required(one of them)");
-      return false;
+      return cb({ code : -6, text : req.__('')});
     }
     var type = meal ? meal.type : params.type;
     if(params.isDelivery && type == 'preorder' && !JSON.parse(params.pickups).some(function(pickup){
         return pickup.method == 'delivery';
       })){
       sails.log.debug("support delivery but no delivery time was added");
-      return false;
+      return cb({ code : -13, text : req.__('meal-delivery-lack-of-method')});
     }
 
     if(!params.isDelivery && params.isDeliveryBySystem){
       sails.log.debug("system delivery provided but delivery option is off");
-      return false;
+      return cb({ code : -12, text : req.__('meal-delivery-conflict')});
     }
-    return true;
+    cb();
   },
 
   dishIsValid : function(params, cb){

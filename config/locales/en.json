@@ -449,6 +449,8 @@
   "delivery-out-of-range-error": "Address is out of delivery range",
   "meal-error-address": "Address parsing error, please refresh and try again.",
   "meal-error-address2": "Address format is wrong or does not exist.",
+  "meal-delivery-conflict" : "Need to offer delivery if you request system delivery support",
+  "meal-delivery-lack-of-method" : "Need to create at least one delivery schedule if delivery is provided",
   "meal-not-found": "No Meal found",
   "meal-active-error": "There are ongoing orders and can’t log off the meal.",
   "meal-chef-incomplete": "Chef information is incomplete or pending review, click the button 'Preview but not publish'",
