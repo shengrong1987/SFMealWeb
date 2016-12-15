@@ -399,6 +399,9 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
+              if(req.body.isDeliveryBySystem){
+                req.body.delivery_fee = "5.99";
+              }
               if(req.body.status == 'on'){
                 host.checkGuideRequirement(function(err){
                   if(err){
@@ -591,7 +594,12 @@ module.exports = {
     if(params.isDelivery && type == 'preorder' && !JSON.parse(params.pickups).some(function(pickup){
         return pickup.method == 'delivery';
       })){
-      console.log("support delivery but no delivery time was added");
+      sails.log.debug("support delivery but no delivery time was added");
+      return false;
+    }
+
+    if(!params.isDelivery && params.isDeliveryBySystem){
+      sails.log.debug("system delivery provided but delivery option is off");
       return false;
     }
     return true;

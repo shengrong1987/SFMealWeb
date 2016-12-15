@@ -230,6 +230,8 @@ module.exports = {
                 email : email,
                 customerId : found.payment[0].customerId,
                 destination : m.chef.accountId,
+                meal : m,
+                method : method,
                 metadata : {
                   mealId : m.id,
                   hostId : m.chef.id,
@@ -344,6 +346,7 @@ module.exports = {
                   email : email,
                   customerId : found.payment[0].customerId,
                   destination : order.host.accountId,
+                  meal : order.meal,
                   metadata : {
                     mealId : order.meal.id,
                     hostId : order.host.id,
@@ -664,6 +667,7 @@ module.exports = {
                 email : email,
                 customerId : found.payment[0].customerId,
                 destination : order.host.accountId,
+                meal : order.meal,
                 metadata : {
                   mealId : order.meal.id,
                   hostId : order.host.id,
@@ -967,6 +971,7 @@ module.exports = {
       default:
         tax = 1.08;
     }
+    tax = 1;
     return Math.round(subtotal * tax * 100);
   },
 

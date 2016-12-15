@@ -242,6 +242,8 @@
   "delivery-range" : "送餐范围",
   "delivery-fee" : "送餐费",
   "delivery-available" : "是否提供送餐服务",
+  "delivery-by-system" : "是否使用系统配送",
+  "delivery-center" : "送餐范围中心点",
   "miles" : "英里",
   "pickup-location" : "取餐地点",
   "pickup-public-location" : " 取餐大概地址（公开显示）",
@@ -650,5 +652,13 @@
   "landing-sfmeal" : "SFMEAL.COM 是一个美食分享平台，不是美食售卖平台。所有货币标示是建议的打赏额（捐款）。我们鼓励吃货和私房厨师以分享及欣赏美食为目的使用该平台。我们支持和帮助烹饪美食爱好者找到他们的知音人。加入我们分享私房菜吧！",
   "subscribe" : "订阅",
   "subscribe-title" : "输入邮箱获取最火私房菜信息",
-  "receiveCoupon" : "我想通过邮箱来接受SFMeal的最新消息和优惠。"
+  "receiveCoupon" : "我想通过邮箱来接受SFMeal的最新消息和优惠。",
+  "shipping-option" : "快递选项",
+  "shipping-available" : "是否提供快递服务",
+  "shipping-type" : "快递费计算方法",
+  "shipping-fee" : "快递费用",
+  "custom" : "自动计算费用",
+  "fixed" : "固定费用",
+  "offer-free-shipping-amount" : "是否提供免运费",
+  "free-amount" : "订单免运费金额"
 }

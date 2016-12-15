@@ -56,6 +56,7 @@ module.exports = function findOneRecord (req, res) {
           if(err){
             return res.badRequest(err);
           }
+          matchingRecord.kitchen_address = host.full_address;
           matchingRecord.allDishes = host.dishes;
           matchingRecord.phone = host.user.phone;
           res.view('meal_edit',{meal : matchingRecord});

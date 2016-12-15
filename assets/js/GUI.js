@@ -35,7 +35,7 @@ function initAutoComplete(){
     type : ['geocode']
   }
   autocomplete = new google.maps.places.Autocomplete(
-    /** @type {!HTMLInputElement} */($("#streetInput")[0]),
+    /** @type {!HTMLInputElement} */($("#streetInput")[0] || $("#deliveryCenterInput")[0]),
     options);
   autocomplete.addListener('place_changed', function() {
     var place = autocomplete.getPlace();

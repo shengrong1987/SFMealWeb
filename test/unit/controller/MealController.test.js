@@ -124,6 +124,7 @@ describe('MealController', function() {
 
     var mealId;
     var preorderMealId;
+    var sysDeliveryMealId;
     var leftQty = {};
     var totalQty = {};
 
@@ -226,6 +227,84 @@ describe('MealController', function() {
             preorderMealId = res.body.id;
             done();
           })
+    })
+
+    it('should create an preorder type meal with system delivery', function (done) {
+      var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
+      var now = new Date();
+      var pickups = [{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
+        "method" : "delivery"
+      }];
+      agent
+        .post('/meal')
+        .send({
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          pickups : JSON.stringify(pickups),
+          delivery_fee : "4.99",
+          isDelivery : true,
+          isDeliveryBySystem : true,
+          delivery_center : "Union Square, San Francisco",
+          leftQty: leftQty,
+          totalQty: totalQty,
+          county : 'San Francisco County',
+          title : "私房面馆2",
+          type : "preorder",
+          dishes : dishes,
+          status : "off",
+          cover : dish1,
+          minimalOrder : 1
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(res.body.chef != hostId){
+            return done(Error("error creating meal"));
+          }
+          sysDeliveryMealId = res.body.id;
+          res.body.delivery_fee.should.be.equal(5.99);
+          res.body.delivery_center.should.be.equal("Union Square, San Francisco");
+          done();
+        })
+    })
+
+    it('should not create an preorder type meal with wrong delivery setting', function (done) {
+      var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
+      var now = new Date();
+      var pickups = [{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
+        "method" : "delivery"
+      }];
+      agent
+        .post('/meal')
+        .send({
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          pickups : JSON.stringify(pickups),
+          delivery_fee : "4.99",
+          isDelivery : false,
+          isDeliveryBySystem : true,
+          delivery_center : "Union Square, San Francisco",
+          leftQty: leftQty,
+          totalQty: totalQty,
+          county : 'San Francisco County',
+          title : "私房面馆2",
+          type : "preorder",
+          dishes : dishes,
+          status : "off",
+          cover : dish1,
+          minimalOrder : 1
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-6);
+          done();
+        })
     })
 
     it('should not create an active preorder type meal', function (done) {

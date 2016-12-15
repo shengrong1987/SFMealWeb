@@ -41,6 +41,9 @@ module.exports = {
     delivery_fee: {
       type: 'float'
     },
+    shipping_fee : {
+      type : 'float'
+    },
     subtotal: {
       type: 'float',
       required: true

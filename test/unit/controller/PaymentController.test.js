@@ -149,6 +149,10 @@ describe('PaymentController', function() {
           address_country: country
         }
       }, function(err, token){
+        if(err){
+          console.log(err);
+          return done(err);
+        }
         agent
           .post('/payment')
           .send({

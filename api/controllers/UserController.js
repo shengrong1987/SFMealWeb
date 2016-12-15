@@ -43,71 +43,79 @@ module.exports = require('waterlock').actions.user({
     if(req.session.user.host){
       return res.badRequest({ code : -1, text : req.__('user-already-host')});
     }
-    Host.create(params).exec(function(err, host){
+    User.findOne(userId).exec(function(err, user){
       if(err){
         return res.badRequest(err);
       }
-      Checklist.create({ host : host.id}).exec(function(err, checklist){
+      if(user.host){
+        return res.badRequest({ code : -1, text : req.__('user-already-host')});
+      }
+      Host.create(params).exec(function(err, host){
         if(err){
           return res.badRequest(err);
         }
-        User.findOne(userId).exec(function(err, user){
+        Checklist.create({ host : host.id}).exec(function(err, checklist){
           if(err){
             return res.badRequest(err);
           }
-          var hostId = host.id;
-          var ip = req.ip;
-          var params = {
-            managed : true,
-            country : 'US',
-            email : email,
-            legal_entity :{
-              type : 'individual'
-            },
-            tos_acceptance : {
-              date : parseInt(new Date().getTime()/1000),
-              ip : ip
-            },
-            transfer_schedule : {
-              interval : "weekly",
-              weekly_anchor : "wednesday"
-            }
-          }
-          if(user.firstname){
-            params.legal_entity.first_name = user.firstname;
-          }
-          if(user.lastname){
-            params.legal_entity.last_name = user.lastname;
-          }
-          if(user.birthday){
-            params.legal_entity.dob = {
-              day : user.birthday.getDay(),
-              month : user.birthday.getMonth() + 1,
-              year : user.birthday.getFullYear()
-            }
-          }
-          stripe.createManagedAccount(params,function(err,account){
+          User.findOne(userId).exec(function(err, user){
             if(err){
               return res.badRequest(err);
             }
-            host.accountId = account.id;
-            host.save(function(err,host){
+            var hostId = host.id;
+            var ip = req.ip;
+            var params = {
+              managed : true,
+              country : 'US',
+              email : email,
+              legal_entity :{
+                type : 'individual'
+              },
+              tos_acceptance : {
+                date : parseInt(new Date().getTime()/1000),
+                ip : ip
+              },
+              transfer_schedule : {
+                interval : "weekly",
+                weekly_anchor : "wednesday"
+              }
+            }
+            if(user.firstname){
+              params.legal_entity.first_name = user.firstname;
+            }
+            if(user.lastname){
+              params.legal_entity.last_name = user.lastname;
+            }
+            if(user.birthday){
+              params.legal_entity.dob = {
+                day : user.birthday.getDay(),
+                month : user.birthday.getMonth() + 1,
+                year : user.birthday.getFullYear()
+              }
+            }
+            stripe.createManagedAccount(params,function(err,account){
               if(err){
                 return res.badRequest(err);
               }
-              User.update({id : userId},{host: hostId}).exec(function(err, user){
+              host.accountId = account.id;
+              host.save(function(err,host){
                 if(err){
-                  res.badRequest(err);
+                  return res.badRequest(err);
                 }
-                // notification.sendEmail("Host","welcome",{ host : host, hostEmail : host.email, isSendToHost : true});
-                mailChimp.addMemberToList({ email : host.email, shopName : shopName, firstname : user[0].firstname, lastname : user[0].lastname, language : req.getLocale() }, "chef");
-                req.session.user = user[0];
-                res.ok({user:user[0]});
+                User.update({id : userId},{host: hostId}).exec(function(err, user){
+                  if(err){
+                    res.badRequest(err);
+                  }
+                  // notification.sendEmail("Host","welcome",{ host : host, hostEmail : host.email, isSendToHost : true});
+                  mailChimp.addMemberToList({ email : host.email, shopName : shopName, firstname : user[0].firstname, lastname : user[0].lastname, language : req.getLocale() }, "chef");
+                  req.session.user = user[0];
+                  res.ok({user:user[0]});
+                });
               });
             });
-          });
+          })
         })
-      })
+      });
     });
   },
 

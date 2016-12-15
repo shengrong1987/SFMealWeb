@@ -25,7 +25,7 @@
         <li><a href="/host/me#myinfo"><h4><strong><%= __('host-nav-info')%></strong></h4></a></li>
       </ul>
 
-      <div id="mealEditingView">
+      <div id="mealEditingView" class="middle">
         <div class="box box-shadow box-primary white text-left">
           <form class="form-horizontal" data-meal-id="<%= meal.id%>" data-id="<%= meal.userId%>" data-host-id="<%= meal.chef.id%>" data-err-container=".submit" data-toggle="validator">
 
@@ -338,6 +338,13 @@
                     <span style="margin-left: 10px;"><%= __('delivery-available')%></span>
                   </div>
                 </div>
+                <div class="col-xs-12">
+                  <div class="box-compact vertical-align">
+                    <input type="checkbox" id="isDeliveryBySystem" class="regular-checkbox" <%= meal.isDeliveryBySystem ? "checked=''" : ""%> <%= !meal.isDelivery ? "disabled='disabled'" : ""%>>
+                    <label for="isDeliveryBySystem"></label>
+                    <span style="margin-left: 10px;"><%= __('delivery-by-system')%></span>
+                  </div>
+                </div>
               </div>
 
               <div class="row">
@@ -355,6 +362,12 @@
                       <div class="input-group-addon">Miles</div>
                     </div>
                   </div>
+                  <div class=col-sm-12>
+                    <div class="input-group">
+                      <div class="input-group-addon"><%= __('delivery-center')%>:</div>
+                      <input id="deliveryCenterInput" onfocus="geolocate()" class="form-control" type="text" value="<%= meal.kitchen_address%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -362,7 +375,64 @@
             </div>
 
             <div class="form-group" style="margin-top: 40px;">
-              <label style="display: block;" >5.<%= __('name-your-dish')%></label>
+              <div class="row">
+                <div class="col-xs-12">
+                  <label>5.<%= __('shipping-option')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                </div>
+                <div class="col-xs-12">
+                  <div class="box-compact vertical-align">
+                    <input type="checkbox" id="isShipping" class="regular-checkbox" <%= meal.isShipping ? "checked=''" : ""%> >
+                    <label for="isShipping"></label>
+                    <span style="margin-left: 10px;"><%= __('shipping-available')%></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12 col-md-10 col-lg-8">
+                  <div class="col-sm-6">
+                    <div class="form-inline">
+                      <label><%= __('shipping-type')%>:</label>
+                      <select id="shippingTypeOpt" class="form-control" <%= meal.isShipping ? "" : "disabled=''"%> style="min-width: 250px;" value="<%= meal.shippingPolicy ? meal.shippingPolicy.type : ''%>">
+                        <option value="custom" <%= (meal.isShipping && meal.shippingPolicy && meal.shippingPolicy.type == 'custom') ? "selected" : ""%>><%= __('custom')%></option>
+                        <option value="fixed" <%= (meal.isShipping && meal.shippingPolicy && meal.shippingPolicy.type == 'fixed') ? "selected" : ""%>><%= __('fixed')%></option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class=col-sm-6>
+                    <div class="input-group">
+                      <div class="input-group-addon"><%= __('shipping-fee')%>: $</div>
+                      <input id="shippingFee" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="" value="<%= meal.shippingPolicy ? meal.shippingPolicy.price : ''%>" <%= (meal.isShipping && meal.shippingPolicy && meal.shippingPolicy.type == 'fixed') ? "" : "disabled=''"%>>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12 col-md-10 col-lg-8">
+                  <div class="box-compact">
+                    <div class="row">
+                      <div class="col-xs-6 vertical-align">
+                        <input type="checkbox" id="freeShippingOption" class="regular-checkbox" <%= (meal.isShipping && meal.shippingPolicy && meal.shippingPolicy.hasFreePolicy) ? "checked=''" : ""%> >
+                        <label style="margin-left: 10px;" for="freeShippingOption"></label>
+                        <span style="margin-left:10px;"><%= __('offer-free-shipping-amount')%></span>
+                      </div>
+                      <div class="col-xs-6">
+                        <div class="input-group">
+                          <div class="input-group-addon"><%= __('free-amount')%>: $</div>
+                          <input type="number" pattern="[0-9]*" inputmode="numberic" class="form-control" id="freeAmount" value="<%= (meal.isShipping && meal.shippingPolicy) ? meal.shippingPolicy.freeAmount : ''%>" <%= !meal.isShipping || !meal.shippingPolicy || !meal.shippingPolicy.hasFreePolicy ? 'disabled="true"' : ''%>>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="help-block with-errors"></div>
+            </div>
+
+            <div class="form-group" style="margin-top: 40px;">
+              <label style="display: block;" >6.<%= __('name-your-dish')%></label>
               <div class="row">
                 <div class="col-xs-12">
                   <input id="meal_title" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="7" placeholder="<%= __('full-name')%>" data-error="<%= __('need-name')%>" required value="<%= meal.title%>"><small> &nbsp;<%= __('Ex-meal-title')%></small>
@@ -388,4 +458,17 @@
 
 <script>
   var mealView = new MealView({ el : "#mealEditingView", model : new Meal()});
+  if(!googleAPILoaded){
+    jQuery.ajax({
+      url: "https://maps.googleapis.com/maps/api/js?key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA&libraries=places&callback=initAutoComplete",
+      dataType: 'script',
+      async: true,
+      defer : true,
+      success : function(){
+        googleAPILoaded = true;
+      }
+    });
+  }else{
+    initAutoComplete();
+  }
 </script>

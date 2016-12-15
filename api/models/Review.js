@@ -68,7 +68,7 @@ module.exports = {
           dishes.forEach(function(dish){
             total_score += dish.score;
           });
-          meal.score = total_score/dishes.length;
+          meal.score = (total_score/dishes.length).toFixed(2);
           meal.numberOfReviews += 1;
           meal.save(cb);
         });

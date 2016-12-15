@@ -11,6 +11,11 @@ var async = require("async");
 
 module.exports = {
 
+  types: {
+    decimal2: function(number){
+      return ((number *100)%1 === 0);
+    }
+  },
   attributes: {
     title : {
       type : 'string'
@@ -93,7 +98,8 @@ module.exports = {
     },
     score : {
       type : 'float',
-      defaultsTo : 5.0
+      defaultsTo : 5.0,
+      decimal2 : true
     },
     numberOfReviews : {
       type : 'integer',
@@ -101,14 +107,41 @@ module.exports = {
     },
     delivery_fee : {
       type : 'float',
-      defaultsTo : 5.0
+      defaultsTo : 5.99,
+      decimal2 : true
     },
     delivery_range : {
       type : 'float',
-      defaultsTo : 5.0
+      defaultsTo : 5.0,
+      decimal2 : true
+    },
+    delivery_center : {
+      type : 'string'
+    },
+    commission : {
+      type : 'float',
+      defaultsTo : 0.2,
+      decimal2 : true
     },
     isDelivery : {
       type : 'boolean'
+    },
+    isDeliveryBySystem : {
+      type : 'boolean',
+      defaultsTo : false
+    },
+    /*
+      type : "fixed/custom",
+      price : "5.00",
+      hasFreePolicy : true,
+      freeAmount : "20.00"
+     */
+    shippingPolicy : {
+      type : 'json'
+    },
+    isShipping : {
+      type : 'boolean',
+      defaultsTo : false
     },
     msg : {
       type : 'string',

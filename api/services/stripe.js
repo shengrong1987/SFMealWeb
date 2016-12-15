@@ -101,7 +101,14 @@ module.exports = {
   },
 
   charge : function(attr ,cb){
-    var application_fee = Math.floor(attr.amount * 0.1);
+    var meal = attr.meal;
+    var delivery_application_fee = 0;
+    if(attr.method && attr.method == "delivery"){
+      if(meal.isDeliveryBySystem){
+        delivery_application_fee = 5.99;
+      }
+    }
+    var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee;
     stripe.charges.create({
       amount: attr.amount,
       currency: "usd",

@@ -54,7 +54,7 @@ describe('OrderController', function() {
     var price1;
     var price2;
     var price3;
-    it('should get a meal ', function (done) {
+    it('should get a meal', function (done) {
       agent
           .get('/meal')
           .expect(200)

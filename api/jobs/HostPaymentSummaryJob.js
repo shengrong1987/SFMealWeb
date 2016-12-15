@@ -37,9 +37,13 @@ module.exports = function(agenda) {
           sails.log.error(err);
           return done();
         }
+        var todayDate = new Date().getDate();
+        var fromDate = new Date().setDate(todayDate - 8);
+        var toDate = new Date().setDate(todayDate - 2);
+
         hosts = hosts.filter(function (host) {
           host.orders = host.orders.filter(function (order) {
-            return !order.isPaid && (order.status == "review" || order.status == "complete");
+            return !order.isPaid && (order.status == "review" || order.status == "complete") && order.createdAt.getTime() > fromDate && order.createdAt < toDate;
           })
           return host.orders.length != 0;
         });
@@ -48,9 +52,6 @@ module.exports = function(agenda) {
           return done();
         }
 
-        var todayDate = new Date().getDate();
-        var fromDate = new Date().setDate(todayDate - 8);
-        var toDate = new Date().setDate(todayDate - 2);
         var showDates = [];
         for(var i=0 ; i < 7; i++){
           var newDate = new Date();

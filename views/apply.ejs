@@ -66,7 +66,7 @@
             <label><%= __('phone')%></label>
             <input type="tel" class="form-control middle" name="phone" style="width: 200px;" type="text" value="<%= user.phone || ''%>" required>
           </div>
-            <button id="applyBtn" class="btn btn-info round"><%= __('step1-action-btn')%></button>
+            <button id="applyBtn" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> <%= __('step1-action-btn')%>" class="btn btn-info round"><%= __('step1-action-btn')%></button>
             <h2></h2>
             <div class="alert alert-danger" data-toggle="alert"></div>
           <%}%>

@@ -242,6 +242,7 @@
   "delivery-range": "Delivery range",
   "delivery-fee": "Delivery fee",
   "delivery-available": "Is delivery provided?",
+  "delivery-center" : "Delivery range center address",
   "miles": "Miles",
   "pickup-location": "Pickup location",
   "pickup-public-location": " Pickup location closed to（Open to public）",
@@ -651,4 +652,12 @@
   "subscribe" : "Subscribe",
   "subscribe-title" : "Get home food by Email",
   "receiveCoupon" : "I want to receive email for promotions and latest updates from SFMeal.com."
+  "shipping-option" : "Shipping Option",
+  "shipping-available" : "Whether mailing service provided?",
+  "shipping-type" : "Type of mailing fee",
+  "shipping-fee" : "Shipping Fee",
+  "custom" : "Calculated by USPS rate",
+  "fixed" : "Fixed price",
+  "offer-free-shipping-amount" : "Enable free mailing",
+  "free-amount" : "Free mailing for order over"
 }
