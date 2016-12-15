@@ -54,6 +54,7 @@
     "sails-hook-parametized-policies": "^0.3.1",
     "sails-mongo": "~v0.12.0",
     "stripe": "~4.5.0",
+    "subdomain": "^1.2.0",
     "twilio": "^2.11.0",
     "waterlock": "~v0.1.2-rc1",
     "waterlock-facebook-auth": "~v0.1.2-rc1",

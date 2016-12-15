@@ -31,6 +31,7 @@ module.exports.http = {
 
     order: [
       'startRequestTimer',
+      'removeSubDomain',
       'cookieParser',
       'session',
       'redirectToHttps',
@@ -52,6 +53,8 @@ module.exports.http = {
      * Example custom middleware; logs each request to the console.              *
      *                                                                           *
      ****************************************************************************/
+
+    removeSubDomain : require('subdomain')({ base : process.env.BASE_URL, removeWWW : true }),
 
     redirectToHttps: function (req, res, next) {
       if(process.env.NODE_ENV == 'production'){
