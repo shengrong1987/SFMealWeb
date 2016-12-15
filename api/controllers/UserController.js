@@ -41,14 +41,14 @@ module.exports = require('waterlock').actions.user({
     params.shopName = shopName;
     params.phone = phone || (user.phone || '');
     if(req.session.user.host){
-      return res.badRequest({ code : -1, text : req.__('user-already-host')});
+      return res.badRequest({ code : -1, responseText : req.__('user-already-host')});
     }
     User.findOne(userId).exec(function(err, user){
       if(err){
         return res.badRequest(err);
       }
       if(user.host){
-        return res.badRequest({ code : -1, text : req.__('user-already-host')});
+        return res.badRequest({ code : -1, responseText : req.__('user-already-host')});
       }
       Host.create(params).exec(function(err, host){
         if(err){

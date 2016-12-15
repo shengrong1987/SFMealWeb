@@ -135,10 +135,10 @@ module.exports = {
       require('../services/geocode').geocode(actual_address,function(err,result){
         if(err){
           sails.log.error(err);
-          return res.badRequest({code : -1, text : req.__('meal-error-address')});
+          return res.badRequest({code : -1, responseText : req.__('meal-error-address')});
         }else{
           if(result.length == 0){
-            return res.badRequest({ code : -2, text : req.__('meal-error-address2')});
+            return res.badRequest({ code : -2, responseText : req.__('meal-error-address2')});
           }
           var administration= result[0].administrativeLevels;
           params.county = administration.level2long;

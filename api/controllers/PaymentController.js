@@ -63,7 +63,7 @@ module.exports = {
                 return card.last4 == cardnumber.slice(-4);
               });
               if(cardExisted){
-                return next({ code : -1, text : req.__('payment-card-exist')});
+                return next({ code : -1, responseText : req.__('payment-card-exist')});
               }
               next();
             }else{

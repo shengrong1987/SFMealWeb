@@ -28,7 +28,7 @@ module.exports = {
       });
       if(orders.length == 0){
         console.log("no available orders for review");
-        return res.forbidden({ code : -1, text : req.__('review-no-available')});
+        return res.forbidden({ code : -1, responseText : req.__('review-no-available')});
       }
       if(reviews && reviews.length > 0){
         async.each(reviews, function(review, next){
@@ -87,7 +87,7 @@ module.exports = {
     async.auto({
       checkReviewForMeal : function(cb){
         if(!mealId) {
-          return cb({code : -2, text : req.__('review-invalid')});
+          return cb({code : -2, responseText : req.__('review-invalid')});
         }
         if(dishId){
           return cb();
@@ -101,7 +101,7 @@ module.exports = {
           return false;
         });
         if(!isValidReview){
-          cb({code : -2, text : req.__('review-invalid')})
+          cb({code : -2, responseText : req.__('review-invalid')})
         }else{
           cb();
         }
@@ -121,7 +121,7 @@ module.exports = {
           return false;
         })
         if(!isValidReview){
-          return cb({code : -2, text : req.__('review-invalid')})
+          return cb({code : -2, responseText : req.__('review-invalid')})
         }
         cb();
       },
@@ -179,7 +179,7 @@ module.exports = {
             review.dish = dish;
             review.hostEmail = host.email;
           }else{
-            return cb({code : -2, text : req.__('review-invalid')})
+            return cb({code : -2, responseText : req.__('review-invalid')})
           }
           sails.log.info("sending review email");
           Notification.notificationCenter("Order", "review", review, true, false, req);

@@ -168,10 +168,10 @@ module.exports = {
       if(typeof zipcode !== 'undefined' && zipcode && zipcode !== 'undefined' && typeof county !== 'undefined' && county && county !== 'undefined'){
         GeoCoder.geocode(zipcode, function(err, result){
           if (err) {
-            return res.badRequest({ code : -1, text : req.__('meal-error-address')});
+            return res.badRequest({ code : -1, responseText : req.__('meal-error-address')});
           }  else {
             if(result.length==0){
-              return res.badRequest({ code : -2, text : req.__('meal-error-address2')});
+              return res.badRequest({ code : -2, responseText : req.__('meal-error-address2')});
             }
             var location = { lat : result[0].latitude, long : result[0].longitude };
             if(keyword){
@@ -227,7 +227,7 @@ module.exports = {
         return res.badRequest(err);
       }
       if(m.length==0){
-        return res.badRequest({ code : -3, text : req.__('meal-not-found')});
+        return res.badRequest({ code : -3, responseText : req.__('meal-not-found')});
       }
       User.find(userId).populate("payment").populate("orders").exec(function(err,user){
         user[0].orders = user[0].orders.filter(function(order){
@@ -249,7 +249,7 @@ module.exports = {
       }
 
       if(orders.length > 0) {
-        return res.badRequest({ code : -4, text : req.__('meal-active-error')});
+        return res.badRequest({ code : -4, responseText : req.__('meal-active-error')});
       }
 
       Meal.update({id : mealId},{status : "off", isScheduled : false}).exec(function(err, meal){
@@ -591,19 +591,19 @@ module.exports = {
     var minOrderTotal = parseFloat(params.minimalTotal);
     if(!minOrderNumber && !minOrderTotal){
       console.log("minimal order number and minimal order bill amount are required(one of them)");
-      return cb({ code : -6, text : req.__('')});
+      return cb({ code : -6, responseText : req.__('')});
     }
     var type = meal ? meal.type : params.type;
     if(params.isDelivery && type == 'preorder' && !JSON.parse(params.pickups).some(function(pickup){
         return pickup.method == 'delivery';
       })){
       sails.log.debug("support delivery but no delivery time was added");
-      return cb({ code : -13, text : req.__('meal-delivery-lack-of-method')});
+      return cb({ code : -13, responseText : req.__('meal-delivery-lack-of-method')});
     }
 
     if(!params.isDelivery && params.isDeliveryBySystem){
       sails.log.debug("system delivery provided but delivery option is off");
-      return cb({ code : -12, text : req.__('meal-delivery-conflict')});
+      return cb({ code : -12, responseText : req.__('meal-delivery-conflict')});
     }
     cb();
   },
