@@ -1204,7 +1204,7 @@ var MealView = Backbone.View.extend({
     var deliveryFeeInput = this.$el.find("#deliveryFeeInput");
     var deliveryRangeInput = this.$el.find("#deliveryRangeInput");
     var deliveryBySysCheckbox = this.$el.find("#isDeliveryBySystem");
-    var deliveryCenterInput = form.find("#deliveryCenterInput");
+    var deliveryCenterInput = this.$el.find("#deliveryCenterInput");
     if(checkbox.prop("checked")){
       deliveryBySysCheckbox.prop("disabled", false);
       deliveryFeeInput.prop('disabled', false);
