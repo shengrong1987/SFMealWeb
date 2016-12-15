@@ -54,13 +54,9 @@ module.exports.http = {
      ****************************************************************************/
 
     redirectToHttps: function (req, res, next) {
-      console.log(req.subdomains);
       if(process.env.NODE_ENV == 'production'){
         if((req.get('X-Forwarded-Proto') && req.get('X-Forwarded-Proto') !== 'https') && !req.isSocket) {
           res.redirect('https://' + req.get('Host') + req.url);
-        }else if(req.subdomains.length == 0){
-          console.log('https://www.' + req.get('Host') + req.url);
-          res.redirect('https://www.' + req.get('Host') + req.url);
         }else{
           next();
         }
