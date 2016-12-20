@@ -33,6 +33,8 @@ module.exports = {
      Date pickupFromTime,
      Date pickupTilltime,
      String location
+     String publicLocation
+     String instruction
      String phone
      */
     pickups : {
@@ -192,6 +194,8 @@ module.exports = {
       var provideTillTime = params.provideTillTime;
       var now = new Date();
       if(provideFromTime >= provideTillTime){
+        return false;
+      }else if(new Date(provideTillTime) < now){
         return false;
       }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
         return false;

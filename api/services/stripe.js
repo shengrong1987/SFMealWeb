@@ -108,7 +108,8 @@ module.exports = {
         delivery_application_fee = 5.99;
       }
     }
-    var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee;
+    var service_fee = 1;
+    var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + service_fee;
     stripe.charges.create({
       amount: attr.amount,
       currency: "usd",

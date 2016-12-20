@@ -45218,7 +45218,7 @@ var TableItem = React.createClass({displayName: "TableItem",
 
   _run : function(event){
     var target = $(event.target);
-    SFMealAPI.command(target.data('model'), target.data('id'), 'run', this.props.detail);
+    SFMealAPI.command(target.data('model'), target.data('id'), 'run', this.props.detail, target.data('job-data'));
   },
 
   _unverifyLicense : function(event){
@@ -45272,7 +45272,7 @@ var TableItem = React.createClass({displayName: "TableItem",
             break;
           case "Job":
             {
-              rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['name'], onClick: this._run}, "Run")
+              rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['name'], onClick: this._run, "data-job-data": JSON.stringify(item['data'])}, "Run")
             }
             break;
           case "Checklist":

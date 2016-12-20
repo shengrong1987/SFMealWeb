@@ -60,7 +60,7 @@
                     <table class="table table-bordered" style="width: 100%;">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -75,9 +75,10 @@
                           if(order.type=="order"){
                       %>
                       <tbody class="item">
-                        <tr class="active">
-                          <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
-                        </tr>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-method')%>: <%= __(order.method)%>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('location')%>: <%= order.address%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
+                      </tr>
                       <%
                           var list = Object.keys(order.orders);
                           var dishes = host.host_dishes;
@@ -90,7 +91,7 @@
                                 index++;
                       %>
                         <tr>
-                          <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                          <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                           <td><%= dish.title%></td>
                           <td>$<%= dish.price.toFixed(2)%></td>
                           <td><% if(order.status=="adjust"){
@@ -103,9 +104,9 @@
                             <%= number%>
                             <%}%><br/><span class="preference"><%= preference || ''%></span></td>
                           <%if(index==0){%>
-                          <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                          <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                          <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                          <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                          <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                          <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                             <% if(order.status == "schedule"){ %>
                             <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customer.firstname || __('user')%>" data-placement="bottom" data-content="<%= order.customer.phone %>"><%= __('contact-user')%></a>
                             <%}else if(order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")) {%>
@@ -149,7 +150,7 @@
                     <table class="table table-bordered">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -164,8 +165,9 @@
                       if(order.type == "order" && order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")){
                       %>
                       <tbody class="item">
-                      <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ? order.customer.firstname : __('user') %> <%= order.customer ? order.customer.lastname : ''%></td>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-method')%>: <%= __(order.method)%>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('location')%>: <%= order.address%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -179,7 +181,7 @@
                             index++;
                       %>
                       <tr>
-                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><% if(order.status=="adjust"){
@@ -193,9 +195,9 @@
                           <%= number%>
                           <%}%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-order"><%= __('reject')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customer.firstname || __('user')%>" data-placement="bottom" data-content="<%= order.customer.phone %>"><%= __('contact-user')%></a>
@@ -217,7 +219,7 @@
                     <table id="order-schedule" class="table table-bordered" style="width: 100%;">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -232,8 +234,9 @@
                             if(order.type == "order" && order.status == "schedule"){
                       %>
                       <tbody class="item">
-                      <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ? order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-method')%>: <%= __(order.method)%>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('location')%>: <%= order.address%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -247,14 +250,14 @@
                               index++;
                       %>
                       <tr>
-                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customer.firstname || __('user')%>" data-placement="bottom" data-content="<%= order.customer.phone %>"><%= __('contact-user')%></a>
@@ -276,7 +279,7 @@
                     <table class="table table-bordered">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -291,8 +294,9 @@
                       if(order.type == "order" && order.status == "preparing"){
                       %>
                       <tbody class="item">
-                      <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ? order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-method')%>: <%= __(order.method)%>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('location')%>: <%= order.address%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -306,14 +310,14 @@
                         index++;
                       %>
                       <tr>
-                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-action="ready" data-order="<%= order.id%>"><%= __('complete')%></a><br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customer.firstname || __('user')%>" data-placement="bottom" data-content="<%= order.customer.phone %>"><%= __('contact-user')%></a>
@@ -335,7 +339,7 @@
                     <table class="table table-bordered" style="width: 100%;">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -350,8 +354,9 @@
                       if(order.type == "order" && order.status == "ready"){
                       %>
                       <tbody class="item">
-                      <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer.firstname || __('user')%> <%= order.customer.lastname || ''%></td>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-method')%>: <%= __(order.method)%>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('location')%>: <%= order.address%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -365,14 +370,14 @@
                               index++;
                       %>
                       <tr>
-                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-action="receive" data-order="<%= order.id%>"><%= __('confirm-pickup')%></a><br/>
                           <% if(order.method == 'delivery'){%>
                           <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('tracking')%>" data-content="<%= __('tracking')%>" data-actionFn="javascript:void(0)" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('Enter-tracking')%></a><br/>
@@ -397,7 +402,7 @@
                     <table class="table table-bordered" style="width: 100%;">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -412,8 +417,9 @@
                       if(order.type == "order" && order.status == "review"){
                       %>
                       <tbody class="item">
-                      <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ? order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-method')%>: <%= __(order.method)%>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('location')%>: <%= order.address%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -426,14 +432,14 @@
                                 index++;
                       %>
                       <tr>
-                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'delivery'){%>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customer.firstname || __('user')%>" data-placement="top" data-content="<%= order.address%>"><%= __('see-address')%></a><br/>
                           <%}%>
@@ -456,7 +462,7 @@
                     <table class="table table-bordered" style="width: 100%;">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -471,8 +477,9 @@
                       if(order.type == "order" && order.status == "complete"){
                       %>
                       <tbody class="item">
-                      <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ? order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-method')%>: <%= __(order.method)%>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('location')%>: <%= order.address%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -486,14 +493,14 @@
                                 index++;
                       %>
                       <tr>
-                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="/meal/<%= order.meal.id%>"><%= __('see-review')%></a>
                         </td>
                       </tr>
@@ -527,7 +534,7 @@
                     <table class="table table-bordered" style="width: 100%;">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -542,9 +549,12 @@
                       if(order.type=="preorder"){
                       %>
                       <tbody class="item">
-                      <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ? order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
+                      <% if(order.pickupInfo){%>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-time')%>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-location')%>: <%= order.pickupInfo.location%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
+                      <%}%>
                       <%
                         var list = Object.keys(order.orders);
                         var dishes = host.host_dishes;
@@ -557,7 +567,7 @@
                         index++;
                       %>
                       <tr>
-                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><% if(order.status=="adjust"){
@@ -570,9 +580,9 @@
                           <%= number%>
                           <%}%><br/><span class="preference"><%= preference || ""%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.status == "schedule"){ %>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customer.firstname || __('user')%>" data-placement="bottom" data-content="<%= order.customer.phone %>"><%= __('contact-user')%></a>
                           <%}else if(order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")) {%>
@@ -595,7 +605,7 @@
                           <%}%>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customer.firstname || __('user')%>" data-placement="bottom" data-content="<%= order.customer.phone %>"><%= __('contact-user')%></a>
                           <%}else if(order.status == "complete"){%>
-                          <a href="/meal/<%= order.meal%>"><%= __('see-review')%></a>
+                          <a href="/meal/<%= order.meal.id%>"><%= __('see-review')%></a>
                           <%}%>
                         </td>
                       </tr>
@@ -614,7 +624,7 @@
                     <table class="table table-bordered">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -629,9 +639,12 @@
                       if(order.type == "preorder" && order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")){
                       %>
                       <tbody class="item">
-                      <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ? order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
+                      <% if(order.pickupInfo){%>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-time')%>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-location')%>: <%= order.pickupInfo.location%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
+                      <%}%>
                       <%
                         var list = Object.keys(order.orders);
                         var dishes = host.host_dishes;
@@ -644,7 +657,7 @@
                         index++;
                       %>
                       <tr>
-                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><% if(order.status=="adjust"){
@@ -657,9 +670,9 @@
                           <%= number%>
                           <%}%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-container="#myorder-preorder" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>"><%= __('reject')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customer.firstname || __('user')%>" data-placement="bottom" data-content="<%= order.customer.phone %>"><%= __('contact-user')%></a>
@@ -681,7 +694,7 @@
                     <table class="table table-bordered" style="width: 100%;">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -696,9 +709,12 @@
                       if(order.type == "preorder" && order.status == "schedule"){
                       %>
                       <tbody class="item">
-                      <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ? order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
+                      <% if(order.pickupInfo){%>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-time')%>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-location')%>: <%= order.pickupInfo.location%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
+                      <%}%>
                       <%
                         var list = Object.keys(order.orders);
                         var dishes = host.host_dishes;
@@ -711,14 +727,14 @@
                         index++;
                       %>
                       <tr>
-                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customer.firstname || __('user')%>" data-placement="bottom" data-content="<%= order.customer.phone %>"><%= __('contact-user')%></a>
                         </td>
                       </tr>
@@ -738,7 +754,7 @@
                     <table class="table table-bordered">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -753,9 +769,12 @@
                       if(order.type == "preorder" && order.status == "preparing"){
                       %>
                       <tbody class="item">
-                      <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ? order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
+                      <% if(order.pickupInfo){%>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-time')%>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-location')%>: <%= order.pickupInfo.location%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
+                      <%}%>
                       <%
                         var list = Object.keys(order.orders);
                         var dishes = host.host_dishes;
@@ -768,14 +787,14 @@
                         index++;
                       %>
                       <tr>
-                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><%= number%><br/><span class="preference"><%= preference || ""%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-action="ready" data-order="<%= order.id%>"><%= __('complete')%></a></br>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customer.firstname || __('user')%>" data-placement="bottom" data-content="<%= order.customer.phone %>"><%= __('contact-user')%></a>
@@ -797,7 +816,7 @@
                     <table class="table table-bordered" style="width: 100%;">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -812,9 +831,12 @@
                       if(order.type == "preorder" && order.status == "ready"){
                       %>
                       <tbody class="item">
-                      <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ? order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
+                      <% if(order.pickupInfo){%>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-time')%>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-location')%>: <%= order.pickupInfo.location%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
+                      <%}%>
                       <%
                         var list = Object.keys(order.orders);
                         var dishes = host.host_dishes;
@@ -827,14 +849,14 @@
                         index++;
                       %>
                       <tr>
-                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><%= number%><br/><span class="preference"><%= preference || ""%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-action="receive" data-order="<%= order.id%>"><%= __('confirm-pickup')%></a><br/>
                           <% if(order.method == 'delivery'){%>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customer.firstname || __('user')%>" data-placement="top" data-content="<%= order.address%>"><%= __('see-address')%></a><br/>
@@ -858,7 +880,7 @@
                     <table class="table table-bordered" style="width: 100%;">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -873,9 +895,12 @@
                       if(order.type == "preorder" && order.status == "review"){
                       %>
                       <tbody class="item">
-                      <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ? order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
+                      <% if(order.pickupInfo){%>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-time')%>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-location')%>: <%= order.pickupInfo.location%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
+                      <%}%>
                       <%
                         var list = Object.keys(order.orders);
                         var dishes = host.host_dishes;
@@ -888,14 +913,14 @@
                         index++;
                       %>
                       <tr>
-                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><%= number%><br/><span class="preference"><%= preference || ""%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'delivery'){%>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customer.firstname || __('user')%>" data-placement="top" data-content="<%= order.address%>"><%= __('see-address')%></a><br/>
                           <%}%>
@@ -918,7 +943,7 @@
                     <table class="table table-bordered" style="width: 100%;">
                       <thead>
                       <tr>
-                        <td><%= __('photo')%></td>
+                        <td class="xs-hide"><%= __('photo')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -933,9 +958,12 @@
                       if(order.type == "preorder" && order.status == "complete"){
                       %>
                       <tbody class="item">
-                      <tr class="active">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.updatedAt%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ? order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
+                      <% if(order.pickupInfo){%>
+                      <tr class="warning">
+                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-time')%>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<%= __('pickup-location')%>: <%= order.pickupInfo.location%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('order-number')%>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('user')%>: <%= order.customer ?  order.customer.firstname : __('user')%> <%= order.customer ? order.customer.lastname : ''%></td>
                       </tr>
+                      <%}%>
                       <%
                         var list = Object.keys(order.orders);
                         var dishes = host.host_dishes;
@@ -948,14 +976,14 @@
                         index++;
                       %>
                       <tr>
-                        <td><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price.toFixed(2)%></td>
                         <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">$<%= order.subtotal.toFixed(2)%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%><br><%= __('delivery-fee-included')%><br>($<%= order.delivery_fee.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __(order.method)%></td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="/meal/<%= order.meal%>"><%= __('see-review')%></a>
                         </td>
                       </tr>

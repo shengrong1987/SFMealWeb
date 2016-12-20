@@ -756,7 +756,7 @@ var AddressView = Backbone.View.extend({
     "click .newAddress" : "newAddress",
     "submit form" : "saveAddress",
     "keydown" : "onKeyDown",
-    "click #contact input[type='radio']" : "switchAddress",
+    "click .contact input[type='radio']" : "switchAddress",
     "click #method button" : "switchDelivery"
   },
   initialize : function() {
@@ -764,7 +764,7 @@ var AddressView = Backbone.View.extend({
     this.model.set({id: userId});
     var range = this.$el.data("range");
     var hostLoc = {lat: this.$el.data("lat"), long: this.$el.data("long")};
-    var contactView = this.$el.find("#contact");
+    var contactView = this.$el.find(".contact");
     var distance = utility.getDistance({lat: contactView.data("user-lat"), long: contactView.data("user-long")}, hostLoc);
     if (distance > range) {
       this.$el.find("#contact-error").html(jQuery.i18n.prop('addressOutOfRangeError'));
@@ -785,7 +785,7 @@ var AddressView = Backbone.View.extend({
     var range = this.$el.data("range");
     var address = $(e.target).next().next().text();
     var $this = this;
-    var contactView = this.$el.find("#contact");
+    var contactView = this.$el.find(".contact");
     utility.distance(address, hostLoc, function(err, distance){
       if(err){
         $this.$el.find("#contact-error").html(err);
@@ -1014,7 +1014,7 @@ var Meal = Backbone.Model.extend({
 
 var MealSelectionView = Backbone.View.extend({
   events : {
-    "click #calculateBtn" : "calculateDelivery",
+    "click .calculateBtn" : "calculateDelivery",
     "change .variation a" : "changePreference"
   },
   initialize : function(){
@@ -1026,22 +1026,31 @@ var MealSelectionView = Backbone.View.extend({
     this.googlemapDisplay = directionsDisplay;
     this.googlemapService = directionsService;
     var range = this.$el.data("range") * 1609.34;
-    var center = {lat: this.$el.data("lat"), lng: this.$el.data("long")}
-    var map = new google.maps.Map(this.$el.find("#googlemap")[0], {
-      center: center,
-      scrollwheel: false,
-      zoom: 11
-    });
-    directionsDisplay.setMap(map);
-    var deliveryCircle = new google.maps.Circle({
-      strokeColor: '#FF0000',
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: '#FF0000',
-      fillOpacity: 0.35,
-      map: map,
-      center: center,
-      radius: range
+    var $this = this;
+    var centerAddress = this.$el.data("center");
+    $.ajax({
+      url : "https://maps.googleapis.com/maps/api/geocode/json?address=" + centerAddress + "&key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA"
+    }).done(function(data){
+      console.log(data.results[0]);
+      if(data.results.length > 0){
+        var center = data.results[0].geometry.location;
+        var map = new google.maps.Map($this.$el.find("#googlemap")[0], {
+          center: center,
+          scrollwheel: false,
+          zoom: 11
+        });
+        directionsDisplay.setMap(map);
+        var deliveryCircle = new google.maps.Circle({
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35,
+          map: map,
+          center: center,
+          radius: range
+        });
+      }
     });
   },
   changePreference : function(e){
@@ -1070,38 +1079,62 @@ var MealSelectionView = Backbone.View.extend({
   },
   calculateDelivery : function(e){
     var $this = this;
+    var target = $(e.currentTarget);
     this.$el.find("#addressAlertView").removeClass('hide');
     this.$el.find("#addressAlertView").hide();
-    var origin = {lat: this.$el.data("lat"), lng: this.$el.data("long")};
-    var uLat = this.$el.data("user-lat");
-    var uLong = this.$el.data("user-long");
-    if(!uLat || uLat == 'undefined' || !uLong || uLong == 'undefined'){
-      return;
-    }
-    var range = this.$el.data("range") * 1609.34;
-    var readyIn = this.$el.data("meal-prepareTime");
-    var destination = {lat : uLat, lng: uLong};
-    this.googlemapService.route({
-      origin : origin,
-      destination : destination,
-      travelMode: google.maps.TravelMode.DRIVING,
-      drivingOptions: {
-        departureTime: new Date(Date.now() + readyIn * 60 * 1000),  // for the time N milliseconds from now.
-        trafficModel: "optimistic"
-      }
-    }, function(response, status){
-      if (status == google.maps.DirectionsStatus.OK) {
-        $this.googlemapDisplay.setDirections(response);
-        var travelTime = response.routes[0].legs[0].duration.text;
-        var distance = response.routes[0].legs[0].distance.value;
-        $(e.currentTarget).find("+ label").text(travelTime + " " + response.routes[0].legs[0].distance.text);
-        if(distance > range){
-          $this.$el.find("#addressAlertView").show();
+    var deliveryCenterAddress = this.$el.data("center");
+    var originAddress = target.data("location");
+    $.ajax({
+      url : "https://maps.googleapis.com/maps/api/geocode/json?address=" + originAddress + "&key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA"
+    }).done(function(data) {
+      if (data.results.length > 0) {
+        var origin = data.results[0].geometry.location;
+        var uLat = $this.$el.data("user-lat");
+        var uLong = $this.$el.data("user-long");
+        if(!uLat || uLat == 'undefined' || !uLong || uLong == 'undefined'){
+          return;
         }
-      } else {
-        window.alert('Directions request failed due to ' + status);
+        var method = target.data("method");
+        var range = $this.$el.data("range");
+        var readyIn = $this.$el.data("meal-prepareTime");
+        var destination = {lat : uLat, lng: uLong};
+        $this.googlemapService.route({
+          origin : origin,
+          destination : destination,
+          travelMode: google.maps.TravelMode.DRIVING,
+          drivingOptions: {
+            departureTime: new Date(Date.now() + readyIn * 60 * 1000),  // for the time N milliseconds from now.
+            trafficModel: "optimistic"
+          }
+        }, function(response, status){
+          if (status == google.maps.DirectionsStatus.OK) {
+            $this.googlemapDisplay.setDirections(response);
+            var travelTime = response.routes[0].legs[0].duration.text;
+            var distance = response.routes[0].legs[0].distance.value;
+            $(e.currentTarget).find("+ label").text(travelTime + " " + response.routes[0].legs[0].distance.text);
+            if(method && method == 'pickup'){
+              return;
+            }
+            utility.distance(deliveryCenterAddress, destination, function(err, distance){
+              if(err){
+                $this.$el.find("#addressAlertView").show();
+                $this.$el.find("#addressAlertView").html(err);
+                return;
+              }
+              if(distance > range){
+                $this.$el.find("#addressAlertView").show();
+                $this.$el.find("#addressAlertView").html(jQuery.i18n.prop('deliveryOutOfRangeError'));
+              }
+            });
+          } else {
+            window.alert('Directions request failed due to ' + status);
+          }
+        })
+      }else{
+        $this.$el.find("#addressAlertView").show();
+        $this.$el.find("#addressAlertView").html(jQuery.i18n.prop('locationFailToGeocode'));
       }
-    })
+    });
   }
 });
 
@@ -1181,12 +1214,13 @@ var MealView = Backbone.View.extend({
     var shippingFeeInput = this.$el.find("#shippingFee");
     var freeAmountInput = this.$el.find("#freeAmount");
     if(checkbox.prop("checked")){
-      shippingTypeOptSelect.prop('disabled', false);
-      shippingFeeInput.prop('disabled', false);
+      freeAmountInput.prop('disabled', false);
+      // shippingTypeOptSelect.prop('disabled', false);
+      // shippingFeeInput.prop('disabled', false);
     }else{
       freeAmountInput.prop('disabled', true);
-      shippingTypeOptSelect.prop('disabled', true);
-      shippingFeeInput.prop('disabled', true);
+      // shippingTypeOptSelect.prop('disabled', true);
+      // shippingFeeInput.prop('disabled', true);
     }
   },
   toggleFreeShippingOpt : function(e){
@@ -1220,7 +1254,15 @@ var MealView = Backbone.View.extend({
   addNewPickup : function(e){
     e.preventDefault();
     this.$el.find("#pickupAlert").hide();
-    var pickupView = '<div class="well form-group pickup"> <div class="col-sm-4"> <label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> <div class="col-sm-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="from"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="end"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div> <div class="form-group location"> <label data-toggle="i18n" data-key="pickupAddress"></label> <input type="text" class="form-control"> </div><div class="form-group public-location"> <label data-toggle="i18n" data-key="publicLocation"></label> <input type="text" class="form-control"> </div><div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div><div class="form-group phone"> <label data-toggle="i18n" data-key="telephone"></label> <input type="tel" class="form-control"> </div> </div> </div>';
+    var pickupView = '<div class="well form-group pickup"> ' +
+      '<div class="col-sm-4"> <label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> ' +
+      '<div class="col-sm-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="from"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div>' +
+      '<div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="end"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div>' +
+      '<div class="form-group location"> <label data-toggle="i18n" data-key="pickupAddress"></label> <input type="text" class="form-control"> </div>' +
+      '<div class="form-group public-location"> <label data-toggle="i18n" data-key="publicLocation"></label> <input type="text" class="form-control"> </div>' +
+      '<div class="form-group instruction"><label data-toggle="i18n" data-key="pickupInstruction"></label> <input type="text" class="form-control"> </div>' +
+      '<div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div>' +
+      '<div class="form-group phone"> <label data-toggle="i18n" data-key="telephone"></label> <input type="tel" class="form-control"> </div> </div> </div>';
     this.$el.find(".pickup_container").append(pickupView);
     this.$el.find("[data-toggle='dateTimePicker']").datetimepicker({
       icons:{
@@ -1324,13 +1366,13 @@ var MealView = Backbone.View.extend({
     var isShipping = form.find("#isShipping").prop("checked");
     var hasFreeShipping = form.find("#freeShippingOption").prop("checked");
     if(isShipping){
-      var shippingFeeType = form.find("#shippingTypeOpt").val();
-      var shippingFee = form.find("#shippingFee").val();
+      // var shippingFeeType = form.find("#shippingTypeOpt").val();
+      // var shippingFee = form.find("#shippingFee").val();
       var freeShippingAmount = form.find("#freeAmount").val();
       var shippingPolicy = {
-        type : shippingFeeType,
-        price : shippingFee,
-        hasFreePolicy : hasFreeShipping,
+        // type : shippingFeeType,
+        // price : shippingFee,
+        // hasFreePolicy : hasFreeShipping,
         freeAmount : freeShippingAmount
       }
     }
@@ -1356,6 +1398,7 @@ var MealView = Backbone.View.extend({
         var pickupTillTime = $(this).find(".end-pickup [data-toggle='dateTimePicker']").data("DateTimePicker").date();
         var location = $(this).find(".location input").val();
         var publicLocation = $(this).find(".public-location input").val();
+        var pickupInstruction = $(this).find(".instruction input").val();
         if(!publicLocation){
           publicLocation = location;
         }
@@ -1383,6 +1426,7 @@ var MealView = Backbone.View.extend({
         pickupObj.method = method;
         pickupObj.phone = phone;
         pickupObj.publicLocation = publicLocation;
+        pickupObj.instruction = pickupInstruction;
         pickups.push(pickupObj);
       });
 
@@ -2426,8 +2470,9 @@ var OrderView = Backbone.View.extend({
     }
     var params = {};
     var method = this.$el.find("#method .active").attr("value");
-    if(method == "delivery"){
-      var contacts = this.$el.find("#contact .regular-radio:checked + label + span").text().split("+");
+    if(method == "delivery" || method == "shipping"){
+      var selectorStr = "#" + method + "Tab .contact .regular-radio:checked + label + span";
+      var contacts = this.$el.find(selectorStr).text().split("+");
       if(method && contacts.length < 2){
         this.contactAlert.html(jQuery.i18n.prop('contactAndAddressEmptyError'));
         this.contactAlert.show();
@@ -2435,12 +2480,14 @@ var OrderView = Backbone.View.extend({
       }
       var address = contacts[0];
       var phone = contacts[1].replace(" ","");
-      var pickupOption = parseInt(this.$el.find("#deliveryMethod .regular-radio:checked").data("index")) + 1;
+      if(method == "delivery"){
+        var pickupOption = parseInt(this.$el.find("#deliveryMethod .regular-radio:checked").data("index")) + 1;
+      }
     }else{
       var pickupOption = parseInt(this.$el.find("#pickupMethod .regular-radio:checked").data("index")) + 1;
     }
 
-    var contactView = this.$el.find("#contact");
+    var contactView = this.$el.find(".contact");
     if(contactView.data("has-error")){
       this.contactAlert.show();
       return;

@@ -37,8 +37,8 @@ module.exports = {
     });
   },
 
-  distance : function(address, location, cb){
-    sails.log.info("geocoding " + address);
+  distance : function(address, deliveryCenterAddress, cb){
+    sails.log.debug("calculating distance between " + address + " and " + deliveryCenterAddress);
     var $this = this;
     geocoder.geocode({ address : address}, function(err, res){
       if (err) {
@@ -47,8 +47,18 @@ module.exports = {
       if(res.length == 0 ){
         return cb("cannot connect to Internet");
       }
-      var distance = $this.getDistance({lat : res[0].latitude, long: res[0].longitude}, location);
-      cb(null, distance);
+      var userLoc = {lat : res[0].latitude, long: res[0].longitude};
+      geocoder.geocode( { address : deliveryCenterAddress }, function(err, res){
+        if(err){
+          return cb(err);
+        }
+        if(res.length == 0){
+          return cb("cannot connect to Internet");
+        }
+        var deliveryLoc = {lat : res[0].latitude, long: res[0].longitude};
+        var distance = $this.getDistance(deliveryLoc, userLoc, "N");
+        cb(null, distance);
+      });
     })
   },
 

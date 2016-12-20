@@ -29,7 +29,7 @@ module.exports = {
 
   run : function(req, res){
     var jobname = req.params.name;
-    Jobs.now(jobname, {}, function(err, job){
+    Jobs.now(jobname, req.body, function(err, job){
       if(err){
         return res.badRequest(err);
       }

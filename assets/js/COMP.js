@@ -1025,7 +1025,7 @@
       },
       error : function(err){
         alertView.show();
-        alertView.html(err.responseText);
+        alertView.html(err.responseJSON ? err.responseJSON.responseText : err.responseText);
         cb(false);
       }
     })

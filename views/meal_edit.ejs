@@ -207,6 +207,11 @@
                             <input type="text" class="form-control" value="<%= pickup.public_location || 'N/A'%>" <%= pickup.method == 'delivery' ? 'disabled' : ''%>>
                           </div>
 
+                          <div class="form-group instruction">
+                            <label><%= __('pickup-instruction')%></label>
+                            <input type="text" class="form-control" value="<%= pickup.instruction || ''%>" <%= pickup.method == 'delivery' ? 'disabled' : ''%>>
+                          </div>
+
                           <div class="form-group method">
                             <label><%= __('pickup-method')%></label>
                             <select class="form-control" value="<%= pickup.method%>">
@@ -365,7 +370,7 @@
                   <div class=col-sm-12>
                     <div class="input-group">
                       <div class="input-group-addon"><%= __('delivery-center')%>:</div>
-                      <input id="deliveryCenterInput" onfocus="geolocate()" class="form-control" type="text" value="<%= meal.kitchen_address%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
+                      <input id="deliveryCenterInput" onfocus="geolocate()" class="form-control" type="text" value="<%= meal.delivery_center ? meal.delivery_center : (meal.kitchen_address || '')%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
                     </div>
                   </div>
                 </div>
@@ -388,35 +393,35 @@
                 </div>
               </div>
 
-              <div class="row">
-                <div class="col-sm-12 col-md-10 col-lg-8">
-                  <div class="col-sm-6">
-                    <div class="form-inline">
-                      <label><%= __('shipping-type')%>:</label>
-                      <select id="shippingTypeOpt" class="form-control" <%= meal.isShipping ? "" : "disabled=''"%> style="min-width: 250px;" value="<%= meal.shippingPolicy ? meal.shippingPolicy.type : ''%>">
-                        <option value="custom" <%= (meal.isShipping && meal.shippingPolicy && meal.shippingPolicy.type == 'custom') ? "selected" : ""%>><%= __('custom')%></option>
-                        <option value="fixed" <%= (meal.isShipping && meal.shippingPolicy && meal.shippingPolicy.type == 'fixed') ? "selected" : ""%>><%= __('fixed')%></option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class=col-sm-6>
-                    <div class="input-group">
-                      <div class="input-group-addon"><%= __('shipping-fee')%>: $</div>
-                      <input id="shippingFee" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="" value="<%= meal.shippingPolicy ? meal.shippingPolicy.price : ''%>" <%= (meal.isShipping && meal.shippingPolicy && meal.shippingPolicy.type == 'fixed') ? "" : "disabled=''"%>>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <!--<div class="row">-->
+                <!--<div class="col-sm-12 col-md-10 col-lg-8">-->
+                  <!--<div class="col-sm-6">-->
+                    <!--<div class="form-inline">-->
+                      <!--<label><%= __('shipping-type')%>:</label>-->
+                      <!--<select id="shippingTypeOpt" class="form-control" <%= meal.isShipping ? "" : "disabled=''"%> style="min-width: 250px;" value="<%= meal.shippingPolicy ? meal.shippingPolicy.type : ''%>">-->
+                        <!--<option value="custom" <%= (meal.isShipping && meal.shippingPolicy && meal.shippingPolicy.type == 'custom') ? "selected" : ""%>><%= __('custom')%></option>-->
+                        <!--<option value="fixed" <%= (meal.isShipping && meal.shippingPolicy && meal.shippingPolicy.type == 'fixed') ? "selected" : ""%>><%= __('fixed')%></option>-->
+                      <!--</select>-->
+                    <!--</div>-->
+                  <!--</div>-->
+                  <!--<div class=col-sm-6>-->
+                    <!--<div class="input-group">-->
+                      <!--<div class="input-group-addon"><%= __('shipping-fee')%>: $</div>-->
+                      <!--<input id="shippingFee" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="" value="<%= meal.shippingPolicy ? meal.shippingPolicy.price : ''%>" <%= (meal.isShipping && meal.shippingPolicy && meal.shippingPolicy.type == 'fixed') ? "" : "disabled=''"%>>-->
+                    <!--</div>-->
+                  <!--</div>-->
+                <!--</div>-->
+              <!--</div>-->
 
               <div class="row">
                 <div class="col-sm-12 col-md-10 col-lg-8">
                   <div class="box-compact">
                     <div class="row">
-                      <div class="col-xs-6 vertical-align">
-                        <input type="checkbox" id="freeShippingOption" class="regular-checkbox" <%= (meal.isShipping && meal.shippingPolicy && meal.shippingPolicy.hasFreePolicy) ? "checked=''" : ""%> >
-                        <label style="margin-left: 10px;" for="freeShippingOption"></label>
-                        <span style="margin-left:10px;"><%= __('offer-free-shipping-amount')%></span>
-                      </div>
+                      <!--<div class="col-xs-6 vertical-align">-->
+                        <!--<input type="checkbox" id="freeShippingOption" class="regular-checkbox" <%= (meal.isShipping && meal.shippingPolicy && meal.shippingPolicy.hasFreePolicy) ? "checked=''" : ""%> >-->
+                        <!--<label style="margin-left: 10px;" for="freeShippingOption"></label>-->
+                        <!--<span style="margin-left:10px;"><%= __('offer-free-shipping-amount')%></span>-->
+                      <!--</div>-->
                       <div class="col-xs-6">
                         <div class="input-group">
                           <div class="input-group-addon"><%= __('free-amount')%>: $</div>

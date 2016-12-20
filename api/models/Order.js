@@ -72,7 +72,7 @@ module.exports = {
     },
     method: {
       type: 'string',
-      enum: ['pickup', 'delivery'],
+      enum: ['pickup', 'delivery','shipping'],
       defaultsTo: 'delivery'
     },
     pickupOption : {

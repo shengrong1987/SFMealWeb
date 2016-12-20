@@ -27,7 +27,7 @@
     </div>
   </div>
 
-  <div id="meal-detail-container" class="container-fluid padding-clear" data-meal-prepareTime="<%= meal.prepareTime%>" data-lat="<%= meal.chef.lat%>" data-long="<%= meal.chef.long%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>">
+  <div id="meal-detail-container" class="padding-clear" data-meal-prepareTime="<%= meal.prepareTime%>" data-center="<%= meal.delivery_center%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>">
 
     <div class="row">
       <div class="col-md-8">
@@ -86,49 +86,73 @@
                   <div class="box-simple text-left">
                     <div class="checkbox">
                       <label>
-                        <input type="checkbox"><small class="font-small"><span class="text-black"><%= __('kitchen-pickup')%></span><br/>
-                          <%= __('ready-time')%>: <%= meal.prepareTime%><%= __('min')%></small>
+                        <input type="checkbox">
+                        <small class="font-small">
+                          <span class="text-black"><%= __('kitchen-pickup')%></span><br/>
+                          <%= __('ready-time')%>: <%= meal.prepareTime%><%= __('min')%><br/>
+                          <%= __('pickup-time')%>:<a class="calculateBtn" class="text-red" data-method="pickup" data-location="<%= meal.chef.full_address%>" href="javascript:void(0)"><%= __('click-to-cal')%></a>
+                        </small><br/>
                       </label>
                     </div>
                   </div>
-                <!--<div class="divider"></div>-->
+                  <% if(meal.isDelivery){%>
                   <div class="box-simple text-left">
                     <div class="checkbox">
                       <label>
                         <input type="checkbox">
                         <small class="font-small">
                           <span class="text-black"><%= __('delivery')%></span>
-                          <%= __('delivery-fee')%>：$<%= meal.delivery_fee%><br/>
-                          <%= __('delivery-time')%>:<a id="calculateBtn" class="text-red" href="javascript:void(0)"><%= __('click-to-cal')%></a><label></label><br/>
+                          <%= __('delivery-fee')%>:$<%= meal.delivery_fee%><br/>
+                          <%= __('delivery-time')%>:<a class="calculateBtn" class="text-red" data-location="<%= meal.chef.full_address%>" href="javascript:void(0)"><%= __('click-to-cal')%></a><label></label><br/>
                           <%= __('ready-time')%>: <%= meal.prepareTime%><%= __('min')%>
                         </small>
                       </label>
                     </div>
                   </div>
+                  <%}%>
                   <div id="addressAlertView" class="alert alert-danger hide"><%= __('delivery-out-of-range-error')%></div>
                 <%}else{
                 var count = 1;
-                meal.pickups.forEach(function(pickupMethod){%>
-                  <div class="box-simple text-left">
+                meal.pickups.forEach(function(pickupMethod){ if(pickupMethod.method == "delivery" && !meal.isDelivery){ return }%>
+                  <div class="box-simple text-left location" data-location="<%= pickupMethod.publicLocation%>">
                     <div class="checkbox">
                       <label>
                         <input type="checkbox">
                         <small class="font-small">
                           <b><%= __('location') + count %>:</b>
                           <% if( orders && orders.some(function(order){ if(!user){return false}; return order.customer == user.id}) || (user && user.host == meal.chef.id)){%>
-                            <%= pickupMethod.location%>
-                          <%}else{%>
+                            <%= pickupMethod.location || ''%>
+                          <%}else if(pickupMethod.method == "pickup"){%>
                             <%= pickupMethod.publicLocation || ''%><br/><%= __('pickup-location-after-order')%>
                           <%}%>
                           <br/><br/>
-                          <b><%= __('time')%></b> <span data-toggle="time-span" data-format="date" data-from="<%= pickupMethod.pickupFromTime%>" data-to="<%= pickupMethod.pickupTillTime%>"></span><br/><br/>
+                          <% if(pickupMethod.instruction){%>
+                          <b><%= __('pickup-instruction')%>: <%= pickupMethod.instruction || ''%></b><br/>
+                          <%}%>
+                          <b><%= __('time')%></b> <span data-toggle="time-span" data-format="date" data-from="<%= pickupMethod.pickupFromTime%>" data-to="<%= pickupMethod.pickupTillTime%>"></span>
+                          <% if(pickupMethod.method == "pickup"){%>
+                          <br/><br/>
+                          <%= __('pickup-time')%>:<a class="text-red calculateBtn" data-location="<%= pickupMethod.location%>" href="javascript:void(0)"><%= __('click-to-cal')%></a><label></label>
+                          <%}%>
+                          <br/>
                           <b><%= __('pickup-method')%>: <%= pickupMethod.method == 'delivery' ? __('delivery') : __('self-pickup') %></b>
                         </small>
                       </label>
                     </div>
                   </div>
-                  <!--<div class="divider"></div>-->
-                <% count++;})}%>
+                <% count++;});}%>
+                <%if(meal.isShipping){%>
+                <div class="box-simple text-left">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox">
+                      <small class="font-small">
+                        <%= __('shipping')%> <%= __('free-shipping-policy', meal.shippingPolicy ? meal.shippingPolicy.freeAmount : '')%>
+                      </small>
+                    </label>
+                  </div>
+                </div>
+                <%}%>
               </div>
             </div>
 
@@ -147,8 +171,7 @@
 
               <h4 class="text-left"><small><% __('pickup-location-after-order')%></small></h4>
 
-              <div id="googlemap" style="height: 440px;"></div>
-
+              <div id="googlemap" style="min-height: 440px;"></div>
             </div>
           </div>
 
@@ -370,6 +393,11 @@
               <!--<td></td>-->
               <!--<th class="text-right"><%= __('tax')%>:<span class="tax" data-value="0"> $0.00</span></th>-->
             <!--</tr>-->
+            <tr>
+            <th></th>
+            <td></td>
+            <th class="text-right"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('tip-service-fee')%>"></i> <%= __('service-fee')%>:<span class="service-fee" data-value="0"> $1.00</span></th>
+            </tr>
             <tr></tr>
             <tr>
               <th></th>
@@ -396,10 +424,10 @@
                   orders.forEach(function(order){%>
                     <tr><td><%= index%>. <%= __('user')%>
                     <%
-                      Object.keys(order).forEach(function(dishId){
+                      Object.keys(order.orders).forEach(function(dishId){
                       meal.dishes.forEach(function(dish){
                         if(dish.id == dishId){
-                          var amount = order[dishId];
+                          var amount = order.orders[dishId].number;
                           if(amount>0){
                     %>
                       <%= dish.title%>(<%= amount%>)

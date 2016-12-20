@@ -57,7 +57,7 @@ module.exports = function(agenda) {
                   console.log("scheduling pickup reminding Job at: " + oneHourBeforePickup);
                   Jobs.schedule(oneHourBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "hour"});
                 }
-              }else{
+              }else if(order.method == "delivery"){
                 var startDeliveryTime = new Date(order.pickupInfo.pickupFromTime);
                 console.log("scheduling delivering reminder Job at: " + startDeliveryTime);
                 Jobs.schedule(startDeliveryTime, 'OrderDeliveringReminderJob', {orderId : order.id, period : "minute"});

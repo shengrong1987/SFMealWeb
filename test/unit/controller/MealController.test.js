@@ -122,6 +122,41 @@ describe('MealController', function() {
         })
     });
 
+    it('should not update invalid address info for host', function (done) {
+      agent
+        .put('/host/' + hostId)
+        .send({
+          address:[invalidAddress]
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-2);
+          done();
+        })
+    });
+
+    it('should update address info for host', function (done) {
+      agent
+        .put('/host/' + hostId)
+        .send({
+          address:[address],
+          phone : "(415)802-3853"
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          if(res.body.city != "San Francisco"){
+            return done(Error("error geocoding or updating address"));
+          }
+          done();
+        })
+    });
+
     var mealId;
     var preorderMealId;
     var sysDeliveryMealId;
@@ -193,7 +228,8 @@ describe('MealController', function() {
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "location" : "1455 Market St, San Francisoc, CA 94124",
-        "publicLocation" : "Around Uber HQ on market st",
+        "publicLocation" : "Uber HQ",
+        "pickupInstruction" : "11th st and Market st",
         "method" : "pickup"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
@@ -223,7 +259,7 @@ describe('MealController', function() {
               return done(Error("error creating meal"));
             }
             res.body.should.have.property('pickups').with.length(2);
-            res.body.pickups[0].publicLocation.should.be.equal("Around Uber HQ on market st");
+            res.body.pickups[0].publicLocation.should.be.equal("Uber HQ");
             preorderMealId = res.body.id;
             done();
           })
@@ -246,7 +282,7 @@ describe('MealController', function() {
           delivery_fee : "4.99",
           isDelivery : true,
           isDeliveryBySystem : true,
-          delivery_center : "Union Square, San Francisco",
+          delivery_center : "333 Post st, San Francisco",
           leftQty: leftQty,
           totalQty: totalQty,
           county : 'San Francisco County',
@@ -264,7 +300,7 @@ describe('MealController', function() {
           }
           sysDeliveryMealId = res.body.id;
           res.body.delivery_fee.should.be.equal(5.99);
-          res.body.delivery_center.should.be.equal("Union Square, San Francisco");
+          res.body.delivery_center.should.be.equal("333 Post st, San Francisco");
           done();
         })
     })
@@ -362,6 +398,20 @@ describe('MealController', function() {
         .end(done)
     });
 
+    it('should be able to update meals with no orders', function(done){
+      var now = new Date();
+      agent
+        .put('/meal/' + preorderMealId)
+        .send({
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          minimalTotal : 1,
+          status : 'off'
+        })
+        .expect(200)
+        .end(done)
+    });
+
     it('should search the meals in San Francisco and with a keyword of 菜式 but no records are found', function (done) {
       agent
           .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
@@ -387,41 +437,6 @@ describe('MealController', function() {
           done();
         })
     })
-
-    it('should not update invalid address info for host', function (done) {
-      agent
-        .put('/host/' + hostId)
-        .send({
-          address:[invalidAddress]
-        })
-        .expect(400)
-        .end(function(err,res){
-          if(err){
-            return done(err);
-          }
-          res.body.code.should.be.equal(-2);
-          done();
-        })
-    });
-
-    it('should update address info for host', function (done) {
-      agent
-        .put('/host/' + hostId)
-        .send({
-          address:[address],
-          phone : "(415)802-3853"
-        })
-        .expect(200)
-        .end(function(err,res){
-          if(err){
-            return done(err);
-          }
-          if(res.body.city != "San Francisco"){
-            return done(Error("error geocoding or updating address"));
-          }
-          done();
-        })
-    });
 
     it('should not turn one meal on because missing account verifications', function (done) {
       agent

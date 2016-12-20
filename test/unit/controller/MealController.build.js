@@ -286,7 +286,7 @@ describe('MealController', function() {
       }];
       agent
           .post('/meal')
-          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), pickups : JSON.stringify(pickups),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "on", cover : dish1, minimalOrder : 5, isDelivery : true})
+          .send({provideFromTime: now, provideTillTime: new Date(now.getTime() + 1000 * 3600), pickups : JSON.stringify(pickups),  leftQty: leftQty, totalQty: totalQty, county : 'San Francisco County', title : "私房面馆", type : "preorder", dishes : dishes, status : "on", cover : dish1, minimalOrder : 1, isDelivery : true})
           .expect(200)
           .end(function(err,res){
             if(res.body.chef != hostId){

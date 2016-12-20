@@ -101,7 +101,7 @@ var TableItem = React.createClass({
 
   _run : function(event){
     var target = $(event.target);
-    SFMealAPI.command(target.data('model'), target.data('id'), 'run', this.props.detail);
+    SFMealAPI.command(target.data('model'), target.data('id'), 'run', this.props.detail, target.data('job-data'));
   },
 
   _unverifyLicense : function(event){
@@ -155,7 +155,7 @@ var TableItem = React.createClass({
             break;
           case "Job":
             {
-              rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['name']} onClick={this._run}>Run</button>
+              rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['name']} onClick={this._run} data-job-data={JSON.stringify(item['data'])}>Run</button>
             }
             break;
           case "Checklist":

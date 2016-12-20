@@ -83,7 +83,7 @@ module.exports = function(agenda) {
 
       var updateOrders = function(meal, done){
         //update all orders to preparing
-        Order.update({ meal : meal.id, status : "schedule"}, { status : "preparing"}).exec(function(err, orders){
+        Order.update({ meal : meal.id, status : "schedule"}, {status : "preparing"}).exec(function(err, orders){
           if(err){
             return done();
           }

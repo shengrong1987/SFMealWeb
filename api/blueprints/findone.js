@@ -30,7 +30,7 @@ module.exports = function findOneRecord (req, res) {
       return res.forbidden();
     }
     var host = user.host;
-    var hostId = host.id ? host.id : host;
+    var hostId = host ? (host.id ? host.id : host) : null;
     if(!hostId){
       return res.forbidden();
     }
@@ -72,9 +72,9 @@ module.exports = function findOneRecord (req, res) {
               if(err){
                 return res.badRequest(err);
               }
-              orders = orders.map(function(order){
-                return order.orders;
-              });
+              // orders = orders.map(function(order){
+              //   return order.orders;
+              // });
               res.view('meal',{meal : matchingRecord, user : user, orders : orders});
             });
           });

@@ -9,7 +9,7 @@
     geocoder = new google.maps.Geocoder();
     geocoder.geocode({ address : address}, function(results, status){
       if (status == google.maps.GeocoderStatus.OK) {
-        var distance = utility.getDistance({lat : results[0].geometry.location.lat(), long: results[0].geometry.location.lng()}, location);
+        var distance = utility.getDistance({lat : results[0].geometry.location.lat(), long: results[0].geometry.location.lng()}, location, "N");
         cb(null, distance);
       } else {
         alert("Geocode was not successful for the following reason: " + status);
@@ -22,7 +22,7 @@
     var lat1 = loc1.lat;
     var long1 = loc1.long;
     var lat2 = loc2.lat;
-    var long2 = loc2.long;
+    var long2 = loc2.lng;
     var radlat1 = Math.PI * lat1/180
     var radlat2 = Math.PI * lat2/180
     var theta = long1-long2

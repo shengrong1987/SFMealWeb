@@ -123,9 +123,10 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
-            if(res.body.customer != guestId){
-              return done(Error("error making order"));
-            }
+            var chargesTotal = price1 * 1 + price2 * 2 + 1;
+            res.body.customer.should.be.equal(guestId);
+            Object.keys(res.body.charges).should.have.length(1);
+            res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(chargesTotal * 100);
             orderId = res.body.id;
             done();
           })

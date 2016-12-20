@@ -23,6 +23,7 @@ var moment = require("moment");
  * -11 : dish can not be empty
  * -12 : system delivery provided but delivery option is off
  * -13 : support delivery but no delivery time was added
+ * -14 : fail to modify info on active meal
  */
 
 module.exports = {
@@ -408,6 +409,9 @@ module.exports = {
               if(req.body.isDeliveryBySystem){
                 req.body.delivery_fee = "5.99";
               }
+              if(!req.body.delivery_center || req.body.delivery_center == "undefined"){
+                req.body.delivery_center = host.full_address;
+              }
               if(req.body.status == 'on'){
                 host.checkGuideRequirement(function(err){
                   if(err){
@@ -513,71 +517,76 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        $this.requirementIsValid(req.body, meal, req, function (err) {
+        !$this.mealActiveCheck(req.body, meal, req, function(err){
           if(err){
             return res.badRequest(err);
           }
-          if(status == "on"){
-            async.auto({
-              updateQty : function(cb){
-                if(!req.body.totalQty && meal.status != "on"){
-                  return cb();
+          $this.requirementIsValid(req.body, meal, req, function (err) {
+            if(err){
+              return res.badRequest(err);
+            }
+            if(status == "on"){
+              async.auto({
+                updateQty : function(cb){
+                  if(!req.body.totalQty && meal.status != "on"){
+                    return cb();
+                  }
+                  req.body.leftQty = $this.updateDishQty(meal.leftQty, meal.totalQty, req.body.totalQty);
+                  if(!req.body.leftQty){
+                    return cb({responseText : req.__('meal-adjust-qty-fail'), code : -9});
+                  }
+                  cb();
                 }
-                req.body.leftQty = $this.updateDishQty(meal.leftQty, meal.totalQty, req.body.totalQty);
-                if(!req.body.leftQty){
-                  return cb({responseText : req.__('meal-adjust-qty-fail'), code : -9});
-                }
-                cb();
-              }
-            }, function(err){
-              if(err){
-                return res.badRequest(err);
-              }
-              meal.chef.dishes = meal.dishes;
-              if(!meal.dishIsValid()){
-                sails.log.debug("meal contain unverified dishes");
-                return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
-              }
-              meal.chef.checkGuideRequirement(function(err){
+              }, function(err){
                 if(err){
                   return res.badRequest(err);
                 }
-                if(!meal.chef.passGuide){
-                  return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
+                meal.chef.dishes = meal.dishes;
+                if(!meal.dishIsValid()){
+                  sails.log.debug("meal contain unverified dishes");
+                  return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
                 }
-                $this.cancelMealJobs(mealId, function(err){
+                meal.chef.checkGuideRequirement(function(err){
                   if(err){
                     return res.badRequest(err);
                   }
-                  req.body.isScheduled = false;
-                  req.body.chef = hostId;
-                  Meal.update({id : mealId}, req.body).exec(function(err, result){
+                  if(!meal.chef.passGuide){
+                    return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
+                  }
+                  $this.cancelMealJobs(mealId, function(err){
                     if(err){
                       return res.badRequest(err);
                     }
-                    return res.ok(result[0]);
-                  });
+                    req.body.isScheduled = false;
+                    req.body.chef = hostId;
+                    Meal.update({id : mealId}, req.body).exec(function(err, result){
+                      if(err){
+                        return res.badRequest(err);
+                      }
+                      return res.ok(result[0]);
+                    });
+                  })
                 })
-              })
-            });
-          }else{
-            $this.cancelMealJobs(mealId, function(err){
-              if(err){
-                return res.badRequest(err);
-              }
-              if(req.body.totalQty){
-                req.body.leftQty = req.body.totalQty;
-              }
-              req.body.isScheduled = false;
-              req.body.chef = hostId;
-              Meal.update({id : mealId}, req.body).exec(function(err, result){
+              });
+            }else{
+              $this.cancelMealJobs(mealId, function(err){
                 if(err){
                   return res.badRequest(err);
                 }
-                return res.ok(result[0]);
-              });
-            })
-          }
+                if(req.body.totalQty){
+                  req.body.leftQty = req.body.totalQty;
+                }
+                req.body.isScheduled = false;
+                req.body.chef = hostId;
+                Meal.update({id : mealId}, req.body).exec(function(err, result){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  return res.ok(result[0]);
+                });
+              })
+            }
+          });
         });
       });
     }else{
@@ -637,6 +646,8 @@ module.exports = {
     var now = new Date();
     if(provideFromTime >= provideTillTime){
       return false;
+    }else if(new Date(provideTillTime) < now){
+      return false;
     }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
       return false;
     }
@@ -661,6 +672,28 @@ module.exports = {
       });
     }
     return valid;
+  },
+
+  mealActiveCheck : function(params, meal, req, cb){
+    Order.find({meal : meal.id, status : { '!' : ['complete','review','cancel']}}).exec(function(err,orders) {
+      if (err) {
+        return cb(err);
+      }
+
+      if (orders.length > 0) {
+        if(params.status == "on"){
+          if(params.pickups || params.title || meal.type){
+            cb({ code : -14, responseText : req.__("meal-modify-active-error")});
+          }else{
+            cb();
+          }
+        }else{
+          return cb({code: -4, responseText: req.__('meal-active-error')});
+        }
+      }else{
+        cb();
+      }
+    });
   },
 
   cancelMealJobs : function(mealId, cb){

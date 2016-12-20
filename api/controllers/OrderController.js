@@ -22,6 +22,9 @@ var geocode = require("../services/geocode.js");
 //-9 : order is empty
 //-10 : meal is not active
 //-11 : order's pickup method invalid
+//-12 : meal does not support shipping
+//-13 : meal's shipping policy is not setup correctly
+//-14 : order's amount not qualify for shipping
 
 
 module.exports = {
@@ -86,24 +89,37 @@ module.exports = {
     });
   },
 
-  validateAddress : function(method, meal, address, cb){
-    if(method === "delivery"){
-      var host = meal.chef;
-      var location = {lat : host.lat, long : host.long};
+  validateDeliveryMethod : function(method, meal, verifyingObj, req, cb){
+    if(method == "pickup"){
+      cb();
+    }else if(method == "delivery"){
       var range = meal.delivery_range;
-      geocode.distance(address, location, function(err, distance){
+      geocode.distance(verifyingObj.address, meal.delivery_center, function(err, distance){
         if(err){
-          sails.log.error(err);
-          return cb(false);
+          sails.log.error("verifiying distance err" + err);
+          return cb(err);
         }
+        sails.log.debug("distance:" + distance, range);
         if(distance > range){
           sails.log.error("distance verification failed");
-          return cb(false);
+          return cb({responseText : req.__('order-invalid-address'), code : -6});
         }
-        cb(true);
+        cb();
       })
     }else{
-      cb(true);
+      if(!meal.isShipping){
+        sails.log.error("meal doesn't support shipping");
+        return cb({responseText : req.__('meal-no-shipping'), code : -12});
+      }
+      if(!meal.shippingPolicy || !meal.shippingPolicy.freeAmount){
+        sails.log.error("meal's shipping setup is not correct");
+        return cb({responseText : req.__('meal-shipping-policy-invalid'), code : -13});
+      }
+      if(verifyingObj.subtotal < parseFloat(meal.shippingPolicy.freeAmount)){
+        sails.log.error("order's amount do not reach free shipping policy");
+        return cb({responseText : req.__('order-not-qualify-shipping'), code : -14});
+      }
+      return cb();
     }
   },
 
@@ -124,35 +140,43 @@ module.exports = {
 
   buildDeliveryData : function(params, meal){
     var dishes = meal.dishes;
-    if(params.method == "delivery"){
-      params.delivery_fee = parseFloat(meal.delivery_fee);
-    }else {
-      params.delivery_fee = 0;
-    }
+    if(params.method == "shipping"){
+      var pickUpInfo;
+      meal.pickups.forEach(function(pickupObj){
+        if(pickupObj.method == "shipping"){
+          pickUpInfo = pickupObj;
+          return;
+        }
+      });
+    }else{
+      if(params.method == "delivery"){
+        params.delivery_fee = parseFloat(meal.delivery_fee);
+      }else {
+        params.delivery_fee = 0;
+      }
 
-    if(meal.type == 'preorder'){
-      if(!params.pickupOption || !meal.pickups || params.pickupOption-1>=meal.pickups.length){
-        return false;
+      if(meal.type == 'preorder'){
+        if(!params.pickupOption || !meal.pickups || params.pickupOption-1>=meal.pickups.length){
+          return false;
+        }
+        var pickupInfo = meal.pickups[params.pickupOption-1];
+        if(!pickupInfo || pickupInfo.method != params.method){
+          return false;
+        }
       }
-      var pickupInfo = meal.pickups[params.pickupOption-1];
-      if(!pickupInfo || pickupInfo.method != params.method){
-        return false;
-      }
-      params.pickupInfo = pickupInfo;
-    }
 
-    if(meal.type == 'order' && params.method == 'pickup'){
-      if(!params.pickupOption || !meal.pickups || params.pickupOption-1>=meal.pickups.length){
-        return false;
+      if(meal.type == 'order' && params.method == 'pickup'){
+        if(!params.pickupOption || !meal.pickups || params.pickupOption-1>=meal.pickups.length){
+          return false;
+        }
+        var pickupInfo = meal.pickups[params.pickupOption-1];
+        if(!pickupInfo || pickupInfo.method != params.method){
+          return false;
+        }
       }
-      var pickupInfo = meal.pickups[params.pickupOption-1];
-      if(!pickupInfo || pickupInfo.method != params.method){
-        return false;
-      }
-      params.pickupInfo = pickupInfo;
     }
+    params.pickupInfo = pickupInfo;
     sails.log.debug("building pickup data");
-
     return params;
   },
 
@@ -173,9 +197,9 @@ module.exports = {
       if (err) {
         return res.badRequest(err);
       }
-      $this.validateAddress(method, m, address, function(valid){
-        if(!valid){
-          return res.badRequest({responseText : req.__('order-invalid-address'), code : -6});
+      $this.validateDeliveryMethod(method, m, { address : address, subtotal : subtotal }, req, function(err){
+        if(err){
+          return res.badRequest(err);
         }
 
         $this.validate_meal(m, orders, undefined, subtotal, req , function(err){
@@ -990,7 +1014,8 @@ module.exports = {
     }
     // tax = tax || 1.08;
     tax = 1;
-    total = total * tax;
+    var serviceFee = 1;
+    total = total * tax + serviceFee;
     if(params.delivery_fee){
       total += params.delivery_fee;
     }

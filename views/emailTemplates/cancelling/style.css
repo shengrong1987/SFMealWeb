@@ -9335,6 +9335,9 @@ fieldset[disabled] .btn-red.active {
   padding-left: 15px;
   width: 30%;
 }
+.minWid50 {
+  min-width: 50px;
+}
 .static-floater {
   position: static;
   margin-left: 0;
@@ -9441,6 +9444,9 @@ fieldset[disabled] .btn-red.active {
   .cell .box-primary {
     padding: 50px;
     border-radius: 10px;
+  }
+  .xs-hide {
+    display: none;
   }
   #dishNewView {
     width: 100%;

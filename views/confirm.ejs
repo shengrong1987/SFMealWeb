@@ -36,11 +36,12 @@
           <h4 class="text-left"><strong><%= __('choose-method') %></strong></h4>
           <h3></h3>
           <div class="btn-set text-left" id="method" data-toggle="btn-set">
-            <%if(meal.isDelivery){%>
             <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
-            <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active" value="delivery"><strong><%= __('delivery') %></strong></button>
-            <%}else{%>
-            <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
+            <%if(meal.isDelivery){%>
+            <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="delivery"><strong><%= __('delivery') %></strong></button>
+            <%}%>
+            <%if(meal.isShipping){%>
+            <button data-toggle="tab" href="#shippingTab" class="btn btn-disable btn-fat btn-lg" value="shipping"><strong><%= __('shipping') %></strong></button>
             <%}%>
           </div>
           <h3></h3>
@@ -81,7 +82,7 @@
                 <div class="col-xs-12">
                   <h5>1.<%= __('delivery-location') %></h5>
                 </div>
-                <div class="radio-box col-xs-12 row" id="contact" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
+                <div class="radio-box col-xs-12 row contact" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
                   <%
                   var addresses= user.address;
                   var keys = Object.keys(addresses);
@@ -123,6 +124,31 @@
                 <h4 class="text-right col-xs-12 delivery"><%= __('meal-delivery-fee') %><%= meal.delivery_fee%></h4>
               </div>
             </div>
+
+            <div id="shippingTab" class="tab-pane">
+              <h4 class="text-left"><strong><%= __('shipping-explain', meal.shippingPolicy ?  meal.shippingPolicy.freeAmount : '') %></strong></h4>
+              <div class="row text-left">
+                <div class="col-xs-12">
+                  <h5><%= __('shipping-location') %></h5>
+                </div>
+                <div class="radio-box col-xs-12 row contact" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
+                  <%
+                  var addresses= user.address;
+                  var keys = Object.keys(addresses);
+                  var i = 0;
+                  keys.forEach(function(key){
+                    var addressObj = addresses[key];
+                    var address = addressObj.street + ", " + addressObj.city + ", CA " + addressObj.zip + ", +" + addressObj.phone;
+                  %>
+                  <label class="btn btn-default fixed-label vertical-align" style="text-align: left;">
+                    <input type="radio" id="radio-2-<%= i%>" name="radio-2-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="radio-2-<%= i%>"></label>
+                    <span style="margin-left: 10px;"><%= address %></span>
+                  </label>
+                  <%i++;}); %>
+                  <h4 style="margin-left: 42px;"><a class="text-red" data-action="updateFromOrder" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" data-id="<%= user.id%>" href="javascript:void(0)"><%= __('new-location-phone') %></a></h4>
+                </div>
+              </div>
+            </div>
             <div id="contact-error" style="margin-top: 40px;" class="alert alert-danger"></div>
           </div>
 
@@ -146,7 +172,7 @@
           <div class="divider"></div>
           <h4 class="text-right"><%= __('total')%><span class="total"></span></h4>
 
-          <div id="payment-error" data-toggle="alert" class="alert alert-warning"></div>
+          <div id="payment-error" data-toggle="alert" class="alert alert-danger"></div>
 
           <button type="button" class="btn btn-danger red btn-lg round" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
         </div>
@@ -223,6 +249,11 @@
               <!--<td></td>-->
               <!--<th class="text-right"><%= __('tax')%>:<span class="tax" data-value="0"> $0.00</span></th>-->
             <!--</tr>-->
+            <tr>
+              <th></th>
+              <td></td>
+              <th class="text-right"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('tip-service-fee')%>"></i> <%= __('service-fee')%>:<span class="service-fee" data-value="0"> $1.00</span></th>
+            </tr>
             <tr></tr>
             <tr>
               <th></th>
