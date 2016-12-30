@@ -13,6 +13,7 @@ var React = require('react/addons'),
   TransactionStore = require('../stores/TransactionStore'),
   JobStore = require('../stores/JobStore'),
   CheckListStore = require('../stores/CheckListStore'),
+  CouponStore = require('../stores/CouponStore'),
   TableItem = require('./TableItem');
 
 var Table = React.createClass({

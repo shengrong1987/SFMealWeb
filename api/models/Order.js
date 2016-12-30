@@ -12,6 +12,9 @@ module.exports = {
     index: {
       type: 'string'
     },
+    coupon : {
+      model : 'Coupon'
+    },
     isScheduled : {
       type : 'boolean',
       defaultsTo : false
@@ -116,31 +119,12 @@ module.exports = {
     getTaxRate : function(){
       return util.getTaxRate(this);
     },
-    statusText: function () {
-      switch (this.status) {
-        case 'schedule':
-          return "已预约";
-        case "preparing":
-          return "准备中";
-        case "ready":
-          if(this.method == "delivery"){
-            return "送餐中";
-          }else{
-            return "待自取";
-          }
-        case "complete":
-          return "已完成";
-        case "cancel":
-          return "已取消";
-        case "adjust":
-          return "调整中，待确认";
-        case "cancelling":
-          return "取消中，待确认";
-        case "review":
-          return "待评价";
-        default:
-          return "未知";
-      }
+    coupon : {
+      model : 'Coupon'
+    },
+    discountAmount : {
+      type : 'float',
+      defaultsTo : 0
     }
   }
 };

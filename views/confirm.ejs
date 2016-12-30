@@ -256,6 +256,14 @@
             </tr>
             <tr></tr>
             <tr>
+              <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('coupon')%>"></i> <%= __('coupon')%>:</th>
+              <th><input class="coupon-code" style="margin:0 5px 0 5px;width: 80px;" maxlength="7" data-code="" data-value=""></input></th>
+              <th class="text-right">
+                <button id="applyCouponBtn" class="btn btn-success"><%= __('applyCode')%></button>
+                <button id="disApplyCouponBtn" class="btn btn-danger" onclick="javascript:applyCoupon(false);"><%= __('disApplyCode')%></button>
+              </th>
+            </tr>
+            <tr>
               <th></th>
               <td></td>
               <th class="text-right"><%= __('total') %><span class="total"></span></th>
@@ -264,6 +272,8 @@
           </table>
 
           <button type="button" data-action="takeOrder" class="btn btn-danger red"><%= __('placeorder') %></button>
+          <div id="orderAlertView" class="alert alert-danger hide" style="margin-top: 10px;"></div>
+
         </div>
       </div>
 
@@ -280,4 +290,5 @@
 <script>
   new OrderView({ el : $("#meal-confirm-container"), model : new Order()})
   new AddressView({ el : $("#meal-confirm-container"), model : new User()})
+  new MealConfirmView( { el : $("#meal-confirm-container"), model : new Meal()})
 </script>

@@ -125,6 +125,20 @@ var ActionsCreators = {
     });
   },
 
+  getCoupon : function(records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_COUPON,
+      records: records
+    });
+  },
+
+  getCoupons : function (records){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_COUPONS,
+      records: records
+    });
+  },
+
   switchTab : function(tab){
     AppDispatcher.handleViewAction({
       type : ActionTypes.TAB_CHANGE,

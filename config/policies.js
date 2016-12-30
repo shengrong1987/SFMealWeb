@@ -130,6 +130,11 @@ module.exports.policies = {
     'findOne' : 'isAdmin',
     "verify" : "isAdmin",
     "unVerify" : "isAdmin"
+  },
+
+  CouponController : {
+    'applyCoupon' : 'sessionAuth',
+    'create' : 'isAdmin'
   }
 
   /***************************************************************************

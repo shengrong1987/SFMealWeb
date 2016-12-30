@@ -163,6 +163,8 @@ var TableItem = React.createClass({
               rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._verifyPhoto}>VerifyPhoto</button><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._unVerifyPhoto}>UnVerifyPhoto</button><input name="key" type="text"/></div>
             }
             break;
+          case "Coupon":
+            break;
         }
       }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){
         rowContent = <img src={rowContent} width="100"/>

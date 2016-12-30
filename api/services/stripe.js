@@ -4,7 +4,12 @@
 var stripe = require('stripe')(sails.config.StripeKeys.secretKey);
 var async = require('async');
 
+const SERVICE_FEE = 100;
+const SYSTEM_DELIVERY_FEE = 500;
+
 module.exports = {
+
+  SYSTEM_DELIVERY_FEE : SYSTEM_DELIVERY_FEE,
 
   createManagedAccount : function(attr,cb){
     stripe.accounts.create(attr,function(err, account) {
@@ -100,18 +105,31 @@ module.exports = {
     stripe.transfers.retrieve(id, cb);
   },
 
-  charge : function(attr ,cb){
+  retrieveApplicationFee : function(id, cb){
+    if(!id){
+      return cb(null, null);
+    }
+    stripe.applicationFees.retrieve(id, function(err, applicationFee) {
+      if(err){
+        return cb(err);
+      }
+      cb(null, applicationFee);
+    });
+  },
+
+  charge : function(attr, cb){
     var meal = attr.meal;
     var delivery_application_fee = 0;
-    if(attr.method && attr.method == "delivery"){
-      if(meal.isDeliveryBySystem){
-        delivery_application_fee = 5.99;
-      }
-    }
-    var service_fee = 1;
-    var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + service_fee;
+    var delivery_fee = attr.deliveryFee || 0;
+    if(attr.method && attr.method == "delivery" && meal.isDeliveryBySystem){delivery_application_fee = SYSTEM_DELIVERY_FEE;}
+    var discount = attr.discount * 100;
+    var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + SERVICE_FEE;
+    sails.log.info("application fee: " + application_fee);
+    sails.log.info("order total:" + attr.amount + " discount: " + discount + " delivery fee: " + delivery_fee + " service fee " + SERVICE_FEE);
+    var total =  attr.amount - discount + delivery_fee + SERVICE_FEE;
+    var $this = this;
     stripe.charges.create({
-      amount: attr.amount,
+      amount: total,
       currency: "usd",
       receipt_email: attr.email,
       customer: attr.customerId,
@@ -122,7 +140,32 @@ module.exports = {
       if(err){
         return cb(err);
       }
-      cb(null,charge);
+      if(discount != 0){
+        $this.retrieveApplicationFee(charge.application_fee, function(err, fee){
+          if(err){
+            return cb(err);
+          }
+          var leftFee = application_fee - fee.amount;
+          sails.log.info("charge left application fee: " + leftFee);
+          stripe.transfers.create(
+            {
+              amount: discount,
+              currency: 'usd',
+              destination: attr.destination,
+              application_fee : leftFee,
+              metadata : attr.metadata
+            }, function(err, transfer){
+              if(err){
+                return cb(err);
+              }
+              sails.log.info("extra transfer created: " + transfer.amount);
+              cb(null, charge, transfer);
+            }
+          );
+        });
+      }else{
+        cb(null, charge, null);
+      }
     });
   },
 

@@ -54,6 +54,7 @@ module.exports.routes = {
   '/host/:id/unverifyLicense' : "HostController.unverifyLicense",
   '/meal/:id/off' : 'MealController.off',
   '/meal/:id/on' : 'MealController.on',
+  '/meal/:id/coupon/:code' : 'CouponController.applyCoupon',
   '/dish/:id/verify' : 'DishController.verify',
   '/dish/:id/fail' : 'DishController.fail',
   '/order/:id/adjust-form' : 'OrderController.adjust_order_form',

@@ -17,8 +17,10 @@ describe('UsersController', function() {
   var newEmail = "shengrong1225" + new Date().getTime() + "@gmail.com";
   var password = "12345678";
 
-  describe('register admin', function(){
+  describe('register admin and create coupon', function(){
     var adminEmail = "admin@sfmeal.com";
+    var now = new Date();
+    var nextHour = new Date(now.getTime() + 60 * 60 * 1000);
     it('should register admin account', function (done) {
       agent
         .post('/auth/register')
@@ -32,6 +34,47 @@ describe('UsersController', function() {
           done();
         })
     })
+
+    it('should create a coupon with $1 off', function(done){
+      agent
+        .post('/coupon')
+        .send({
+          type : "fix",
+          amount : 1.00,
+          description : "Happy Holiday",
+          code : "XMAS",
+          expire_at : nextHour
+        })
+        .expect(201)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          should.exist(res.body.id);
+          res.body.amount.should.be.equal(1.00);
+          done();
+        })
+    });
+
+    it('should create a coupon with free shipping', function(done){
+      agent
+        .post('/coupon')
+        .send({
+          type : "freeShipping",
+          description : "Happy Holiday",
+          code : "SHIP",
+          expire_at : nextHour
+        })
+        .expect(201)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          should.exist(res.body.id);
+          res.body.code.should.be.equal("SHIP");
+          done();
+        })
+    });
   })
 
   describe('user login', function() {

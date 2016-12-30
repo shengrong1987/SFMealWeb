@@ -646,4 +646,150 @@ describe('OrderController', function() {
     })
   });
 
+  describe('order a meal with coupon', function() {
+
+    var mealId;
+    var dishId1;
+    var dishId2;
+    var dishId3;
+    var dishId4;
+    var price1;
+    var price2;
+    var price3;
+    var orderId;
+    var phone = "1(415)802-3853";
+    var guestEmail = 'enjoymyself1987@gmail.com';
+    var adminEmail = 'admin@sfmeal.com';
+    var password = '12345678';
+
+    it('should login a guest account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should get a meal', function (done) {
+      agent
+        .get('/meal')
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            console.log(err);
+            return done(err);
+          }
+          if(res.body.meals.length == 0){
+            return done(Error("error getting any meal"));
+          }
+          var meal = res.body.meals[1];
+          mealId = meal.id;
+          dishId1 = meal.dishes[0].id;
+          dishId2 = meal.dishes[1].id;
+          dishId3 = meal.dishes[2].id;
+          dishId4 = meal.dishes[3].id;
+          price1 = meal.dishes[0].price;
+          price2 = meal.dishes[1].price;
+          price3 = meal.dishes[2].price;
+          done();
+        })
+    })
+
+    it('should be able to order a meal with coupon', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 1};
+      dishObj[dishId2] = { number : 0};
+      dishObj[dishId3] = { number : 0};
+      dishObj[dishId4] = { number : 0};
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 1,
+          pickupOption : 1,
+          phone : phone,
+          method : "pickup",
+          mealId : mealId,
+          couponCode : "XMAS"
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.discountAmount.should.be.equal(1);
+          res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(400);
+          res.body.application_fees[Object.keys(res.body.application_fees)[0]].should.be.equal(180);
+          orderId = res.body.id;
+          done();
+        })
+    });
+
+    it('should not be able to order another meal with same coupon', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 0};
+      dishObj[dishId2] = { number : 0};
+      dishObj[dishId3] = { number : 1};
+      dishObj[dishId4] = { number : 0};
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price3 * 1,
+          pickupOption : 1,
+          phone : phone,
+          method : "pickup",
+          mealId : mealId,
+          couponCode : "XMAS"
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-15);
+          done();
+        })
+    });
+
+    it('should not adjust the order with coupon', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 2};
+      dishObj[dishId2] = { number : 2};
+      dishObj[dishId3] = { number : 0};
+      dishObj[dishId4] = { number : 0};
+      agent
+        .post('/order/' + orderId + "/adjust")
+        .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, mealId : mealId, delivery_fee : 0})
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-18);
+          done();
+        })
+    });
+
+    it('should not cancel the order with coupon', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 2};
+      dishObj[dishId2] = { number : 2};
+      dishObj[dishId3] = { number : 0};
+      dishObj[dishId4] = { number : 0};
+      agent
+        .post('/order/' + orderId + "/cancel")
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-19);
+          done();
+        })
+    });
+
+  })
+
 });

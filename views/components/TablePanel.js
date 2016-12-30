@@ -82,6 +82,11 @@ var TablePanel = React.createClass({
         details = {id : 'checklist ID', 'host.id' : 'host', kitchen : 'kitchen', surface : 'surface', utensil : 'utensil', dishes : 'dishes', refrigerator : 'refrigerator', sourceStorage : 'sourceStorage', dryFoodStorage : 'dryFoodStorage', water : 'water', command : 'Command' };
         criterias = ['id', 'host', 'key'];
         break;
+      case "Coupon":
+        headers = {id : 'Coupon ID', type : 'type', amount : 'amount', description : 'description', code : 'code', expires : 'expires_at', command : 'Command' };
+        details = {id : 'Coupon ID', type : 'type', amount : 'amount', description : 'description', code : 'code', expires : 'expires_at', command : 'Command' };
+        criterias = ['id', 'code', 'type'];
+        break;
     }
 
     return (

@@ -20,6 +20,8 @@ module.exports = {
     GET_JOB : null,
     GET_CHECKLISTS : null,
     GET_CHECKLIST : null,
+    GET_COUPON : null,
+    GET_COUPONS : null,
     TAB_CHANGE : null,
     SEARCH_CHANGE : null,
     NO_RESULT : null,

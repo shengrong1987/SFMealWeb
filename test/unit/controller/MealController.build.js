@@ -3,6 +3,7 @@
  */
 
 var assert = require('assert'),
+    should = require('should'),
     sinon = require('sinon'),config, stripe,request = require('supertest');
 var agent;
 
@@ -13,12 +14,13 @@ before(function(done) {
 
 describe('MealController', function() {
 
-  this.timeout(12000);
+  this.timeout(30000);
 
   describe('build a meal with dishes', function() {
 
     var hostId;
     var email = 'aimbebe.r@gmail.com';
+    var adminEmail = 'admin@sfmeal.com';
     var password = 'Rs89030659';
     var picture = "/images/thumbnail.jpg";
     var address1 = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : "(415)802-3853","isDefault" : true};
@@ -28,12 +30,51 @@ describe('MealController', function() {
     var lastname = "Lian";
     var shopName = "Crispy, Tangy, Sweet, and Spicy";
     var phone = "(415)802-3853";
+    var now = new Date();
+    var nextHour = new Date(now.getTime() + 60 * 60 * 1000);
 
     it('should register an account', function (done) {
       agent
         .post('/auth/register')
         .send({email : email, password: password})
         .expect(200)
+        .end(done)
+    });
+
+    it('should register an account', function (done) {
+      agent
+        .post('/auth/register')
+        .send({email : adminEmail, password: password})
+        .expect(200)
+        .end(done)
+    });
+
+    it('should create a coupon with $5 off', function(done){
+      agent
+        .post('/coupon')
+        .send({
+          type : "fix",
+          amount : 5.00,
+          description : "Happy Holiday",
+          code : "XMAS",
+          expire_at : nextHour
+        })
+        .expect(201)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          should.exist(res.body.id);
+          done();
+        })
+    });
+
+    it('should login email account', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
         .end(done)
     });
 
@@ -412,10 +453,10 @@ describe('MealController', function() {
               return done(err);
             }
             orderId = res.body.id;
-            console.log("this is an order id: " + orderId);
             done();
           })
     })
+
     var newSubtotal = 4;
     it('should adjust an order as a user', function(done){
       orders[dish1] = { number : 0};
@@ -452,8 +493,8 @@ describe('MealController', function() {
             method : "delivery",
             mealId : mealId,
             phone : address1.phone,
-            delivery_fee : 0,
-            eta : new Date()
+            eta : new Date(),
+            couponCode : 'XMAS'
           })
           .expect(200)
           .end(function(err,res){
@@ -461,6 +502,7 @@ describe('MealController', function() {
               return done(err);
             }
             preparingOrderId = res.body.id;
+            res.body.discountAmount.should.be.equal(5);
             done();
           })
     })

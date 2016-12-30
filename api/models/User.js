@@ -113,6 +113,9 @@ module.exports = {
       collection : 'Notification',
       via : 'user'
     },
+    coupons : {
+      collection : 'Coupon'
+    },
     //[{"dish1": id}, {"dish2":id}, {"dish3":id}]
     feature_dishes : {
       type : 'json'

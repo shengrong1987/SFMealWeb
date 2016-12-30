@@ -1009,16 +1009,26 @@ var CheckListView = Backbone.View.extend({
 
 
 var Meal = Backbone.Model.extend({
-  urlRoot : "/meal"
+  urlRoot : "/meal",
+  url : function(){
+    if(this.type == "coupon"){
+      return this.urlRoot + "/" + this.get("id") + "/coupon/" + this.get("code");
+    }else{
+      return this.urlRoot + "/" + this.get("id");
+    }
+  }
 });
 
 var MealSelectionView = Backbone.View.extend({
   events : {
     "click .calculateBtn" : "calculateDelivery",
-    "change .variation a" : "changePreference"
+    "change .variation a" : "changePreference",
+    "click #applyCouponBtn" : "applyCouponCode"
   },
   initialize : function(){
-
+    this.alertView = this.$el.find("#orderAlertView");
+    this.alertView.removeClass("hide");
+    this.alertView.hide();
   },
   initMap : function(){
     var directionsDisplay = new google.maps.DirectionsRenderer;
@@ -1135,6 +1145,32 @@ var MealSelectionView = Backbone.View.extend({
         $this.$el.find("#addressAlertView").html(jQuery.i18n.prop('locationFailToGeocode'));
       }
     });
+  },
+  applyCouponCode : function(e){
+    e.preventDefault();
+    this.alertView.hide();
+    var code = this.$el.find(".coupon-code").val();
+    if(!code){
+      this.alertView.show();
+      this.alertView.html(jQuery.i18n.prop('couponCodeEmpty'));
+      return;
+    }
+    var mealId = this.$el.find("[data-meal]").data("meal");
+    this.model.set("id", mealId);
+    this.model.set("code", code);
+    this.model.type = "coupon";
+    var $this = this;
+    this.model.save({},{
+    success : function( model, res){
+      var discount = res.amount;
+      var code = res.code;
+      applyCoupon(true, discount, code);
+    },
+    error : function(model, err){
+      $this.alertView.show();
+      $this.alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+    }});
+
   }
 });
 
@@ -2346,6 +2382,43 @@ var TransactionView = Backbone.View.extend({
   }
 });
 
+var MealConfirmView = Backbone.View.extend({
+  events : {
+    "click #applyCouponBtn" : "applyCouponCode"
+  },
+  initialize : function(){
+    this.alertView = this.$el.find("#orderAlertView");
+    this.alertView.removeClass("hide");
+    this.alertView.hide();
+  },
+  applyCouponCode : function(e) {
+    e.preventDefault();
+    this.alertView.hide();
+    var code = this.$el.find(".coupon-code").val();
+    if (!code) {
+      this.alertView.show();
+      this.alertView.html(jQuery.i18n.prop('couponCodeEmpty'));
+      return;
+    }
+    var mealId = this.$el.find("[data-meal]").data("meal");
+    this.model.set("id", mealId);
+    this.model.set("code", code);
+    this.model.type = "coupon";
+    var $this = this;
+    this.model.save({}, {
+      success: function (model, res) {
+        var discount = res.amount;
+        var code = res.code;
+        applyCoupon(true, discount, code);
+      },
+      error: function (model, err) {
+        $this.alertView.show();
+        $this.alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+      }
+    });
+  }
+})
+
 var OrderView = Backbone.View.extend({
   events : {
     "click [data-action='receive']" : "receive",
@@ -2508,10 +2581,16 @@ var OrderView = Backbone.View.extend({
       var delivery_fee = 0;
     }
     var subtotal = form.find(".subtotal").data("value");
-    if(subtotal == 0){
+    if(subtotal == 0) {
       this.paymentAlert.html(jQuery.i18n.prop('orderEmptyError'));
       this.paymentAlert.show();
       return;
+    }
+
+    //coupon info
+    var couponValue = localCoupon;
+    if(couponValue){
+      var code = Object.keys(couponValue)[0];
     }
 
     this.model.set({
@@ -2522,7 +2601,8 @@ var OrderView = Backbone.View.extend({
       method : method,
       mealId : mealId,
       phone : phone,
-      delivery_fee : delivery_fee
+      delivery_fee : delivery_fee,
+      couponCode : code
     });
 
     this.model.save({},{
@@ -2569,7 +2649,7 @@ var OrderView = Backbone.View.extend({
           }
         });
       },error : function(model, err){
-        BootstrapDialog.alert(err.responseText);
+        BootstrapDialog.alert(err.responseJSON ? err.responseJSON.responseText : err.responseText);
       }
     })
   }

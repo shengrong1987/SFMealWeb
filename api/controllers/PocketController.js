@@ -83,8 +83,8 @@ module.exports = {
                 if(err){
                   return next(err);
                 }
-                charge.application_fee = "N/A";
-                charge.type = "charge";
+                charge.application_fee = 0;
+                charge.type = "type-charge";
                 charge.host = host;
                 var date = moment(charge.created * 1000);
                 charge.month = moment.months()[date.month()];
@@ -165,8 +165,9 @@ module.exports = {
             return res.badRequest(err);
           }
           var transactions = [];
-          async.each(host.orders, function (order, next) {
+          async.each(host.orders, function (order, cb) {
             var charges = order.charges;
+            var transfer = order.transfer;
             async.each(Object.keys(charges), function(chargeId , next){
               stripe.retrieveCharge(chargeId, function(err, charge){
                 if(err){
@@ -177,21 +178,51 @@ module.exports = {
                   if (err) {
                     return next(err);
                   }
-                  charge.application_fee = (charge.amount - charge.amount_refunded) * 0.10;
                   var date = moment(charge.created * 1000);
                   charge.month = moment.months()[date.month()];
                   charge.day = date.date();
-                  charge.type = "payment";
+                  charge.type = "type-payment";
                   charge.host = host;
-                  transactions.push(charge);
-                  next();
+                  stripe.retrieveApplicationFee(charge.application_fee, function(err, fee){
+                    if(err){
+                      return next(err);
+                    }
+                    charge.application_fee = fee.amount - fee.amount_refunded;
+                    transactions.push(charge);
+                    next();
+                  });
                 })
               });
             },function(err){
               if(err){
-                return next(err);
+                return cb(err);
               }
-              next();
+              if(transfer){
+                Host.findOne(transfer.metadata.hostId).exec(function(err, host) {
+                  if (err) {
+                    return next(err);
+                  }
+                  var date = moment(transfer.created * 1000);
+                  transfer.month = moment.months()[date.month()];
+                  transfer.day = date.date();
+                  transfer.type = "type-compensation";
+                  transfer.host = host;
+                  stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee){
+                    if(err){
+                      return cb(err);
+                    }
+                    if(fee){
+                      transfer.application_fee = fee.application_fee - fee.amount_refunded;
+                    }else{
+                      transfer.application_fee = 0;
+                    }
+                    transactions.push(transfer);
+                    cb();
+                  })
+                });
+              }else{
+                cb();
+              }
             });
           },function(err){
             if(err){
@@ -205,8 +236,9 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
-              async.each(user.orders, function (order, next) {
+              async.each(user.orders, function (order, cb) {
                 var charges = Object.keys(order.charges);
+                var transfer = order.transfer;
                 async.each(charges, function (chargeId, next) {
                   stripe.retrieveCharge(chargeId, function(err, charge){
                     if(err){
@@ -217,7 +249,7 @@ module.exports = {
                         return next(err);
                       }
                       charge.application_fee = "N/A";
-                      charge.type = "charge";
+                      charge.type = "type-charge";
                       charge.host = host;
                       var date = moment(charge.created * 1000);
                       charge.month = moment.months()[date.month()];
@@ -228,9 +260,34 @@ module.exports = {
                   });
                 }, function (err) {
                   if(err){
-                    return next(err);
+                    return cb(err);
                   }
-                  next();
+                  if(transfer){
+                    Host.findOne(transfer.metadata.hostId).exec(function(err, host) {
+                      if (err) {
+                        return next(err);
+                      }
+                      var date = moment(transfer.created * 1000);
+                      transfer.month = moment.months()[date.month()];
+                      transfer.day = date.date();
+                      transfer.type = "payment";
+                      transfer.host = host;
+                      stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee){
+                        if(err){
+                          return cb(err);
+                        }
+                        if(fee){
+                          transfer.application_fee = fee.application_fee - fee.amount_refunded;
+                        }else{
+                          transfer.application_fee = 0;
+                        }
+                        transactions.push(transfer);
+                        cb();
+                      })
+                    });
+                  }else{
+                    cb();
+                  }
                 });
               }, function (err) {
                 if(err){

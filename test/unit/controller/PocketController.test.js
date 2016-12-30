@@ -44,7 +44,7 @@ describe('PocketController', function() {
           should.exist(res.body.pocket.totalBalance);
           should.exist(res.body.pocket.pending_balances);
           should.exist(res.body.pocket.transactions);
-          res.body.pocket.transactions.should.have.length(5);
+          res.body.pocket.transactions.should.have.length(7);
           done()
         })
     })
@@ -76,7 +76,7 @@ describe('PocketController', function() {
             return done(err);
           }
           should.exist(res.body.pocket.transactions);
-          res.body.pocket.transactions.should.have.length(5);
+          res.body.pocket.transactions.should.have.length(7);
           done()
         })
     })
@@ -100,7 +100,7 @@ describe('PocketController', function() {
             return done(err);
           }
           should.exist(res.body.pocket.transactions);
-          res.body.pocket.transactions.should.have.length(5);
+          res.body.pocket.transactions.should.have.length(6);
           done()
         })
     })
