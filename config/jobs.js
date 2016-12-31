@@ -25,5 +25,5 @@ module.exports.jobs = {
   "processEvery": "10 seconds",
   "maxConcurrency": 20,
   "defaultConcurrency": 5,
-  "defaultLockLifetime": 10000
+  "defaultLockLifetime": 100
 };
