@@ -682,7 +682,7 @@ module.exports = {
 
       if (orders.length > 0) {
         if(params.status == "on"){
-          if(params.pickups || params.title || meal.type){
+          if(params.pickups || params.title || meal.type || params.minimalOrder || params.minimalTotal){
             cb({ code : -14, responseText : req.__("meal-modify-active-error")});
           }else{
             cb();

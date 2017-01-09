@@ -116,7 +116,12 @@ module.exports = {
     coupons : {
       collection : 'Coupon'
     },
-    //[{"dish1": id}, {"dish2":id}, {"dish3":id}]
+    likes : {
+      collection : 'Host'
+    },
+    follow : {
+      model : 'Host'
+    },
     feature_dishes : {
       type : 'json'
     },

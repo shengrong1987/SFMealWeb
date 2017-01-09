@@ -178,10 +178,6 @@ var RegisterView = Backbone.View.extend({
   }
 });
 
-var Host = Backbone.Model.extend({
-  urlRoot : "/host"
-});
-
 var UserBarView = Backbone.View.extend({
   events : {
     "click #applyToHostBtn" : "applyForHost",
@@ -741,7 +737,14 @@ var PaymentView = Backbone.View.extend({
 
 
 var Host = Backbone.Model.extend({
-  urlRoot : "/host"
+  urlRoot : "/host",
+  url : function(){
+    if(this.action){
+      return this.urlRoot + "/" + this.get("id") + "/" + this.action;
+    }else{
+      return this.urlRoot + "/" + this.get("id");
+    }
+  }
 });
 
 var User = Backbone.Model.extend({
@@ -2215,6 +2218,76 @@ var HostProfileView = Backbone.View.extend({
         $this.successView.hide();
         $this.alertView.html(jQuery.i18n.prop('saveError'));
       }
+    });
+  }
+});
+
+var HostPageView = Backbone.View.extend({
+  events : {
+    "click #likeBtn" : "like",
+    "click #followBtn" : "follow"
+  },
+  initialize : function(){
+    var alertView = this.$el.find("#actionAlertView");
+    alertView.removeClass("hide");
+    alertView.hide();
+    this.alertView = alertView;
+
+    var hostId = this.$el.data("host");
+    this.model.set("id", hostId);
+  },
+  like : function(e){
+    e.preventDefault();
+    this.model.action = "like";
+    this.alertView.hide();
+    var countView = $(e.currentTarget).find("[data-count]");
+    var likeCount = countView.data('count');
+    var $this = this;
+    this.model.save({}, {
+      success : function(){
+        likeCount++;
+        countView.data("count", likeCount);
+        countView.text(likeCount);
+      },
+      error : function(model, err){
+        $this.alertView.show();
+        $this.alertView.html(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+      }
+    })
+  },
+  follow : function(e){
+    e.preventDefault();
+    var isFollowed = $(e.currentTarget).data("followed");
+    if(isFollowed){
+      this.model.action = "unfollow";
+    }else{
+      this.model.action = "follow";
+    }
+    var $this = this;
+    BootstrapDialog.show({
+      title: jQuery.i18n.prop('tip'),
+      message : isFollowed ? jQuery.i18n.prop('unFollowAlert') : jQuery.i18n.prop('followAlert'),
+      buttons: [{
+        label: jQuery.i18n.prop('yes'),
+        action: function(dialog) {
+          $this.alertView.hide();
+          $this.model.save({}, {
+            success : function(){
+              location.reload();
+            },
+            error : function(model, err){
+              dialog.close();
+              $this.alertView.show();
+              $this.alertView.html(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+            }
+          })
+        }
+      }, {
+        label: jQuery.i18n.prop('cancel'),
+        action: function(dialog) {
+          dialog.close();
+        }
+      }]
     });
   }
 });

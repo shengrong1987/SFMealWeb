@@ -54,10 +54,10 @@ module.exports = function(agenda) {
 
         var showDates = [];
         for(var i=0 ; i < 7; i++){
-          var newDate = new Date();
-          newDate.setDate(new Date(fromDate).getDate() + i);
-          var month = moment.months()[newDate.getMonth()];
-          var day = newDate.getDate();
+          var mFromDate = moment(fromDate);
+          mFromDate.add(i, 'days');
+          var month = moment.months()[mFromDate.month()];
+          var day = mFromDate.date();
           var dateObj = {
             date : month + " " + day,
             income : 0,
@@ -79,6 +79,7 @@ module.exports = function(agenda) {
             var orderTotalPayment = 0;
             async.each(host.orders, function (order, next2) {
               var charges = order.charges;
+              var transfer = order.transfer;
               async.each(Object.keys(charges), function (chargeId, next3) {
                 stripe.retrieveCharge(chargeId, function (err, charge) {
                   if (err) {
@@ -89,30 +90,35 @@ module.exports = function(agenda) {
                     if (err) {
                       return next3(err);
                     }
-                    var date = moment(charge.created * 1000);
                     charge.income = (charge.amount - charge.amount_refunded);
-                    charge.application_fee = charge.income * 0.10;
-                    charge.month = moment.months()[date.month()];
-                    charge.day = date.date();
-                    charge.type = "payment";
-                    charge.host = host;
-                    var paidInPeriod = false;
-                    for(var i=0; i < 7; i++){
-                      var dateObj = showDates[i];
-                      var date = dateObj.date;
-                      var dateInfos = date.split(" ");
-                      if(dateInfos.length > 1 && dateInfos[0] == charge.month && dateInfos[1] == charge.day){
-                        orderTotalPayment += charge.income - charge.application_fee;
-                        dateObj.income += charge.income;
-                        dateObj.fee += charge.application_fee;
-                        dateObj.number++;
-                        paidInPeriod = true;
+                    stripe.retrieveApplicationFee(charge.application_fee, function(err, fee){
+                      if(err){
+                        return next(err);
                       }
-                    }
-                    if(!paidInPeriod){
-                      transactions.push(charge);
-                    }
-                    next3();
+                      var date = moment(charge.created * 1000);
+                      charge.application_fee = fee.amount - fee.amount_refunded;
+                      charge.month = moment.months()[date.month()];
+                      charge.day = date.date();
+                      charge.type = "payment";
+                      charge.host = host;
+                      var paidInPeriod = false;
+                      for(var i=0; i < 7; i++){
+                        var dateObj = showDates[i];
+                        var date = dateObj.date;
+                        var dateInfos = date.split(" ");
+                        if(dateInfos.length > 1 && dateInfos[0] == charge.month && dateInfos[1] == charge.day){
+                          orderTotalPayment += charge.income - charge.application_fee;
+                          dateObj.income += charge.income;
+                          dateObj.fee += charge.application_fee;
+                          dateObj.number++;
+                          paidInPeriod = true;
+                        }
+                      }
+                      if(paidInPeriod){
+                        transactions.push(charge);
+                      }
+                      next3();
+                    });
                   })
                 });
               }, function (err) {

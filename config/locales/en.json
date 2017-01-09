@@ -363,6 +363,8 @@
   "create-new-card": "Add new card",
   "index": "Home",
   "favourite": "Collect",
+  "follow" : "Follow",
+  "followed" : "Followed",
   "notification": "Notification",
   "pay-attention": "Attention",
   "login-before-apply-chef": "You must logged in to apply for chef.",
@@ -469,6 +471,8 @@
   "meal-adjust-qty-fail": "There are already orders to this dish, can’t reduce the number .",
   "meal-no-shipping" : "Meal don't support shipping.",
   "meal-shipping-policy-invalid" : "Meal has invalid shipping setup.",
+  "host-like-once-error" : "You can only like the same chef once",
+  "host-like-himself-error" : "You can not like/follow yourself",
   "host-bank-ok": "Your bank account has been successfully created",
   "order-empty": "Order is empty",
   "order-dish-not-enough": "Dish: %s is less than %d",
@@ -691,5 +695,6 @@
   "type-compensation" : "Compensation",
   "type-charge" : "Expense",
   "application_fee" : "fee",
-  "refunded" : "Refund"
+  "refunded" : "Refund",
+  "has-foodhandler-license" : "Valid California Food Handler's Certificate"
 }

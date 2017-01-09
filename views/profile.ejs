@@ -15,7 +15,7 @@
     </div>
   </div>
 
-  <div id="host-profile" class="default-container" style="padding: 30px 20px 30px 20px;">
+  <div id="hostProfileView" data-host="<%= host.id%>" class="default-container" style="padding: 30px 20px 30px 20px;">
 
     <div class="row">
       <div class="col-md-5">
@@ -28,7 +28,12 @@
           <div class="row">
             <div class="col-xs-12">
               <h4 class="text-dark"><strong><%= host.shopName %></strong><br/><br/><small><%= host.shortIntro %></small></h4>
-              <p><% if(host.license && host.license.valid){%><i class="fa fa-certificate fa-2x text-yellow"></i> 已获得食品操作安全证书<%}%></p>
+              <p><% if(host.license && host.license.valid){%><i class="fa fa-certificate fa-2x text-yellow"></i><%= __('has-foodhandler-license')%> <%}%></p>
+              <p>
+                <button id="likeBtn" class="btn btn-red"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
+                <button id="followBtn" class="btn btn-green" data-followed="<%= (user.follow && user.follow==host.id) ? true : false%>"><%= (user.follow && user.follow==host.id) ? __('followed') : __('follow')%> <i class="fa <%= (user.follow && user.follow==host.id) ? 'fa-star' : 'fa-star-o'%>"></i></button>
+              </p>
+              <div id="actionAlertView" class="alert alert-danger hide"></div>
             </div>
           </div>
           <div class="row">
@@ -189,3 +194,7 @@
   </div>
 
 </div>
+
+<script>
+  new HostPageView({ el : $("#hostProfileView"), model : new Host()})
+</script>

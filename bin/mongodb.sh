@@ -25,7 +25,7 @@ start() {
 	echo -n $"Starting $prog: "
 	chown -R $USER:$USER "$APP_DIR/data"
 	truncate -s 0 /var/log/mongodb.log
-	daemon $mongod -dbpath "$APP_DIR/data" --smallfiles "--fork --logpath /var/log/mongodb.log --logappend 2>&1 >>/var/log/mongodb.log"
+	daemon $mongod -dbpath "$APP_DIR/data" --auth --smallfiles "--fork --logpath /var/log/mongodb.log --logappend 2>&1 >>/var/log/mongodb.log"
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$prog

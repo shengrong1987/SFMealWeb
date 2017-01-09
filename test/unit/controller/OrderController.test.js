@@ -274,6 +274,24 @@ describe('OrderController', function() {
         .end(done)
     });
 
+
+    it('should not update any thing on meal with orders', function(done){
+      var now = new Date()
+      agent
+        .put('/meal/' + mealId)
+        .send({
+          status : 'on',
+          provideFromTime : now,
+          provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
+          delivery_fee : 10.00
+        })
+        .expect(400)
+        .end(function(err, res){
+          res.body.code.should.be.equal(-14);
+          done();
+        })
+    })
+
     it('should not cancel the order at schedule as a host', function(done){
       agent
         .put('/order/' + orderId + '/cancel')

@@ -1,12 +1,6 @@
 /**
  * Created by shengrong on 7/27/16.
  */
-var async = require('async');
-var util = require('../services/util');
-var stripe = require("../services/stripe");
-var notification = require("../services/notification");
-var moment = require("moment");
-
 module.exports = function(agenda) {
   var job = {
 

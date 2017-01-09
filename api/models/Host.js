@@ -103,6 +103,14 @@ module.exports = {
       model : 'Pocket',
       via : 'user'
     },
+    likes : {
+      type : 'integer',
+      defaultsTo : 0
+    },
+    followers : {
+      collection : 'User',
+      via : 'follow'
+    },
     //check stripe verification, return verification object if not there's field_needed
     checkVerification : function(cb){
       var host = this;

@@ -5,6 +5,8 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  * @error       :: -1 address decode error
  *                 -2 address not found
+ *                 -3 Can only like one host once
+ *                 -4 can not like yourself
  */
 
 var stripe = require("../services/stripe.js");
@@ -344,6 +346,7 @@ module.exports = {
         }
         if(!isAdmin){
           var publicHost = {};
+          publicHost.id = host.id;
           publicHost.dishes = host.dishes;
           publicHost.meals = host.meals;
           publicHost.shopName = host.shopName;
@@ -353,16 +356,17 @@ module.exports = {
           publicHost.shortIntro = host.shortIntro();
           publicHost.license = host.license;
           publicHost.reviews = reviews;
+          publicHost.likes = host.likes;
           if(req.wantsJSON){
             return res.ok(publicHost);
           }
-          return res.view("profile",{host : publicHost});
+          return res.view("profile",{host : publicHost, user : req.session.user});
         }
         host.reviews = reviews;
         if(req.wantsJSON && isAdmin){
           return res.ok(host);
         }else{
-          return res.ok();
+          return res.ok({});
         }
       });
     });
@@ -405,6 +409,102 @@ module.exports = {
     }else{
       return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, passGuide: false, verification : null, dishVerifying : null});
     }
+  },
+
+  like : function(req, res){
+    var hostId = req.params.id;
+    var userId = req.session.user.id;
+    User.findOne(userId).populate("likes").exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(user.host && user.host == hostId){
+        return res.badRequest({ code : -4, responseText : req.__('host-like-himself-error')});
+      }
+      var alreadyLike = false;
+      if(user.likes){
+        alreadyLike = user.likes.some(function(host){
+          return host.id == hostId;
+        })
+      }
+      if(alreadyLike){
+        return res.badRequest({ code : -3, responseText : req.__('host-like-once-error')});
+      }
+
+      Host.findOne(hostId).exec(function(err, host){
+        if(err){
+          return res.badRequest(err);
+        }
+        host.likes = host.likes || 0;
+        host.likes++;
+        host.save(function(err, h){
+          if(err){
+            return res.badRequest(err);
+          }
+          user.likes.add(hostId);
+          user.save(function(err, u){
+            if(err){
+              return res.badRequest(err);
+            }
+            res.ok({});
+          });
+        });
+      })
+    });
+  },
+
+  follow : function(req, res){
+    var hostId = req.params.id;
+    var userId = req.session.user.id;
+    User.findOne(userId).populate("follow").exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(user.host && user.host == hostId){
+        return res.badRequest({ code : -4, responseText : req.__('host-like-himself-error')});
+      }
+
+      Host.findOne(hostId).exec(function(err, host){
+        if(err){
+          return res.badRequest(err);
+        }
+        user.follow = hostId;
+        user.save(function(err, u){
+          if(err){
+            return res.badRequest(err);
+          }
+          req.session.user.follow = user.follow;
+          res.ok({});
+        });
+      })
+    });
+  },
+
+  unfollow : function(req, res){
+    var hostId = req.params.id;
+    var userId = req.session.user.id;
+    User.findOne(userId).populate("follow").exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(user.host && user.host == hostId){
+        return res.badRequest({ code : -4, responseText : req.__('host-like-himself-error')});
+      }
+
+      Host.findOne(hostId).exec(function(err, host){
+        if(err){
+          return res.badRequest(err);
+        }
+        user.follow = null;
+        user.save(function(err, u){
+          if(err){
+            return res.badRequest(err);
+          }
+          req.session.user.follow = u.follow;
+          res.ok({});
+        });
+      })
+    });
   },
 
   //to-test

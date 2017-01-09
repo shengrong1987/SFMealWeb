@@ -364,6 +364,8 @@
   "create-new-card" : "添加新卡",
   "index" : "主页",
   "favourite" : "收藏",
+  "follow" : "关注",
+  "followed" : "已关注",
   "notification" : "消息",
   "pay-attention" : "注意",
   "login-before-apply-chef" : "你必须先登录才能申请成为大厨",
@@ -470,6 +472,8 @@
   "meal-adjust-qty-fail" : "已经有订单订购这个菜式,无法降低数量了。",
   "meal-no-shipping" : "Meal不支持快递方式",
   "meal-shipping-policy-invalid" : "Meal快递政策有误，请检查设置。",
+  "host-like-once-error" : "你已经给这个厨师点过赞了",
+  "host-like-himself-error" : "不可以自己给自己点赞／关注",
   "host-bank-ok" : "您的银行账号已成功输入",
   "order-empty" : "订单为空",
   "order-dish-not-enough" : "菜式:%s 数量不足 %d",
@@ -691,5 +695,6 @@
   "type-compensation" : "收入补充",
   "type-charge" : "订单支出",
   "application_fee" : "手续费",
-  "refunded" : "退款"
+  "refunded" : "退款",
+  "has-foodhandler-license" : "已获得食品操作安全证书"
 }
