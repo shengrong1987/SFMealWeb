@@ -398,7 +398,7 @@ module.exports = require('waterlock').actions.user({
     var credential = s3.id + "/" + date + "/" + s3.region + "/s3/aws4_request";
     var url = "https://" + bucket + ".s3.amazonaws.com/";
     var maxSize = this.getMaxSize(module);
-    var signatureJSON = { "expiration": "2016-12-30T12:00:00.000Z",
+    var signatureJSON = { "expiration": "2017-12-30T12:00:00.000Z",
       "conditions": [
         {"bucket": "sfmeal"},
         ["starts-with", "$key", "users/" + userId + "/"],
