@@ -696,5 +696,6 @@
   "type-charge" : "Expense",
   "application_fee" : "fee",
   "refunded" : "Refund",
-  "has-foodhandler-license" : "Valid California Food Handler's Certificate"
+  "has-foodhandler-license" : "Valid California Food Handler's Certificate",
+  "area" : "Neighborhood"
 }

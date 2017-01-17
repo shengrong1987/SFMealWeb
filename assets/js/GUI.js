@@ -25,10 +25,18 @@ function geolocate() {
 }
 function initAutoComplete(){
   var componentForm = {
-    "street_number" : "#streetInput",
-    "route" : "#streetInput",
-    "locality" : "#cityInput",
-    "postal_code" : "#postalInput"
+    "street_number" : ["#streetInput","#deliveryCenterInput"],
+    "route" : ["#streetInput","#deliveryCenterInput"],
+    "locality" : ["#cityInput","#deliveryCenterInput"],
+    "postal_code" : ["#postalInput","#deliveryCenterInput"]
+  };
+  var zipCodeToArea = {
+    "Mission District and Nearby" : ["94110","94114","94131","94134","94131"],
+    "SFSU & CCSF" : ["94132", "94127","94116","94112"],
+    "Sunset & Richmond" : ["94122","94121","94118"],
+    "Market and Downtown" : ["94103","94102","94108","94104"],
+    "Bayview" : ["94124"]
+
   };
   var options = {
     componentRestrictions : { country : 'us'},
@@ -42,9 +50,12 @@ function initAutoComplete(){
     if(!place.address_components){
       return;
     }
-    for (var component in componentForm) {
-      $(componentForm[component]).val("");
-      $(componentForm[component]).attr("disabled",false);
+    for (var key in componentForm) {
+      var components = componentForm[key];
+      components.forEach(function(component){
+        $(component).val("");
+        $(component).attr("disabled", false);
+      });
     }
     // Get each component of the address from the place details
     // and fill the corresponding field on the form.
@@ -52,10 +63,19 @@ function initAutoComplete(){
       var addressType = place.address_components[i].types[0];
       if(componentForm[addressType]){
         var val = place.address_components[i].long_name;
-        if($(componentForm[addressType]).val() != ""){
-          val = $(componentForm[addressType]).val() + " " + val;
+        if(addressType=="postal_code"){
+          Object.keys(zipCodeToArea).forEach(function(area){
+            var zipcodes = zipCodeToArea[area];
+            if(zipcodes.indexOf(val) != -1){
+              $("#areaInput").val(area);
+            }
+          })
         }
-        $(componentForm[addressType]).val(val);
+        componentForm[addressType].forEach(function(selector){
+          if($(selector).length > 0){
+            $(selector).val($(selector).val() + " " + val);
+          }
+        });
       }
     }
   });

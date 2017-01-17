@@ -120,6 +120,9 @@ module.exports = {
     delivery_center : {
       type : 'string'
     },
+    area : {
+      type : 'string'
+    },
     commission : {
       type : 'float',
       defaultsTo : 0.2,

@@ -25,7 +25,7 @@
         <li><a href="/host/me#myinfo"><h4><strong><%= __('host-nav-info')%></strong></h4></a></li>
       </ul>
 
-      <div id="mealCreatingView">
+      <div id="mealCreatingView" class="middle box-compact">
         <div class="box box-shadow box-primary white text-left">
           <h4 class="text-green"><%= __('new-meal')%></h4>
           <h1></h1>
@@ -253,6 +253,18 @@
                       <div class="input-group-addon"><%= __('delivery-range')%>:</div>
                       <input id="deliveryRangeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="5" value="5">
                       <div class="input-group-addon"><%= __('miles')%></div>
+                    </div>
+                  </div>
+                  <div class=col-sm-12>
+                    <div class="input-group">
+                      <div class="input-group-addon"><%= __('delivery-center')%>:</div>
+                      <input id="deliveryCenterInput" onfocus="geolocate()" class="form-control" type="text">
+                    </div>
+                  </div>
+                  <div class=col-sm-12>
+                    <div class="input-group">
+                      <div class="input-group-addon"><%= __('area')%>:</div>
+                      <input id="areaInput" class="form-control" type="text" readonly="readonly">
                     </div>
                   </div>
                 </div>

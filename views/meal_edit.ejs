@@ -25,7 +25,7 @@
         <li><a href="/host/me#myinfo"><h4><strong><%= __('host-nav-info')%></strong></h4></a></li>
       </ul>
 
-      <div id="mealEditingView" class="middle">
+      <div id="mealEditingView" class="middle box-compact">
         <div class="box box-shadow box-primary white text-left">
           <form class="form-horizontal" data-meal-id="<%= meal.id%>" data-id="<%= meal.userId%>" data-host-id="<%= meal.chef.id%>" data-err-container=".submit" data-toggle="validator">
 
@@ -371,6 +371,12 @@
                     <div class="input-group">
                       <div class="input-group-addon"><%= __('delivery-center')%>:</div>
                       <input id="deliveryCenterInput" onfocus="geolocate()" class="form-control" type="text" value="<%= meal.delivery_center ? meal.delivery_center : (meal.kitchen_address || '')%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
+                    </div>
+                  </div>
+                  <div class=col-sm-12>
+                    <div class="input-group">
+                      <div class="input-group-addon"><%= __('area')%>:</div>
+                      <input id="areaInput" class="form-control" type="text" readonly="readonly" value="<%= meal.area%>">
                     </div>
                   </div>
                 </div>

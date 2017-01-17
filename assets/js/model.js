@@ -1016,8 +1016,10 @@ var Meal = Backbone.Model.extend({
   url : function(){
     if(this.type == "coupon"){
       return this.urlRoot + "/" + this.get("id") + "/coupon/" + this.get("code");
-    }else{
+    }else if(this.get("id")){
       return this.urlRoot + "/" + this.get("id");
+    }else{
+      return this.urlRoot;
     }
   }
 });
@@ -1394,6 +1396,7 @@ var MealView = Backbone.View.extend({
       var deliveryFee = form.find("#deliveryFeeInput").val();
       var deliveryRange = form.find("#deliveryRangeInput").val();
       var deliveryCenterInput = form.find("#deliveryCenterInput").val();
+      var areaInput = form.find("#areaInput").val();
       var isDeliveryBySystem = this.$el.find("#isDeliveryBySystem").prop("checked");
       if(!deliveryFee || !deliveryRange || !deliveryCenterInput){
         this.formAlert.show();
@@ -1553,6 +1556,7 @@ var MealView = Backbone.View.extend({
       delivery_fee : deliveryFee,
       delivery_range : deliveryRange,
       delivery_center : deliveryCenterInput,
+      area : areaInput,
       isShipping : isShipping,
       shippingPolicy : shippingPolicy
     });

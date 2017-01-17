@@ -696,5 +696,6 @@
   "type-charge" : "订单支出",
   "application_fee" : "手续费",
   "refunded" : "退款",
-  "has-foodhandler-license" : "已获得食品操作安全证书"
+  "has-foodhandler-license" : "已获得食品操作安全证书",
+  "area" : "区域"
 }
