@@ -69,6 +69,7 @@ module.exports = {
         var publicHosts = [];
         hosts.filter(function(host){
           var _host = {};
+          _host.score = null;
           var popularHost = host.orders.length >= 0;
           var highScore = host.meals.every(function(meal){
             if(meal.score >= 4.8){
