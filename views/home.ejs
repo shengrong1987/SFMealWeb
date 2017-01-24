@@ -161,8 +161,8 @@
             <div class="box">
               <img class="round_thumb" style="width: 100px;" src="<%= host.picture%>" onclick="javascript:location.href='/host/<%= host.id%>'">
               <p style="margin-top: 15px;"><%= host.intro%></p>
-              <div data-toggle="tooltip" data-placement="bottom" title="<%= host.score || 5%>">
-                <div class="rating" data-toggle="star-set" data-rate="<%= host.score || 5%>">
+              <div data-toggle="tooltip" data-placement="bottom" title="<%= host.score || 5.0%>">
+                <div class="rating" data-toggle="star-set" data-rate="<%= host.score || 5.0%>">
                   <i class="fa fa-star"></i>
                   <i class="fa fa-star"></i>
                   <i class="fa fa-star"></i>
