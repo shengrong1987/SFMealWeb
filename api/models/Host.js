@@ -165,8 +165,8 @@ module.exports = {
     },
     shortIntro : function(){
       var length = this.intro?this.intro.length:0;
-      if(length > 12){
-        return this.intro.slice(0,30) + "...";
+      if(length > 50){
+        return this.intro.slice(0,50) + "...";
       }
       return this.intro;
     }
