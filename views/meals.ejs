@@ -15,7 +15,7 @@
         <!--<div class="btn-group">-->
           <!---->
         <!--</div>-->
-        <input name="keyword" type="text" class="input btn btn-default round light" style="max-width: 150px;" placeholder="<%= __('searching-tips')%>">
+        <input name="keyword" type="text" style="max-width: 150px;" placeholder="<%= __('searching-tips')%>">
         <input name="zipcode" type="number" class="btn btn-default zipCode" placeholder="<%= __('zipcode')%>" style="width: 100px;display: inline;" value="<%= user?(user.zip?user.zip:''):''%>">
         <button class="btn btn-warning round orange text-white searchBtn" onclick="javascript:search(this)">
           <i class="fa fa-search"></i>
