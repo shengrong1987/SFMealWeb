@@ -1446,6 +1446,7 @@
                     </div>
                     <div class="row">
                       <div class="col-xs-12">
+                        <div class="alert alert-info" data-toggle="alert"></div>
                         <div class="alert alert-danger" data-toggle="alert"></div>
                         <div class="alert alert-success" data-toggle="alert"></div>
                       </div>
@@ -1489,7 +1490,7 @@
                   <label>3. <%= __('host-story')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
                 </div>
                 <div class="col-xs-12" style="margin-top:15px;">
-                  <div class="story" >
+                  <div class="story">
                     <div class="col-sm-5">
                       <label>(1) <%= __('host-story')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
                       <input class="form-control" data-error="<%= __('max-title-7')%>" name="story-title" maxlength="7" type="text" class="form-control" placeholder="<% if(typeof user.host.shopName == 'undefined'){%>标题最多七个字<%}else{%><%= user.host.shopName %><%}%>" value="<% if(typeof user.host.shopName == 'undefined'){%><%}else{%><%= user.host.shopName %><%}%>">
@@ -1514,6 +1515,7 @@
                               $("input[type='file']").data("isDelete",true);
                             });
                           </script>
+                          <div class="alert alert-info" data-toggle="alert"></div>
                           <div class="alert alert-danger" data-toggle="alert"></div>
                           <div class="alert alert-success" data-toggle="alert"></div>
                         </div>
