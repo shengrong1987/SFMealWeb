@@ -27,7 +27,8 @@ module.exports = {
     },
     intro : {
       type : 'string',
-      defaultsTo : ""
+      defaultsTo : "",
+      maxLength : 200
     },
     email : {
       type : 'email',
