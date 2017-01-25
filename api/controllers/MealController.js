@@ -79,7 +79,7 @@ module.exports = {
             return false;
           })
           if(popularHost && highScore){
-            _host.intro = host.intro;
+            _host.shortIntro = host.shortIntro;
             _host.shopName = host.shopName;
             _host.picture = host.picture;
             _host.id = host.id;
