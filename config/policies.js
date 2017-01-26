@@ -76,7 +76,6 @@ module.exports.policies = {
     'verifyLicense' : 'isAdmin',
     'me' : ['sessionAuth','isHost'],
     'apply' : ['sessionAuth'],
-    'findOne' : ['sessionAuth'],
     'update' : 'or(and(sessionAuth, sessionSelf, isNotFields("user","accountId","bankId","long","lat","city","street","passGuide","pocket")), isAdmin)',
     'like' : 'sessionAuth',
     'follow' : 'sessionAuth',
