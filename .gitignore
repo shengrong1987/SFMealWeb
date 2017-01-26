@@ -125,6 +125,7 @@ nbproject
 .idea
 .node_history
 *.pem
+.env
 
 
 
