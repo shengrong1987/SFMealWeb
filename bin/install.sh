@@ -19,9 +19,13 @@ get_instance_tags(){
 tags_to_env () {
     tags=$1
 
+    echo tags
+
     for key in $(echo $tags | /usr/bin/jq/jq -r ".[][].Key"); do
         value=$(echo $tags | /usr/bin/jq/jq -r ".[][] | select(.Key==\"$key\") | .Value")
         key=$(echo $key | /usr/bin/tr '-' '_' | /usr/bin/tr '[:lower:]' '[:upper:]')
+        echo $key
+        echo $value
         export $key="$value"
     done
 }
