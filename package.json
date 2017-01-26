@@ -67,6 +67,7 @@
     "stop": "forever stopall",
     "install": "./bin/install.sh",
     "uninstall": "./bin/uninstall.sh",
+    "env" : "./bin/exportENV.sh",
     "unit": "grunt mochaTest:unit",
     "build": "grunt mochaTest:build",
     "buildEmail": "grunt mochaTest:buildEmail"
