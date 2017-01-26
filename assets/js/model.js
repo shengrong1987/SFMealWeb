@@ -62,7 +62,7 @@ var LoginView = Backbone.View.extend({
     this.errorView.hide();
     this.model.type = "login";
     this.model.method = "facebook";
-    this.model.originUrl = location.href.indexOf('google_oauth2') != -1 ? 'https://sfmeal.com' : location.href;
+    this.model.originUrl = location.href.indexOf('oauth2') != -1 ? 'https://sfmeal.com' : location.href;
     location.href = this.model.url();
   },
   GoogleLogin : function(e){
@@ -70,7 +70,7 @@ var LoginView = Backbone.View.extend({
     this.errorView.hide();
     this.model.type = "login";
     this.model.method = "google";
-    this.model.originUrl = location.href.indexOf('facebook_oauth2') != -1 ? 'https://sfmeal.com' : location.href;
+    this.model.originUrl = location.href.indexOf('oauth2') != -1 ? 'https://sfmeal.com' : location.href;
     var $this = this;
     location.href = this.model.url();
   },
