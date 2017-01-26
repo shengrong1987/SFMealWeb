@@ -62,7 +62,7 @@ module.exports = {
         })
       });
     }else{
-      Host.find({ passGuide : true, intro :{ '!' : ''}}).populate("orders").populate("meals").exec(function(err, hosts){
+      Host.find({ passGuide : true, intro : { '!' : ''}}).populate("orders").populate("meals").exec(function(err, hosts){
         if(err){
           return res.badRequest(err);
         }
