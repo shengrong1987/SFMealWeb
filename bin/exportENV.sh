@@ -8,12 +8,14 @@ tags_to_env () {
 
     echo $tags
 
+    rm /home/ec2-user/my-app/.env
+    touch /home/ec2-user/my-app/.env
+    chown $USER:$USER .env
+
     for key in $(echo $tags | /usr/bin/jq/jq -r ".[][].Key"); do
         value=$(echo $tags | /usr/bin/jq/jq -r ".[][] | select(.Key==\"$key\") | .Value")
         key=$(echo $key | /usr/bin/tr '-' '_' | /usr/bin/tr '[:lower:]' '[:upper:]')
-        rm /home/ec2-user/my-app/.env
-        touch /home/ec2-user/my-app/.env
-        chown $USER:$USER .env
+
         echo $key="$value" >> /home/ec2-user/my-app/.env
     done
 }
