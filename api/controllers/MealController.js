@@ -603,7 +603,7 @@ module.exports = {
       console.log("minimal order number and minimal order bill amount are required(one of them)");
       return cb({ code : -6, responseText : req.__('')});
     }
-    var type = meal ? meal.type : params.type;
+    var type = params.type;
     if(params.isDelivery && type == 'preorder' && !JSON.parse(params.pickups).some(function(pickup){
         return pickup.method == 'delivery';
       })){
