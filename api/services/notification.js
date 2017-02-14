@@ -321,7 +321,7 @@ var notification = {
           template = "cancel" + model;
           break;
         default:
-          template = "start";
+          template = action;
       }
     }else if(model == "Host"){
       template = action;
@@ -379,6 +379,9 @@ var notification = {
           break;
         case "cancel":
           i18ns = i18ns.concat(['pity','cancel','de-order','cancel-meal-title','meal-create-time','preorder-start-time','preorder-end-time','cancel-meal-context','meal-fail-requirement','open-meal','preorder-end-time','cancel-time','meal-number',"qty","left","cancel-reason"]);
+          break;
+        case "chefSelect":
+          i18ns = i18ns.concat(['search','searching-tips','yourfollowedchef','menuoftheweek','hometaste1','see-more']);
           break;
       }
     }else if(model == "Host"){

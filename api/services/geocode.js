@@ -12,7 +12,9 @@ var geocoder = require('node-geocoder')(geocoderProvider, httpAdapter, extra);
 
 module.exports = {
   geocode : function(address, cb){
+    sails.log.debug("starting geocoding: " + address);
     geocoder.geocode(address, function(err, res) {
+      sails.log.debug("finish geocoding: " + err);
       if(err){
         cb(err);
       }else{

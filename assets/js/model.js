@@ -1084,17 +1084,31 @@ var MealSelectionView = Backbone.View.extend({
     if(preference){
       preference += ")";
     }
+    var extra = this.$el.find(".variation a[data-selected='true']").data("extra");
+    var option = {
+      property : preference,
+      extra : extra
+    }
     var dishId = $(e.currentTarget).data("dish");
     var dishItem = this.$el.find("#order .item[data-id='" + dishId + "']");
+    var priceItem = dishItem.find(".price");
     dishItem.find(".preference").text(preference);
+    if(extra > 0){
+      priceItem.data("extra", extra);
+      priceItem.html("$" + priceItem.attr("value") + " + $" + extra);
+    }else{
+      priceItem.data("extra", extra);
+      priceItem.html("$" + priceItem.attr("value"));
+    }
     var localDish = readCookie(dishId);
     if(localDish){
       var localDishObj = JSON.parse(localDish);
-      localDishObj.preference = preference;
+      localDishObj.preference = option;
     }else{
-      var localDishObj = { number : 0, preference : preference};
+      var localDishObj = { number : 0, preference : option};
     }
     createCookie(dishId, JSON.stringify(localDishObj), 1);
+    refreshMenu()
   },
   calculateDelivery : function(e){
     var $this = this;
@@ -1613,13 +1627,14 @@ var DishView = Backbone.View.extend({
     var btn = $(e.currentTarget);
     var property = btn.closest(".customProperty").find("input[name='property']").val();
     var variation = btn.closest(".option").data("value");
+    var extra = btn.closest(".customProperty").find("[name='extra']").val();
     if(!property){
       btn.addClass("disabled");
       return;
     }else{
       btn.removeClass('disabled');
     }
-    this.addPropertyView(property,variation);
+    this.addPropertyView(property,variation,extra);
     setupLanguage();
   },
   addCustomVariation : function(e){
@@ -1683,6 +1698,7 @@ var DishView = Backbone.View.extend({
     var property = target.attr("value");
     var propertyText = target.text();
     var variation = target.closest(".option").data("value");
+    var extra = target.closest(".option").find("[name='extra']").val();
     console.log("add new property : " + property + "within variation :" + variation);
     $(e.currentTarget).next().find("li").each(function(){
       if($(this).find("a").attr('value') == property){
@@ -1694,7 +1710,7 @@ var DishView = Backbone.View.extend({
       var $this = this;
       this.addCustomPropertyInput(variation);
     }else{
-      this.addPropertyView(propertyText, variation);
+      this.addPropertyView(propertyText, variation, extra);
     }
     setupLanguage();
   },
@@ -1710,16 +1726,17 @@ var DishView = Backbone.View.extend({
     var container = this.$el.find(".currentVar .option[data-value='" + variation + "'] table tbody");
     var section = '<tr class="customProperty"><td>'
       + '<input name="property" class="form-control" type="text" placeholder="Property name" required></td> '
+      + '<td><input name="extra" class="form-control" type="number" value="0"></td>'
       + '<td><button class="btn btn-default btn-outline continue" data-toggle="i18n" data-key="continueBtn"></button>'
-      + '<a class="reset" style="margin-left:10px;" href="javascript:void(0)" data-toggle="i18n" data-key="resetBtn"></a> </td> </tr>';
+      + '<a class="reset" style="margin-left:10px;" href="javascript:void(0)" data-toggle="i18n" data-key="resetBtn"></a></td></tr>';
     container.append(section);
   },
-  addPropertyView : function(property, variation){
+  addPropertyView : function(property, variation, extra){
     var container = this.$el.find(".currentVar .option[data-value='" + variation + "'] table tbody");
     property = property.toString().trim();
     var section = '<tr class="customProperty">'
       + '<td>' + property + '<i class="fa fa-close reset cursor-pointer" data-value="' + property + '" style="float: right;" href="javascript:void(0)"></i></td> '
-      + '<td></td> </tr>';
+        + '<td class="extra" data-value="' + extra + '"> $' + extra + '</td><td></td> </tr>';
     container.append(section);
   },
   addOptionView : function(variation, text){
@@ -1735,12 +1752,12 @@ var DishView = Backbone.View.extend({
       + '<h3>' + text + '</h3>'
       + '<a class="deleteBtn" href="javascript:void(0);" data-value="' + variation + '" data-toggle="i18n" data-key="deleteBtn"></a>'
       + '</div> <div class="col-xs-9"><table class="table table-bordered"> <thead>'
-      + '<tr class="active"> <td data-toggle="i18n" data-key="property"></td> <td data-toggle="i18n" data-key="price"></td> </tr> </thead>'
+      + '<tr class="active"> <td data-toggle="i18n" data-key="property"></td> <td data-toggle="i18n" data-key="extra"></td> <td data-toggle="i18n" data-key="action"></td> </tr> </thead>'
       + '<tbody> <tr> <td> <div class="dropdown">'
       + '<a class="btn btn-default btn-outline dropdown-toggle property" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="">'
       + '<span data-toggle="i18n" data-key="addVariation"></span> <span class="caret"></span> </a>'
       + '<ul class="dropdown-menu" aria-labelledby="dLabel">'
-      + '</ul> </div> </td> <td></td> </tr> </tbody> </table> </div> </div>';
+      + '</ul> </div> </td> <td><input name="extra" class="form-control" type="number" value="0"></td><td></td> </tr> </tbody> </table> </div> </div>';
     container.append(section);
     var dropDownMenu = container.find(".option[data-value='" + variation + "'] .dropdown-menu");
     if(varSets[variation] && varSets[variation].length > 0 ){
@@ -1887,8 +1904,10 @@ var DishView = Backbone.View.extend({
       var variationValue = $(this).data("value");
       $(this).find(".customProperty").each(function(){
         var property = $(this).find(".reset").data("value");
-        if (property){
-          properties.push(property.toString().trim());
+        if(property){
+          var extra = $(this).find(".extra").data("value");
+          var propertyObj = { property : property.toString().trim(), extra : extra };
+          properties.push(propertyObj);
         }
       });
       preference[variationValue] = properties;

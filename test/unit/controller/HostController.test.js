@@ -34,7 +34,7 @@ describe('UsersController', function() {
 
     it('should become a host', function (done) {
       agent
-        .post('/user/becomeHost')
+        .get('/user/becomeHost?shopName=The Tea House&phone=(415) 802-3853')
         .expect(200)
         .end(function(err,res){
           res.body.should.have.property("user");

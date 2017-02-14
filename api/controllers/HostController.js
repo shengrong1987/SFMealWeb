@@ -449,7 +449,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            res.ok({});
+            res.ok(u);
           });
         });
       })
@@ -477,7 +477,7 @@ module.exports = {
             return res.badRequest(err);
           }
           req.session.user.follow = user.follow;
-          res.ok({});
+          res.ok(user);
         });
       })
     });

@@ -71,7 +71,7 @@ module.exports.routes = {
   '/order/:id/refund' : 'OrderController.refund',
   '/auth/resetForm' : "AuthController.resetForm",
   "/apply" : "HostController.apply",
-  '/email/welcome' : { view : 'emailTemplates/welcome/html'},
+  '/email/test' : { view : 'emailTemplates/chefSelect/html'},
   '/notification/msg' : 'NotificationController.sendMessage',
   '/job/:name/run' : 'JobController.run',
   '/help' : { view : 'help'},

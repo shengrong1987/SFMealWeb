@@ -127,6 +127,7 @@
   "review": "Review",
   "meal": "Meal",
   "price": "Price",
+  "extra" : "Extra",
   "quantity": "Quantity",
   "on": "On",
   "off": "Off",
@@ -697,5 +698,8 @@
   "application_fee" : "fee",
   "refunded" : "Refund",
   "has-foodhandler-license" : "Valid California Food Handler's Certificate",
-  "area" : "Neighborhood"
+  "area" : "Neighborhood",
+  "yourfollowedchef" : "Your Chef",
+  "menuoftheweek" : "menu of the week",
+  "hometaste1" : "Everyone has a taste of home, is it here?"
 }

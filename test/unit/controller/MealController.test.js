@@ -6,6 +6,7 @@ var assert = require('assert'),
     stripe = require('stripe')(config.StripeKeys.secretKey),
     request = require("supertest-as-promised");
 var agent;
+var moment = require('moment');
 
 before(function(done){
   agent = request.agent(sails.hooks.http.app);
@@ -26,8 +27,9 @@ describe('MealController', function() {
     var password = '12345678';
     var address = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : "(415)802-3853"};
     var invalidAddress = {"street" : "1", "city" : '', "zip" : 0, "phone" : ""};
+    var guestEmail = 'enjoymyself1987@gmail.com';
 
-    it('should login or register an account', function (done) {
+    it('should login an account', function (done) {
       agent
         .post('/auth/login?type=local')
         .send({email : email, password: password})
@@ -92,7 +94,14 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '糖水',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'dessert', chef : hostId})
+          .send({
+            title : '糖水',
+            price: 8,
+            photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
+            type: 'dessert',
+            chef : hostId,
+            preference : { sweetness : [ { property : 'super sweet', extra : 1}, { property : 'normal', extra : 0} ]}
+          })
           .expect(200)
           .end(function(err,res){
             if(res.body.id == undefined){
@@ -251,7 +260,8 @@ describe('MealController', function() {
             dishes : dishes,
             status : "off",
             cover : dish1,
-            minimalOrder : 1
+            minimalOrder : 1,
+            area : 'Mission District and Nearby'
           })
           .expect(200)
           .end(function(err,res){
@@ -260,6 +270,8 @@ describe('MealController', function() {
             }
             res.body.should.have.property('pickups').with.length(2);
             res.body.pickups[0].publicLocation.should.be.equal("Uber HQ");
+            res.body.should.have.property('area');
+            res.body.area.should.be.equal('Mission District and Nearby');
             preorderMealId = res.body.id;
             done();
           })
@@ -426,14 +438,17 @@ describe('MealController', function() {
           })
     })
 
-    it('should not turn one meal on, because missing address info', function (done) {
+    it('host should not be passGuide', function(done){
       agent
-        .post('/meal/' + mealId + "/on")
-        .expect(302)
-        .end(function(err,res){
+        .get('/host/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
           if(err){
             return done(err);
           }
+          res.body.host.passGuide.should.be.false();
           done();
         })
     })
@@ -463,7 +478,7 @@ describe('MealController', function() {
         // .field('Content-Type', 'multipart/form-data')
         .field('legal_entity',JSON.stringify(legalObj))
         .field('hasImage',"true")
-        .attach('image','/Users/shengrong/Documents/SFMealWeb/assets/images/dumplings.jpg')
+        .attach('image','/Users/shengrong/Documents/SFMeal/SFMealWeb/assets/images/dumplings.jpg')
         .expect(200)
         .end(function(err, res){
           if(err){
@@ -490,6 +505,21 @@ describe('MealController', function() {
           done();
         })
     });
+
+    it('host should be passGuide', function(done){
+      agent
+        .get('/host/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.host.passGuide.should.be.true();
+          done();
+        })
+    })
 
     it('should not turn meal on for invalid host because none dish is verified', function(done){
       agent
@@ -618,6 +648,79 @@ describe('MealController', function() {
         })
     });
 
+    it('should register as guest', function (done) {
+      agent
+        .post('/auth/register')
+        .send({email : guestEmail, password : password})
+        .expect(200)
+        .end(done)
+    })
+
+    it('should be able to like host', function(done){
+      agent
+        .post('/host/' + hostId + '/like')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property("likes");
+          res.body.likes.should.have.length(1);
+          done();
+        });
+    })
+
+    it('should not be able to like host twice', function(done){
+      agent
+        .post('/host/' + hostId + '/like')
+        .expect(400)
+        .end(function(err, res){
+          res.body.code.should.be.equal(-3);
+          done();
+        });
+    })
+
+    it('should be able to follow host', function(done){
+      agent
+        .post('/host/' + hostId + '/follow')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('follow');
+          res.body.follow.should.be.equal(hostId);
+          done();
+        });
+    })
+
+    it('should be able to unfollow host', function(done){
+      agent
+        .post('/host/' + hostId + '/unfollow')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          should.not.exist(res.body.follow);
+          done();
+        });
+    })
+
+    it('should be able to follow host', function(done){
+      agent
+        .post('/host/' + hostId + '/follow')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('follow');
+          res.body.follow.should.be.equal(hostId);
+          done();
+        });
+    })
+
     it('should login as host', function (done) {
       agent
         .post('/auth/login?type=local')
@@ -626,6 +729,36 @@ describe('MealController', function() {
         .expect('Location','/auth/done')
         .end(done)
     });
+
+    it('should not be able to like host itself', function(done){
+      agent
+        .post('/host/' + hostId + '/like')
+        .expect(400)
+        .end(function(err, res){
+          res.body.code.should.be.equal(-4);
+          done();
+        });
+    })
+
+    it('should not be able to follow host itself', function(done){
+      agent
+        .post('/host/' + hostId + '/follow')
+        .expect(400)
+        .end(function(err, res){
+          res.body.code.should.be.equal(-4);
+          done();
+        });
+    })
+
+    it('should not be able to unfollow host itself', function(done){
+      agent
+        .post('/host/' + hostId + '/unfollow')
+        .expect(400)
+        .end(function(err, res){
+          res.body.code.should.be.equal(-4);
+          done();
+        });
+    })
 
     it('should turn one meal on', function (done) {
       agent
@@ -664,14 +797,55 @@ describe('MealController', function() {
         })
     });
 
+    it('should update the meals provideFromTime to 5 minutes later', function(done){
+      var fiveMinutesLater = moment().add('5','minutes')._d;
+      var twoHourLater = moment().add('2','hours')._d;
+      agent
+        .put('/meal/' + mealId)
+        .send({
+          status : 'on',
+          provideFromTime : fiveMinutesLater,
+          provideTillTime : twoHourLater,
+          minimalOrder : 5
+        })
+        .expect(200)
+        .end(done)
+    })
+
+    it('should login as administrator', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : adminEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should send menu of followed chef to guest and guest should receive an email of meals from "The Tea House"', function(done){
+      agent
+        .get('/job/FollowedChefPushingJob/run')
+        .expect(200)
+        .end(done);
+    });
+
+    it('should login as host', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
     it('should update the meals provideFromTime to now and appear in the search results', function(done){
-      var now = new Date()
+      var now = moment()._d;
+      var twoHourLater = moment().add('2','hours')._d;
       agent
         .put('/meal/' + mealId)
         .send({
           status : 'on',
           provideFromTime : now,
-          provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
+          provideTillTime : twoHourLater,
           minimalOrder : 5
         })
         .expect(200)
@@ -708,7 +882,6 @@ describe('MealController', function() {
     //       done(err)
     //     })
     // })
-
 
     it('should turn another meal on and schedule preorder schedule end job', function (done) {
       agent

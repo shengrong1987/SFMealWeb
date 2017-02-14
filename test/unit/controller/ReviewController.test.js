@@ -23,7 +23,7 @@ describe('ReviewController', function() {
 
     var guestEmail = 'enjoymyself1987@gmail.com'
 
-    it('should login or register an account', function (done) {
+    it('should login host account', function (done) {
       agent
         .post('/auth/login?type=local')
         .send({email : email, password: password})

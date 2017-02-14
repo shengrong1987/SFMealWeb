@@ -160,6 +160,7 @@ module.exports = require('waterlock').actions.user({
         }
         var addresses = params.address;
         async.each(addresses, function(addObj, next){
+          sails.log.debug(addObj);
           if(addObj.delete){
             if(user.address.length == 1){
               return next(req.__('user-only-address'));
@@ -176,8 +177,10 @@ module.exports = require('waterlock').actions.user({
           var actualAddress = addObj.street + " " + addObj.city;
           require('../services/geocode').geocode(actualAddress, function (err, result) {
             if (err) {
+              sails.log.debug(err);
               return next(req.__('meal-error-address'));
             }
+            sails.log.debug("geocoded result: " + result);
             if(result.length==0){
               return next(req.__('meal-error-address2'));
             }
@@ -216,6 +219,7 @@ module.exports = require('waterlock').actions.user({
             return cb(err);
           }
           delete params.address;
+          sails.log.debug("address updated");
           cb(null, user);
         });
       }],

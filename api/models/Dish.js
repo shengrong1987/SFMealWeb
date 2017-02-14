@@ -30,7 +30,7 @@ module.exports = {
     },
     /*
       {
-        sweetness : [s1, s2],
+        sweetness : [{property : s1, extra : 1}, s2],
         icy : [i1, i2]
       }
      */

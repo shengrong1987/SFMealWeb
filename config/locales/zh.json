@@ -127,6 +127,7 @@
   "review" : "评价",
   "meal" : "私房菜",
   "price" : "单价",
+  "extra" : "加价",
   "quantity" : "数量",
   "on" : "上线",
   "off" : "离线",
@@ -697,5 +698,8 @@
   "application_fee" : "手续费",
   "refunded" : "退款",
   "has-foodhandler-license" : "已获得食品操作安全证书",
-  "area" : "区域"
+  "area" : "区域",
+  "yourfollowedchef" : "您的厨师",
+  "menuoftheweek" : "本周菜单",
+  "hometaste1" : "每个人都有属于自己的家的味道，你的味道属于这里吗？"
 }

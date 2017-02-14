@@ -142,6 +142,7 @@
                         <tr class="active">
                           <td><%= __('property')%></td>
                           <td><%= __('price')%></td>
+                          <td><%= __('action')%></td>
                         </tr>
                       </thead>
                       <tbody>
@@ -170,9 +171,13 @@
                             </div>
                           </td>
                           <td>
+                            <input class="form-control" name="extra" type="number">
+                          </td>
+                          <td>
                             <% props.forEach(function(property){ %>
                               <tr class="customProperty">
-                                <td><%= property%><i class="fa fa-close reset cursor-pointer" data-value="<%= property%>" style="float: right;" href="javascript:void(0)"></i></td>
+                                <td><%= property.property %><i class="fa fa-close reset cursor-pointer" data-value="<%= property.property%>" style="float: right;" href="javascript:void(0)"></i></td>
+                                <td class="extra" data-value="<%= property.extra%>">$<%= property.extra %></td>
                                 <td></td>
                               </tr>
                             <% });%>

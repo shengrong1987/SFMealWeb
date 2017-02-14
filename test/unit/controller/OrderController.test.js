@@ -24,7 +24,7 @@ describe('OrderController', function() {
     var farAddress = "7116 Tiant way, Elk Grove, CA 95758";
     var phone = "1-415-802-3853";
 
-    it('should login or register an account for guest', function (done) {
+    it('should login as guest', function (done) {
       agent
         .post('/auth/login?type=local')
         .send({email : guestEmail, password: password})
@@ -54,6 +54,7 @@ describe('OrderController', function() {
     var price1;
     var price2;
     var price3;
+    var price4;
     it('should get a meal', function (done) {
       agent
           .get('/meal')
@@ -75,6 +76,7 @@ describe('OrderController', function() {
             price1 = meal.dishes[0].price;
             price2 = meal.dishes[1].price;
             price3 = meal.dishes[2].price;
+            price4 = meal.dishes[3].price;
             done();
           })
     })
@@ -107,12 +109,13 @@ describe('OrderController', function() {
       dishObj[dishId1] = { number : 1};
       dishObj[dishId2] = { number : 2};
       dishObj[dishId3] = { number : 0};
-      dishObj[dishId4] = { number : 0};
+      dishObj[dishId4] = { number : 2, preference : { property : 'super sweet', extra : 1 }};
+      var subtotal = parseFloat(price1*1) + parseFloat(price2*2) + parseFloat((price4+1)*2);
       agent
           .post('/order')
           .send({
             orders : dishObj,
-            subtotal : price1 * 1 + price2 * 2,
+            subtotal : subtotal,
             pickupOption : 1,
             phone : phone,
             method : "pickup",
@@ -123,13 +126,51 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
-            var chargesTotal = price1 * 1 + price2 * 2 + 1;
+            var chargesTotal = price1 * 1 + price2 * 2 + (price4+1) * 2 + 1;
             res.body.customer.should.be.equal(guestId);
             Object.keys(res.body.charges).should.have.length(1);
             res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(chargesTotal * 100);
             orderId = res.body.id;
             done();
           })
+    })
+
+    it('should order the dish with preference and get not preference not exist error', function (done) {
+      var dishObj = {};
+      dishObj[dishId1] = { number : 1, preference : { property : 'hot', extra : 0}};
+      dishObj[dishId2] = { number : 1 };
+      dishObj[dishId3] = { number : 0 };
+      dishObj[dishId4] = { number : 0 };
+      agent
+        .post('/order')
+        .send({orders : dishObj, subtotal : price1 * 1 + price2 * 1, address : address, phone : phone, method : "delivery", mealId : mealId, delivery_fee : 0})
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-20);
+          done();
+        })
+    })
+
+    it('should order the dish with preference and get subtotal not match error', function (done) {
+      var dishObj = {};
+      dishObj[dishId1] = { number : 0 };
+      dishObj[dishId2] = { number : 0 };
+      dishObj[dishId3] = { number : 0 };
+      dishObj[dishId4] = { number : 1, preference : { property : 'super sweet', extra : 5}};
+      agent
+        .post('/order')
+        .send({orders : dishObj, subtotal : price4 * 1, address : address, phone : phone, method : "delivery", mealId : mealId, delivery_fee : 0})
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-3);
+          done();
+        })
     })
 
     it('should order the full dish and get not enough quantity error', function (done) {
@@ -146,9 +187,7 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
-            if(res.body.code != -1){
-              return done(Error("not getting not enough quantity error"));
-            }
+            res.body.code.should.be.equal(-1);
             done();
           })
     })
@@ -167,9 +206,7 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
-            if(res.body.code != -1){
-              return done(Error("not getting not enough quantity error"));
-            }
+            res.body.code.should.be.equal(-1);
             done();
           })
     })

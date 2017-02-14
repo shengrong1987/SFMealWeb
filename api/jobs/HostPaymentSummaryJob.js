@@ -32,7 +32,7 @@ module.exports = function(agenda) {
     // execute job
     run: function (job, done) {
       sails.log.info("Sending host income summary");
-      Host.find({passGuide: true}).populate("orders").populate('meals').exec(function (err, hosts) {
+      Host.find({ passGuide: true }).populate("orders").populate('meals').exec(function (err, hosts) {
         if (err) {
           sails.log.error(err);
           return done();

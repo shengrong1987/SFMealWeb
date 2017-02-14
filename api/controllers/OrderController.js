@@ -30,6 +30,7 @@ var geocode = require("../services/geocode.js");
 //-17 : coupon expire
 //-18 : order with coupon cannot be adjusted
 //-19 : order with coupon cannot be cancelled
+//-20 :
 
 
 module.exports = {
@@ -59,6 +60,7 @@ module.exports = {
 
     async.each(Object.keys(orders), function(dishId, next){
       var qty = parseInt(orders[dishId].number);
+      var property = orders[dishId].preference ? orders[dishId].preference.property : null;
       var lastQty = lastOrders ? parseInt(lastOrders[dishId].number) : 0;
       if(qty > 0 || lastQty > 0){
         async.each(meal.dishes, function(dish, next2){
@@ -66,11 +68,24 @@ module.exports = {
             if(!dish.isVerified){
               return next2({responseText : req.__('order-invalid-dish',dishId), code : -2});
             }
+            var extra = 0;
+            if(property && dish.preference && !Object.keys(dish.preference).some(function(preference){
+              var pros = dish.preference[preference];
+              return pros.some(function(p){
+                if(p.property == property){
+                  extra = p.extra;
+                  return true;
+                }
+                return false;
+              })
+            })){
+              return next2({ responseText : req.__('order-preference-not-exist'), code : -20});
+            }
             var diff = qty - lastQty;
             if(diff > meal.leftQty[dishId]){
               return next2({responseText : req.__('order-dish-not-enough',dishId, qty), code : -1});
             }
-            actual_subtotal += qty * dish.price;
+            actual_subtotal += qty * ( dish.price + extra);
           }
           next2();
         }, function(err){

@@ -36,7 +36,6 @@ function initAutoComplete(){
     "Sunset & Richmond" : ["94122","94121","94118"],
     "Market and Downtown" : ["94103","94102","94108","94104"],
     "Bayview" : ["94124"]
-
   };
   var options = {
     componentRestrictions : { country : 'us'},
@@ -285,7 +284,7 @@ function loadOrder(fromCahce){
       if(localDish){
         localDish = JSON.parse(localDish);
       }else{
-        localDish = {number : 0, preference : ""};
+        localDish = {number : 0, preference : { property : '', extra : 0}};
       }
       localOrders[dishId] = localDish;
       $(this).data("left-amount",$(this).data("left-amount") - localOrders[dishId].number);
@@ -319,7 +318,7 @@ function orderFood(id,number){
   var alertView = $($("#order").data("err-container"));
   alertView.removeClass("hide");
   alertView.hide();
-  localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : ''};
+  localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : { property : '', extra : 0}};
   localOrders[id].number += number;
   if(number < 0){
     if(localOrders[id].number<0){
@@ -367,7 +366,8 @@ var refreshMenu = function(){
   var subtotal = 0;
   var method = $("#meal-confirm-container #method .active").attr("value");
   $("#order .item").each(function(){
-    subtotal += parseFloat($(this).find(".amount").text()) * $(this).find(".price").attr("value");
+    var unitPrice = parseInt($(this).find(".price").attr("value")) + parseInt($(this).find(".price").data("extra"));
+    subtotal += parseFloat($(this).find(".amount").text()) * unitPrice;
   });
   $("#order .subtotal").html("$" + subtotal.toFixed(2));
   $("#order .subtotal").data("value", subtotal.toFixed(2));
@@ -414,7 +414,13 @@ function refreshOrder(id){
   var item = $("#order .item[data-id=" + id + "]");
   var left = item.data("left-amount");
   item.find(".amount").html(localOrders[id].number);
-  item.find(".preference").html(localOrders[id].preference);
+  item.find(".preference").html(localOrders[id].preference.property);
+  var extra = localOrders[id].preference.extra;
+  var price = item.find(".price");
+  if(extra > 0){
+    price.data("extra", extra);
+    price.html("$" + price.attr('value') + " + $" + extra);
+  }
   $("#meal-detail-container .dish[data-id=" + id + "]").find(".left-amount span").attr("value",left);
   $("#meal-detail-container .dish[data-id=" + id + "]").find(".left-amount span").html(left);
 }
@@ -489,10 +495,16 @@ function setupDropdownMenu(){
     }
     var text = $(this).text();
     var value = $(this).attr("value") || $(this).data("value");
+    var data = $(this).data();
     var parent = $(this).closest('.dropdown-menu').prev();
     var previousValue = parent.attr('value');
     if(!value){
       return;
+    }
+    if(data){
+      Object.keys(data).forEach(function(key){
+        parent.data(key, data[key]);
+      });
     }
     parent.html(text + "&nbsp;<span class='caret'></span>");
     parent.attr("value",value);
@@ -677,8 +689,8 @@ function setupLanguage(){
 
 $("document").ready(function(){
   if(typeof Stripe != 'undefined'){
-    Stripe.setPublishableKey('pk_live_AUWn3rb2SLc92lXsocPCDUcw');
-    // Stripe.setPublishableKey('pk_test_ztZDHzxIInBmBRrkuEKBee8G');
+    // Stripe.setPublishableKey('pk_live_AUWn3rb2SLc92lXsocPCDUcw');
+    Stripe.setPublishableKey('pk_test_ztZDHzxIInBmBRrkuEKBee8G');
   }
   setup();
 });

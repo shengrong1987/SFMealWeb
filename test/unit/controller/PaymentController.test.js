@@ -19,11 +19,12 @@ describe('PaymentController', function() {
     var email = "enjoymyself1987@gmail.com";
     var password = "12345678";
 
-    it('should register a guest account', function (done) {
+    it('should login a guest account', function (done) {
       agent
-        .post('/auth/register')
+        .post('/auth/login?type=local')
         .send({email : email, password: password})
-        .expect(200)
+        .expect(302)
+        .expect('Location','/auth/done')
         .end(done)
     });
 

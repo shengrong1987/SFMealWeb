@@ -238,27 +238,32 @@
                   </div>
 
                   <div class="col-sm-4" style="padding-top: 25px;">
+                    <div class="row">
                     <% if(dish.preference){%>
-                    <a class="btn btn-default btn-outline dropdown-toggle" type="button" data-toggle="dropdown" data-submenu aria-haspopup="true" aria-expanded="true" value="">
-                      <span><%= __('addVariation')%></span>
-                      <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu text-center" aria-labelledby="dLabel">
-                      <% Object.keys(dish.preference).forEach(function(key){%>
-                        <li class="dropdown-submenu variation">
-                          <a tabindex="0" data-submenu data-dish=<%= dish.id%> data-variation=<%= key%> data-selected="true"><%= __(key)%></a>
-                          <ul class="dropdown-menu">
-                            <% var properties = dish.preference[key]; properties.forEach(function(prop){%>
-                              <li tabindex="0"><a value=<%= prop%> href="javascript:void(0);"><%= prop%></a></li>
-                            <%});%>
-                          </ul>
-                        </li>
-                      <%});%>
-                    </ul>
-                    <% } %>
-                    <button class="btn btn-red take-order" data-toggle="i18n" data-key="orderOne" onclick="javascript:orderFood('<%= dish.id %>',1)"><%= __('order-one')%></button>
-                    <button class="btn btn-red untake-order" onclick="javascript:orderFood('<%= dish.id %>',-1)" style="width: 50px;display: none;">-</button>
-                    <div class="getsocial gs-reaction-button" style="margin-top: 25px;"></div>
+                      <div class="col-xs-12">
+                        <a class="btn btn-default btn-outline dropdown-toggle" type="button" data-toggle="dropdown" data-submenu aria-haspopup="true" aria-expanded="true" value="">
+                          <span><%= __('addVariation')%></span>
+                          <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu text-center" aria-labelledby="dLabel">
+                          <% Object.keys(dish.preference).forEach(function(key){%>
+                          <li class="dropdown-submenu variation">
+                            <a tabindex="0" data-toggle="dropdown" data-submenu data-dish=<%= dish.id%> data-variation=<%= key%> data-selected="true"><%= __(key)%></a>
+                            <ul class="dropdown-menu">
+                              <% var options = dish.preference[key]; options.forEach(function(option){%>
+                              <li tabindex="0"><a value=<%= option.property%> data-extra=<%= option.extra%> href="javascript:void(0);"><%= option.property%> + $<%= option.extra%></a></li>
+                              <%});%>
+                            </ul>
+                          </li>
+                          <%});%>
+                        </ul>
+                        <% } %>
+                      </div>
+                      <div class="col-xs-12" style="margin-top: 10px;">
+                        <button class="btn btn-red take-order" data-toggle="i18n" data-key="orderOne" onclick="javascript:orderFood('<%= dish.id %>',1)"><%= __('order-one')%></button>
+                        <button class="btn btn-red untake-order" onclick="javascript:orderFood('<%= dish.id %>',-1)" style="width: 50px;display: none;">-</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -357,7 +362,7 @@
             %>
             <tr class="success item" data-id=<%= dish.id %> data-left-amount=<%= meal.leftQty[dish.id] %>>
               <td><%= dish.title %><br/><span class="preference"></span> </td>
-              <td class="price" value=<%= dish.price %>>$<%= dish.price %></td>
+              <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
               <td>
                 <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1)">-</button>
                 <span class="amount" style="padding: 5px;">  0  </span>
