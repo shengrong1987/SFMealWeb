@@ -14,8 +14,8 @@
           <div class="relative text-left search-container" style="top: 20px;">
             <h4 class="text-white"><strong><%= __('searching-word')%></strong></h4>
             <div class="btn-group">
-              <input name="keyword" class="input btn btn-default round light" placeholder="<%= __('searching-tips')%>">
-              <input name="zipcode" type="text" class="btn btn-default zipCode" placeholder="<%= __('zipcode')%>" style="width: 100px;display: inline;">
+              <input name="keyword" type="text" class="btn round light input" style="max-width: 150px;" placeholder="<%= __('searching-tips')%>">
+              <input name="zipcode" type="number" class="btn btn-default zipCode" placeholder="<%= __('zipcode')%>" style="width: 100px;display: inline;">
               <button class="btn btn-warning round orange text-white searchBtn" onclick="javascript:search(this)">
                 <i class="fa fa-search"></i>
                 <%= __('search')%>
