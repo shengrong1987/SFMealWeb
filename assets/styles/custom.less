@@ -529,7 +529,7 @@ input:focus{
 @grey : #999999;
 @light-grey : #e6e6e6;
 @medium-grey : #999999;
-@dark-grey : #333333;
+@dark-grey : #4b4b4b;
 @black : black;
 @green : #22b571;
 @pink : #ff7bac;
@@ -1044,7 +1044,15 @@ fieldset[disabled] .btn-red.active {
 }
 
 .border-lightgrey{
-  border-color: @light-grey !important;
+  border: solid 1px @light-grey !important;
+}
+
+.border-darkgrey{
+  border: solid 1px @dark-grey !important;
+}
+
+.border-red{
+  border: solid 1px @red !important;
 }
 
 .border-blue{
@@ -1091,7 +1099,8 @@ fieldset[disabled] .btn-red.active {
 
 .footer-nav{
   li{
-    float: left;
+    display: inline-block;
+    width: 50px;
     a{
       display: inline !important;
     }
@@ -1798,6 +1807,10 @@ fieldset[disabled] .btn-red.active {
     margin-left: 100px;
   }
 
+  .footer-container{
+    width : 334px;
+  }
+
   .footer .nav{
     padding-left: 25px;
   }
@@ -1993,10 +2006,6 @@ fieldset[disabled] .btn-red.active {
 
   .navbar-nav{
     margin : 0;
-  }
-
-  .footer .nav li{
-    width: 14%;
   }
 
   .footer .footer-text {

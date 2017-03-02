@@ -34,12 +34,12 @@
         <div class="box white">
           <div class="row">
             <div class="col-xs-12 col-sm-6">
-              <div class="row vertical-align-base">
+              <div class="row">
                 <div class="col-xs-9">
                   <h2 class="text-left"><%= meal.title %>  <small class="text-orange"><% if(meal.type=='order'){ __('order') }else if(meal.type=='preorder'){ __('preorder') } %> <i class="fa fa-question-circle text-lightgrey"></i><%= meal.isFull()? __('full'): "" %></small></h2>
                 </div>
-                <div class="col-xs-3">
-                  <button class="btn btn-outline btn-outline-red btn-lg"><i class="fa fa-heart fa-2x cursor-pointer" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}else{%>false<%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i></button>
+                <div class="col-xs-3" style="margin-top: 20px;">
+                  <i class="fa fa-heart-o round_thumb border-red text-red fa-2x cursor-pointer" style="padding:8px;" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}else{%>false<%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
                 </div>
               </div>
 
@@ -251,7 +251,7 @@
                             <a tabindex="0" data-toggle="dropdown" data-submenu data-dish=<%= dish.id%> data-variation=<%= key%> data-selected="true"><%= __(key)%></a>
                             <ul class="dropdown-menu">
                               <% var options = dish.preference[key]; options.forEach(function(option){%>
-                              <li tabindex="0"><a value=<%= option.property%> data-extra=<%= option.extra%> href="javascript:void(0);"><%= option.property%> + $<%= option.extra%></a></li>
+                              <li tabindex="0"><a value="<%= option.property%>" data-extra="<%= option.extra%>" href="javascript:void(0);"><%= option.property%> + $<%= option.extra%></a></li>
                               <%});%>
                             </ul>
                           </li>

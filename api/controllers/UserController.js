@@ -106,7 +106,6 @@ module.exports = require('waterlock').actions.user({
                   if(err){
                     res.badRequest(err);
                   }
-                  // notification.sendEmail("Host","welcome",{ host : host, hostEmail : host.email, isSendToHost : true});
                   mailChimp.addMemberToList({ email : host.email, shopName : shopName, firstname : user[0].firstname, lastname : user[0].lastname, language : req.getLocale() }, "chef");
                   req.session.user = user[0];
                   res.ok({user:user[0]});

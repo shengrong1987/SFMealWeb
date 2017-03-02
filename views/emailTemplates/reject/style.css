@@ -8343,7 +8343,7 @@ hovereffect p {
   background-color: #e6e6e6 !important;
 }
 .dark {
-  background-color: #333333 !important;
+  background-color: #4b4b4b !important;
 }
 .green {
   background-color: #22b571 !important;
@@ -8383,7 +8383,7 @@ hovereffect p {
   color: #ff931e !important;
 }
 .text-dark {
-  color: #333333 !important;
+  color: #4b4b4b !important;
 }
 .text-shadow {
   text-shadow: 1px 1px 1px #999999 !important;
@@ -8558,7 +8558,7 @@ label {
 }
 /*outline*/
 .btn-outline {
-  border: solid 1px #333333 !important;
+  border: solid 1px #4b4b4b !important;
   background: none;
 }
 .btn-outline:hover {
@@ -8747,7 +8747,13 @@ fieldset[disabled] .btn-red.active {
   border-color: white !important;
 }
 .border-lightgrey {
-  border-color: #e6e6e6 !important;
+  border: solid 1px #e6e6e6 !important;
+}
+.border-darkgrey {
+  border: solid 1px #4b4b4b !important;
+}
+.border-red {
+  border: solid 1px #ff4001 !important;
 }
 .border-blue {
   border-color: #3fa9f5 !important;
@@ -8782,7 +8788,8 @@ fieldset[disabled] .btn-red.active {
   min-height: 20px;
 }
 .footer-nav li {
-  float: left;
+  display: inline-block;
+  width: 50px;
 }
 .footer-nav li a {
   display: inline !important;
@@ -8799,7 +8806,7 @@ fieldset[disabled] .btn-red.active {
   max-width: 350px;
 }
 .nav-tab-cute li a {
-  color: #333333;
+  color: #4b4b4b;
 }
 .nav-tab-cute .active a {
   color: #ffffff;
@@ -8816,7 +8823,7 @@ fieldset[disabled] .btn-red.active {
   /*border-radius: 6px;*/
 }
 .nav-tab-blue li a {
-  color: #333333;
+  color: #4b4b4b;
 }
 .nav-tab-blue .active a {
   color: #ffffff;
@@ -8832,7 +8839,7 @@ fieldset[disabled] .btn-red.active {
   background-color: #3fa9f5;
 }
 .nav-tab-green li a {
-  color: #333333;
+  color: #4b4b4b;
 }
 .nav-tab-green .active a {
   color: #ffffff;
@@ -9349,6 +9356,9 @@ fieldset[disabled] .btn-red.active {
   .mynavbar .navbar-header {
     margin-left: 100px;
   }
+  .footer-container {
+    width: 334px;
+  }
   .footer .nav {
     padding-left: 25px;
   }
@@ -9509,9 +9519,6 @@ fieldset[disabled] .btn-red.active {
   }
   .navbar-nav {
     margin: 0;
-  }
-  .footer .nav li {
-    width: 14%;
   }
   .footer .footer-text {
     margin-left: 0;

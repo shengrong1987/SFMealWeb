@@ -41,7 +41,7 @@ module.exports = {
 
   feature : function(req, res){
     var now = new Date();
-    var county = req.cookies['county'] || "San Francisco County";
+    var county = req.cookies['county'] || req.param('county') || "San Francisco County";
     var user = req.session.user;
     if(req.session.authenticated){
       Meal.find({county : county, type : 'order', status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
@@ -376,8 +376,7 @@ module.exports = {
   },
 
   find : function(req, res){
-    var county = req.param('county');
-    county = county || "San Francisco County";
+    var county = req.cookies['county'] || req.param('county') || "San Francisco County";
     var now = new Date();
     Meal.find({ county : county, status : 'on', provideFromTime : {'<' : now}, provideTillTime : {'>' : now}  }).populate('dishes').populate('chef').exec(function(err,found){
       if(err){

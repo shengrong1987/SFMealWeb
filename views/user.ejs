@@ -95,7 +95,7 @@
                           <%= number%>
                           <%}%>
                           <br/>
-                          <span class="preference"><%= preference || ""%></span>
+                          <span class="preference"><%= preference.property || ""%></span>
                         </td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
@@ -185,7 +185,7 @@
                           <%= number%>
                           <%}%>
                           <br/>
-                          <span class="preference"><%= preference || ''%></span>
+                          <span class="preference"><%= preference.property || ''%></span>
                         </td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
@@ -247,7 +247,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price%></td>
-                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
+                        <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
@@ -305,7 +305,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price%></td>
-                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
+                        <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
@@ -364,7 +364,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price%></td>
-                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
+                        <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
@@ -424,7 +424,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price%></td>
-                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
+                        <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
@@ -507,7 +507,7 @@
                           <%= number%>
                           <%}%>
                           <br/>
-                          <span class="preference"><%= preference || ""%></span>
+                          <span class="preference"><%= preference.property || ""%></span>
                         </td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
@@ -593,7 +593,7 @@
                           <%= number%>
                           <%}%>
                           <br/>
-                          <span class="preference"><%= preference || ''%></span></td>
+                          <span class="preference"><%= preference.property || ''%></span></td>
                         <%if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
@@ -652,7 +652,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price%></td>
-                        <td class="minWid50"><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
+                        <td class="minWid50"><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
@@ -710,7 +710,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price%></td>
-                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
+                        <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
@@ -767,7 +767,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price%></td>
-                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
+                        <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
@@ -828,7 +828,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>$<%= dish.price%></td>
-                        <td><%= number%><br/><span class="preference"><%= preference || ''%></span></td>
+                        <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b>$<%= (order.subtotal + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>

@@ -58,6 +58,10 @@ module.exports = {
       type: 'string',
       required: true
     },
+    customerPhone : {
+      type : 'string',
+      required : true
+    },
     guestEmail : {
       type : 'string',
       required : true

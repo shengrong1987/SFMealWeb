@@ -20,11 +20,13 @@ module.exports = {
     },
     firstname : {
       type : 'string',
-      regex : /^([A-z\ ]{1,15})$/
+      regex : /^([A-z\ ]{1,15})$/,
+      defaultsTo : ''
     },
     lastname : {
       type : 'string',
-      regex : /^([A-z\ ]{1,15})$/
+      regex : /^([A-z\ ]{1,15})$/,
+      defaultsTo : ''
     },
     status : {
       type : 'string',

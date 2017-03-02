@@ -70,6 +70,27 @@
                   <%}i++;})}; %>
                 </div>
 
+                <div class="col-xs-12">
+                  <h5>2.<%= __('contact-phone')%></h5>
+                </div>
+
+                <div class="radio-box col-xs-12 row contact" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
+                  <%
+                  var addresses= user.address;
+                  var keys = Object.keys(addresses);
+                  var i = 0;
+                  keys.forEach(function(key){
+                    var addressObj = addresses[key];
+                    var phone = addressObj.phone;
+                  %>
+                  <label class="btn btn-default fixed-label vertical-align" style="text-align: left;">
+                    <input type="radio" id="radio-2-<%= i%>" name="radio-2-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="radio-2-<%= i%>"></label>
+                    <span style="margin-left: 10px;"><%= phone %></span>
+                  </label>
+                  <%i++;}); %>
+                  <h4 style="margin-left: 42px;"><a class="text-red" data-action="updateFromOrder" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" data-id="<%= user.id%>" href="javascript:void(0)"><%= __('new-location-phone') %></a></h4>
+                </div>
+
                 <h1></h1>
                 <div class="divider"></div>
                 <h4 class="text-right col-xs-12 delivery"><%= __('meal-delivery-fee') %><%= meal.delivery_fee%></h4>

@@ -297,6 +297,7 @@ module.exports = {
           req.body.meal = m.id;
           req.body.guestEmail = email;
           req.body.hostEmail = m.chef.email;
+          req.body.phone = m.chef.phone;
 
           User.findOne(userId).populate('payment').populate("coupons").exec(function (err, found) {
             if (err) {
@@ -308,10 +309,10 @@ module.exports = {
             if(m.type == "order"){
               req.body.status = "preparing";
             }
-            if(!found.phone && !req.body.phone){
+            if(!found.phone && !req.body.customerPhone){
               return res.badRequest(req.__('order-lack-contact'));
             }
-            req.body.phone = found.phone || req.body.phone;
+            req.body.customerPhone = req.body.customerPhone || found.phone;
 
             //validate Coupon
             $this.verifyCoupon(req, code, found, m, function(err, coupon){

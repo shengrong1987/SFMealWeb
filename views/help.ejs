@@ -4,12 +4,15 @@
     <div id="sidebar-wrapper">
       <ul class="sidebar-nav">
         <li class="sidebar-brand">
-          <a class="sidenav-item" href="#">
+          <a class="sidenav-item text-black" href="#">
             帮助中心
           </a>
         </li>
         <li><a href="#menu-toggle" class="btn btn-default" data-toggle="menu-toggle"><%= __('help-menu-collapse')%></a></li>
         <li><span class="divider"></span></li>
+        <li>
+          <a class="sidenav-item" href="#aboutUs"><%= __('about-us')%></a>
+        </li>
         <li>
           <a class="sidenav-item" href="#general">常规帮助</a>
         </li>
@@ -22,19 +25,30 @@
         <li>
           <a class="sidenav-item" href="#trust"><%= __('trust')%></a>
         </li>
-        <li>
-          <a class="sidenav-item" href="#aboutUs"><%= __('about-us')%></a>
-        </li>
       </ul>
     </div>
 
     <div id="page-content-wrapper">
-      <div class="container-fluid">
+      <div class="container-fluid well white">
         <div class="row">
           <div class="col-lg-12 text-left">
+
+            <div id="aboutUs">
+              <h2><%= __('about-us')%></h2>
+              <p><%= __('about-us-context-1')%></p>
+
+              <p><%= __('about-us-context-2')%></p>
+
+              <p><%= __('about-us-context-3')%></p>
+
+              <p><%= __('about-us-context-4')%></p>
+            </div>
+
+            <div class="divider"></div>
+
             <div id="general">
               <h2>常规帮助</h2>
-              <a href="#menu-toggle" class="btn btn-default" data-toggle="menu-toggle"><%= __('help-menu')%></a>
+              <a href="#menu-toggle" class="btn btn-default btn-outline" data-toggle="menu-toggle"><%= __('help-menu')%></a>
               <div class="divider"></div>
               <div id="order">
                 <p>1. 点餐流程</p>
@@ -130,16 +144,7 @@
               <p><%= __('chef-guide-context-3-4')%> <a href="/trust"><%= __('trust')%></a>。</p>
             </div>
 
-            <div id="aboutUs">
-              <h2><%= __('about-us')%></h2>
-              <p><%= __('about-us-context-1')%></p>
-
-              <p><%= __('about-us-context-2')%></p>
-
-              <p><%= __('about-us-context-3')%></p>
-
-              <p><%= __('about-us-context-4')%></p>
-            </div>
+            <div class="divider"></div>
           </div>
         </div>
       </div>
