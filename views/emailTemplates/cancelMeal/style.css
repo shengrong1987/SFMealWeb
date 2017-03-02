@@ -8788,10 +8788,16 @@ fieldset[disabled] .btn-red.active {
   min-height: 20px;
 }
 .footer-nav li {
+  float: left;
+}
+.footer-nav li a {
+  display: inline !important;
+}
+.nav-email li {
   display: inline-block;
   width: 50px;
 }
-.footer-nav li a {
+.nav-email li a {
   display: inline !important;
 }
 /* compo*/
@@ -9519,6 +9525,9 @@ fieldset[disabled] .btn-red.active {
   }
   .navbar-nav {
     margin: 0;
+  }
+  .footer .nav li {
+    width: 14%;
   }
   .footer .footer-text {
     margin-left: 0;
