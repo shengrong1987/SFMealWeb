@@ -28,7 +28,7 @@ module.exports = function(agenda) {
     run: function(job, done) {
       var orderId = job.attrs.data.orderId;
       Order.findOne(orderId).populate('host').populate('dishes').populate("customer").exec(function(err, order){
-        if(err){
+        if(err || !order){
           return done();
         }
         console.log("sending arrive reminder email to guest");

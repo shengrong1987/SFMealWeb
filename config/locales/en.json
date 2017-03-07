@@ -610,6 +610,7 @@
   "wrongPasswordError": "Email or password error, please try again.",
   "userNotFoundError": "Can not find the user",
   "socialLoginError": "Please use a social account to login.",
+  "localLoginError" : "Please use email account to login",
   "notLoginError": "You are not logged in, please log in to view this page.",
   "notHostError": "You are not a chef, so you can not view this page.",
   "pageNotFoundError": "Sweetie! We can't find that page!",

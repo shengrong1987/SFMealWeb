@@ -50,7 +50,7 @@ var LoginView = Backbone.View.extend({
     var $this = this;
     this.model.save({},{
       success : function(){
-        location.reload();
+        location.href = location.href.indexOf('oauth2') != -1 ? 'https://sfmeal.com' : location.href;
       },error : function(model,err){
         $this.errorView.html(err.responseText);
         $this.errorView.show();
@@ -651,7 +651,7 @@ var PaymentView = Backbone.View.extend({
         address_country: this.$el.find(".flagstrap").data('selected-country')
       }, function(status, response){
         if (response.error) {
-          $this.alertView.html(response.error.message);
+          $this.alertView.html(jQuery.i18n.prop(response.error.code));
           $this.alertView.show();
         } else {
           var form = $this.$el.find("form");

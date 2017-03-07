@@ -610,6 +610,7 @@
   "wrongPasswordError" : "邮箱或者密码错误，请重试。",
   "userNotFoundError" : "找不到用户。",
   "socialLoginError" : "请使用社交帐号登录。",
+  "localLoginError" : "请使用邮箱账号登录",
   "notLoginError" : "您还没有登录, 请登录来查看这个页面。",
   "notHostError" : "您不是厨师, 无法查看这个页面。",
   "pageNotFoundError" : "亲!我们找不到那个页面。",
