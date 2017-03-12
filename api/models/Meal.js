@@ -297,12 +297,22 @@ module.exports = {
           next();
         }
       },
-      updatePickup : function(next){
-        if(values.type == "order"){
-          Host.findOne(values.chef || values.host).populate("user").exec(function(err, host){
-            if(err){
-              return next(err);
-            }
+      updateCountyAndPickup: function(next){
+        if(!values.chef){
+          console.log("meal has no chef");
+          return next(Error("meal has no chef"));
+        }
+        if(values.county && values.type != "order"){
+          return next();
+        }
+        Host.findOne(values.chef).populate("user").exec(function(err, host){
+          if(err){
+            return next(err);
+          }
+          if(!values.county){
+            values.county = host.county;
+          }
+          if(values.type == "order"){
             values.pickups = JSON.stringify([{
               "pickupFromTime" : values.provideFromTime,
               "pickupTillTime" : values.provideTillTime,
@@ -310,12 +320,10 @@ module.exports = {
               "phone" : host.user.phone,
               "method" : "pickup"
             }])
-            next();
-          });
-        }else{
+          }
           next();
-        }
-      }
+        });
+      },
     },function(err){
       cb(err);
     });

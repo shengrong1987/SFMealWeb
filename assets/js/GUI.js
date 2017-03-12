@@ -30,53 +30,48 @@ function initAutoComplete(){
     "locality" : ["#cityInput","#deliveryCenterInput"],
     "postal_code" : ["#postalInput","#deliveryCenterInput"]
   };
-  var zipCodeToArea = {
-    "Mission District and Nearby" : ["94110","94114","94131","94134","94131"],
-    "SFSU & CCSF" : ["94132", "94127","94116","94112"],
-    "Sunset & Richmond" : ["94122","94121","94118"],
-    "Market and Downtown" : ["94103","94102","94108","94104"],
-    "Bayview" : ["94124"]
-  };
-  var options = {
-    componentRestrictions : { country : 'us'},
-    type : ['geocode']
-  }
-  autocomplete = new google.maps.places.Autocomplete(
-    /** @type {!HTMLInputElement} */($("#streetInput")[0] || $("#deliveryCenterInput")[0]),
-    options);
-  autocomplete.addListener('place_changed', function() {
-    var place = autocomplete.getPlace();
-    if(!place.address_components){
-      return;
+  $.getJSON("/files/zipcode.json", function(zipCodeToArea){
+    var options = {
+      componentRestrictions : { country : 'us'},
+      type : ['geocode']
     }
-    for (var key in componentForm) {
-      var components = componentForm[key];
-      components.forEach(function(component){
-        $(component).val("");
-        $(component).attr("disabled", false);
-      });
-    }
-    // Get each component of the address from the place details
-    // and fill the corresponding field on the form.
-    for(var i=0; i<place.address_components.length;i++){
-      var addressType = place.address_components[i].types[0];
-      if(componentForm[addressType]){
-        var val = place.address_components[i].long_name;
-        if(addressType=="postal_code"){
-          Object.keys(zipCodeToArea).forEach(function(area){
-            var zipcodes = zipCodeToArea[area];
-            if(zipcodes.indexOf(val) != -1){
-              $("#areaInput").val(area);
-            }
-          })
-        }
-        componentForm[addressType].forEach(function(selector){
-          if($(selector).length > 0){
-            $(selector).val($(selector).val() + " " + val);
-          }
+    autocomplete = new google.maps.places.Autocomplete(
+      /** @type {!HTMLInputElement} */($("#streetInput")[0] || $("#deliveryCenterInput")[0]),
+      options);
+    autocomplete.addListener('place_changed', function() {
+      var place = autocomplete.getPlace();
+      if(!place.address_components){
+        return;
+      }
+      for (var key in componentForm) {
+        var components = componentForm[key];
+        components.forEach(function(component){
+          $(component).val("");
+          $(component).attr("disabled", false);
         });
       }
-    }
+      // Get each component of the address from the place details
+      // and fill the corresponding field on the form.
+      for(var i=0; i<place.address_components.length;i++){
+        var addressType = place.address_components[i].types[0];
+        if(componentForm[addressType]){
+          var val = place.address_components[i].long_name;
+          if(addressType=="postal_code"){
+            Object.keys(zipCodeToArea).forEach(function(area){
+              var zipcodes = zipCodeToArea[area];
+              if(zipcodes.indexOf(val) != -1){
+                $("#areaInput").val(area);
+              }
+            })
+          }
+          componentForm[addressType].forEach(function(selector){
+            if($(selector).length > 0){
+              $(selector).val($(selector).val() + " " + val);
+            }
+          });
+        }
+      }
+    });
   });
 }
 

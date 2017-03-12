@@ -335,11 +335,12 @@
   "user": "Foodies",
   "meal-no-orders": "No orders yet.",
   "upload-photo": "Upload photo",
-  "location-san-francisco": "US/San Francisco",
-  "location-los-angeles-country": "US/LA",
-  "location-new-york-county": "US/New York",
-  "location-san-mateo-county": "US/San Mateo County",
-  "location-sacramento-county": "US/Sacramento County",
+  "location-san-francisco": "San Francisco",
+  "location-los-angeles-country": "LA",
+  "location-new-york-county": "New York",
+  "location-san-mateo-county": "San Mateo County",
+  "location-santa-clara-county" : "Santa Clara County",
+  "location-sacramento-county": "Sacramento County",
   "firstname": "First name",
   "lastname": "Last name",
   "address-info": "Credit card info",
@@ -702,5 +703,6 @@
   "area" : "Neighborhood",
   "yourfollowedchef" : "Your Chef",
   "menuoftheweek" : "menu of the week",
-  "hometaste1" : "Everyone has a taste of home, is it here?"
+  "hometaste1" : "Everyone has a taste of home, is it here?",
+  "area-not-open" : "This area is currently not available"
 }

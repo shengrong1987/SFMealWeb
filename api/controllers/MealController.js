@@ -243,6 +243,7 @@ module.exports = {
   off : function(req, res){
     var mealId = req.param("id");
     var user = req.session.user;
+    var hostId = user.host.id || user.host;
     var isAdmin = user.auth.email === 'admin@sfmeal.com';
     var $this = this;
     Order.find({meal : mealId, status : { '!' : ['complete','review','cancel']}}).exec(function(err,orders){
@@ -254,7 +255,7 @@ module.exports = {
         return res.badRequest({ code : -4, responseText : req.__('meal-active-error')});
       }
 
-      Meal.update({id : mealId},{status : "off", isScheduled : false}).exec(function(err, meal){
+      Meal.update({id : mealId},{status : "off", isScheduled : false, chef : hostId }).exec(function(err, meal){
         if(err){
           return res.badRequest(err);
         }

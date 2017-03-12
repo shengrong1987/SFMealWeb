@@ -70,7 +70,7 @@ module.exports = {
     },
     county : {
       type : 'string',
-      enum : ["San Francisco County", "Sacramento County", "San Mateo County"]
+      enum : ["San Francisco County", "Sacramento County", "San Mateo County", "Santa Clara County"]
     },
     state : {
       type : 'string'

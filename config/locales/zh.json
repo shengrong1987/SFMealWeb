@@ -336,11 +336,12 @@
   "user" : "吃货",
   "meal-no-orders" : "暂无其他订单",
   "upload-photo" : "上传照片",
-  "location-san-francisco" : "美国/旧金山",
-  "location-los-angeles-country" :"美国/洛杉矶",
-  "location-new-york-county" :"美国/纽约",
-  "location-san-mateo-county" :"美国/圣马特奥县",
-  "location-sacramento-county" : "美国/萨克拉门托",
+  "location-san-francisco" : "旧金山",
+  "location-los-angeles-country" :"洛杉矶",
+  "location-new-york-county" :"纽约",
+  "location-san-mateo-county" :"中半岛",
+  "location-santa-clara-county" : "南湾",
+  "location-sacramento-county" : "萨克拉门托",
   "firstname" : "名字",
   "lastname" : "姓",
   "address-info" : "信用卡信息",
@@ -702,5 +703,6 @@
   "area" : "区域",
   "yourfollowedchef" : "您的厨师",
   "menuoftheweek" : "本周菜单",
-  "hometaste1" : "每个人都有属于自己的家的味道，你的味道属于这里吗？"
+  "hometaste1" : "每个人都有属于自己的家的味道，你的味道属于这里吗？",
+  "area-not-open" : "这个地区尚未开放服务"
 }
