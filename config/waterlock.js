@@ -55,16 +55,17 @@ module.exports.waterlock = {
         mail: {
           protocol: 'SMTP',
           options:{
-            host : "smtp.office365.com",
-            secureConnection : false,
-            port : 587,
+            // host : "smtp.office365.com",
+            // secureConnection : false,
+            // port : 587,
             auth: {
               user: process.env.ADMIN_EMAIL,
               pass: process.env.ADMIN_EMAIL_PWD
             },
-            tls : {
-              ciphers : 'SSLv3'
-            }
+            service : 'gmail'
+            // tls : {
+            //   ciphers : 'SSLv3'
+            // }
           },
           from: process.env.ADMIN_EMAIL,
           subject: 'Your password reset!',
