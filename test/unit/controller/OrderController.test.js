@@ -20,7 +20,7 @@ describe('OrderController', function() {
     var adminEmail = 'admin@sfmeal.com';
     var password = '12345678';
     var guestId = "";
-    var address = "1455 Market St, San Francisco";
+    var address = "1974 Palou Ave, San Francisco";
     var farAddress = "7116 Tiant way, Elk Grove, CA 95758";
     var phone = "1-415-802-3853";
 

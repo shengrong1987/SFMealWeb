@@ -44,20 +44,27 @@ module.exports = {
     var county = req.cookies['county'] || req.param('county') || "San Francisco County";
     var user = req.session.user;
     if(req.session.authenticated){
-      Meal.find({county : county, type : 'order', status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
+      Meal.find({type : 'order', status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
         if(err){
           return res.badRequest(err);
         }
-        Meal.find({county : county, type : 'preorder',status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>=' : now}}).sort('score DESC').limit(6).populate('dishes').populate('chef').exec(function(err, preorders){
+        orders = orders.filter(function(meal){
+          return meal.county.split("+").indexOf(county) != -1;
+        })
+        Meal.find({type : 'preorder',status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>=' : now}}).sort('score DESC').limit(6).populate('dishes').populate('chef').exec(function(err, preorders){
           if(err){
             return res.badRequest(err);
           }
+
+          preorders = preorders.filter(function(meal){
+            return meal.county.split("+").indexOf(county) != -1;
+          })
 
           User.findOne(user.id).populate("collects").exec(function(err,u){
             if(err){
               return res.badRequest(err);
             }
-            return res.view('meals',{meals : orders.concat(preorders), user : u});
+            return res.view('meals',{meals : orders.concat(preorders), user : u, county : county});
           });
         })
       });
@@ -100,11 +107,14 @@ module.exports = {
       county = "San Francisco";
     }
 
-    Meal.find({county : county,status : "on",provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).exec(function(err, found){
+    Meal.find({status : "on",provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).exec(function(err, found){
       if(err){
         res.badRequest(err);
       }else{
-        res.view("meals",{meals : found});
+        found = found.filter(function(meal){
+          return meal.county.split("+").indexOf(county) != -1;
+        })
+        res.view("meals",{meals : found, county : county});
       }
     });
   },
@@ -112,11 +122,14 @@ module.exports = {
   county : function(req, res){
     var county = req.param('county');
     var now = new Date();
-    Meal.find({county : county, status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).exec(function(err, found){
+    Meal.find({status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).exec(function(err, found){
       if(err){
         res.badRequest(err);
       }else{
-        res.view("meals",{meals : found});
+        found = found.filter(function(meal){
+          return meal.county.split("+").indexOf(county) != -1;
+        })
+        res.view("meals",{meals : found, county : county});
       }
     });
   },
@@ -150,14 +163,13 @@ module.exports = {
   search : function(req, res){
     var keyword = req.param('keyword');
     var zipcode = req.param('zipcode');
-    var county = req.param('county') || req.cookies['county'];
+    var county = req.cookies['county'] || req.param('county') || "San Francisco County";;
     var type = req.param('type');
     var now = new Date();
     var params = {
       status : 'on',
       provideFromTime : {'<' : now},
-      provideTillTime : {'>' : now},
-      county : county
+      provideTillTime : {'>' : now}
     }
     if(type){
       params.type = type;
@@ -166,6 +178,10 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
+
+      found = found.filter(function(meal){
+        return meal.county.split("+").indexOf(county) != -1;
+      })
 
       if(typeof zipcode !== 'undefined' && zipcode && zipcode !== 'undefined' && typeof county !== 'undefined' && county && county !== 'undefined'){
         GeoCoder.geocode(zipcode, function(err, result){
@@ -193,7 +209,7 @@ module.exports = {
             if(req.wantsJSON) {
               res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, anchor : location});
             }else{
-              res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, anchor : location });
+              res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, anchor : location, county : county });
             }
           }
         });
@@ -379,15 +395,18 @@ module.exports = {
   find : function(req, res){
     var county = req.cookies['county'] || req.param('county') || "San Francisco County";
     var now = new Date();
-    Meal.find({ county : county, status : 'on', provideFromTime : {'<' : now}, provideTillTime : {'>' : now}  }).populate('dishes').populate('chef').exec(function(err,found){
+    Meal.find({ status : 'on', provideFromTime : {'<' : now}, provideTillTime : {'>' : now}  }).populate('dishes').populate('chef').exec(function(err,found){
       if(err){
         return res.badRequest(err);
       }
+      found = found.filter(function(meal){
+        return meal.county.split("+").indexOf(county) != -1;
+      });
       //test only
       if(req.wantsJSON){
         return res.ok({meals : found});
       }
-      return res.view("meals",{meals : found, user : req.session.user});
+      return res.view("meals",{meals : found, user : req.session.user, county : county});
     });
   },
 
@@ -407,40 +426,134 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
-              if(req.body.isDeliveryBySystem){
-                req.body.delivery_fee = "5.99";
-              }
-              if(!req.body.delivery_center || req.body.delivery_center == "undefined"){
-                req.body.delivery_center = host.full_address;
-              }
-              if(req.body.status == 'on'){
-                host.checkGuideRequirement(function(err){
-                  if(err){
-                    return res.badRequest(err);
-                  }
-                  if(!host.passGuide || !host.dishVerifying){
-                    return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
-                  }
+              $this.updateDelivery(req.body, host, function(err, params){
+                if(err){
+                  return res.badRequest(err);
+                }
+                req.body = params;
+                if(req.body.status == 'on'){
+                  host.checkGuideRequirement(function(err){
+                    if(err){
+                      return res.badRequest(err);
+                    }
+                    if(!host.passGuide || !host.dishVerifying){
+                      return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
+                    }
+                    Meal.create(req.body).exec(function(err,meal){
+                      if(err){
+                        return res.badRequest(err);
+                      }
+                      return res.ok(meal);
+                    });
+                  })
+                }else{
                   Meal.create(req.body).exec(function(err,meal){
                     if(err){
                       return res.badRequest(err);
                     }
                     return res.ok(meal);
                   });
-                })
-              }else{
-                Meal.create(req.body).exec(function(err,meal){
-                  if(err){
-                    return res.badRequest(err);
-                  }
-                  return res.ok(meal);
-                });
-              }
+                }
+              });
             });
           }else{
             console.log("meal contain unverified dishes");
             return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
           }
+        });
+      });
+    }else{
+      console.log("Date format of meal is not valid");
+      return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
+    }
+  },
+
+  update : function(req, res){
+    var mealId = req.param("id");
+    var hostId = req.session.user.host.id? req.session.user.host.id : req.session.user.host;
+    var status = req.body.status;
+    var $this = this;
+    if(this.dateIsValid(req.body)){
+      Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,meal){
+        if(err){
+          return res.badRequest(err);
+        }
+        !$this.mealActiveCheck(req.body, meal, req, function(err){
+          if(err){
+            return res.badRequest(err);
+          }
+          $this.requirementIsValid(req.body, meal, req, function (err) {
+            if(err){
+              return res.badRequest(err);
+            }
+            $this.updateDelivery(req.body, meal.chef, function(err, params){
+              if(err){
+                return res.badRequest(err);
+              }
+              req.body = params;
+              if(status == "on"){
+                async.auto({
+                  updateQty : function(cb){
+                    if(!req.body.totalQty && meal.status != "on"){
+                      return cb();
+                    }
+                    req.body.leftQty = $this.updateDishQty(meal.leftQty, meal.totalQty, req.body.totalQty);
+                    if(!req.body.leftQty){
+                      return cb({responseText : req.__('meal-adjust-qty-fail'), code : -9});
+                    }
+                    cb();
+                  }
+                }, function(err){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  meal.chef.dishes = meal.dishes;
+                  if(!meal.dishIsValid()){
+                    sails.log.debug("meal contain unverified dishes");
+                    return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
+                  }
+                  meal.chef.checkGuideRequirement(function(err){
+                    if(err){
+                      return res.badRequest(err);
+                    }
+                    if(!meal.chef.passGuide){
+                      return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
+                    }
+                    $this.cancelMealJobs(mealId, function(err){
+                      if(err){
+                        return res.badRequest(err);
+                      }
+                      req.body.isScheduled = false;
+                      req.body.chef = hostId;
+                      Meal.update({id : mealId}, req.body).exec(function(err, result){
+                        if(err){
+                          return res.badRequest(err);
+                        }
+                        return res.ok(result[0]);
+                      });
+                    })
+                  })
+                });
+              }else{
+                $this.cancelMealJobs(mealId, function(err){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  if(req.body.totalQty){
+                    req.body.leftQty = req.body.totalQty;
+                  }
+                  req.body.isScheduled = false;
+                  req.body.chef = hostId;
+                  Meal.update({id : mealId}, req.body).exec(function(err, result){
+                    if(err){
+                      return res.badRequest(err);
+                    }
+                    return res.ok(result[0]);
+                  });
+                })
+              }
+            })
+          });
         });
       });
     }else{
@@ -494,6 +607,51 @@ module.exports = {
     });
   },
 
+  updateDelivery : function(params, host, cb){
+
+    if(params.isDeliveryBySystem){
+      params.delivery_fee = "3.99";
+    }
+    if(params.isDelivery && (!params.delivery_center || params.delivery_center == "undefined")){
+      params.delivery_center = host.full_address;
+    }
+
+    var counties = [];
+    async.auto({
+      updatePickupLocation : function(cb){
+        if(!params.pickups){
+          return cb();
+        }
+        async.each(JSON.parse(params.pickups), function(pickup, next){
+          if(!pickup.county){
+            return next();
+          }
+          if(counties.indexOf(pickup.county) == -1){
+            counties.push(pickup.county);
+          }
+          next();
+        }, function(err){
+          if(err){
+            return cb(err);
+          }
+          cb();
+        });
+      }
+    }, function(err){
+      if(err){
+        return cb(err);
+      }
+      if(counties.length == 0){
+        sails.log.info("something went wrong and we need to setup a default county");
+        params.county = host.county;
+      }else{
+        params.county = counties.join("+");
+      }
+      sails.log.info("counties are: " + counties.join("+"))
+      cb(null, params);
+    });
+  },
+
   updateDishQty : function(leftQty, oldTotalQty, newTotalQty){
     if(!newTotalQty){
       return leftQty;
@@ -506,94 +664,6 @@ module.exports = {
       }
     });
     return leftQty;
-  },
-
-  update : function(req, res){
-    var mealId = req.param("id");
-    var hostId = req.session.user.host.id? req.session.user.host.id : req.session.user.host;
-    var status = req.body.status;
-    var $this = this;
-    if(this.dateIsValid(req.body)){
-      Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,meal){
-        if(err){
-          return res.badRequest(err);
-        }
-        !$this.mealActiveCheck(req.body, meal, req, function(err){
-          if(err){
-            return res.badRequest(err);
-          }
-          $this.requirementIsValid(req.body, meal, req, function (err) {
-            if(err){
-              return res.badRequest(err);
-            }
-            if(status == "on"){
-              async.auto({
-                updateQty : function(cb){
-                  if(!req.body.totalQty && meal.status != "on"){
-                    return cb();
-                  }
-                  req.body.leftQty = $this.updateDishQty(meal.leftQty, meal.totalQty, req.body.totalQty);
-                  if(!req.body.leftQty){
-                    return cb({responseText : req.__('meal-adjust-qty-fail'), code : -9});
-                  }
-                  cb();
-                }
-              }, function(err){
-                if(err){
-                  return res.badRequest(err);
-                }
-                meal.chef.dishes = meal.dishes;
-                if(!meal.dishIsValid()){
-                  sails.log.debug("meal contain unverified dishes");
-                  return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
-                }
-                meal.chef.checkGuideRequirement(function(err){
-                  if(err){
-                    return res.badRequest(err);
-                  }
-                  if(!meal.chef.passGuide){
-                    return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
-                  }
-                  $this.cancelMealJobs(mealId, function(err){
-                    if(err){
-                      return res.badRequest(err);
-                    }
-                    req.body.isScheduled = false;
-                    req.body.chef = hostId;
-                    Meal.update({id : mealId}, req.body).exec(function(err, result){
-                      if(err){
-                        return res.badRequest(err);
-                      }
-                      return res.ok(result[0]);
-                    });
-                  })
-                })
-              });
-            }else{
-              $this.cancelMealJobs(mealId, function(err){
-                if(err){
-                  return res.badRequest(err);
-                }
-                if(req.body.totalQty){
-                  req.body.leftQty = req.body.totalQty;
-                }
-                req.body.isScheduled = false;
-                req.body.chef = hostId;
-                Meal.update({id : mealId}, req.body).exec(function(err, result){
-                  if(err){
-                    return res.badRequest(err);
-                  }
-                  return res.ok(result[0]);
-                });
-              })
-            }
-          });
-        });
-      });
-    }else{
-      console.log("Date format of meal is not valid");
-      return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
-    }
   },
 
   requirementIsValid : function(params, meal, req, cb){

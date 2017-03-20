@@ -80,16 +80,25 @@
         } else if (user) {
           var distance = meal.chef.getDistance(user.lat, user.long);
         }
-        if (meal.area) {
-          if (mealInAreas.hasOwnProperty(meal.area)) {
-            mealInAreas[meal.area].push(meal);
-          } else {
-            mealInAreas[meal.area] = [meal];
-          }
+        if(meal.pickups){
+          meal.pickups.forEach(function(pickup){
+            if(pickup.county == county && pickup.area){
+              if (mealInAreas.hasOwnProperty(pickup.area)) {
+                mealInAreas[pickup.area].push(meal);
+              } else {
+                mealInAreas[pickup.area] = [meal];
+              }
+            }
+          })
+        }else{
+          mealInAreas[''] = meal;
         }
       }
 
       var areasPower = Object.keys(mealInAreas).sort(function(k1,k2){
+        if(k1 == ''){
+          return -1;
+        }
         return mealInAreas[k1].length < mealInAreas[k2].length;
       });
 
@@ -98,6 +107,7 @@
       %>
 
       <div class="row">
+        <% if(areaName){%>
         <div class="row vertical-align">
           <div class="col-sm-5"><div class="divider"></div></div>
           <div class="col-sm-2 col-xs-12"><h3 style="margin:10px 0;"><%= areaName%></h3></div>
@@ -105,6 +115,7 @@
         </div>
 
       <%
+        }
         var mealsInArea = mealInAreas[areaName];
         for(var k=0; k < mealsInArea.length; k++){
           var meal = mealsInArea[k];

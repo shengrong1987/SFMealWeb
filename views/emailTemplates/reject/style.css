@@ -8787,10 +8787,10 @@ fieldset[disabled] .btn-red.active {
   margin-bottom: 20px;
   min-height: 20px;
 }
-.navbar.footer-nav li {
+.navbar-nav.footer-nav li {
   float: left;
 }
-.navbar.footer-nav li a {
+.navbar-nav.footer-nav li a {
   display: inline !important;
 }
 .nav-email li {

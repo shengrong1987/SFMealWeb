@@ -8,6 +8,7 @@
 var dateUtil = require("../services/util.js");
 var moment = require("moment");
 var async = require("async");
+var geoService = require("../services/geocode.js");
 
 module.exports = {
 
@@ -36,6 +37,8 @@ module.exports = {
      String publicLocation
      String instruction
      String phone
+     String area
+     String county
      */
     pickups : {
      type : 'json'
@@ -78,8 +81,7 @@ module.exports = {
       type : 'float'
     },
     county : {
-      type : 'string',
-      enum : ['San Francisco County','Sacramento County']
+      type : 'string'
     },
     chef : {
       model : 'Host'
@@ -109,7 +111,7 @@ module.exports = {
     },
     delivery_fee : {
       type : 'float',
-      defaultsTo : 5.99,
+      defaultsTo : 3.99,
       decimal2 : true
     },
     delivery_range : {
@@ -118,9 +120,6 @@ module.exports = {
       decimal2 : true
     },
     delivery_center : {
-      type : 'string'
-    },
-    area : {
       type : 'string'
     },
     commission : {
@@ -243,15 +242,12 @@ module.exports = {
           console.log("meal has no chef");
           return next(Error("meal has no chef"));
         }
-        if(values.county && values.type != "order"){
+        if(values.type != "order"){
           return next();
         }
         Host.findOne(values.chef).populate("user").exec(function(err, host){
           if(err){
             return next(err);
-          }
-          if(!values.county){
-            values.county = host.county;
           }
           if(values.type == "order"){
             values.pickups = JSON.stringify([{
@@ -302,15 +298,12 @@ module.exports = {
           console.log("meal has no chef");
           return next(Error("meal has no chef"));
         }
-        if(values.county && values.type != "order"){
+        if(values.type != "order"){
           return next();
         }
         Host.findOne(values.chef).populate("user").exec(function(err, host){
           if(err){
             return next(err);
-          }
-          if(!values.county){
-            values.county = host.county;
           }
           if(values.type == "order"){
             values.pickups = JSON.stringify([{
@@ -318,8 +311,10 @@ module.exports = {
               "pickupTillTime" : values.provideTillTime,
               "location" : host.full_address,
               "phone" : host.user.phone,
-              "method" : "pickup"
+              "method" : "pickup",
+              "county" : host.county
             }])
+            values.county = host.county;
           }
           next();
         });

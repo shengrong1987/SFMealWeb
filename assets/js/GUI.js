@@ -25,53 +25,70 @@ function geolocate() {
 }
 function initAutoComplete(){
   var componentForm = {
-    "street_number" : ["#streetInput","#deliveryCenterInput"],
-    "route" : ["#streetInput","#deliveryCenterInput"],
-    "locality" : ["#cityInput","#deliveryCenterInput"],
-    "postal_code" : ["#postalInput","#deliveryCenterInput"]
+    "street_number" : ["#streetInput"],
+    "route" : ["#streetInput"],
+    "locality" : ["#cityInput"],
+    "postal_code" : ["#postalInput"],
+    "administrative_area_level_2" : []
   };
   $.getJSON("/files/zipcode.json", function(zipCodeToArea){
     var options = {
       componentRestrictions : { country : 'us'},
       type : ['geocode']
     }
-    autocomplete = new google.maps.places.Autocomplete(
-      /** @type {!HTMLInputElement} */($("#streetInput")[0] || $("#deliveryCenterInput")[0]),
-      options);
-    autocomplete.addListener('place_changed', function() {
-      var place = autocomplete.getPlace();
-      if(!place.address_components){
-        return;
-      }
-      for (var key in componentForm) {
-        var components = componentForm[key];
-        components.forEach(function(component){
-          $(component).val("");
-          $(component).attr("disabled", false);
-        });
-      }
-      // Get each component of the address from the place details
-      // and fill the corresponding field on the form.
-      for(var i=0; i<place.address_components.length;i++){
-        var addressType = place.address_components[i].types[0];
-        if(componentForm[addressType]){
-          var val = place.address_components[i].long_name;
-          if(addressType=="postal_code"){
-            Object.keys(zipCodeToArea).forEach(function(area){
-              var zipcodes = zipCodeToArea[area];
-              if(zipcodes.indexOf(val) != -1){
-                $("#areaInput").val(area);
+
+    var autocomplete;
+    var autoCompleteEle = ["#streetInput",".location input",".delivery-center input"];
+
+    autoCompleteEle.forEach(function(eles){
+      if($(eles).length){
+        $(eles).toArray().forEach(function(ele){
+          autocomplete = new google.maps.places.Autocomplete(ele, options);
+          autocomplete.addListener('place_changed', function() {
+            var place = this.getPlace();
+            if(!place.address_components){
+              return;
+            }
+            for (var key in componentForm) {
+              var components = componentForm[key];
+              components.forEach(function(component){
+                $(component).val("");
+                $(component).attr("disabled", false);
+              });
+            }
+            // Get each component of the address from the place details
+            // and fill the corresponding field on the form.
+            for(var i=0; i<place.address_components.length;i++){
+              var addressType = place.address_components[i].types[0];
+              if(componentForm[addressType]){
+                var val = place.address_components[i].long_name;
+                if(addressType=="postal_code"){
+                  Object.keys(zipCodeToArea).forEach(function(area){
+                    var zipcodes = zipCodeToArea[area];
+                    if(zipcodes.indexOf(val) != -1){
+                      $(ele).parent().parent().find(".area input").val(area);
+                    }
+                  })
+                }
+                if(addressType == "administrative_area_level_2"){
+                  $(ele).parent().parent().find(".area").data("county",val);
+                }
+                componentForm[addressType].forEach(function(selector){
+                  if($(selector).length > 0){
+                    $(selector).val($(selector).val() + " " + val);
+                  }
+                });
               }
-            })
-          }
-          componentForm[addressType].forEach(function(selector){
-            if($(selector).length > 0){
-              $(selector).val($(selector).val() + " " + val);
             }
           });
-        }
+        });
       }
     });
+
+    autocomplete = new google.maps.places.Autocomplete(
+      /** @type {!HTMLInputElement} */($("#streetInput")[0] || $(".location input")[0] || $(".delivery-center input")[0]),
+      options);
+
   });
 }
 
@@ -235,14 +252,14 @@ function enterAddressInfo(event){
 
 
 //on user search action - redirect
-function search(target){
+function search(target, isRegular){
   var searchContainer = $(target).parent();
   var keyword = searchContainer.find("input[name='keyword']").val() || '';
   var zip = searchContainer.find("input[name='zipcode']").val() || '';
   var county = getCountyInfo();
   var query = "keyword=" + keyword;
   //check zip's county
-  if(zip) {
+  if(zip && !isRegular) {
     query += "&zip=" + zip;
     $.ajax({
       url: "http://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURI(zip)

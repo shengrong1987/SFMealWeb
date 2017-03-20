@@ -197,19 +197,29 @@
                             </div>
                           </div>
 
-                          <div class="form-group location">
+                          <div class="form-group location pickup-item" style="display: <%= pickup.method == 'pickup' ? 'block' : 'none'%>">
                             <label><%= __('pickup-location')%></label>
-                            <input type="text" class="form-control" value="<%= pickup.location || 'N/A'%>" <%= pickup.method == 'delivery' ? 'disabled' : ''%>>
+                            <input onfocus="geolocate()" type="text" class="form-control" value="<%= pickup.location || '' %>">
                           </div>
 
-                          <div class="form-group public-location">
+                          <div class="form-group delivery-center delivery-item" style="display: <%= pickup.method == 'delivery' ? 'block' : 'none'%>">
+                            <label><%= __('delivery-center')%></label>
+                            <input onfocus="geolocate()" type="text" class="form-control" value="<%= pickup.deliveryCenter || '' %>">
+                          </div>
+
+                          <div class="form-group public-location pickup-item" style="display: <%= pickup.method == 'pickup' ? 'block' : 'none'%>">
                             <label><%= __('pickup-public-location')%></label>
-                            <input type="text" class="form-control" value="<%= pickup.public_location || 'N/A'%>" <%= pickup.method == 'delivery' ? 'disabled' : ''%>>
+                            <input type="text" class="form-control" value="<%= pickup.public_location || '' %>">
                           </div>
 
-                          <div class="form-group instruction">
+                          <div class="form-group instruction pickup-item" style="display: <%= pickup.method == 'pickup' ? 'block' : 'none'%>">
                             <label><%= __('pickup-instruction')%></label>
-                            <input type="text" class="form-control" value="<%= pickup.instruction || ''%>" <%= pickup.method == 'delivery' ? 'disabled' : ''%>>
+                            <input type="text" class="form-control" value="<%= pickup.instruction || '' %>">
+                          </div>
+
+                          <div class="form-group area" data-county="<%= pickup.county%>">
+                            <label><%= __('area')%></label>
+                            <input class="form-control" type="text" readonly="readonly" value="<%= pickup.area || ''%>">
                           </div>
 
                           <div class="form-group method">
@@ -365,18 +375,6 @@
                       <div class="input-group-addon"><%= __('delivery-range')%>:</div>
                       <input id="deliveryRangeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="5" value="<%= meal.delivery_range%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
                       <div class="input-group-addon">Miles</div>
-                    </div>
-                  </div>
-                  <div class=col-sm-12>
-                    <div class="input-group">
-                      <div class="input-group-addon"><%= __('delivery-center')%>:</div>
-                      <input id="deliveryCenterInput" onfocus="geolocate()" class="form-control" type="text" value="<%= meal.delivery_center ? meal.delivery_center : (meal.kitchen_address || '')%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
-                    </div>
-                  </div>
-                  <div class=col-sm-12>
-                    <div class="input-group">
-                      <div class="input-group-addon"><%= __('area')%>:</div>
-                      <input id="areaInput" class="form-control" type="text" readonly="readonly" value="<%= meal.area%>">
                     </div>
                   </div>
                 </div>

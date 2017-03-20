@@ -26,6 +26,7 @@ describe('MealController', function() {
     var password2 = "123456789";
     var password = '12345678';
     var address = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : "(415)802-3853"};
+    var outOfSFAddress = {"street":"25 Washington St","city" : "Daly City", "zip" : 94014, "phone" : "(415)802-3853"};
     var invalidAddress = {"street" : "1", "city" : '', "zip" : 0, "phone" : ""};
     var guestEmail = 'enjoymyself1987@gmail.com';
 
@@ -207,7 +208,6 @@ describe('MealController', function() {
             provideTillTime: new Date(now.getTime() + 1000 * 2 * 3600),
             leftQty: leftQty,
             totalQty: totalQty,
-            county : 'San Francisco County',
             title : "私房面馆",
             type : "order",
             dishes : dishes,
@@ -225,6 +225,7 @@ describe('MealController', function() {
             if(res.body.chef != hostId){
               return done(Error("error creating meal"));
             }
+            res.body.county.should.be.equal("San Francisco County");
             mealId = res.body.id;
             done();
           })
@@ -236,14 +237,37 @@ describe('MealController', function() {
       var pickups = [{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
-        "location" : "1455 Market St, San Francisoc, CA 94124",
+        "location" : "1455 Market St, San Francisco, CA 94124",
         "publicLocation" : "Uber HQ",
         "pickupInstruction" : "11th st and Market st",
-        "method" : "pickup"
+        "method" : "pickup",
+        "area" : "Market & Downtown",
+        "county" : "San Francisco County"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
-        "method" : "delivery"
+        "method" : "delivery",
+        "deliveryCenter" : "1974 Palou Ave, San Francisco, CA 94124, USA",
+        "area" : "Bay View",
+        "county" : "San Francisco County"
+      },{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+        "location" : "25 Washington St, Daly City",
+        "publicLocation" : "John Daly Blvd",
+        "pickupInstruction" : "John Daly Blvd",
+        "method" : "pickup",
+        "county" : "San Mateo County",
+        "area" : "Daly City"
+      },{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 4),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 5),
+        "location" : "665 W Olive Ave, Sunnyvale, CA 94086",
+        "publicLocation" : "Sunnyvalue",
+        "pickupInstruction" : "Sunnyvalue library",
+        "method" : "pickup",
+        "county" : "Santa Clara County",
+        "area" : "Sunnyvale"
       }];
       agent
           .post('/meal')
@@ -254,24 +278,24 @@ describe('MealController', function() {
             isDelivery : true,
             leftQty: leftQty,
             totalQty: totalQty,
-            county : 'San Francisco County',
             title : "私房面馆",
             type : "preorder",
             dishes : dishes,
             status : "off",
             cover : dish1,
-            minimalOrder : 1,
-            area : 'Mission District and Nearby'
+            minimalOrder : 1
           })
           .expect(200)
           .end(function(err,res){
             if(res.body.chef != hostId){
               return done(Error("error creating meal"));
             }
-            res.body.should.have.property('pickups').with.length(2);
+            res.body.should.have.property('pickups').with.length(4);
             res.body.pickups[0].publicLocation.should.be.equal("Uber HQ");
-            res.body.should.have.property('area');
-            res.body.area.should.be.equal('Mission District and Nearby');
+            res.body.should.have.property('county');
+            res.body.county.should.containEql('San Francisco County');
+            res.body.county.should.containEql('San Mateo County');
+            res.body.county.should.containEql('Santa Clara County');
             preorderMealId = res.body.id;
             done();
           })
@@ -283,7 +307,8 @@ describe('MealController', function() {
       var pickups = [{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
-        "method" : "delivery"
+        "method" : "delivery",
+        "delivery_center" : "455 Post St, San Francisco"
       }];
       agent
         .post('/meal')
@@ -294,10 +319,9 @@ describe('MealController', function() {
           delivery_fee : "4.99",
           isDelivery : true,
           isDeliveryBySystem : true,
-          delivery_center : "333 Post st, San Francisco",
           leftQty: leftQty,
           totalQty: totalQty,
-          county : 'San Francisco County',
+          county : 'San Mateo County',
           title : "私房面馆2",
           type : "preorder",
           dishes : dishes,
@@ -311,8 +335,8 @@ describe('MealController', function() {
             return done(Error("error creating meal"));
           }
           sysDeliveryMealId = res.body.id;
-          res.body.delivery_fee.should.be.equal(5.99);
-          res.body.delivery_center.should.be.equal("333 Post st, San Francisco");
+          res.body.delivery_fee.should.be.equal(3.99);
+          res.body.county.should.be.equal("San Francisco County");
           done();
         })
     })
@@ -323,7 +347,8 @@ describe('MealController', function() {
       var pickups = [{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
-        "method" : "delivery"
+        "method" : "delivery",
+        "delivery_center" : "Union Square, San Francisco"
       }];
       agent
         .post('/meal')
@@ -334,7 +359,6 @@ describe('MealController', function() {
           delivery_fee : "4.99",
           isDelivery : false,
           isDeliveryBySystem : true,
-          delivery_center : "Union Square, San Francisco",
           leftQty: leftQty,
           totalQty: totalQty,
           county : 'San Francisco County',
@@ -412,11 +436,32 @@ describe('MealController', function() {
 
     it('should be able to update meals with no orders', function(done){
       var now = new Date();
+      var pickups = [{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+        "location" : "1455 Market St, San Francisoc, CA 94124",
+        "publicLocation" : "Uber HQ",
+        "pickupInstruction" : "11th st and Market st",
+        "method" : "pickup"
+      },{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
+        "method" : "delivery"
+      },{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+        "location" : "25 Washington St, Daly City",
+        "publicLocation" : "John Daly Blvd",
+        "pickupInstruction" : "John Daly Blvd",
+        "method" : "pickup"
+      }];
       agent
         .put('/meal/' + preorderMealId)
         .send({
           provideFromTime: now,
           provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          pickups : JSON.stringify(pickups),
+          isDelivery : true,
           minimalTotal : 1,
           status : 'off'
         })
@@ -868,6 +913,72 @@ describe('MealController', function() {
         })
     })
 
+    it('should update address info for host outside of San Francisco', function (done) {
+      agent
+        .put('/host/' + hostId)
+        .send({
+          address:[outOfSFAddress],
+          phone : "(415)802-3853"
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          if(res.body.city != "Daly City"){
+            return done(Error("error geocoding or updating address"));
+          }
+          done();
+        })
+    });
+
+    it('should update the meal and appear in the search results of San Mateo County', function(done){
+      agent
+        .put('/meal/' + mealId + '/on')
+        .expect(200)
+        .toPromise()
+        .then(function(res){
+          agent
+            .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Mateo County'))
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .end(function(err,res){
+              res.body.meals.should.have.length(1);
+              done();
+            })
+        })
+        .catch(function(err){
+          done(err);
+        })
+    })
+
+    it('should update address back to San Francisco', function (done) {
+      agent
+        .put('/host/' + hostId)
+        .send({
+          address:[address],
+          phone : "(415)802-3853"
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          if(res.body.city != "San Francisco"){
+            return done(Error("error geocoding or updating address"));
+          }
+          done();
+        })
+    });
+
+    it('should update the meal', function(done) {
+      agent
+        .put('/meal/' + mealId + '/on')
+        .expect(200)
+        .end(done)
+    });
+
     // it('should cancel the meal starting reminder and should not start a new one because start time less than 10 minutes', function(done){
     //   agent
     //     .get('/job?data.mealId=' + mealId)
@@ -985,7 +1096,7 @@ describe('MealController', function() {
           provideTillTime: new Date(now.getTime() + 1000 * 2 * 3600),
           leftQty: leftQty,
           totalQty: totalQty,
-          county : 'San Francisco County',
+          county : 'San Mateo County',
           title : "私房面馆",
           type : "order",
           dishes : dishes,
@@ -1002,6 +1113,7 @@ describe('MealController', function() {
           if(res.body.chef != hostId){
             return done(Error("error creating meal"));
           }
+          res.body.county.should.be.equal('San Francisco County');
           done();
         })
     })

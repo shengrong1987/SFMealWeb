@@ -22,7 +22,7 @@
     var lat1 = loc1.lat;
     var long1 = loc1.long;
     var lat2 = loc2.lat;
-    var long2 = loc2.lng;
+    var long2 = loc2.long;
     var radlat1 = Math.PI * lat1/180
     var radlat2 = Math.PI * lat2/180
     var theta = long1-long2

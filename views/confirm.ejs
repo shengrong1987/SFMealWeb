@@ -26,7 +26,7 @@
     </div>
   </div>
 
-  <div id="meal-confirm-container" class="container-fluid padding-clear" data-lat="<%= meal.chef.lat%>" data-long="<%= meal.chef.long%>" data-range="<%= meal.chef.deliveryRange%>">
+  <div id="meal-confirm-container" class="container-fluid padding-clear" data-center="<%= meal.delivery_center%>" data-range="<%= meal.delivery_range %>">
 
     <div class="row">
       <div class="col-md-8">
@@ -170,7 +170,7 @@
                 </div>
               </div>
             </div>
-            <div id="contact-error" style="margin-top: 40px;" class="alert alert-danger"></div>
+            <div id="contact-error" style="margin-top: 40px;" class="alert alert-danger hide"></div>
           </div>
 
           <h1 class="text-red text-left">Step3:<strong><%= __('payment-method') %></strong></h1>

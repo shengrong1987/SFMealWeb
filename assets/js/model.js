@@ -250,7 +250,7 @@ var UserBarView = Backbone.View.extend({
     }
     createCookie("county",$(e.currentTarget).attr("value"),30);
     if(location.href.indexOf('search') != -1){
-      search($(".search-container .searchBtn")[0]);
+      search($(".search-container .searchBtn")[0], true);
     }else{
       location.reload();
     }
@@ -775,44 +775,49 @@ var AddressView = Backbone.View.extend({
   initialize : function() {
     var userId = this.$el.data("id");
     this.model.set({id: userId});
-    var range = this.$el.data("range");
-    var hostLoc = {lat: this.$el.data("lat"), long: this.$el.data("long")};
-    var contactView = this.$el.find(".contact");
-    var distance = utility.getDistance({lat: contactView.data("user-lat"), long: contactView.data("user-long")}, hostLoc);
-    if (distance > range) {
-      this.$el.find("#contact-error").html(jQuery.i18n.prop('addressOutOfRangeError'));
-      this.$el.find("#contact-error").show();
-      contactView.data("has-error", true);
-    }
   },
   onKeyDown : function(e){
     if(e.which == 13) e.preventDefault();
   },
   switchDelivery : function(e){
     var curMethod = $(e.target).attr("value");
+    if(curMethod == "pickup"){
+      var contactView = this.$el.find("#contact-error");
+      contactView.hide();
+    }
     refreshMenu();
   },
   switchAddress : function(e){
     this.$el.find("#contact-error").hide();
-    var hostLoc = {lat : this.$el.data("lat"), long: this.$el.data("long")};
+    var deliveryCenter = this.$el.data("center");
     var range = this.$el.data("range");
     var address = $(e.target).next().next().text();
     var $this = this;
     var contactView = this.$el.find(".contact");
-    utility.distance(address, hostLoc, function(err, distance){
-      if(err){
-        $this.$el.find("#contact-error").html(err);
-        $this.$el.find("#contact-error").show();
-        return;
+
+    geocoder = new google.maps.Geocoder();
+    geocoder.geocode({address : deliveryCenter}, function(results, status){
+      if (status == google.maps.GeocoderStatus.OK) {
+        var hostLoc = {lat : results[0].geometry.location.lat(), long: results[0].geometry.location.lng()};
+        utility.distance(address, hostLoc, function(err, distance){
+          if(err){
+            $this.$el.find("#contact-error").html(err);
+            $this.$el.find("#contact-error").show();
+            return;
+          }
+          if(distance > range){
+            $this.$el.find("#contact-error").html(jQuery.i18n.prop('addressOutOfRangeError'));
+            $this.$el.find("#contact-error").show();
+            contactView.data("has-error", true);
+          }else{
+            contactView.data("has-error", false);
+          }
+        });
+      } else {
+        alert("Geocode was not successful for the following reason: " + status);
       }
-      if(distance > range){
-        $this.$el.find("#contact-error").html(jQuery.i18n.prop('addressOutOfRangeError'));
-        $this.$el.find("#contact-error").show();
-        contactView.data("has-error", true);
-      }else{
-        contactView.data("has-error", false);
-      }
-    });
+    })
+
   },
   updateAddress : function(e){
     e.data = {mt :this};
@@ -1123,59 +1128,52 @@ var MealSelectionView = Backbone.View.extend({
     var target = $(e.currentTarget);
     this.$el.find("#addressAlertView").removeClass('hide');
     this.$el.find("#addressAlertView").hide();
-    var deliveryCenterAddress = this.$el.data("center");
     var originAddress = target.data("location");
-    $.ajax({
-      url : "https://maps.googleapis.com/maps/api/geocode/json?address=" + deliveryCenterAddress + "&key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA"
-    }).done(function(data) {
-      if (data.results.length > 0) {
-        var origin = data.results[0].geometry.location;
-        var uLat = $this.$el.data("user-lat");
-        var uLong = $this.$el.data("user-long");
-        if(!uLat || uLat == 'undefined' || !uLong || uLong == 'undefined'){
+    var uLat = $this.$el.data("user-lat");
+    var uLong = $this.$el.data("user-long");
+    if(!uLat || uLat == 'undefined' || !uLong || uLong == 'undefined'){
+      return;
+    }
+    var method = target.data("method");
+    var range = $this.$el.data("range");
+    var readyIn = $this.$el.data("meal-prepareTime");
+    var destination = {lat : uLat, lng: uLong};
+    $this.googlemapService.route({
+      origin : destination,
+      destination : originAddress,
+      travelMode: google.maps.TravelMode.DRIVING,
+      drivingOptions: {
+        departureTime: new Date(Date.now() + readyIn * 60 * 1000),  // for the time N milliseconds from now.
+        trafficModel: "optimistic"
+      }
+    }, function(response, status){
+      if (status == google.maps.DirectionsStatus.OK) {
+        $this.googlemapDisplay.setDirections(response);
+        var travelTime = response.routes[0].legs[0].duration.text;
+        var distance = response.routes[0].legs[0].distance.value * 0.0006;
+        $(e.currentTarget).find("+ label").text(travelTime + " " + response.routes[0].legs[0].distance.text);
+        if(method && method == 'pickup'){
           return;
         }
-        var method = target.data("method");
-        var range = $this.$el.data("range");
-        var readyIn = $this.$el.data("meal-prepareTime");
-        var destination = {lat : uLat, lng: uLong};
-        $this.googlemapService.route({
-          origin : origin,
-          destination : destination,
-          travelMode: google.maps.TravelMode.DRIVING,
-          drivingOptions: {
-            departureTime: new Date(Date.now() + readyIn * 60 * 1000),  // for the time N milliseconds from now.
-            trafficModel: "optimistic"
-          }
-        }, function(response, status){
-          if (status == google.maps.DirectionsStatus.OK) {
-            $this.googlemapDisplay.setDirections(response);
-            var travelTime = response.routes[0].legs[0].duration.text;
-            var distance = response.routes[0].legs[0].distance.value;
-            $(e.currentTarget).find("+ label").text(travelTime + " " + response.routes[0].legs[0].distance.text);
-            if(method && method == 'pickup'){
-              return;
-            }
-            utility.distance(deliveryCenterAddress, destination, function(err, distance){
-              if(err){
-                $this.$el.find("#addressAlertView").show();
-                $this.$el.find("#addressAlertView").html(err);
-                return;
-              }
-              if(distance > range){
-                $this.$el.find("#addressAlertView").show();
-                $this.$el.find("#addressAlertView").html(jQuery.i18n.prop('deliveryOutOfRangeError'));
-              }
-            });
-          } else {
-            window.alert('Directions request failed due to ' + status);
-          }
-        })
-      }else{
-        $this.$el.find("#addressAlertView").show();
-        $this.$el.find("#addressAlertView").html(jQuery.i18n.prop('locationFailToGeocode'));
+        if(distance > range){
+          $this.$el.find("#addressAlertView").show();
+          $this.$el.find("#addressAlertView").html(jQuery.i18n.prop('deliveryOutOfRangeError'));
+        }
+        // utility.distance(deliveryCenterAddress, destination, function(err, distance){
+        //   if(err){
+        //     $this.$el.find("#addressAlertView").show();
+        //     $this.$el.find("#addressAlertView").html(err);
+        //     return;
+        //   }
+        //   if(distance > range){
+        //     $this.$el.find("#addressAlertView").show();
+        //     $this.$el.find("#addressAlertView").html(jQuery.i18n.prop('deliveryOutOfRangeError'));
+        //   }
+        // });
+      } else {
+        window.alert('Directions request failed due to ' + status);
       }
-    });
+    })
   },
   applyCouponCode : function(e){
     e.preventDefault();
@@ -1261,19 +1259,27 @@ var MealView = Backbone.View.extend({
   changeMethod : function(e){
     var select = $(e.target);
     var method = select.val();
-    var locationInput = select.closest('.method').parent().find('.location input');
-    var publicLocation = select.closest('.method').parent().find('.public-location input');
-    if(method == 'delivery'){
-      locationInput.prop('disabled',true);
-      publicLocation.prop('disabled',true);
-      locationInput.val('N/A');
-      publicLocation.val('N/A');
+    if(method == "pickup"){
+      this.$el.find(".pickup-item").show();
+      this.$el.find(".delivery-item").hide();
     }else{
-      locationInput.removeAttr('disabled');
-      publicLocation.removeAttr('disabled');
-      publicLocation.val('');
-      locationInput.val('');
+      this.$el.find(".pickup-item").hide();
+      this.$el.find(".delivery-item").show();
     }
+    // var locationInput = select.closest('.method').parent().find('.location input');
+    // var publicLocation = select.closest('.method').parent().find('.public-location input');
+    //
+    // if(method == 'delivery'){
+    //   locationInput.prop('disabled',true);
+    //   publicLocation.prop('disabled',true);
+    //   locationInput.val('N/A');
+    //   publicLocation.val('N/A');
+    // }else{
+    //   locationInput.removeAttr('disabled');
+    //   publicLocation.removeAttr('disabled');
+    //   publicLocation.val('');
+    //   locationInput.val('');
+    // }
   },
   toggleShipping : function(e){
     var checkbox = $(e.target);
@@ -1305,17 +1311,14 @@ var MealView = Backbone.View.extend({
     var deliveryFeeInput = this.$el.find("#deliveryFeeInput");
     var deliveryRangeInput = this.$el.find("#deliveryRangeInput");
     var deliveryBySysCheckbox = this.$el.find("#isDeliveryBySystem");
-    var deliveryCenterInput = this.$el.find("#deliveryCenterInput");
     if(checkbox.prop("checked")){
       deliveryBySysCheckbox.prop("disabled", false);
       deliveryFeeInput.prop('disabled', false);
       deliveryRangeInput.prop('disabled', false);
-      deliveryCenterInput.prop('disabled',false);
     }else{
       deliveryBySysCheckbox.prop("disabled", true);
       deliveryFeeInput.prop('disabled', true);
       deliveryRangeInput.prop('disabled', true);
-      deliveryCenterInput.prop('disabled',true);
     }
   },
   addNewPickup : function(e){
@@ -1325,9 +1328,10 @@ var MealView = Backbone.View.extend({
       '<div class="col-sm-4"> <label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> ' +
       '<div class="col-sm-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="from"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div>' +
       '<div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="end"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div>' +
-      '<div class="form-group location"> <label data-toggle="i18n" data-key="pickupAddress"></label> <input type="text" class="form-control"> </div>' +
-      '<div class="form-group public-location"> <label data-toggle="i18n" data-key="publicLocation"></label> <input type="text" class="form-control"> </div>' +
-      '<div class="form-group instruction"><label data-toggle="i18n" data-key="pickupInstruction"></label> <input type="text" class="form-control"> </div>' +
+      '<div class="form-group location pickup-item"> <label data-toggle="i18n" data-key="pickupAddress"></label> <input type="text" class="form-control"> </div>' +
+      '<div class="form-group delivery-center delivery-item" style="display: none;"> <label data-toggle="i18n" data-key="deliveryCenter"></label> <input onfocus="geolocate()" type="text" class="form-control"></div>' +
+      '<div class="form-group public-location pickup-item"> <label data-toggle="i18n" data-key="publicLocation"></label> <input type="text" class="form-control"> </div>' +
+      '<div class="form-group instruction pickup-item"><label data-toggle="i18n" data-key="pickupInstruction"></label> <input type="text" class="form-control"> </div>' +
       '<div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div>' +
       '<div class="form-group phone"> <label data-toggle="i18n" data-key="telephone"></label> <input type="tel" class="form-control"> </div> </div> </div>';
     this.$el.find(".pickup_container").append(pickupView);
@@ -1421,10 +1425,9 @@ var MealView = Backbone.View.extend({
     if(isDelivery){
       var deliveryFee = form.find("#deliveryFeeInput").val();
       var deliveryRange = form.find("#deliveryRangeInput").val();
-      var deliveryCenterInput = form.find("#deliveryCenterInput").val();
       var areaInput = form.find("#areaInput").val();
       var isDeliveryBySystem = this.$el.find("#isDeliveryBySystem").prop("checked");
-      if(!deliveryFee || !deliveryRange || !deliveryCenterInput){
+      if(!deliveryFee || !deliveryRange){
         this.formAlert.show();
         this.formAlert.html(jQuery.i18n.prop("deliveryOptionError"));
         return;
@@ -1467,6 +1470,9 @@ var MealView = Backbone.View.extend({
         var location = $(this).find(".location input").val();
         var publicLocation = $(this).find(".public-location input").val();
         var pickupInstruction = $(this).find(".instruction input").val();
+        var deliveryCenter = $(this).find(".delivery-center input").val();
+        var area = $(this).find(".area input").val();
+        var county = $(this).find(".area").data("county");
         if(!publicLocation){
           publicLocation = location;
         }
@@ -1495,6 +1501,9 @@ var MealView = Backbone.View.extend({
         pickupObj.phone = phone;
         pickupObj.publicLocation = publicLocation;
         pickupObj.instruction = pickupInstruction;
+        pickupObj.deliveryCenter = deliveryCenter;
+        pickupObj.area = area;
+        pickupObj.county = county;
         pickups.push(pickupObj);
       });
 
@@ -1581,8 +1590,6 @@ var MealView = Backbone.View.extend({
       isDeliveryBySystem : isDeliveryBySystem,
       delivery_fee : deliveryFee,
       delivery_range : deliveryRange,
-      delivery_center : deliveryCenterInput,
-      area : areaInput,
       isShipping : isShipping,
       shippingPolicy : shippingPolicy
     });
