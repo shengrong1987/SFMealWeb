@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">14.75% </span>
+        <span class="strong">16.07% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>9/61</span>
+        <span class='fraction'>9/56</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">11.11% </span>
+        <span class="strong">6.25% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>2/18</span>
+        <span class='fraction'>1/16</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">10% </span>
+        <span class="strong">22.22% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>1/10</span>
+        <span class='fraction'>2/9</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">14.75% </span>
+        <span class="strong">16.07% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>9/61</span>
+        <span class='fraction'>9/56</span>
       </div>
     </div>
   </div>
@@ -143,15 +143,7 @@
 98
 99
 100
-101
-102
-103
-104
-105
-106
-107
-108
-109</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+101</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2×</span>
@@ -227,34 +219,26 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-yes">44×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">18×</span>
-<span class="cline-any cline-yes">18×</span>
-<span class="cline-any cline-yes">18×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">18×</span>
-<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">36×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">18×</span>
-<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">44×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -334,34 +318,26 @@ module.exports = {
 <span class="cstat-no" title="statement not covered" >    var mDate = moment(date).subtract(1, 'day');</span>
 <span class="cstat-no" title="statement not covered" >    return mDate._d;</span>
   },
-  minutesBefore : <span class="fstat-no" title="function not covered" >function(date, minutes){</span>
-<span class="cstat-no" title="statement not covered" >    var mDate = moment(date).subtract(minutes, 'minute');</span>
-<span class="cstat-no" title="statement not covered" >    return mDate._d;</span>
+  minutesBefore : function(date, minutes){
+    var mDate = moment(date).subtract(minutes, 'minute');
+    return mDate._d;
   },
-  calculateTax : <span class="fstat-no" title="function not covered" >function(subtotal, county){</span>
-<span class="cstat-no" title="statement not covered" >    var tax = 0.08;</span>
-<span class="cstat-no" title="statement not covered" >    switch(county){</span>
-      case "San Francisco County":
-<span class="cstat-no" title="statement not covered" >        tax = 0.0875;</span>
-<span class="cstat-no" title="statement not covered" >        break;</span>
-      case "Sacramento County":
-<span class="cstat-no" title="statement not covered" >        tax = 0.08;</span>
-<span class="cstat-no" title="statement not covered" >        break;</span>
-    }
-<span class="cstat-no" title="statement not covered" >    return (subtotal * (1 + tax)).toFixed(2);</span>
-  },
-  getTaxRate : function(params){
-    var county = (params.host || <span class="branch-1 cbranch-no" title="branch not covered" >params.chef)</span>.county;
+  getTaxRate : function(county){
     var tax = 0.08;
     switch(county){
       case "San Francisco County":
-        tax = 0.0875;
+        tax = 0.085;
         break;
 <span class="branch-1 cbranch-no" title="branch not covered" >      case "Sacramento County":</span>
-<span class="cstat-no" title="statement not covered" >        tax = 0.08;</span>
+<span class="cstat-no" title="statement not covered" >        tax = 0.0825;</span>
+<span class="cstat-no" title="statement not covered" >        break;</span>
+<span class="branch-2 cbranch-no" title="branch not covered" >      case "San Mateo County":</span>
+<span class="cstat-no" title="statement not covered" >        tax = 0.0875;</span>
+<span class="cstat-no" title="statement not covered" >        break;</span>
+<span class="branch-3 cbranch-no" title="branch not covered" >      case "San Jose County":</span>
+<span class="cstat-no" title="statement not covered" >        tax = 0.0925;</span>
 <span class="cstat-no" title="statement not covered" >        break;</span>
     }
-    params.taxRate = tax;
     return tax;
   }
 };
@@ -373,7 +349,7 @@ module.exports = {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Nov 01 2016 15:26:24 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sat Apr 08 2017 01:41:35 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

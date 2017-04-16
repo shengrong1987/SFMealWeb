@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">8.6% </span>
+        <span class="strong">8.25% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>8/93</span>
+        <span class='fraction'>8/97</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/26</span>
+        <span class='fraction'>0/30</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">5.56% </span>
+        <span class="strong">5.26% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>1/18</span>
+        <span class='fraction'>1/19</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">8.6% </span>
+        <span class="strong">8.25% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>8/93</span>
+        <span class='fraction'>8/97</span>
       </div>
     </div>
   </div>
@@ -201,7 +201,14 @@
 156
 157
 158
-159</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+159
+160
+161
+162
+163
+164
+165
+166</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
@@ -245,6 +252,10 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -258,9 +269,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -285,6 +293,12 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -308,13 +322,13 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -393,14 +407,18 @@ module.exports = function(agenda) {
     // execute job
     run: <span class="fstat-no" title="function not covered" >function (job, done) {</span>
 <span class="cstat-no" title="statement not covered" >      sails.log.info("Sending host income summary");</span>
-<span class="cstat-no" title="statement not covered" >      Host.find({passGuide: true}).populate("orders").populate('meals').exec(<span class="fstat-no" title="function not covered" >function (err, hosts) {</span></span>
+<span class="cstat-no" title="statement not covered" >      Host.find({ passGuide: true }).populate("orders").populate('meals').exec(<span class="fstat-no" title="function not covered" >function (err, hosts) {</span></span>
 <span class="cstat-no" title="statement not covered" >        if (err) {</span>
 <span class="cstat-no" title="statement not covered" >          sails.log.error(err);</span>
 <span class="cstat-no" title="statement not covered" >          return done();</span>
         }
+<span class="cstat-no" title="statement not covered" >        var todayDate = new Date().getDate();</span>
+<span class="cstat-no" title="statement not covered" >        var fromDate = new Date().setDate(todayDate - 8);</span>
+<span class="cstat-no" title="statement not covered" >        var toDate = new Date().setDate(todayDate - 2);</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >        hosts = hosts.filter(<span class="fstat-no" title="function not covered" >function (host) {</span></span>
 <span class="cstat-no" title="statement not covered" >          host.orders = host.orders.filter(<span class="fstat-no" title="function not covered" >function (order) {</span></span>
-<span class="cstat-no" title="statement not covered" >            return !order.isPaid &amp;&amp; (order.status == "review" || order.status == "complete");</span>
+<span class="cstat-no" title="statement not covered" >            return !order.isPaid &amp;&amp; (order.status == "review" || order.status == "complete") &amp;&amp; order.createdAt.getTime() &gt; fromDate &amp;&amp; order.createdAt &lt; toDate;</span>
           })
 <span class="cstat-no" title="statement not covered" >          return host.orders.length != 0;</span>
         });
@@ -409,15 +427,12 @@ module.exports = function(agenda) {
 <span class="cstat-no" title="statement not covered" >          return done();</span>
         }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        var todayDate = new Date().getDate();</span>
-<span class="cstat-no" title="statement not covered" >        var fromDate = new Date().setDate(todayDate - 8);</span>
-<span class="cstat-no" title="statement not covered" >        var toDate = new Date().setDate(todayDate - 2);</span>
 <span class="cstat-no" title="statement not covered" >        var showDates = [];</span>
 <span class="cstat-no" title="statement not covered" >        for(var i=0 ; i &lt; 7; i++){</span>
-<span class="cstat-no" title="statement not covered" >          var newDate = new Date();</span>
-<span class="cstat-no" title="statement not covered" >          newDate.setDate(new Date(fromDate).getDate() + i);</span>
-<span class="cstat-no" title="statement not covered" >          var month = moment.months()[newDate.getMonth()];</span>
-<span class="cstat-no" title="statement not covered" >          var day = newDate.getDate();</span>
+<span class="cstat-no" title="statement not covered" >          var mFromDate = moment(fromDate);</span>
+<span class="cstat-no" title="statement not covered" >          mFromDate.add(i, 'days');</span>
+<span class="cstat-no" title="statement not covered" >          var month = moment.months()[mFromDate.month()];</span>
+<span class="cstat-no" title="statement not covered" >          var day = mFromDate.date();</span>
 <span class="cstat-no" title="statement not covered" >          var dateObj = {</span>
             date : month + " " + day,
             income : 0,
@@ -439,6 +454,7 @@ module.exports = function(agenda) {
 <span class="cstat-no" title="statement not covered" >            var orderTotalPayment = 0;</span>
 <span class="cstat-no" title="statement not covered" >            async.each(host.orders, <span class="fstat-no" title="function not covered" >function (order, next2) {</span></span>
 <span class="cstat-no" title="statement not covered" >              var charges = order.charges;</span>
+<span class="cstat-no" title="statement not covered" >              var transfer = order.transfer;</span>
 <span class="cstat-no" title="statement not covered" >              async.each(Object.keys(charges), <span class="fstat-no" title="function not covered" >function (chargeId, next3) {</span></span>
 <span class="cstat-no" title="statement not covered" >                stripe.retrieveCharge(chargeId, <span class="fstat-no" title="function not covered" >function (err, charge) {</span></span>
 <span class="cstat-no" title="statement not covered" >                  if (err) {</span>
@@ -449,30 +465,35 @@ module.exports = function(agenda) {
 <span class="cstat-no" title="statement not covered" >                    if (err) {</span>
 <span class="cstat-no" title="statement not covered" >                      return next3(err);</span>
                     }
-<span class="cstat-no" title="statement not covered" >                    var date = moment(charge.created * 1000);</span>
 <span class="cstat-no" title="statement not covered" >                    charge.income = (charge.amount - charge.amount_refunded);</span>
-<span class="cstat-no" title="statement not covered" >                    charge.application_fee = charge.income * 0.10;</span>
-<span class="cstat-no" title="statement not covered" >                    charge.month = moment.months()[date.month()];</span>
-<span class="cstat-no" title="statement not covered" >                    charge.day = date.date();</span>
-<span class="cstat-no" title="statement not covered" >                    charge.type = "payment";</span>
-<span class="cstat-no" title="statement not covered" >                    charge.host = host;</span>
-<span class="cstat-no" title="statement not covered" >                    var paidInPeriod = false;</span>
-<span class="cstat-no" title="statement not covered" >                    for(var i=0; i &lt; 7; i++){</span>
-<span class="cstat-no" title="statement not covered" >                      var dateObj = showDates[i];</span>
-<span class="cstat-no" title="statement not covered" >                      var date = dateObj.date;</span>
-<span class="cstat-no" title="statement not covered" >                      var dateInfos = date.split(" ");</span>
-<span class="cstat-no" title="statement not covered" >                      if(dateInfos.length &gt; 1 &amp;&amp; dateInfos[0] == charge.month &amp;&amp; dateInfos[1] == charge.day){</span>
-<span class="cstat-no" title="statement not covered" >                        orderTotalPayment += charge.income - charge.application_fee;</span>
-<span class="cstat-no" title="statement not covered" >                        dateObj.income += charge.income;</span>
-<span class="cstat-no" title="statement not covered" >                        dateObj.fee += charge.application_fee;</span>
-<span class="cstat-no" title="statement not covered" >                        dateObj.number++;</span>
-<span class="cstat-no" title="statement not covered" >                        paidInPeriod = true;</span>
+<span class="cstat-no" title="statement not covered" >                    stripe.retrieveApplicationFee(charge.application_fee, <span class="fstat-no" title="function not covered" >function(err, fee){</span></span>
+<span class="cstat-no" title="statement not covered" >                      if(err){</span>
+<span class="cstat-no" title="statement not covered" >                        return next(err);</span>
                       }
-                    }
-<span class="cstat-no" title="statement not covered" >                    if(!paidInPeriod){</span>
-<span class="cstat-no" title="statement not covered" >                      transactions.push(charge);</span>
-                    }
-<span class="cstat-no" title="statement not covered" >                    next3();</span>
+<span class="cstat-no" title="statement not covered" >                      var date = moment(charge.created * 1000);</span>
+<span class="cstat-no" title="statement not covered" >                      charge.application_fee = fee.amount - fee.amount_refunded;</span>
+<span class="cstat-no" title="statement not covered" >                      charge.month = moment.months()[date.month()];</span>
+<span class="cstat-no" title="statement not covered" >                      charge.day = date.date();</span>
+<span class="cstat-no" title="statement not covered" >                      charge.type = "payment";</span>
+<span class="cstat-no" title="statement not covered" >                      charge.host = host;</span>
+<span class="cstat-no" title="statement not covered" >                      var paidInPeriod = false;</span>
+<span class="cstat-no" title="statement not covered" >                      for(var i=0; i &lt; 7; i++){</span>
+<span class="cstat-no" title="statement not covered" >                        var dateObj = showDates[i];</span>
+<span class="cstat-no" title="statement not covered" >                        var date = dateObj.date;</span>
+<span class="cstat-no" title="statement not covered" >                        var dateInfos = date.split(" ");</span>
+<span class="cstat-no" title="statement not covered" >                        if(dateInfos.length &gt; 1 &amp;&amp; dateInfos[0] == charge.month &amp;&amp; dateInfos[1] == charge.day){</span>
+<span class="cstat-no" title="statement not covered" >                          orderTotalPayment += charge.income - charge.application_fee;</span>
+<span class="cstat-no" title="statement not covered" >                          dateObj.income += charge.income;</span>
+<span class="cstat-no" title="statement not covered" >                          dateObj.fee += charge.application_fee;</span>
+<span class="cstat-no" title="statement not covered" >                          dateObj.number++;</span>
+<span class="cstat-no" title="statement not covered" >                          paidInPeriod = true;</span>
+                        }
+                      }
+<span class="cstat-no" title="statement not covered" >                      if(paidInPeriod){</span>
+<span class="cstat-no" title="statement not covered" >                        transactions.push(charge);</span>
+                      }
+<span class="cstat-no" title="statement not covered" >                      next3();</span>
+                    });
                   })
                 });
               }, <span class="fstat-no" title="function not covered" >function (err) {</span>
@@ -523,7 +544,7 @@ module.exports = function(agenda) {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Nov 01 2016 15:26:24 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sat Apr 08 2017 01:41:35 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

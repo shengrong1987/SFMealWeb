@@ -215,7 +215,7 @@ module.exports = {
             console.log("pickup time too short");
             valid = false;
             return;
-          }else if(pickupFromTime <= provideTillTime){
+          }else if(pickupFromTime <= provideTillTime && params.type == "preorder"){
             console.log("pickup time too early");
             valid = false;
             return;
@@ -249,15 +249,27 @@ module.exports = {
           if(err){
             return next(err);
           }
-          if(values.type == "order"){
-            values.pickups = JSON.stringify([{
-              "pickupFromTime" : values.provideFromTime,
-              "pickupTillTime" : values.provideTillTime,
-              "location" : host.full_address,
-              "phone" : host.user.phone,
-              "method" : "pickup"
-            }])
+          values.county = host.county;
+          var pickupOption = {
+            "pickupFromTime": values.pickupFromTime,
+            "pickupTillTime": values.pickupTillTime,
+            "location": host.full_address,
+            "phone": host.user.phone,
+            "method": "pickup"
+          };
+          var deliveryOption = {
+            "pickupFromTime": values.provideFromTime,
+            "pickupTillTime": values.provideTillTime,
+            "deliveryCenter": host.full_address,
+            "phone": host.user.phone,
+            "method": "delivery"
           }
+          if(values.isDelivery){
+            values.pickups = [pickupOption, deliveryOption];
+          }else{
+            values.pickups = [pickupOption];
+          }
+          sails.log.info("pickups: " + JSON.stringify(values.pickups));
           next();
         });
       },
@@ -305,17 +317,27 @@ module.exports = {
           if(err){
             return next(err);
           }
-          if(values.type == "order"){
-            values.pickups = JSON.stringify([{
-              "pickupFromTime" : values.provideFromTime,
-              "pickupTillTime" : values.provideTillTime,
-              "location" : host.full_address,
-              "phone" : host.user.phone,
-              "method" : "pickup",
-              "county" : host.county
-            }])
-            values.county = host.county;
+          values.county = host.county;
+          var pickupOption = {
+            "pickupFromTime": values.provideFromTime,
+            "pickupTillTime": values.provideTillTime,
+            "location": host.full_address,
+            "phone": host.user.phone,
+            "method": "pickup"
+          };
+          var deliveryOption = {
+            "pickupFromTime": values.provideFromTime,
+            "pickupTillTime": values.provideTillTime,
+            "deliveryCenter": host.full_address,
+            "phone": host.user.phone,
+            "method": "delivery"
           }
+          if(values.isDelivery){
+            values.pickups = [pickupOption, deliveryOption];
+          }else{
+            values.pickups = [pickupOption];
+          }
+          sails.log.info("pickups: " + JSON.stringify(values.pickups));
           next();
         });
       },

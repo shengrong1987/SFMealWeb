@@ -5,7 +5,7 @@ var stripe = require('stripe')(sails.config.StripeKeys.secretKey);
 var async = require('async');
 
 const SERVICE_FEE = 100;
-const SYSTEM_DELIVERY_FEE = 500;
+const SYSTEM_DELIVERY_FEE = 399;
 
 module.exports = {
 
@@ -118,15 +118,33 @@ module.exports = {
   },
 
   charge : function(attr, cb){
+
     var meal = attr.meal;
-    var delivery_application_fee = 0;
+
+    //declare all fees
+    var delivery_application_fee = (attr.method && attr.method == "delivery" && meal.isDeliveryBySystem) ? SYSTEM_DELIVERY_FEE : 0;
     var delivery_fee = attr.deliveryFee || 0;
-    if(attr.method && attr.method == "delivery" && meal.isDeliveryBySystem){delivery_application_fee = SYSTEM_DELIVERY_FEE;}
-    var discount = attr.discount * 100;
+    var discount = attr.discount;
+    var tax = attr.tax;
+
+    sails.log.info("delivery application fee is: " + delivery_application_fee);
+    sails.log.info("delivery fee is: " + delivery_fee);
+    sails.log.info("discount is: " + discount);
+    sails.log.info("subtotal is: " + attr.amount);
+    sails.log.info("tax is: " + tax);
+
+    //calculate application fee
     var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + SERVICE_FEE;
-    sails.log.info("application fee: " + application_fee);
-    sails.log.info("order total:" + attr.amount + " discount: " + discount + " delivery fee: " + delivery_fee + " service fee " + SERVICE_FEE);
-    var total =  attr.amount - discount + delivery_fee + SERVICE_FEE;
+
+    //calculate subtotal after tax
+    var subtotalAfterTax = attr.amount + tax;
+
+    //calculate other fee
+    var originalTotal = subtotalAfterTax + delivery_fee + SERVICE_FEE;
+
+    //apply discount
+    var total = originalTotal - discount;
+
     var $this = this;
     stripe.charges.create({
       amount: total,
@@ -146,7 +164,7 @@ module.exports = {
             return cb(err);
           }
           var leftFee = application_fee - fee.amount;
-          sails.log.info("charge left application fee: " + leftFee);
+          sails.log.info("charge remain application fee: " + leftFee);
           stripe.transfers.create(
             {
               amount: discount,
@@ -170,7 +188,7 @@ module.exports = {
   },
 
   refund : function(attr, cb){
-    sails.log.debug("refunding customer : " + attr.amount || "fully");
+    sails.log.debug("refunding customer : " + typeof attr.amount === 'undefined' || "fully");
     stripe.refunds.create({
       charge : attr.id,
       amount : attr.amount,

@@ -20,28 +20,28 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">15.38% </span>
+        <span class="strong">76.92% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>2/13</span>
+        <span class='fraction'>10/13</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">62.5% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/8</span>
+        <span class='fraction'>5/8</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/2</span>
+        <span class='fraction'>2/2</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">16.67% </span>
+        <span class="strong">83.33% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>2/12</span>
+        <span class='fraction'>10/12</span>
       </div>
     </div>
   </div>
-  <div class='status-line low'></div>
+  <div class='status-line medium'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -116,37 +116,37 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
@@ -167,39 +167,39 @@ var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUt
  * @param {String} callback - default jsonp callback param (i.e. the name of the js function returned)
  * @param {*} * - other params will be used as `values` in the create
  */
-module.exports = <span class="fstat-no" title="function not covered" >function createRecord (req, res) {</span>
+module.exports = function createRecord (req, res) {
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	var Model = actionUtil.parseModel(req);</span>
+	var Model = actionUtil.parseModel(req);
 &nbsp;
 	// Create data object (monolithic combination of all parameters)
 	// Omit the blacklisted params (like JSONP callback param, etc.)
-<span class="cstat-no" title="statement not covered" >	var data = actionUtil.parseValues(req);</span>
+	var data = actionUtil.parseValues(req);
   // var hostId = req.session.user.host;
   // data.chef = hostId;
 &nbsp;
 	// Create new instance of model using data from params
-<span class="cstat-no" title="statement not covered" >	Model.create(data).exec(<span class="fstat-no" title="function not covered" >function created (err, newInstance) {</span></span>
+	Model.create(data).exec(function created (err, newInstance) {
 &nbsp;
 		// Differentiate between waterline-originated validation errors
 		// and serious underlying issues. Respond with badRequest if a
 		// validation error is encountered, w/ validation info.
-<span class="cstat-no" title="statement not covered" >		if (err) <span class="cstat-no" title="statement not covered" >return res.negotiate(err);</span></span>
+		<span class="missing-if-branch" title="if path not taken" >I</span>if (err) <span class="cstat-no" title="statement not covered" >return res.negotiate(err);</span>
 &nbsp;
 		// If we have the pubsub hook, use the model class's publish method
 		// to notify all subscribers about the created item
-<span class="cstat-no" title="statement not covered" >		if (req._sails.hooks.pubsub) {</span>
-<span class="cstat-no" title="statement not covered" >			if (req.isSocket) {</span>
+		<span class="missing-if-branch" title="else path not taken" >E</span>if (req._sails.hooks.pubsub) {
+			<span class="missing-if-branch" title="if path not taken" >I</span>if (req.isSocket) {
 <span class="cstat-no" title="statement not covered" >				Model.subscribe(req, newInstance);</span>
 <span class="cstat-no" title="statement not covered" >				Model.introduce(newInstance);</span>
 			}
-<span class="cstat-no" title="statement not covered" >			Model.publishCreate(newInstance, !req.options.mirror &amp;&amp; req);</span>
+			Model.publishCreate(newInstance, !req.options.mirror &amp;&amp; req);
 		}
 &nbsp;
 &nbsp;
 &nbsp;
 &nbsp;
 		// Send JSONP-friendly response if it's supported
-<span class="cstat-no" title="statement not covered" >		res.created(newInstance);</span>
+		res.created(newInstance);
 	});
 };
 &nbsp;</pre></td></tr>
@@ -208,7 +208,7 @@ module.exports = <span class="fstat-no" title="function not covered" >function c
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Nov 01 2016 15:26:24 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sat Apr 08 2017 01:41:35 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

@@ -171,7 +171,7 @@ module.exports = require('waterlock').actions.user({
             if(deletingAdd.isDefault){
               user.address[0].isDefault = true;
             }
-            return next(null, user);
+            return next();
           }
           var actualAddress = addObj.street + " " + addObj.city;
           require('../services/geocode').geocode(actualAddress, function (err, result) {
@@ -218,6 +218,7 @@ module.exports = require('waterlock').actions.user({
             return cb(err);
           }
           delete params.address;
+          sails.log.debug(user.address[0].isDefault);
           sails.log.debug("address updated");
           cb(null, user);
         });

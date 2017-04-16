@@ -272,7 +272,7 @@
   "order-and-pay" : "下单并支付",
   "no-dish-left" : "这个菜已经被订完了，请选择其他。",
   "no-meal-left" : "这个Meal已经被订完了，请选择其他或稍后再试。",
-  "order-fee" : "打赏金",
+  "order-fee" : "订单金额",
   "name" : "名称",
   "user-name" : "姓名",
   "meal-fee" : "打赏金小计: ",
@@ -474,6 +474,7 @@
   "meal-adjust-qty-fail" : "已经有订单订购这个菜式,无法降低数量了。",
   "meal-no-shipping" : "Meal不支持快递方式",
   "meal-shipping-policy-invalid" : "Meal快递政策有误，请检查设置。",
+  "meal-delivery-on-option" : "Meal支持外卖但是没有找到任何外卖选项",
   "host-like-once-error" : "你已经给这个厨师点过赞了",
   "host-like-himself-error" : "不可以自己给自己点赞／关注",
   "host-bank-ok" : "您的银行账号已成功输入",
@@ -488,7 +489,10 @@
   "order-lack-contact" : "订单却少用户联系方式",
   "order-adjust-cancel-at-schedule-by-host" : "Host不能在预定过程中调整或取消订单,请按照订单准备",
   "order-unknown-error" : "订单未知错误,请刷新页面.",
+  "order-pickup-method-empty-error" : "订单领取方式为空",
+  "order-pickup-method-not-match-error" : "订单领取方式不匹配",
   "order-pickup-option-error" : "订单领取地点有误",
+  "order-pickup-option-invalid-error" : "订单领取方式不存在",
   "order-ok" : "您的订单已成功下单,您将会被赚到订单管理页面.请等待您的美食烹饪.",
   "order-adjust-ok" : "订单调整完成,已从用户账户中扣除$%f",
   "order-adjust-ok2" : "订单调整完成,已返回$%f到用户账户中",
@@ -689,7 +693,6 @@
   "offer-free-shipping-amount" : "是否提供免运费",
   "free-amount" : "订单免运费金额",
   "service-fee" : "订单手续费",
-  "application-fee" : "订单费用",
   "tip-service-fee" : "手续费用于支付交易手续费以及保险费用",
   "ready" : "待取餐／送餐中",
   "coupon" : "折扣码",
@@ -704,5 +707,6 @@
   "yourfollowedchef" : "您的厨师",
   "menuoftheweek" : "本周菜单",
   "hometaste1" : "每个人都有属于自己的家的味道，你的味道属于这里吗？",
-  "area-not-open" : "这个地区尚未开放服务"
+  "area-not-open" : "这个地区尚未开放服务",
+  "compensation-amount" : "收入补贴"
 }

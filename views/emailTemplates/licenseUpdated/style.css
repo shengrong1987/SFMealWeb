@@ -8783,21 +8783,21 @@ fieldset[disabled] .btn-red.active {
   pointer-events: none;
 }
 /*nav*/
-.nav-email {
+.navbar .navbar-nav.footer-nav li {
+  float: left;
+}
+.navbar .navbar-nav.footer-nav li a {
+  display: inline !important;
+}
+.nav-email .navbar-nav.footer-nav {
   margin-bottom: 20px;
   min-height: 20px;
 }
-.navbar-nav.footer-nav li {
-  float: left;
-}
-.navbar-nav.footer-nav li a {
-  display: inline !important;
-}
-.nav-email li {
+.nav-email .navbar-nav.footer-nav li {
   display: inline-block;
   width: 50px;
 }
-.nav-email li a {
+.nav-email .navbar-nav.footer-nav li a {
   display: inline !important;
 }
 /* compo*/

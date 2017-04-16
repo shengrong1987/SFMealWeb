@@ -4,9 +4,8 @@
 
 //utility
 
-var autocomplete;
 var googleAPILoaded;
-function geolocate() {
+function geolocate(autocomplete) {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
       var geolocation = {
@@ -31,50 +30,51 @@ function initAutoComplete(){
     "postal_code" : ["#postalInput"],
     "administrative_area_level_2" : []
   };
-  $.getJSON("/files/zipcode.json", function(zipCodeToArea){
+  $.getJSON("/files/zipcode.json", function(zipCodeToArea) {
     var options = {
-      componentRestrictions : { country : 'us'},
-      type : ['geocode']
+      componentRestrictions: {country: 'us'},
+      type: ['address']
     }
 
     var autocomplete;
-    var autoCompleteEle = ["#streetInput",".location input",".delivery-center input"];
+    var autoCompleteEle = ["#streetInput", ".location input", ".delivery-center input"];
 
-    autoCompleteEle.forEach(function(eles){
-      if($(eles).length){
-        $(eles).toArray().forEach(function(ele){
+    autoCompleteEle.forEach(function (eles) {
+      if ($(eles).length) {
+        $(eles).toArray().forEach(function (ele) {
           autocomplete = new google.maps.places.Autocomplete(ele, options);
-          autocomplete.addListener('place_changed', function() {
+          geolocate(autocomplete);
+          autocomplete.addListener('place_changed', function () {
             var place = this.getPlace();
-            if(!place.address_components){
+            if (!place.geometry) {
+              window.alert("No details available for input: '" + place.name + "'");
               return;
             }
             for (var key in componentForm) {
               var components = componentForm[key];
-              components.forEach(function(component){
+              components.forEach(function (component) {
                 $(component).val("");
                 $(component).attr("disabled", false);
               });
             }
             // Get each component of the address from the place details
             // and fill the corresponding field on the form.
-            for(var i=0; i<place.address_components.length;i++){
+            for (var i = 0; i < place.address_components.length; i++) {
               var addressType = place.address_components[i].types[0];
-              if(componentForm[addressType]){
+              if (componentForm[addressType]) {
                 var val = place.address_components[i].long_name;
-                if(addressType=="postal_code"){
-                  Object.keys(zipCodeToArea).forEach(function(area){
+                if (addressType == "postal_code") {
+                  Object.keys(zipCodeToArea).forEach(function (area) {
                     var zipcodes = zipCodeToArea[area];
-                    if(zipcodes.indexOf(val) != -1){
+                    if (zipcodes.indexOf(val) != -1) {
                       $(ele).parent().parent().find(".area input").val(area);
                     }
                   })
+                } else if (addressType == "administrative_area_level_2") {
+                  $(ele).parent().parent().find(".area").data("county", val);
                 }
-                if(addressType == "administrative_area_level_2"){
-                  $(ele).parent().parent().find(".area").data("county",val);
-                }
-                componentForm[addressType].forEach(function(selector){
-                  if($(selector).length > 0){
+                componentForm[addressType].forEach(function (selector) {
+                  if ($(selector).length > 0) {
                     $(selector).val($(selector).val() + " " + val);
                   }
                 });
@@ -84,11 +84,6 @@ function initAutoComplete(){
         });
       }
     });
-
-    autocomplete = new google.maps.places.Autocomplete(
-      /** @type {!HTMLInputElement} */($("#streetInput")[0] || $(".location input")[0] || $(".delivery-center input")[0]),
-      options);
-
   });
 }
 
@@ -524,6 +519,21 @@ function setupDropdownMenu(){
   });
 }
 
+function setupAutoComplete(){
+  if(!googleAPILoaded){
+    jQuery.ajax({
+      url: "https://maps.googleapis.com/maps/api/js?key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA&libraries=places&callback=initAutoComplete",
+      dataType: 'script',
+      async: true,
+      defer : true,
+      success : function(){
+        googleAPILoaded = true;
+      }
+    });
+  }else{
+    initAutoComplete();
+  }
+}
 function setup(){
   setupLanguage();
   tapController();
@@ -541,22 +551,22 @@ function setup(){
   setupValidator();
   setupCountrySelector();
   setupSelector();
-  $(function(){
-    var keyStop = {
-      // 8: ":not(input:text, textarea, input:file, input:password)", // stop backspace = back
-      13: "input:text, input:password", // stop enter = submit
-
-      end: null
-    };
-    $(document).bind("keydown", function(event){
-      var selector = keyStop[event.which];
-
-      if(selector !== undefined && $(event.target).is(selector)) {
-        event.preventDefault(); //stop event
-      }
-      return true;
-    });
-  });
+  // $(function(){
+  //   var keyStop = {
+  //     // 8: ":not(input:text, textarea, input:file, input:password)", // stop backspace = back
+  //     13: "input:text, input:password", // stop enter = submit
+  //
+  //     end: null
+  //   };
+  //   $(document).bind("keydown", function(event){
+  //     var selector = keyStop[event.which];
+  //
+  //     if(selector !== undefined && $(event.target).is(selector)) {
+  //       event.preventDefault(); //stop event
+  //     }
+  //     return true;
+  //   });
+  // });
   $('.lazyload').each(function(){
     $(this).attr('src', $(this).data('src'));
   });

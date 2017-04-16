@@ -473,6 +473,7 @@
   "meal-adjust-qty-fail": "There are already orders to this dish, can’t reduce the number .",
   "meal-no-shipping" : "Meal don't support shipping.",
   "meal-shipping-policy-invalid" : "Meal has invalid shipping setup.",
+  "meal-delivery-on-option" : "Meal support delivery but no delivery option was provided.",
   "host-like-once-error" : "You can only like the same chef once",
   "host-like-himself-error" : "You can not like/follow yourself",
   "host-bank-ok": "Your bank account has been successfully created",
@@ -487,7 +488,10 @@
   "order-lack-contact": "Order less of user’s contact",
   "order-adjust-cancel-at-schedule-by-host": "Host can’t adjust or cancel the order during the booking process. ",
   "order-unknown-error": "Order unknown Error, please refresh the page.",
+  "order-pickup-method-empty-error" : "Lack of pick-up option.",
+  "order-pickup-method-not-match-error" : "Selected pick-up option doesn't match your pick-up method.",
   "order-pickup-option-error": "The order pick-up location is incorrect",
+  "order-pickup-option-invalid-error" : "The order pick-up option is not valid.",
   "order-ok": "Your order has been placed successfully and you will be transferred to the order management page. Please wait for your food to be cooked.",
   "order-adjust-ok": "Order adjustment has completed, $%f has been deducted from the user's account",
   "order-adjust-ok2": "Order adjustment has completed and returned $%f to foodie account",
@@ -704,5 +708,6 @@
   "yourfollowedchef" : "Your Chef",
   "menuoftheweek" : "menu of the week",
   "hometaste1" : "Everyone has a taste of home, is it here?",
-  "area-not-open" : "This area is currently not available"
+  "area-not-open" : "This area is currently not available",
+  "compensation-amount" : "Compensation"
 }

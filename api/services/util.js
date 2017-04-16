@@ -77,32 +77,22 @@ module.exports = {
     var mDate = moment(date).subtract(minutes, 'minute');
     return mDate._d;
   },
-  calculateTax : function(subtotal, county){
+  getTaxRate : function(county){
     var tax = 0.08;
     switch(county){
       case "San Francisco County":
-        tax = 0.0875;
+        tax = 0.085;
         break;
       case "Sacramento County":
-        tax = 0.08;
+        tax = 0.0825;
         break;
-    }
-    return (subtotal * (1 + tax)).toFixed(2);
-  },
-  getTaxRate : function(params){
-    var host = (params.host || params.chef) || params;
-    var county = host.county;
-    var tax = 0.08;
-    switch(county){
-      case "San Francisco County":
+      case "San Mateo County":
         tax = 0.0875;
         break;
-      case "Sacramento County":
-        tax = 0.08;
+      case "San Jose County":
+        tax = 0.0925;
         break;
     }
-    tax = 0;
-    params.taxRate = tax;
     return tax;
   }
 };

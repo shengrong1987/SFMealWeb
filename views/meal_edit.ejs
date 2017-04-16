@@ -199,12 +199,12 @@
 
                           <div class="form-group location pickup-item" style="display: <%= pickup.method == 'pickup' ? 'block' : 'none'%>">
                             <label><%= __('pickup-location')%></label>
-                            <input onfocus="geolocate()" type="text" class="form-control" value="<%= pickup.location || '' %>">
+                            <input type="text" class="form-control" value="<%= pickup.location || '' %>">
                           </div>
 
                           <div class="form-group delivery-center delivery-item" style="display: <%= pickup.method == 'delivery' ? 'block' : 'none'%>">
                             <label><%= __('delivery-center')%></label>
-                            <input onfocus="geolocate()" type="text" class="form-control" value="<%= pickup.deliveryCenter || '' %>">
+                            <input type="text" class="form-control" value="<%= pickup.deliveryCenter || '' %>">
                           </div>
 
                           <div class="form-group public-location pickup-item" style="display: <%= pickup.method == 'pickup' ? 'block' : 'none'%>">
@@ -467,17 +467,5 @@
 
 <script>
   var mealView = new MealView({ el : "#mealEditingView", model : new Meal()});
-  if(!googleAPILoaded){
-    jQuery.ajax({
-      url: "https://maps.googleapis.com/maps/api/js?key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA&libraries=places&callback=initAutoComplete",
-      dataType: 'script',
-      async: true,
-      defer : true,
-      success : function(){
-        googleAPILoaded = true;
-      }
-    });
-  }else{
-    initAutoComplete();
-  }
+  setupAutoComplete();
 </script>

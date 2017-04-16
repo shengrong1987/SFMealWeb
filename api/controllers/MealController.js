@@ -24,6 +24,7 @@ var moment = require("moment");
  * -12 : system delivery provided but delivery option is off
  * -13 : support delivery but no delivery time was added
  * -14 : fail to modify info on active meal
+ * -15 : meal support delivery but no delivery option was provided
  */
 
 module.exports = {
@@ -207,7 +208,7 @@ module.exports = {
               });
             }
             if(req.wantsJSON) {
-              res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, anchor : location});
+              res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, anchor : location, county : county});
             }else{
               res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, anchor : location, county : county });
             }
@@ -229,9 +230,9 @@ module.exports = {
           });
         }
         if(req.wantsJSON) {
-          res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : null, anchor : null});
+          res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : null, anchor : null, county : county});
         }else{
-          res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : null, anchor : null });
+          res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : null, anchor : null, county : county });
         }
       }
     });
@@ -294,102 +295,98 @@ module.exports = {
     var user = req.session.user;
     var isAdmin = user.auth.email === 'admin@sfmeal.com';
     var $this = this;
-    if(isAdmin){
-      Meal.findOne(mealId).populate('dishes').exec(function(err, meal){
+
+    Meal.findOne(mealId).populate('dishes').exec(function(err, meal){
+      if(err){
+        return res.badRequest(err);
+      }
+      Host.findOne(meal.chef).populate('meals').populate('dishes').exec(function(err, host){
         if(err){
           return res.badRequest(err);
         }
-        Host.findOne(meal.chef).populate('meals').populate('dishes').exec(function(err, host){
-          if(err){
-            return res.badRequest(err);
-          }
-          host.checkGuideRequirement(function(err) {
-            if(err){
-              return res.badRequest(err);
-            }
-            if(!host.passGuide){
-              return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
-            }
-            if(!meal.dateIsValid()){
-              console.log("Date format of meal is not valid");
-              return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
-            }
-            if(!meal.dishIsValid()){
-              console.log("meal contain unverified dishes");
-              return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
-            }
-            $this.cancelMealJobs( mealId, function(err){
-              if(err){
-                return res.badRequest(err);
-              }
-              meal.status = "on";
-              meal.isScheduled = false;
-              meal.save(function(err,result){
-                if(err){
-                  return res.badRequest(err);
-                }
-                return res.ok(meal);
-              });
-            })
-          });
-        });
-      })
-    }else{
-      var hostId = req.session.user.host;
-      var now = new Date();
-      Host.findOne(hostId).populate("meals").populate("dishes").exec(function(err, host){
-        if(err){
-          return res.badRequest(err);
-        }
-        host.checkGuideRequirement(function(err){
+        host.checkGuideRequirement(function(err) {
           if(err){
             return res.badRequest(err);
           }
           if(!host.passGuide || !host.dishVerifying){
+            if(isAdmin){
+              return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
+            }
             return res.redirect("/apply");
           }
-          Meal.findOne(mealId).populate("dishes").exec(function(err,meal){
+          if(!meal.dateIsValid()){
+            console.log("Date format of meal is not valid");
+            return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
+          }
+          if(!meal.dishIsValid()){
+            console.log("meal contain unverified dishes");
+            return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
+          }
+          $this.cancelMealJobs( mealId, function(err){
             if(err){
               return res.badRequest(err);
             }
-            if(!meal.dateIsValid()){
-              console.log("Date format of meal is not valid");
-              return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
-            }
-            if(!meal.dishIsValid()){
-              console.log("meal contain unverified dishes");
-              return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
-            }
-
-            $this.cancelMealJobs(mealId, function(err){
+            meal.status = "on";
+            meal.isScheduled = false;
+            meal.save(function(err,result){
               if(err){
                 return res.badRequest(err);
               }
-              meal.status = "on";
-              meal.isScheduled = false;
-              meal.save(function(err,result){
-                if(err){
-                  return res.badRequest(err);
-                }
-                if(req.wantsJSON){
-                  return res.ok(meal);
-                }
-                return res.redirect("/host/me#mymeal");
-              });
-            })
-          });
+              if(isAdmin || req.wantsJSON){
+                return res.ok(meal);
+              }
+              return res.redirect("/host/me#mymeal");
+            });
+          })
         });
       });
-    }
-  },
+    });
 
-  findAll : function(req, res){
-    Meal.find().exec(function(err, meals){
-      if(err){
-        return res.badRequest(err);
-      }
-      return res.ok(meals);
-    })
+    // var hostId = req.session.user.host;
+    // var now = new Date();
+    // Host.findOne(hostId).populate("meals").populate("dishes").exec(function(err, host){
+    //   if(err){
+    //     return res.badRequest(err);
+    //   }
+    //   host.checkGuideRequirement(function(err){
+    //     if(err){
+    //       return res.badRequest(err);
+    //     }
+    //     if(!host.passGuide || !host.dishVerifying){
+    //       return res.redirect("/apply");
+    //     }
+    //     Meal.findOne(mealId).populate("dishes").exec(function(err,meal){
+    //       if(err){
+    //         return res.badRequest(err);
+    //       }
+    //       if(!meal.dateIsValid()){
+    //         console.log("Date format of meal is not valid");
+    //         return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
+    //       }
+    //       if(!meal.dishIsValid()){
+    //         console.log("meal contain unverified dishes");
+    //         return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
+    //       }
+    //
+    //       $this.cancelMealJobs(mealId, function(err){
+    //         if(err){
+    //           return res.badRequest(err);
+    //         }
+    //         meal.status = "on";
+    //         meal.isScheduled = false;
+    //         meal.save(function(err,result){
+    //           if(err){
+    //             return res.badRequest(err);
+    //           }
+    //           if(req.wantsJSON){
+    //             return res.ok(meal);
+    //           }
+    //           return res.redirect("/host/me#mymeal");
+    //         });
+    //       })
+    //     });
+    //   });
+    // });
   },
 
   find : function(req, res){
@@ -426,7 +423,7 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
-              $this.updateDelivery(req.body, host, function(err, params){
+              $this.updateDelivery(req.body, host, req, function(err, params){
                 if(err){
                   return res.badRequest(err);
                 }
@@ -486,7 +483,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            $this.updateDelivery(req.body, meal.chef, function(err, params){
+            $this.updateDelivery(req.body, meal.chef, req, function(err, params){
               if(err){
                 return res.badRequest(err);
               }
@@ -607,13 +604,16 @@ module.exports = {
     });
   },
 
-  updateDelivery : function(params, host, cb){
+  updateDelivery : function(params, host, req, cb){
 
     if(params.isDeliveryBySystem){
       params.delivery_fee = "3.99";
     }
-    if(params.isDelivery && (!params.delivery_center || params.delivery_center == "undefined")){
-      params.delivery_center = host.full_address;
+
+    if(params.isDelivery && params.type == "preorder" && (!params.pickups || (params.pickups && !JSON.parse(params.pickups).some(function(pickup){
+      return pickup.method == "delivery";
+    })))){
+      return cb({ responseText : req.__('meal-delivery-on-option'), code : -15})
     }
 
     var counties = [];
@@ -626,6 +626,7 @@ module.exports = {
           if(!pickup.county){
             return next();
           }
+          sails.log.info("county is : " + pickup.county);
           if(counties.indexOf(pickup.county) == -1){
             counties.push(pickup.county);
           }
@@ -641,10 +642,7 @@ module.exports = {
       if(err){
         return cb(err);
       }
-      if(counties.length == 0){
-        sails.log.info("something went wrong and we need to setup a default county");
-        params.county = host.county;
-      }else{
+      if(counties.length != 0){
         params.county = counties.join("+");
       }
       sails.log.info("counties are: " + counties.join("+"))
@@ -683,6 +681,12 @@ module.exports = {
 
     if(!params.isDelivery && params.isDeliveryBySystem){
       sails.log.debug("system delivery provided but delivery option is off");
+      return cb({ code : -12, responseText : req.__('meal-delivery-conflict')});
+    }
+
+    if(!params.isDelivery && params.pickups && JSON.parse(params.pickups).some(function(pickup){
+      return pickup.method == "delivery";})
+    ){
       return cb({ code : -12, responseText : req.__('meal-delivery-conflict')});
     }
     cb();
@@ -735,7 +739,7 @@ module.exports = {
           console.log("pickup time too short");
           valid = false;
           return;
-        }else if(pickupFromTime <= provideTillTime){
+        }else if(pickupFromTime <= provideTillTime && params.type == "preorder"){
           console.log("pickup time too early");
           valid = false;
           return;

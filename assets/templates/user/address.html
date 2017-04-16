@@ -12,7 +12,7 @@
 
         <div class="form-group" role="form">
           <label for="streetInput"><span data-toggle="i18n" data-key="street"></span><span>* </span>:</label>
-          <input type="text" onFocus="geolocate()" class="form-control" style="min-width: 250px;" id="streetInput" placeholder="No., Street name" required>
+          <input type="text" class="form-control" style="min-width: 250px;" id="streetInput" placeholder="No., Street name" required>
           <div class="help-block with-errors"></div>
         </div>
 
@@ -66,17 +66,5 @@
 
 <script>
   setup();
-  if(!googleAPILoaded){
-    jQuery.ajax({
-      url: "https://maps.googleapis.com/maps/api/js?key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA&libraries=places&callback=initAutoComplete",
-      dataType: 'script',
-      async: true,
-      defer : true,
-      success : function(){
-        googleAPILoaded = true;
-      }
-    });
-  }else{
-    initAutoComplete();
-  }
+  setupAutoComplete();
 </script>

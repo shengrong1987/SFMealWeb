@@ -769,12 +769,16 @@ var AddressView = Backbone.View.extend({
     "click .newAddress" : "newAddress",
     "submit form" : "saveAddress",
     "keydown" : "onKeyDown",
-    "click #deliveryTab .contact input[type='radio']" : "switchAddress",
+    "change #deliveryTab .regular-radio" : "switchAddress",
     "click #method button" : "switchDelivery"
   },
   initialize : function() {
     var userId = this.$el.data("id");
     this.model.set({id: userId});
+    var contactTip = this.$el.find("#contact-tips");
+    contactTip.removeClass("hide");
+    contactTip.hide();
+    this.contactTip = contactTip;
   },
   onKeyDown : function(e){
     if(e.which == 13) e.preventDefault();
@@ -789,17 +793,29 @@ var AddressView = Backbone.View.extend({
   },
   switchAddress : function(e){
     this.$el.find("#contact-error").hide();
-    var deliveryCenter = this.$el.data("center");
+    this.contactTip.hide();
     var range = this.$el.data("range");
-    var address = $(e.target).next().next().text();
     var $this = this;
     var contactView = this.$el.find(".contact");
-
+    var deliveryLocationOption = this.$el.find("#deliveryTab .contact .regular-radio:checked");
+    if(!deliveryLocationOption.length){
+      this.contactTip.html(jQuery.i18n.prop('deliveryOptionNotSelected'));
+      this.contactTip.show();
+      return;
+    }
+    var yourAddress = deliveryLocationOption.next().next().text();
+    var deliveryOption = this.$el.find("#deliveryMethod .regular-radio:checked");
+    if(!deliveryOption.length){
+      this.contactTip.html(jQuery.i18n.prop('deliveryOptionNotSelected'));
+      this.contactTip.show();
+      return;
+    }
+    var deliveryCenter = deliveryOption.parent().data('center');
     geocoder = new google.maps.Geocoder();
     geocoder.geocode({address : deliveryCenter}, function(results, status){
       if (status == google.maps.GeocoderStatus.OK) {
         var hostLoc = {lat : results[0].geometry.location.lat(), long: results[0].geometry.location.lng()};
-        utility.distance(address, hostLoc, function(err, distance){
+        utility.distance(yourAddress, hostLoc, function(err, distance){
           if(err){
             $this.$el.find("#contact-error").html(err);
             $this.$el.find("#contact-error").show();
@@ -1054,37 +1070,116 @@ var MealSelectionView = Backbone.View.extend({
     this.alertView.removeClass("hide");
     this.alertView.hide();
   },
-  initMap : function(){
+  initDelivery : function(cb){
     var directionsDisplay = new google.maps.DirectionsRenderer;
     var directionsService = new google.maps.DirectionsService;
     this.googlemapDisplay = directionsDisplay;
     this.googlemapService = directionsService;
+    var range = this.$el.data("range");
+    var $this = this;
+    if(!this.$el.find(".deliveryOption").length){
+      return cb(null);
+    }
+    var map;
+    this.$el.find(".deliveryOption").each(function () {
+      var location = $(this).data("location");
+      $.ajax({
+        url: "https://maps.googleapis.com/maps/api/geocode/json?address=" + location + "&key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA"
+      }).done(function (data) {
+        if (data.results.length > 0) {
+          var center = data.results[0].geometry.location;
+          if(!map){
+            map = new google.maps.Map($this.$el.find("#googlemap")[0], {
+              center: center,
+              scrollwheel: false,
+              zoom: 11
+            });
+          }
+          // directionsDisplay.setMap(map);
+          var deliveryCircle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: map,
+            center: center,
+            radius: range * 1600
+          });
+          var image = {
+            url : '/images/car-icon.png',
+            size : new google.maps.Size(36, 36),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(18, 18)
+          }
+          var deliveryMarker = new google.maps.Marker({
+            position: center,
+            map: map,
+            icon: image
+          });
+          var deliveryInfo = new google.maps.InfoWindow({
+            content : "<h4><span data-toggle='i18n' data-key='deliveryRange'></span></h4>"
+          })
+          deliveryMarker.addListener('click', function(){
+            deliveryInfo.open(map, deliveryMarker);
+            setupLanguage();
+          })
+          cb(map);
+        }
+      });
+    });
+  },
+  initPickups : function(map){
+    var mapCenter = '';
+    var $this = this;
+    if(this.$el.find(".pickup").length == 0){
+      mapCenter = "25 Washington St, Daly City";
+    }else{
+      mapCenter = $(this.$el.find(".pickup [data-point]")[0]).data('point');
+    }
+    $.ajax({
+      url: "https://maps.googleapis.com/maps/api/geocode/json?address=" + mapCenter + "&key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA"
+    }).done(function (data) {
+      if (data.results.length > 0) {
+        var center = data.results[0].geometry.location;
+        if(!map){
+          map = new google.maps.Map($this.$el.find("#googlemap")[0], {
+            center: center,
+            scrollwheel: false,
+            zoom: 11
+          });
+        }
+        $this.$el.find(".pickup").each(function () {
+          var location = $(this).find("[data-point]").data("point");
+          var title = '<div><h4><span data-toggle="i18n" data-key="pickup"></span>' + $(this).data("name") + '</h4><p>' + location + '</p></div>';
+          var infowindow = new google.maps.InfoWindow({
+            content: title
+          });
+          $.ajax({
+            url: "https://maps.googleapis.com/maps/api/geocode/json?address=" + location + "&key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA"
+          }).done(function (data) {
+            if (data.results.length > 0) {
+              var center = data.results[0].geometry.location;
+              var marker = new google.maps.Marker({
+                position: center,
+                title: title
+              });
+              marker.addListener('click', function () {
+                infowindow.open(map, marker);
+                setupLanguage();
+              })
+              marker.setMap(map);
+            }
+          });
+        })
+      }
+    });
+  },
+  initMap : function(){
     var range = this.$el.data("range") * 1609.34;
     var $this = this;
-    var centerAddress = this.$el.data("center");
-    $.ajax({
-      url : "https://maps.googleapis.com/maps/api/geocode/json?address=" + centerAddress + "&key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA"
-    }).done(function(data){
-      console.log(data.results[0]);
-      if(data.results.length > 0){
-        var center = data.results[0].geometry.location;
-        var map = new google.maps.Map($this.$el.find("#googlemap")[0], {
-          center: center,
-          scrollwheel: false,
-          zoom: 11
-        });
-        directionsDisplay.setMap(map);
-        var deliveryCircle = new google.maps.Circle({
-          strokeColor: '#FF0000',
-          strokeOpacity: 0.8,
-          strokeWeight: 2,
-          fillColor: '#FF0000',
-          fillOpacity: 0.35,
-          map: map,
-          center: center,
-          radius: range
-        });
-      }
+    this.initDelivery(function(map){
+      $this.initPickups(map);
     });
   },
   changePreference : function(e){
@@ -1258,13 +1353,14 @@ var MealView = Backbone.View.extend({
   },
   changeMethod : function(e){
     var select = $(e.target);
+    var container = select.closest('.pickup');
     var method = select.val();
     if(method == "pickup"){
-      this.$el.find(".pickup-item").show();
-      this.$el.find(".delivery-item").hide();
+      container.find(".pickup-item").show();
+      container.find(".delivery-item").hide();
     }else{
-      this.$el.find(".pickup-item").hide();
-      this.$el.find(".delivery-item").show();
+      container.find(".pickup-item").hide();
+      container.find(".delivery-item").show();
     }
     // var locationInput = select.closest('.method').parent().find('.location input');
     // var publicLocation = select.closest('.method').parent().find('.public-location input');
@@ -1329,9 +1425,10 @@ var MealView = Backbone.View.extend({
       '<div class="col-sm-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="from"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div>' +
       '<div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="end"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div>' +
       '<div class="form-group location pickup-item"> <label data-toggle="i18n" data-key="pickupAddress"></label> <input type="text" class="form-control"> </div>' +
-      '<div class="form-group delivery-center delivery-item" style="display: none;"> <label data-toggle="i18n" data-key="deliveryCenter"></label> <input onfocus="geolocate()" type="text" class="form-control"></div>' +
+      '<div class="form-group delivery-center delivery-item" style="display: none;"> <label data-toggle="i18n" data-key="deliveryCenter"></label> <input type="text" class="form-control"></div>' +
       '<div class="form-group public-location pickup-item"> <label data-toggle="i18n" data-key="publicLocation"></label> <input type="text" class="form-control"> </div>' +
       '<div class="form-group instruction pickup-item"><label data-toggle="i18n" data-key="pickupInstruction"></label> <input type="text" class="form-control"> </div>' +
+      '<div class="form-group area"> <label data-toggle="i18n" data-key="area"></label> <input class="form-control" type="text" readonly="readonly" value=""> </div>' +
       '<div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div>' +
       '<div class="form-group phone"> <label data-toggle="i18n" data-key="telephone"></label> <input type="tel" class="form-control"> </div> </div> </div>';
     this.$el.find(".pickup_container").append(pickupView);
@@ -1349,6 +1446,7 @@ var MealView = Backbone.View.extend({
       showTodayButton : true,
     });
     setupLanguage();
+    setupAutoComplete();
     $("input[type='tel']").inputmask({"mask": "(999) 999-9999"});
   },
   removeNewPickup : function(e){
@@ -1478,15 +1576,26 @@ var MealView = Backbone.View.extend({
         }
         var method = $(this).find('.method select').val();
         var phone = $(this).find('.phone input').val();
-        if(!pickupFromTime || !pickupTillTime || !location){
+        if(method == "pickup" && !location){
           pickupValid = false;
           $this.scheduleAlert.show();
-          $this.scheduleAlert.html(jQuery.i18n.prop('pickupLocationError'));
+          $this.scheduleAlert.html(jQuery.i18n.prop('pickupLocationEmptyError'));
+          return;
+        }
+        if(!pickupFromTime || !pickupTillTime){
+          pickupValid = false;
+          $this.scheduleAlert.show();
+          $this.scheduleAlert.html(jQuery.i18n.prop('pickupTimeEmptyError'));
           return;
         }else if(pickupFromTime.isSame(pickupTillTime)){
           pickupValid = false;
           $this.scheduleAlert.show();
           $this.scheduleAlert.html(jQuery.i18n.prop('provideTimeError'));
+          return;
+        }else if(pickupFromTime.isAfter(pickupTillTime)){
+          pickupValid = false;
+          $this.scheduleAlert.show();
+          $this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeInvalidError'));
           return;
         }else if(moment.duration(pickupTillTime.diff(pickupFromTime)).asMinutes() < 30){
           pickupValid = false;

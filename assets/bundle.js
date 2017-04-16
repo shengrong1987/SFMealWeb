@@ -45241,71 +45241,66 @@ var TableItem = React.createClass({displayName: "TableItem",
     SFMealAPI.command(target.data('model'),target.data('id'),'unverifyLicense',this.props.detail);
   },
 
-  _renderRow : function(rowContent, col, item){
+  _renderRow : function(rowContent, col, rowData){
     if((typeof rowContent !== 'boolean' && rowContent) || typeof rowContent === 'boolean' || col === 'command'){
       if(col === 'command'){
         switch(this.props.model){
           case "Dish":
-            if(item.hasOwnProperty('isVerified')){
-              if(item['isVerified']){
-                rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._fail}, "Off")
+            if(rowData.hasOwnProperty('isVerified')){
+              if(rowData['isVerified']){
+                rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._fail}, "Off")
               }else{
-                rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._verify}, "On")
+                rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._verify}, "On")
               }
             }
             break;
           case "Meal":
-            if(item.hasOwnProperty('status')){
-              if(item['status'] === 'on'){
-                rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._off}, "Off")
+            if(rowData.hasOwnProperty('status')){
+              if(rowData['status'] === 'on'){
+                rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._off}, "Off")
               }else{
-                rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._on}, "On")
+                rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._on}, "On")
               }
             }
             break;
           case "Order":
-            if(item.hasOwnProperty('status')){
-              if(item['status'] !== 'complete' && item['status'] !== 'cancel'){
-                rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._abort}, "Cancel"), React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._refund}, "Refund"))
-              }else if(item.hasOwnProperty('charges')){
-                if(item['charges'] && Object.keys(item['charges']).length > 0){
-                  rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._refund}, "Refund")
+            if(rowData.hasOwnProperty('status')){
+              if(rowData['status'] !== 'complete' && rowData['status'] !== 'cancel'){
+                rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._abort}, "Cancel"), React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._refund}, "Refund"))
+              }else if(rowData.hasOwnProperty('charges')){
+                if(rowData['charges'] && Object.keys(rowData['charges']).length > 0){
+                  rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._refund}, "Refund")
                 }
               }
             }
             break;
           case "Host":
-            if(item.hasOwnProperty('license')){
-              if(item['license']){
-                if(!item['license']['valid']){
-                  rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._verifyLicense}, "VerifyLicense"), React.createElement("input", {name: "month", type: "text", placeholder: "month"}), React.createElement("input", {name: "day", type: "text", placeholder: "day"}), React.createElement("input", {name: "year", type: "text", placeholder: "year"}))
+            if(rowData.hasOwnProperty('license')){
+              if(rowData['license']){
+                if(!rowData['license']['valid']){
+                  rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._verifyLicense}, "VerifyLicense"), React.createElement("input", {name: "month", type: "text", placeholder: "month"}), React.createElement("input", {name: "day", type: "text", placeholder: "day"}), React.createElement("input", {name: "year", type: "text", placeholder: "year"}))
                 }else{
-                  rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._unverifyLicense}, "UnverifyLicense"), React.createElement("input", {name: "month", type: "text", value: new Date(item['license']['exp']).getMonth() + 1}), React.createElement("input", {name: "day", type: "text", value: new Date(item['license']['exp']).getDate()}), React.createElement("input", {name: "year", type: "text", value: new Date(item['license']['exp']).getFullYear()}))
+                  rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._unverifyLicense}, "UnverifyLicense"), React.createElement("input", {name: "month", type: "text", value: new Date(rowData['license']['exp']).getMonth() + 1}), React.createElement("input", {name: "day", type: "text", value: new Date(rowData['license']['exp']).getDate()}), React.createElement("input", {name: "year", type: "text", value: new Date(rowData['license']['exp']).getFullYear()}))
                 }
               }
             }
             break;
           case "Job":
-            {
-              rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['name'], onClick: this._run, "data-job-data": JSON.stringify(item['data'])}, "Run")
-            }
+              rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['name'], onClick: this._run, "data-job-data": JSON.stringify(rowData['data'])}, "Run")
             break;
           case "Checklist":
-            {
-              rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._verifyPhoto}, "VerifyPhoto"), React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": item['id'], onClick: this._unVerifyPhoto}, "UnVerifyPhoto"), React.createElement("input", {name: "key", type: "text"}))
-            }
+              rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._verifyPhoto}, "VerifyPhoto"), React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._unVerifyPhoto}, "UnVerifyPhoto"), React.createElement("input", {name: "key", type: "text"}))
             break;
           case "Coupon":
             break;
         }
-      }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){
+      }else if(this._isImage(rowContent)){
         rowContent = React.createElement("img", {src: rowContent, width: "100"})
       }else if(Array.isArray(rowContent)){
         rowContent = rowContent.map(function(ele){
           for(var key in ele){
-            if(typeof ele[key] === 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(ele[key])){
+            if(this._isImage(ele[key])){
               ele[key] = React.createElement("img", {src: ele[key], width: "100"})
-              return ele[key];
             }
           }
           return key + ":" + ele[key];
@@ -45316,7 +45311,7 @@ var TableItem = React.createClass({displayName: "TableItem",
         rowContent = Object.keys(rowContent).map(function(key){
           return React.createElement("p", null, key, " : ", rowContent[key]);
         });
-      }else if(typeof rowContent === 'string' && new Date(rowContent) !== 'Invalid Date' && !isNaN(new Date(rowContent))){
+      }else if(this._isDate(rowContent)){
         if(col == 'nextRunAt' && new Date(rowContent).getTime() <= new Date().getTime()){
           rowContent = 'null';
         }else{
@@ -45355,6 +45350,14 @@ var TableItem = React.createClass({displayName: "TableItem",
         cols
       )
     );
+  },
+
+  _isImage : function(value){
+    return typeof value == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(value)
+  },
+
+  _isDate : function(value){
+    return typeof value === 'string' && new Date(value) !== 'Invalid Date' && !isNaN(new Date(value))
   }
 });
 
@@ -45632,7 +45635,7 @@ module.exports = {
     }else if(value) {
       var url = "/meal/searchAll?" + criteria + "=" + value;
     }else{
-      var url = "/meal/findAll";
+      var url = "/meal/searchAll";
     }
     $.ajax({
       url: url,

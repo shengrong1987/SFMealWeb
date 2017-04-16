@@ -109,71 +109,66 @@ var TableItem = React.createClass({
     SFMealAPI.command(target.data('model'),target.data('id'),'unverifyLicense',this.props.detail);
   },
 
-  _renderRow : function(rowContent, col, item){
+  _renderRow : function(rowContent, col, rowData){
     if((typeof rowContent !== 'boolean' && rowContent) || typeof rowContent === 'boolean' || col === 'command'){
       if(col === 'command'){
         switch(this.props.model){
           case "Dish":
-            if(item.hasOwnProperty('isVerified')){
-              if(item['isVerified']){
-                rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._fail}>Off</button>
+            if(rowData.hasOwnProperty('isVerified')){
+              if(rowData['isVerified']){
+                rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._fail}>Off</button>
               }else{
-                rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._verify}>On</button>
+                rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._verify}>On</button>
               }
             }
             break;
           case "Meal":
-            if(item.hasOwnProperty('status')){
-              if(item['status'] === 'on'){
-                rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._off}>Off</button>
+            if(rowData.hasOwnProperty('status')){
+              if(rowData['status'] === 'on'){
+                rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._off}>Off</button>
               }else{
-                rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._on}>On</button>
+                rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._on}>On</button>
               }
             }
             break;
           case "Order":
-            if(item.hasOwnProperty('status')){
-              if(item['status'] !== 'complete' && item['status'] !== 'cancel'){
-                rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._abort}>Cancel</button><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._refund}>Refund</button></div>
-              }else if(item.hasOwnProperty('charges')){
-                if(item['charges'] && Object.keys(item['charges']).length > 0){
-                  rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._refund}>Refund</button>
+            if(rowData.hasOwnProperty('status')){
+              if(rowData['status'] !== 'complete' && rowData['status'] !== 'cancel'){
+                rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._abort}>Cancel</button><button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._refund}>Refund</button></div>
+              }else if(rowData.hasOwnProperty('charges')){
+                if(rowData['charges'] && Object.keys(rowData['charges']).length > 0){
+                  rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._refund}>Refund</button>
                 }
               }
             }
             break;
           case "Host":
-            if(item.hasOwnProperty('license')){
-              if(item['license']){
-                if(!item['license']['valid']){
-                  rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._verifyLicense}>VerifyLicense</button><input name="month" type="text" placeholder="month"/><input  name="day" type="text" placeholder="day"/><input name="year" type="text" placeholder="year"/></div>
+            if(rowData.hasOwnProperty('license')){
+              if(rowData['license']){
+                if(!rowData['license']['valid']){
+                  rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._verifyLicense}>VerifyLicense</button><input name="month" type="text" placeholder="month"/><input  name="day" type="text" placeholder="day"/><input name="year" type="text" placeholder="year"/></div>
                 }else{
-                  rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._unverifyLicense}>UnverifyLicense</button><input name="month" type="text" value={new Date(item['license']['exp']).getMonth() + 1}/><input name="day" type="text" value={new Date(item['license']['exp']).getDate()}/><input name="year" type="text" value={new Date(item['license']['exp']).getFullYear()}/></div>
+                  rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._unverifyLicense}>UnverifyLicense</button><input name="month" type="text" value={new Date(rowData['license']['exp']).getMonth() + 1}/><input name="day" type="text" value={new Date(rowData['license']['exp']).getDate()}/><input name="year" type="text" value={new Date(rowData['license']['exp']).getFullYear()}/></div>
                 }
               }
             }
             break;
           case "Job":
-            {
-              rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={item['name']} onClick={this._run} data-job-data={JSON.stringify(item['data'])}>Run</button>
-            }
+              rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={rowData['name']} onClick={this._run} data-job-data={JSON.stringify(rowData['data'])}>Run</button>
             break;
           case "Checklist":
-            {
-              rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._verifyPhoto}>VerifyPhoto</button><button className="btn btn-info" data-model={this.props.model} data-id={item['id']} onClick={this._unVerifyPhoto}>UnVerifyPhoto</button><input name="key" type="text"/></div>
-            }
+              rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._verifyPhoto}>VerifyPhoto</button><button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._unVerifyPhoto}>UnVerifyPhoto</button><input name="key" type="text"/></div>
             break;
           case "Coupon":
             break;
         }
-      }else if(typeof rowContent == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(rowContent)){
+      }else if(this._isImage(rowContent)){
         rowContent = <img src={rowContent} width="100"/>
       }else if(Array.isArray(rowContent)){
         rowContent = rowContent.map(function(ele){
           for(var key in ele){
-            if(typeof ele[key] === 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(ele[key])){
+            if(this._isImage(ele[key])){
               ele[key] = <img src={ele[key]} width="100"/>
-              return ele[key];
             }
           }
           return key + ":" + ele[key];
@@ -184,7 +179,7 @@ var TableItem = React.createClass({
         rowContent = Object.keys(rowContent).map(function(key){
           return <p>{key} : {rowContent[key]}</p>;
         });
-      }else if(typeof rowContent === 'string' && new Date(rowContent) !== 'Invalid Date' && !isNaN(new Date(rowContent))){
+      }else if(this._isDate(rowContent)){
         if(col == 'nextRunAt' && new Date(rowContent).getTime() <= new Date().getTime()){
           rowContent = 'null';
         }else{
@@ -223,6 +218,14 @@ var TableItem = React.createClass({
         {cols}
       </tr>
     );
+  },
+
+  _isImage : function(value){
+    return typeof value == 'string' && (/\.(jpg|png|gif|jpeg)$/i).test(value)
+  },
+
+  _isDate : function(value){
+    return typeof value === 'string' && new Date(value) !== 'Invalid Date' && !isNaN(new Date(value))
   }
 });
 

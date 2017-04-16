@@ -12,7 +12,6 @@ module.exports = function(firstPolicy, secondPolicy){
       if(i === 'forbidden'){
         // override the functions you want the `or` factory to handle
         fakeRes[i] = function(){
-          console.log("running second policy");
           secondPolicy(req, res, next);
         };
       }

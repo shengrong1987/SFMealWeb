@@ -81,7 +81,7 @@ module.exports = {
     }else if(value) {
       var url = "/meal/searchAll?" + criteria + "=" + value;
     }else{
-      var url = "/meal/findAll";
+      var url = "/meal/searchAll";
     }
     $.ajax({
       url: url,

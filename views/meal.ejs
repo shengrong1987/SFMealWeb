@@ -27,7 +27,7 @@
     </div>
   </div>
 
-  <div id="meal-detail-container" class="padding-clear" data-meal-prepareTime="<%= meal.prepareTime%>" data-center="<%= meal.delivery_center%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>">
+  <div id="meal-detail-container" class="padding-clear" data-meal-prepareTime="<%= meal.prepareTime%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>">
 
     <div class="row">
       <div class="col-md-8">
@@ -113,34 +113,49 @@
                   <div id="addressAlertView" class="alert alert-danger hide"><%= __('delivery-out-of-range-error')%></div>
                 <%}else{
                 var count = 1;
-                meal.pickups.forEach(function(pickupMethod){ if(pickupMethod.method == "delivery" && !meal.isDelivery){ return }%>
-                  <div class="box-simple text-left location" data-location="<%= pickupMethod.publicLocation%>">
+                meal.pickups.forEach(function(pickup){ if(pickup.method == "pickup"){%>
+                  <div class="box-simple text-left pickup" data-location="<%= pickup.publicLocation%>" data-name="<%= __('location') + count%>">
                     <div class="checkbox">
                       <label>
                         <input type="checkbox">
                         <small class="font-small">
                           <b><%= __('location') + count %>:</b>
                           <% if( orders && orders.some(function(order){ if(!user){return false}; return order.customer == user.id}) || (user && user.host == meal.chef.id)){%>
-                            <%= pickupMethod.location || ''%>
-                          <%}else if(pickupMethod.method == "pickup"){%>
-                            <%= pickupMethod.publicLocation || ''%><br/><%= __('pickup-location-after-order')%>
+                            <span data-point="<%= pickup.location%>"><%= pickup.location || ''%></span>
+                          <%}else if(pickup.method == "pickup"){%>
+                            <span data-point="<%= pickup.publicLocation%>"><%= pickup.publicLocation ? (pickup.publicLocation + ' ' + __('pickup-location-after-order')): pickupMethod.location %></span>
                           <%}%>
                           <br/><br/>
-                          <% if(pickupMethod.instruction){%>
-                          <b><%= __('pickup-instruction')%>: <%= pickupMethod.instruction || ''%></b><br/>
+                          <% if(pickup.instruction){%>
+                          <b><%= __('pickup-instruction')%>: <%= pickup.instruction || ''%></b><br/>
                           <%}%>
-                          <b><%= __('time')%></b> <span data-toggle="time-span" data-format="date" data-from="<%= pickupMethod.pickupFromTime%>" data-to="<%= pickupMethod.pickupTillTime%>"></span>
-                          <% if(pickupMethod.method == "pickup"){%>
+                          <b><%= __('time')%></b> <span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"></span>
                           <br/><br/>
-                          <%= __('pickup-time')%>:<a class="text-red calculateBtn" data-location="<%= pickupMethod.location%>" href="javascript:void(0)"><%= __('click-to-cal')%></a><label></label>
-                          <%}%>
+                          <%= __('pickup-time')%>:<a class="text-red calculateBtn" data-location="<%= pickup.location%>" href="javascript:void(0)"><%= __('click-to-cal')%></a><label></label>
                           <br/>
-                          <b><%= __('pickup-method')%>: <%= pickupMethod.method == 'delivery' ? __('delivery') : __('self-pickup') %></b>
+                          <b><%= __('pickup-method')%>: <%= __('self-pickup') %></b>
                         </small>
                       </label>
                     </div>
                   </div>
-                <% count++;});}%>
+                <% }else{%>
+
+                <div class="box-simple text-left deliveryOption" data-location="<%= pickup.deliveryCenter%>">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox">
+                      <small class="font-small">
+                        <b><%= __('location') + count %>:</b>
+                        <span class="text-black"><%= __('delivery')%></span>
+                        <%= __('delivery-fee')%>:$<%= meal.delivery_fee%><br/>
+                        <%= __('delivery-time')%>:<a class="calculateBtn" class="text-red" data-location="<%= meal.chef.full_address%>" href="javascript:void(0)"><%= __('click-to-cal')%></a><label></label><br/>
+                        <%= __('ready-time')%>: <%= meal.prepareTime%><%= __('min')%>
+                      </small>
+                    </label>
+                  </div>
+                </div>
+
+                <%}count++;});}%>
                 <%if(meal.isShipping){%>
                 <div class="box-simple text-left">
                   <div class="checkbox">
@@ -171,7 +186,7 @@
 
               <h4 class="text-left"><small><% __('pickup-location-after-order')%></small></h4>
 
-              <div id="googlemap" style="min-height: 440px;"></div>
+              <div id="googlemap" style="min-height: 550px;"></div>
             </div>
           </div>
 

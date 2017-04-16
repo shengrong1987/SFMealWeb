@@ -171,8 +171,10 @@ var notification = {
 
     this.mergeI18N(model, action, req, locale, params);
 
+    var chef = params.chef || params.host;
+    var county = chef ? chef.county : params.county;
     this.transitLocaleTimeZone(params);
-    util.getTaxRate(params);
+    params.taxRate = util.getTaxRate(county);
     params.recipientName = basicInfo.recipientName;
     params.senderName = "SFMeal.com";
 

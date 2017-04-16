@@ -56,6 +56,27 @@ describe('UsersController', function() {
         })
     });
 
+    it('should create a coupon with $5 off', function(done){
+      agent
+        .post('/coupon')
+        .send({
+          type : "fix",
+          amount : 5.00,
+          description : "Happy Holiday",
+          code : "5Dollar",
+          expire_at : nextHour
+        })
+        .expect(201)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          should.exist(res.body.id);
+          res.body.amount.should.be.equal(5.00);
+          done();
+        })
+    });
+
     it('should create a coupon with free shipping', function(done){
       agent
         .post('/coupon')
@@ -400,7 +421,12 @@ describe('UsersController', function() {
         })
     })
 
-    var addresses = [{"street":"1974 palou ave","city" : "San Francisco", "zip" : '94124', "phone" : '14158023853',"isDefault": true},{"street":"7116 Tiant Way","city" : "Elk Grove", "zip" : '95758', "phone" : '14158023853', "isDefault" : false}];
+    var addresses = [
+      {"street":"1974 palou ave","city" : "San Francisco", "zip" : '94124', "phone" : '14158023853',"isDefault": false },
+      {"street":"7116 Tiant Way","city" : "Elk Grove", "zip" : '95758', "phone" : '14158023853', "isDefault" : false },
+      {"street":"7118 Tiant Way","city" : "Elk Grove", "zip" : '95758', "phone" : '14158023853', "isDefault" : true }
+    ];
+    var deletedAddresses;
     var firstname = "sheng";
     var lastname = "rong";
 
@@ -415,12 +441,39 @@ describe('UsersController', function() {
           })
           .expect(200)
           .end(function(err,res){
-            res.body.should.have.property("address").with.length(2);
+            res.body.should.have.property("address").with.length(3);
             should(res.body.address[0]).which.is.a.Object();
-            (true).should.be.equalOneOf(res.body.address[0].isDefault, res.body.address[1].isDefault);
-            res.body.city.should.be.equal("San Francisco");
+            (true).should.be.equalOneOf(res.body.address[0].isDefault, res.body.address[1].isDefault, res.body.address[2].isDefault);
+            res.body.city.should.be.equal("Elk Grove");
+            deletedAddresses = res.body.address;
+            deletedAddresses = deletedAddresses.filter(function(address){
+              if(address.isDefault){
+                address.delete = true;
+                return true;
+              }
+              return false;
+            });
             done();
           })
+    })
+
+    it('should delete a default address', function (done) {
+      agent
+        .put('/user/' + userId)
+        .send({
+          address : deletedAddresses,
+          firstname : firstname,
+          lastname : lastname,
+          phone : '(415)802-3853'
+        })
+        .expect(200)
+        .end(function(err,res){
+          res.body.should.have.property("address").with.length(2);
+          should(res.body.address[0]).which.is.a.Object();
+          (true).should.be.equalOneOf(res.body.address[0].isDefault, res.body.address[1].isDefault);
+          // res.body.city.should.be.equal("San Francisco");
+          done();
+        })
     })
 
     var email = "aimbebe.r@gmail.com";

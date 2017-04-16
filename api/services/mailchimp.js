@@ -92,7 +92,6 @@ module.exports = {
         sails.log.debug(err);
         return;
       }
-      sails.log.info(result);
     }, {
       wait : true,
       unpack : true

@@ -366,11 +366,7 @@ module.exports = {
           return res.view("profile",{host : publicHost, user : req.session.user});
         }
         host.reviews = reviews;
-        if(req.wantsJSON && isAdmin){
-          return res.ok(host);
-        }else{
-          return res.ok({});
-        }
+        return res.ok(host);
       });
     });
   },
@@ -511,35 +507,35 @@ module.exports = {
   },
 
   //to-test
-  cashout : function(req, res){
-    //check account balance
-    var hostId = req.params.id;
-    Host.findOne(hostId).exec(function(err,host){
-      if(err){
-        return res.badRequest(err);
-      }
-      var bankId = host.bankId;
-      var accountId = host.accountId;
-      stripe.balance.retrieve({stripe_account: accountId},
-          function(err, balance) {
-            var totalAva = balance.available[0].amount;
-            stripe.transfers.create({
-              amount: totalAva,
-              application_fee : 50,
-              currency: "usd",
-              destination: "default_for_currency",
-              description: "Thanks for your housemade food - SFMeal.com"
-            }, function(err, transfer) {
-              // asynchronously called
-              if(err){
-                return res.badRequest(err);
-              }
-              //for testing only
-              res.ok(transfer);
-            });
-          });
-    });
-  }
+  // cashout : function(req, res){
+  //   //check account balance
+  //   var hostId = req.params.id;
+  //   Host.findOne(hostId).exec(function(err,host){
+  //     if(err){
+  //       return res.badRequest(err);
+  //     }
+  //     var bankId = host.bankId;
+  //     var accountId = host.accountId;
+  //     stripe.balance.retrieve({stripe_account: accountId},
+  //         function(err, balance) {
+  //           var totalAva = balance.available[0].amount;
+  //           stripe.transfers.create({
+  //             amount: totalAva,
+  //             application_fee : 50,
+  //             currency: "usd",
+  //             destination: "default_for_currency",
+  //             description: "Thanks for your housemade food - SFMeal.com"
+  //           }, function(err, transfer) {
+  //             // asynchronously called
+  //             if(err){
+  //               return res.badRequest(err);
+  //             }
+  //             //for testing only
+  //             res.ok(transfer);
+  //           });
+  //         });
+  //   });
+  // }
 
 };
 

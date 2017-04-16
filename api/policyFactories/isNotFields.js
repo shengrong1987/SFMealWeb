@@ -6,7 +6,6 @@ module.exports = function(){
   var fields = arguments.callee.arguments;
   return function(req, res, next){
 
-    sails.log.debug("running isNotFields policy checking fields :" + fields.length);
     if(fields.length == 0){
       return next();
     }

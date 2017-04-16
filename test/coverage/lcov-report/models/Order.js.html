@@ -20,28 +20,28 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">13.33% </span>
+        <span class="strong">66.67% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>2/15</span>
+        <span class='fraction'>2/3</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/11</span>
+        <span class='fraction'>0/0</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/2</span>
+        <span class='fraction'>0/1</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">13.33% </span>
+        <span class="strong">66.67% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>2/15</span>
+        <span class='fraction'>2/3</span>
       </div>
     </div>
   </div>
-  <div class='status-line low'></div>
+  <div class='status-line medium'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -178,16 +178,7 @@
 133
 134
 135
-136
-137
-138
-139
-140
-141
-142
-143
-144
-145</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+136</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -300,32 +291,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -344,6 +326,9 @@ module.exports = {
   attributes: {
     index: {
       type: 'string'
+    },
+    coupon : {
+      model : 'Coupon'
     },
     isScheduled : {
       type : 'boolean',
@@ -374,6 +359,9 @@ module.exports = {
     delivery_fee: {
       type: 'float'
     },
+    shipping_fee : {
+      type : 'float'
+    },
     subtotal: {
       type: 'float',
       required: true
@@ -384,6 +372,10 @@ module.exports = {
     phone: {
       type: 'string',
       required: true
+    },
+    customerPhone : {
+      type : 'string',
+      required : true
     },
     guestEmail : {
       type : 'string',
@@ -402,7 +394,7 @@ module.exports = {
     },
     method: {
       type: 'string',
-      enum: ['pickup', 'delivery'],
+      enum: ['pickup', 'delivery','shipping'],
       defaultsTo: 'delivery'
     },
     pickupOption : {
@@ -444,33 +436,14 @@ module.exports = {
       defaultsTo : ''
     },
     getTaxRate : <span class="fstat-no" title="function not covered" >function(){</span>
-<span class="cstat-no" title="statement not covered" >      return util.getTaxRate(this);</span>
+<span class="cstat-no" title="statement not covered" >      return util.getTaxRate(this.host.county);</span>
     },
-    statusText: <span class="fstat-no" title="function not covered" >function () {</span>
-<span class="cstat-no" title="statement not covered" >      switch (this.status) {</span>
-        case 'schedule':
-<span class="cstat-no" title="statement not covered" >          return "已预约";</span>
-        case "preparing":
-<span class="cstat-no" title="statement not covered" >          return "准备中";</span>
-        case "ready":
-<span class="cstat-no" title="statement not covered" >          if(this.method == "delivery"){</span>
-<span class="cstat-no" title="statement not covered" >            return "送餐中";</span>
-          }else{
-<span class="cstat-no" title="statement not covered" >            return "待自取";</span>
-          }
-        case "complete":
-<span class="cstat-no" title="statement not covered" >          return "已完成";</span>
-        case "cancel":
-<span class="cstat-no" title="statement not covered" >          return "已取消";</span>
-        case "adjust":
-<span class="cstat-no" title="statement not covered" >          return "调整中，待确认";</span>
-        case "cancelling":
-<span class="cstat-no" title="statement not covered" >          return "取消中，待确认";</span>
-        case "review":
-<span class="cstat-no" title="statement not covered" >          return "待评价";</span>
-        default:
-<span class="cstat-no" title="statement not covered" >          return "未知";</span>
-      }
+    coupon : {
+      model : 'Coupon'
+    },
+    discountAmount : {
+      type : 'float',
+      defaultsTo : 0
     }
   }
 };
@@ -481,7 +454,7 @@ module.exports = {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Nov 01 2016 15:26:24 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sat Apr 08 2017 01:41:35 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

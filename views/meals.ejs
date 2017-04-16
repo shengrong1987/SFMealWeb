@@ -82,11 +82,12 @@
         }
         if(meal.pickups){
           meal.pickups.forEach(function(pickup){
-            if(pickup.county == county && pickup.area){
-              if (mealInAreas.hasOwnProperty(pickup.area)) {
-                mealInAreas[pickup.area].push(meal);
-              } else {
+            if(pickup.county == county){
+              pickup.area =  pickup.area || '';
+              if (!mealInAreas.hasOwnProperty(pickup.area)) {
                 mealInAreas[pickup.area] = [meal];
+              } else if(!mealInAreas[pickup.area].some(function(m){return m.id == meal.id})){
+                mealInAreas[pickup.area].push(meal);
               }
             }
           })

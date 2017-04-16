@@ -20,28 +20,28 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">6.25% </span>
+        <span class="strong">50% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>1/16</span>
+        <span class='fraction'>8/16</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">33.33% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/6</span>
+        <span class='fraction'>2/6</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">66.67% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/6</span>
+        <span class='fraction'>4/6</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">6.25% </span>
+        <span class="strong">50% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>1/16</span>
+        <span class='fraction'>8/16</span>
       </div>
     </div>
   </div>
-  <div class='status-line low'></div>
+  <div class='status-line medium'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -92,6 +92,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -101,23 +112,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -130,12 +130,12 @@
  * @docs        :
  */
 module.exports = {
-  find : <span class="fstat-no" title="function not covered" >function(req, res){</span>
-<span class="cstat-no" title="statement not covered" >    Jobs.jobs(req.query,<span class="fstat-no" title="function not covered" >function(err, jobs){</span></span>
-<span class="cstat-no" title="statement not covered" >      if(err){</span>
+  find : function(req, res){
+    Jobs.jobs(req.query,function(err, jobs){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
 <span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
       }
-<span class="cstat-no" title="statement not covered" >      return res.ok(jobs);</span>
+      return res.ok(jobs);
     });
   },
 &nbsp;
@@ -150,13 +150,13 @@ module.exports = {
     })
   },
 &nbsp;
-  run : <span class="fstat-no" title="function not covered" >function(req, res){</span>
-<span class="cstat-no" title="statement not covered" >    var jobname = req.params.name;</span>
-<span class="cstat-no" title="statement not covered" >    Jobs.now(jobname, {}, <span class="fstat-no" title="function not covered" >function(err, job){</span></span>
-<span class="cstat-no" title="statement not covered" >      if(err){</span>
+  run : function(req, res){
+    var jobname = req.params.name;
+    Jobs.now(jobname, req.body, function(err, job){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
 <span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
       }
-<span class="cstat-no" title="statement not covered" >      return res.ok(job);</span>
+      return res.ok(job);
     });
   }
 };
@@ -166,7 +166,7 @@ module.exports = {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Nov 01 2016 15:26:24 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sat Apr 08 2017 01:41:35 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

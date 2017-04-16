@@ -121,7 +121,7 @@ module.exports = {
       defaultsTo : ''
     },
     getTaxRate : function(){
-      return util.getTaxRate(this);
+      return util.getTaxRate(this.host.county);
     },
     coupon : {
       model : 'Coupon'

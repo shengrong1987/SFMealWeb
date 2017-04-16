@@ -15,7 +15,7 @@ before(function(done){
 
 describe('MealController', function() {
 
-  this.timeout(12000);
+  this.timeout(15000);
 
   describe('build a meal with dishes', function() {
 
@@ -205,7 +205,7 @@ describe('MealController', function() {
           .post('/meal')
           .send({
             provideFromTime: new Date(now.getTime() + 1000 * 60 * 11),
-            provideTillTime: new Date(now.getTime() + 1000 * 2 * 3600),
+            provideTillTime: new Date(now.getTime() + 1000 * 60 * 120),
             leftQty: leftQty,
             totalQty: totalQty,
             title : "私房面馆",
@@ -308,7 +308,8 @@ describe('MealController', function() {
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
         "method" : "delivery",
-        "delivery_center" : "455 Post St, San Francisco"
+        "deliveryCenter" : "455 Post St, San Francisco",
+        "county" : "San Francisco County"
       }];
       agent
         .post('/meal')
@@ -348,7 +349,8 @@ describe('MealController', function() {
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
         "method" : "delivery",
-        "delivery_center" : "Union Square, San Francisco"
+        "deliveryCenter" : "Union Square, San Francisco",
+        "county" : "San Francisco County"
       }];
       agent
         .post('/meal')
@@ -385,7 +387,7 @@ describe('MealController', function() {
       var pickups = [{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
-        "location" : "1455 Market St, San Francisoc, CA 94124",
+        "location" : "1455 Market St, San Francisco, CA 94124",
         "method" : "pickup"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
@@ -439,21 +441,37 @@ describe('MealController', function() {
       var pickups = [{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
-        "location" : "1455 Market St, San Francisoc, CA 94124",
+        "location" : "1455 Market St, San Francisco, CA 94124",
         "publicLocation" : "Uber HQ",
         "pickupInstruction" : "11th st and Market st",
-        "method" : "pickup"
+        "method" : "pickup",
+        "area" : "Market & Downtown",
+        "county" : "San Francisco County"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
-        "method" : "delivery"
+        "method" : "delivery",
+        "deliveryCenter" : "1974 Palou Ave, San Francisco, CA 94124, USA",
+        "area" : "Bay View",
+        "county" : "San Francisco County"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "location" : "25 Washington St, Daly City",
         "publicLocation" : "John Daly Blvd",
         "pickupInstruction" : "John Daly Blvd",
-        "method" : "pickup"
+        "method" : "pickup",
+        "county" : "San Mateo County",
+        "area" : "Daly City"
+      },{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 4),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 5),
+        "location" : "665 W Olive Ave, Sunnyvale, CA 94086",
+        "publicLocation" : "Sunnyvalue",
+        "pickupInstruction" : "Sunnyvalue library",
+        "method" : "pickup",
+        "county" : "Santa Clara County",
+        "area" : "Sunnyvale"
       }];
       agent
         .put('/meal/' + preorderMealId)
