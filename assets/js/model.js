@@ -1071,10 +1071,6 @@ var MealSelectionView = Backbone.View.extend({
     this.alertView.hide();
   },
   initDelivery : function(cb){
-    var directionsDisplay = new google.maps.DirectionsRenderer;
-    var directionsService = new google.maps.DirectionsService;
-    this.googlemapDisplay = directionsDisplay;
-    this.googlemapService = directionsService;
     var range = this.$el.data("range");
     var $this = this;
     if(!this.$el.find(".deliveryOption").length){
@@ -1094,8 +1090,8 @@ var MealSelectionView = Backbone.View.extend({
               scrollwheel: false,
               zoom: 11
             });
+            $this.googlemapDisplay.setMap(map);
           }
-          // directionsDisplay.setMap(map);
           var deliveryCircle = new google.maps.Circle({
             strokeColor: '#FF0000',
             strokeOpacity: 0.8,
@@ -1148,6 +1144,7 @@ var MealSelectionView = Backbone.View.extend({
             scrollwheel: false,
             zoom: 11
           });
+          $this.googlemapDisplay.setMap(map);
         }
         $this.$el.find(".pickup").each(function () {
           var location = $(this).find("[data-point]").data("point");
@@ -1178,6 +1175,10 @@ var MealSelectionView = Backbone.View.extend({
   initMap : function(){
     var range = this.$el.data("range") * 1609.34;
     var $this = this;
+    var directionsDisplay = new google.maps.DirectionsRenderer;
+    var directionsService = new google.maps.DirectionsService;
+    this.googlemapDisplay = directionsDisplay;
+    this.googlemapService = directionsService;
     this.initDelivery(function(map){
       $this.initPickups(map);
     });
