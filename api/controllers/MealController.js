@@ -428,6 +428,8 @@ module.exports = {
                   return res.badRequest(err);
                 }
                 req.body = params;
+                req.body.commision = host.commision;
+                req.body.chef = host.id;
                 if(req.body.status == 'on'){
                   host.checkGuideRequirement(function(err){
                     if(err){

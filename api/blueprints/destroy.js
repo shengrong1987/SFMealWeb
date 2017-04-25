@@ -49,8 +49,9 @@ module.exports = function destroyOneRecord (req, res) {
           console.log(numberRemoved + "meal jobs removed");
           return res.redirect("/host/me#mymeal");
         });
+      }else{
+        return res.ok(record);
       }
-      return res.ok(record);
     });
   });
 };

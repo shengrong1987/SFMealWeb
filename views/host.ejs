@@ -1074,7 +1074,7 @@
                       <td style="vertical-align: middle;">
                         <!--<a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('update')%></a><br>-->
                         <a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('edit')%></a><br>
-                        <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:deleteMeal" data-argument="<%= meal.id%>"><%= __('delete')%></a><br/>
+                        <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-container="#mymeal" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:deleteMeal" data-argument="<%= meal.id%>"><%= __('delete')%></a><br/>
                       <td style="vertical-align: middle;">
                         <% if(meal.status == "on"){%>
                         <button name="action" class="btn btn-outline text-red" data-id="<%= meal.id%>" data-action="off"><%= __('off')%></button>
@@ -1152,7 +1152,7 @@
                     <td style="vertical-align: middle;">
                       <!--<a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('update')%></a><br>-->
                       <a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('edit')%></a><br>
-                      <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:deleteMeal" data-argument="<%= meal.id%>"><%= __('delete')%></a><br/>
+                      <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-container="#mymeal" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:deleteMeal" data-argument="<%= meal.id%>"><%= __('delete')%></a><br/>
                     <td style="vertical-align: middle;"><a class="text-red" href="/meal/<%= meal.id%>/off"><%= __('off')%></a></td>
                   </tr>
                   </tbody>
@@ -1226,7 +1226,7 @@
                     <td style="vertical-align: middle;">
                       <!--<a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('update')%></a><br>-->
                       <a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('edit')%></a><br>
-                      <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:deleteMeal" data-argument="<%= meal.id%>"><%= __('delete')%></a><br/>
+                      <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-container="#mymeal" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:deleteMeal" data-argument="<%= meal.id%>"><%= __('delete')%></a><br/>
                   </tr>
                   </tbody>
                   <%}}}%>
@@ -1300,7 +1300,7 @@
                     <td style="vertical-align: middle;">
                       <!--<a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><td><%= __('update')%></a><br>-->
                       <a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('edit')%></a><br>
-                      <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:deleteMeal" data-argument="<%= meal.id%>"><%= __('delete')%></a></td>
+                      <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-container="#mymeal" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:deleteMeal" data-argument="<%= meal.id%>"><%= __('delete')%></a></td>
                     <td style="vertical-align: middle;"><button name="action" class="btn btn-outline text-grey" data-id="<%= meal.id%>" data-action="on"><%= __('on')%></button></td>
                   </tr>
                   </tbody>

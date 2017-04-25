@@ -51,6 +51,7 @@ var LoginView = Backbone.View.extend({
     this.model.save({},{
       success : function(){
         location.href = location.href.indexOf('oauth2') != -1 ? 'https://sfmeal.com' : location.href;
+        location.reload();
       },error : function(model,err){
         $this.errorView.html(err.responseText);
         $this.errorView.show();
@@ -564,7 +565,7 @@ var ApplyView = Backbone.View.extend({
       success: function () {
         location.reload();
       }, error: function (model, err) {
-        if(err && err.responseJSON && err.responseJSON.invalidAttributes.county && err.responseJSON.invalidAttributes.county.length > 0){
+        if(err && err.responseJSON && err.responseJSON.invalidAttributes && err.responseJSON.invalidAttributes.county && err.responseJSON.invalidAttributes.county.length > 0){
           alert_block.html(jQuery.i18n.prop('countyNotInServiceError'));
         }else{
           alert_block.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);

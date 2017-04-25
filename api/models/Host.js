@@ -111,6 +111,11 @@ module.exports = {
       collection : 'User',
       via : 'follow'
     },
+    commission : {
+      type : 'float',
+      defaultsTo : 0.2,
+      decimal2 : true
+    },
     //check stripe verification, return verification object if not there's field_needed
     checkVerification : function(cb){
       var host = this;
