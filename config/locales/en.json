@@ -246,7 +246,7 @@
   "delivery-range": "Delivery range",
   "delivery-fee": "Delivery fee",
   "delivery-available": "Is delivery provided?",
-  "delivery-center" : "Delivery range center address",
+  "delivery-center" : "Delivery Center Address(Enter address, not place name)",
   "miles": "Miles",
   "pickup-location": "Pickup location",
   "pickup-public-location": " Pickup location closed to（Open to public）",

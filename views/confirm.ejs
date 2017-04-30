@@ -211,18 +211,16 @@
             </div>
           <%}%>
           <button type="button" data-action="takeOrder" class="btn btn-danger red"><%= __('placeorder') %></button>
-          <table id="order" class="table" data-meal="<%= meal.id%>" data-err-container="#alert-order">
+
+          <table id="order" class="table tableBodyScroll" data-meal="<%= meal.id%>" data-err-container="#alert-order">
             <thead>
-            <tr>
-              <th><%= __('order-fee') %></th>
-            </tr>
             <tr>
               <th><%= __('name') %></th>
               <td><%= __('price') %></td>
               <td><%= __('quantity') %></td>
             </tr>
             </thead>
-            <tbody>
+            <tbody class="scroll">
             <%
             var dishes = meal.dishes;
             for(var i=0; i < dishes.length; i++){
@@ -238,6 +236,8 @@
               </td>
             </tr>
             <% }%>
+            </tbody>
+            <tbody>
             <tr></tr>
             <tr>
               <th></th>

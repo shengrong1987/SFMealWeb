@@ -247,7 +247,7 @@
   "delivery-fee" : "送餐费",
   "delivery-available" : "是否提供送餐服务",
   "delivery-by-system" : "是否使用系统配送",
-  "delivery-center" : "送餐范围中心点",
+  "delivery-center" : "送餐范围中心点(请输入地址，不要输入地名）",
   "miles" : "英里",
   "pickup-location" : "取餐地点",
   "pickup-public-location" : " 取餐大概地址（公开显示）",

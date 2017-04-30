@@ -358,7 +358,7 @@
           </div>
           <%}%>
           <button type="button" class="btn btn-red" onclick="location.href += '/confirm'"><%= __('checkout')%></button>
-          <table id="order" class="table" data-err-container="#order-alert">
+          <table id="order" class="table tableBodyScroll" data-err-container="#order-alert">
             <thead>
             <tr>
               <th><%= __('meal-fee')%></th>
@@ -369,7 +369,7 @@
               <td><%= __('quantity')%></td>
             </tr>
             </thead>
-            <tbody>
+            <tbody class="scroll">
             <%
               var dishes = meal.dishes;
               for(var i=0; i < dishes.length; i++){
@@ -385,6 +385,8 @@
               </td>
             </tr>
             <% }%>
+            </tbody>
+            <tbody>
             <tr></tr>
             <tr>
               <th></th>
