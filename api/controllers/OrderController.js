@@ -659,18 +659,27 @@ module.exports = {
 
       order.status = "cancel";
       order.msg = "Order aborted by admin, please see email for detail, order id:" + order.id;
-      order.save(function(err, result){
-        if(err){
+      var curOrder = extend({}, order.orders);
+      Object.keys(curOrder).forEach(function (dishId) {
+        curOrder[dishId] = { number : 0};
+      });
+      $this.updateMealLeftQty(order.meal, order.orders, curOrder, function(err, m) {
+        if (err) {
           return res.badRequest(err);
         }
-        notification.notificationCenter("Order", "cancel", result, false, true, req);
-        $this.cancelOrderJob(result.id, function(err){
+        order.save(function(err, result){
           if(err){
             return res.badRequest(err);
           }
-          return res.ok(order);
-        });
-      })
+          notification.notificationCenter("Order", "cancel", result, false, true, req);
+          $this.cancelOrderJob(result.id, function(err){
+            if(err){
+              return res.badRequest(err);
+            }
+            return res.ok(order);
+          });
+        })
+      });
     });
   },
 
