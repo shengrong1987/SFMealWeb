@@ -123,7 +123,7 @@
                           <% if( orders && orders.some(function(order){ if(!user){return false}; return order.customer == user.id}) || (user && user.host == meal.chef.id)){%>
                             <span data-point="<%= pickup.location%>"><%= pickup.location || ''%></span>
                           <%}else if(pickup.method == "pickup"){%>
-                            <span data-point="<%= pickup.publicLocation%>"><%= pickup.publicLocation ? (pickup.publicLocation + ' ' + __('pickup-location-after-order')): pickupMethod.location %></span>
+                            <span data-point="<%= pickup.publicLocation%>"><%= pickup.publicLocation ? (pickup.publicLocation + ' ' + __('pickup-location-after-order')): pickup.location %></span>
                           <%}%>
                           <br/><br/>
                           <% if(pickup.instruction){%>
