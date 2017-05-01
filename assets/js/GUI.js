@@ -257,7 +257,7 @@ function search(target, isRegular){
   if(zip && !isRegular) {
     query += "&zip=" + zip;
     $.ajax({
-      url: "http://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURI(zip)
+      url: "https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURI(zip)
       + "&sensor=false&language=en",
       success: function (response) {
         if (response.results.length == 0) {

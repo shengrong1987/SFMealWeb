@@ -50,8 +50,11 @@ var LoginView = Backbone.View.extend({
     var $this = this;
     this.model.save({},{
       success : function(){
-        location.href = location.href.indexOf('oauth2') != -1 ? 'https://sfmeal.com' : location.href;
-        location.reload();
+        if(location.href.indexOf('oauth2') != -1){
+          location.href = 'https://sfmeal.com';
+        }else{
+          location.reload();
+        }
       },error : function(model,err){
         $this.errorView.html(err.responseText);
         $this.errorView.show();
