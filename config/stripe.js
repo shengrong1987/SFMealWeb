@@ -17,4 +17,7 @@ config.mailChimp = {
   apiKey : process.env.MAILCHIMP_KEY
 }
 
+config.wechat = {
+  token : process.env.WEHCAT_TOKEN
+}
 module.exports = config;

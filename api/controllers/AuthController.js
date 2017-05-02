@@ -9,6 +9,7 @@
  */
 
 var mailChimp = require("../services/mailchimp");
+var wechatToken = sails.config.wechat.token;
 
 module.exports = require('waterlock').waterlocked({
   /* e.g.
@@ -85,5 +86,25 @@ module.exports = require('waterlock').waterlocked({
 
   resetForm : function(req, res){
     return res.view("resetPassword");
+  },
+
+  wechat : function(req, res){
+    var signature =  req.query.signature,
+      timestamp = req.query.timestamp,
+      nonce = req.query.nonce,
+      echostr = req.query.echostr;
+
+    var sha1 = crypto.createHash('sha1'),
+      sha1Str = sha1.update([wechatToken, timestamp, nonce].sort().join('')).digest('hex');
+
+    res.set('Content-Type', 'text/plain');
+
+    if (sha1Str == signature) {
+      console.log('validation success');
+      return res.ok(echostr);
+    } else {
+      console.log('validation error');
+      return res.forbidden();
+    }
   }
 });
