@@ -357,7 +357,7 @@
             <%= __('dish-out-tips')%>
           </div>
           <%}%>
-          <button type="button" class="btn btn-red" onclick="location.href += '/confirm'"><%= __('checkout')%></button>
+          <button type="button" data-id="<%= meal.id%>" class="btn btn-red" onclick="javascript:location.href='/meal/' + $(this).data('id') + '/confirm'"><%= __('checkout')%></button>
           <table id="order" class="table tableBodyScroll" data-err-container="#order-alert">
             <thead>
             <tr>
@@ -438,7 +438,7 @@
             </tbody>
           </table>
 
-          <button type="button" class="btn btn-red" onclick="location.href += '/confirm'"><%= __('checkout')%></button>
+          <button type="button" data-id="<%= meal.id%>" class="btn btn-red" onclick="javascript:location.href='/meal/' + $(this).data('id') + '/confirm'"><%= __('checkout')%></button>
 
           <div id="orderAlertView" class="alert alert-danger hide" style="margin-top: 10px;"></div>
 

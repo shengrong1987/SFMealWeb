@@ -366,7 +366,7 @@ module.exports = {
                       tax : tax
                     }
                   },function(err, charge, transfer){
-                    if (err) {
+                    if(err){
                       Order.destroy(order.id).exec(function(err2){
                         if(err2){
                           return res.badRequest(err2);
@@ -376,7 +376,7 @@ module.exports = {
                     } else if(charge.status == "succeeded"){
 
                       sails.log.info("charge succeed, gathering charging info for order");
-                      for (var i = 0; i < m.dishes.length; i++) {
+                      for(var i = 0; i < m.dishes.length; i++){
                         var dishId = m.dishes[i].id;
                         var quantity = parseInt(orders[dishId].number);
                         m.leftQty[dishId] -= quantity;
