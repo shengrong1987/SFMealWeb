@@ -95,8 +95,12 @@ module.exports = require('waterlock').waterlocked({
       nonce = req.query.nonce,
       echostr = req.query.echostr;
 
+    console.log("signature: " + signature, "timestamp: " + timestamp, "nonce: " + nonce, 'echostr: ' + echostr );
+
     var sha1 = crypto.createHash('sha1'),
       sha1Str = sha1.update([wechatToken, timestamp, nonce].sort().join('')).digest('hex');
+
+    console.log(sha1Str, signature);
 
     if (sha1Str == signature) {
       res.set('Content-Type', 'text/plain');
