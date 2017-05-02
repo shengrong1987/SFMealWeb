@@ -96,6 +96,7 @@ module.exports = require('waterlock').waterlocked({
       echostr = req.query.echostr;
 
     console.log("signature: " + signature, "timestamp: " + timestamp, "nonce: " + nonce, 'echostr: ' + echostr );
+    console.log("token:" + wechatToken);
 
     var sha1 = crypto.createHash('sha1'),
       sha1Str = sha1.update([wechatToken, timestamp, nonce].sort().join('')).digest('hex');
