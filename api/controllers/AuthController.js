@@ -10,6 +10,7 @@
 
 var mailChimp = require("../services/mailchimp");
 var wechatToken = sails.config.wechat.token;
+var crypto = require('crypto');
 
 module.exports = require('waterlock').waterlocked({
   /* e.g.
@@ -97,14 +98,13 @@ module.exports = require('waterlock').waterlocked({
     var sha1 = crypto.createHash('sha1'),
       sha1Str = sha1.update([wechatToken, timestamp, nonce].sort().join('')).digest('hex');
 
-    res.set('Content-Type', 'text/plain');
-
     if (sha1Str == signature) {
+      res.set('Content-Type', 'text/plain');
       console.log('validation success');
       return res.ok(echostr);
     } else {
       console.log('validation error');
-      return res.forbidden();
+      return res.notFound();
     }
   }
 });

@@ -37,7 +37,8 @@ module.exports.policies = {
     'google_oauth2' : true,
     'loginSuccess' : ['sessionAuth'],
     'logout' : ['sessionAuth'],
-    'admin' : 'isAdmin'
+    'admin' : 'isAdmin',
+    'wechat' : true
   },
 
   UserController : {
