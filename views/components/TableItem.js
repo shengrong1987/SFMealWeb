@@ -57,6 +57,11 @@ var TableItem = React.createClass({
     SFMealAPI.command(target.data('model'),target.data('id'),'refund',this.props.detail);
   },
 
+  _delete : function(event){
+    var target = $(event.target);
+    SFMealAPI.command(target.data('model'),target.data('id'),'delete',this.props.detail);
+  },
+
   _verifyPhoto : function(event){
     var target = $(event.target);
     var key = target.find("~input[name='key']").val();
@@ -99,6 +104,41 @@ var TableItem = React.createClass({
     SFMealAPI.command(target.data('model'),target.data('id'),'verifyLicense',this.props.detail, data);
   },
 
+  _create : function(event){
+    var target = $(event.target);
+    var model = target.data("model");
+    switch(model){
+      case "Coupon":
+        var type = target.closest('tr').find("input[name='type']").val();
+        var amount = target.closest('tr').find("input[name='amount']").val();
+        var description = target.closest('tr').find("input[name='description']").val();
+        var code = target.closest('tr').find("input[name='code']").val();
+        var expires = new Date(parseInt(target.closest('tr').find("input[name='expires']").val() * 1000));
+        if(Object.prototype.toString.call(expires) === "[object Date]" ){
+          if(isNaN(expires.getTime())){
+            ActionCreators.badRequest("expire date is not valid");
+            return;
+          }
+        }else{
+          ActionCreators.badRequest("expire date is not valid");
+          return;
+        }
+        if(!type || !amount || !description || !code){
+          ActionCreators.badRequest("please fill in all values");
+          return;
+        }
+        var data = {
+          type : type,
+          amount : amount,
+          description : description,
+          code : code,
+          expires : expires
+        };
+        SFMealAPI.command(model, null, 'create', false, data);
+        break;
+    }
+  },
+
   _run : function(event){
     var target = $(event.target);
     SFMealAPI.command(target.data('model'), target.data('id'), 'run', this.props.detail, target.data('job-data'));
@@ -109,8 +149,17 @@ var TableItem = React.createClass({
     SFMealAPI.command(target.data('model'),target.data('id'),'unverifyLicense',this.props.detail);
   },
 
-  _renderRow : function(rowContent, col, rowData){
-    if((typeof rowContent !== 'boolean' && rowContent) || typeof rowContent === 'boolean' || col === 'command'){
+  _renderRow : function(rowContent, col, rowData, isCreate){
+    if(isCreate){
+      if(col === "command"){
+        rowContent = <button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._create}>Create</button>
+      }else{
+        if(col !== "id"){
+          rowContent = <input type="text" name={col}></input>
+        }
+      }
+    }
+    else if((typeof rowContent !== 'boolean' && rowContent) || typeof rowContent === 'boolean' || col === 'command'){
       if(col === 'command'){
         switch(this.props.model){
           case "Dish":
@@ -160,6 +209,7 @@ var TableItem = React.createClass({
               rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._verifyPhoto}>VerifyPhoto</button><button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._unVerifyPhoto}>UnVerifyPhoto</button><input name="key" type="text"/></div>
             break;
           case "Coupon":
+              rowContent = <div><button className="btn btn-info" data-model={this.props.model} data-id={rowData['id']} onClick={this._delete}>Delete</button></div>
             break;
         }
       }else if(this._isImage(rowContent)){
@@ -193,11 +243,12 @@ var TableItem = React.createClass({
   render: function() {
     var item = this.props.data,
       attributes = this.props.attrs,
-      cols = attributes.map(function (col, i) {
+      isCreate = this.props.isCreate,
+      cols = attributes.map(function (col, i){
         var attrs = col.split('.');
         if(attrs.length == 1){
           var rowContent = item[col];
-          rowContent = this._renderRow(rowContent, col, item);
+          rowContent = this._renderRow(rowContent, col, item, isCreate);
         }else{
           var tmpItem = Object.assign({}, item);
           attrs.map(function(attr){
@@ -206,7 +257,7 @@ var TableItem = React.createClass({
             }
             tmpItem = tmpItem[attr]?tmpItem[attr]:null;
           },this);
-          var rowContent = this._renderRow(tmpItem, col, null);
+          var rowContent = this._renderRow(tmpItem, col, null, isCreate);
         }
         return (
           <td key={i} className="col-md-1">{rowContent}</td>
@@ -225,7 +276,7 @@ var TableItem = React.createClass({
   },
 
   _isDate : function(value){
-    return typeof value === 'string' && new Date(value) !== 'Invalid Date' && !isNaN(new Date(value))
+    return typeof value === 'string' && new Date(value) !== 'Invalid Date' && new Date(value).getTime() > new Date(2015,1,1).getTime() && !isNaN(new Date(value));
   }
 });
 

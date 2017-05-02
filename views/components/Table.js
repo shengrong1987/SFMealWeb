@@ -61,6 +61,9 @@ var Table = React.createClass({
       case "Checklist":
         return {data : CheckListStore.getAllChecklist(), detail : CheckListStore.isShowDetail()};
         break;
+      case "Coupon":
+        return {data : CouponStore.getAllCoupons(), detail : CouponStore.isShowDetail(), isCreate : CouponStore.isCreate()};
+        break;
     }
   },
 
@@ -81,6 +84,7 @@ var Table = React.createClass({
     TransactionStore.addChangeListener(this._onChange);
     JobStore.addChangeListener(this._onChange);
     CheckListStore.addChangeListener(this._onChange);
+    CouponStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount: function () {
@@ -92,6 +96,7 @@ var Table = React.createClass({
     TransactionStore.removeChangeListener(this._onChange);
     JobStore.removeChangeListener(this._onChange);
     CheckListStore.removeChangeListener(this._onChange);
+    CouponStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function () {
@@ -114,18 +119,27 @@ var Table = React.createClass({
     }
 
     var model = this.props.model;
+    var isCreate = this.state.isCreate;
 
-    var tableRows = this.state.data.map(function(item, key){
-      return (
-        <TableItem
-          key={key}
-          data={item}
-          attrs={attrs}
-          model={model}
-          detail={this.state.detail}
+    if(isCreate){
+      var tableRows = <TableItem
+        attrs={attrs}
+        model={model}
+        isCreate={isCreate}/>;
+    }else{
+      var tableRows = this.state.data.map(function(item, key){
+        return (
+          <TableItem
+        key={key}
+        data={item}
+        attrs={attrs}
+        model={model}
+        detail={this.state.detail}
         />
-      );
-    },this);
+        );
+      },this);
+    }
+
     return (
         <table className="table table-striped table-bordered table-hover">
           <tr><td colSpan={header.length}>{this.state.headData}</td></tr>

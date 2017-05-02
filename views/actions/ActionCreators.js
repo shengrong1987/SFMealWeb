@@ -154,6 +154,13 @@ var ActionsCreators = {
     })
   },
 
+  create : function(model){
+    AppDispatcher.handleViewAction({
+      type : ActionTypes.MODEL_CREATE,
+      model : model
+    })
+  },
+
   noResult : function(msg){
     AppDispatcher.handleViewAction({
       type : ActionTypes.NO_RESULT,

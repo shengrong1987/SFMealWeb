@@ -14,6 +14,7 @@ var CHANGE_EVENT = 'change';
 
 var _coupons = [];
 var _showDetail = false;
+var _isCreate = false;
 
 var CouponStore = _.assign({}, EventEmitter.prototype, {
   getAllCoupons: function () {
@@ -22,6 +23,10 @@ var CouponStore = _.assign({}, EventEmitter.prototype, {
 
   isShowDetail : function(){
     return _showDetail;
+  },
+
+  isCreate : function(){
+    return _isCreate;
   },
 
   emitChange: function () {
@@ -43,6 +48,7 @@ AppDispatcher.register(function (payload) {
 
   switch (action.type) {
     case ActionTypes.GET_COUPONS:
+      _isCreate = false;
       if(!Array.isArray(action.records)){
         _coupons = [action.records];
       }else{
@@ -53,6 +59,7 @@ AppDispatcher.register(function (payload) {
       break;
 
     case ActionTypes.GET_COUPON:
+      _isCreate = false;
       if(!Array.isArray(action.records)){
         _coupons = [action.records];
       }else{
@@ -62,9 +69,15 @@ AppDispatcher.register(function (payload) {
       CouponStore.emitChange();
       break;
 
+    case ActionTypes.MODEL_CREATE:
+      _isCreate = true;
+      CouponStore.emitChange();
+      break;
+
     case ActionTypes.NO_RESULT:
-      _dishes = [];
+      _coupons = [];
       _showDetail = false;
+      _isCreate = false;
       CouponStore.emitChange();
       break;
 

@@ -24,6 +24,7 @@ module.exports = {
     GET_COUPONS : null,
     TAB_CHANGE : null,
     SEARCH_CHANGE : null,
+    MODEL_CREATE : null,
     NO_RESULT : null,
     BAD_REQUEST : null
   }),

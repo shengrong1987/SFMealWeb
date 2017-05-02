@@ -9,6 +9,7 @@
  */
 
 module.exports = {
+
   applyCoupon : function(req, res){
     var couponCode = req.params.code;
     var userId = req.session.user.id;
@@ -52,6 +53,21 @@ module.exports = {
         });
       });
     });
+  },
+
+  delete : function(req, res){
+    var id = req.params.id;
+    Coupon.destroy(id).exec(function(err){
+      if(err){
+        return res.badRequest(err);
+      }
+      Coupon.find().exec(function(err, data){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(data);
+      })
+    })
   }
 };
 

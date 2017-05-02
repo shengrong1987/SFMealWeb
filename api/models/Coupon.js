@@ -19,7 +19,8 @@ module.exports = {
       type : 'string'
     },
     code : {
-      type : 'string'
+      type : 'string',
+      unique : true
     },
     expires_at : {
       type : 'date'

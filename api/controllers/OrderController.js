@@ -667,6 +667,7 @@ module.exports = {
         if (err) {
           return res.badRequest(err);
         }
+        order.meal = m.id;
         order.save(function(err, result){
           if(err){
             return res.badRequest(err);

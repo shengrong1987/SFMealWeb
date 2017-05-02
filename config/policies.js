@@ -138,7 +138,10 @@ module.exports.policies = {
 
   CouponController : {
     'applyCoupon' : 'sessionAuth',
-    'create' : 'isAdmin'
+    'create' : 'isAdmin',
+    'find' : 'isAdmin',
+    'findOne' : 'isAdmin',
+    'delete' : 'isAdmin'
   }
 
   /***************************************************************************

@@ -251,8 +251,41 @@ module.exports = {
     });
   },
 
+  getCoupon : function(id){
+    $.ajax({
+      url: '/coupon/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getCoupon(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getCoupons : function(criteria, value){
+    if(criteria && value){
+      var url = "/coupon?" + criteria + "=" + value;
+    }else{
+      var url = "/coupon";
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getCoupons(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
   command : function(model, id, action, detail, data){
-    var url = '/' + model.toLowerCase() + '/' + id + '/' + action;
+    if(action == "create"){
+      var url = '/' + model.toLowerCase();
+    }else{
+      var url = '/' + model.toLowerCase() + '/' + id + '/' + action;
+    }
     $.ajax({
       url: url,
       type: 'POST',
@@ -302,6 +335,12 @@ module.exports = {
             ActionCreators.getCheckLists(data);
           }
           break;
+        case "Coupon":
+          if(detail){
+            ActionCreators.getCoupon(data);
+          }else{
+            ActionCreators.getCoupons(data);
+          }
       }
     }).fail(function(jqXHR, textStatus){
       ActionCreators.badRequest(jqXHR.responseText);
@@ -310,6 +349,20 @@ module.exports = {
 
   changeTab : function(tab){
     ActionCreators.switchTab(tab);
+  },
+
+  createForm : function(model){
+    var isValid;
+    switch(model){
+      case "Coupon":
+        isValid = true;
+        break;
+    }
+    if(!isValid){
+      ActionCreators.badRequest("Can not create item on " + model);
+    }else{
+      ActionCreators.create(model);
+    }
   },
 
   search : function(model, criteria, content){
@@ -368,6 +421,13 @@ module.exports = {
           this.getCheckList(content);
         }else{
           this.getCheckLists(criteria, content);
+        }
+        break;
+      case "Coupon":
+        if(criteria == "id" && content){
+          this.getCoupon(content);
+        }else{
+          this.getCoupons(criteria, content);
         }
         break;
     }

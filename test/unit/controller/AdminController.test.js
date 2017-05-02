@@ -220,7 +220,7 @@ describe('UsersController', function() {
         .end(done)
     })
 
-    it('should be able to abort order that is completed', function (done) {
+    it('should not be able to abort order that is completed', function (done) {
       agent
         .get('/order/' + cancelOrderId + '/abort')
         .expect(400)

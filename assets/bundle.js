@@ -44691,6 +44691,13 @@ var ActionsCreators = {
     })
   },
 
+  create : function(model){
+    AppDispatcher.handleViewAction({
+      type : ActionTypes.MODEL_CREATE,
+      model : model
+    })
+  },
+
   noResult : function(msg){
     AppDispatcher.handleViewAction({
       type : ActionTypes.NO_RESULT,
@@ -44835,12 +44842,19 @@ var Search = React.createClass({displayName: "Search",
     SFMealAPI.search(this.props.model,$("input[type='radio']:checked").val(),encodeURI($("#searchInput").val()))
   },
 
+  _onCreate : function(){
+    SFMealAPI.createForm(this.props.model);
+  },
+
   render: function () {
     var divStyle = {
       width : '100%'
     }, criterias = this.props.criteria.map(function(c){
       return (React.createElement("label", {className: "radio-inline"}, React.createElement("input", {type: "radio", name: "criteriaOpt", value: c}), c));
     }, this);
+    var buttonStyle = {
+      marginLeft: 5 + 'px'
+    };
     var resultContent = this.state.data.errMsg ? this.state.data.errMsg : 'Result of "' + this.state.data.criteria + '" searched as "' + decodeURI(this.state.data.search) + '"';
     return (
       React.createElement("div", {className: "box"}, 
@@ -44849,7 +44863,12 @@ var Search = React.createClass({displayName: "Search",
             React.createElement("input", {id: "searchInput", className: "input btn-lg btn-outline-blue round text-grey", style: divStyle, type: "search"})
           ), 
           React.createElement("div", {className: "col-xs-2"}, 
-            React.createElement("button", {className: "btn btn-info", onClick: this._onSearch}, "Search")
+            React.createElement("div", null, 
+              React.createElement("button", {className: "btn btn-info", onClick: this._onSearch, style: buttonStyle}, "Search")
+            ), 
+            React.createElement("div", null, 
+              React.createElement("button", {className: "btn btn-info", onClick: this._onCreate, style: buttonStyle}, "Create")
+            )
           )
         ), 
         React.createElement("div", {className: "row"}, 
@@ -45005,6 +45024,9 @@ var Table = React.createClass({displayName: "Table",
       case "Checklist":
         return {data : CheckListStore.getAllChecklist(), detail : CheckListStore.isShowDetail()};
         break;
+      case "Coupon":
+        return {data : CouponStore.getAllCoupons(), detail : CouponStore.isShowDetail(), isCreate : CouponStore.isCreate()};
+        break;
     }
   },
 
@@ -45025,6 +45047,7 @@ var Table = React.createClass({displayName: "Table",
     TransactionStore.addChangeListener(this._onChange);
     JobStore.addChangeListener(this._onChange);
     CheckListStore.addChangeListener(this._onChange);
+    CouponStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount: function () {
@@ -45036,6 +45059,7 @@ var Table = React.createClass({displayName: "Table",
     TransactionStore.removeChangeListener(this._onChange);
     JobStore.removeChangeListener(this._onChange);
     CheckListStore.removeChangeListener(this._onChange);
+    CouponStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function () {
@@ -45058,18 +45082,27 @@ var Table = React.createClass({displayName: "Table",
     }
 
     var model = this.props.model;
+    var isCreate = this.state.isCreate;
 
-    var tableRows = this.state.data.map(function(item, key){
-      return (
-        React.createElement(TableItem, {
-          key: key, 
-          data: item, 
-          attrs: attrs, 
-          model: model, 
-          detail: this.state.detail}
+    if(isCreate){
+      var tableRows = React.createElement(TableItem, {
+        attrs: attrs, 
+        model: model, 
+        isCreate: isCreate});
+    }else{
+      var tableRows = this.state.data.map(function(item, key){
+        return (
+          React.createElement(TableItem, {
+        key: key, 
+        data: item, 
+        attrs: attrs, 
+        model: model, 
+        detail: this.state.detail}
         )
-      );
-    },this);
+        );
+      },this);
+    }
+
     return (
         React.createElement("table", {className: "table table-striped table-bordered table-hover"}, 
           React.createElement("tr", null, React.createElement("td", {colSpan: header.length}, this.state.headData)), 
@@ -45189,6 +45222,11 @@ var TableItem = React.createClass({displayName: "TableItem",
     SFMealAPI.command(target.data('model'),target.data('id'),'refund',this.props.detail);
   },
 
+  _delete : function(event){
+    var target = $(event.target);
+    SFMealAPI.command(target.data('model'),target.data('id'),'delete',this.props.detail);
+  },
+
   _verifyPhoto : function(event){
     var target = $(event.target);
     var key = target.find("~input[name='key']").val();
@@ -45231,6 +45269,41 @@ var TableItem = React.createClass({displayName: "TableItem",
     SFMealAPI.command(target.data('model'),target.data('id'),'verifyLicense',this.props.detail, data);
   },
 
+  _create : function(event){
+    var target = $(event.target);
+    var model = target.data("model");
+    switch(model){
+      case "Coupon":
+        var type = target.closest('tr').find("input[name='type']").val();
+        var amount = target.closest('tr').find("input[name='amount']").val();
+        var description = target.closest('tr').find("input[name='description']").val();
+        var code = target.closest('tr').find("input[name='code']").val();
+        var expires = new Date(parseInt(target.closest('tr').find("input[name='expires']").val() * 1000));
+        if(Object.prototype.toString.call(expires) === "[object Date]" ){
+          if(isNaN(expires.getTime())){
+            ActionCreators.badRequest("expire date is not valid");
+            return;
+          }
+        }else{
+          ActionCreators.badRequest("expire date is not valid");
+          return;
+        }
+        if(!type || !amount || !description || !code){
+          ActionCreators.badRequest("please fill in all values");
+          return;
+        }
+        var data = {
+          type : type,
+          amount : amount,
+          description : description,
+          code : code,
+          expires : expires
+        };
+        SFMealAPI.command(model, null, 'create', false, data);
+        break;
+    }
+  },
+
   _run : function(event){
     var target = $(event.target);
     SFMealAPI.command(target.data('model'), target.data('id'), 'run', this.props.detail, target.data('job-data'));
@@ -45241,8 +45314,17 @@ var TableItem = React.createClass({displayName: "TableItem",
     SFMealAPI.command(target.data('model'),target.data('id'),'unverifyLicense',this.props.detail);
   },
 
-  _renderRow : function(rowContent, col, rowData){
-    if((typeof rowContent !== 'boolean' && rowContent) || typeof rowContent === 'boolean' || col === 'command'){
+  _renderRow : function(rowContent, col, rowData, isCreate){
+    if(isCreate){
+      if(col === "command"){
+        rowContent = React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._create}, "Create")
+      }else{
+        if(col !== "id"){
+          rowContent = React.createElement("input", {type: "text", name: col})
+        }
+      }
+    }
+    else if((typeof rowContent !== 'boolean' && rowContent) || typeof rowContent === 'boolean' || col === 'command'){
       if(col === 'command'){
         switch(this.props.model){
           case "Dish":
@@ -45292,6 +45374,7 @@ var TableItem = React.createClass({displayName: "TableItem",
               rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._verifyPhoto}, "VerifyPhoto"), React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._unVerifyPhoto}, "UnVerifyPhoto"), React.createElement("input", {name: "key", type: "text"}))
             break;
           case "Coupon":
+              rowContent = React.createElement("div", null, React.createElement("button", {className: "btn btn-info", "data-model": this.props.model, "data-id": rowData['id'], onClick: this._delete}, "Delete"))
             break;
         }
       }else if(this._isImage(rowContent)){
@@ -45325,11 +45408,12 @@ var TableItem = React.createClass({displayName: "TableItem",
   render: function() {
     var item = this.props.data,
       attributes = this.props.attrs,
-      cols = attributes.map(function (col, i) {
+      isCreate = this.props.isCreate,
+      cols = attributes.map(function (col, i){
         var attrs = col.split('.');
         if(attrs.length == 1){
           var rowContent = item[col];
-          rowContent = this._renderRow(rowContent, col, item);
+          rowContent = this._renderRow(rowContent, col, item, isCreate);
         }else{
           var tmpItem = Object.assign({}, item);
           attrs.map(function(attr){
@@ -45338,7 +45422,7 @@ var TableItem = React.createClass({displayName: "TableItem",
             }
             tmpItem = tmpItem[attr]?tmpItem[attr]:null;
           },this);
-          var rowContent = this._renderRow(tmpItem, col, null);
+          var rowContent = this._renderRow(tmpItem, col, null, isCreate);
         }
         return (
           React.createElement("td", {key: i, className: "col-md-1"}, rowContent)
@@ -45357,7 +45441,7 @@ var TableItem = React.createClass({displayName: "TableItem",
   },
 
   _isDate : function(value){
-    return typeof value === 'string' && new Date(value) !== 'Invalid Date' && !isNaN(new Date(value))
+    return typeof value === 'string' && new Date(value) !== 'Invalid Date' && new Date(value).getTime() > new Date(2015,1,1).getTime() && !isNaN(new Date(value));
   }
 });
 
@@ -45515,6 +45599,7 @@ module.exports = {
     GET_COUPONS : null,
     TAB_CHANGE : null,
     SEARCH_CHANGE : null,
+    MODEL_CREATE : null,
     NO_RESULT : null,
     BAD_REQUEST : null
   }),
@@ -45805,8 +45890,41 @@ module.exports = {
     });
   },
 
+  getCoupon : function(id){
+    $.ajax({
+      url: '/coupon/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getCoupon(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getCoupons : function(criteria, value){
+    if(criteria && value){
+      var url = "/coupon?" + criteria + "=" + value;
+    }else{
+      var url = "/coupon";
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getCoupons(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
   command : function(model, id, action, detail, data){
-    var url = '/' + model.toLowerCase() + '/' + id + '/' + action;
+    if(action == "create"){
+      var url = '/' + model.toLowerCase();
+    }else{
+      var url = '/' + model.toLowerCase() + '/' + id + '/' + action;
+    }
     $.ajax({
       url: url,
       type: 'POST',
@@ -45856,6 +45974,12 @@ module.exports = {
             ActionCreators.getCheckLists(data);
           }
           break;
+        case "Coupon":
+          if(detail){
+            ActionCreators.getCoupon(data);
+          }else{
+            ActionCreators.getCoupons(data);
+          }
       }
     }).fail(function(jqXHR, textStatus){
       ActionCreators.badRequest(jqXHR.responseText);
@@ -45864,6 +45988,20 @@ module.exports = {
 
   changeTab : function(tab){
     ActionCreators.switchTab(tab);
+  },
+
+  createForm : function(model){
+    var isValid;
+    switch(model){
+      case "Coupon":
+        isValid = true;
+        break;
+    }
+    if(!isValid){
+      ActionCreators.badRequest("Can not create item on " + model);
+    }else{
+      ActionCreators.create(model);
+    }
   },
 
   search : function(model, criteria, content){
@@ -45922,6 +46060,13 @@ module.exports = {
           this.getCheckList(content);
         }else{
           this.getCheckLists(criteria, content);
+        }
+        break;
+      case "Coupon":
+        if(criteria == "id" && content){
+          this.getCoupon(content);
+        }else{
+          this.getCoupons(criteria, content);
         }
         break;
     }
@@ -46034,6 +46179,7 @@ var CHANGE_EVENT = 'change';
 
 var _coupons = [];
 var _showDetail = false;
+var _isCreate = false;
 
 var CouponStore = _.assign({}, EventEmitter.prototype, {
   getAllCoupons: function () {
@@ -46042,6 +46188,10 @@ var CouponStore = _.assign({}, EventEmitter.prototype, {
 
   isShowDetail : function(){
     return _showDetail;
+  },
+
+  isCreate : function(){
+    return _isCreate;
   },
 
   emitChange: function () {
@@ -46063,6 +46213,7 @@ AppDispatcher.register(function (payload) {
 
   switch (action.type) {
     case ActionTypes.GET_COUPONS:
+      _isCreate = false;
       if(!Array.isArray(action.records)){
         _coupons = [action.records];
       }else{
@@ -46073,6 +46224,7 @@ AppDispatcher.register(function (payload) {
       break;
 
     case ActionTypes.GET_COUPON:
+      _isCreate = false;
       if(!Array.isArray(action.records)){
         _coupons = [action.records];
       }else{
@@ -46082,9 +46234,15 @@ AppDispatcher.register(function (payload) {
       CouponStore.emitChange();
       break;
 
+    case ActionTypes.MODEL_CREATE:
+      _isCreate = true;
+      CouponStore.emitChange();
+      break;
+
     case ActionTypes.NO_RESULT:
-      _dishes = [];
+      _coupons = [];
       _showDetail = false;
+      _isCreate = false;
       CouponStore.emitChange();
       break;
 

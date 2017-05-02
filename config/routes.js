@@ -78,7 +78,8 @@ module.exports.routes = {
   '/trust' : { view : 'trust'},
   '/terms' : {view : 'terms'},
   '/checklist/:id/verify' : 'ChecklistController.verify',
-  '/checklist/:id/unVerify' : 'ChecklistController.unVerify'
+  '/checklist/:id/unVerify' : 'ChecklistController.unVerify',
+  '/coupon/:id/delete' : 'CouponController.delete'
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *
