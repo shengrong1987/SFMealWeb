@@ -18,6 +18,6 @@ config.mailChimp = {
 }
 
 config.wechat = {
-  token : process.env.WEHCAT_TOKEN
+  token : process.env.WECHAT_TOKEN
 }
 module.exports = config;
