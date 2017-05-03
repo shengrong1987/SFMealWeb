@@ -9595,10 +9595,6 @@ fieldset[disabled] .btn-red.active {
     width: 100%;
     min-height: 200px;
   }
-  .compact-banner .content {
-    width: 410px;
-    margin: auto;
-  }
   .compact-banner .logo {
     top: 10px;
     left: 10%;
