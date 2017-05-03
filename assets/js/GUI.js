@@ -717,6 +717,50 @@ $("document").ready(function(){
   setup();
 });
 
+function setupWechat(imgSrc, title){
+  var gm_ua = navigator.userAgent.toLowerCase();
+  if(gm_ua.match(/MicroMessenger/i)=="micromessenger") {
+    $('body').prepend('<div style="overflow:hidden;width:0px;height:0px;margin:0 auto;position:absolute;top:-800px;"><img src="' + imgSrc + '"></div>');
+    document.title = title;
+    // wechat browser
+    // var domain = location.href.split('#')[0];
+    // var res = encodeURIComponent(domain);
+    // res = 'api/wechat/signature?url='+ res;
+    // $.ajax({
+    //   url: res,//  此处url请求地址需要替换成你自己实际项目中服务器数字签名服务地址
+    //   type: 'get'
+    // }).done(function(r) {
+    //   // 返回了数字签名对象
+    //   /*console.log(r);
+    //    //console.log(r.appid);
+    //    console.log(r.timestamp);
+    //    //console.log(r.nonceStr);
+    //    console.log(r.signature);
+    //    console.log(location.href.split('#')[0]);*/
+    //   // 开始配置微信JS-SDK
+    //   wx.config({
+    //     debug: false,
+    //     appId: 'wx1e498c6c9a37fa07',
+    //     timestamp: r.timestamp,
+    //     nonceStr: r.nonce_str,
+    //     signature: r.signature,
+    //     jsApiList: [
+    //       'checkJsApi',
+    //       'onMenuShareTimeline',
+    //       'onMenuShareAppMessage',
+    //       'onMenuShareQQ',
+    //       'onMenuShareWeibo',
+    //       'hideMenuItems',
+    //       'chooseImage'
+    //     ]
+    //   });
+    //
+    // });
+  } else {
+    // not wechat browser
+  }
+}
+
 function createCookie(name, value, days) {
   var expires;
 

@@ -42,16 +42,15 @@
     <div class="page" style="text-align: center;">
 
       <div class="main" style="min-height: 500px;">
-        <h1>
-          <%= __('forbidden')%>
-        </h1>
-        <h2>
+        <h3>
           <% if (typeof error !== 'undefined') { %>
           <%= error %>
           <% } else { %>
           <%= data || __('authorizedError')%>
           <% } %>
-        </h2>
+          <br/>
+          <small><span data-toggle="i18n" data-key="newlyJoin">第一次使用? 点这里</span><a toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)" data-toggle="i18n" data-key="register">注册</a></small>
+        </h3>
 
         <% if(!login){%>
 

@@ -27,7 +27,7 @@
     </div>
   </div>
 
-  <div id="meal-detail-container" class="padding-clear" data-meal-prepareTime="<%= meal.prepareTime%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>">
+  <div id="meal-detail-container" class="padding-clear" data-meal-prepareTime="<%= meal.prepareTime%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>" data-title="<%= meal.title%>" data-cover="<%= meal.cover%>">
 
     <div class="row">
       <div class="col-md-8">
@@ -482,6 +482,8 @@
 <script>
   var mealSelectionView = new MealSelectionView({ el : $("#meal-detail-container"), model : new Meal()});
   setupLanguage();
+  setupWechat($("#meal-detail-container").data("cover"),$("#meal-detail-container").data("title"));
+
 </script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA&callback=mealSelectionView.initMap" async defer></script>

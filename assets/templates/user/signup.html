@@ -2,7 +2,6 @@
   <div class="alert alert-warning hide" data-toggle="i18n" data-key="userRegisterExistError"></div>
   <div id="step1" class="text-center step">
     <div class="popup box middle" style="width: 300px;">
-      <a class="close relative" onclick="javascript:dismissModal()" style="right: -15px;top:-5px;"><i class="fa fa-close"></i></a>
       <h2></h2>
       <button id="FBBtn" class="popline btn btn-blue btn-lg round light">
         <span><i class="fa fa-facebook-f fa" style="padding-right: 15px;"></i>Facebook <span data-toggle="i18n" data-key="login">账号登陆</span></span>
@@ -25,14 +24,17 @@
       <span class="divider popline"></span>
 
       <h6><span data-toggle="i18n" data-key="alreadyMember"></span><a toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)"><span data-toggle="i18n" data-key="login"></span></a></h6>
+      <a class="close relative" onclick="javascript:dismissModal()" style="right: -15px;top:-360px;"><i class="fa fa-close"></i></a>
     </div>
   </div>
 
   <div id="step2" class="text-center hide step" >
     <div class="popup box middle" style="width: 300px;">
-      <a class="close relative" onclick="javascript:dismissModal()" style="right: -15px;top:-5px;"><i class="fa fa-close"></i></a>
+
+      <a class="close relative" onclick="javascript:dismissModal()" style="right: -15px;"><i class="fa fa-close"></i></a>
+
       <h3 class="text-center">
-        <small><a href="#" class="last-step" data-step="2" onclick="lastStep(event)">Facebook</a><span data-toggle="i18n" data-key="register"></span> <span data-toggle="i18n" data-key="or"></span> <a href="#" class="last-step" data-step="2" onclick="lastStep(event)">Google</a></span><span data-toggle="i18n" data-key="register"></span></small>
+        <small><a href="#" class="last-step" data-step="2" onclick="lastStep(event)">Facebook </a><span data-toggle="i18n" data-key="register"></span> <span data-toggle="i18n" data-key="or"></span> <a href="#" class="last-step" data-step="2" onclick="lastStep(event)">Google </a></span><span data-toggle="i18n" data-key="register"></span></small>
       </h3>
 
       <h4 class="text-center">
