@@ -7,20 +7,21 @@
 
     <div class="absolute logo-container">
 
-      <div class="col-xs-4 relative text-left">
+      <div class="col-lg-3 col-sm-4 col-xs-12 relative text-left">
         <a href="/" class="logo"></a>
       </div>
 
-      <div class="relative text-left col-xs-8 content search-container">
-        <h4 class="text-white"><strong><%= __('searching-word') %></strong></h4>
+      <div class="relative text-left col-lg-9 col-sm-8 col-xs-12 content">
+        <h4 class="text-white"><strong><%__('searching-word')%></strong></h4>
         <div class="btn-group">
-          <input class="input btn btn-default round light text-grey" placeholder="<%= __('searching-tips') %>">
+          <input class="input btn btn-default round light text-grey" placeholder="<%= __('searching-tips')%>">
           <button class="btn btn-warning round orange text-white" onclick="javascript:search(this)">
             <i class="fa fa-search"></i>
-            <%= __('search') %>
+            <%= __('search')%>
           </button>
         </div>
-        <button class="btn btn-danger round red" onclick="location.href='/meal'"><%= __('see-menu') %></button>
+        <button class="btn btn-red round" onclick="location.href='/meal'"><%= __('see-menu')%></button>
+
       </div>
 
     </div>
