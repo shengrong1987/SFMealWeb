@@ -719,7 +719,7 @@ $("document").ready(function(){
 
 function setupWechat(imgSrc, title){
   var gm_ua = navigator.userAgent.toLowerCase();
-  if(gm_ua.match(/MicroMessenger/i)=="micromessenger") {
+  if(gm_ua.match(/MicroMessenger/i)!="micromessenger") {
     if(imgSrc){
       $('body').prepend('<div style="overflow:hidden;width:0px;height:0px;margin:0 auto;position:absolute;top:-800px;"><img src="' + imgSrc + '"></div>');
     }
@@ -735,14 +735,9 @@ function setupWechat(imgSrc, title){
     }).done(function(r) {
       // 返回了数字签名对象
       console.log(r);
-      console.log(r.appid);
-      console.log(r.timestamp);
-      console.log(r.nonceStr);
-      console.log(r.signature);
-      console.log(location.href.split('#')[0]);
       // 开始配置微信JS-SDK
       wx.config({
-        debug: false,
+        debug: true,
         appId: r.appid,
         timestamp: r.timestamp,
         nonceStr: r.nonceStr,
@@ -771,9 +766,9 @@ function setupWechat(imgSrc, title){
           }
         });
         wx.onMenuShareAppMessage({
-          title: '', // Sharing title
-          desc: '', // Sharing description
-          link: '', // Sharing link
+          title: '12', // Sharing title
+          desc: '12', // Sharing description
+          link: '12', // Sharing link
           imgUrl: '', // Sharing image URL
           type: '', // Sharing type, such as “music”, “video “ or “link”. It is “link” by default.
           dataUrl: '', // The data URL should be provided for items of type “music” or “video”. It is null by default.
