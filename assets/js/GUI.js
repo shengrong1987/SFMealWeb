@@ -720,8 +720,12 @@ $("document").ready(function(){
 function setupWechat(imgSrc, title){
   var gm_ua = navigator.userAgent.toLowerCase();
   if(gm_ua.match(/MicroMessenger/i)!="micromessenger") {
-    $('body').prepend('<div style="overflow:hidden;width:0px;height:0px;margin:0 auto;position:absolute;top:-800px;"><img src="' + imgSrc + '"></div>');
-    document.title = title;
+    if(imgSrc){
+      $('body').prepend('<div style="overflow:hidden;width:0px;height:0px;margin:0 auto;position:absolute;top:-800px;"><img src="' + imgSrc + '"></div>');
+    }
+    if(title){
+      document.title = title;
+    }
     var domain = location.href.split('#')[0];
     // var res = encodeURIComponent(domain);
     // res = 'api/wechat/signature?url='+ res;
