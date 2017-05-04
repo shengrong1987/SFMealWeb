@@ -12,6 +12,7 @@ var mailChimp = require("../services/mailchimp");
 var wechatToken = sails.config.wechat.token;
 var wechatAppId = sails.config.wechat.appId;
 var wechatAppSecret = sails.config.wechat.secret;
+var wechatNonceStr = sails.config.wechat.nonceStr;
 var crypto = require('crypto');
 var request = require('request');
 
@@ -118,16 +119,37 @@ module.exports = require('waterlock').waterlocked({
 
   wechatSignature : function(req, res){
     sails.log.info(wechatAppId, wechatAppSecret);
+    var originalUrl = req.query.url;
     var url = "https://api.wechat.com/cgi-bin/token?grant_type=client_credential&appid=" + wechatAppId + "&secret=" + wechatAppSecret;
     request.get({
       url : url
-    }, function(err, response, body){
+    }, function(err, response){
       if(err){
         return res.badRequest(err);
       }
-      sails.log.info(response);
-      sails.log.info(body);
-      return res.ok(response);
+      var body = JSON.parse(response.body);
+      var ticketUrl = "https://api.wechat.com/cgi-bin/ticket/getticket?access_token=" + body.access_token + "&type=jsapi";
+      request.get({
+        url : ticketUrl
+      }, function(err, response){
+        if(err){
+          return res.badRequest(err);
+        }
+        body = JSON.parse(response.body);
+        var ticket = body.ticket;
+        var nonceStr = wechatNonceStr;
+        var timestamp = new Date().getTime();
+        var preSignatureStr = "jsapi_ticket=" + ticket + "&noncestr=" + nonceStr + "&timstamp=" + timestamp + "&url=" + originalUrl;
+        var sha1 = crypto.createHash('sha1'),
+          signature = sha1.update(preSignatureStr).digest('hex');
+        return res.ok({
+          appid : wechatAppId,
+          timestamp : timestamp,
+          nonceStr : nonceStr,
+          signature : signature,
+          url : originalUrl
+        });
+      })
     })
   }
 

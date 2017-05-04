@@ -719,7 +719,7 @@ $("document").ready(function(){
 
 function setupWechat(imgSrc, title){
   var gm_ua = navigator.userAgent.toLowerCase();
-  if(gm_ua.match(/MicroMessenger/i)!="micromessenger") {
+  if(gm_ua.match(/MicroMessenger/i)=="micromessenger") {
     if(imgSrc){
       $('body').prepend('<div style="overflow:hidden;width:0px;height:0px;margin:0 auto;position:absolute;top:-800px;"><img src="' + imgSrc + '"></div>');
     }
@@ -743,9 +743,9 @@ function setupWechat(imgSrc, title){
       // 开始配置微信JS-SDK
       wx.config({
         debug: false,
-        appId: 'wx4859c87cbb120758',
+        appId: r.appid,
         timestamp: r.timestamp,
-        nonceStr: r.nonce_str,
+        nonceStr: r.nonceStr,
         signature: r.signature,
         jsApiList: [
           'onMenuShareTimeline',
@@ -757,6 +757,7 @@ function setupWechat(imgSrc, title){
         ]
       });
       wx.ready(function(){
+        console.log("success");
         // The callback function of ready API will be executed after a successful config authentication, and each API calling must be done after the config API obtains a result. As config is an asynchronous operation, all relevant API calling must be put in the callback function if it needs to be called while the page loads. A user-initiated API call can be called directly without needing to be put in the callback function.
         wx.onMenuShareTimeline({
           title: '', // Sharing title
@@ -785,7 +786,7 @@ function setupWechat(imgSrc, title){
         });
       });
       wx.error(function(res){
-
+        console.log("error");
         // The callback function of error API will be executed if config authentication fails. If authentication failure is due to an expired signature, the detailed error information can be viewed by enabling the debugging mode within config API, or via the returned res parameter. The signature can be updated here for the SPA.
 
       });

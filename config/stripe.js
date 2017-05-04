@@ -20,6 +20,7 @@ config.mailChimp = {
 config.wechat = {
   token : process.env.WECHAT_TOKEN,
   appId : process.env.WECHAT_APPID,
-  secret : process.env.WECHAT_SECRET
+  secret : process.env.WECHAT_SECRET,
+  nonceStr : process.env.WECHAT_NONCESTR
 }
 module.exports = config;
