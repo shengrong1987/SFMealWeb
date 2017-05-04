@@ -10,7 +10,10 @@
 
 var mailChimp = require("../services/mailchimp");
 var wechatToken = sails.config.wechat.token;
+var wechatAppId = sails.config.wechat.appId;
+var wechatAppSecret = sails.config.wechat.secret;
 var crypto = require('crypto');
+var request = require('request');
 
 module.exports = require('waterlock').waterlocked({
   /* e.g.
@@ -111,5 +114,21 @@ module.exports = require('waterlock').waterlocked({
       console.log('validation error');
       return res.notFound();
     }
+  },
+
+  wechatSignature : function(req, res){
+    var url = "https://api.wechat.com/cgi-bin/token?grant_type=client_credential&appid=" + wechatAppId + "&secret=" + wechatAppSecret;
+    request.get({
+      url : url
+    }, function(err, response, body){
+      if(err){
+        return res.badRequest(err);
+      }
+      sails.log.info(response);
+      sails.log.info(body);
+      return res.ok(response);
+    })
   }
+
+
 });

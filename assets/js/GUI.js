@@ -719,43 +719,74 @@ $("document").ready(function(){
 
 function setupWechat(imgSrc, title){
   var gm_ua = navigator.userAgent.toLowerCase();
-  if(gm_ua.match(/MicroMessenger/i)=="micromessenger") {
+  if(gm_ua.match(/MicroMessenger/i)!="micromessenger") {
     $('body').prepend('<div style="overflow:hidden;width:0px;height:0px;margin:0 auto;position:absolute;top:-800px;"><img src="' + imgSrc + '"></div>');
     document.title = title;
-    // wechat browser
-    // var domain = location.href.split('#')[0];
+    var domain = location.href.split('#')[0];
     // var res = encodeURIComponent(domain);
     // res = 'api/wechat/signature?url='+ res;
-    // $.ajax({
-    //   url: res,//  此处url请求地址需要替换成你自己实际项目中服务器数字签名服务地址
-    //   type: 'get'
-    // }).done(function(r) {
-    //   // 返回了数字签名对象
-    //   /*console.log(r);
-    //    //console.log(r.appid);
-    //    console.log(r.timestamp);
-    //    //console.log(r.nonceStr);
-    //    console.log(r.signature);
-    //    console.log(location.href.split('#')[0]);*/
-    //   // 开始配置微信JS-SDK
-    //   wx.config({
-    //     debug: false,
-    //     appId: 'wx1e498c6c9a37fa07',
-    //     timestamp: r.timestamp,
-    //     nonceStr: r.nonce_str,
-    //     signature: r.signature,
-    //     jsApiList: [
-    //       'checkJsApi',
-    //       'onMenuShareTimeline',
-    //       'onMenuShareAppMessage',
-    //       'onMenuShareQQ',
-    //       'onMenuShareWeibo',
-    //       'hideMenuItems',
-    //       'chooseImage'
-    //     ]
-    //   });
+    $.ajax({
+      url: "/auth/wechatSignature",//  此处url请求地址需要替换成你自己实际项目中服务器数字签名服务地址
+      type: 'get'
+    }).done(function(r) {
+      // 返回了数字签名对象
+      console.log(r);
+      console.log(r.appid);
+      console.log(r.timestamp);
+      console.log(r.nonceStr);
+      console.log(r.signature);
+      console.log(location.href.split('#')[0]);
+      // 开始配置微信JS-SDK
+      wx.config({
+        debug: false,
+        appId: 'wx4859c87cbb120758',
+        timestamp: r.timestamp,
+        nonceStr: r.nonce_str,
+        signature: r.signature,
+        jsApiList: [
+          'onMenuShareTimeline',
+          'onMenuShareAppMessage',
+          'onMenuShareQQ',
+          'onMenuShareWeibo',
+          'hideMenuItems',
+          'chooseImage'
+        ]
+      });
+      wx.ready(function(){
+        // The callback function of ready API will be executed after a successful config authentication, and each API calling must be done after the config API obtains a result. As config is an asynchronous operation, all relevant API calling must be put in the callback function if it needs to be called while the page loads. A user-initiated API call can be called directly without needing to be put in the callback function.
+        wx.onMenuShareTimeline({
+          title: '', // Sharing title
+          link: '', // Sharing link
+          imgUrl: '', // Sharing image URL
+          success: function () {
+            // Callback function executed after a user confirms sharing
+          },
+          cancel: function () {
+            // Callback function executed after a user cancels sharing
+          }
+        });
+        wx.onMenuShareAppMessage({
+          title: '', // Sharing title
+          desc: '', // Sharing description
+          link: '', // Sharing link
+          imgUrl: '', // Sharing image URL
+          type: '', // Sharing type, such as “music”, “video “ or “link”. It is “link” by default.
+          dataUrl: '', // The data URL should be provided for items of type “music” or “video”. It is null by default.
+          success: function () {
+            // Callback function executed after a user confirms sharing
+          },
+          cancel: function () {
+            // Callback function executed after a user cancels sharing
+          }
+        });
+      });
+      wx.error(function(res){
+
+        // The callback function of error API will be executed if config authentication fails. If authentication failure is due to an expired signature, the detailed error information can be viewed by enabling the debugging mode within config API, or via the returned res parameter. The signature can be updated here for the SPA.
+
+      });
     //
-    // });
+    });
   } else {
     // not wechat browser
   }
