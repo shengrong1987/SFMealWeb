@@ -138,8 +138,8 @@ module.exports = require('waterlock').waterlocked({
         body = JSON.parse(response.body);
         var ticket = body.ticket;
         var nonceStr = wechatNonceStr;
-        var timestamp = new Date().getTime();
-        var preSignatureStr = "jsapi_ticket=" + ticket + "&noncestr=" + nonceStr + "&timstamp=" + timestamp + "&url=" + originalUrl;
+        var timestamp = parseInt(new Date().getTime()/1000);
+        var preSignatureStr = "jsapi_ticket=" + ticket + "&noncestr=" + nonceStr + "&timestamp=" + timestamp + "&url=" + originalUrl;
         var sha1 = crypto.createHash('sha1'),
           signature = sha1.update(preSignatureStr).digest('hex');
         return res.ok({
