@@ -117,6 +117,7 @@ module.exports = require('waterlock').waterlocked({
   },
 
   wechatSignature : function(req, res){
+    sails.log.info(wechatAppId, wechatAppSecret);
     var url = "https://api.wechat.com/cgi-bin/token?grant_type=client_credential&appid=" + wechatAppId + "&secret=" + wechatAppSecret;
     request.get({
       url : url
