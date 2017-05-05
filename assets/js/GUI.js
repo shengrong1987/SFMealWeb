@@ -717,7 +717,7 @@ $("document").ready(function(){
   setup();
 });
 
-function setupWechat(imgSrc, title){
+function setupWechat(imgSrc, title, desc){
   var gm_ua = navigator.userAgent.toLowerCase();
   if(gm_ua.match(/MicroMessenger/i)=="micromessenger") {
     if(imgSrc){
@@ -755,9 +755,9 @@ function setupWechat(imgSrc, title){
         console.log("success");
         // The callback function of ready API will be executed after a successful config authentication, and each API calling must be done after the config API obtains a result. As config is an asynchronous operation, all relevant API calling must be put in the callback function if it needs to be called while the page loads. A user-initiated API call can be called directly without needing to be put in the callback function.
         wx.onMenuShareTimeline({
-          title: '12', // Sharing title
-          link: '12', // Sharing link
-          imgUrl: '', // Sharing image URL
+          title: title, // Sharing title
+          link: location.href, // Sharing link
+          imgUrl: imgSrc, // Sharing image URL
           success: function () {
             // Callback function executed after a user confirms sharing
           },
@@ -766,10 +766,10 @@ function setupWechat(imgSrc, title){
           }
         });
         wx.onMenuShareAppMessage({
-          title: '12', // Sharing title
-          desc: '12', // Sharing description
-          link: '12', // Sharing link
-          imgUrl: '', // Sharing image URL
+          title: title, // Sharing title
+          desc: desc, // Sharing description
+          link: location.href, // Sharing link
+          imgUrl: imgSrc, // Sharing image URL
           type: '', // Sharing type, such as “music”, “video “ or “link”. It is “link” by default.
           dataUrl: '', // The data URL should be provided for items of type “music” or “video”. It is null by default.
           success: function () {
