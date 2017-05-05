@@ -737,7 +737,7 @@ function setupWechat(imgSrc, title, desc){
       console.log(r);
       // 开始配置微信JS-SDK
       wx.config({
-        debug: true,
+        debug: false,
         appId: r.appid,
         timestamp: r.timestamp,
         nonceStr: r.nonceStr,
