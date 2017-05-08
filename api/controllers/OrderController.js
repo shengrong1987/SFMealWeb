@@ -521,7 +521,7 @@ module.exports = {
                     hostId : order.host.id,
                     orderId : order.id,
                     userId : userId,
-                    deliveryFee : order.delivery_fee,
+                    deliveryFee : order.delivery_fee * 100,
                     tax : tax
                   }
                 },function(err, charge, transfer){
@@ -871,7 +871,7 @@ module.exports = {
                   hostId : order.host.id,
                   orderId : order.id,
                   userId : userId,
-                  deliveryFee : order.delivery_fee,
+                  deliveryFee : order.delivery_fee * 100,
                   tax : tax
                 }
               },function(err, charge, transfer){

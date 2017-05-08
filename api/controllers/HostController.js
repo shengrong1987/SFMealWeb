@@ -38,7 +38,7 @@ module.exports = {
             //construct orders for host
             var fullOrders = [];
             async.each(host.orders,function(order, next){
-              Order.findOne(order.id).populate("meal").populate('customer').exec(function(err, o){
+              Order.findOne(order.id).populate("meal").populate('customer').populate("host").exec(function(err, o){
                 if(err){
                   return next(err);
                 }
