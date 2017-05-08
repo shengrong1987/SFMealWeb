@@ -709,5 +709,6 @@
   "menuoftheweek" : "menu of the week",
   "hometaste1" : "Everyone has a taste of home, is it here?",
   "area-not-open" : "This area is currently not available",
-  "compensation-amount" : "Compensation"
+  "compensation-amount" : "Compensation",
+  "order-adjust-title" : "Order Adjustment"
 }

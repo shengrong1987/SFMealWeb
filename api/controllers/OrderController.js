@@ -348,6 +348,7 @@ module.exports = {
                     return res.badRequest(err);
                   }
                   stripe.charge({
+                    isInitial : true,
                     amount : subtotal * 100,
                     deliveryFee : req.body.delivery_fee * 100,
                     discount : discount * 100,
@@ -454,7 +455,7 @@ module.exports = {
     var userId = req.session.user.id;
     var orderId = req.params.id;
     var params = req.body;
-    Order.findOne(orderId).populate("customer").populate("meal").populate("dishes").exec(function(err,order){
+    Order.findOne(orderId).populate("customer").populate("meal").populate("dishes").populate("host").exec(function(err,order){
       if(err){
         return res.badRequest(err);
       }
@@ -507,6 +508,7 @@ module.exports = {
               if(diff>0){
                 //create another charge
                 stripe.charge({
+                  isInitial : false,
                   amount : diff * 100,
                   discount : 0,
                   email : email,
@@ -552,7 +554,10 @@ module.exports = {
                 });
               }else{
                 var totalRefund = Math.abs(diff);
+                tax = $this.getTax(totalRefund, order.host.county)/100;
+                totalRefund += tax;
                 diff = - diff;
+                diff += tax;
                 var chargeIds = Object.keys(order.charges);
                 var refundCharges = [];
                 chargeIds.forEach(function(chargeId){
@@ -573,7 +578,7 @@ module.exports = {
                 async.each(refundCharges,function(charge, next){
                   stripe.refund({
                     id : charge.id,
-                    amount : charge.amount
+                    amount : charge.amount * 100
                   },function(err, refund){
                     if(err){
                       return next(err);
@@ -599,7 +604,7 @@ module.exports = {
                       }
                       //send notification
                       notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
-                      return res.ok({responseText : req.__('order-adjust-ok2', totalRefund /100)});
+                      return res.ok({responseText : req.__('order-adjust-ok2', totalRefund)});
                     })
                   });
                 });
@@ -853,6 +858,7 @@ module.exports = {
             if(diff>0){
               //create another charge
               stripe.charge({
+                isInitial : false,
                 amount : diff * 100,
                 email : email,
                 discount : 0,
@@ -924,7 +930,7 @@ module.exports = {
               async.each(refundCharges, function (charge, next) {
                 stripe.refund({
                   id: charge.id,
-                  amount: charge.amount
+                  amount: charge.amount * 100
                 }, function (err, refund) {
                   if (err) {
                     return next(err);

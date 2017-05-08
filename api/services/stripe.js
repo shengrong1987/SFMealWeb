@@ -120,6 +120,8 @@ module.exports = {
   charge : function(attr, cb){
 
     var meal = attr.meal;
+    var isInitial = attr.isInitial;
+    var serviceFee = isInitial ? SERVICE_FEE : 0;
 
     //declare all fees
     var delivery_application_fee = (attr.method && attr.method == "delivery" && meal.isDeliveryBySystem) ? SYSTEM_DELIVERY_FEE : 0;
@@ -134,13 +136,13 @@ module.exports = {
     sails.log.info("tax is: " + tax);
 
     //calculate application fee
-    var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + SERVICE_FEE;
+    var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee;
 
     //calculate subtotal after tax
     var subtotalAfterTax = attr.amount + tax;
 
     //calculate other fee
-    var originalTotal = subtotalAfterTax + delivery_fee + SERVICE_FEE;
+    var originalTotal = subtotalAfterTax + delivery_fee + serviceFee;
 
     //apply discount
     var total = originalTotal - discount;

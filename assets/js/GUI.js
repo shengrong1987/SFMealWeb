@@ -297,7 +297,7 @@ function loadOrder(fromCahce){
       $(this).data("left-amount",$(this).data("left-amount") - localOrders[dishId].number);
       refreshOrder(dishId);
     }else{
-      localOrders[dishId] = { number : $(this).find(".amount").data("value")};
+      localOrders[dishId] = { number : $(this).find(".amount").data("value"), preference : { property : $(this).find(".preference").data("preference"), extra :  $(this).find(".price").data("extra")}};
     }
   });
   loadCoupon(fromCahce);
@@ -388,8 +388,8 @@ var refreshMenu = function(){
     delivery = 0;
   }
   $(".delivery").text("$" + delivery.toFixed(2));
-  // var tax = parseFloat(subtotal * 0.0875);
-  var tax = 0;
+  var taxRate = $("#order .tax").data("taxrate");
+  var tax = parseFloat(subtotal * taxRate);
   var serviceFee = 1;
   $("#order .tax").text(" $" + tax.toFixed(2));
   var coupons = Object.keys(localCoupon);
@@ -421,12 +421,17 @@ function refreshOrder(id){
   var item = $("#order .item[data-id=" + id + "]");
   var left = item.data("left-amount");
   item.find(".amount").html(localOrders[id].number);
-  item.find(".preference").html("(" + localOrders[id].preference.property + ")");
-  var extra = localOrders[id].preference.extra;
   var price = item.find(".price");
-  if(extra > 0){
-    price.data("extra", extra);
-    price.html("$" + price.attr('value') + " + $" + extra);
+  if(localOrders[id].preference && localOrders[id].preference.property){
+    item.find(".preference").html("(" + localOrders[id].preference.property + ")");
+    var extra = localOrders[id].preference.extra;
+    if(extra > 0){
+      price.data("extra", extra);
+      price.html("$" + price.attr('value') + " + $" + extra);
+    }
+  }else{
+    var extra = 0;
+    price.html("$" + price.attr('value'));
   }
   $("#meal-detail-container .dish[data-id=" + id + "]").find(".left-amount span").attr("value",left);
   $("#meal-detail-container .dish[data-id=" + id + "]").find(".left-amount span").html(left);
@@ -534,6 +539,7 @@ function setupAutoComplete(){
     initAutoComplete();
   }
 }
+
 function setup(){
   setupLanguage();
   tapController();

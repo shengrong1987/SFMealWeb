@@ -44,14 +44,14 @@ var LoginView = Backbone.View.extend({
     if(this.$el.find("button[type='submit']").hasClass("disabled")){
       return;
     }
-    var email = this.$el.find("#emailInput").val();
-    var password = this.$el.find("#passwordInput").val();
+    var email = this.$el.find("#emailInput").length ? this.$el.find("#emailInput").val() : this.$el.find("#emailInput2").val();
+    var password = this.$el.find("#passwordInput").length ? this.$el.find("#passwordInput").val() : this.$el.find("#passwordInput2").val();
     this.model.set({email : email, password : password});
     var $this = this;
     this.model.save({},{
       success : function(){
         if(location.href.indexOf('oauth2') != -1){
-          location.href = 'https://sfmeal.com';
+          location.href = '/';
         }else{
           location.reload();
         }
@@ -159,7 +159,11 @@ var RegisterView = Backbone.View.extend({
     });
     this.model.save({},{
       success : function(){
-        location.href='/meal';
+        if(location.href.indexOf('oauth2') != -1){
+          location.href = '/';
+        }else{
+          location.reload();
+        }
       },error : function(model,err){
         alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
         alertView.show();
@@ -740,7 +744,8 @@ var PaymentView = Backbone.View.extend({
     });
     this.model.save({}, {
       success: function () {
-        reloadUrl('/pocket/me','#mypayment');
+        // reloadUrl('/pocket/me','#mypayment');
+        location.reload();
       }, error: function (model, err) {
         $this.alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
         $this.alertView.show();

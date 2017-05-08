@@ -267,11 +267,11 @@
               <td></td>
               <th class="text-right"><%= __('meal-delivery-fee') %><span class="delivery" data-value="<%= meal.delivery_fee%>">$<%= meal.delivery_fee%></span></th>
             </tr>
-            <!--<tr>-->
-              <!--<th></th>-->
-              <!--<td></td>-->
-              <!--<th class="text-right"><%= __('tax')%>:<span class="tax" data-value="0"> $0.00</span></th>-->
-            <!--</tr>-->
+            <tr>
+              <th></th>
+              <td></td>
+              <th class="text-right"><%= __('tax')%>:<span class="tax" data-taxrate="<%= meal.getTaxRate()%>" data-value="0"> $0.00</span></th>
+            </tr>
             <tr>
               <th></th>
               <td></td>

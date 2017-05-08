@@ -232,6 +232,10 @@ module.exports = {
       return this.dishes.every(function(dish){
         return dish.isVerified;
       });
+    },
+
+    getTaxRate : function(){
+      return util.getTaxRate(this.chef.county);
     }
   },
 
@@ -310,14 +314,14 @@ module.exports = {
           console.log("meal has no chef");
           return next(Error("meal has no chef"));
         }
-        if(values.type != "order"){
-          return next();
-        }
         Host.findOne(values.chef).populate("user").exec(function(err, host){
           if(err){
             return next(err);
           }
           values.county = host.county;
+          if(values.type != "order"){
+            return next();
+          }
           var pickupOption = {
             "pickupFromTime": values.provideFromTime,
             "pickupTillTime": values.provideTillTime,
