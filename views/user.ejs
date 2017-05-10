@@ -77,6 +77,13 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
+                            if(order.status=="adjust") {
+                              var adjustingNumber = order.adjusting_orders[key].number;
+                            }
+
+                            if(number == 0 && (adjustingNumber == 0 || !adjustingNumber)){
+                              return;
+                            }
                             dishes.forEach(function(dish){
                               if(dish.id == key){
                                 index++;
@@ -99,7 +106,7 @@
                         </td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.status == "schedule" || order.status == "preparing"){ %>
                           <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
@@ -164,12 +171,19 @@
                         var list = Object.keys(order.orders);
                         var dishes = order.dishes;
                         var index = -1;
-                      list.forEach(function(key){
-                        var number = order.orders[key].number;
-                        var preference = order.orders[key].preference;
-                      dishes.forEach(function(dish){
-                      if(dish.id == key){
-                        index++;
+                        list.forEach(function(key){
+                          var number = order.orders[key].number;
+                          var preference = order.orders[key].preference;
+                          if(order.status=="adjust") {
+                            var adjustingNumber = order.adjusting_orders[key].number;
+                          }
+
+                          if(number == 0 && (adjustingNumber == 0 || !adjustingNumber)){
+                            return;
+                          }
+                          dishes.forEach(function(dish){
+                            if(dish.id == key){
+                              index++;
                       %>
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
@@ -239,6 +253,9 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
+                            if(number == 0){
+                              return;
+                            }
                             dishes.forEach(function(dish){
                               if(dish.id == key){
                                 index++;
@@ -297,9 +314,12 @@
                           list.forEach(function(key){
                           var number = order.orders[key].number;
                           var preference = order.orders[key].preference;
+                          if(number == 0){
+                            return;
+                          }
                           dishes.forEach(function(dish){
-                      if(dish.id == key){
-                        index++;
+                            if(dish.id == key){
+                              index++;
                       %>
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
@@ -356,6 +376,9 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
+                            if(number == 0){
+                              return;
+                            }
                             dishes.forEach(function(dish){
                             if(dish.id == key){
                               index++;
@@ -416,6 +439,9 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
+                            if(number == 0){
+                              return;
+                            }
                             dishes.forEach(function(dish){
                               if(dish.id == key){
                                 index++;
@@ -488,6 +514,13 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
+                            if(order.status=="adjust") {
+                              var adjustingNumber = order.adjusting_orders[key].number;
+                            }
+
+                            if(number == 0 && (adjustingNumber == 0 || !adjustingNumber)){
+                              return;
+                            }
                             dishes.forEach(function(dish){
                               if(dish.id == key){
                                 index++;
@@ -572,13 +605,20 @@
                         var list = Object.keys(order.orders);
                         var dishes = order.dishes;
                         var index = -1;
-                      list.forEach(function(key){
-                        var number = order.orders[key].number;
-                        var preference = order.orders[key].preference;
-                      dishes.forEach(function(dish){
-                      if(dish.id == key){
-                        index++;
-                      %>
+                        list.forEach(function(key){
+                          var number = order.orders[key].number;
+                          var preference = order.orders[key].preference;
+                          if(order.status=="adjust") {
+                            var adjustingNumber = order.adjusting_orders[key].number;
+                          }
+
+                          if(number == 0 && (adjustingNumber == 0 || !adjustingNumber)){
+                            return;
+                          }
+                          dishes.forEach(function(dish){
+                            if(dish.id == key){
+                              index++;
+                            %>
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
@@ -644,6 +684,9 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
+                            if(number == 0){
+                              return;
+                            }
                             dishes.forEach(function(dish){
                               if(dish.id == key){
                                 index++;
@@ -702,6 +745,9 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
+                            if(number == 0){
+                              return;
+                            }
                             dishes.forEach(function(dish){
                               if(dish.id == key){
                                 index++;
@@ -759,6 +805,9 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
+                            if(number == 0){
+                              return;
+                            }
                             dishes.forEach(function(dish){
                               if(dish.id == key){
                                 index++;
@@ -819,6 +868,9 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
+                            if(number == 0){
+                              return;
+                            }
                             dishes.forEach(function(dish){
                               if(dish.id == key){
                                 index++;

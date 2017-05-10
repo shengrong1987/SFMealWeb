@@ -37,12 +37,14 @@
           <h4 class="text-left"><strong><%= __('choose-method') %></strong></h4>
           <h3></h3>
           <div class="btn-set text-left" id="method" data-toggle="btn-set">
-            <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
             <%if(meal.isDelivery){%>
+            <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
             <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="delivery"><strong><%= __('delivery') %></strong></button>
-            <%}%>
-            <%if(meal.isShipping){%>
-            <button data-toggle="tab" href="#shippingTab" class="btn btn-disable btn-fat btn-lg" value="shipping"><strong><%= __('shipping') %></strong></button>
+            <%}else if(meal.isShipping){%>
+            <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
+            <button data-toggle="tab" href="#shippingTab" class="btn btn-disable btn-fat btn-lg active" value="shipping"><strong><%= __('shipping') %></strong></button>
+            <%}else{%>
+            <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
             <%}%>
           </div>
           <h3></h3>
@@ -58,7 +60,7 @@
                   var i = 0;
                   if(meal.pickups){ meal.pickups.forEach(function(pickup){ if(pickup.method == 'pickup'){ %>
                   <label class="btn btn-default fixed-label vertical-inline" style="text-align: left;height: 70px;">
-                    <input type="radio" id="radio-1-<%= i%>" data-index="<%= i%>" name="radio-1-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="radio-1-<%= i%>"></label>
+                    <input type="radio" id="pickup-1-<%= i%>" data-index="<%= i%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
                     <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"><%= __('time') %><span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
                     <br/>
                     <% if( (user && user.orders.some(function(order){ return order.meal == meal.id})) || (user && user.host == meal.chef.id)){%>
@@ -85,7 +87,7 @@
                     var phone = addressObj.phone;
                   %>
                   <label class="btn btn-default fixed-label vertical-align" style="text-align: left;">
-                    <input type="radio" id="radio-2-<%= i%>" name="radio-2-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="radio-2-<%= i%>"></label>
+                    <input type="radio" id="pickup-2-<%= i%>" name="pickup-contact-set" data-index="<%= i%>" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ""%>><label for="pickup-2-<%= i%>"></label>
                     <span style="margin-left: 10px;"><%= phone %></span>
                   </label>
                   <%i++;}); %>
@@ -114,7 +116,7 @@
                     var address = addressObj.street + ", " + addressObj.city + ", CA " + addressObj.zip + ", +" + addressObj.phone;
                   %>
                   <label class="btn btn-default fixed-label vertical-align" style="text-align: left;">
-                    <input type="radio" id="radio-2-<%= i%>" name="radio-2-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="radio-2-<%= i%>"></label>
+                    <input type="radio" id="delivery-1-<%= i%>" name="delivery-location-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="delivery-1-<%= i%>"></label>
                     <span style="margin-left: 10px;"><%= address %></span>
                   </label>
                   <%i++;}); %>
@@ -127,14 +129,14 @@
 
                 <div class="radio-box col-xs-12 row" id="deliveryMethod" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
                   <%
-                  var i = 0;
+                  var j = 0;
                   if(meal.pickups){ meal.pickups.forEach(function(pickup){ if(pickup.method == 'delivery'){ %>
                   <label class="btn btn-default fixed-label vertical-inline" style="text-align: left;height: 70px;" data-center="<%= pickup.deliveryCenter%>">
-                    <input type="radio" id="radio-1-<%= i%>" data-index="<%= i%>" name="radio-1-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="radio-1-<%= i%>"></label>
+                    <input type="radio" id="delivery-2-<%= j%>" data-index="<%= j%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= j%>"></label>
                     <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"><%= __('delivery-center')%>: <%= pickup.deliveryCenter%><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('time') %><span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
                     <br/>
                   </label>
-                  <%}i++;})}; %>
+                  <%j++;}})}; %>
                 </div>
 
                 <div class="col-xs-12">

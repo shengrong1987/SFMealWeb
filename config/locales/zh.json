@@ -460,6 +460,7 @@
   "meal-error-address" : "地址解析错误,请刷新再试.",
   "meal-error-address2" : "地址格式不对或地址不存在.",
   "meal-delivery-conflict" : "如果想要使用系统配送服务必须先勾选'提供送餐'",
+  "meal-delivery-conflict2" : "取餐方式选择了送餐，但未勾取送餐选项。",
   "meal-delivery-lack-of-method" : "以勾选送餐服务，但缺少送餐时间",
   "meal-not-found" : "没有找到任何Meal",
   "meal-active-error" : "目前有正在进行中的订单,无法下线这个Meal.",

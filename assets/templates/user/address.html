@@ -3,7 +3,7 @@
   <div class="alert alert-danger hide">
     <p data-toggle="i18n" data-key="error"></p>
   </div>
-  <div class="popup box middle" style="width: 400px;">
+  <div class="popup box middle">
     <form class="text-center form-inline" data-toggle="validator" role="form">
       <h4 id="new_title" class="hide text-left" data-toggle="i18n" data-key="newAddress" style="margin-bottom:20px;"><strong></strong></h4>
       <h4 id="exist_title" class="hide text-left" data-toggle="i18n" data-key="editAddress" style="margin-bottom:20px;"><strong class="guest"></strong><strong class="host" data-i18n="enterKitchenAddress"></strong></h4>
@@ -28,7 +28,7 @@
 
         <div class="form-group" role="form">
           <label for="postalInput"><span data-toggle="i18n" data-key="zipcode"></span><span>* </span>:</label>
-          <input type="text" class="form-control" style="min-width: 250px;" id="postalInput" pattern="^\d{5}(?:[-\s]\d{4})?$" data-toggle="i18n" data-pattern-key="zipcodeBadFormat" data-pattern-error="bad format" placeholder="(zip-code)" required>
+          <input type="text" class="form-control" style="min-width: 250px;" id="postalInput" pattern="^\s?\d{5}(?:[-\s]\d{4})?$" data-toggle="i18n" data-pattern-key="zipcodeBadFormat" data-pattern-error="bad format" placeholder="(zip-code)" required>
           <div class="help-block with-errors"></div>
         </div>
 
