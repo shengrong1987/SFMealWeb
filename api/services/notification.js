@@ -166,7 +166,8 @@ var notification = {
     if(params.isSendToAdmin){
       var locale = params.locale;
     }else{
-      var locale = req ? (params.isSendToHost ? params.host.locale : params.customer.locale) : '';
+      var host = params.host || params.chef;
+      var locale = req ? (params.isSendToHost ? host.locale : params.customer.locale) : '';
     }
 
     this.mergeI18N(model, action, req, locale, params);

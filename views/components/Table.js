@@ -14,6 +14,7 @@ var React = require('react/addons'),
   JobStore = require('../stores/JobStore'),
   CheckListStore = require('../stores/CheckListStore'),
   CouponStore = require('../stores/CouponStore'),
+  EmailStore = require('../stores/EmailStore'),
   TableItem = require('./TableItem');
 
 var Table = React.createClass({
@@ -64,6 +65,9 @@ var Table = React.createClass({
       case "Coupon":
         return {data : CouponStore.getAllCoupons(), detail : CouponStore.isShowDetail(), isCreate : CouponStore.isCreate()};
         break;
+      case "Email":
+        return {data : EmailStore.getAllEmails(), isCreate : EmailStore.isCreate()};
+        break;
     }
   },
 
@@ -85,6 +89,7 @@ var Table = React.createClass({
     JobStore.addChangeListener(this._onChange);
     CheckListStore.addChangeListener(this._onChange);
     CouponStore.addChangeListener(this._onChange);
+    EmailStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount: function () {
@@ -97,6 +102,7 @@ var Table = React.createClass({
     JobStore.removeChangeListener(this._onChange);
     CheckListStore.removeChangeListener(this._onChange);
     CouponStore.removeChangeListener(this._onChange);
+    EmailStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function () {

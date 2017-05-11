@@ -355,6 +355,7 @@ module.exports = {
     var isValid;
     switch(model){
       case "Coupon":
+      case "Email":
         isValid = true;
         break;
     }

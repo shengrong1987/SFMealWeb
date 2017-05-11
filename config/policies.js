@@ -144,6 +144,10 @@ module.exports.policies = {
     'find' : 'isAdmin',
     'findOne' : 'isAdmin',
     'delete' : 'isAdmin'
+  },
+
+  EmailController : {
+    'create' : 'isAdmin'
   }
 
   /***************************************************************************

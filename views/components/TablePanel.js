@@ -87,6 +87,11 @@ var TablePanel = React.createClass({
         details = {id : 'Coupon ID', type : 'type', amount : 'amount', description : 'description', code : 'code', expires : 'expires_at', command : 'Command' };
         criterias = ['id', 'code', 'type'];
         break;
+      case "Email":
+        headers = {id : 'Email ID', model : 'model', action : 'action', metaData : 'meta', command : 'Command' };
+        details = {id : 'Email ID', model : 'model', action : 'action', metaData : 'meta', command : 'Command' };
+        criterias = ['model', 'action', "meta"];
+        break;
     }
 
     return (

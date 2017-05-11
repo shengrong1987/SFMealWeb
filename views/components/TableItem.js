@@ -136,6 +136,27 @@ var TableItem = React.createClass({
         };
         SFMealAPI.command(model, null, 'create', false, data);
         break;
+      case "Email":
+        var modelType = target.closest('tr').find("input[name='model']").val();
+        var action = target.closest('tr').find("input[name='action']").val();
+        var metaData = target.closest('tr').find("input[name='metaData']").val();
+        if(!model || !action || !metaData){
+          ActionCreators.badRequest("please fill in all values");
+          return;
+        }
+        try{
+          JSON.parse(metaData)
+        }catch(e){
+          ActionCreators.badRequest("metaData must be a json string");
+          return;
+        }
+        var data = {
+          model : modelType,
+          action : action,
+          metaData : metaData
+        }
+        SFMealAPI.command(model, null, 'create', false, data);
+        break;
     }
   },
 
