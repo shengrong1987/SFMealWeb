@@ -48,6 +48,7 @@
         <td>
           <% Object.keys(order.orders).forEach(function(dishId){
             var amount = order.orders[dishId].number;
+            var preference = order.orders[dishId].preference;
           if(amount > 0){
             var dish;
             dishes.forEach(function(d){
@@ -56,10 +57,14 @@
                 return;
               }
             })%>
+          <% if(preference && preference.property){%>
+          <%= dish.title%>(<%= preference.property + " x" + amount%>)
+          <% }else{%>
           <%= dish.title%>(<%= amount%>)
+          <% }%>
           <%}});%>
         </td>
-        <td><%= order.phone%></td>
+        <td><%= order.customerPhone%></td>
         <td><%= order.address%></td>
         <td></td>
       </tr>
@@ -90,15 +95,20 @@
         <td>
           <% Object.keys(order.orders).forEach(function(dishId){
             var amount = order.orders[dishId].number;
-          if(amount > 0){
-            var dish;
-            dishes.forEach(function(d){
-              if(d.id == dishId){
-                dish = d;
-                return;
-              }
-            })%>
+            var preference = order.orders[dishId].preference;
+            if(amount > 0){
+              var dish;
+              dishes.forEach(function(d){
+                if(d.id == dishId){
+                  dish = d;
+                  return;
+                }
+              })%>
+          <% if(preference && preference.property){%>
+          <%= dish.title%>(<%= preference.property + " x" + amount%>)
+          <% }else{%>
           <%= dish.title%>(<%= amount%>)
+          <% }%>
           <%}});%>
         </td>
         <td><%= order.phone%></td>

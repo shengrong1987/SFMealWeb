@@ -572,6 +572,12 @@ module.exports = {
         return res.badRequest({responseText : req.__('meal-active-update-dish'), code : -10});
       }
       meal.dishes.add(dishId);
+      if(!meal.leftQty.hasOwnProperty(dishId)){
+        meal.leftQty[dishId] = 1;
+      }
+      if(!meal.totalQty.hasOwnProperty(dishId)){
+        meal.totalQty[dishId] = 1;
+      }
       meal.save(function(err, result){
         if(err){
           return res.badRequest(err);
@@ -595,6 +601,12 @@ module.exports = {
         return dish.id != dishId;
       }) == 0){
         return res.badRequest({responseText : req.__('meal-dishes-empty'), code : -11});
+      }
+      if(meal.leftQty.hasOwnProperty(dishId)){
+        delete meal.leftQty[dishId];
+      }
+      if(meal.totalQty.hasOwnProperty(dishId)){
+        delete meal.totalQty[dishId];
       }
       meal.dishes.remove(dishId);
       meal.save(function(err, result){

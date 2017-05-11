@@ -90,6 +90,7 @@
   "transaction-complete" : "交易完成",
   "edit" : "编辑",
   "cancel" : "取消",
+  "cancelling" : "申请取消中",
   "meal-name" : "Meal名字",
   "cancel-collect" : "取消收藏",
   "see-review" : "查看评价",

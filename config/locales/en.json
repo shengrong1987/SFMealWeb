@@ -90,6 +90,7 @@
   "transaction-complete": "Transaction completed",
   "edit": "Edit",
   "cancel": "Cancel",
+  "cancelling" : "Cancelling",
   "meal-name": "Meal's name",
   "cancel-collect": "Remove",
   "see-review": "See reviews",
