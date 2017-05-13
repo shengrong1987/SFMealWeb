@@ -31,25 +31,25 @@
       </tr>
       <%});%>
       <tr>
-        <td><%= mealcreatetime%>: <%= createdAt%></td>
+        <td><%= mealcreatetime%>: <%= new Date(createdAt).toLocaleString()%></td>
         <td></td>
         <td></td>
         <td></td>
       </tr>
       <tr>
-        <td><%= preorderstarttime%>: <%= provideFromTime%></td>
+        <td><%= preorderstarttime%>: <%= new Date(provideFromTime).toLocaleString()%></td>
         <td></td>
         <td></td>
         <td></td>
       </tr>
       <tr>
-        <td><%= preorderendtime%>: <%= provideTillTime%></td>
+        <td><%= preorderendtime%>: <%= new Date(provideTillTime).toLocaleString()%></td>
         <td></td>
         <td></td>
         <td></td>
       </tr>
       <tr>
-        <td class="text-red"><%= canceltime%>: <%= updatedAt%></td>
+        <td class="text-red"><%= canceltime%>: <%= new Date(updatedAt).toLocaleString()%></td>
         <td></td>
         <td></td>
         <td></td>

@@ -55,13 +55,13 @@
         <td></td>
       </tr>
       <tr>
-        <td><%= pickuptime%>: <%= pickupInfo.pickupFromTime%> - <%= pickupInfo.pickupTillTime%></td>
+        <td><%= pickuptime%>: <%= new Date(pickupInfo.pickupFromTime).toLocaleString()%> - <%= new Date(pickupInfo.pickupTillTime).toLocaleString()%></td>
         <td></td>
         <td></td>
         <td></td>
       </tr>
       <tr>
-        <td><%= contactphone%>: <%= pickupInfo.phone%></td>
+        <td><%= contactphone%>: <%= new Date(pickupInfo.phone).toLocaleString()%></td>
         <td></td>
         <td></td>
         <td></td>

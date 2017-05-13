@@ -276,7 +276,7 @@
   "order-fee" : "订单金额",
   "name" : "名称",
   "user-name" : "姓名",
-  "meal-fee" : "打赏金小计: ",
+  "meal-fee" : "订单小计: ",
   "pickup-method" : "取餐方式",
   "estimated-time" : "预计时间",
   "min" : "分钟",
@@ -520,8 +520,8 @@
   "coupon-invalid-error" : "找不到这个折扣码",
   "coupon-expire-error" : "折扣码已过期",
   "coupon-already-redeem-error" : "折扣码已经兑换过了",
-  "adjust-with-coupon-error" : "无法调整使用折扣码的订单",
-  "cancel-with-coupon-error" : "无法取消使用折扣码的订单",
+  "adjust-with-coupon-error" : "无法自动调整使用折扣码/积分的订单，请联系客服 help@sfmeal.com.",
+  "cancel-with-coupon-error" : "无法自动取消使用折扣码/积分的订单，请联系客服 help@sfmeal.com.",
   "review-no-available" : "没有可供评价的Meal",
   "review-invalid" : "评价的Meal/菜式错误",
   "user-already-host" : "您已经是厨师了",
@@ -711,5 +711,9 @@
   "hometaste1" : "每个人都有属于自己的家的味道，你的味道属于这里吗？",
   "area-not-open" : "这个地区尚未开放服务",
   "compensation-amount" : "收入补贴",
-  "order-adjust-title" : "订单调整"
+  "order-adjust-title" : "订单调整",
+  "apply-code" : "使用",
+  "disapply-code" : "取消使用",
+  "points" : "积分",
+  "points-tips" : "每10积分可以充当1元"
 }

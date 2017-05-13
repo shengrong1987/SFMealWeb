@@ -282,15 +282,21 @@
             <tr></tr>
             <tr>
               <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('coupon')%>"></i> <%= __('coupon')%>:</th>
-              <th><input class="coupon-code" style="margin:0 5px 0 5px;width: 80px;" maxlength="7" data-code="" data-value=""></input></th>
+              <th><input class="coupon-code form-control" style="margin:0 5px 0 5px;width: 80px;" maxlength="7" data-code="" data-value=""></input></th>
               <th class="text-right">
-                <button id="applyCouponBtn" class="btn btn-success"><%= __('applyCode')%></button>
-                <button id="disApplyCouponBtn" class="btn btn-danger" onclick="javascript:applyCoupon(false);"><%= __('disApplyCode')%></button>
+                <button id="applyCouponBtn" class="btn btn-success"><%= __('apply-code')%></button>
+                <button id="disApplyCouponBtn" class="btn btn-danger" onclick="javascript:applyCoupon(false);"><%= __('disapply-code')%></button>
               </th>
             </tr>
             <tr>
-              <th></th>
-              <td></td>
+              <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i> <%= __('points')%>:</th>
+              <th><input class="points form-control" style="margin:0 5px 0 5px;width: 80px;" readonly value="<%= user?user.points:-1%>"></input></th>
+              <th class="text-right">
+                <button id="applyPointsBtn" class="btn btn-success"><%= __('apply-code')%></button>
+                <button id="disApplyPointsBtn" class="btn btn-danger" onclick="javascript:applyPoints(false);"><%= __('disapply-code')%></button>
+              </th>
+            </tr>
+            <tr>
               <th class="text-right"><%= __('total') %><span class="total"></span></th>
             </tr>
             </tbody>

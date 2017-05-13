@@ -1072,7 +1072,8 @@ var MealSelectionView = Backbone.View.extend({
   events : {
     "click .calculateBtn" : "calculateDelivery",
     "change .variation a" : "changePreference",
-    "click #applyCouponBtn" : "applyCouponCode"
+    "click #applyCouponBtn" : "applyCouponCode",
+    "click #applyPointsBtn" : "addPointsToOrder"
   },
   initialize : function(){
     this.alertView = this.$el.find("#orderAlertView");
@@ -1304,7 +1305,36 @@ var MealSelectionView = Backbone.View.extend({
       $this.alertView.show();
       $this.alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
     }});
-
+  },
+  addPointsToOrder : function(e){
+    e.preventDefault();
+    this.alertView.hide();
+    var subtotal = this.$el.find(".subtotal").data("value");
+    var tax = this.$el.find(".tax").data("value");
+    var subtotalAfterTax = parseFloat(subtotal + tax);
+    if(subtotalAfterTax == 0){
+      this.alertView.show();
+      this.alertView.html(jQuery.i18n.prop('orderEmptyError'));
+      return;
+    }
+    var point = parseFloat(this.$el.find(".points").val());
+    if(point==-1){
+      this.alertView.show();
+      this.alertView.html(jQuery.i18n.prop('notAuthorize'));
+      return;
+    }
+    var pointRedeem;
+    if(point >= subtotalAfterTax * 10){
+      pointRedeem = Math.ceil(subtotalAfterTax * 10);
+    }else{
+      pointRedeem = point;
+    }
+    if(pointRedeem < 10){
+      this.alertView.show();
+      this.alertView.html(jQuery.i18n.prop('pointsTooLittle'));
+      return;
+    }
+    applyPoints(true, pointRedeem);
   }
 });
 
@@ -2640,7 +2670,8 @@ var TransactionView = Backbone.View.extend({
 
 var MealConfirmView = Backbone.View.extend({
   events : {
-    "click #applyCouponBtn" : "applyCouponCode"
+    "click #applyCouponBtn" : "applyCouponCode",
+    "click #applyPointsBtn" : "addPointsToOrder"
   },
   initialize : function(){
     this.alertView = this.$el.find("#orderAlertView");
@@ -2672,6 +2703,36 @@ var MealConfirmView = Backbone.View.extend({
         $this.alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
       }
     });
+  },
+  addPointsToOrder : function(e){
+    e.preventDefault();
+    this.alertView.hide();
+    var subtotal = this.$el.find(".subtotal").data("value");
+    var tax = this.$el.find(".tax").data("value");
+    var subtotalAfterTax = parseFloat(subtotal + tax);
+    if(subtotalAfterTax == 0){
+      this.alertView.show();
+      this.alertView.html(jQuery.i18n.prop('orderEmptyError'));
+      return;
+    }
+    var point = parseFloat(this.$el.find(".points").val());
+    if(point==-1){
+      this.alertView.show();
+      this.alertView.html(jQuery.i18n.prop('notAuthorize'));
+      return;
+    }
+    var pointRedeem;
+    if(point >= subtotalAfterTax * 10){
+      pointRedeem = Math.ceil(subtotalAfterTax * 10);
+    }else{
+      pointRedeem = point;
+    }
+    if(pointRedeem < 10){
+      this.alertView.show();
+      this.alertView.html(jQuery.i18n.prop('pointsTooLittle'));
+      return;
+    }
+    applyPoints(true, pointRedeem);
   }
 })
 
@@ -2863,6 +2924,8 @@ var OrderView = Backbone.View.extend({
       var code = Object.keys(couponValue)[0];
     }
 
+    var points = localPoints;
+
     this.model.set({
       orders : currentOrder,
       subtotal : subtotal,
@@ -2872,7 +2935,8 @@ var OrderView = Backbone.View.extend({
       mealId : mealId,
       customerPhone : phone,
       delivery_fee : delivery_fee,
-      couponCode : code
+      couponCode : code,
+      points : points
     });
 
     this.model.save({},{
@@ -2880,7 +2944,9 @@ var OrderView = Backbone.View.extend({
         Object.keys(localOrders).forEach(function(dishId){
           eraseCookie(dishId);
         });
+        eraseCookie('points');
         localOrders = {};
+        localPoints = 0;
         BootstrapDialog.alert(jQuery.i18n.prop('newOrderTakenSuccessfully'), function(){
           reloadUrl("/user/me","#myorder");
         });

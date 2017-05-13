@@ -11,6 +11,16 @@ var geocode = require('../services/geocode');
 
 module.exports = {
 
+  types: {
+    at1000Max : function(value){
+      var type = typeof value;
+      if(type === 'integer' || type === 'float' || type === 'number'){
+        return value <= 1000;
+      }
+      return false;
+    }
+  },
+
   attributes: require('waterlock').models.user.attributes({
     /* e.g.
     nickname: 'string'
@@ -134,6 +144,11 @@ module.exports = {
       return this.collects.some(function(meal){
         return meal.id == mealId;
       });
+    },
+    points : {
+      type : 'integer',
+      at1000Max : true,
+      defaultsTo : 0
     }
   }),
 

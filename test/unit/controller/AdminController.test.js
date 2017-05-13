@@ -165,7 +165,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(2);
+          res.body.should.have.length(3);
           scheduledOrderId = res.body[0].id;
           done();
         })

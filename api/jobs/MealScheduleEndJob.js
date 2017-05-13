@@ -40,7 +40,10 @@ module.exports = function(agenda) {
             var refundCharges = Object.keys(order.charges);
             async.each(refundCharges, function(chargeId, next){
               stripe.refund({
-                id : chargeId
+                id : chargeId,
+                metadata : {
+                  userId : order.customer.id
+                }
               },function(err, refund){
                 if(err){
                   return next(err);

@@ -275,7 +275,7 @@
   "order-fee": "Fee",
   "name": "Name",
   "user-name": "Name",
-  "meal-fee": "Fee subtotal: ",
+  "meal-fee": "Order Subtotal: ",
   "pickup-method": "Pickup method",
   "estimated-time": "Estimated arrival",
   "min": "Minutes",
@@ -639,7 +639,7 @@
   "orderRejectMessageToGuest": "Chef rejected the adjust/cancel request, the order number: %s, refuse reason: %s, https://www.sfmeal.com/user/me#myorder",
   "orderArriveReminderMessageToGuest": "Your order is on the way, get ready to enjoy it, contact phone number: %s",
   "orderPickupReminderMessageToGuestInHour": "Your booking order will be ready for pickup in one hour, please check when you receive it. the order number: %s,  address: %s,  contact phone number: %s, https://www.sfmeal.com/user/me#myorder",
-  "orderReadyPickupReminderMessageToGuest": "Your SFMeal order has been ready, please check when you receive it.  The order number: %s, address: %s, Contact phone number: %s, Pick up time: %s, https://www.sfmeal.com/user/me#myorder",
+  "orderReadyPickupReminderMessageToGuest": "Your SFMeal order is ready, please check order number during pickup. The order number: %s, address: %s, Contact phone number: %s, Pick up time: %s, https://www.sfmeal.com/user/me#myorder",
   "help-menu": "Help list",
   "help-menu-collapse": "Hide list",
   "cant-find-option": "Can't find an option?",
@@ -712,5 +712,9 @@
   "hometaste1" : "Everyone has a taste of home, is it here?",
   "area-not-open" : "This area is currently not available",
   "compensation-amount" : "Compensation",
-  "order-adjust-title" : "Order Adjustment"
+  "order-adjust-title" : "Order Adjustment"，
+  "apply-code" : "Apply",
+  "disapply-code" : "Disapply",
+  "points" : "Points",
+  "points-tips" : "Every 10 points is worth $1"
 }

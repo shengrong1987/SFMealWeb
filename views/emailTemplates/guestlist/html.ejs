@@ -26,7 +26,7 @@
     <% if(orders.length != 0){ if(isDelivery){
     pickups.forEach(function(pickup){if(pickup.method == "delivery"){%>
 
-    <p><%= deliverytime%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%></p>
+    <p><%= deliverytime%>: <%= new Date(pickup.pickupFromTime).toLocaleString()%> - <%= new Date(pickup.pickupTillTime).toLocaleString()%></p>
     <table class="table table-bordered">
       <thead>
       <tr>
@@ -73,7 +73,7 @@
     </table>
     <%} pickups.forEach(function(pickup, index){if(pickup.method == "pickup"){%>
     <p>
-      <%= pickuptime%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/>
+      <%= pickuptime%>: <%= new Date(pickup.pickupFromTime).toLocaleString()%> - <%= new Date(pickup.pickupTillTime).toLocaleString()%><br/>
       <%= pickuplocation%>: <%= pickup.location%>
     </p>
     <table class="table table-bordered">

@@ -72,9 +72,7 @@
             return dish.id == cover;
           })[0];
         }
-        if (!mainDish) {
-          break;
-        }
+        if (!mainDish) {break;}
         if (typeof anchor !== 'undefined' && anchor) {
           var distance = meal.chef.getDistance(anchor.lat, anchor.long);
         } else if (user) {
@@ -117,7 +115,8 @@
 
       <%
         }
-        var mealsInArea = mealInAreas[areaName];
+        var mealsInArea = mealInAreas[areaName];%>
+        <%
         for(var k=0; k < mealsInArea.length; k++){
           var meal = mealsInArea[k];
       %>

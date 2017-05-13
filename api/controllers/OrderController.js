@@ -34,6 +34,9 @@ var util = require('../services/util');
 //-20 : lack of pick-up option
 //-21 : selected pick-up method does not match pick-up option
 //-22 : pick-up option invalid
+//-23 : coupon and points can not be used together
+//-24 : redeeming points exceed order amount
+//-25 : redeeming points insufficient
 
 
 module.exports = {
@@ -254,9 +257,9 @@ module.exports = {
     })
   },
 
-  redeemCoupon : function(req, code, total, coupon, user, cb){
+  redeemCoupon : function(req, code, total, coupon, user, discount, cb){
     if(!code){
-      return cb(null, 0);
+      return cb(null, discount);
     }
     var diff = total - coupon.amount;
     if(diff < 0){ coupon.amount += diff; }
@@ -271,6 +274,39 @@ module.exports = {
     });
   },
 
+  applyPoints : function(req, res){
+    var userId = req.session.user.id;
+    User.findOne(userId).exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok({ points : user.points});
+    })
+  },
+
+  redeemPoints : function(req, points, user, total, cb){
+    if(!points){
+      return cb(null, 0);
+    }
+    //verify how many points need to be redeemed
+    if(points > total * 10){
+      return cb({ code : -24, responseText : req.__('order-points-exceed')});
+    }
+    //verify if user have enough points
+    if(points > user.points){
+      return cb({ code : -25, responseText : req.__('order-points-insufficient')});
+    }
+    //apply points
+    user.points -= points;
+    user.save(function(err, user){
+      if(err){
+        return cb(err);
+      }
+      req.body.discountAmount = points/10;
+      cb(null, points/10);
+    });
+  },
+
 	create : function(req, res){
 
     var userId = req.session.user.id;
@@ -281,6 +317,7 @@ module.exports = {
     var address = req.body.address;
     var subtotal = parseFloat(req.body.subtotal);
     var code = req.body.couponCode;
+    var pointsRedeem = req.body.points;
     req.body.customer = userId;
 
     var $this = this;
@@ -329,75 +366,105 @@ module.exports = {
             }
             req.body.customerPhone = req.body.customerPhone || found.phone;
 
+            if(code && pointsRedeem){
+              return res.badRequest({ code : -23, responseText : req.__('order-duplicate-discount')});
+            }
+
             //validate Coupon
             $this.verifyCoupon(req, code, found, m, function(err, coupon){
               if(err){
                 return res.badRequest(err);
               }
-              //calculate total
               var tax = $this.getTax(req.body.subtotal, m.chef.county);
-              $this.redeemCoupon(req, code, subtotal, coupon, found, function(err, discount){
+              var subtotalAfterTax = subtotal + tax/100;
+              $this.redeemPoints(req, pointsRedeem, found, subtotalAfterTax, function(err, discount){
                 if(err){
                   return res.badRequest(err);
                 }
-                if(coupon){
-                  req.body.coupon = coupon.id;
-                }
-                Order.create(req.body).exec(function (err, order) {
-                  if (err) {
+                //calculate total
+                $this.redeemCoupon(req, code, subtotalAfterTax, coupon, found, discount, function(err, discount){
+                  if(err){
                     return res.badRequest(err);
                   }
-                  stripe.charge({
-                    isInitial : true,
-                    amount : subtotal * 100,
-                    deliveryFee : req.body.delivery_fee * 100,
-                    discount : discount * 100,
-                    email : email,
-                    customerId : found.payment[0].customerId,
-                    destination : m.chef.accountId,
-                    meal : m,
-                    method : method,
-                    tax : tax,
-                    metadata : {
-                      mealId : m.id,
-                      hostId : m.chef.id,
-                      orderId : order.id,
-                      userId : userId,
-                      deliveryFee : (req.body.delivery_fee || 0) * 100,
-                      tax : tax
+                  if(coupon){
+                    req.body.coupon = coupon.id;
+                  }
+                  Order.create(req.body).exec(function (err, order) {
+                    if (err) {
+                      return res.badRequest(err);
                     }
-                  },function(err, charge, transfer){
-                    if(err){
-                      Order.destroy(order.id).exec(function(err2){
-                        if(err2){
-                          return res.badRequest(err2);
-                        }
-                        return res.badRequest(err);
-                      });
-                    } else if(charge.status == "succeeded"){
-
-                      sails.log.info("charge succeed, gathering charging info for order");
-                      for(var i = 0; i < m.dishes.length; i++){
-                        var dishId = m.dishes[i].id;
-                        var quantity = parseInt(orders[dishId].number);
-                        m.leftQty[dishId] -= quantity;
+                    stripe.charge({
+                      isInitial : true,
+                      amount : subtotal * 100,
+                      deliveryFee : req.body.delivery_fee * 100,
+                      discount : discount * 100,
+                      email : email,
+                      customerId : found.payment[0].customerId,
+                      destination : m.chef.accountId,
+                      meal : m,
+                      method : method,
+                      tax : tax,
+                      metadata : {
+                        mealId : m.id,
+                        hostId : m.chef.id,
+                        orderId : order.id,
+                        userId : userId,
+                        deliveryFee : (req.body.delivery_fee || 0) * 100,
+                        tax : tax
                       }
-                      order.transfer = transfer;
-                      order.charges = {};
-                      order.charges[charge.id] = charge.amount;
-                      order.application_fees = {};
-
-                      stripe.retrieveApplicationFee(charge.application_fee, function(err, fee1){
-                        if(err){
+                    },function(err, charge, transfer){
+                      if(err){
+                        Order.destroy(order.id).exec(function(err2){
+                          if(err2){
+                            return res.badRequest(err2);
+                          }
                           return res.badRequest(err);
+                        });
+                      } else if(charge.status == "succeeded"){
+
+                        sails.log.info("charge succeed, gathering charging info for order");
+                        for(var i = 0; i < m.dishes.length; i++){
+                          var dishId = m.dishes[i].id;
+                          var quantity = parseInt(orders[dishId].number);
+                          m.leftQty[dishId] -= quantity;
                         }
-                        if(transfer && transfer.application_fee){
-                          stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee2){
-                            if(err){
-                              return res.badRequest(err);
-                            }
-                            order.application_fees[charge.id] = fee1.amount + fee2.amount;
-                            m.save(function (err, result) {
+                        order.transfer = transfer;
+                        order.charges = {};
+                        order.charges[charge.id] = charge.amount;
+                        order.application_fees = {};
+
+                        stripe.retrieveApplicationFee(charge.application_fee, function(err, fee1){
+                          if(err){
+                            return res.badRequest(err);
+                          }
+                          if(transfer && transfer.application_fee){
+                            stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee2){
+                              if(err){
+                                return res.badRequest(err);
+                              }
+                              order.application_fees[charge.id] = fee1.amount + fee2.amount;
+                              m.save(function (err, result) {
+                                if(err){
+                                  return res.badRequest(err);
+                                }
+                                order.save(function(err, o){
+                                  if(err){
+                                    return res.badRequest(err);
+                                  }
+                                  o.chef = m.chef;
+                                  o.dishes = m.dishes;
+                                  notification.notificationCenter("Order", "new", o, true, false, req);
+                                  //test only
+                                  if(req.wantsJSON){
+                                    return res.ok(order);
+                                  }
+                                  return res.ok({});
+                                });
+                              });
+                            })
+                          }else{
+                            order.application_fees[charge.id] = fee1.amount;
+                            m.save(function (err, result){
                               if(err){
                                 return res.badRequest(err);
                               }
@@ -415,32 +482,12 @@ module.exports = {
                                 return res.ok({});
                               });
                             });
-                          })
-                        }else{
-                          order.application_fees[charge.id] = fee1.amount;
-                          m.save(function (err, result){
-                            if(err){
-                              return res.badRequest(err);
-                            }
-                            order.save(function(err, o){
-                              if(err){
-                                return res.badRequest(err);
-                              }
-                              o.chef = m.chef;
-                              o.dishes = m.dishes;
-                              notification.notificationCenter("Order", "new", o, true, false, req);
-                              //test only
-                              if(req.wantsJSON){
-                                return res.ok(order);
-                              }
-                              return res.ok({});
-                            });
-                          });
-                        }
-                      });
-                    } else {
-                      res.badRequest({ reponseText : req.__('order-unknown-error'), code : -8});
-                    }
+                          }
+                        });
+                      } else {
+                        res.badRequest({ reponseText : req.__('order-unknown-error'), code : -8});
+                      }
+                    });
                   });
                 });
               });
@@ -476,7 +523,7 @@ module.exports = {
       if(err){
         return res.badRequest(err)
       }
-      if(order.coupon){
+      if(order.discountAmount){
         return res.badRequest({ code : -18, responseText : req.__('adjust-with-coupon-error')});
       }
       order.meal.dishes = order.dishes;
@@ -520,7 +567,7 @@ module.exports = {
                     mealId : order.meal.id,
                     hostId : order.host.id,
                     orderId : order.id,
-                    userId : userId,
+                    userId : order.customer.id,
                     deliveryFee : order.delivery_fee * 100,
                     tax : tax
                   }
@@ -558,6 +605,7 @@ module.exports = {
                 totalRefund += tax;
                 diff = - diff;
                 diff += tax;
+                sails.log.info("refunding amount plus tax: " + diff);
                 var chargeIds = Object.keys(order.charges);
                 var refundCharges = [];
                 chargeIds.forEach(function(chargeId){
@@ -578,7 +626,10 @@ module.exports = {
                 async.each(refundCharges,function(charge, next){
                   stripe.refund({
                     id : charge.id,
-                    amount : charge.amount * 100
+                    amount : charge.amount * 100,
+                    metadata : {
+                      userId : order.customer.id
+                    }
                   },function(err, refund){
                     if(err){
                       return next(err);
@@ -691,6 +742,7 @@ module.exports = {
 
   refund : function(req, res){
     var orderId = req.params.id;
+    var userId = req.session.user.id;
     Order.findOne(orderId).populate("meal").populate("host").populate('customer').exec(function(err,order) {
       if (err) {
         return res.badRequest(err)
@@ -701,7 +753,10 @@ module.exports = {
       var refundCharges = Object.keys(order.charges);
       async.each(refundCharges, function(chargeId,next){
         stripe.refund({
-          id : chargeId
+          id : chargeId,
+          metadata : {
+            userId : order.customer.id
+          }
         },function(err, refund){
           if(err){
             return next(err);
@@ -756,7 +811,10 @@ module.exports = {
             var refundCharges = Object.keys(order.charges);
             async.each(refundCharges, function(chargeId, next){
               stripe.refund({
-                id : chargeId
+                id : chargeId,
+                metadata : {
+                  userId : order.customer.id
+                }
               },function(err, refund) {
                 if(err){
                   return next(err);
@@ -870,7 +928,7 @@ module.exports = {
                   mealId : order.meal.id,
                   hostId : order.host.id,
                   orderId : order.id,
-                  userId : userId,
+                  userId : order.customer.id,
                   deliveryFee : order.delivery_fee * 100,
                   tax : tax
                 }
@@ -930,7 +988,10 @@ module.exports = {
               async.each(refundCharges, function (charge, next) {
                 stripe.refund({
                   id: charge.id,
-                  amount: charge.amount * 100
+                  amount: charge.amount * 100,
+                  metadata : {
+                    userId : order.customer.id
+                  }
                 }, function (err, refund) {
                   if (err) {
                     return next(err);
@@ -1007,7 +1068,10 @@ module.exports = {
                 return next();
               }
               stripe.refund({
-                id : chargeId
+                id : chargeId,
+                metadata : {
+                  userId : order.customer.id
+                }
               },function(err, refund){
                 if(err){
                   return next(err);

@@ -10,6 +10,7 @@ const SYSTEM_DELIVERY_FEE = 399;
 module.exports = {
 
   SYSTEM_DELIVERY_FEE : SYSTEM_DELIVERY_FEE,
+  SERVICE_FEE : SERVICE_FEE,
 
   createManagedAccount : function(attr,cb){
     stripe.accounts.create(attr,function(err, account) {
@@ -179,18 +180,52 @@ module.exports = {
                 return cb(err);
               }
               sails.log.info("extra transfer created: " + transfer.amount);
-              cb(null, charge, transfer);
+              $this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
+                if(err){
+                  return cb(err);
+                }
+                cb(null, charge, transfer);
+              });
             }
           );
         });
       }else{
-        cb(null, charge, null);
+        $this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
+          if(err){
+            return cb(err);
+          }
+          cb(null, charge);
+        });
       }
     });
   },
 
+  handlePoint : function(charge, userId, isCharge, cb){
+    if(charge.status != "succeeded"){
+      return cb();
+    }
+    User.findOne(userId).exec(function(err, user){
+      if(err){
+        return cb(err);
+      }
+      var points = user.points || 0;
+      var earnedPoints = Math.floor(charge.amount/100);
+      if(isCharge){
+        var newPoints = points + earnedPoints;
+      }else{
+        var newPoints = points - earnedPoints;
+      }
+      sails.log.info("user old points: " + points);
+      sails.log.info("points difference: " + earnedPoints);
+      sails.log.info("user total points: " + newPoints);
+      user.points = newPoints;
+      user.save(cb);
+    })
+  },
+
   refund : function(attr, cb){
-    sails.log.debug("refunding customer : " + typeof attr.amount === 'undefined' || "fully");
+    var $this = this;
+    sails.log.debug("refunding customer : " + (typeof attr.amount === 'undefined' || "fully"));
     stripe.refunds.create({
       charge : attr.id,
       amount : attr.amount,
@@ -200,7 +235,12 @@ module.exports = {
       if(err){
         return cb(err);
       }
-      cb(null,refund);
+      $this.handlePoint(refund, attr.metadata.userId, false, function(err, user){
+        if(err){
+          return cb(err);
+        }
+        cb(null,refund);
+      });
     });
   },
 

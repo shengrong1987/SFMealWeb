@@ -282,6 +282,7 @@ function search(target, isRegular){
 */
 var localOrders = {};
 var localCoupon = {};
+var localPoints = false;
 //load previous order from cookies
 function loadOrder(fromCahce){
   $("#order .item").each(function(){
@@ -301,6 +302,7 @@ function loadOrder(fromCahce){
     }
   });
   loadCoupon(fromCahce);
+  loadPoints(fromCahce);
   refreshMenu();
 }
 
@@ -317,6 +319,16 @@ function loadCoupon(fromCache){
     //set code and amount as key & value
   }
   localCoupon = coupon;
+}
+
+function loadPoints(fromCache){
+  if(fromCache){
+    var hasPoints = readCookie('points');
+  }else{
+    var hasPoints = false;
+    //set code and amount as key & value
+  }
+  localPoints = hasPoints;
 }
 
 //order food
@@ -357,6 +369,18 @@ function applyCoupon(isApply, amount, code){
   }else{
     localCoupon = {};
     eraseCookie('coupon');
+  }
+  refreshMenu();
+}
+
+function applyPoints(isApply, amount){
+  if(isApply){
+    localPoints = localPoints || {};
+    localPoints = amount;
+    createCookie('points',localPoints,5);
+  }else{
+    localPoints = 0;
+    eraseCookie('points');
   }
   refreshMenu();
 }
@@ -412,8 +436,24 @@ var refreshMenu = function(){
     $("#order .total").html(" $" + (subtotal+delivery+tax+serviceFee).toFixed(2));
     $("#meal-confirm-container .total").text(total);
   }
-
-
+  if(localPoints){
+    var discount = localPoints/10;
+    $("#applyPointsBtn").hide();
+    $("#disApplyPointsBtn").show();
+    var total = subtotal+delivery+tax-discount;
+    if(total < 0){total = 0;}
+    total = (total + serviceFee).toFixed(2);
+    $("#order .total").data("value",total);
+    $("#order .total").html(" $" + total + "( -$" + discount.toFixed(2) + " )");
+    $("#meal-confirm-container .total").text(" $" + total + "( -$" + discount.toFixed(2) + " )");
+  }else{
+    $("#applyPointsBtn").show();
+    $("#disApplyPointsBtn").hide();
+    var total = (subtotal+delivery+tax+serviceFee).toFixed(2);
+    $("#order .total").data("value",(subtotal+delivery+tax+serviceFee).toFixed(2));
+    $("#order .total").html(" $" + (subtotal+delivery+tax+serviceFee).toFixed(2));
+    $("#meal-confirm-container .total").text(total);
+  }
 }
 
 //render order view

@@ -44,7 +44,7 @@
         <td><%= dingdan%>: $<%= subtotal.toFixed(2)%></td>
       </tr>
       <tr>
-        <td><%= ordertime%>: <%= createdAt%></td>
+        <td><%= ordertime%>: <%= new Date(createdAt).toLocaleString()%></td>
         <td></td>
         <td></td>
       </tr>

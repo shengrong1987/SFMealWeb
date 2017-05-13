@@ -259,14 +259,18 @@ module.exports = {
             "pickupTillTime": values.pickupTillTime,
             "location": host.full_address,
             "phone": host.user.phone,
-            "method": "pickup"
+            "method": "pickup",
+            "county" : host.county,
+            "area" : ''
           };
           var deliveryOption = {
             "pickupFromTime": values.provideFromTime,
             "pickupTillTime": values.provideTillTime,
             "deliveryCenter": host.full_address,
             "phone": host.user.phone,
-            "method": "delivery"
+            "method": "delivery",
+            "county" : host.county,
+            "area" : ''
           }
           if(values.isDelivery){
             values.pickups = [pickupOption, deliveryOption];
@@ -327,14 +331,18 @@ module.exports = {
             "pickupTillTime": values.provideTillTime,
             "location": host.full_address,
             "phone": host.user.phone,
-            "method": "pickup"
+            "method": "pickup",
+            "county" : host.county,
+            "area" : ''
           };
           var deliveryOption = {
             "pickupFromTime": values.provideFromTime,
             "pickupTillTime": values.provideTillTime,
             "deliveryCenter": host.full_address,
             "phone": host.user.phone,
-            "method": "delivery"
+            "method": "delivery",
+            "county" : host.county,
+            "area" : ''
           }
           if(values.isDelivery){
             values.pickups = [pickupOption, deliveryOption];

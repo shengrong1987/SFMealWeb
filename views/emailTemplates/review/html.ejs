@@ -20,7 +20,7 @@
     <p><%= dish ? reviewdish : reviewmeal%>: <%= title%></p>
     <p><%= scoreLabel%> : <%= score%></p>
     <p><%= content%>: <%= review%></p>
-    <p><%= reviewtime%>: <%= createdAt%></p>
+    <p><%= reviewtime%>: <%= new Date(createdAt).toLocaleString()%></p>
     <p></p>
     <div class="row text-center">
       <a class="btn btn-green btn-inline" href="https://www.sfmeal.com/host/<%= host.id%>"><%= viewreview%></a>
