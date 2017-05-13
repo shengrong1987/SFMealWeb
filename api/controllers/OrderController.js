@@ -292,6 +292,7 @@ module.exports = {
     if(points > total * 10){
       return cb({ code : -24, responseText : req.__('order-points-exceed')});
     }
+    user.points = user.points || 0;
     //verify if user have enough points
     if(points > user.points){
       return cb({ code : -25, responseText : req.__('order-points-insufficient')});
