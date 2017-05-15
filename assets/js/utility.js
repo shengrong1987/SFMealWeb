@@ -55,12 +55,12 @@
 
   utility.formattedDate = function(date){
     var mDate = moment(new Date(date).toISOString());
-    return mDate.local().format("MMM Do YYYY LT");
+    return mDate.local().format("ddd, l, LT");
   }
 
   utility.formattedDay = function(date){
     var mDate = moment(new Date(date).toISOString());
-    return mDate.local().format("MMM Do YYYY");
+    return mDate.local().format("l");
   }
 
   utility.monthDesc = function(value){

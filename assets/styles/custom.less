@@ -16,6 +16,10 @@ body{
   min-height: 550px;
 }
 
+#myUserBar{
+  z-index: 101;
+}
+
 .modal-backdrop{
   z-index : 950 !important;
 }
@@ -776,6 +780,25 @@ label {
   width: 100%;
 }
 
+/* multiline label*/
+@font-size: 16px;
+@line-height: 1.4;
+@lines-to-show: 3;
+
+.multi-line-label {
+  display: block; /* Fallback for non-webkit */
+  display: -webkit-box;
+  max-width: 400px;
+  height: @font-size*@line-height*@lines-to-show; /* Fallback for non-webkit */
+  margin: 0 auto;
+  font-size: @font-size;
+  line-height: @line-height;
+  -webkit-line-clamp: @lines-to-show;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /*button*/
 .btn {
   font-size: 14px;
@@ -841,6 +864,10 @@ label {
 .btn-outline-blue{
    border: solid 1px @blue !important;
  }
+
+.btn-outline-white{
+  border: solid 1px @white !important;
+}
 
 .btn-outline-red{
   border: solid 1px @red !important;
@@ -1110,6 +1137,15 @@ fieldset[disabled] .btn-red.active {
   }
   margin-bottom: 20px;
   min-height: 20px;
+}
+
+/* text-box*/
+.text-box{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
 }
 
 /* compo*/
@@ -1805,7 +1841,7 @@ fieldset[disabled] .btn-red.active {
   padding-right: 15px;
   padding-left: 15px;
   width: 30%;
-  z-index : 1000;
+  z-index : 100;
 }
 
 .minWid50{
@@ -1824,6 +1860,11 @@ fieldset[disabled] .btn-red.active {
 
 
 @media (min-width: 768px){
+
+  #shoppingCartView{
+    display: none;;
+  }
+
   .mynavbar .navbar-header{
     margin-left: 100px;
   }
@@ -1882,6 +1923,10 @@ fieldset[disabled] .btn-red.active {
   }
   #mealEditingView{
     width: 90%;
+  }
+
+  .dish-operator{
+    padding-top: 15px;
   }
   .bar{
     .cell.with-text-right{
@@ -1951,6 +1996,10 @@ fieldset[disabled] .btn-red.active {
     border-radius: 10px;
   }
 
+  #shoppingCartView{
+    display: inline-flex;;
+  }
+
   .xs-hide{
     display: none;
   }
@@ -1987,6 +2036,10 @@ fieldset[disabled] .btn-red.active {
   }
   .gs-reactions{
     text-align: center !important;
+  }
+
+  .dish-operator{
+    padding:0;
   }
 
   .bar{

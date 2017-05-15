@@ -7888,6 +7888,9 @@ button.close {
 body {
   min-height: 550px;
 }
+#myUserBar {
+  z-index: 101;
+}
 .modal-backdrop {
   z-index: 950 !important;
 }
@@ -8516,6 +8519,22 @@ label {
   overflow: hidden;
   width: 100%;
 }
+/* multiline label*/
+.multi-line-label {
+  display: block;
+  /* Fallback for non-webkit */
+  display: -webkit-box;
+  max-width: 400px;
+  height: 67.2px;
+  /* Fallback for non-webkit */
+  margin: 0 auto;
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 /*button*/
 .btn {
   font-size: 14px;
@@ -8566,6 +8585,9 @@ label {
 }
 .btn-outline-blue {
   border: solid 1px #3fa9f5 !important;
+}
+.btn-outline-white {
+  border: solid 1px #ffffff !important;
 }
 .btn-outline-red {
   border: solid 1px #ff4001 !important;
@@ -8799,6 +8821,14 @@ fieldset[disabled] .btn-red.active {
 }
 .nav-email .navbar-nav.footer-nav li a {
   display: inline !important;
+}
+/* text-box*/
+.text-box {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
 }
 /* compo*/
 .bar .cell {
@@ -9359,7 +9389,7 @@ fieldset[disabled] .btn-red.active {
   padding-right: 15px;
   padding-left: 15px;
   width: 30%;
-  z-index: 1000;
+  z-index: 100;
 }
 .minWid50 {
   min-width: 50px;
@@ -9372,6 +9402,9 @@ fieldset[disabled] .btn-red.active {
   position: static;
 }
 @media (min-width: 768px) {
+  #shoppingCartView {
+    display: none;
+  }
   .mynavbar .navbar-header {
     margin-left: 100px;
   }
@@ -9419,6 +9452,9 @@ fieldset[disabled] .btn-red.active {
   }
   #mealEditingView {
     width: 90%;
+  }
+  .dish-operator {
+    padding-top: 15px;
   }
   .bar .cell.with-text-right {
     text-align: right;
@@ -9474,6 +9510,9 @@ fieldset[disabled] .btn-red.active {
     padding: 50px;
     border-radius: 10px;
   }
+  #shoppingCartView {
+    display: inline-flex;
+  }
   .xs-hide {
     display: none;
   }
@@ -9509,6 +9548,9 @@ fieldset[disabled] .btn-red.active {
   }
   .gs-reactions {
     text-align: center !important;
+  }
+  .dish-operator {
+    padding: 0;
   }
   .bar .cell.with-text-right {
     text-align: center;

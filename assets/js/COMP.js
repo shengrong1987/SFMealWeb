@@ -291,9 +291,20 @@
     init : 1
   }
 
+  AmountInput.prototype.update = function(){
+    this.$value = parseInt(this.$element.find("input").val());
+  }
+
   AmountInput.prototype.add = function(node){
-    this.$value = this.$value + 1;
-    node.prev().val(this.$value);
+    if(this.$options.max){
+      if(this.$value < this.$options.max){
+        this.$value = this.$value + 1;
+        node.prev().val(this.$value);
+      }
+    }else{
+      this.$value = this.$value + 1;
+      node.prev().val(this.$value);
+    }
   }
 
   AmountInput.prototype.minus = function(node){

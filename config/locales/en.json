@@ -253,7 +253,7 @@
   "pickup-public-location": " Pickup location closed to（Open to public）",
   "pickup-instruction" : "Pickup Instruction",
   "click-to-cal": "Click to calculate",
-  "order-one": "Order one",
+  "order-one": "Add to Cart",
   "user-review": "Review from Foodies",
   "host-review": "Review from Chef",
   "dish-out-tips": "This dish is sold out.Please see other dishes.",
@@ -716,5 +716,8 @@
   "apply-code" : "Apply",
   "disapply-code" : "Disapply",
   "points" : "Points",
-  "points-tips" : "Every 10 points is worth $1"
+  "points-tips" : "Every 10 points is worth $1",
+  "host-profile-tip" : "You can click chef's thumbnail to learn more about the chef.",
+  "check-out-fast-btn" : "View Cart",
+  "check-out-sold-btn" : "Sold out"
 }

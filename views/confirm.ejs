@@ -27,7 +27,7 @@
     </div>
   </div>
 
-  <div id="meal-confirm-container" class="container-fluid padding-clear" data-center="<%= meal.delivery_center%>" data-range="<%= meal.delivery_range %>">
+  <div id="meal-confirm-container" class="padding-clear" data-center="<%= meal.delivery_center%>" data-range="<%= meal.delivery_range %>">
 
     <div class="row">
       <div class="col-md-8">
@@ -59,14 +59,14 @@
                   <%
                   var i = 0;
                   if(meal.pickups){ meal.pickups.forEach(function(pickup){ if(pickup.method == 'pickup'){ %>
-                  <label class="btn btn-default fixed-label vertical-inline" style="text-align: left;height: 70px;">
+                  <label class="btn btn-default vertical-inline" style="text-align: left;white-space: inherit;height: 140px;">
                     <input type="radio" id="pickup-1-<%= i%>" data-index="<%= i%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
                     <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"><%= __('time') %><span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
                     <br/>
                     <% if( (user && user.orders.some(function(order){ return order.meal == meal.id})) || (user && user.host == meal.chef.id)){%>
-                      <label class="location" data-value="<%= pickup.location%>" style="margin-left: 23px;"><span><%= __('location') %>&nbsp; <%= pickup.location%></span></label>
+                      <label class="location multi-line-label" data-value="<%= pickup.location%>" style="margin-left: 23px;"><%= __('location') %>&nbsp; <%= pickup.location%></label>
                     <%}else{%>
-                      <label class="location" data-value="<%= pickup.publicLocation || pickup.location%>" style="margin-left: 23px;"><span><%= __('location') %>&nbsp; <%= pickup.publicLocation || pickup.location%></span></label><%= __('pickup-location-after-order')%>
+                      <label class="location multi-line-label" data-value="<%= pickup.publicLocation || pickup.location%>" style="margin-left: 23px;"><%= __('location') %>&nbsp; <%= pickup.publicLocation || pickup.location%></label><%= __('pickup-location-after-order')%>
                     <%}%>
 
                   </label>

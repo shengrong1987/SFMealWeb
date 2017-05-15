@@ -367,6 +367,7 @@ function applyCoupon(isApply, amount, code){
     localCoupon[code] = amount;
     createCookie('coupon',JSON.stringify(localCoupon),5);
   }else{
+    $(".coupon-code").val('');
     localCoupon = {};
     eraseCookie('coupon');
   }
@@ -387,10 +388,12 @@ function applyPoints(isApply, amount){
 
 //render menu view
 var refreshMenu = function(){
+  var numberOfItem = 0;
   for(var key in localOrders){
     if(localOrders[key].number==0){
       $("#meal-detail-container .dish[data-id=" + key + "]").find(".untake-order").hide('slow');
     }else{
+      numberOfItem += localOrders[key].number;
       $("#meal-detail-container .dish[data-id=" + key + "]").find(".untake-order").show('slow');
     }
   }
@@ -449,18 +452,24 @@ var refreshMenu = function(){
   }else{
     $("#applyPointsBtn").show();
     $("#disApplyPointsBtn").hide();
-    var total = (subtotal+delivery+tax+serviceFee).toFixed(2);
-    $("#order .total").data("value",(subtotal+delivery+tax+serviceFee).toFixed(2));
-    $("#order .total").html(" $" + (subtotal+delivery+tax+serviceFee).toFixed(2));
-    $("#meal-confirm-container .total").text(total);
   }
+  refreshCart(total, numberOfItem);
+}
+
+function refreshCart(subtotal, numberOfItem){
+  var shoppingCart = $("#shoppingCartView");
+  shoppingCart.find(".total-preview").text(subtotal);
+  shoppingCart.find(".total-preview").data('subtotal', subtotal);
+  shoppingCart.find(".order-preview").text(numberOfItem);
+  shoppingCart.find(".order-preview").data('item',numberOfItem);
 }
 
 //render order view
 function refreshOrder(id){
+  var number = localOrders[id].number;
   var item = $("#order .item[data-id=" + id + "]");
   var left = item.data("left-amount");
-  item.find(".amount").html(localOrders[id].number);
+  item.find(".amount").html(number);
   var price = item.find(".price");
   if(localOrders[id].preference && localOrders[id].preference.property){
     item.find(".preference").html("(" + localOrders[id].preference.property + ")");
@@ -473,8 +482,18 @@ function refreshOrder(id){
     var extra = 0;
     price.html("$" + price.attr('value'));
   }
-  $("#meal-detail-container .dish[data-id=" + id + "]").find(".left-amount span").attr("value",left);
-  $("#meal-detail-container .dish[data-id=" + id + "]").find(".left-amount span").html(left);
+  var dishItem = $("#meal-detail-container .dish[data-id='" + id + "']");
+  if(number > 0){
+    dishItem.find(".beforeOrder").hide();
+    dishItem.find(".afterOrder").show();
+    dishItem.find(".dish-number").val(number);
+  }else{
+    dishItem.find(".beforeOrder").show();
+    dishItem.find(".afterOrder").hide();
+  }
+  dishItem.find(".left-amount span").attr("value",left);
+  dishItem.find(".left-amount span").html(left);
+  $(this).amountInput('add',dishItem.find("[data-toggle='amount-input']"));
 }
 
 function tapController(){
@@ -585,7 +604,7 @@ function setup(){
   tapController();
   stepContainer();
   getCountyInfo();
-  loadOrder(true);
+  (true);
   setupTooltip();
   setupMixin();
   setupDishSelector();

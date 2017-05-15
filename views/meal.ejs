@@ -25,6 +25,15 @@
     </div>
   </div>
 
+  <div id="shoppingCartView" class="btn btn-red btn-info vertical-align" style="position: fixed;bottom: 0;right: 0;z-index:90;width: 100%;height:50px;" onclick="javascript:location.href='#order'">
+    <div style="width:100%;height: 35px;line-height: 35px;">
+      <div class="col-xs-3"><span style="left: 10px;" class="total-preview relative" data-subtotal=""></span></div>
+      <div class="col-xs-6 middle"><span style="margin-right: 5px;text-align: center;"><%= __('check-out-fast-btn')%></span></div>
+      <div class="col-xs-3 text-right"><div style="right: 10px;" class="btn btn-outline-white order-preview relative" data-item=""></div></div>
+    </div>
+
+  </div>
+
   <div id="meal-detail-container" class="padding-clear" data-meal-prepareTime="<%= meal.prepareTime%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>" data-title="<%= meal.title%>" data-coverString="<%= meal.coverString%>" data-cover="<%= meal.cover%>">
 
     <div class="row">
@@ -43,7 +52,7 @@
 
               <div class="row vertical-align-base">
                 <div class="col-xs-12 text-left">
-                  <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(2)%>" style="display: inline;">
+                  <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(2)%>" style="display: inline;margin-top: 5px;">
                     <div class="rating" data-toggle="star-set" data-rate="<%= meal.score.toFixed(2)%>">
                       <i class="fa fa-star"></i>
                       <i class="fa fa-star"></i>
@@ -67,15 +76,14 @@
                 </div>
               </div>
 
-              <div class="row chef-cell vertical-align text-left">
+              <div class="row chef-cell vertical-align text-center">
                 <div class="col-md-2 col-xs-3">
                   <img class="round_thumb size-small text-center cursor-pointer" onclick="javascript:location.href='/host/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/profile_man.png" %>>
+                  <br/>
+                  <i class="fa fa-question-circle fa-2x text-lightgrey cursor-pointer" title="<%= __('')%>"></i>
                 </div>
-                <div class="col-md-8 col-xs-8">
-                  <h4 class="text-left text-dark" style="margin: 0 0 0 10px;"><%= meal.chef.shopName %><br><small><%= meal.chef.intro %></small></h4>
-                </div>
-                <div class="col-md-2">
-                  <i class="fa fa-question-circle fa-2x text-lightgrey cursor-pointer" style="position: relative;right: -10px;"></i>
+                <div class="col-md-10 col-xs-8">
+                  <h4 class="text-left text-dark text-box" style="margin: 0 0 10px 10px;"><%= meal.chef.shopName %><br><small><%= meal.chef.intro %></small></h4>
                 </div>
               </div>
 
@@ -220,15 +228,14 @@
                 </a>
                 <%}%>
                 <div class="box-float-top-right red"><h3 class="text-white" style="margin-top: 10px;">$<%= dish.price.toFixed(2) %></h3></div>
-                <div class="row">
+                <div class="row dish-operator">
                   <div class="col-sm-8">
-                    <h3></h3>
                     <div>
                       <div class="col-sm-3">
                         <h4 class="text-black"><%= dish.title %><span> ( <%= dish.quantity || '1' + __('fen') %> )</span></h4>
                       </div>
                       <div class="col-sm-6">
-                        <div data-toggle="tooltip" data-placement="bottom" title="<%= dish.score.toFixed(2)%>">
+                        <div data-toggle="tooltip" data-placement="bottom" title="<%= dish.score.toFixed(2)%>" style="display: inline;margin-top: 5px;">
                           <div class="rating" data-toggle="star-set" data-rate="<%= dish.score.toFixed(2)%>">
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
@@ -237,10 +244,7 @@
                             <i class="fa fa-star"></i>
                           </div>
                         </div>
-                        <small style="font-size: 20px;" class="text-lightgrey"> <%= dish.numberOfReviews %></small>
-                      </div>
-                      <div class="col-sm-3">
-                        <h4><small class="left-amount"><%= __('left')%><span class="text-red" value=<%= meal.leftQty[dish.id] %>><%= meal.leftQty[dish.id] %></span><%= __('fen')%></small></h4>
+                        <small style="font-size: 20px;" class="text-lightgrey">(<%= dish.numberOfReviews %>)</small>
                       </div>
                     </div>
                     <div class="row">
@@ -250,11 +254,34 @@
                     </div>
                   </div>
 
-                  <div class="col-sm-4" style="padding-top: 25px;">
+                  <div class="col-sm-4">
+
                     <div class="row">
-                    <% if(dish.preference){%>
                       <div class="col-xs-12">
-                        <a class="btn btn-default btn-outline dropdown-toggle" type="button" data-toggle="dropdown" data-submenu aria-haspopup="true" aria-expanded="true" value="">
+                        <h4><small class="left-amount"><%= __('left')%><span class="text-red" value=<%= meal.leftQty[dish.id] %>><%= meal.leftQty[dish.id] %></span><%= __('fen')%></small></h4>
+                      </div>
+                    </div>
+
+                    <div class="row beforeOrder">
+                      <div class="col-xs-12">
+                        <button class="btn btn-red take-order btn-lg <%= parseInt(meal.leftQty[dish.id])==0 ? 'disabled' : '' %>" onclick="javascript:orderFood('<%= dish.id %>',1)"><%= parseInt(meal.leftQty[dish.id]) == 0 ? __('check-out-sold-btn') : __('order-one')%></button>
+                      </div>
+                    </div>
+
+                    <div class="row afterOrder">
+                      <div class="col-xs-12" style="margin-top:10px;">
+                        <div class="input-group input-group-lg amount-input round" data-toggle="amount-input" data-max="<%= meal.leftQty[dish.id] %>" data-dish="<%= dish.id%>" style="width:150px;margin:auto;">
+                          <div class="input-group-addon minus" onclick="javascript:orderFood('<%= dish.id %>',-1)">-</div>
+                          <input class="form-control text-center dish-number" type="number" pattern="[0-9]*" inputmode="numeric" value="0" style="min-width: 75px;">
+                          <div class="input-group-addon add" onclick="javascript:orderFood('<%= dish.id %>',1)">+</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row afterOrder" style="margin-top: 10px;">
+                      <% if(dish.preference && Object.keys(dish.preference).length){%>
+                      <div class="col-xs-12">
+                        <a class="btn btn-default btn-outline dropdown-toggle" style="width:160px;" type="button" data-toggle="dropdown" data-submenu aria-haspopup="true" aria-expanded="true" value="">
                           <span><%= __('addVariation')%></span>
                           <span class="caret"></span>
                         </a>
@@ -270,13 +297,10 @@
                           </li>
                           <%});%>
                         </ul>
-                        <% } %>
                       </div>
-                      <div class="col-xs-12" style="margin-top: 10px;">
-                        <button class="btn btn-red take-order" data-toggle="i18n" data-key="orderOne" onclick="javascript:orderFood('<%= dish.id %>',1)"><%= __('order-one')%></button>
-                        <button class="btn btn-red untake-order" onclick="javascript:orderFood('<%= dish.id %>',-1)" style="width: 50px;display: none;">-</button>
-                      </div>
+                      <% } %>
                     </div>
+
                   </div>
                 </div>
 
@@ -306,7 +330,7 @@
                   <div class="item">
                     <div class="row">
                       <div class="col-sm-9 text-left">
-                        <div data-toggle="tooltip" data-placement="bottom" title="<%= review.score.toFixed(2)%>" style="margin-top: 5px;">
+                        <div data-toggle="tooltip" data-placement="bottom" title="<%= review.score.toFixed(2)%>" style="margin-top: 5px;display: inline;">
                           <div class="rating" data-toggle="star-set" data-rate="<%= review.score.toFixed(2)%>">
                             <i class="fa fa-star"></i>
                             <i class="fa fa-star"></i>
@@ -420,16 +444,16 @@
               <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('coupon')%>"></i> <%= __('coupon')%>:</th>
               <th><input class="coupon-code form-control" style="margin:0 5px 0 5px;width: 80px;" maxlength="7" data-code="" data-value=""></input></th>
               <th class="text-right">
-                <button id="applyCouponBtn" class="btn btn-success"><%= __('apply-code')%></button>
-                <button id="disApplyCouponBtn" class="btn btn-danger" onclick="javascript:applyCoupon(false);"><%= __('disapply-code')%></button>
+                <button id="applyCouponBtn" class="btn btn-green"><%= __('apply-code')%></button>
+                <button id="disApplyCouponBtn" class="btn btn-default btn-outline" onclick="javascript:applyCoupon(false);"><%= __('disapply-code')%></button>
               </th>
             </tr>
             <tr>
               <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i> <%= __('points')%>:</th>
               <th><input class="points form-control" style="margin:0 5px 0 5px;width: 80px;" readonly value="<%= user?(user.points || 0):-1%>"></input></th>
               <th class="text-right">
-                <button id="applyPointsBtn" class="btn btn-success"><%= __('apply-code')%></button>
-                <button id="disApplyPointsBtn" class="btn btn-danger" onclick="javascript:applyPoints(false);"><%= __('disapply-code')%></button>
+                <button id="applyPointsBtn" class="btn btn-green"><%= __('apply-code')%></button>
+                <button id="disApplyPointsBtn" class="btn btn-default btn-outline" onclick="javascript:applyPoints(false);"><%= __('disapply-code')%></button>
               </th>
             </tr>
             <tr></tr>
@@ -488,6 +512,7 @@
   var dishTitle = coverDish.data("title");
   var desc = coverDish.data("footer");
   setupWechat($("#meal-detail-container").data("coverstring"),$("#meal-detail-container").data("title"), dishTitle + ":" + desc);
+  loadOrder(true);
 </script>
 
 <script src="/js/jweixin-1.0.0.js"></script>
