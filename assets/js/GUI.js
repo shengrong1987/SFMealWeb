@@ -332,7 +332,11 @@ function loadPoints(fromCache){
 }
 
 //order food
-function orderFood(id,number){
+function orderFood(id,number,initial){
+  var dishItem = $("#meal-detail-container .dish[data-id='" + id + "']");
+  if(initial){
+    $(this).amountInput('add',dishItem.find("[data-toggle='amount-input']"));
+  }
   var item = $("#order .item[data-id=" + id + "]");
   var alertView = $($("#order").data("err-container"));
   alertView.removeClass("hide");
@@ -493,7 +497,6 @@ function refreshOrder(id){
   }
   dishItem.find(".left-amount span").attr("value",left);
   dishItem.find(".left-amount span").html(left);
-  $(this).amountInput('add',dishItem.find("[data-toggle='amount-input']"));
 }
 
 function tapController(){
