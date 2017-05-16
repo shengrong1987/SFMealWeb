@@ -122,7 +122,7 @@ function toggleModal(event,cb){
 }
 
 //Modal dismiss
-function dismissModal(cb){
+function dismissModal(event, cb){
   var modal = $("#myModal");
   if(cb){
     modal.on('hidden.bs.modal',cb);

@@ -62,7 +62,7 @@ module.exports.connections = {
     port: 27017,
     user: process.env.MONGODB_USER,
     password: process.env.MONGODB_PWD
-    //database: 'test'
+    // database: 'test'
   },
 
 

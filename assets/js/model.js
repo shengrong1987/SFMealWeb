@@ -737,6 +737,7 @@ var PaymentView = Backbone.View.extend({
 
   createPaymentProfile: function () {
     var $this = this;
+    this.model.clear();
     this.model.set({
       stripeToken: this.$el.find("input[name='stripeToken']").val(),
       cardNumber: this.$el.find("input[name='cardNumber']").val(),
