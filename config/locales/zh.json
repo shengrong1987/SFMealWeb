@@ -718,5 +718,6 @@
   "points-tips" : "每10积分可以充当1元",
   "host-profile-tip" : "点击头像可以查看厨师详细资料",
   "check-out-fast-btn" : "查看购物车",
-  "check-out-sold-btn" : "已售罄"
+  "check-out-sold-btn" : "已售罄",
+  "enter-phone" : "联系方式为空"
 }

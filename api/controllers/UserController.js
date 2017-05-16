@@ -174,6 +174,9 @@ module.exports = require('waterlock').actions.user({
             return next();
           }
           var actualAddress = addObj.street + " " + addObj.city;
+          if(addObj.isDefault){
+            user.phone = addObj.phone;
+          }
           require('../services/geocode').geocode(actualAddress, function (err, result) {
             if (err) {
               sails.log.debug(err);

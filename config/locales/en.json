@@ -719,5 +719,6 @@
   "points-tips" : "Every 10 points is worth $1",
   "host-profile-tip" : "You can click chef's thumbnail to learn more about the chef.",
   "check-out-fast-btn" : "View Cart",
-  "check-out-sold-btn" : "Sold out"
+  "check-out-sold-btn" : "Sold out",
+  "enter-phone" : "Need a phone number to contact you."
 }
