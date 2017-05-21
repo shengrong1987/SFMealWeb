@@ -59,7 +59,7 @@
                   <%
                   var i = 0;
                   if(meal.pickups){ meal.pickups.forEach(function(pickup){ if(pickup.method == 'pickup'){ %>
-                  <label class="btn btn-default vertical-inline" style="text-align: left;white-space: inherit;height: 140px;">
+                  <label class="btn btn-default vertical-inline" style="text-align: left;white-space: inherit;height: 200px;">
                     <input type="radio" id="pickup-1-<%= i%>" data-index="<%= i%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
                     <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"><%= __('time') %><span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
                     <br/>
