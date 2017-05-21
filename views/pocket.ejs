@@ -109,7 +109,7 @@
               <%
               user.pocket.transactions = user.pocket.transactions || [];
               user.pocket.transactions.forEach(function(tranObj){
-              if(tranObj.status == "paid" || tranObj.status == "succeeded"){
+              if(tranObj.status == "paid" || tranObj.status == "succeeded" || tranObj.status == "cash"){
                 if(tranObj.type == "type-compensation"){
                   var refund = tranObj.amount_reversed;
               %>

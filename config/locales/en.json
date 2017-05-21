@@ -513,6 +513,8 @@
   "order-abort-complete": "Order has been completed or cancelled, can't abort",
   "order-refund-fail": "Order don’t need a refund or have a full refund,",
   "order-not-qualify-shipping" : "Order amount is not enough to qualify for shipping.",
+  "order-cash-no-discount" : "No discount can be used with cash checkout.",
+  "order-cash-miss-profile" : "You need name & phone to use cash checkout.",
   "adjust-with-coupon-error" : "Can not adjust an order with coupon",
   "cancel-with-coupon-error" : "Can not cancel an order with coupon",
   "payment-card-exist": "Bank card already exists",
@@ -720,5 +722,8 @@
   "host-profile-tip" : "You can click chef's thumbnail to learn more about the chef.",
   "check-out-fast-btn" : "View Cart",
   "check-out-sold-btn" : "Sold out",
-  "enter-phone" : "Need a phone number to contact you."
+  "enter-phone" : "Need a phone number to contact you.",
+  "cash-method" : "Paid Cash",
+  "cash" : "Cash",
+  "online" : "Online"
 }

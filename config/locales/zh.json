@@ -514,6 +514,9 @@
   "order-abort-complete" : "订单已完成或已取消,无法终止",
   "order-refund-fail" : "订单无须退款或已经全额退款",
   "order-not-qualify-shipping" : "订单金额未达到快递最低要求",
+  "order-cash-no-discount" : "现金支付无法使用优惠券或积分",
+  "order-cash-miss-profile" : "现金支付请先填写名字和联系方式",
+  "adjust-with-coupon-error" : "使用折扣券的订单无法调整",
   "cancel-with-coupon-error" : "使用折扣券的订单无法取消",
   "payment-card-exist" : "银行卡已存在",
   "payment-unique-card" : "不能删除唯一的支付方式",
@@ -719,5 +722,8 @@
   "host-profile-tip" : "点击头像可以查看厨师详细资料",
   "check-out-fast-btn" : "查看购物车",
   "check-out-sold-btn" : "已售罄",
-  "enter-phone" : "联系方式为空"
+  "enter-phone" : "联系方式为空",
+  "cash-method" : "现金支付",
+  "cash" : "现金",
+  "online" : "线上支付"
 }

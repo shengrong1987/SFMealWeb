@@ -118,6 +118,10 @@ module.exports = require('waterlock').actions.user({
     });
   },
 
+  contactForm : function(req, res){
+    return res.view("contact",{ layout:false, user : req.session.user});
+  },
+
   search : function(req, res){
     var email = req.query.email;
     delete req.query.email;

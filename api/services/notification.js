@@ -112,7 +112,7 @@ var notification = {
           content = params.method == 'pickup' ? sails.__({
             phrase : 'orderReadyPickupReminderMessageToGuest',
             locale : locale
-          }, params.id, params.pickupInfo.location, params.pickupInfo.phone, new Date(params.pickupInfo.pickupFromTime).toLocaleString() + ' - ' + new Date(params.pickupInfo.pickupTillTime).toLocaleString()) : sails.__({
+          }, params.id, params.pickupInfo.location, params.pickupInfo.phone, params.pickupInfo.pickupFromTime + ' - ' + params.pickupInfo.pickupTillTime) : sails.__({
             phrase : 'orderArriveReminderMessageToGuest',
             locale : locale
           }, params.phone);

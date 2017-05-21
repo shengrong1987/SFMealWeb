@@ -24,6 +24,11 @@ module.exports = {
       enum: ['order', 'preorder'],
       defaultsTo: 'preorder'
     },
+    paymentMethod : {
+      type : 'string',
+      enum : ['cash','online'],
+      defaultsTo : 'online'
+    },
     dishes: {
       collection: 'Dish',
       required: true
@@ -40,6 +45,10 @@ module.exports = {
     },
     adjusting_subtotal : {
       type : 'float'
+    },
+    service_fee : {
+      type : 'float',
+      defaultsTo : 1.0
     },
     delivery_fee: {
       type: 'float'
@@ -61,6 +70,9 @@ module.exports = {
     customerPhone : {
       type : 'string',
       required : true
+    },
+    customerName : {
+      type : 'string'
     },
     guestEmail : {
       type : 'string',
@@ -127,6 +139,10 @@ module.exports = {
       model : 'Coupon'
     },
     discountAmount : {
+      type : 'float',
+      defaultsTo : 0
+    },
+    tax : {
       type : 'float',
       defaultsTo : 0
     }

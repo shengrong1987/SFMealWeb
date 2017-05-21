@@ -240,7 +240,7 @@ module.exports = {
 
   confirm : function(req, res){
     var mealId = req.param("id");
-    var userId = req.session.user.id;
+    var user = req.session.user;
     Meal.find(mealId).populate("dishes").populate("chef").exec(function(err,m){
       if(err){
         return res.badRequest(err);
@@ -248,12 +248,16 @@ module.exports = {
       if(m.length==0){
         return res.badRequest({ code : -3, responseText : req.__('meal-not-found')});
       }
-      User.find(userId).populate("payment").populate("orders").exec(function(err,user){
-        user[0].orders = user[0].orders.filter(function(order){
-          return order.status == "schedule" || order.status == "preparing";
-        })
-        res.view("confirm",{meal : m[0], user : user[0]});
-      });
+      if(user){
+        User.find(user.id).populate("payment").populate("orders").exec(function(err,user){
+          user[0].orders = user[0].orders.filter(function(order){
+            return order.status == "schedule" || order.status == "preparing";
+          })
+          res.view("confirm",{meal : m[0], user : user[0]});
+        });
+      }else{
+        return res.view("confirm", { meal : m[0], user : {}});
+      }
     });
   },
 

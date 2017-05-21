@@ -237,7 +237,7 @@ describe('ReviewController', function() {
       agent
         .post('/review')
         .send({meal : mealId, dish : dishId2, score : 4.5, review : "Very delicious could be more",user: guestId})
-        .expect(403)
+        .expect(400)
         .end(function(err, res){
           if(err){
             console.log(err);
@@ -254,7 +254,7 @@ describe('ReviewController', function() {
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
         .send({meal : mealId, dish : dishId1, score : 5, review : "Very delicious could be more",user: guestId})
-        .expect(403)
+        .expect(400)
         .end(function(err,res){
           res.body.code.should.be.equal(-1);
           done();

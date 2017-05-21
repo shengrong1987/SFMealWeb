@@ -59,7 +59,7 @@
         <td></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= total%> $<%= (subtotal * (1 + taxRate) + delivery_fee).toFixed(2)%></td>
+        <td style="text-align: right;"><%= total%> $<%= (subtotal * (1 + taxRate) + delivery_fee + service_fee).toFixed(2)%></td>
       </tr>
       <tr>
         <td><%= ordertime%>: <%= new Date(createdAt).toLocaleString()%></td>

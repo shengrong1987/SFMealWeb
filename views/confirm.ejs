@@ -63,7 +63,7 @@
                     <input type="radio" id="pickup-1-<%= i%>" data-index="<%= i%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
                     <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"><%= __('time') %><span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
                     <br/>
-                    <% if( (user && user.orders.some(function(order){ return order.meal == meal.id})) || (user && user.host == meal.chef.id)){%>
+                    <% if( (user.orders && user.orders.some(function(order){ return order.meal == meal.id})) || (user && user.host == meal.chef.id)){%>
                       <label class="location multi-line-label" data-value="<%= pickup.location%>" style="margin-left: 23px;"><%= __('location') %>&nbsp; <%= pickup.location%></label>
                     <%}else{%>
                       <label class="location multi-line-label" data-value="<%= pickup.publicLocation || pickup.location%>" style="margin-left: 23px;"><%= __('location') %>&nbsp; <%= pickup.publicLocation || pickup.location%></label><%= __('pickup-location-after-order')%>
@@ -91,12 +91,12 @@
                       <span style="margin-left: 10px;"><%= phone %></span>
                     </label>
                   <% i++;});
-                  }else{var phone = user.phone; %>
+                  }else{var phone = user.phone;if(phone){ %>
                   <label class="btn btn-default fixed-label vertical-align" style="text-align: left;">
                     <input type="radio" id="pickup-2-<%= i%>" name="pickup-contact-set" data-index="<%= i%>" class="regular-radio" checked=''><label for="pickup-2-<%= i%>"></label>
-                    <span style="margin-left: 10px;"><%= phone || __('enter-phone') %></span>
+                    <span style="margin-left: 10px;"><%= phone %></span>
                   </label>
-                  <%} %>
+                  <%}} %>
                   <h4 style="margin-left: 42px;"><a class="text-red" data-action="updateFromOrder" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" data-id="<%= user.id%>" href="javascript:void(0)"><%= __('new-location-phone') %></a></h4>
                 </div>
 
@@ -115,16 +115,17 @@
                 <div class="radio-box col-xs-12 row contact" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
                   <%
                   var addresses= user.address;
-                  var keys = Object.keys(addresses);
-                  keys.forEach(function(key){
-                    var addressObj = addresses[key];
-                    var address = addressObj.street + ", " + addressObj.city + ", CA " + addressObj.zip + ", +" + addressObj.phone;
+                  if(addresses){
+                    var keys = Object.keys(addresses);
+                    keys.forEach(function(key){
+                      var addressObj = addresses[key];
+                      var address = addressObj.street + ", " + addressObj.city + ", CA " + addressObj.zip + ", +" + addressObj.phone;
                   %>
                   <label class="btn btn-default fixed-label vertical-align" style="text-align: left;">
                     <input type="radio" id="delivery-1-<%= i%>" name="delivery-location-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="delivery-1-<%= i%>"></label>
                     <span style="margin-left: 10px;"><%= address %></span>
                   </label>
-                  <%i++;}); %>
+                  <%i++;})}; %>
                   <h4 style="margin-left: 42px;"><a class="text-red" data-action="updateFromOrder" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" data-id="<%= user.id%>" href="javascript:void(0)"><%= __('new-location-phone') %></a></h4>
                 </div>
 
@@ -164,17 +165,18 @@
                 <div class="radio-box col-xs-12 row contact" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
                   <%
                   var addresses= user.address;
-                  var keys = Object.keys(addresses);
-                  var i = 0;
-                  keys.forEach(function(key){
-                    var addressObj = addresses[key];
-                    var address = addressObj.street + ", " + addressObj.city + ", CA " + addressObj.zip + ", +" + addressObj.phone;
+                  if(addresses){
+                    var keys = Object.keys(addresses);
+                    var i = 0;
+                    keys.forEach(function(key){
+                      var addressObj = addresses[key];
+                      var address = addressObj.street + ", " + addressObj.city + ", CA " + addressObj.zip + ", +" + addressObj.phone;
                   %>
                   <label class="btn btn-default fixed-label vertical-align" style="text-align: left;">
                     <input type="radio" id="radio-2-<%= i%>" name="radio-2-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="radio-2-<%= i%>"></label>
                     <span style="margin-left: 10px;"><%= address %></span>
                   </label>
-                  <%i++;}); %>
+                  <%i++;})}; %>
                   <h4 style="margin-left: 42px;"><a class="text-red" data-action="updateFromOrder" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" data-id="<%= user.id%>" href="javascript:void(0)"><%= __('new-location-phone') %></a></h4>
                 </div>
               </div>
@@ -189,13 +191,15 @@
           <div id="payment-cards" class="btn-set text-left">
             <%
               var cards = user.payment;
-              for(var j=0; j < cards.length; j++){
-                var card = cards[j];
-                var last4 = card.last4;
+              if(cards){
+                for(var j=0; j < cards.length; j++){
+                  var card = cards[j];
+                  var last4 = card.last4;
             %>
-            <button class="btn btn-disable btn-fat btn-lg<%if(card.isDefaultPayment){%> active<%}%>" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
-            <%}%>
-            <button class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
+            <button class="btn btn-disable btn-fat btn-lg <%if(card.isDefaultPayment){%> active<%}%>" data-method="online" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
+            <%}}%>
+            <button class="btn btn-disable btn-fat btn-lg" data-method="online" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
+            <button class="btn btn-disable btn-fat btn-lg" data-phone="" data-name="" data-method="cash" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/user/me/contact" onclick="toggleModal(event)"><i class="fa fa-money fa-2x"></i><br/><%= __('cash-method') %></button>
           </div>
 
           <h3></h3>

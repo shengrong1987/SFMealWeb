@@ -72,32 +72,45 @@ module.exports = {
           return res.badRequest(err);
         }
         var transactions = [];
-        async.each(user.orders, function (order, next) {
-          var charges = Object.keys(order.charges);
-          async.each(charges, function (chargeId, next) {
-            stripe.retrieveCharge(chargeId, function(err, charge){
-              if(err){
-                return next(err);
-              }
-              Host.findOne(charge.metadata.hostId).exec(function(err, host){
+        async.each(user.orders, function (order, next1) {
+          Host.findOne(order.host).exec(function(err, host){
+            if(err){
+              return next1(err);
+            }
+            var charges = Object.keys(order.charges);
+            async.each(charges, function (chargeId, next2) {
+              stripe.retrieveCharge(chargeId, function(err, charge){
                 if(err){
-                  return next(err);
+                  return next2(err);
+                }
+                if(chargeId == "cash"){
+                  charge.amount = order.charges[chargeId];
+                  charge.amount_refunded = 0;
+                  charge.paymentMethod = "cash";
+                  charge.status = "cash";
+                  charge.metadata = {
+                    orderId : order.id,
+                    deliveryFee : order.delivery_fee,
+                    tax : order.tax
+                  }
+                }else{
+                  charge.paymentMethod = "online";
                 }
                 charge.application_fee = 0;
                 charge.type = "type-charge";
                 charge.host = host;
-                var date = moment(charge.created * 1000);
+                var date = moment(order.createdAt);
                 charge.month = moment.months()[date.month()];
                 charge.day = date.date();
                 transactions.push(charge);
-                next();
+                next2();
               });
+            }, function (err) {
+              if(err){
+                return next(err);
+              }
+              next1();
             });
-          }, function (err) {
-            if(err){
-              return next(err);
-            }
-            next();
           });
         }, function (err) {
           if(err){
@@ -173,25 +186,38 @@ module.exports = {
                 if(err){
                   return next(err);
                 }
-                var hostId = charge.metadata.hostId;
-                Host.findOne(hostId).exec(function (err, host) {
-                  if (err) {
+                var date = moment(order.createdAt);
+                charge.month = moment.months()[date.month()];
+                charge.day = date.date();
+                charge.type = "type-payment";
+                charge.host = host;
+
+                if(chargeId == "cash"){
+                  charge.amount = order.charges[chargeId];
+                  charge.amount_refunded = 0;
+                  charge.paymentMethod = "cash";
+                  charge.status = "cash";
+                  charge.metadata = {
+                    orderId : order.id,
+                    deliveryFee : order.delivery_fee,
+                    tax : order.tax
+                  }
+                }else{
+                  charge.paymentMethod = "online";
+                }
+
+                stripe.retrieveApplicationFee(charge.application_fee, function(err, fee){
+                  if(err){
                     return next(err);
                   }
-                  var date = moment(charge.created * 1000);
-                  charge.month = moment.months()[date.month()];
-                  charge.day = date.date();
-                  charge.type = "type-payment";
-                  charge.host = host;
-                  stripe.retrieveApplicationFee(charge.application_fee, function(err, fee){
-                    if(err){
-                      return next(err);
-                    }
+                  if(chargeId == "cash"){
+                    charge.application_fee = order.application_fees['cash'];
+                  }else{
                     charge.application_fee = fee.amount - fee.amount_refunded;
-                    transactions.push(charge);
-                    next();
-                  });
-                })
+                  }
+                  transactions.push(charge);
+                  next();
+                });
               });
             },function(err){
               if(err){

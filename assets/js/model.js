@@ -2669,6 +2669,56 @@ var TransactionView = Backbone.View.extend({
   }
 });
 
+var ContactInfoView = Backbone.View.extend({
+  events : {
+    "click [name='submit']" : "saveInfo"
+  },
+  initialize : function(options){
+    var errorView = this.$el.find(".alert.alert-danger");
+    errorView.removeClass("hide");
+    errorView.hide();
+    this.alertView = errorView;
+    this.$options = options;
+  },
+  saveInfo : function(e){
+    e.preventDefault();
+    var isLogin = this.$el.data("id") ? true : false;
+    if(this.$el.find("button[type='submit']").hasClass("disabled")){
+      return;
+    }
+    this.alertView.hide();
+    var firstname = this.$el.find("#nameInput").val();
+    var phone = this.$el.find("#phoneInput").val();
+    if(isLogin){
+      this.model.clear();
+      this.model.set({
+        id : this.$el.data("id"),
+        firstname : firstname,
+        phone : phone
+      });
+      var $this = this;
+      this.model.save({},{
+        success : function(){
+          dismissModal();
+          var btn = $("#meal-confirm-container [data-method='cash']");
+          btn.parent().find("button").removeClass('active');
+          btn.addClass('active');
+        },error : function(model, err){
+          $this.alertView.html(jQuery.i18n.prop('saveError'))
+          $this.alertView.show();
+        }
+      });
+    }else{
+      this.$options.target.find("#cashMethod").data('phone',phone);
+      $(this).find("#cashMethod").data('name',firstname);
+      dismissModal();
+      var btn = $("#meal-confirm-container [data-method='cash']");
+      btn.parent().find("button").removeClass('active');
+      btn.addClass('active');
+    }
+  }
+});
+
 var MealConfirmView = Backbone.View.extend({
   events : {
     "click #applyCouponBtn" : "applyCouponCode",
@@ -2865,6 +2915,7 @@ var OrderView = Backbone.View.extend({
     var selectorStr = "#" + method + "Tab .contact .regular-radio:checked + label + span";
     var contacts = this.$el.find(selectorStr).text().split("+");
     var phone;
+    var paymentMethod = this.$el.find("#payment-cards button.active").data('method');
     if(method == "delivery"){
       if(contacts.length < 2){
         this.contactAlert.html(jQuery.i18n.prop('contactAndAddressEmptyError'));
@@ -2877,7 +2928,7 @@ var OrderView = Backbone.View.extend({
       var address = contacts[0];
       phone = contacts[1].replace(" ","");
     }else{
-      if(contacts.length == 0 || !contacts[0]){
+      if((contacts.length == 0 || !contacts[0]) && paymentMethod=='online'){
         this.contactAlert.html(jQuery.i18n.prop('contactAndAddressEmptyError'));
         this.contactAlert.show();
         this.formAlert.html(jQuery.i18n.prop('contactAndAddressEmptyError'));
@@ -2894,8 +2945,8 @@ var OrderView = Backbone.View.extend({
       return;
     }
 
-    var cards = this.$el.find("#payment-cards button");
-    if(cards && cards.length == 1){
+    var cards = this.$el.find("#payment-cards button.active");
+    if(!cards.length){
       this.paymentAlert.html(jQuery.i18n.prop('paymentEmptyError'));
       this.paymentAlert.show();
       this.formAlert.html(jQuery.i18n.prop('paymentEmptyError'));
@@ -2937,7 +2988,8 @@ var OrderView = Backbone.View.extend({
       customerPhone : phone,
       delivery_fee : delivery_fee,
       couponCode : code,
-      points : points
+      points : points,
+      paymentMethod : paymentMethod
     });
 
     this.model.save({},{

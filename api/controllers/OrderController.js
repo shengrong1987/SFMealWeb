@@ -37,6 +37,8 @@ var util = require('../services/util');
 //-23 : coupon and points can not be used together
 //-24 : redeeming points exceed order amount
 //-25 : redeeming points insufficient
+//-26 : can not use any discount on cash checkout
+//-27 : can not order meal with cash checkout without name & phone
 
 
 module.exports = {
@@ -319,6 +321,7 @@ module.exports = {
     var subtotal = parseFloat(req.body.subtotal);
     var code = req.body.couponCode;
     var pointsRedeem = req.body.points;
+    var paymentMethod = req.body.paymentMethod;
     req.body.customer = userId;
 
     var $this = this;
@@ -356,8 +359,11 @@ module.exports = {
             if (err) {
               return res.badRequest(err);
             }
-            if(!found.payment || found.payment.length == 0){
+            if(paymentMethod == 'online' && (!found.payment || found.payment.length == 0)){
               return res.badRequest({ responseText : req.__('order-lack-payment'), code : -5});
+            }
+            if(paymentMethod == 'cash' && (!found.phone || !found.firstname)){
+              return res.badRequest({ responseText : req.__('order-cash-miss-profile'), code : -27});
             }
             if(m.type == "order"){
               req.body.status = "preparing";
@@ -369,6 +375,10 @@ module.exports = {
 
             if(code && pointsRedeem){
               return res.badRequest({ code : -23, responseText : req.__('order-duplicate-discount')});
+            }
+
+            if((code || pointsRedeem) && paymentMethod == 'cash'){
+              return res.badRequest({ code : -26, responseText : req.__('order-cash-no-discount')});
             }
 
             //validate Coupon
@@ -395,12 +405,13 @@ module.exports = {
                       return res.badRequest(err);
                     }
                     stripe.charge({
+                      paymentMethod : order.paymentMethod,
                       isInitial : true,
                       amount : subtotal * 100,
                       deliveryFee : req.body.delivery_fee * 100,
                       discount : discount * 100,
                       email : email,
-                      customerId : found.payment[0].customerId,
+                      customerId : found.payment[0] ? found.payment[0].customerId : null,
                       destination : m.chef.accountId,
                       meal : m,
                       method : method,
@@ -429,22 +440,64 @@ module.exports = {
                           var quantity = parseInt(orders[dishId].number);
                           m.leftQty[dishId] -= quantity;
                         }
+                        order.tax = tax;
                         order.transfer = transfer;
                         order.charges = {};
-                        order.charges[charge.id] = charge.amount;
+                        if(order.paymentMethod == "cash"){
+                          order.charges[charge.id] = order.charges[charge.id] || 0;
+                          order.charges[charge.id] += charge.amount;
+                        }else{
+                          order.charges[charge.id] = charge.amount;
+                        }
                         order.application_fees = {};
-
-                        stripe.retrieveApplicationFee(charge.application_fee, function(err, fee1){
-                          if(err){
-                            return res.badRequest(err);
-                          }
-                          if(transfer && transfer.application_fee){
-                            stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee2){
-                              if(err){
-                                return res.badRequest(err);
-                              }
-                              order.application_fees[charge.id] = fee1.amount + fee2.amount;
-                              m.save(function (err, result) {
+                        if(order.paymentMethod == 'cash'){
+                          order.application_fees[charge.id] = charge.application_fee;
+                          order.save(function(err, o){
+                            if(err){
+                              return res.badRequest(err);
+                            }
+                            o.chef = m.chef;
+                            o.dishes = m.dishes;
+                            notification.notificationCenter("Order", "new", o, true, false, req);
+                            //test only
+                            if(req.wantsJSON){
+                              return res.ok(order);
+                            }
+                            return res.ok({});
+                          })
+                        }else{
+                          stripe.retrieveApplicationFee(charge.application_fee, function(err, fee1){
+                            if(err){
+                              return res.badRequest(err);
+                            }
+                            if(transfer && transfer.application_fee){
+                              stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee2){
+                                if(err){
+                                  return res.badRequest(err);
+                                }
+                                order.application_fees[charge.id] = fee1.amount + fee2.amount;
+                                m.save(function (err, result) {
+                                  if(err){
+                                    return res.badRequest(err);
+                                  }
+                                  order.save(function(err, o){
+                                    if(err){
+                                      return res.badRequest(err);
+                                    }
+                                    o.chef = m.chef;
+                                    o.dishes = m.dishes;
+                                    notification.notificationCenter("Order", "new", o, true, false, req);
+                                    //test only
+                                    if(req.wantsJSON){
+                                      return res.ok(order);
+                                    }
+                                    return res.ok({});
+                                  });
+                                });
+                              })
+                            }else{
+                              order.application_fees[charge.id] = fee1.amount;
+                              m.save(function (err, result){
                                 if(err){
                                   return res.badRequest(err);
                                 }
@@ -462,31 +515,11 @@ module.exports = {
                                   return res.ok({});
                                 });
                               });
-                            })
-                          }else{
-                            order.application_fees[charge.id] = fee1.amount;
-                            m.save(function (err, result){
-                              if(err){
-                                return res.badRequest(err);
-                              }
-                              order.save(function(err, o){
-                                if(err){
-                                  return res.badRequest(err);
-                                }
-                                o.chef = m.chef;
-                                o.dishes = m.dishes;
-                                notification.notificationCenter("Order", "new", o, true, false, req);
-                                //test only
-                                if(req.wantsJSON){
-                                  return res.ok(order);
-                                }
-                                return res.ok({});
-                              });
-                            });
-                          }
-                        });
+                            }
+                          });
+                        }
                       } else {
-                        res.badRequest({ reponseText : req.__('order-unknown-error'), code : -8});
+                        return res.badRequest({ code : -99, responseText : req.__('order-unknown-error') });
                       }
                     });
                   });
@@ -540,27 +573,30 @@ module.exports = {
         if(order.status == "schedule"){
           //host cannot adjust the order at schedule
           //can update without permission of host or adjust by host
-          var diff = subtotal - order.subtotal;
+          var diff = parseFloat(subtotal - order.subtotal);
           var tax = $this.getTax(diff, order.host.county);
 
           sails.log.info("adjusting amount: " + diff);
+          sails.log.info("original tax amount: " + order.tax);
+          sails.log.info("tax adjusting amount: " + tax);
 
           if(diff != 0){
             User.findOne(order.customer.id).populate('payment').exec(function (err, found) {
               if (err) {
                 return res.badRequest(err);
               }
-              if(!found.payment || found.payment.length == 0){
+              if(order.paymentMethod == 'online' && (!found.payment || found.payment.length == 0)){
                 return res.badRequest({responseText : req.__('order-lack-payment'), code : -5});
               }
               if(diff>0){
                 //create another charge
                 stripe.charge({
                   isInitial : false,
+                  paymentMethod : order.paymentMethod,
                   amount : diff * 100,
                   discount : 0,
                   email : email,
-                  customerId : found.payment[0].customerId,
+                  customerId : found.payment[0] ? found.payment[0].customerId : null,
                   destination : order.host.accountId,
                   meal : order.meal,
                   tax : tax,
@@ -570,7 +606,7 @@ module.exports = {
                     orderId : order.id,
                     userId : order.customer.id,
                     deliveryFee : order.delivery_fee * 100,
-                    tax : tax
+                    tax : order.tax + tax
                   }
                 },function(err, charge, transfer){
                   if (err) {
@@ -586,7 +622,14 @@ module.exports = {
                       order.adjusting_subtotal = order.subtotal;
                       order.orders = params.orders;
                       order.subtotal = params.subtotal;
-                      order.charges[charge.id] = charge.amount;
+                      if(order.paymentMethod == "cash"){
+                        order.charges[charge.id] = order.charges[charge.id] || 0;
+                        order.charges[charge.id] += charge.amount;
+                        order.application_fees[charge.id] += charge.application_fee;
+                      }else{
+                        order.charges[charge.id] = charge.amount;
+                      }
+                      order.tax += tax;
                       order.transfer = transfer;
                       order.meal = m.id;
                       order.save(function(err,result){
@@ -595,14 +638,20 @@ module.exports = {
                         }
                         //send notification
                         notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
-                        return res.ok({responseText : req.__('order-adjust-ok',charge.amount / 100)});
+                        return res.ok({responseText : req.__('order-adjust-ok',charge.amount / 100), tax : order.tax});
                       })
                     });
+                  }else{
+                    return res.badRequest({ code : -99, responseText : req.__('order-unknown-error') });
                   }
                 });
               }else{
                 var totalRefund = Math.abs(diff);
+                var refunded_application_fee = totalRefund * order.meal.commission;
                 tax = $this.getTax(totalRefund, order.host.county)/100;
+                sails.log.info("original tax amount: " + order.tax);
+                sails.log.info("tax refund amount: " + tax);
+                order.tax -= tax * 100;
                 totalRefund += tax;
                 diff = - diff;
                 diff += tax;
@@ -626,6 +675,7 @@ module.exports = {
 
                 async.each(refundCharges,function(charge, next){
                   stripe.refund({
+                    paymentMethod : order.paymentMethod,
                     id : charge.id,
                     amount : charge.amount * 100,
                     metadata : {
@@ -634,6 +684,13 @@ module.exports = {
                   },function(err, refund){
                     if(err){
                       return next(err);
+                    }
+                    if(order.paymentMethod == "cash"){
+                      order.charges['cash'] -= refund.amount;
+                      order.application_fees['cash'] -= refunded_application_fee;
+                      if(order.charges['cash'] < 0){
+                        order.charges['cash'] = 0;
+                      }
                     }
                     next();
                   })
@@ -656,7 +713,7 @@ module.exports = {
                       }
                       //send notification
                       notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
-                      return res.ok({responseText : req.__('order-adjust-ok2', totalRefund)});
+                      return res.ok({responseText : req.__('order-adjust-ok2', totalRefund), tax : order.tax});
                     })
                   });
                 });
@@ -675,7 +732,7 @@ module.exports = {
                   return res.badRequest(err);
                 }
                 notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
-                return res.ok({responseText :req.__('order-adjust-ok3')});
+                return res.ok({responseText :req.__('order-adjust-ok3'), tax : order.tax});
               })
             });
           }
@@ -754,6 +811,7 @@ module.exports = {
       var refundCharges = Object.keys(order.charges);
       async.each(refundCharges, function(chargeId,next){
         stripe.refund({
+          paymentMethod : order.paymentMethod,
           id : chargeId,
           metadata : {
             userId : order.customer.id
@@ -762,12 +820,17 @@ module.exports = {
           if(err){
             return next(err);
           }
+          if(order.paymentMethod == "cash"){
+            order.charges['cash'] = 0;
+            order.application_fees['cash'] = 0;
+          }
           next();
         });
       },function(err){
         if(err){
           return res.badRequest(err);
         }
+        order.tax = 0;
         order.msg = "Order refunded by admin, please see email for detail, order id:" + order.id;
         order.save(function(err, result){
           if(err){
@@ -806,12 +869,16 @@ module.exports = {
         var amount = (order.subtotal + order.delivery_fee).toFixed(2);
         if(amount > 0){
           User.findOne(order.customer.id).populate('payment').exec(function (err, found) {
-            if (err || !found.payment || found.payment.length == 0) {
+            if(err) {
               return res.badRequest(err);
+            }
+            if(order.paymentMethod == 'online' && (!found.payment || found.payment.length == 0)){
+              return res.badRequest({ responseText : req.__('order-lack-payment'), code : -5});
             }
             var refundCharges = Object.keys(order.charges);
             async.each(refundCharges, function(chargeId, next){
               stripe.refund({
+                paymentMethod : order.paymentMethod,
                 id : chargeId,
                 metadata : {
                   userId : order.customer.id
@@ -835,6 +902,11 @@ module.exports = {
                 if (err) {
                   return res.badRequest(err);
                 }
+                if(order.paymentMethod == "cash"){
+                  order.charges['cash'] = 0;
+                  order.application_fees = 0;
+                }
+                order.tax = 0;
                 order.status = "cancel";
                 order.meal = m.id;
                 order.subtotal = 0;
@@ -842,13 +914,12 @@ module.exports = {
                   if(err){
                     return res.badRequest(err);
                   }
-                  //send notification
                   notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
                   $this.cancelOrderJob(result.id, function(err){
                     if(err){
                       return res.badRequest(err);
                     }
-                    return res.ok({responseText : req.__('order-cancel-ok')});
+                    return res.ok({responseText : req.__('order-cancel-ok'), tax : order.tax});
                   });
                 })
               });
@@ -856,6 +927,7 @@ module.exports = {
           });
         }else{
           order.status = "cancel";
+          order.tax = 0;
           order.save(function(err,result){
             if(err){
               return res.badRequest(err);
@@ -866,7 +938,7 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
-              return res.ok({responseText : req.__('order-cancel-ok')});
+              return res.ok({responseText : req.__('order-cancel-ok'), tax : order.tax});
             });
           })
         }
@@ -911,17 +983,21 @@ module.exports = {
         var customerId = order.customer.id;
         if(diff != 0){
           User.findOne(customerId).populate('payment').exec(function (err, found) {
-            if (err || !found.payment || found.payment.length == 0) {
+            if (err) {
               return res.badRequest(err);
+            }
+            if(order.paymentMethod == 'online' && (!found.payment || found.payment.length == 0)){
+              return res.badRequest({ responseText : req.__('order-lack-payment'), code : -5});
             }
             if(diff>0){
               //create another charge
               stripe.charge({
+                paymentMethod : order.paymentMethod,
                 isInitial : false,
                 amount : diff * 100,
                 email : email,
                 discount : 0,
-                customerId : found.payment[0].customerId,
+                customerId : found.payment[0] ?  found.payment[0].customerId : null,
                 destination : order.host.accountId,
                 meal : order.meal,
                 tax : tax,
@@ -949,7 +1025,14 @@ module.exports = {
                     var tmpLastStatus = order.status;
                     order.status = order.lastStatus;
                     order.lastStatus = tmpLastStatus;
-                    order.charges[charge.id] = charge.amount;
+                    if(order.paymentMethod == "cash"){
+                      order.charges[charge.id] = order.charges[charge.id] || 0;
+                      order.charges[charge.id] += charge.amount;
+                      order.application_fees[charge.id] += charge.application_fee;
+                    }else{
+                      order.charges[charge.id] = charge.amount;
+                    }
+                    order.tax += tax * 100;
                     order.transfer = transfer;
                     order.meal = order.meal.id;
                     order.save(function(err,result){
@@ -964,10 +1047,18 @@ module.exports = {
                       }
                     })
                   });
+                }else{
+                  return res.badRequest({ code : -99, responseText : req.__('order-unknown-error') });
                 }
               });
             }else {
-              diff = -diff;
+              var totalRefund = Math.abs(diff);
+              var refunded_application_fee = totalRefund * order.meal.commission;
+              tax = $this.getTax(totalRefund, order.host.county)/100;
+              diff = - diff;
+              diff += tax;
+              sails.log.info("refunding amount plus tax: " + diff);
+              sails.log.info("refunding application fee: " + refunded_application_fee);
               var chargeIds = Object.keys(order.charges);
               var refundCharges = [];
               chargeIds.forEach(function (chargeId) {
@@ -976,7 +1067,7 @@ module.exports = {
                   if(chargeAmount != 0){
                     if (chargeAmount > diff) {
                       refundCharges.push({amount: diff, id: chargeId});
-                      order.charges[chargeId] = chargeAmount - diff;
+                      order.charges[chargeId] = chargeAmount - diff * 100;
                       diff = 0;
                     } else if(chargeAmount <= diff) {
                       diff -= chargeAmount;
@@ -988,6 +1079,7 @@ module.exports = {
               });
               async.each(refundCharges, function (charge, next) {
                 stripe.refund({
+                  paymentMethod : order.paymentMethod,
                   id: charge.id,
                   amount: charge.amount * 100,
                   metadata : {
@@ -1007,6 +1099,10 @@ module.exports = {
                   if (err) {
                     return res.badRequest(err);
                   }
+                  if(order.paymentMethod == "cash"){
+                    sails.log.info("original application fee: " + order.application_fees['cash']);
+                    order.application_fees['cash'] -= refunded_application_fee * 100;
+                  }
                   order.orders = adjusting_orders;
                   order.subtotal = adjusting_subtotal;
                   order.adjusting_orders = {};
@@ -1015,6 +1111,7 @@ module.exports = {
                   order.status = order.lastStatus;
                   order.lastStatus = tmpLastStatus;
                   order.meal = order.meal.id;
+                  order.tax -= tax * 100;
                   order.save(function (err, result) {
                     if (err) {
                       return res.badRequest(err);
@@ -1069,6 +1166,7 @@ module.exports = {
                 return next();
               }
               stripe.refund({
+                paymentMethod : order.paymentMethod,
                 id : chargeId,
                 metadata : {
                   userId : order.customer.id
@@ -1076,6 +1174,10 @@ module.exports = {
               },function(err, refund){
                 if(err){
                   return next(err);
+                }
+                if(order.paymentMethod == "cash"){
+                  order.charges['cash'] = 0;
+                  order.application_fees['cash'] = 0;
                 }
                 next();
               });
@@ -1091,6 +1193,7 @@ module.exports = {
                 if (err) {
                   return res.badRequest(err);
                 }
+                order.tax = 0;
                 order.status = "cancel";
                 order.lastStatus = "cancelling";
                 order.meal = order.meal.id;
@@ -1110,6 +1213,7 @@ module.exports = {
             })
           });
         }else{
+          order.tax = 0;
           order.status = "cancel";
           order.lastStatus = "cancelling";
           order.meal = order.meal.id;

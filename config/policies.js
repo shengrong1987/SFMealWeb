@@ -48,6 +48,7 @@ module.exports.policies = {
     'becomeHost' : 'or(and(sessionAuth, notHost),isAdmin)',
     'pocket' : 'or(sessionAuth,isAdmin)',
     'me' : ['sessionAuth'],
+    'contactForm' : 'sessionAuth',
     'search' : 'isAdmin',
     'deleteObject' : 'or(sessionAuth,isAdmin)',
     'update' : 'or(and(sessionAuth, sessionSelf, isNotFields("status","pocket","host","customerId")),isAdmin)'

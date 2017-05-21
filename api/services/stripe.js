@@ -99,6 +99,9 @@ module.exports = {
   },
 
   retrieveCharge : function(attr, cb){
+    if(attr == "cash"){
+      return cb(null, {});
+    }
     stripe.charges.retrieve(attr, cb);
   },
 
@@ -147,6 +150,10 @@ module.exports = {
 
     //apply discount
     var total = originalTotal - discount;
+
+    if(attr.paymentMethod == "cash"){
+      return cb(null, { id : 'cash', status : 'succeeded', amount : total, application_fee : application_fee});
+    }
 
     var $this = this;
     stripe.charges.create({
@@ -224,6 +231,9 @@ module.exports = {
   },
 
   refund : function(attr, cb){
+    if(attr.paymentMethod == "cash"){
+      return cb(null, { amount : attr.amount });
+    }
     var $this = this;
     sails.log.debug("refunding customer : " + (typeof attr.amount === 'undefined' || "fully"));
     stripe.refunds.create({

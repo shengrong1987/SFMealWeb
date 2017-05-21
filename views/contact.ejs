@@ -1,0 +1,40 @@
+
+<div id="contactInfoView" data-id="<%= user ? (user.id || '') : ''%>">
+
+  <div class="popup box middle">
+    <form class="text-center form-inline" data-toggle="validator" role="form">
+
+      <fieldset>
+
+        <div class="form-group" role="form">
+          <label for="nameInput"><span data-toggle="i18n" data-key="name"></span><span>* </span>:</label>
+          <input type="text" class="form-control" id="nameInput" value="<%= user ? (user.firstname || '') : ''%>" required>
+          <div class="help-block with-errors"></div>
+        </div>
+
+        <h4></h4>
+
+        <div class="form-group" role="form">
+          <label for="phoneInput"><span data-toggle="i18n" data-key="phone"></span><span>* </span>:</label>
+          <input type="tel" class="form-control" id="phoneInput" data-toggle="i18n" data-key="needPhone" value="<%= user ? (user.phone || '') : ''%>" data-error="电话格式不对" required>
+          <div class="help-block with-errors"></div>
+        </div>
+        <div class="alert alert-danger hide"></div>
+
+        <div class="col-xs-12 form-group" style="margin-top: 10px;">
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" name="submit" class="btn btn-danger red" data-toggle="i18n" data-key="save"></button>
+              <button type="button" class="btn btn-disable" data-toggle="i18n" data-key="cancel" onclick="dismissModal()"></button>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>
+
+<script>
+  setup();
+  new ContactInfoView({ el : $("#contactInfoView"), model : new User(), target : $("#meal-confirm-container [data-method='cash']")});
+</script>

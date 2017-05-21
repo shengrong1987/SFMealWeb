@@ -422,9 +422,9 @@ describe('UsersController', function() {
     })
 
     var addresses = [
-      {"street":"1974 palou ave","city" : "San Francisco", "zip" : '94124', "phone" : '14158023853',"isDefault": false },
-      {"street":"7116 Tiant Way","city" : "Elk Grove", "zip" : '95758', "phone" : '14158023853', "isDefault" : false },
-      {"street":"7118 Tiant Way","city" : "Elk Grove", "zip" : '95758', "phone" : '14158023853', "isDefault" : true }
+      {"street":"1974 palou ave","city" : "San Francisco", "zip" : '94124', "phone" : '(415)802-3853',"isDefault": false },
+      {"street":"7116 Tiant Way","city" : "Elk Grove", "zip" : '95758', "phone" : '(415)802-3853', "isDefault" : false },
+      {"street":"7118 Tiant Way","city" : "Elk Grove", "zip" : '95758', "phone" : '(415)802-3853', "isDefault" : true }
     ];
     var deletedAddresses;
     var firstname = "sheng";

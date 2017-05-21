@@ -166,8 +166,10 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
+            var tax = Math.round((price1 + price2 * 2 + (price4+1)*2)*0.085*100);
             var chargesTotal = Math.round(((price1 * 1 + price2 * 2 + (price4+1) * 2) * 1.085 + 1) * 100);
             userPoints += Math.floor(chargesTotal / 100);
+            res.body.tax.should.be.equal(tax);
             res.body.customer.should.be.equal(guestId);
             Object.keys(res.body.charges).should.have.length(1);
             res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(chargesTotal);
@@ -279,6 +281,8 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
+            var tax = Math.round(price1 * 0.085 * 100);
+            res.body.tax.should.be.equal(tax);
             var points = Math.floor((price2 * 2 + ((price4+1) * 2)) * 1.085);
             userPoints -= points;
             done();
@@ -312,6 +316,8 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
+            var tax = Math.round(price2 * 0.085 * 100);
+            res.body.tax.should.be.equal(tax);
             done();
           })
     })
@@ -405,6 +411,8 @@ describe('OrderController', function() {
           }
           var points = Math.floor(price3 * 1 * 1.085);
           userPoints += points;
+          var tax = Math.round((price2 + price3) * 0.085 * 100);
+          res.body.tax.should.be.equal(tax);
           done();
         })
     })
@@ -431,6 +439,7 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
+            res.body.tax.should.be.equal(0);
             done();
           })
     })
@@ -543,8 +552,6 @@ describe('OrderController', function() {
           done();
         })
     });
-
-
 
     it('should not update any thing on meal with orders', function(done){
       var now = new Date()
@@ -1280,5 +1287,176 @@ describe('OrderController', function() {
     });
 
   })
+
+  describe('order a meal with coupon', function() {
+    var mealId;
+    var dishId1;
+    var dishId2;
+    var dishId3;
+    var dishId4;
+    var price1;
+    var price2;
+    var price3;
+    var orderId;
+    var phone = "1(415)802-3853";
+    var adminEmail = 'admin@sfmeal.com';
+    var password = '123456789';
+    var user5Email = "user5@sfmeal.com";
+    var userId;
+
+    it('should login a guest account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : user5Email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should get user info', function(done){
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property("auth");
+          res.body.auth.email.should.be.equal(user5Email, "login user email does not match");
+          userId = res.body.id;
+          done()
+        })
+    })
+
+    it('should get a meal', function (done) {
+      agent
+        .get('/meal')
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            console.log(err);
+            return done(err);
+          }
+          if(res.body.meals.length == 0){
+            return done(Error("error getting any meal"));
+          }
+          var meal = res.body.meals[1];
+          mealId = meal.id;
+          dishId1 = meal.dishes[0].id;
+          dishId2 = meal.dishes[1].id;
+          dishId3 = meal.dishes[2].id;
+          dishId4 = meal.dishes[3].id;
+          price1 = meal.dishes[0].price;
+          price2 = meal.dishes[1].price;
+          price3 = meal.dishes[2].price;
+          done();
+        })
+    })
+
+    it('should not be able to order a meal without name & phone', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId4] = { number : 1 , preference : { property : '', extra : 0} };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price3 * 1,
+          pickupOption : 1,
+          customerPhone : phone,
+          method : "pickup",
+          mealId : mealId,
+          paymentMethod : 'cash'
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-27);
+          done();
+        })
+    });
+
+    it('should update user profile', function (done) {
+      agent
+        .put('/user/' + userId)
+        .send({
+          firstname : "user5",
+          phone : '(415)802-3853'
+        })
+        .expect(200)
+        .end(function(err,res){
+          done();
+        })
+    })
+
+    it('should be able to order a meal with cash with no card', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId4] = { number : 1 , preference : { property : '', extra : 0} };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price3 * 1,
+          pickupOption : 1,
+          customerPhone : phone,
+          method : "pickup",
+          mealId : mealId,
+          paymentMethod : 'cash'
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.tax.should.be.equal(price3 * 0.085 * 100);
+          res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + 1) * 100);
+          orderId = res.body.id;
+          done();
+        })
+    });
+
+    it('should adjust the dish with less amount successfully', function (done) {
+      var dishObj = {};
+      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId2] = { number : 1 , preference : { property : '', extra : 0} };
+      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      agent
+        .post('/order/' + orderId + "/adjust")
+        .send({orders : dishObj, subtotal : price1 * 1, mealId : mealId, delivery_fee : 0})
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          var tax = Math.round(price1 * 0.085 * 100);
+          res.body.tax.should.be.equal(tax);
+          done();
+        })
+    })
+
+    it('should cancel the order with cash', function(done){
+      agent
+        .post('/order/' + orderId + "/cancel")
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    });
+
+
+  });
 
 });

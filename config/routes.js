@@ -37,6 +37,7 @@ module.exports.routes = {
   '/payment/new' : 'PaymentController.newForm',
   '/auth/done' : "AuthController.loginSuccess",
   '/user/me' : 'UserController.me',
+  '/user/me/contact' : 'UserController.contactForm',
   '/user/getSignedUrl' : 'UserController.calculateSignature',
   '/user/me/delete' : 'UserController.deleteObject',
   '/pocket/me' : 'PocketController.getBalance',
