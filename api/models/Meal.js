@@ -102,8 +102,7 @@ module.exports = {
     },
     score : {
       type : 'float',
-      defaultsTo : 5.0,
-      decimal2 : true
+      defaultsTo : 5.0
     },
     numberOfReviews : {
       type : 'integer',
