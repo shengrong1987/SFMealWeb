@@ -68,7 +68,7 @@
                     <%}else{%>
                       <label class="location multi-line-label" data-value="<%= pickup.publicLocation || pickup.location%>" style="margin-left: 23px;"><%= __('location') %>:&nbsp; <%= pickup.publicLocation || pickup.location%></label><%= __('pickup-location-after-order')%>
                     <%}%>
-                    <label class="pickupInstruction" data-value="<%= pickup.pickupInstruction%>" style="margin-left: 23px;"><%= __('pickup-instruction') %>:&nbsp; <%= pickup.pickupInstruction || ''%></label>
+                    <label class="pickupInstruction" data-value="<%= pickup.instruction%>" style="margin-left: 23px;"><%= __('pickup-instruction') %>:&nbsp; <%= pickup.instruction || ''%></label>
 
                   </label>
                   <%}i++;})}; %>
