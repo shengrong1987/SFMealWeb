@@ -155,7 +155,7 @@
                         <span class="text-black"><%= __('delivery')%></span>
                         <%= __('delivery-fee')%>:$<%= meal.delivery_fee%><br/>
                         <%= __('delivery-time')%>:<a class="calculateBtn" class="text-red" data-location="<%= meal.chef.full_address%>" href="javascript:void(0)"><%= __('click-to-cal')%></a><label></label><br/>
-                        <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"><%= __('delivery-center')%>: <%= pickup.deliveryCenter%><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<%= __('time') %><span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
+                        <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"><%= __('pickup-time') %><span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
                       </small>
                     </label>
                   </div>
