@@ -725,5 +725,6 @@
   "enter-phone" : "联系方式为空",
   "cash-method" : "现金支付",
   "cash" : "现金",
-  "online" : "线上支付"
+  "online" : "线上支付",
+  "amount-owe" : "需付"
 }

@@ -85,7 +85,7 @@
 
               <%
               user.pocket.transactions.forEach(function(tranObj){
-              if(tranObj.status == "pending"){
+              if(tranObj.orderStatus != "cancel" && (tranObj.status == "pending" || tranObj.status == "cash")){
                 var refund = tranObj.type == "type-compensation" ? tranObj.amount_reversed : tranObj.amount_refunded;
               %>
               <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
@@ -109,9 +109,8 @@
               <%
               user.pocket.transactions = user.pocket.transactions || [];
               user.pocket.transactions.forEach(function(tranObj){
-              if(tranObj.status == "paid" || tranObj.status == "succeeded" || tranObj.status == "cash"){
-                if(tranObj.type == "type-compensation"){
-                  var refund = tranObj.amount_reversed;
+              if(tranObj.orderStatus != "cancel" && (tranObj.status == "paid" || tranObj.status == "succeeded" || tranObj.status == "cash")){
+                if(tranObj.type == "type-compensation" && !tranObj.reversed){
               %>
               <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">

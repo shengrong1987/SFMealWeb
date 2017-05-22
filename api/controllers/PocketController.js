@@ -96,6 +96,7 @@ module.exports = {
                 }else{
                   charge.paymentMethod = "online";
                 }
+                charge.orderStatus = order.status;
                 charge.application_fee = 0;
                 charge.type = "type-charge";
                 charge.host = host;
@@ -191,6 +192,7 @@ module.exports = {
                 charge.day = date.date();
                 charge.type = "type-payment";
                 charge.host = host;
+                charge.orderStatus = order.status;
 
                 if(chargeId == "cash"){
                   charge.amount = order.charges[chargeId];
@@ -274,6 +276,7 @@ module.exports = {
                       if(err){
                         return next(err);
                       }
+                      charge.orderStatus = order.status;
                       charge.application_fee = "N/A";
                       charge.type = "type-charge";
                       charge.host = host;
