@@ -53,7 +53,7 @@ var notification = {
   sendMsg : function(model, action, params, req){
     this.transitLocaleTimeZone(params);
     var locale = req ? (params.isSendToHost ? params.host.locale : params.customer.locale) : '';
-    var phone = params.isSendToHost ? (params.host ? params.host.phone : params.chef.phone) : params.customer.phone;
+    var phone = params.isSendToHost ? (params.host ? params.host.phone : params.chef.phone) : params.customerPhone;
     var content = "";
     if(model === "Order"){
       switch(action){

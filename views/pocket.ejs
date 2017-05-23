@@ -31,21 +31,21 @@
             <div class="row">
               <div>
                 <div class="form-group col-xs-12">
-                  <div class='input-group from col-xs-4' data-toggle="dateTimePicker" style="float: left">
+                  <div class='input-group from col-xs-12 col-sm-6 col-md-4' data-toggle="dateTimePicker" style="float: left">
                     <span class="input-group-addon"><%= __('date-from')%></span>
                     <input type='text' class="form-control" />
                     <span class="input-group-addon">
                       <span class="fa fa-calendar"></span>
                     </span>
                   </div>
-                  <div class='input-group to col-xs-4' data-toggle="dateTimePicker" style="float: left;margin-left:20px;">
+                  <div class='input-group to col-xs-12 col-sm-6 col-md-4' data-toggle="dateTimePicker" style="float: left;">
                     <span class="input-group-addon"><%= __('date-to')%></span>
                     <input type='text' class="form-control" />
                     <span class="input-group-addon">
                       <span class="fa fa-calendar"></span>
                     </span>
                   </div>
-                  <div id="durationBtn" data-target="#transaction_container" class="btn btn-info do col-xs-2" style="float:left;margin-left: 15px;"><%= __('filter')%></div>
+                  <div id="durationBtn" data-target="#transaction_container" class="btn btn-info do col-xs-12 col-sm-6 col-md-2" style="float:left;"><%= __('filter')%></div>
                 </div>
                 <div class="alert alert-warning" data-toggle="alert"><%= __('need-from-or-to-time')%></div>
               </div>
@@ -91,9 +91,9 @@
               <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
-                  <div class="col-xs-4"><%= __(tranObj.type) %><a href="<%= tranObj.type==('type-payment'||'type-compensation')?'/host/me' : '/user/me'%>">#<%= tranObj.metadata.orderId%></a></div>
+                  <div class="col-xs-4"><%= __(tranObj.type) %><label><%= tranObj.metadata.orderId.slice(-4)%></label> <i class="fa fa-question-circle white cursor-pointer" data-toggle="tooltip" title=<%= __('order-last-4')%>></i></div>
                   <div class="col-xs-3"><img class="img-thumbnail round_thumb size-small" src="<%= tranObj.host.picture || "/images/profile_man.png"%>" onclick="javascript:location.href='/host/<%= tranObj.host.id %>'">&nbsp;<%= tranObj.host.shopName%></div>
-                  <div class="col-xs-3"><b>$<%= (tranObj.amount - refund - tranObj.application_fee)/100%></b> ( <%= __('order-fee')%>: $<%= Math.round(tranObj.amount - tranObj.metadata.deliveryFee - tranObj.metadata.tax)/100 %> + <%= __('tax')%>: $<%= tranObj.metadata.tax/100%> + <%= __('delivery-fee')%>: $<%= tranObj.metadata.deliveryFee/100%> - <%= __('application_fee')%>: $<%= tranObj.application_fee/100%><%= refund ? " - " + __('refunded')+ ": $" + refund/100 : "" %> )</div>
+                  <div class="col-xs-3"><b>$<%= (tranObj.amount - refund - tranObj.application_fee)/100%></b> ( <%= __('order-fee')%>: $<%= Math.round(tranObj.amount - tranObj.deliveryFee * 100 - tranObj.metadata.tax)/100 %> + <%= __('tax')%>: $<%= tranObj.metadata.tax/100%> + <%= __('delivery-fee')%>: $<%= tranObj.deliveryFee %> - <%= __('application_fee')%>: $<%= tranObj.application_fee/100%><%= refund ? " - " + __('refunded')+ ": $" + refund/100 : "" %> )</div>
                 </div>
               </div>
               <%}});%>
@@ -115,7 +115,7 @@
               <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
-                  <div class="col-xs-4"><%= __(tranObj.type) %> <a href="/host/me">#<%= tranObj.metadata.orderId%></a></div>
+                  <div class="col-xs-4"><%= __(tranObj.type) %> <label><%= tranObj.metadata.orderId.slice(-4)%></label> <i class="fa fa-question-circle white cursor-pointer" data-toggle="tooltip" title=<%= __('order-last-4')%>></i></div>
                   <div class="col-xs-3"><img class="img-thumbnail round_thumb size-small" src="<%= tranObj.host.picture || "/images/profile_man.png"%>" onclick="javascript:location.href='/host/<%= tranObj.host.id %>'">&nbsp;<%= tranObj.host.shopName%></div>
                   <div class="col-xs-3"><b>$<%= tranObj.amount/100 %></b> ( <%= __('compensation-amount')%>: $<%= Math.round(tranObj.amount)/100 %>)</div>
                 </div>
@@ -124,18 +124,18 @@
               <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
-                  <div class="col-xs-4"><%= __(tranObj.type) %><a href="/host/me">#<%= tranObj.metadata.orderId%></a></div>
+                  <div class="col-xs-4"><%= __(tranObj.type) %><label><%= tranObj.metadata.orderId.slice(-4)%></label> <i class="fa fa-question-circle white cursor-pointer" data-toggle="tooltip" title=<%= __('order-last-4')%>></i></div>
                   <div class="col-xs-3"><img class="img-thumbnail round_thumb size-small" src="<%= tranObj.host.picture || "/images/profile_man.png"%>" onclick="javascript:location.href='/host/<%= tranObj.host.id %>'">&nbsp;<%= tranObj.host.shopName%></div>
-                  <div class="col-xs-3"><b>$<%= (tranObj.amount - refund - tranObj.application_fee)/100%></b> ( <%= __('order-fee')%>: $<%= Math.round(tranObj.amount - tranObj.metadata.deliveryFee - tranObj.metadata.tax)/100 %> + <%= __('tax')%>: $<%= tranObj.metadata.tax/100%> + <%= __('delivery-fee')%>: $<%= tranObj.metadata.deliveryFee/100%> - <%= __('application_fee')%>: $<%= tranObj.application_fee/100%><%= refund ? " - " + __('refunded')+ ": $" + refund/100 : "" %> )</div>
+                  <div class="col-xs-3"><b>$<%= (tranObj.amount - refund - tranObj.application_fee)/100%></b> ( <%= __('order-fee')%>: $<%= Math.round(tranObj.amount - tranObj.deliveryFee * 100 - tranObj.metadata.tax)/100 %> + <%= __('tax')%>: $<%= tranObj.metadata.tax/100%> + <%= __('delivery-fee')%>: $<%= tranObj.deliveryFee%> - <%= __('application_fee')%>: $<%= tranObj.application_fee/100%><%= refund ? " - " + __('refunded')+ ": $" + refund/100 : "" %> )</div>
                 </div>
               </div>
               <%}else if(tranObj.type == 'type-charge'){var refund = tranObj.amount_refunded;%>
               <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
-                  <div class="col-xs-4"><%= __(tranObj.type) %><a href="/user/me">#<%= tranObj.metadata.orderId%></a></div>
+                  <div class="col-xs-4"><%= __(tranObj.type) %><label><%= tranObj.metadata.orderId.slice(-4)%></label> <i class="fa fa-question-circle white cursor-pointer" data-toggle="tooltip" title=<%= __('order-last-4')%>></i></a></div>
                   <div class="col-xs-3"><img class="img-thumbnail round_thumb size-small" src="<%= tranObj.host.picture || "/images/profile_man.png"%>" onclick="javascript:location.href='/host/<%= tranObj.host.id %>'">&nbsp;<%= tranObj.host.shopName%></div>
-                  <div class="col-xs-3"><b>$<%= (tranObj.amount - refund - tranObj.application_fee)/100%></b> ( <%= __('order-fee')%>: $<%= Math.round(tranObj.amount - tranObj.metadata.deliveryFee - tranObj.metadata.tax)/100 %> + <%= __('tax')%>: $<%= tranObj.metadata.tax/100%> + <%= __('delivery-fee')%>: $<%= tranObj.metadata.deliveryFee/100%> <%= refund ? " - " + __('refunded')+ ": $" + refund/100 : "" %> )</div>
+                  <div class="col-xs-3"><b>$<%= (tranObj.amount - refund - tranObj.application_fee)/100%></b> ( <%= __('order-fee')%>: $<%= Math.round(tranObj.amount - tranObj.deliveryFee * 100 - tranObj.metadata.tax)/100 %> + <%= __('tax')%>: $<%= tranObj.metadata.tax/100%> + <%= __('delivery-fee')%>: $<%= tranObj.deliveryFee%> <%= refund ? " - " + __('refunded')+ ": $" + refund/100 : "" %> )</div>
                 </div>
               </div>
               <%}}});%>
@@ -143,7 +143,7 @@
             </div>
 
             <nav class="pull-right">
-              <ul class="pagination pagination-sm" data-trigger="pagination" data-target="#transaction_container" data-npp="5">
+              <ul class="pagination pagination-sm" data-trigger="pagination" data-target="#transaction_container" data-npp="10">
                 <li class="active"><a href="javascript:void(0)">1</a></li>
               </ul>
             </nav>

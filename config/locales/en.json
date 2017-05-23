@@ -726,5 +726,6 @@
   "cash-method" : "Paid Cash",
   "cash" : "Cash",
   "online" : "Online",
-  "amount-owe" : "Owe"
+  "amount-owe" : "Owe",
+  "order-last-4" : "Last 4 digits of order id"
 }
