@@ -456,6 +456,16 @@ describe('OrderController', function() {
           })
     })
 
+    it('should update the user name', function (done) {
+      agent
+        .put('/user/' + guestId)
+        .send({
+          firstname : "guest"
+        })
+        .expect(200)
+        .end(done)
+    })
+
     it('should order the meal again', function (done) {
       var dishObj = {};
       dishObj[dishId1] = { number : 1 , preference : { property : '', extra : 0} };
@@ -479,9 +489,8 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          if(res.body.customer != guestId){
-            return done(Error("error making order"));
-          }
+          res.body.customer.should.be.equal(guestId);
+          res.body.customerName.should.be.equal("guest");
           orderId = res.body.id;
           done();
         })

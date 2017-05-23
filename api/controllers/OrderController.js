@@ -371,6 +371,7 @@ module.exports = {
             if(!found.phone && !req.body.customerPhone){
               return res.badRequest(req.__('order-lack-contact'));
             }
+            req.body.customerName = found.firstname || '';
             req.body.customerPhone = req.body.customerPhone || found.phone;
 
             if(code && pointsRedeem){
