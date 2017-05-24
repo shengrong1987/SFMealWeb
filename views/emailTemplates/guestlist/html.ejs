@@ -43,7 +43,7 @@
       <% orders.forEach(function(order){
       if(order.method == 'delivery'){%>
       <tr>
-        <td><%= order.customer.firstname + " " + order.customer.lastname%></td>
+        <td><%= order.customerName %></td>
         <td><%= order.id%></td>
         <td>
           <% Object.keys(order.orders).forEach(function(dishId){
@@ -90,7 +90,7 @@
       <tbody>
       <% orders.forEach(function(order){if(order.pickupOption-1 == index){%>
       <tr>
-        <td><%= order.customer.firstname + " " + order.customer.lastname%></td>
+        <td><%= order.customerName%></td>
         <td><%= order.id%></td>
         <td>
           <% Object.keys(order.orders).forEach(function(dishId){
