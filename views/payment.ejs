@@ -137,7 +137,7 @@
               <!-- Submit -->
               <div class="control-group">
                 <div class="controls text-center">
-                  <button class="btn btn-success" type="submit"><% if( typeof payment != 'undefined'){%><%= __('save')%><%}else{%><%= __('create')%><%}%></button>
+                  <button class="btn btn-success" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> <%= __('saving')%>" type="submit"><% if( typeof payment != 'undefined'){%><%= __('save')%><%}else{%><%= __('create')%><%}%></button>
                   <button class="btn btn-info" name="setToDefault" type="button"><%= __('set-default-payment')%></button>
                   <% if (typeof payment != "undefined"){%>
                   <button class="btn btn-error" name="delete" type="button"><%= __('delete')%></button>

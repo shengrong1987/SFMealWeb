@@ -56,7 +56,7 @@ var LoginView = Backbone.View.extend({
           location.reload();
         }
       },error : function(model,err){
-        $this.errorView.html(err.responseText);
+        $this.errorView.html(showErrorMsg(err));
         $this.errorView.show();
       }
     });
@@ -92,7 +92,7 @@ var LoginView = Backbone.View.extend({
         $this.successView.html(jQuery.i18n.prop('emailSent'))
       },error : function(model, err){
         $this.errorView.show();
-        $this.errorView.html(err.responseText);
+        $this.errorView.html(showErrorMsg(err));
       }
     })
   },
@@ -111,7 +111,7 @@ var LoginView = Backbone.View.extend({
           $this.errorView.show();
         }
       },error : function(model, err){
-        $this.errorView.html(err.responseText);
+        $this.errorView.html(showErrorMsg(err));
         $this.errorView.show();
       }
     })
@@ -165,7 +165,7 @@ var RegisterView = Backbone.View.extend({
           location.reload();
         }
       },error : function(model,err){
-        alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+        alertView.html(showErrorMsg(err));
         alertView.show();
       }
     })
@@ -513,7 +513,7 @@ var ApplyView = Backbone.View.extend({
       success : function(){
         reloadUrl("/apply","#step6");
       },error : function(model,err){
-        $this.alertView.html(err.responseText);
+        $this.alertView.html(showErrorMsg(err));
         $this.alertView.show();
       }
     })
@@ -575,7 +575,7 @@ var ApplyView = Backbone.View.extend({
         if(err && err.responseJSON && err.responseJSON.invalidAttributes && err.responseJSON.invalidAttributes.county && err.responseJSON.invalidAttributes.county.length > 0){
           alert_block.html(jQuery.i18n.prop('countyNotInServiceError'));
         }else{
-          alert_block.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+          alert_block.html(showErrorMsg(err));
         }
         alert_block.show();
         submit_btn.button("reset");
@@ -636,6 +636,9 @@ var PaymentView = Backbone.View.extend({
   submitProfile: function (e) {
     e.preventDefault();
 
+    var btn = $(e.currentTarget).find('[type="submit"]');
+    btn.button("loading");
+
     if (!Stripe.card.validateCVC(this.$el.find("#cvv").val())) {
       this.$el.find("#cvv").next().html($("#cvv").data("error"));
       return;
@@ -644,7 +647,7 @@ var PaymentView = Backbone.View.extend({
     var $this = this;
     var paymentId = this.$el.find("form").data("id");
     if(paymentId){
-      this.updatePaymentProfile();
+      this.updatePaymentProfile(btn);
     }else{
       Stripe.card.createToken({
         number: this.$el.find("input[name='cardNumber']").val(),
@@ -659,6 +662,7 @@ var PaymentView = Backbone.View.extend({
         address_country: this.$el.find(".flagstrap").data('selected-country')
       }, function(status, response){
         if (response.error) {
+          btn.button('reset');
           $this.alertView.html(jQuery.i18n.prop(response.error.code));
           $this.alertView.show();
         } else {
@@ -677,7 +681,7 @@ var PaymentView = Backbone.View.extend({
           }else {
             stripeTokenInput.attr("value", token);
           }
-          $this.createPaymentProfile();
+          $this.createPaymentProfile(btn);
         }
       });
     }
@@ -688,12 +692,13 @@ var PaymentView = Backbone.View.extend({
     var $this = this;
     this.model.destroy({
       success : function(model, response){
-        reloadUrl('/pocket/me','#mypayment');
+        location.reload();
+        // reloadUrl('/pocket/me','#mypayment');
       },error : function(model,err){
         if(err.status == 200){
           location.reload();
         }else{
-          $this.alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+          $this.alertView.html(showErrorMsg(err));
           $this.alertView.show();
         }
       }
@@ -706,7 +711,7 @@ var PaymentView = Backbone.View.extend({
     this.$el.find("form").validator({}).submit();
   },
 
-  updatePaymentProfile : function(){
+  updatePaymentProfile : function(button){
     var $this = this;
     this.model.set({
       id : this.$el.find("form").data("id"),
@@ -729,13 +734,14 @@ var PaymentView = Backbone.View.extend({
           location.reload();
         }
       }, error: function (model, err) {
-        $this.alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+        button.button('reset');
+        $this.alertView.html(showErrorMsg(err));
         $this.alertView.show();
       }
     });
   },
 
-  createPaymentProfile: function () {
+  createPaymentProfile: function (button) {
     var $this = this;
     this.model.clear();
     this.model.set({
@@ -745,10 +751,10 @@ var PaymentView = Backbone.View.extend({
     });
     this.model.save({}, {
       success: function () {
-        // reloadUrl('/pocket/me','#mypayment');
         location.reload();
       }, error: function (model, err) {
-        $this.alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+        button.button('reset');
+        $this.alertView.html(showErrorMsg(err));
         $this.alertView.show();
       }
     });
@@ -959,12 +965,11 @@ var AddressView = Backbone.View.extend({
     $this.model.save({}, {
       success: function () {
         location.reload();
-        //reloadUrl("/user/me","#myaddress");
       }, error: function (model, err) {
         if(err && err.responseJSON && err.responseJSON.invalidAttributes.county && err.responseJSON.invalidAttributes.county.length > 0){
           alert_block.html(jQuery.i18n.prop('countyNotInServiceError'));
         }else{
-          alert_block.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+          alert_block.html(showErrorMsg(err));
         }
         alert_block.show();
         submit_btn.button("reset");
@@ -1011,7 +1016,7 @@ var CheckListView = Backbone.View.extend({
         success : function (model) {
           location.reload();
         }, error: function (model, err) {
-          $this.errorView.html(err);
+          $this.errorView.html(showErrorMsg(err));
           $this.errorView.show();
         }
       });
@@ -1039,12 +1044,12 @@ var CheckListView = Backbone.View.extend({
         success : function (model) {
           location.reload();
         }, error: function (model, err) {
-          $this.errorView.html(err);
+          $this.errorView.html(showErrorMsg(err));
           $this.errorView.show();
         }
       });
     }, function(err){
-      $this.errorView.html(err);
+      $this.errorView.html(showErrorMsg(err));
       $this.errorView.show();
       return;
     },0,name,true);
@@ -1304,7 +1309,7 @@ var MealSelectionView = Backbone.View.extend({
     },
     error : function(model, err){
       $this.alertView.show();
-      $this.alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+      $this.alertView.html(showErrorMsg(err));
     }});
   },
   addPointsToOrder : function(e){
@@ -1756,7 +1761,7 @@ var MealView = Backbone.View.extend({
       },error : function(model, err){
         $this.successAlert.hide();
         $this.formAlert.show();
-        $this.formAlert.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+        $this.formAlert.html(showErrorMsg(err));
       }
     });
   }
@@ -2154,7 +2159,7 @@ var DishView = Backbone.View.extend({
               }
             },error : function(model, err){
               $this.progressAlert.hide();
-              $this.formAlert.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+              $this.formAlert.html(showErrorMsg(err));
               $this.formAlert.show();
             }
           });
@@ -2247,7 +2252,7 @@ var BankView = Backbone.View.extend({
 
             }
           },error : function(model, err){
-            $this.alertForm.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+            $this.alertForm.html(showErrorMsg(err));
             $this.alertForm.show();
           }
         });
@@ -2465,7 +2470,7 @@ var HostPageView = Backbone.View.extend({
       },
       error : function(model, err){
         $this.alertView.show();
-        $this.alertView.html(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+        $this.alertView.html(showErrorMsg(err));
       }
     })
   },
@@ -2492,7 +2497,7 @@ var HostPageView = Backbone.View.extend({
             error : function(model, err){
               dialog.close();
               $this.alertView.show();
-              $this.alertView.html(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+              $this.alertView.html(showErrorMsg(err));
             }
           })
         }
@@ -2575,7 +2580,7 @@ var ReviewView = Backbone.View.extend({
               success : function(){
                 reloadUrl("/user/me","#myreview");
               },error : function(model, err){
-                alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+                alertView.html(showErrorMsg(err));
                 alertView.show();
               }
             })
@@ -2601,7 +2606,7 @@ var ReviewView = Backbone.View.extend({
       success : function(){
         reloadUrl("/user/me","#myreview");
       },error : function(model, err){
-        alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+        alertView.html(showErrorMsg(err));
         alertView.show();
       }
     })
@@ -2734,8 +2739,7 @@ var MealConfirmView = Backbone.View.extend({
     this.alertView.hide();
     var code = this.$el.find(".coupon-code").val();
     if (!code) {
-      this.alertView.show();
-      this.alertView.html(jQuery.i18n.prop('couponCodeEmpty'));
+      makeAToast(jQuery.i18n.prop('couponCodeEmpty'));
       return;
     }
     var mealId = this.$el.find("[data-meal]").data("meal");
@@ -2751,7 +2755,7 @@ var MealConfirmView = Backbone.View.extend({
       },
       error: function (model, err) {
         $this.alertView.show();
-        $this.alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+        $this.alertView.html(showErrorMsg(err));
       }
     });
   },
@@ -2762,14 +2766,12 @@ var MealConfirmView = Backbone.View.extend({
     var tax = this.$el.find(".tax").data("value");
     var subtotalAfterTax = parseFloat(subtotal + tax);
     if(subtotalAfterTax == 0){
-      this.alertView.show();
-      this.alertView.html(jQuery.i18n.prop('orderEmptyError'));
+      makeAToast(jQuery.i18n.prop('orderEmptyError'));
       return;
     }
     var point = parseFloat(this.$el.find(".points").val());
     if(point==-1){
-      this.alertView.show();
-      this.alertView.html(jQuery.i18n.prop('notAuthorize'));
+      makeAToast(jQuery.i18n.prop('notAuthorize'));
       return;
     }
     var pointRedeem;
@@ -2779,8 +2781,7 @@ var MealConfirmView = Backbone.View.extend({
       pointRedeem = point;
     }
     if(pointRedeem < 10){
-      this.alertView.show();
-      this.alertView.html(jQuery.i18n.prop('pointsTooLittle'));
+      makeAToast(jQuery.i18n.prop('pointsTooLittle'));
       return;
     }
     applyPoints(true, pointRedeem);
@@ -2796,20 +2797,6 @@ var OrderView = Backbone.View.extend({
     "click [data-action='cancel']" : "cancel",
     "click [data-action='adjust']" : "adjust",
     "click [data-action='takeOrder']" : "takeOrder"
-  },
-  initialize : function(){
-    var contactAlert = this.$el.find("#contact-error");
-    contactAlert.removeClass("hide");
-    contactAlert.hide();
-    this.contactAlert = contactAlert;
-    var paymentAlert = this.$el.find("#payment-error");
-    paymentAlert.removeClass("hide");
-    paymentAlert.hide();
-    this.paymentAlert = paymentAlert;
-    var formAlert = this.$el.find("#orderAlertView");
-    formAlert.removeClass("hide");
-    formAlert.hide();
-    this.formAlert = formAlert;
   },
   receive : function(e){
     e.preventDefault();
@@ -2902,11 +2889,6 @@ var OrderView = Backbone.View.extend({
     e.preventDefault();
     var form = this.$el.find("#order");
     var orderId = form.data("order");
-
-    this.contactAlert.hide();
-    this.paymentAlert.hide();
-    this.formAlert.hide();
-
     if(orderId){
       this.model.set({id : orderId});
     }
@@ -2918,10 +2900,7 @@ var OrderView = Backbone.View.extend({
     var paymentMethod = this.$el.find("#payment-cards button.active").data('method');
     if(method == "delivery"){
       if(contacts.length < 2){
-        this.contactAlert.html(jQuery.i18n.prop('contactAndAddressEmptyError'));
-        this.contactAlert.show();
-        this.formAlert.html(jQuery.i18n.prop('contactAndAddressEmptyError'));
-        this.formAlert.show();
+        makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'),'warning');
         return;
       }
       var pickupOption = parseInt(this.$el.find("#deliveryMethod .regular-radio:checked").data("index")) + 1;
@@ -2929,28 +2908,16 @@ var OrderView = Backbone.View.extend({
       phone = contacts[1].replace(" ","");
     }else{
       if((contacts.length == 0 || !contacts[0]) && paymentMethod=='online'){
-        this.contactAlert.html(jQuery.i18n.prop('contactAndAddressEmptyError'));
-        this.contactAlert.show();
-        this.formAlert.html(jQuery.i18n.prop('contactAndAddressEmptyError'));
-        this.formAlert.show();
+        makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'),'error');
         return;
       }
       var pickupOption = parseInt(this.$el.find("#pickupMethod .regular-radio:checked").data("index")) + 1;
       phone = contacts[0];
     }
 
-    var contactView = this.$el.find(".contact");
-    if(contactView.data("has-error")){
-      this.contactAlert.show();
-      return;
-    }
-
     var cards = this.$el.find("#payment-cards button.active");
     if(!cards.length){
-      this.paymentAlert.html(jQuery.i18n.prop('paymentEmptyError'));
-      this.paymentAlert.show();
-      this.formAlert.html(jQuery.i18n.prop('paymentEmptyError'));
-      this.formAlert.show();
+      makeAToast(jQuery.i18n.prop('paymentEmptyError'));
       return;
     }
     var currentOrder = localOrders;
@@ -2963,10 +2930,7 @@ var OrderView = Backbone.View.extend({
     }
     var subtotal = form.find(".subtotal").data("value");
     if(subtotal == 0) {
-      this.paymentAlert.html(jQuery.i18n.prop('orderEmptyError'));
-      this.paymentAlert.show();
-      this.formAlert.html(jQuery.i18n.prop('orderEmptyError'));
-      this.formAlert.show();
+      makeAToast(jQuery.i18n.prop('orderEmptyError'));
       return;
     }
 
@@ -3017,8 +2981,7 @@ var OrderView = Backbone.View.extend({
     var delivery_fee = this.$el.find("#order .delivery").data("value");
     var subtotal = form.find(".subtotal").data("value");
     if(subtotal == 0){
-      this.formAlert.html(jQuery.i18n.prop('orderAdjustZeroError'));
-      this.formAlert.show();
+      makeAToast(jQuery.i18n.prop('orderAdjustZeroError'));
       return;
     }
     this.model.set({
@@ -3063,7 +3026,7 @@ function deleteHandler(id, module, alertView){
       location.reload();
     },error : function(err){
       alertView.show();
-      alertView.html(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
+      alertView.html(showErrorMsg(err));
     }
   })
 }

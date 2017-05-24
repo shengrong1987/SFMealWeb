@@ -379,7 +379,6 @@
             <%= __('dish-out-tips')%>
           </div>
           <%}%>
-          <button type="button" data-id="<%= meal.id%>" class="btn btn-red" onclick="javascript:location.href='/meal/' + $(this).data('id') + '/confirm'"><%= __('checkout')%></button>
           <table id="order" class="table tableBodyScroll" data-err-container="#order-alert">
             <thead>
             <tr>
@@ -412,24 +411,7 @@
               <td></td>
               <th class="text-right"><%= __('meal-fee')%><span class="subtotal">$0.00</span></th>
             </tr>
-            <tr></tr>
-            <tr>
-              <th><%= __('pickup-method')%></th>
-              <td><%= __('estimated-time')%></td>
-              <td><%= __('delivery-fee')%></td>
-            </tr>
-            <tr></tr>
-            <tr class="info">
-              <td><%= __('self-pickup')%></td>
-              <td><%= meal.prepareTime + __('min')%></td>
-              <td><%= __('free')%></td>
-            </tr>
-            <tr>
-              <th></th>
-              <td></td>
-              <th class="text-right"><%= __('meal-delivery-fee')%><span class="delivery" data-value="0"> $0.00</span></th>
-            </tr>
-            <tr>
+            <tr class="border-less">
               <th></th>
               <td></td>
               <th class="text-right"><%= __('tax')%>:<span class="tax" data-value="0" data-taxrate="<%= meal.getTaxRate()%>"> $0.00</span></th>

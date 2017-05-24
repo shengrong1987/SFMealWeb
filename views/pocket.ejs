@@ -85,7 +85,7 @@
 
               <%
               user.pocket.transactions.forEach(function(tranObj){
-              if(tranObj.orderStatus != "cancel" && (tranObj.status == "pending" || tranObj.status == "cash")){
+              if(tranObj.orderStatus != "cancel" && tranObj.status == "pending"){
                 var refund = tranObj.type == "type-compensation" ? tranObj.amount_reversed : tranObj.amount_refunded;
               %>
               <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">

@@ -780,6 +780,36 @@ label {
   width: 100%;
 }
 
+/* toastr */
+#toaster > .toast {
+  background-image: none !important;
+}
+
+#toaster > .toast:before {
+  position: relative;
+  font-family: FontAwesome;
+  font-size: 24px;
+  line-height: 18px;
+  float: left;
+  margin-left: -1em;
+  color: #FFF;
+  padding-right: 0.5em;
+  margin-right: 0.5em;
+}
+
+#toast > .toast-warning:before {
+  content: "\f071";
+}
+#toast > .toast-error:before {
+  content: "\f071";
+}
+#toast > .toast-info:before {
+  content: "\f05a";
+}
+#toast > .toast-success:before {
+  content: "\f00c";
+}
+
 /* multiline label*/
 @font-size: 16px;
 @line-height: 1.4;
@@ -1604,6 +1634,9 @@ fieldset[disabled] .btn-red.active {
   td{
     border: none !important;
   }
+  th{
+    border: none !important;
+  }
 }
 
 .qrcode img{
@@ -2079,6 +2112,9 @@ fieldset[disabled] .btn-red.active {
   }
 
   .navbar-nav{
+    li{
+      text-align: center;
+    }
     margin : 0;
   }
 

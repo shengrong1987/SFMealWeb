@@ -265,12 +265,12 @@
               <td><%= __('delivery-fee') %></td>
             </tr>
             <tr></tr>
-            <tr class="pickupOpt" style="display: none;">
+            <tr class="pickupOpt info" style="display: none;">
               <td><%= __('self-pickup') %></td>
               <td><%= meal.prepareTime%><%= __('min') %></td>
               <td><%= __('free') %></td>
             </tr>
-            <tr class="deliveryOpt">
+            <tr class="deliveryOpt info">
               <td><%= __('delivery') %></td>
               <td> > <%= meal.prepareTime%> <%= __('min') %></td>
               <td>$ <%= meal.delivery_fee%></td>
