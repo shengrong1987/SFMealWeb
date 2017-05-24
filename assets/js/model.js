@@ -2809,7 +2809,7 @@ var OrderView = Backbone.View.extend({
           reloadUrl("/host/me", "#myorder");
         });
       },error : function(model, err){
-        BootstrapDialog.alert(err.responseText);
+        BootstrapDialog.alert(showErrorMsg(err));
       }
     })
   },
@@ -2824,7 +2824,7 @@ var OrderView = Backbone.View.extend({
           reloadUrl("/host/me", "#myorder");
         });
       },error : function(model, err){
-        BootstrapDialog.alert(err.responseText);
+        BootstrapDialog.alert(showErrorMsg(err));
       }
     })
   },
@@ -2843,7 +2843,7 @@ var OrderView = Backbone.View.extend({
           }
         });
       },error : function(model, err){
-        BootstrapDialog.alert(err.responseText);
+        BootstrapDialog.alert(showErrorMsg(err));
       }
     })
   },
@@ -2862,7 +2862,7 @@ var OrderView = Backbone.View.extend({
           }
         });
       },error : function(model, err){
-        BootstrapDialog.alert(err.responseText);
+        BootstrapDialog.alert(showErrorMsg(err));
       }
     })
   },
@@ -2881,7 +2881,7 @@ var OrderView = Backbone.View.extend({
           }
         });
       },error : function(model, err){
-        BootstrapDialog.alert(err.responseText);
+        BootstrapDialog.alert(showErrorMsg(err));
       }
     })
   },

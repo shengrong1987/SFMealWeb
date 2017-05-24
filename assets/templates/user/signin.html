@@ -47,4 +47,5 @@
 <script>
   new LoginView({model : new Auth(), el: $("#loginView")});
   setup();
+  if(browserVersion()=="uiwebview"){$("#googlebtn").hide();}
 </script>
