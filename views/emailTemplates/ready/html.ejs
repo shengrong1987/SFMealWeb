@@ -27,7 +27,7 @@
     <div class="divider" style="margin-bottom: 10px;margin-top:5px;"></div>
     <p><%= contactphone%>: <%= pickupInfo.phone%></p>
     <div class="divider" style="margin-bottom: 10px;margin-top:5px;"></div>
-    <p><%= pickuptime%>: <%= new Date(pickupInfo.pickupFromTime).toLocaleString()%> - <%= new Date(pickupInfo.pickupTillTime).toLocaleString()%></p>
+    <p><%= pickuptime%>: <%= pickupInfo.pickupFromTime%> - <%= pickupInfo.pickupTillTime%></p>
     <%}else{%>
     <p><%= pickuplocation%>: <%= address%></p>
     <div class="divider" style="margin-bottom: 10px;margin-top:5px;"></div>
@@ -35,7 +35,7 @@
     <%}%>
     <table class="table table-email">
       <% Object.keys(orders).forEach(function(dishId){
-        var amount = parseInt(orders[dishId]);
+        var amount = parseInt(orders[dishId].number);
       if(amount > 0){
         var dish;
         dishes.forEach(function(d){
@@ -74,16 +74,22 @@
         <td></td>
         <td></td>
         <td></td>
+        <td style="text-align: right;"><%= servicefee%>: $<%= service_fee.toFixed(2)%></td>
+      </tr>
+      <tr class="border-less">
+        <td></td>
+        <td></td>
+        <td></td>
         <td style="text-align: right;"><%= total%> $<%= (subtotal * (1 + taxRate) + delivery_fee + service_fee).toFixed(2)%></td>
       </tr>
       <tr>
-        <td><%= ordertime%>: <%= new Date(createdAt).toLocaleString()%></td>
+        <td><%= ordertime%>: <%= createdAt%></td>
         <td></td>
         <td></td>
         <td></td>
       </tr>
       <tr>
-        <td><%= completetime%>: <%= new Date(updatedAt).toLocaleString()%></td>
+        <td><%= completetime%>: <%= updatedAt%></td>
         <td></td>
         <td></td>
         <td></td>

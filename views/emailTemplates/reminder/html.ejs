@@ -20,7 +20,7 @@
     <p><%= ordernumber%>: <%= id%></p>
     <table class="table table-email">
       <% Object.keys(orders).forEach(function(dishId){
-        var amount = parseInt(orders[dishId]);
+        var amount = parseInt(orders[dishId].number);
       if(amount > 0){
         var dish;
         dishes.forEach(function(d){
@@ -55,13 +55,13 @@
         <td></td>
       </tr>
       <tr>
-        <td><%= pickuptime%>: <%= new Date(pickupInfo.pickupFromTime).toLocaleString()%> - <%= new Date(pickupInfo.pickupTillTime).toLocaleString()%></td>
+        <td><%= pickuptime%>: <%= pickupInfo.pickupFromTime%> - <%= pickupInfo.pickupTillTime%></td>
         <td></td>
         <td></td>
         <td></td>
       </tr>
       <tr>
-        <td><%= contactphone%>: <%= new Date(pickupInfo.phone).toLocaleString()%></td>
+        <td><%= contactphone%>: <%=pickupInfo.phone%></td>
         <td></td>
         <td></td>
         <td></td>

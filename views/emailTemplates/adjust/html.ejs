@@ -20,8 +20,8 @@
     <p><%= ordernumber%>: <%= id%></p>
     <table class="table table-email">
       <% Object.keys(orders).forEach(function(dishId){
-        var lastAmount = parseInt(orders[dishId]);
-        var currentAmount = parseInt(adjusting_orders[dishId]);
+        var lastAmount = parseInt(orders[dishId].number);
+        var currentAmount = parseInt(adjusting_orders[dishId].number);
         if(lastAmount > 0 || currentAmount > 0){
           var dish;
           dishes.forEach(function(d){
@@ -69,16 +69,22 @@
         <td></td>
         <td></td>
         <td></td>
+        <td style="text-align: right;"><%= servicefee%>: $<%= service_fee.toFixed(2)%></td>
+      </tr>
+      <tr class="border-less">
+        <td></td>
+        <td></td>
+        <td></td>
         <td style="text-align: right;"><%= total%> $<%= (adjusting_subtotal * (1 + taxRate) + delivery_fee + service_fee).toFixed(2)%></td>
       </tr>
       <tr>
-        <td><%= ordertime%>: <%= new Date(createdAt).toLocaleString()%></td>
+        <td><%= ordertime%>: <%= createdAt%></td>
         <td></td>
         <td></td>
         <td></td>
       </tr>
       <tr>
-        <td><%= adjusttime%>: <%= new Date(updatedAt).toLocaleString()%></td>
+        <td><%= adjusttime%>: <%= updatedAt%></td>
         <td></td>
         <td></td>
         <td></td>

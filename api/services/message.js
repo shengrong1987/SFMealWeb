@@ -15,11 +15,13 @@ module.exports = {
       return;
     }
     phone = "+1" + phone.replace('(','').replace(')','').replace('-','').replace(' ','').trim();
+    sails.log.info("msg: " + content);
     client.messages.create({
       to: phone,
       from: "+14159936325",
       body : content
     }, function (err, message) {
+      sails.log.info("sent text: " + err);
     });
   }
 }

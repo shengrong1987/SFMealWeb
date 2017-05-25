@@ -31,7 +31,7 @@
     <%}%>
     <table class="table table-email">
       <% Object.keys(orders).forEach(function(dishId){
-        var amount = parseInt(orders[dishId]);
+        var amount = parseInt(orders[dishId].number);
         if(amount > 0){
           var dish;
           dishes.forEach(function(d){
@@ -48,19 +48,19 @@
       </tr>
       <%}});%>
       <tr>
-        <td><%= ordertime%>: <%= new Date(createdAt).toLocaleString()%></td>
+        <td><%= ordertime%>: <%= createdAt%></td>
         <td></td>
         <td></td>
         <td></td>
       </tr>
       <tr>
-        <td><%= preorderendtime%>: <%= new Date(meal.provideTillTime).toLocaleString()%></td>
+        <td><%= preorderendtime%>: <%= meal.provideTillTime%></td>
         <td></td>
         <td></td>
         <td></td>
       </tr>
       <tr>
-        <td class="text-red"><%= canceltime%>: <%= new Date(updatedAt).toLocaleString()%></td>
+        <td class="text-red"><%= canceltime%>: <%= updatedAt%></td>
         <td></td>
         <td></td>
         <td></td>

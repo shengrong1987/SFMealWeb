@@ -22,7 +22,7 @@
     <p><%= ordernumber%>: <%= id%></p>
     <table class="table table-email">
       <% Object.keys(orders).forEach(function(dishId){
-        var amount = parseInt(orders[dishId]);
+        var amount = parseInt(orders[dishId].number);
       if(amount > 0){
         var dish;
         dishes.forEach(function(d){
@@ -41,10 +41,10 @@
       <tr>
         <td></td>
         <td></td>
-        <td><%= dingdan%>: $<%= subtotal.toFixed(2)%></td>
+        <td style="text-align: right;"><%= dingdan%>: $<%= subtotal.toFixed(2)%></td>
       </tr>
       <tr>
-        <td><%= ordertime%>: <%= new Date(createdAt).toLocaleString()%></td>
+        <td><%= ordertime%>: <%= createdAt%></td>
         <td></td>
         <td></td>
       </tr>

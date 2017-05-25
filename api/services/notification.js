@@ -32,6 +32,8 @@ var notification = {
     isAdminAction = isAdminAction || false;
     params.isAdminAction = isAdminAction;
 
+    this.transitLocaleTimeZone(params);
+
     this.publishEvent(model, action, params, isSendToHost, isAdminAction, isSendToAdmin);
 
     if(isAdminAction){
@@ -51,7 +53,6 @@ var notification = {
   },
 
   sendMsg : function(model, action, params, req){
-    this.transitLocaleTimeZone(params);
     var locale = req ? (params.isSendToHost ? params.host.locale : params.customer.locale) : '';
     var phone = params.isSendToHost ? (params.host ? params.host.phone : params.chef.phone) : params.customerPhone;
     var content = "";
@@ -174,7 +175,6 @@ var notification = {
 
     var chef = params.chef || params.host;
     var county = chef ? chef.county : params.county;
-    this.transitLocaleTimeZone(params);
     params.taxRate = util.getTaxRate(county);
     params.recipientName = basicInfo.recipientName;
     params.senderName = "SFMeal.com";
@@ -335,7 +335,7 @@ var notification = {
   },
 
   mergeI18N : function(model, action, req, locale, params){
-    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','our-mailing-address','tax','question-email','click-enter-info','click-upload-info','click-apply'];
+    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','our-mailing-address','tax','service-fee','question-email','click-enter-info','click-upload-info','click-apply'];
     if(model == "Order"){
       switch(action){
         case "new":
@@ -422,25 +422,25 @@ var notification = {
   transitLocaleTimeZone : function(params){
     moment.tz.add('America/Los_Angeles|PST PDT|80 70|0101|1Lzm0 1zb0 Op0');
     if(params.pickupInfo){
-      params.pickupInfo.pickupFromTime = moment.tz(params.pickupInfo.pickupFromTime, "America/Los_Angeles");
-      params.pickupInfo.pickupTillTime = moment.tz(params.pickupInfo.pickupTillTime, "America/Los_Angeles");
+      params.pickupInfo.pickupFromTime = moment.tz(params.pickupInfo.pickupFromTime, "America/Los_Angeles").format('ddd, L, LT');
+      params.pickupInfo.pickupTillTime = moment.tz(params.pickupInfo.pickupTillTime, "America/Los_Angeles").format('ddd, L, LT');
     }
     if(params.eta){
-      params.eta = moment.tz(params.eta,"America/Los_Angeles");
+      params.eta = moment.tz(params.eta,"America/Los_Angeles").format('ddd, L, LT');
     }
     if(params.meal){
-      params.meal.provideFromTime = moment.tz(params.meal.provideFromTime, "America/Los_Angeles");
-      params.meal.provideTillTime = moment.tz(params.meal.provideTillTime, "America/Los_Angeles");
+      params.meal.provideFromTime = moment.tz(params.meal.provideFromTime, "America/Los_Angeles").format('ddd, L, LT');
+      params.meal.provideTillTime = moment.tz(params.meal.provideTillTime, "America/Los_Angeles").format('ddd, L, LT');
     }
     if(params.pickups){
       params.pickups.forEach(function(pickup){
-        pickup.pickupFromTime = moment.tz(pickup.pickupFromTime, "America/Los_Angeles");
-        pickup.pickupTillTime = moment.tz(pickup.pickupTillTime, "America/Los_Angeles");
+        pickup.pickupFromTime = moment.tz(pickup.pickupFromTime, "America/Los_Angeles").format('ddd, L, LT');
+        pickup.pickupTillTime = moment.tz(pickup.pickupTillTime, "America/Los_Angeles").format('ddd, L, LT');
       });
     }
     if(params.createdAt && params.updatedAt){
-      params.createdAt = moment.tz(params.createdAt, "America/Los_Angeles");
-      params.updatedAt = moment.tz(params.updatedAt, "America/Los_Angeles");
+      params.createdAt = moment.tz(params.createdAt, "America/Los_Angeles").format('L, LT');
+      params.updatedAt = moment.tz(params.updatedAt, "America/Los_Angeles").format('L, LT');
     }
   }
 }
