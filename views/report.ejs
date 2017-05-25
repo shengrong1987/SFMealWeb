@@ -108,7 +108,7 @@
 
     <div class="row text-center">
       <% if(meal.orders.length == 0){%>
-      <a class="btn btn-green btn-inline" href="https://www.sfmeal.com/meal/<%= id%>?edit=true"><%= __('open-meal')%></a>
+      <a class="btn btn-green btn-inline" href="https://www.sfmeal.com/meal/<%= meal.id%>?edit=true"><%= __('open-meal')%></a>
       <%}else{%>
       <a class="btn btn-green btn-inline" href="javascript:window.print();"><%= __('print-list')%></a>
       <%}%>

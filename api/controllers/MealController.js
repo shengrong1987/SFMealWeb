@@ -7,7 +7,7 @@
 
 var GeoCoder = require("../services/geocode.js");
 var moment = require("moment");
-
+var notification = require("../services/notification");
 /*
  error
  * -1 : geo service not available
@@ -812,6 +812,7 @@ module.exports = {
           return done();
         }
         meal.orders = orders;
+        notification.transitLocaleTimeZone(meal);
         return res.view('report',{ meal : meal });
       });
     })
