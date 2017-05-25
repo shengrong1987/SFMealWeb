@@ -24,6 +24,7 @@ module.exports = {
           });
         }
         params.isSendToHost = true;
+        notification.transitLocaleTimeZone(params);
         notification.sendEmail(email.model, email.action, params, req);
         res.ok(params);
       })
