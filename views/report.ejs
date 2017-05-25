@@ -1,0 +1,118 @@
+<div class="green" style="padding: 25px;margin-top: -20px;">
+  <div class="box-email white relative middle text-left">
+
+    <% if(meal.orders.length == 0){%>
+    <h3 class="text-green"><u><%= meal.chef.shopName%></u> <small><%= __('guest-list-no-tips')%></small></h3>
+    <%}else{%>
+    <h3 class="text-green"><u><%= meal.chef.shopName%></u></h3>
+    <%}%>
+
+    <% if(meal.orders.length != 0){ if(meal.isDelivery){
+    meal.pickups.forEach(function(pickup){if(pickup.method == "delivery"){%>
+
+    <p><%= __('delivery-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%></p>
+    <table class="table table-bordered">
+      <thead>
+      <tr>
+        <td><%= __('user')%></td>
+        <td><%= __('order-number')%></td>
+        <td><%= __('content')%></td>
+        <td><%= __('contact')%></td>
+        <td><%= __('delivery-location')%></td>
+        <td><%= __('amount-owe')%></td>
+      </tr>
+      </thead>
+      <tbody>
+      <%}})%>
+      <% meal.orders.forEach(function(order){
+      if(order.method == 'delivery'){%>
+      <tr>
+        <td><%= order.customerName %></td>
+        <td><%= order.id%></td>
+        <td>
+          <% Object.keys(order.orders).forEach(function(dishId){
+            var amount = order.orders[dishId].number;
+            var preference = order.orders[dishId].preference;
+          if(amount > 0){
+            var dish;
+            meal.dishes.forEach(function(d){
+              if(d.id == dishId){
+                dish = d;
+                return;
+              }
+            })%>
+          <% if(preference && preference.property){%>
+          <%= dish.title%>(<%= preference.property + " x" + amount%>)
+          <% }else{%>
+          <%= dish.title%>(<%= amount%>)
+          <% }%>
+          <%}});%>
+        </td>
+        <td><%= order.customerPhone%></td>
+        <td><%= order.address%></td>
+        <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
+      </tr>
+      <%}})%>
+      </tbody>
+    </table>
+    <%} meal.pickups.forEach(function(pickup, index){if(pickup.method == "pickup"){%>
+    <p>
+      <%= __('pickup-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/>
+      <%= __('pickup-location')%>: <%= pickup.location%>
+    </p>
+    <table class="table table-bordered">
+      <thead>
+      <tr>
+        <td><%= __('user')%></td>
+        <td><%= __('order-number')%></td>
+        <td><%= __('content')%></td>
+        <td><%= __('contact')%></td>
+        <td><%= __('delivery-location')%></td>
+        <td><%= __('amount-owe')%></td>
+      </tr>
+      </thead>
+      <tbody>
+      <% meal.orders.forEach(function(order){if(order.pickupOption-1 == index){%>
+      <tr>
+        <td><%= order.customerName%></td>
+        <td><%= order.id%></td>
+        <td>
+          <% Object.keys(order.orders).forEach(function(dishId){
+            var amount = order.orders[dishId].number;
+            var preference = order.orders[dishId].preference;
+          if(amount > 0){
+            var dish;
+            dishes.forEach(function(d){
+              if(d.id == dishId){
+                dish = d;
+                return;
+              }
+            })%>
+          <% if(preference && preference.property){%>
+          <%= dish.title%>(<%= preference.property + " x" + amount%>)
+          <% }else{%>
+          <%= dish.title%>(<%= amount%>)
+          <% }%>
+          <%}});%>
+        </td>
+        <td><%= order.customerPhone%></td>
+        <td>N/A</td>
+        <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
+      </tr>
+      <%}})%>
+      </tbody>
+    </table>
+    <%}});} %>
+
+    <div class="divider"></div>
+
+    <div class="row text-center">
+      <% if(meal.orders.length == 0){%>
+      <a class="btn btn-green btn-inline" href="https://www.sfmeal.com/meal/<%= id%>?edit=true"><%= __('open-meal')%></a>
+      <%}else{%>
+      <a class="btn btn-green btn-inline" href="javascript:window.print();"><%= __('print-list')%></a>
+      <%}%>
+
+    </div>
+  </div>
+</div>

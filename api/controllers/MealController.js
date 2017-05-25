@@ -797,6 +797,24 @@ module.exports = {
       sails.log.debug(numberRemoved + " order jobs of meal : " + mealId +  " removed");
       return cb();
     })
+  },
+
+  report : function(req, res){
+    var mealId = req.param("id");
+    Meal.findOne(mealId).populate("chef").populate("dishes").exec(function(err, meal){
+      if(err || !meal){
+        return done();
+      }
+      meal.hostEmail = meal.chef.email;
+
+      Order.find({ meal : mealId, status : "preparing"}).exec(function(err, orders){
+        if(err){
+          return done();
+        }
+        meal.orders = orders;
+        return res.view('report',{ meal : meal });
+      });
+    })
   }
 
   //To test after finishing review model
