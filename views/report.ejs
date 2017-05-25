@@ -82,7 +82,7 @@
             var preference = order.orders[dishId].preference;
           if(amount > 0){
             var dish;
-            dishes.forEach(function(d){
+            meal.dishes.forEach(function(d){
               if(d.id == dishId){
                 dish = d;
                 return;
