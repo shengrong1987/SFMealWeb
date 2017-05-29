@@ -418,7 +418,11 @@ function loadPoints(fromCache){
 function orderFood(id,number,initial){
   var dishItem = $("#meal-detail-container .dish[data-id='" + id + "']");
   if(initial){
-    $(this).amountInput('add',dishItem.find("[data-toggle='amount-input']"));
+    if(number > 0){
+      $(this).amountInput('add',dishItem.find("[data-toggle='amount-input']"));
+    }else if(number < 0){
+      $(this).amountInput('minus',dishItem.find("[data-toggle='amount-input']"));
+    }
   }
   var item = $("#order .item[data-id=" + id + "]");
   var alertView = $($("#order").data("err-container"));
@@ -667,8 +671,10 @@ function setupTooltip(){
 
 function resetDropdownMenu(target){
   var resetLabel = target.next().find(".dropdown-submenu.variation > a");
-  resetLabel.text(jQuery.i18n.prop(resetLabel.data('variation')));
-  resetLabel.attr("value", resetLabel.data('variation'));
+  resetLabel.each(function(){
+    $(this).text(jQuery.i18n.prop($(this).data('variation')));
+    $(this).attr("value", $(this).data('variation'));
+  });
 }
 
 function setupDropdownMenu(){

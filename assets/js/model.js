@@ -1208,7 +1208,7 @@ var MealSelectionView = Backbone.View.extend({
     var allVariations = target.closest('.variation').parent().children();
     allVariations.each(function(){
       var value = $(this).find("a").attr("value");
-      var itemExtra = $(this).find("a").data("extra");
+      var itemExtra = $(this).find("a").data("extra") || 0;
       if(preference && value){ preference += ",";}
       if(value){ preference += value;}
       extra += itemExtra;

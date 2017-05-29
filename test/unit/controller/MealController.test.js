@@ -101,7 +101,10 @@ describe('MealController', function() {
             photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
             type: 'dessert',
             chef : hostId,
-            preference : { sweetness : [ { property : 'super sweet', extra : 1}, { property : 'normal', extra : 0}, { property : 'ultra sweet', extra : 2} ]}
+            preference : {
+              sweetness : [ { property : 'super sweet', extra : 1}, { property : 'normal', extra : 0}, { property : 'ultra sweet', extra : 2} ],
+              spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
+            }
           })
           .expect(200)
           .end(function(err,res){

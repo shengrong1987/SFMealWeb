@@ -402,9 +402,9 @@
               <td><%= dish.title %><br/><span class="preference"></span> </td>
               <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
               <td>
-                <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1)">-</button>
+                <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">-</button>
                 <span class="amount" style="padding: 5px;">  0  </span>
-                <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',1)">+</button>
+                <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',1,true)">+</button>
               </td>
             </tr>
             <% }%>
