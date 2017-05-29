@@ -229,6 +229,17 @@ function lastStep(event){
   $(steps[currentStep-1]).removeClass('hide');
 }
 
+function enterDishPreference(event){
+  var preference = $(event.target).data("preference");
+  var container = $("#preferenceTable tbody");
+  container.empty();
+  preference.forEach(function(pre, index){
+    var element = "<tr><th>$index</th><td>$extra</td><td>$preference</td></tr>";
+    element = element.replace("$index", index+1).replace("$extra", "$" + pre.extra.toFixed(2)).replace("$preference",pre.property);
+    container.append(element);
+  })
+}
+
 function enterHostInfo(event){
   var hostId = $(event.target).data("host");
   var isUpdating = $(event.target).data("updating");
@@ -315,26 +326,67 @@ var localOrders = {};
 var localCoupon = {};
 var localPoints = false;
 //load previous order from cookies
-function loadOrder(fromCahce){
+function loadOrder(fromCache){
   $("#order .item").each(function(){
     var dishId = $(this).data("id");
-    if(fromCahce){
+    if(fromCache){
       var localDish = readCookie(dishId);
       if(localDish){
         localDish = JSON.parse(localDish);
       }else{
-        localDish = {number : 0, preference : { property : '', extra : 0}};
+        localDish = {number : 0, preference : []};
       }
       localOrders[dishId] = localDish;
       $(this).data("left-amount",$(this).data("left-amount") - localOrders[dishId].number);
       refreshOrder(dishId);
     }else{
-      localOrders[dishId] = { number : $(this).find(".amount").data("value"), preference : { property : $(this).find(".preference").data("preference"), extra :  $(this).find(".price").data("extra")}};
+      localOrders[dishId] = {
+        number : $(this).find(".amount").data("value"),
+        preference : $(this).data("preference")
+      };
     }
   });
-  loadCoupon(fromCahce);
-  loadPoints(fromCahce);
+  loadCoupon(fromCache);
+  loadPoints(fromCache);
   refreshMenu();
+}
+
+function loadPreference(){
+  $("#order .item").each(function(){
+    var dishId = $(this).data("id");
+      refreshPreference(dishId);
+  });
+}
+
+function refreshPreference(id){
+  var number = localOrders[id].number;
+  var preferences = localOrders[id].preference;
+  var preferenceBtn = $('[data-submenu][data-dish="' + id + '"]');
+  preferenceBtn.data('value', jQuery.i18n.prop('the') + number + jQuery.i18n.prop('fen'));
+  if(number > 1){
+    preferenceBtn.submenupicker('updateMenu', preferenceBtn);
+  }
+  if(preferences){
+    preferences.forEach(function(preference, index){
+      var props = preference.property;
+      if(props){
+        var propInArray = props.split(",");
+        if(propInArray){
+          propInArray.forEach(function(prop){
+            console.log("index is: " + index, "prop: " + prop);
+            var i = parseInt(index) + 1;
+            var propertyLabel = preferenceBtn.next().find(".dropdown-submenu:nth-child(" + i + ") .variation a[value='" + prop + "']");
+            var extra = propertyLabel.data("extra");
+            var variationLabel = propertyLabel.closest(".dropdown-submenu.variation").find("a").first();
+            if(variationLabel.length){
+              variationLabel.attr("value", prop);
+              variationLabel.text(prop + " + $" + extra);
+            }
+          })
+        }
+      }
+    });
+  }
 }
 
 function loadCoupon(fromCache){
@@ -372,23 +424,41 @@ function orderFood(id,number,initial){
   var alertView = $($("#order").data("err-container"));
   alertView.removeClass("hide");
   alertView.hide();
-  localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : { property : '', extra : 0}};
+  localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : [{ property : '', extra : 0}]};
   localOrders[id].number += number;
+  var preferenceBtn = $('[data-submenu][data-dish="' + id + '"]');
+  preferenceBtn.data('value', jQuery.i18n.prop('the') + localOrders[id].number + jQuery.i18n.prop('fen'));
+  var left = parseInt(item.data("left-amount"));
   if(number < 0){
     if(localOrders[id].number<0){
       localOrders[id].number = 0;
       return;
     }
-    item.data("left-amount", item.data("left-amount") + 1);
+    left++;
+    localOrders[id].preference.pop();
+    item.data("left-amount", left);
+    if(localOrders[id].number >= 1){
+      preferenceBtn.submenupicker('removeMenu', preferenceBtn);
+    }else{
+      resetDropdownMenu(preferenceBtn);
+    }
   }else{
-    var left = item.data("left-amount");
     if(left<=0 && number > 0){
       localOrders[id].number -= number;
       alertView.show();
       return;
     }
-    left -= number;
+    left--;
     item.data("left-amount",left);
+    var preferences = localOrders[id].preference;
+    if(!preferences.length){
+      preferences.push({ extra : 0, property : ""});
+    }else{
+      preferences.push(preferences[0]);
+    }
+    if(localOrders[id].number > 1){
+      preferenceBtn.submenupicker('insertMenu', preferenceBtn);
+    }
   }
   createCookie(id,JSON.stringify(localOrders[id]),1);
   refreshOrder(id);
@@ -435,8 +505,8 @@ var refreshMenu = function(){
   var subtotal = 0;
   var method = $("#meal-confirm-container #method .active").attr("value");
   $("#order .item").each(function(){
-    var unitPrice = parseInt($(this).find(".price").attr("value")) + parseInt($(this).find(".price").data("extra"));
-    subtotal += parseFloat($(this).find(".amount").text()) * unitPrice;
+    var unitPrice = parseInt($(this).find(".price").attr("value"));
+    subtotal += parseFloat($(this).find(".amount").text()) * unitPrice + parseInt($(this).find(".price").data("extra"));
   });
   $("#order .subtotal").html("$" + subtotal.toFixed(2));
   $("#order .subtotal").data("value", subtotal.toFixed(2));
@@ -506,15 +576,19 @@ function refreshOrder(id){
   var left = item.data("left-amount");
   item.find(".amount").html(number);
   var price = item.find(".price");
-  if(localOrders[id].preference && localOrders[id].preference.property){
-    item.find(".preference").html("(" + localOrders[id].preference.property + ")");
-    var extra = localOrders[id].preference.extra;
+  var preference = localOrders[id].preference;
+  if(preference && preference.length){
+    var extra = preference.reduce(function(total, next){
+      return total + next.extra;
+    }, 0);
+    price.data("extra", extra);
     if(extra > 0){
-      price.data("extra", extra);
-      price.html("$" + price.attr('value') + " + $" + extra);
+      price.html("$" + price.attr('value') + " ($" + extra + ")");
+    }else{
+      price.html("$" + price.attr('value'));
     }
   }else{
-    var extra = 0;
+    price.data("extra", 0);
     price.html("$" + price.attr('value'));
   }
   var dishItem = $("#meal-detail-container .dish[data-id='" + id + "']");
@@ -591,6 +665,12 @@ function setupTooltip(){
   });
 }
 
+function resetDropdownMenu(target){
+  var resetLabel = target.next().find(".dropdown-submenu.variation > a");
+  resetLabel.text(jQuery.i18n.prop(resetLabel.data('variation')));
+  resetLabel.attr("value", resetLabel.data('variation'));
+}
+
 function setupDropdownMenu(){
   $('[data-toggle="dropdown"][data-selected="true"]').next().find("li a").off("click");
   $('[data-toggle="dropdown"][data-selected="true"]').next().find("li a").click(function(e){
@@ -611,7 +691,7 @@ function setupDropdownMenu(){
         parent.data(key, data[key]);
       });
     }
-    parent.html(text + "&nbsp;<span class='caret'></span>");
+    parent.html(text);
     parent.attr("value",value);
     parent.trigger("change");
   });
@@ -791,6 +871,8 @@ function setupLanguage(){
         userBarView.clearBadges();
         userBarView.getNotification();
       }
+
+      loadPreference();
 
       // We specified mode: 'both' so translated values will be
       // available as JS vars/functions and as a map

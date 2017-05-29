@@ -264,7 +264,7 @@
 
                     <div class="row beforeOrder">
                       <div class="col-xs-12">
-                        <button class="btn btn-red take-order btn-lg <%= parseInt(meal.leftQty[dish.id])==0 ? 'disabled' : '' %>" onclick="javascript:orderFood('<%= dish.id %>',1)"><%= parseInt(meal.leftQty[dish.id]) == 0 ? __('check-out-sold-btn') : __('order-one')%></button>
+                        <button class="btn btn-red take-order btn-lg <%= parseInt(meal.leftQty[dish.id])==0 ? 'disabled' : '' %>" onclick="javascript:orderFood('<%= dish.id %>',1, true)"><%= parseInt(meal.leftQty[dish.id]) == 0 ? __('check-out-sold-btn') : __('order-one')%></button>
                       </div>
                     </div>
 
@@ -281,21 +281,26 @@
                     <div class="row afterOrder" style="margin-top: 10px;">
                       <% if(dish.preference && Object.keys(dish.preference).length){%>
                       <div class="col-xs-12">
-                        <a class="btn btn-default btn-outline dropdown-toggle" style="width:160px;" type="button" data-toggle="dropdown" data-submenu aria-haspopup="true" aria-expanded="true" value="">
+                        <a class="btn btn-default btn-outline dropdown-toggle" data-dish=<%= dish.id%> style="width:160px;" type="button" data-toggle="dropdown" data-layer="0" data-submenu aria-haspopup="true" aria-expanded="true" value="">
                           <span><%= __('addVariation')%></span>
                           <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu text-center" aria-labelledby="dLabel">
-                          <% Object.keys(dish.preference).forEach(function(key){%>
-                          <li class="dropdown-submenu variation">
-                            <a tabindex="0" data-toggle="dropdown" data-submenu data-dish=<%= dish.id%> data-variation=<%= key%> data-selected="true"><%= __(key)%></a>
+                          <li class="dropdown-submenu" data-layer="0">
+                            <a tabindex="0" data-toggle="dropdown" data-selected="true"><%= __('the')%>1<%= __('fen')%></a>
                             <ul class="dropdown-menu">
-                              <% var options = dish.preference[key]; options.forEach(function(option){%>
-                              <li tabindex="0"><a value="<%= option.property%>" data-extra="<%= option.extra%>" href="javascript:void(0);"><%= option.property%> + $<%= option.extra%></a></li>
+                              <% Object.keys(dish.preference).forEach(function(key){%>
+                              <li class="dropdown-submenu variation" data-layer="1">
+                                <a tabindex="0" data-toggle="dropdown" data-dish=<%= dish.id%> data-variation=<%= key%> data-selected="true"><%= __(key)%></a>
+                                <ul class="dropdown-menu">
+                                  <% var options = dish.preference[key]; options.forEach(function(option){%>
+                                  <li tabindex="0"><a value="<%= option.property%>" data-extra="<%= option.extra%>" href="javascript:void(0);"><%= option.property%> + $<%= option.extra%></a></li>
+                                  <%});%>
+                                </ul>
+                              </li>
                               <%});%>
                             </ul>
                           </li>
-                          <%});%>
                         </ul>
                       </div>
                       <% } %>
@@ -488,13 +493,11 @@
 
 <script>
   var mealSelectionView = new MealSelectionView({ el : $("#meal-detail-container"), model : new Meal()});
-  setupLanguage();
   var coverDishId = $("#meal-detail-container").data("cover");
   var coverDish = $("#meal-detail-container").find(".dish a[data-gallery='" + coverDishId + "']");
   var dishTitle = coverDish.data("title");
   var desc = coverDish.data("footer");
   setupWechat($("#meal-detail-container").data("coverstring"),$("#meal-detail-container").data("title"), dishTitle + ":" + desc);
-  loadOrder(true);
 </script>
 
 <script src="/js/jweixin-1.0.0.js"></script>

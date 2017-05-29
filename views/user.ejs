@@ -79,7 +79,11 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
-                            var extra = parseInt(preference.extra);
+                            if(!preference.length){preference = [preference];}
+                            var extra = preference.reduce(function(total,next){
+                              return total + parseInt(next.extra);
+                            },0);
+
                             if(order.status=="adjust") {
                               var adjustingNumber = order.adjusting_orders[key].number;
                             }
@@ -94,7 +98,13 @@
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>$<%= (dish.price + extra).toFixed(2)%></td>
+                        <td>
+                          $<%= dish.price.toFixed(2)%><br/>
+                          <% if(extra){%>
+                          (+$<%= extra.toFixed(2)%>)<br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <% }%>
+                        </td>
                         <td><% if(order.status=="adjust"){
                             var adjustingNumber = order.adjusting_orders[key].number;
                           if(adjustingNumber != number){%>
@@ -179,7 +189,10 @@
                         list.forEach(function(key){
                           var number = order.orders[key].number;
                           var preference = order.orders[key].preference;
-                          var extra = parseInt(preference.extra);
+                          if(!preference.length){preference = [preference];}
+                          var extra = preference.reduce(function(total,next){
+                            return total + parseInt(next.extra);
+                          },0);
                           if(order.status=="adjust") {
                             var adjustingNumber = order.adjusting_orders[key].number;
                           }
@@ -194,7 +207,13 @@
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>$<%= (dish.price + extra).toFixed(2)%></td>
+                        <td>
+                          $<%= dish.price.toFixed(2)%><br/>
+                          <% if(extra){%>
+                          (+$<%= extra.toFixed(2)%>)<br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <% }%>
+                        </td>
                         <td><% if(order.status=="adjust"){
                             var adjustingNumber = order.adjusting_orders[key].number;
                           if(adjustingNumber != number){%>
@@ -261,7 +280,10 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
-                            var extra = parseInt(preference.extra);
+                            if(!preference.length){preference = [preference];}
+                            var extra = preference.reduce(function(total,next){
+                              return total + parseInt(next.extra);
+                            },0);
                             if(number == 0){
                               return;
                             }
@@ -272,7 +294,13 @@
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>$<%= (dish.price + extra).toFixed(2)%></td>
+                        <td>
+                          $<%= dish.price.toFixed(2)%><br/>
+                          <% if(extra){%>
+                          (+$<%= extra.toFixed(2)%>)<br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <% }%>
+                        </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
@@ -325,7 +353,10 @@
                           list.forEach(function(key){
                           var number = order.orders[key].number;
                           var preference = order.orders[key].preference;
-                          var extra = parseInt(preference.extra);
+                          if(!preference.length){preference = [preference];}
+                          var extra = preference.reduce(function(total,next){
+                            return total + parseInt(next.extra);
+                          },0);
                           if(number == 0){
                             return;
                           }
@@ -336,7 +367,13 @@
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>$<%= (dish.price + extra).toFixed(2)%></td>
+                        <td>
+                          $<%= dish.price.toFixed(2)%><br/>
+                          <% if(extra){%>
+                          (+$<%= extra.toFixed(2)%>)<br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <% }%>
+                        </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
@@ -390,7 +427,10 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
-                            var extra = parseInt(preference.extra);
+                            if(!preference.length){preference = [preference];}
+                            var extra = preference.reduce(function(total,next){
+                              return total + parseInt(next.extra);
+                            },0);
                             if(number == 0){
                               return;
                             }
@@ -401,7 +441,13 @@
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>$<%= (dish.price + extra).toFixed(2)%></td>
+                        <td>
+                          $<%= dish.price.toFixed(2)%><br/>
+                          <% if(extra){%>
+                          (+$<%= extra.toFixed(2)%>)<br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <% }%>
+                        </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
@@ -456,7 +502,10 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
-                            var extra = parseInt(preference.extra);
+                            if(!preference.length){preference = [preference];}
+                            var extra = preference.reduce(function(total,next){
+                              return total + parseInt(next.extra);
+                            },0);
                             if(number == 0){
                               return;
                             }
@@ -467,7 +516,13 @@
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>$<%= (dish.price + extra).toFixed(2)%></td>
+                        <td>
+                          $<%= dish.price.toFixed(2)%><br/>
+                          <% if(extra){%>
+                          (+$<%= extra.toFixed(2)%>)<br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <% }%>
+                        </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
@@ -505,8 +560,8 @@
                 <div class="tab-content">
                   <div id="preorder-all" class="tab-pane middle active">
                     <table class="table table-bordered table-vertical-middle" style="width: 100%;">
-                      <thead>
-                      <tr class="item">
+                      <thead class="item">
+                      <tr>
                         <td class="xs-hide"><%= __('photos')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
@@ -534,7 +589,11 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
-                            var extra = parseInt(preference.extra);
+                            if(!preference.length){preference = [preference];}
+                            var extra = preference.reduce(function(total,next){
+                              return total + parseInt(next.extra);
+                            },0);
+
                             if(order.status=="adjust") {
                               var adjustingNumber = order.adjusting_orders[key].number;
                             }
@@ -549,7 +608,13 @@
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>$<%= (dish.price + extra).toFixed(2)%></td>
+                        <td>
+                          $<%= dish.price.toFixed(2)%><br/>
+                          <% if(extra){%>
+                          (+$<%= extra.toFixed(2)%>)<br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <% }%>
+                        </td>
                         <td><% if(order.status=="adjust"){
                             var adjustingNumber = order.adjusting_orders[key].number;
                           if(adjustingNumber != number){%>
@@ -633,7 +698,10 @@
                         list.forEach(function(key){
                           var number = order.orders[key].number;
                           var preference = order.orders[key].preference;
-                          var extra = parseInt(preference.extra);
+                          if(!preference.length){preference = [preference];}
+                          var extra = preference.reduce(function(total,next){
+                            return total + parseInt(next.extra);
+                          },0);
                           if(order.status=="adjust") {
                             var adjustingNumber = order.adjusting_orders[key].number;
                           }
@@ -648,7 +716,13 @@
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>$<%= (dish.price + extra).toFixed(2)%></td>
+                        <td>
+                          $<%= dish.price.toFixed(2)%><br/>
+                          <% if(extra){%>
+                          (+$<%= extra.toFixed(2)%>)<br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <% }%>
+                        </td>
                         <td><% if(order.status=="adjust"){
                             var adjustingNumber = order.adjusting_orders[key].number;
                           if(adjustingNumber != number){%>
@@ -714,7 +788,10 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
-                            var extra = parseInt(preference.extra);
+                            if(!preference.length){preference = [preference];}
+                            var extra = preference.reduce(function(total,next){
+                              return total + parseInt(next.extra);
+                            },0);
                             if(number == 0){
                               return;
                             }
@@ -725,7 +802,13 @@
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>$<%= (dish.price + extra).toFixed(2)%></td>
+                        <td>
+                          $<%= dish.price.toFixed(2)%><br/>
+                          <% if(extra){%>
+                          (+$<%= extra.toFixed(2)%>)<br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <% }%>
+                        </td>
                         <td class="minWid50"><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
@@ -780,7 +863,10 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
-                            var extra = parseInt(preference.extra);
+                            if(!preference.length){preference = [preference];}
+                            var extra = preference.reduce(function(total,next){
+                              return total + parseInt(next.extra);
+                            },0);
                             if(number == 0){
                               return;
                             }
@@ -791,7 +877,13 @@
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>$<%= (dish.price + extra).toFixed(2)%></td>
+                        <td>
+                          $<%= dish.price.toFixed(2)%><br/>
+                          <% if(extra){%>
+                          (+$<%= extra.toFixed(2)%>)<br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <% }%>
+                        </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
@@ -845,7 +937,10 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
-                            var extra = parseInt(preference.extra);
+                            if(!preference.length){preference = [preference];}
+                            var extra = preference.reduce(function(total,next){
+                              return total + parseInt(next.extra);
+                            },0);
                             if(number == 0){
                               return;
                             }
@@ -856,7 +951,13 @@
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>$<%= (dish.price + extra).toFixed(2)%></td>
+                        <td>
+                          $<%= dish.price.toFixed(2)%><br/>
+                          <% if(extra){%>
+                          (+$<%= extra.toFixed(2)%>)<br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <% }%>
+                        </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
@@ -913,7 +1014,10 @@
                           list.forEach(function(key){
                             var number = order.orders[key].number;
                             var preference = order.orders[key].preference;
-                            var extra = parseInt(preference.extra);
+                            if(!preference.length){preference = [preference];}
+                            var extra = preference.reduce(function(total,next){
+                              return total + parseInt(next.extra);
+                            },0);
                             if(number == 0){
                               return;
                             }
@@ -925,7 +1029,13 @@
                       <tr>
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>$<%= (dish.price + extra).toFixed(2)%></td>
+                        <td>
+                          $<%= dish.price.toFixed(2)%><br/>
+                          <% if(extra){%>
+                          (+$<%= extra.toFixed(2)%>)<br/>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <% }%>
+                        </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>

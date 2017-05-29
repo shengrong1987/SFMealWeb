@@ -49,16 +49,21 @@
           <% Object.keys(order.orders).forEach(function(dishId){
             var amount = order.orders[dishId].number;
             var preference = order.orders[dishId].preference;
-          if(amount > 0){
-            var dish;
-            dishes.forEach(function(d){
-              if(d.id == dishId){
-                dish = d;
-                return;
-              }
-            })%>
-          <% if(preference && preference.property){%>
-          <%= dish.title%>(<%= preference.property + " x" + amount%>)
+            if(amount > 0){
+              var dish;
+              dishes.forEach(function(d){
+                if(d.id == dishId){
+                  dish = d;
+                  return;
+                }
+              })%>
+          <% var dishPreferenceTitle = "";
+          if(preference && preference.length){
+            preference.forEach(function(pref){
+              dishPreferenceTitle += "(" + pref.property + " x1)";
+            });
+          %>
+          <%= dish.title%><%= dishPreferenceTitle%>
           <% }else{%>
           <%= dish.title%>(<%= amount%>)
           <% }%>

@@ -728,5 +728,7 @@
   "cash" : "Cash",
   "online" : "Online",
   "amount-owe" : "Owe",
-  "order-last-4" : "Last 4 digits of order id"
+  "order-last-4" : "Last 4 digits of order id",
+  "the" : "No.",
+  "preference" : "Preference"
 }

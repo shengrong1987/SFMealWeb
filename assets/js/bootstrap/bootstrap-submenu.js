@@ -30,6 +30,7 @@
 
   Item.prototype = {
     init: function() {
+      this.$element.off('keydown');
       this.$element.on('keydown', $.proxy(this, 'keydown'));
     },
     close: function() {
@@ -60,11 +61,13 @@
 
   $.extend(SubmenuItem.prototype, Item.prototype, {
     init: function() {
+      this.$element.off();
       this.$element.on({
         click: $.proxy(this, 'click'),
         keydown: $.proxy(this, 'keydown')
       });
 
+      this.$main.off();
       this.$main.on('hide.bs.submenu', $.proxy(this, 'hide'));
     },
     click: function(event) {
@@ -129,6 +132,7 @@
         new SubmenuItem(this);
       });
 
+      this.$main.off('hidden.bs.dropdown');
       this.$main.on('hidden.bs.dropdown', $.proxy(this, 'hidden'));
     },
     hidden: function() {
@@ -158,6 +162,45 @@
 
         $items.eq(index).trigger('focus');
       }
+    },
+    insertMenu : function(layer, value, wait){
+      var parentMenu = this.findParentSubmenu(layer);
+      var children = this.tract(parentMenu, layer);
+      this.insert(parentMenu, value, children, layer, desc);
+      setupDropdownMenu();
+      if(!wait){
+        this.init();
+      }
+    },
+    removeMenu : function(layer, value){
+      var parentMenu = this.findParentSubmenu(layer);
+      this.remove(parentMenu, layer);
+    },
+    updateMenu : function(layer, value){
+      var numberOnly = value.match(/\d+/) ? value.match(/\d+/)[0] : 0;
+      for(var i=2; i <= numberOnly; i++){
+        this.insertMenu(layer, value.replace(/\d+/,i), true);
+      }
+      setupDropdownMenu();
+      this.init();
+    },
+    findParentSubmenu : function(layer){
+      if(layer==0){ return this.$menu };
+      var parentMenu =  this.$menu.find(".dropdown-submenu[data-layer='" +  layer + "']").parent();
+      return parentMenu;
+    },
+    tract : function(parent, layer){
+      var ele = parent.find(".dropdown-submenu[data-layer='" +  layer + "'] .dropdown-menu:first").children();
+      return ele.clone();
+    },
+    insert : function(parent,value,children,layer){
+      var newSubmenu = '<li class="dropdown-submenu" data-layer="' + layer + '">' +
+      '<a tabindex="0" data-toggle="dropdown" data-selected="true">' + value + '</a>' + '<ul class="dropdown-menu"></ul></li>';
+      parent.append(newSubmenu);
+      parent.children().last().find(".dropdown-menu").append(children);
+    },
+    remove : function(parent, layer){
+      parent.find(".dropdown-submenu[data-layer='" + layer + "']").last().remove();
     }
   };
 
@@ -165,7 +208,7 @@
 
   // For AMD/Node/CommonJS used elements (optional)
   // http://learn.jquery.com/jquery-ui/environments/amd/
-  $.fn.submenupicker = function(elements) {
+  $.fn.submenupicker = function(option, elements) {
     var $elements = this instanceof $ ? this : $(elements);
 
     return $elements.each(function() {
@@ -176,6 +219,7 @@
 
         $.data(this, 'bs.submenu', data);
       }
+      if(typeof option == "string"){ data[option]($elements.data('layer'),$elements.data("value"))};
     });
   };
 

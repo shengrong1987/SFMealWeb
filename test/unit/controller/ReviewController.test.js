@@ -107,10 +107,10 @@ describe('ReviewController', function() {
     var orderId;
     it('should order the meal', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 0, preference : { property : '', extra : 0}};
-      dishObj[dishId2] = { number : 1, preference : { property : '', extra : 0}};
-      dishObj[dishId3] = { number : 1, preference : { property : '', extra : 0}};
-      dishObj[dishId4] = { number : 1, preference : { property : '', extra : 0}};
+      dishObj[dishId1] = { number : 0, preference : [{ property : '', extra : 0}]};
+      dishObj[dishId2] = { number : 1, preference : [{ property : '', extra : 0}]};
+      dishObj[dishId3] = { number : 1, preference : [{ property : '', extra : 0}]};
+      dishObj[dishId4] = { number : 1, preference : [{ property : '', extra : 0}]};
       agent
         .post('/order')
         .send({

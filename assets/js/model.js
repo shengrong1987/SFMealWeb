@@ -1200,40 +1200,39 @@ var MealSelectionView = Backbone.View.extend({
     });
   },
   changePreference : function(e){
+    var target = $(e.currentTarget);
+    var mySubmenu = target.closest('.dropdown-submenu[data-layer=0]');
+    var orderIndex = mySubmenu.parent().children().index(mySubmenu);
     var preference = '';
-    var myVariation = $(e.currentTarget).closest('.variation');
-    myVariation.each(function(){
+    var extra = 0;
+    var allVariations = target.closest('.variation').parent().children();
+    allVariations.each(function(){
       var value = $(this).find("a").attr("value");
-      if(value){
-        preference += value;
-      }
+      var itemExtra = $(this).find("a").data("extra");
+      if(preference && value){ preference += ",";}
+      if(value){ preference += value;}
+      extra += itemExtra;
     });
-    var extra = myVariation.find("a[data-selected='true']").data("extra");
     var option = {
       property : preference,
       extra : extra
     }
     var dishId = $(e.currentTarget).data("dish");
-    var dishItem = this.$el.find("#order .item[data-id='" + dishId + "']");
-    var priceItem = dishItem.find(".price");
-    dishItem.find(".preference").text("(" + preference + ")");
-    if(extra > 0){
-      priceItem.data("extra", extra);
-      priceItem.html("$" + priceItem.attr("value") + " + $" + extra);
-    }else{
-      priceItem.data("extra", extra);
-      priceItem.html("$" + priceItem.attr("value"));
-    }
+    this.saveOption(orderIndex, option, dishId);
+    refreshOrder(dishId);
+    refreshMenu();
+  },
+  saveOption : function(index, option, dishId){
     var localDish = readCookie(dishId);
     if(localDish){
       var localDishObj = JSON.parse(localDish);
-      localDishObj.preference = option;
+      var options = localDishObj.preference;
     }else{
-      var localDishObj = { number : 0, preference : option};
+      var options = [];
     }
+    options[index] = option;
     localOrders[dishId] = localDishObj;
     createCookie(dishId, JSON.stringify(localDishObj), 1);
-    refreshMenu()
   },
   calculateDelivery : function(e){
     var $this = this;

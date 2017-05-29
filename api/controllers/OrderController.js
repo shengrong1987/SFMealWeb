@@ -43,6 +43,17 @@ var util = require('../services/util');
 
 module.exports = {
 
+  getProperties : function(preferences){
+    var properties = [];
+    preferences.forEach(function(preference){
+      var props = preference.property.split(",");
+      props.forEach(function(prop){
+        properties.push(prop);
+      });
+    });
+    return properties;
+  },
+
   validate_meal : function(meal, orders, lastOrders, subtotal, req, cb) {
     var now = new Date();
     var params = req.body;
@@ -61,10 +72,11 @@ module.exports = {
 
     var actual_subtotal = 0;
     var validDish = false;
+    var $this = this;
 
     async.each(Object.keys(orders), function(dishId, next){
       var qty = parseInt(orders[dishId].number);
-      var property = orders[dishId].preference ? orders[dishId].preference.property : null;
+      var properties = $this.getProperties(orders[dishId].preference);
       var lastQty = lastOrders ? parseInt(lastOrders[dishId].number) : 0;
       if(qty > 0 || lastQty > 0){
         async.each(meal.dishes, function(dish, next2){
@@ -73,15 +85,25 @@ module.exports = {
               return next2({responseText : req.__('order-invalid-dish',dishId), code : -2});
             }
             var extra = 0;
-            if(property && dish.preference && !Object.keys(dish.preference).some(function(preference){
-              var pros = dish.preference[preference];
-              return pros.some(function(p){
-                if(p.property == property){
-                  extra = p.extra;
+            if(!properties.every(function(property){
+                if(property && dish.preference) {
+                  var hasPreference = Object.keys(dish.preference).some(function(preference){
+                    var pros = dish.preference[preference];
+                    var hasPros = pros.some(function(p){
+                      if(p.property == property){
+                        extra += parseInt(p.extra);
+                        return true;
+                      }
+                      return false;
+                    });
+                    sails.log.info("dish has property: " + property + " : " + hasPros);
+                    return hasPros;
+                  });
+                  sails.log.info("dish has preference: " + property + " : " + hasPreference);
+                  return hasPreference;
+                }else{
                   return true;
                 }
-                return false;
-              })
             })){
               return next2({ responseText : req.__('order-preference-not-exist'), code : -20});
             }
@@ -89,7 +111,7 @@ module.exports = {
             if(diff > meal.leftQty[dishId]){
               return next2({responseText : req.__('order-dish-not-enough',dishId, qty), code : -1});
             }
-            actual_subtotal += qty * ( dish.price + extra);
+            actual_subtotal += (qty * (dish.price) + extra);
           }
           next2();
         }, function(err){

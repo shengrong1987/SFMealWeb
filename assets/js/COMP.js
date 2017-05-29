@@ -86,6 +86,9 @@
     index : 1
   }
 
+  $.fn.pagination           = Plugin
+  $.fn.pagination.Constructor = Pagination
+
   function Plugin(option ,root){
     return this.each(function(){
       var $this = $(this);

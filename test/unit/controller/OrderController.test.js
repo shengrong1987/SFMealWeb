@@ -84,10 +84,10 @@ describe('OrderController', function() {
 
     it('should order the meal with pickup method not match selected method error', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 2 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
         .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : address, customerPhone : phone, method : "delivery", mealId : mealId, pickupOption : 1})
@@ -103,10 +103,10 @@ describe('OrderController', function() {
 
     it('should order the meal with no pickup option selected error', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 2 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
         .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : address, customerPhone : phone, method : "delivery", mealId : mealId})
@@ -122,10 +122,10 @@ describe('OrderController', function() {
 
     it('should order the meal with out of range error', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 2 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
         .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : farAddress, customerPhone : phone, method : "delivery", mealId : mealId, pickupOption : 2})
@@ -146,11 +146,11 @@ describe('OrderController', function() {
     var userPoints = 0;
     it('should order the meal', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 2 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 2, preference : { property : 'super sweet', extra : 1 }};
-      var subtotal = parseFloat(price1*1) + parseFloat(price2*2) + parseFloat((price4+1)*2);
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 2, preference : [{ property : 'super sweet', extra : 1 },{ property : 'super sweet', extra : 1 }]};
+      var subtotal = parseFloat(price1*1) + parseFloat(price2*2) + parseFloat((price4*2+2));
       agent
           .post('/order')
           .send({
@@ -166,8 +166,8 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
-            var tax = Math.round((price1 + price2 * 2 + (price4+1)*2)*0.085*100);
-            var chargesTotal = Math.round(((price1 * 1 + price2 * 2 + (price4+1) * 2) * 1.085 + 1) * 100);
+            var tax = Math.round((price1 + price2 * 2 + (price4*2+2))*0.085*100);
+            var chargesTotal = Math.round(((price1 * 1 + price2 * 2 + (price4*2 + 2)) * 1.085 + 1) * 100);
             userPoints += Math.floor(chargesTotal / 100);
             res.body.tax.should.be.equal(tax);
             res.body.customer.should.be.equal(guestId);
@@ -193,10 +193,10 @@ describe('OrderController', function() {
 
     it('should order the dish with preference and get preference not exist error', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : { property : 'hot', extra : 0}};
-      dishObj[dishId2] = { number : 1 , preference : { property : '', extra : 0}  };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0}  };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0}  };
+      dishObj[dishId1] = { number : 1 , preference : [{ property : 'hot', extra : 0}]};
+      dishObj[dishId2] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}]  };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}]  };
       agent
         .post('/order')
         .send({orders : dishObj, subtotal : price1 * 1 + price2 * 1, address : address, customerPhone : phone, method : "delivery", mealId : mealId, delivery_fee : 0})
@@ -212,10 +212,10 @@ describe('OrderController', function() {
 
     it('should order the dish with preference and get subtotal not match error', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0}  };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0}  };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0}  };
-      dishObj[dishId4] = { number : 1 , preference : { property : 'super sweet', extra : 5}};
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}]  };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}]  };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}]  };
+      dishObj[dishId4] = { number : 1 , preference : [{ property : 'super sweet', extra : 5}]};
       agent
         .post('/order')
         .send({orders : dishObj, subtotal : price4 * 1, address : address, customerPhone : phone, method : "delivery", mealId : mealId, delivery_fee : 0, pickupOption : 2})
@@ -231,10 +231,10 @@ describe('OrderController', function() {
 
     it('should order the full dish and get not enough quantity error', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 2 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
           .post('/order')
           .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : address, customerPhone : phone, method : "delivery", mealId : mealId, delivery_fee : 0, pickupOption : 2})
@@ -250,10 +250,10 @@ describe('OrderController', function() {
 
     it('should adjust the full dish and get not enough quantity error', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 2 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 2 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
           .post('/order/' + orderId + "/adjust")
           .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, mealId : mealId, delivery_fee : 0})
@@ -269,10 +269,10 @@ describe('OrderController', function() {
 
     it('should adjust the dish with less amount successfully', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
           .post('/order/' + orderId + "/adjust")
           .send({orders : dishObj, subtotal : price1 * 1, mealId : mealId, delivery_fee : 0})
@@ -304,10 +304,10 @@ describe('OrderController', function() {
 
     it('should adjust the dish with equal amount successfully', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
           .post('/order/' + orderId + "/adjust")
           .send({orders : dishObj, subtotal : price2 * 1, mealId : mealId, delivery_fee : 0})
@@ -338,10 +338,10 @@ describe('OrderController', function() {
 
     it('should not order the meal with insufficient points', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
         .send({
@@ -367,10 +367,10 @@ describe('OrderController', function() {
 
     it('should not order the meal with points and coupon', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
         .send({
@@ -397,10 +397,10 @@ describe('OrderController', function() {
 
     it('should adjust the dish with greater amount successfully', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order/' + orderId + "/adjust")
         .send({orders : dishObj, subtotal : price2 + price3, mealId : mealId, delivery_fee : 0})
@@ -468,10 +468,10 @@ describe('OrderController', function() {
 
     it('should order the meal again', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 2 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
         .send({
@@ -498,10 +498,10 @@ describe('OrderController', function() {
 
     it('should order the meal again with points', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
         .send({
@@ -588,10 +588,10 @@ describe('OrderController', function() {
 
     it('should not adjust the order at schedule as a host', function(done){
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order/' + orderId + "/adjust")
         .send({
@@ -641,10 +641,10 @@ describe('OrderController', function() {
 
     it('should request for adjusting', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order/' + orderId + "/adjust")
         .send({
@@ -749,10 +749,10 @@ describe('OrderController', function() {
 
     it('should request for adjusting for same order amount', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order/' + orderId + "/adjust")
         .send({
@@ -801,10 +801,10 @@ describe('OrderController', function() {
 
     it('should request for adjusting for greater order amount', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 1 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 1 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order/' + orderId + "/adjust")
         .send({
@@ -853,10 +853,10 @@ describe('OrderController', function() {
 
     it('should request for adjusting for lesser order amount', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 1 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 1 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order/' + orderId + "/adjust")
         .send({
@@ -979,10 +979,10 @@ describe('OrderController', function() {
       var orderId;
       it('should order the meal with delivery with pickup option invalid error', function (done) {
         var dishObj = {};
-        dishObj[dishId1] = { number : 1 , preference : { property : '', extra : 0} };
-        dishObj[dishId2] = { number : 2 , preference : { property : '', extra : 0} };
-        dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-        dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+        dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+        dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+        dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+        dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
         agent
           .post('/order')
           .send({
@@ -1036,10 +1036,10 @@ describe('OrderController', function() {
 
       it('should order the meal with delivery', function (done) {
         var dishObj = {};
-        dishObj[dishId1] = { number : 1,  preference : { property : '', extra : 0}};
-        dishObj[dishId2] = { number : 1 , preference : { property : '', extra : 0} };
-        dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-        dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+        dishObj[dishId1] = { number : 1,  preference : [{ property : '', extra : 0}]};
+        dishObj[dishId2] = { number : 1 , preference : [{ property : '', extra : 0}] };
+        dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+        dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
         agent
           .post('/order')
           .send({
@@ -1173,10 +1173,10 @@ describe('OrderController', function() {
 
     it('should be able to order a meal with coupon', function(done){
       var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
         .send({
@@ -1203,10 +1203,10 @@ describe('OrderController', function() {
 
     it('should be able to order a meal with coupon greater than original order', function(done){
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
         .send({
@@ -1233,10 +1233,10 @@ describe('OrderController', function() {
 
     it('should not be able to order another meal with same coupon', function(done){
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
         .send({
@@ -1260,10 +1260,10 @@ describe('OrderController', function() {
 
     it('should not adjust the order with coupon', function(done){
       var dishObj = {};
-      dishObj[dishId1] = { number : 2 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 2 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order/' + orderId + "/adjust")
         .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, mealId : mealId, delivery_fee : 0})
@@ -1279,10 +1279,10 @@ describe('OrderController', function() {
 
     it('should not cancel the order with coupon', function(done){
       var dishObj = {};
-      dishObj[dishId1] = { number : 2 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 2 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order/' + orderId + "/cancel")
         .expect(400)
@@ -1366,10 +1366,10 @@ describe('OrderController', function() {
 
     it('should not be able to order a meal without name & phone', function(done){
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 1 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 1 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
         .send({
@@ -1406,10 +1406,10 @@ describe('OrderController', function() {
 
     it('should be able to order a meal with cash with no card', function(done){
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 1 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 1 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
         .send({
@@ -1435,10 +1435,10 @@ describe('OrderController', function() {
 
     it('should adjust the dish with less amount successfully', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId2] = { number : 1 , preference : { property : '', extra : 0} };
-      dishObj[dishId3] = { number : 0 , preference : { property : '', extra : 0} };
-      dishObj[dishId4] = { number : 0 , preference : { property : '', extra : 0} };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order/' + orderId + "/adjust")
         .send({orders : dishObj, subtotal : price1 * 1, mealId : mealId, delivery_fee : 0})

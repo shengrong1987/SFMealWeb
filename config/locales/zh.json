@@ -728,5 +728,7 @@
   "cash" : "现金",
   "online" : "线上支付",
   "amount-owe" : "需付",
-  "order-last-4" : "订单号后4位"
+  "order-last-4" : "订单号后4位",
+  "the" : "第",
+  "preference" : "口味"
 }
