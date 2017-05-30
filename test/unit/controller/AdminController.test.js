@@ -165,7 +165,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(3);
+          res.body.should.have.length(4);
           scheduledOrderId = res.body[0].id;
           done();
         })
@@ -199,7 +199,7 @@ describe('UsersController', function() {
     })
 
     var cancelOrderId;
-    it('should be able to search orders that is completed', function (done) {
+    it('should be able to search orders that is cancelled', function (done) {
       agent
         .get(encodeURI('/order/search?status=cancel'))
         .expect(200)
@@ -213,14 +213,7 @@ describe('UsersController', function() {
         })
     })
 
-    it('should not be able to abort order that is completed', function (done) {
-      agent
-        .get('/order/' + cancelOrderId + '/abort')
-        .expect(400)
-        .end(done)
-    })
-
-    it('should not be able to abort order that is completed', function (done) {
+    it('should not be able to abort order that is cancelled', function (done) {
       agent
         .get('/order/' + cancelOrderId + '/abort')
         .expect(400)

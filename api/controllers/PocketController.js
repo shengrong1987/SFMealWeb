@@ -88,6 +88,7 @@ module.exports = {
                   charge.amount_refunded = 0;
                   charge.paymentMethod = "cash";
                   charge.status = "cash";
+                  charge.created = new Date(order.createdAt).getTime();
                   charge.metadata = {
                     orderId : order.id,
                     deliveryFee : order.delivery_fee,
@@ -201,6 +202,7 @@ module.exports = {
                   charge.amount_refunded = 0;
                   charge.paymentMethod = "cash";
                   charge.status = "cash";
+                  charge.created = new Date(order.createdAt).getTime();
                   charge.metadata = {
                     orderId : order.id,
                     deliveryFee : order.delivery_fee,

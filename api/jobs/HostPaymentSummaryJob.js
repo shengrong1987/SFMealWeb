@@ -85,18 +85,24 @@ module.exports = function(agenda) {
                   if (err) {
                     return next3(err);
                   }
-                  var hostId = charge.metadata.hostId;
-                  Host.findOne(hostId).exec(function (err, host) {
+                  Host.findOne(host.id).exec(function (err, host) {
                     if (err) {
                       return next3(err);
                     }
-                    charge.income = (charge.amount - charge.amount_refunded);
                     stripe.retrieveApplicationFee(charge.application_fee, function(err, fee){
                       if(err){
                         return next(err);
                       }
-                      var date = moment(charge.created * 1000);
-                      charge.application_fee = fee.amount - fee.amount_refunded;
+                      if(chargeId == "cash"){
+                        var date = moment(new Date(order.createdAt).getTime());
+                        charge.income = order.charges['cash'];
+                        charge.application_fee = order.application_fees['cash'];
+                      }else {
+                        var date = moment(charge.created * 1000);
+                        charge.application_fee = fee.amount - fee.amount_refunded;
+                        charge.income = (charge.amount - charge.amount_refunded);
+                      }
+
                       charge.month = moment.months()[date.month()];
                       charge.day = date.date();
                       charge.type = "payment";
