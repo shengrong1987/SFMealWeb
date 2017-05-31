@@ -42,15 +42,12 @@
               }
             })%>
           <% if(preference && preference.length > 0){
-            var title = "";
+            var title = '';
             preference.forEach(function(pref){
-              if(!title){ title += "[";}
-              else{ title += ","};
-              title += pref.property;
+              title += "(" + pref.property + ')';
             });
-            title += ']';
           %>
-          <%= dish.title%>(<%= amount + title%>)
+          <%= dish.title%>(<%= amount%>)<%= title%>
           <% }else{%>
           <%= dish.title%>(<%= amount%>)
           <% }%>
@@ -88,19 +85,24 @@
           <% Object.keys(order.orders).forEach(function(dishId){
             var amount = order.orders[dishId].number;
             var preference = order.orders[dishId].preference;
-          if(amount > 0){
-            var dish;
-            meal.dishes.forEach(function(d){
-              if(d.id == dishId){
-                dish = d;
-                return;
-              }
-            })%>
-          <% if(preference && preference.property){%>
-          <%= dish.title%>(<%= preference.property + " x" + amount%>)
-          <% }else{%>
-          <%= dish.title%>(<%= amount%>)
-          <% }%>
+            if(amount > 0){
+              var dish;
+              meal.dishes.forEach(function(d){
+                if(d.id == dishId){
+                  dish = d;
+                  return;
+                }
+              })%>
+              <% if(preference && preference.length > 0){
+                var title = '';
+                preference.forEach(function(pref){
+                  title += "(" + pref.property + ')';
+                });
+              %>
+              <%= dish.title%>(<%= amount%>)<%= title%>
+              <% }else{%>
+              <%= dish.title%>(<%= amount%>)
+              <% }%>
           <%}});%>
         </td>
         <td><%= order.customerPhone%></td>

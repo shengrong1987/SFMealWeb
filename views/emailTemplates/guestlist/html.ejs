@@ -59,15 +59,12 @@
               })
           %>
           <% if(preference && preference.length > 0){
-            var title = "";
+            var title = '';
             preference.forEach(function(pref){
-              if(!title){ title += "[";}
-              else{ title += ","};
-              title += pref.property;
+              title += "(" + pref.property + ')';
             });
-            title += ']';
           %>
-          <%= dish.title%>(<%= amount + title%>)
+          <%= dish.title%>(<%= amount%>)<%= title%>
           <% }else{%>
           <%= dish.title%>(<%= amount%>)
           <% }%>
@@ -113,8 +110,13 @@
                   return;
                 }
               })%>
-          <% if(preference && preference.property){%>
-          <%= dish.title%>(<%= preference.property + " x" + amount%>)
+          <% if(preference && preference.length > 0){
+            var title = '';
+            preference.forEach(function(pref){
+              title += "(" + pref.property + ')';
+            });
+          %>
+          <%= dish.title%>(<%= amount%>)<%= title%>
           <% }else{%>
           <%= dish.title%>(<%= amount%>)
           <% }%>

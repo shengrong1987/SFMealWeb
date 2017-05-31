@@ -812,16 +812,6 @@ module.exports = {
           return done();
         }
         meal.orders = orders;
-        var items = meal.orders[0].orders;
-        Object.keys(items).forEach(function(key){
-          var amount = items[key].amount;
-          var prefs = items[key].preference;
-          if(amount > 0){
-            prefs.forEach(function(pref){
-              sails.log.debug('preference for dish:' + key + " is: " + pref);
-            });
-          }
-        })
         notification.transitLocaleTimeZone(meal);
         return res.view('report',{ meal : meal });
       });
