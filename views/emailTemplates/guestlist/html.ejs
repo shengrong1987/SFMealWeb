@@ -56,14 +56,18 @@
                   dish = d;
                   return;
                 }
-              })%>
-          <% var dishPreferenceTitle = "";
-          if(preference && preference.length){
-            preference.forEach(function(pref){
-              dishPreferenceTitle += "(" + pref.property + " x1)";
-            });
+              })
           %>
-          <%= dish.title%><%= dishPreferenceTitle%>
+          <% if(preference && preference.length > 0){
+            var title = "";
+            preference.forEach(function(pref){
+              if(!title){ title += "[";}
+              else{ title += ","};
+              title += pref.property;
+            });
+            title += ']';
+          %>
+          <%= dish.title%>(<%= amount + title%>)
           <% }else{%>
           <%= dish.title%>(<%= amount%>)
           <% }%>

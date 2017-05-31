@@ -185,7 +185,7 @@ module.exports = {
     var userId = req.session.user.id;
     var email = req.session.user.auth.email;
     var params = req.body;
-    var isDefaultPayment = params.isDefaultPayment;
+    var isDefaultPayment = typeof params.isDefaultPayment == 'boolean';
 
     Payment.findOne(paymentId).exec(function(err, payment){
       if(err){
@@ -193,6 +193,7 @@ module.exports = {
       }
       var customerId = payment.customerId;
       var cardId = payment.cardId;
+      var updatedParam = {};
       async.auto({
         updateCard : function(cb){
           delete params.id;
@@ -205,7 +206,7 @@ module.exports = {
             if(err){
               return cb(err);
             }
-            params.last4 = card.last4;
+            updatedParam.last4 = card.last4;
             switch (card.brand) {
               case "MasterCard":
                 card.brand = "master";
@@ -217,7 +218,7 @@ module.exports = {
                 card.brand = "DC"
                 break;
             }
-            params.brand = card.brand;
+            updatedParam.brand = card.brand;
             cb();
           });
         },
@@ -232,6 +233,7 @@ module.exports = {
             if(err){
               return cb(err);
             }
+            updatedParam.isDefaultPayment = true;
             Payment.update({user:userId},{isDefaultPayment : false}).exec(function(err,payments) {
               if (err) {
                 return cb(err);
@@ -244,13 +246,21 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        params.isDefaultPayment = isDefaultPayment;
-        Payment.update(paymentId, params).exec(function(err, payment){
+        Payment.count({user:userId}).exec(function(err, number){
           if(err){
             return res.badRequest(err);
           }
-          res.ok(payment[0]);
-        });
+          if(number == 1){
+            updatedParam.isDefaultPayment = true;
+          }
+          Payment.update(paymentId, updatedParam).exec(function(err, payment){
+            if(err){
+              return res.badRequest(err);
+            }
+            res.ok(payment[0]);
+          });
+        })
+
       })
     });
   },
