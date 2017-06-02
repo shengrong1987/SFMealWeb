@@ -185,7 +185,7 @@ module.exports = {
     var userId = req.session.user.id;
     var email = req.session.user.auth.email;
     var params = req.body;
-    var isDefaultPayment = typeof params.isDefaultPayment == 'boolean';
+    var isDefaultPayment = params.isDefaultPayment;
 
     Payment.findOne(paymentId).exec(function(err, payment){
       if(err){
@@ -194,6 +194,7 @@ module.exports = {
       var customerId = payment.customerId;
       var cardId = payment.cardId;
       var updatedParam = {};
+      updatedParam.isDefaultPayment = false;
       async.auto({
         updateCard : function(cb){
           delete params.id;
@@ -223,7 +224,8 @@ module.exports = {
           });
         },
         updateDefaultSource : function(cb){
-          if(!isDefaultPayment){
+          sails.log.info("is default card: " + isDefaultPayment);
+          if(!isDefaultPayment || isDefaultPayment == "false"){
             return cb();
           }
           stripe.updateDefaultSource({

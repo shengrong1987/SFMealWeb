@@ -300,7 +300,7 @@ var notification = {
       info.recipientName = "SFMeal.com";
     }else{
       info.recipientEmail = params.guestEmail;
-      info.recipientName = params.customer.firstname || '';
+      info.recipientName = params.customerName || params.customer.firstname || '';
     }
     return info;
   },

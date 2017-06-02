@@ -9,6 +9,47 @@
 <div id="mocha"><p><a href=".">Index</a></p></div>
 <div id="messages"></div>
 <div id="fixtures"></div>
+
+<div style="display: none;">
+  <div id="pagination_less_page">
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+  </div>
+  <div id="pagination_more_page_1">
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+  </div>
+  <div id="pagination_more_page_2">
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+    <span class="item"></span>
+  </div>
+
+  <div data-trigger="pagination" data-target="#pagination_less_page"></div>
+  <div data-trigger="pagination" data-target="#pagination_not_exist"></div>
+  <div data-trigger="pagination" data-target="#pagination_more_page_1"></div>
+  <div data-trigger="pagination" data-target="#pagination_more_page_2"></div>
+</div>
+
 <script src="/SFMealWeb/html/assets/js/dependencies/jquery/jquery-2.1.4.min.js"></script>
 <script src="vendor/mocha.js"></script>
 <script src="vendor/chai.js"></script>
