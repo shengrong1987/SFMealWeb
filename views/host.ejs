@@ -1203,7 +1203,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discountAmount + 1).toFixed(2)%></b> (<%= __('service-fee')%>: $1.00 + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discountAmount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="/meal/<%= order.meal%>"><%= __('see-review')%></a>
+                          <a href="/meal/<%= order.meal.id%>"><%= __('see-review')%></a>
                         </td>
                       </tr>
                       <%}%>

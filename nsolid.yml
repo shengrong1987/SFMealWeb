@@ -1,0 +1,21 @@
+version: "2"
+services:
+  storage:
+    image: nodesource/nsolid-storage
+    container_name: nsolid.storage
+    ports:
+      - 4000:4000
+      - 9001:9001
+      - 9002:9002
+      - 9003:9003
+#    volumes:
+#      - /var/lib/nsolid/storage/data
+  console:
+    image: nodesource/nsolid-console
+    container_name: nsolid.console
+    environment:
+      - NSOLID_CONSOLE_STORAGE_URL=https://storage:4000
+    links:
+      - storage
+    ports:
+      - 6753:6753

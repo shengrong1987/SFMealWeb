@@ -1,0 +1,27 @@
+version: "2"
+services:
+  sails:
+    build: .
+    #from: node:4.0
+    ports:
+      - "1337:1337"
+    volumes:
+      - ./:/sails
+    command: npm start
+    environment:
+      - NODE_ENV=development
+      - NSOLID_APPNAME=example
+      - NSOLID_COMMAND=storage:9001
+      - NSOLID_DATA=storage:9002
+      - NSOLID_BULK=storage:9003
+    links:
+      - mongo
+
+  mongo:
+      image: mongo
+      volumes:
+        - ./data:/sails/data
+      ports:
+        - "27017:27017"
+      command : "-dbpath /sails/data --smallfiles --logpath=/dev/null"
+

@@ -1,0 +1,13 @@
+FROM nodesource/nsolid
+
+WORKDIR /sails
+ADD .docker/root/.bashrc /root/
+ADD package.json package.json
+ADD bin/. bin/.
+RUN npm run install
+
+ADD . .
+RUN grunt prod
+
+EXPOSE 1337
+CMD ["npm", "start"]

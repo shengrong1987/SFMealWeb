@@ -1477,11 +1477,16 @@
                 </div>
                 <div class="col-md-5 col-xs-7">
                   <h2 class="text-left"><%= order.meal.title%>  <small class="text-orange"><%= order.meal.type=="order"?__('order'):__('preorder')%></small></h2>
-                  <div class="vertical-align text-left">
-                    <a href="#" class="round_thumb size-small">
-                      <img src="<%= order.host.picture || "/images/profile_man.png" %>">
-                    </a>
-                    <h4 class="text-left text-lightgrey" style="margin-top: 15px;margin-left:10px;"><%= order.host.shopName %><br><small><%= order.host.intro %></small></h4>
+                  <div class="row vertical-align text-left">
+                    <div class="col-xs-3 col-lg-1"><img class="round_thumb size-small cursor-pointer" onclick="location.href='/host/<%= order.host.id%>'" src="<%= order.host.picture || "/images/profile_man.png" %>"></div>
+                    <div class="col-xs-9 col-lg-11">
+                      <h4 class="text-left text-lightgrey" style="margin-top: 15px;margin-left:10px;"><%= order.host.shopName %></h4>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-xs-12">
+                      <h4 class="text-left text-lightgrey" style="margin-top: 15px;margin-left:10px;"><small><%= order.host.intro %></small></h4>
+                    </div>
                   </div>
                   <div class="row">
                     <div class="col-xs-12">
@@ -1498,7 +1503,7 @@
                   </div>
                   <div class="row">
                     <div class="col-xs-12">
-                      <h3><small><%= __('total') %></small><span class="text-red">$<%= (order.subtotal * ( 1 + order.getTaxRate())).toFixed(2)+1%> <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%></span></h3>
+                      <h3><small><%= __('total') %></small><span class="text-red"> $<%= (order.subtotal * ( 1 + order.getTaxRate()) + 1).toFixed(2)%></span></h3>
                     </div>
                   </div>
                 </div>
@@ -1512,7 +1517,7 @@
                 <div style="margin-top:10px;" class="dish-item" data-dish="<%= dish.id%>">
                   <div class="row vertical-align">
                     <div class="col-md-2 col-xs-3">
-                      <img src="<%= dish.photos[0].v%>" style="width:100%;max-height:100px;">
+                      <img src="<%= dish.photos[0].v%>" style="max-height:100px;">
                     </div>
                     <div class="col-md-6 col-xs-9">
                       <h3 class="none-margin"><small class="text-black"><%= dish.title%>&nbsp&nbsp&nbsp&nbsp&nbsp$<%= dish.price%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.orders[dish.id].number%><%= __('fen')%></small></h3>

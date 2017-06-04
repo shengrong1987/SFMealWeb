@@ -2536,9 +2536,10 @@ var ReviewView = Backbone.View.extend({
     var dishId = ele.data("dish");
     var mealId = ele.data("meal");
     var hostId = ele.data("host");
+    var score;
     if(dishId){
       //single dish review
-      var score = rating_container.find(".rating .text-yellow").length;
+      score = rating_container.find(".rating .text-yellow").length;
       var content = rating_container.find(".review").val();
     }else if(mealId){
       //meal review
@@ -2556,8 +2557,8 @@ var ReviewView = Backbone.View.extend({
       });
     }
     var $this = this;
-    if(score == 0 || scoreNotRated){
-      alertView.show();
+    if(!score || score == 0 || scoreNotRated){
+      makeAToast(jQuery.i18n.prop('reviewScoreEmpty'));
       return;
     }
     if(score <= 1){

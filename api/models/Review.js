@@ -22,7 +22,8 @@ module.exports = {
       model : 'Meal'
     },
     score : {
-      type : 'float'
+      type : 'float',
+      required : true
     },
     review : {
       type : 'string'
