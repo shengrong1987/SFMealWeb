@@ -52,8 +52,8 @@ module.exports.session = {
   *                                                                          *
   ***************************************************************************/
 
-  // host: 'localhost',
-  // port: 6379,
+  host: process.env.NODE_ENV == 'production' ? '35.162.155.234' : 'localhost',
+  port: 6379
   // ttl: <redis session TTL in seconds>,
   // db: 2
   // pass: <redis auth password>,
