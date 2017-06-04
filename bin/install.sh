@@ -5,3 +5,5 @@ npm uninstall es5-ext
 npm install -g grunt --save
 npm install
 npm install --save sails-hook-parametized-policies
+sudo chown -R $USER:$USER
+.grunt prod
