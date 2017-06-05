@@ -36,10 +36,13 @@ module.exports = require('waterlock').actions.user({
     var shopName = req.query.shopName;
     var phone = req.query.phone;
     var params = {};
+    if(!phone && !user.phone){
+      return res.badRequest({ code : -2, responseText : req.__('host-lack-of-phone')});
+    }
+    phone = phone || user.phone;
     params.user = userId;
     params.email = email;
     params.shopName = shopName;
-    params.phone = phone || (user.phone || '');
     if(req.session.user.host){
       return res.badRequest({ code : -1, responseText : req.__('user-already-host')});
     }
@@ -102,7 +105,7 @@ module.exports = require('waterlock').actions.user({
                 if(err){
                   return res.badRequest(err);
                 }
-                User.update({id : userId},{host: hostId}).exec(function(err, user){
+                User.update({id : userId},{host: hostId, phone : phone}).exec(function(err, user){
                   if(err){
                     res.badRequest(err);
                   }
@@ -131,7 +134,7 @@ module.exports = require('waterlock').actions.user({
       }
       if(email){
         users = users.filter(function(user){
-          return user.auth.email == email;
+          return user.auth ? user.auth.email == email : false;
         });
       }
       return res.ok(users);

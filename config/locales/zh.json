@@ -534,6 +534,7 @@
   "user-upload-need-module" : "上传资料不完成",
   "user-exist-error" : "该用户已存在, 请使用邮箱登录",
   "user-credential-needed" : "需要输入邮箱和密码",
+  "host-lack-of-phone" : "需要填写手机",
   "enter-website" : "进入网站",
   "our-mailing-address" : "我们的邮寄地址是",
   "footer-send-by" : "这封电邮是由SFMeal.com发送的.遇到问题? SFMeal客户服务邮箱:",

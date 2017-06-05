@@ -39,6 +39,7 @@ var util = require('../services/util');
 //-25 : redeeming points insufficient
 //-26 : can not use any discount on cash checkout
 //-27 : can not order meal with cash checkout without name & phone
+//-28 : pickup info lack of phone
 
 
 module.exports = {
@@ -151,6 +152,9 @@ module.exports = {
       var pickupInfo = meal.pickups[options-1];
       if(!pickupInfo){
         return cb({responseText : req.__('order-pickup-option-invalid-error'), code : -22});
+      }
+      if(!pickupInfo.phone){
+        return cb({responseText : req.__('order-pickup-option-invalid-error'), code : -28});
       }
       if(pickupInfo.method != method){
         return cb({responseText : req.__('order-pickup-method-not-match-error'), code : -21});

@@ -18,7 +18,7 @@ module.exports.jobs = {
   // for more details about configuration,
   // check https://github.com/rschmukler/agenda
   "db": {
-    "address"    : process.env.MONGODB_JOB_USER + ":" + process.env.MONGODB_JOB_PWD + "@localhost:27017/jobs",
+    "address"    : process.env.MONGODB_JOB_USER + ":" + process.env.MONGODB_JOB_PWD + "@" + (process.env.NODE_ENV === 'production' ? process.env.PUBLIC_IP : "localhost") + ":27017/jobs",
     "collection" : "agendaJobs"
   },
   "name": "process name",

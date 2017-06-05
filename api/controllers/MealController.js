@@ -423,7 +423,7 @@ module.exports = {
         }
         $this.dishIsValid(req.body, function(valid){
           if(valid){
-            Host.findOne(hostId).populate("meals").populate("dishes").exec(function(err, host){
+            Host.findOne(hostId).populate("meals").populate("dishes").populate("user").exec(function(err, host){
               if(err){
                 return res.badRequest(err);
               }
@@ -474,6 +474,7 @@ module.exports = {
   update : function(req, res){
     var mealId = req.param("id");
     var hostId = req.session.user.host.id? req.session.user.host.id : req.session.user.host;
+    var user = req.session.user;
     var status = req.body.status;
     var $this = this;
     if(this.dateIsValid(req.body)){
@@ -489,6 +490,9 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
+            meal.chef.user = {
+              phone : user.phone
+            };
             $this.updateDelivery(req.body, meal.chef, req, function(err, params){
               if(err){
                 return res.badRequest(err);
@@ -640,10 +644,15 @@ module.exports = {
         if(!params.pickups){
           return cb();
         }
-        async.each(JSON.parse(params.pickups), function(pickup, next){
+        var pickupArrays = JSON.parse(params.pickups);
+        async.each(pickupArrays, function(pickup, next){
           if(!pickup.county){
             return next();
           }
+          if(!pickup.phone || pickup.phone == 'undefined'){
+            pickup.phone = host.user.phone;
+          }
+          sails.log.info("phone is : " + pickup.phone);
           sails.log.info("county is : " + pickup.county);
           if(counties.indexOf(pickup.county) == -1){
             counties.push(pickup.county);
@@ -653,6 +662,7 @@ module.exports = {
           if(err){
             return cb(err);
           }
+          params.pickups = pickupArrays;
           cb();
         });
       }

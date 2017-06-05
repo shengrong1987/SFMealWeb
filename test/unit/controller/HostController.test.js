@@ -34,11 +34,12 @@ describe('UsersController', function() {
 
     it('should become a host', function (done) {
       agent
-        .get('/user/becomeHost?shopName=The Tea House&phone=(415) 802-3853')
+        .get('/user/becomeHost?shopName=The Tea House&phone=(415)802-3853')
         .expect(200)
         .end(function(err,res){
           res.body.should.have.property("user");
           should.exist(res.body.user.host);
+          res.body.user.phone.should.be.equal("(415)802-3853");
           hostId = res.body.user.host;
           done();
         })
