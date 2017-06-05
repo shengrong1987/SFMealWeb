@@ -2557,7 +2557,7 @@ var ReviewView = Backbone.View.extend({
       });
     }
     var $this = this;
-    if(!score || score == 0 || scoreNotRated){
+    if((!score || score == 0) && scoreNotRated){
       makeAToast(jQuery.i18n.prop('reviewScoreEmpty'));
       return;
     }

@@ -63,6 +63,9 @@ module.exports = {
         var score = req.body.score;
         var review = req.body.review;
         $this.reviewForDish(dishId, mealId, user, orders, score, review, function(err, results){
+          if(err){
+            return res.badRequest(err);
+          }
           async.each(orders, function(order,next){
             order.save(function(err,o){
               if(err){
