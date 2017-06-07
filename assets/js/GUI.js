@@ -1034,7 +1034,7 @@ $(window).scroll(function () {
   }else if (scrolltop > headerHeight){
     $('.floater').removeClass("static-floater");
     $('.floater').addClass("fix-floater");
-    $('.floater').css('top', 25);
+    $('.floater').css('top', -20);
   }else{
     $('.floater').removeClass("fix-floater");
     $('.floater').addClass("static-floater");

@@ -16,9 +16,9 @@ module.exports = function(req, res, next) {
     var hostId = req.param('id') || req.param('parentid');
     var userId = req.session.user.id;
     User.findOne(userId).exec(function(err,user){
-      if (err){
+      if(err){
         return res.badRequest(err);
-      }else if(user.host == hostId){
+      }else if(user && user.host == hostId){
         return next();
       }else{
         // User is not allowed
