@@ -6,7 +6,8 @@
 var React = require('react/addons'),
   Table = require('./Table'),
   Search = require('./Search'),
-  TabStore = require('../stores/TabStore')
+  TabStore = require('../stores/TabStore'),
+  Pagination = require('./Pagination');
 
 var _getStateFromStores = function () {
   return TabStore.getCurrentTab();
@@ -101,6 +102,7 @@ var TablePanel = React.createClass({
           <div className="panel-heading">{this.state.tab}</div>
           <div className="table-responsive">
             <Table header={headers} details={details} model={this.state.tab}/>
+            <Pagination maxIndex={10} model={this.state.tab}/>
           </div>
         </div>
       </div>

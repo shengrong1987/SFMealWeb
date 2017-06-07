@@ -836,7 +836,7 @@ function setupValidator(){
       }
     }
   });
-  $("input[type='tel']").inputmask({"mask": "(999) 999-9999"});
+  $("input[type='tel']").mask("(000)000-0000");
 }
 
 function setupCountrySelector(){

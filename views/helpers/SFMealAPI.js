@@ -17,11 +17,11 @@ module.exports = {
     });
   },
 
-  getUsers: function(criteria, value) {
+  getUsers: function(criteria, value, skip) {
     if(!criteria || !value){
-      var url = "/user";
+      var url = "/user?skip=" + skip;
     }else{
-      var url = "/user/search?" + criteria + "=" + value;
+      var url = "/user/search?skip=" + skip + "&" + criteria + "=" + value;
     }
     $.ajax({
       url: url,
@@ -46,11 +46,11 @@ module.exports = {
     });
   },
 
-  getHosts: function(criteria, value) {
+  getHosts: function(criteria, value, skip) {
     if(!criteria || !value){
-      var url = "/host";
+      var url = "/host?skip=" + skip;
     }else{
-      var url = "/host/search?" + criteria + "=" + value;
+      var url = "/host/search?skip=" + skip + "&" + criteria + "=" + value;
     }
     $.ajax({
       url: url,
@@ -75,13 +75,13 @@ module.exports = {
     });
   },
 
-  getMeals : function(criteria, value){
+  getMeals : function(criteria, value, skip){
     if(criteria == "hostId" && value){
-      var url = "/host/" + value + "/meals";
+      var url = "/host/" + value + "/meals?skip=" + skip;
     }else if(value) {
-      var url = "/meal/searchAll?" + criteria + "=" + value;
+      var url = "/meal/searchAll?skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      var url = "/meal/searchAll";
+      var url = "/meal/searchAll?skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -106,15 +106,15 @@ module.exports = {
     });
   },
 
-  getDishes : function(criteria, value){
+  getDishes : function(criteria, value, skip){
     if(criteria == "hostId" && value){
-      var url = "/host/" + value + "/dishes";
+      var url = "/host/" + value + "/dishes?skip=" + skip;
     }else if(criteria == "mealId" && value) {
-      var url = "/meal/" + value + "/dishes";
+      var url = "/meal/" + value + "/dishes?skip=" + skip;
     }else if(value) {
-      var url = "/dish/search?" + criteria + "=" + value;
+      var url = "/dish/search?skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      var url = "/dish";
+      var url = "/dish?skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -139,17 +139,17 @@ module.exports = {
     });
   },
 
-  getOrders : function(criteria, value){
+  getOrders : function(criteria, value, skip){
     if(criteria == "hostId" && value){
-      var url = "/host/" + value + "/orders";
+      var url = "/host/" + value + "/orders?skip=" + skip;
     }else if(criteria == "userId" && value) {
-      var url = "/user/" + value + "/orders";
+      var url = "/user/" + value + "/orders?skip=" + skip;
     }else if(criteria == "mealId" && value) {
-      var url = "/order/search?meal=" + value;
+      var url = "/order/search?skip=" + skip + "&meal=" + value;
     }else if(value) {
-      var url = "/order/search?" + criteria + "=" + value;
+      var url = "/order/search?skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      var url = "/order";
+      var url = "/order?skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -205,11 +205,11 @@ module.exports = {
     });
   },
 
-  getJobs : function(criteria, value){
+  getJobs : function(criteria, value, skip){
     if(criteria && value){
-      var url = "/job?" + criteria + "=" + value;
+      var url = "/job?skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      var url = "/job";
+      var url = "/job?skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -234,11 +234,11 @@ module.exports = {
     });
   },
 
-  getCheckLists : function(criteria, value){
+  getCheckLists : function(criteria, value, skip){
     if(criteria && value){
-      var url = "/checkList?" + criteria + "=" + value;
+      var url = "/checkList?skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      var url = "/checkList";
+      var url = "/checkList?skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -263,11 +263,11 @@ module.exports = {
     });
   },
 
-  getCoupons : function(criteria, value){
+  getCoupons : function(criteria, value, skip){
     if(criteria && value){
-      var url = "/coupon?" + criteria + "=" + value;
+      var url = "/coupon?skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      var url = "/coupon";
+      var url = "/coupon?skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -366,69 +366,71 @@ module.exports = {
     }
   },
 
-  search : function(model, criteria, content){
+  search : function(model, criteria, content, pageIndex){
+    pageIndex = pageIndex || 0;
+    var skip = pageIndex * 30;
     switch (model){
       case "User":
         if(criteria == "id" && content){
           this.getUser(content);
         }else{
-          this.getUsers(criteria,content);
+          this.getUsers(criteria,content,skip);
         }
         break;
       case "Host":
         if(criteria == "id" && content){
           this.getHost(content)
         }else{
-          this.getHosts(criteria,content);
+          this.getHosts(criteria,content,skip);
         }
         break;
       case "Meal":
         if(criteria == "id" && content){
           this.getMeal(content);
         }else{
-          this.getMeals(criteria,content);
+          this.getMeals(criteria,content,skip);
         }
         break;
       case "Dish":
         if(criteria == "id" && content){
           this.getDish(content);
         }else{
-          this.getDishes(criteria,content);
+          this.getDishes(criteria,content,skip);
         }
         break;
       case "Order":
         if(criteria == "id" && content){
           this.getOrder(content);
         }else{
-          this.getOrders(criteria,content);
+          this.getOrders(criteria,content,skip);
         }
         break;
       case "Transaction":
         if(criteria == "id" && content){
           this.getTransaction(content);
         }else{
-          this.getTransactions(criteria,content);
+          this.getTransactions(criteria,content,skip);
         }
         break;
       case "Job":
         if(criteria == "id" && content){
           this.getJob(content);
         }else{
-          this.getJobs(criteria, content);
+          this.getJobs(criteria, content,skip);
         }
         break;
       case "Checklist":
         if(criteria == "id" && content){
           this.getCheckList(content);
         }else{
-          this.getCheckLists(criteria, content);
+          this.getCheckLists(criteria, content,skip);
         }
         break;
       case "Coupon":
         if(criteria == "id" && content){
           this.getCoupon(content);
         }else{
-          this.getCoupons(criteria, content);
+          this.getCoupons(criteria, content,skip);
         }
         break;
     }

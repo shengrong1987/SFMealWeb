@@ -76,7 +76,7 @@ var Table = React.createClass({
   },
 
   componentWillReceiveProps : function(nextProps){
-    this.state = this.getStateFromStore(nextProps.model);
+    this.setState(this.getStateFromStore(nextProps.model));
   },
 
   componentDidMount: function () {
