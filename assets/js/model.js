@@ -2758,6 +2758,7 @@ var MealConfirmView = Backbone.View.extend({
     var value = this.$el.find("#method button.active").attr("value");
     if(value == "pickup"){
       $('#contactInfoView').removeClass('hide');
+      $('#contactInfoView').show();
     }else{
       // e.data = {mt : this};
       toggleModal(e, addressView.enterAddressInfoFromOrder);
@@ -2770,12 +2771,18 @@ var MealConfirmView = Backbone.View.extend({
     if(value == "delivery"){
       this.$el.find(".deliveryInput").show();
       if(isLogin){
+        $('#contactInfoView').hide();
         this.switchAddress(e);
       }else{
         this.verifyAddress(e);
       }
     }else{
       this.$el.find(".deliveryInput").hide();
+      if(isLogin){
+        $('#contactInfoView').hide();
+      }else{
+        $('#contactInfoView').show();
+      }
     }
     refreshMenu();
   },
@@ -2867,14 +2874,18 @@ var MealConfirmView = Backbone.View.extend({
           return;
         }
         makeAToast(jQuery.i18n.prop('addressValid'),'success');
-        cb(true);
+        if(cb){
+          cb(true);
+        }
       })
       setTimeout(function(){
         $this.isCoolDown = true;
       }, cdTime);
     }else {
       makeAToast(jQuery.i18n.prop("apiCooldown"));
-      cb(true);
+      if(cb){
+        cb(true);
+      }
     }
   },
   applyCouponCode : function(e) {
