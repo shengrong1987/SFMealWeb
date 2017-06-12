@@ -33,7 +33,7 @@ module.exports = require('waterlock').waterlocked({
       criteria = { },
       scopeKey = 'email';
     if(!params.password || !params.email){
-      return res.serverError({code : -2, text : req.__('user-credential-needed')});
+      return res.badRequest({code : -2, responseText : req.__('user-credential-needed')});
     }
     var attr = {
       password: params.password
@@ -42,11 +42,11 @@ module.exports = require('waterlock').waterlocked({
     criteria[scopeKey] = attr[scopeKey];
     waterlock.engine.findAuth(criteria, function(err, user) {
       if(user){
-        return res.badRequest({code : -1, text : req.__('user-exist-error')});
+        return res.badRequest({code : -1, responseText : req.__('user-exist-error')});
       }else{
         waterlock.engine.findOrCreateAuth(criteria, attr, function(err, user) {
           if(err){
-            return res.serverError(err);
+            return res.badRequest(err);
           }
           var typeOfUser = params.receivedEmail ? "subscriber" : "member";
           mailChimp.addMemberToList({ email : params.email, firstname : params.firstname, lastname : params.lastname, language : req.getLocale() }, typeOfUser);

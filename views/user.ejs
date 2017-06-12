@@ -69,8 +69,8 @@
                       <tbody class="item" style="vertical-align: middle;">
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.address%></br>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> <%= order.customerName || ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address %> </br>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -133,13 +133,13 @@
                             <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                           <%}else if(order.status == "ready"){%>
                             <% if(order.method == 'pickup'){%>
-                              <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.address %>"><%= __('see-address')%></a><br/>
+                              <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.contactInfo.address %>"><%= __('see-address')%></a><br/>
                             <%}%>
                             <a href="javascript:void(0)"><%= __('Track-order')%></a><br/>
                             <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                           <%}else if(order.status == "review"){%>
                             <% if(order.method == 'pickup'){%>
-                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.address%>"><%= __('see-address')%></a><br/>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.contactInfo.address%>"><%= __('see-address')%></a><br/>
                             <%}%>
                             <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a><br/>
                             <a href="#myreview"><%= __('review')%></a>
@@ -179,8 +179,8 @@
                       <tbody class="item">
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.address%></br>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> <%= order.customerName || ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address%></br>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -270,8 +270,8 @@
                       <tbody class="item">
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.address%></br>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> <%= order.customerName || ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address%></br>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -343,8 +343,8 @@
                       <tbody class="item">
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.address%></br>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> <%= order.customerName || ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address%></br>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -417,8 +417,8 @@
                       <tbody class="item" style="vertical-align: middle;">
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.address%></br>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> <%= order.customerName || ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address%></br>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -454,7 +454,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'pickup'){%>
-                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.address%>"><%= __('see-address')%></a><br/>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.contactInfo.address%>"><%= __('see-address')%></a><br/>
                           <%}%>
                           <a href="javascript:void(0)"><%= __('Track-order')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
@@ -492,8 +492,8 @@
                       <tbody class="item">
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.address%></br>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> <%= order.customerName || ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address%></br>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -529,7 +529,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'pickup'){%>
-                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.address %>"><%= __('see-address')%></a><br/>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.contactInfo.address %>"><%= __('see-address')%></a><br/>
                           <%}%>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a><br/>
                           <a href="#myreview"><%= __('review')%></a>
@@ -579,8 +579,8 @@
                       <tbody class="item" style="vertical-align: middle;">
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-time')%></b>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> <%= order.customerName || ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -642,13 +642,13 @@
                             <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                             <%}else if(order.status == "ready"){%>
                             <% if(order.method == 'pickup'){%>
-                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.address%>"><%= __('see-address')%></a><br/>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.contactInfo.address%>"><%= __('see-address')%></a><br/>
                             <%}%>
                             <a href="javascript:void(0)"><%= __('Track-order')%></a><br/>
                             <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                             <%}else if(order.status == "review"){%>
                             <% if(order.method == 'pickup'){%>
-                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.address%>"><%= __('see-address')%></a><br/>
+                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.contactInfo.address%>"><%= __('see-address')%></a><br/>
                             <%}%>
                             <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a><br/>
                             <a href="#myreview"><%= __('review')%></a>
@@ -687,8 +687,8 @@
                       <% if(order.pickupInfo){%>
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-time')%></b>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= user ?  user.firstname : __('user')%> <%= order.customerName || ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
                       </tr>
                       <%}%>
                       <%
@@ -777,8 +777,8 @@
                       <% if(order.pickupInfo){%>
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-time')%></b>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= user ?  user.firstname : __('user')%> <%= order.customerName || ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
                       </tr>
                       <%}%>
                       <%
@@ -852,8 +852,8 @@
                       <% if(order.pickupInfo){%>
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-time')%></b>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> <%= order.customerName || ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
                       </tr>
                       <%}%>
                       <%
@@ -926,8 +926,8 @@
                       <% if(order.pickupInfo){%>
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-time')%></b>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= user ?  order.customer.firstname : __('user')%> <%= user ? order.customer.lastname : ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
                       </tr>
                       <%}%>
                       <%
@@ -964,7 +964,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'pickup'){%>
-                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.address%>"><%= __('see-address')%></a><br/>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.contactInfo.address%>"><%= __('see-address')%></a><br/>
                           <%}%>
                           <a href="javascript:void(0)"><%= __('Track-order')%></a><br/>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
@@ -1003,8 +1003,8 @@
                       <% if(order.pickupInfo){%>
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-time')%></b>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> <%= order.customerName || ''%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
                       </tr>
                       <%}%>
                       <%
@@ -1042,7 +1042,7 @@
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'pickup'){%>
-                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.address%>"><%= __('see-address')%></a><br/>
+                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.contactInfo.address%>"><%= __('see-address')%></a><br/>
                           <%}%>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a><br/>
                           <a href="#myreview"><%= __('review')%></a>

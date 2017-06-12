@@ -185,8 +185,12 @@ module.exports = {
       }
     },
 
-    dispatchingHour : function() {
-      return dateUtil.formattedHour(this.pickupFromTime) + " - " + dateUtil.formattedHour(this.pickupTillTime);
+    dispatchingHour : function(from, till) {
+      return dateUtil.formattedHour(from) + " - " + dateUtil.formattedHour(till);
+    },
+
+    getTimeOfDay : function(date){
+      return dateUtil.getTimeOfDay(date);
     },
 
     dateIsValid : function(params){
@@ -235,6 +239,14 @@ module.exports = {
 
     getTaxRate : function(){
       return util.getTaxRate(this.chef.county);
+    },
+
+    getMonthName : function(date){
+      return util.getMonthNameFromDate(date);
+    },
+
+    getDateFromDate : function(date){
+      return util.getDateFromDate(date);
     }
   },
 

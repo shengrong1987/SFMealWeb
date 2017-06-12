@@ -71,6 +71,8 @@ module.exports.routes = {
   '/order/:id/receive' : 'OrderController.receive',
   '/order/:id/abort' : 'OrderController.abort',
   '/order/:id/refund' : 'OrderController.refund',
+  '/order/:id/receipt' : "OrderController.receipt",
+  '/order/:id/receipt/download' : "OrderController.downloadReceipt",
   '/auth/resetForm' : "AuthController.resetForm",
   "/apply" : "HostController.apply",
   '/email/test' : { view : 'emailTemplates/chefSelect/html'},

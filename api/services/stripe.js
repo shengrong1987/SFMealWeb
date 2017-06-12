@@ -197,6 +197,9 @@ module.exports = {
           );
         });
       }else{
+        if(!attr.metadata.userId){
+          return cb(null, charge);
+        }
         $this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
           if(err){
             return cb(err);

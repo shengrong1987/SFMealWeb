@@ -531,7 +531,7 @@ input:focus{
 @white : white;
 @orange : #ff931e;
 @grey : #999999;
-@light-grey : #e6e6e6;
+@light-grey : #eee;
 @medium-grey : #999999;
 @dark-grey : #4b4b4b;
 @black : black;
@@ -634,8 +634,16 @@ input:focus{
   color: @yellow !important;
 }
 
+.text-pink{
+  color : @pink !important;
+}
+
 .text-blue{
   color : @blue !important;
+}
+
+.text-dark-blue{
+  color : @dark-blue !important;
 }
 
 .text-background{
@@ -733,8 +741,134 @@ label {
   font-size: 32px;
 }
 
+.regular-radio[data-color='red']:checked + label:after {
+  content: ' ';
+  width: 12px;
+  height: 12px;
+  border-radius: 50px;
+  position: absolute;
+  top: 3px;
+  background: @red;
+  box-shadow: inset 0px 0px 10px rgba(0,0,0,0.3);
+  text-shadow: 0px;
+  left: 3px;
+  font-size: 32px;
+}
+
+.regular-radio[data-color='blue']:checked + label:after {
+  content: ' ';
+  width: 12px;
+  height: 12px;
+  border-radius: 50px;
+  position: absolute;
+  top: 3px;
+  background: @blue;
+  box-shadow: inset 0px 0px 10px rgba(0,0,0,0.3);
+  text-shadow: 0px;
+  left: 3px;
+  font-size: 32px;
+}
+
+.regular-radio[data-color='green']:checked + label:after {
+  content: ' ';
+  width: 12px;
+  height: 12px;
+  border-radius: 50px;
+  position: absolute;
+  top: 3px;
+  background: @green;
+  box-shadow: inset 0px 0px 10px rgba(0,0,0,0.3);
+  text-shadow: 0px;
+  left: 3px;
+  font-size: 32px;
+}
+
+.regular-radio[data-color='pink']:checked + label:after {
+  content: ' ';
+  width: 12px;
+  height: 12px;
+  border-radius: 50px;
+  position: absolute;
+  top: 3px;
+  background: @pink;
+  box-shadow: inset 0px 0px 10px rgba(0,0,0,0.3);
+  text-shadow: 0px;
+  left: 3px;
+  font-size: 32px;
+}
+
+.regular-radio[data-color='yellow']:checked + label:after {
+  content: ' ';
+  width: 12px;
+  height: 12px;
+  border-radius: 50px;
+  position: absolute;
+  top: 3px;
+  background: @yellow;
+  box-shadow: inset 0px 0px 10px rgba(0,0,0,0.3);
+  text-shadow: 0px;
+  left: 3px;
+  font-size: 32px;
+}
+
+.regular-radio[data-color='orange']:checked + label:after {
+  content: ' ';
+  width: 12px;
+  height: 12px;
+  border-radius: 50px;
+  position: absolute;
+  top: 3px;
+  background: @orange;
+  box-shadow: inset 0px 0px 10px rgba(0,0,0,0.3);
+  text-shadow: 0px;
+  left: 3px;
+  font-size: 32px;
+}
+
+.regular-radio[data-color='dark-blue']:checked + label:after {
+  content: ' ';
+  width: 12px;
+  height: 12px;
+  border-radius: 50px;
+  position: absolute;
+  top: 3px;
+  background: @dark-blue;
+  box-shadow: inset 0px 0px 10px rgba(0,0,0,0.3);
+  text-shadow: 0px;
+  left: 3px;
+  font-size: 32px;
+}
+
 .regular-radio:checked + label + span{
   color: @red;
+}
+
+.regular-radio[data-color='red']:checked + label + span{
+  color: @red;
+}
+
+.regular-radio[data-color='blue']:checked + label + span{
+  color: @blue;
+}
+
+.regular-radio[data-color='green']:checked + label + span{
+  color: @green;
+}
+
+.regular-radio[data-color='pink']:checked + label + span{
+  color: @pink;
+}
+
+.regular-radio[data-color='yellow']:checked + label + span{
+  color: @yellow;
+}
+
+.regular-radio[data-color='orange']:checked + label + span{
+   color: @orange;
+ }
+
+.regular-radio[data-color='dark-blue']:checked + label + span{
+  color: @dark-blue;
 }
 
 .regular-radio:checked + label {
@@ -770,6 +904,40 @@ label {
 .checkbox input[type=checkbox]:checked + label {
   text-decoration: line-through;
   color: rgb(128, 144, 160);
+}
+
+/* pickup option*/
+.option{
+  .content.adjust{
+    position: relative;
+    top: -35px;
+    left : 30px;
+  }
+  .text-left;
+  height : auto !important;
+  white-space : inherit;
+  .vertical-inline;
+  margin-top:5px;
+}
+
+/* pickup date*/
+.pickup-date{
+  width:100%;
+  display: inline-block;
+  color: #fff;
+  padding: 5px 0;
+  text-align: center;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  > span:first-child{
+    background: #55c3be;
+  }
+  > span:last-child{
+    display: block;
+    border-radius: 0 0 5px 5px;
+    color: #4c566b;
+    box-shadow: 0 0 5px rgba(0,0,0,.1)
+  }
 }
 
 /*label*/
@@ -808,25 +976,6 @@ label {
 }
 #toast > .toast-success:before {
   content: "\f00c";
-}
-
-/* multiline label*/
-@font-size: 16px;
-@line-height: 1.4;
-@lines-to-show: 3;
-
-.multi-line-label {
-  display: block; /* Fallback for non-webkit */
-  display: -webkit-box;
-  max-width: 400px;
-  height: @font-size*@line-height*@lines-to-show; /* Fallback for non-webkit */
-  margin: 0 auto;
-  font-size: @font-size;
-  line-height: @line-height;
-  -webkit-line-clamp: @lines-to-show;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /*button*/
@@ -1366,7 +1515,7 @@ fieldset[disabled] .btn-red.active {
 
 .compact-banner{
   height: 150px;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
   .img-wrapper {
     height: 150px;
     overflow: hidden;
@@ -1382,7 +1531,7 @@ fieldset[disabled] .btn-red.active {
   }
 
   .logo{
-    top: 10px;
+    top: 30px;
     left: 10%;
   }
 }
@@ -1514,7 +1663,8 @@ fieldset[disabled] .btn-red.active {
 }
 
 .chef-cell{
-  padding : 5px 5px 8px 10px;
+  padding : 15px 0px 5px 0px;
+  .light-grey;
 }
 
 .category-cell{
@@ -1893,8 +2043,53 @@ fieldset[disabled] .btn-red.active {
   position: static;
 }
 
+@font-size: 15px;
+@line-height: 1.4;
+@lines-to-show: 3;
+
+/* multiline label*/
+.multi-line-label {
+  display: block; /* Fallback for non-webkit */
+  display: -webkit-box;
+  max-width: 400px;
+  height: @font-size*@line-height*@lines-to-show; /* Fallback for non-webkit */
+  margin: 0 auto;
+  font-size: @font-size;
+  line-height: @line-height;
+  -webkit-line-clamp: @lines-to-show;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/*
+ screen width specification
+*/
 
 @media (min-width: 768px){
+
+  @font-size: 15px;
+  @line-height: 1.4;
+  @lines-to-show: 2;
+
+  /* multiline label*/
+  .multi-line-label {
+    display: block; /* Fallback for non-webkit */
+    display: -webkit-box;
+    max-width: 400px;
+    height: @font-size*@line-height*@lines-to-show; /* Fallback for non-webkit */
+    margin: 0 auto;
+    font-size: @font-size;
+    line-height: @line-height;
+    -webkit-line-clamp: @lines-to-show;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #googlemap{
+    display: block;
+  }
 
   #shoppingCartView{
     display: none;;
@@ -1929,35 +2124,8 @@ fieldset[disabled] .btn-red.active {
     }
   }
 
-  #dishEditView{
+  #dishEditView, #dishNewView, #order, #preorder, #myorder, #mymeal, #myinfo, #mealCreatingView, #mealEditingView{
     width : 90%;
-  }
-  #dishNewView{
-    width : 90%;
-  }
-  #order{
-    width : 90%;
-  }
-  #preorder{
-    width: 90%;
-  }
-  #myorder{
-    width : 90%;
-  }
-  #mymeal{
-    width : 90%;
-  }
-  #mydish{
-    width : 90%;
-  }
-  #myinfo{
-    width : 90%;
-  }
-  #mealCreatingView{
-    width: 90%;
-  }
-  #mealEditingView{
-    width: 90%;
   }
 
   .dish-operator{
@@ -1981,29 +2149,131 @@ fieldset[disabled] .btn-red.active {
   }
 }
 
+@media (min-width: 992px) {
+
+  @font-size: 15px;
+  @line-height: 1.4;
+  @lines-to-show: 2;
+
+  /* multiline label*/
+  .multi-line-label {
+    display: block; /* Fallback for non-webkit */
+    display: -webkit-box;
+    max-width: 400px;
+    height: @font-size*@line-height*@lines-to-show; /* Fallback for non-webkit */
+    margin: 0 auto;
+    font-size: @font-size;
+    line-height: @line-height;
+    -webkit-line-clamp: @lines-to-show;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cell .box-primary{
+    padding: 15px 50px 15px 50px;
+    border-radius: 10px;
+  }
+
+  .pickup-date{
+    width:100%;
+    display: inline-block;
+    color: #fff;
+    padding: 5px 0;
+    text-align: center;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    > span:first-child{
+      background: #55c3be;
+    }
+    > span:last-child{
+      display: block;
+      border-radius: 0 0 5px 5px;
+      color: #4c566b;
+      box-shadow: 0 0 5px rgba(0,0,0,.1);
+      font-size: 16px;
+    }
+  }
+}
+
+@media (min-width: 1200px) {
+
+  @font-size: 15px;
+  @line-height: 1.4;
+  @lines-to-show: 2;
+
+  /* multiline label*/
+  .multi-line-label {
+    display: block; /* Fallback for non-webkit */
+    display: -webkit-box;
+    max-width: 400px;
+    height: @font-size*@line-height*@lines-to-show; /* Fallback for non-webkit */
+    margin: 0 auto;
+    font-size: @font-size;
+    line-height: @line-height;
+    -webkit-line-clamp: @lines-to-show;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cell .box-primary{
+    padding: 30px;
+    border-radius: 10px;
+  }
+
+  .pickup-date{
+    width:100%;
+    display: inline-block;
+    color: #fff;
+    padding: 5px 0;
+    text-align: center;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    > span:first-child{
+      background: #55c3be;
+    }
+    > span:last-child{
+      display: block;
+      border-radius: 0 0 5px 5px;
+      color: #4c566b;
+      box-shadow: 0 0 5px rgba(0,0,0,.1);
+      font-size: 24px;
+    }
+  }
+}
+
+@media (min-width: 1600px) {
+  @font-size: 15px;
+  @line-height: 1.4;
+  @lines-to-show: 1;
+
+  /* multiline label*/
+  .multi-line-label {
+    display: block; /* Fallback for non-webkit */
+    display: -webkit-box;
+    max-width: 400px;
+    height: @font-size*@line-height*@lines-to-show; /* Fallback for non-webkit */
+    margin: 0 auto;
+    font-size: @font-size;
+    line-height: @line-height;
+    -webkit-line-clamp: @lines-to-show;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 @media (max-width : 1600px) {
   #our-story {
     width: 80%;
   }
 }
 
+
 @media (max-width: 1200px){
   .preorder-box{
     width: 90%;
-  }
-}
-
-@media (min-width: 992px) {
-  .cell .box-primary{
-    padding: 15px 50px 15px 50px;
-    border-radius: 10px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .cell .box-primary{
-    padding: 30px;
-    border-radius: 10px;
   }
 }
 
@@ -2022,9 +2292,52 @@ fieldset[disabled] .btn-red.active {
     padding: 15px;
     border-radius: 10px;
   }
+
+  .pickup-date{
+    width:100%;
+    display: inline-block;
+    color: #fff;
+    padding: 5px 0;
+    text-align: center;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    > span:first-child{
+      background: #55c3be;
+    }
+    > span:last-child{
+      display: block;
+      border-radius: 0 0 5px 5px;
+      font-size: 22px;
+      color: #4c566b;
+      box-shadow: 0 0 5px rgba(0,0,0,.1)
+    }
+  }
 }
 
-@media (max-width: 768px){
+@media (max-width: 767px){
+
+  #googlemap{
+    display: none;
+  }
+
+  .pickup-date{
+    width:100%;
+    display: inline-block;
+    color: #fff;
+    padding: 5px 0;
+    text-align: center;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    > span:first-child{
+      background: #55c3be;
+    }
+    > span:last-child{
+      display: block;
+      border-radius: 0 0 5px 5px;
+      color: #4c566b;
+      box-shadow: 0 0 5px rgba(0,0,0,.1)
+    }
+  }
 
   .cell .box-primary{
     padding: 50px;
@@ -2035,40 +2348,14 @@ fieldset[disabled] .btn-red.active {
     display: inline-flex;;
   }
 
-  .xs-hide{
+  .xs-hide, #our-story img{
     display: none;
   }
 
-  #dishNewView{
+  #dishNewView, #dishEditView, #order, #preorder, #myorder, #mymeal, #mydish, #myinfo, #mealCreatingView, .default-container{
     width : 100%;
   }
-  #dishEditView{
-    width : 100%;
-  }
-  #order{
-    width : 100%;
-  }
-  #preorder{
-    width: 100%;
-  }
-  #myorder{
-    width : 100%;
-  }
-  #mymeal{
-    width : 100%;
-  }
-  #mydish{
-    width : 100%;
-  }
-  #myinfo{
-    width : 100%;
-  }
-  #mealCreatingView{
-    width: 100%;
-  }
-  #our-story img{
-    display: none;
-  }
+
   .gs-reactions{
     text-align: center !important;
   }
@@ -2086,11 +2373,7 @@ fieldset[disabled] .btn-red.active {
     }
   }
 
-  .box-cell-left{
-    margin: auto;
-  }
-
-  .box-cell-right{
+  .box-cell-left, .box-cell-right{
     margin: auto;
   }
 
@@ -2168,10 +2451,6 @@ fieldset[disabled] .btn-red.active {
     display: none !important;
   }
 
-  .default-container{
-    width: 100%;
-  }
-
   #meal-container .title button{
     position: relative;
     left: 0;
@@ -2183,24 +2462,22 @@ fieldset[disabled] .btn-red.active {
   }
 
   .compact-banner{
-    height: 200px;
+    height: 100px;
     margin-bottom: 30px;
     .img-wrapper {
-      height: 200px;
+      height: 100px;
       overflow: hidden;
     }
     .img-wrapper img{
       width: 100%;
-      min-height: 200px;
-    }
-    .content{
-      //width: 410px;
-      //margin: auto;
+      min-height: 120px;
     }
 
     .logo{
-      top: 10px;
+      top: 20px;
       left: 10%;
     }
   }
 }
+
+

@@ -13,6 +13,7 @@ before(function(done) {
 describe('OrderController', function() {
 
   this.timeout(20000);
+  var address = "1974 Palou Ave, San Francisco, CA 94124";
 
   describe('', function() {
 
@@ -21,7 +22,6 @@ describe('OrderController', function() {
     var hostEmail = 'aimbebe.r@gmail.com';
     var password = '12345678';
     var guestId = "";
-    var address = "1974 Palou Ave, San Francisco";
     var farAddress = "7116 Tiant way, Elk Grove, CA 95758";
     var phone = "1-415-802-3853";
 
@@ -90,7 +90,7 @@ describe('OrderController', function() {
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
-        .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : address, customerPhone : phone, method : "delivery", mealId : mealId, pickupOption : 1})
+        .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, contactInfo : { address : address, phone : phone }, method : "delivery", mealId : mealId, pickupOption : 1})
         .expect(400)
         .end(function(err,res){
           if(err){
@@ -109,7 +109,7 @@ describe('OrderController', function() {
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
-        .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : address, customerPhone : phone, method : "delivery", mealId : mealId})
+        .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, contactInfo : { address : address, phone : phone }, method : "delivery", mealId : mealId})
         .expect(400)
         .end(function(err,res){
           if(err){
@@ -128,7 +128,7 @@ describe('OrderController', function() {
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
-        .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : farAddress, customerPhone : phone, method : "delivery", mealId : mealId, pickupOption : 2})
+        .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, contactInfo : { address : farAddress, phone : phone }, method : "delivery", mealId : mealId, pickupOption : 2})
         .expect(400)
         .end(function(err,res){
           if(err){
@@ -138,6 +138,86 @@ describe('OrderController', function() {
           if(res.body.code != -6){
             return done(Error("not getting address out of range error"));
           }
+          done();
+        })
+    })
+
+    it('should order the meal with delivery but get lack of phone error', function (done) {
+      var dishObj = {};
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 1 + price2 * 2,
+          contactInfo : { address : address },
+          paymentInfo : { method : 'online'},
+          method : "delivery",
+          mealId : mealId,
+          pickupOption : 2})
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-31);
+          done();
+        })
+    })
+
+    it('should order the meal with pickup but get lack of name error', function (done) {
+      var dishObj = {};
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 1 + price2 * 2,
+          contactInfo : { phone : phone },
+          paymentInfo : { method : 'online'},
+          method : "pickup",
+          mealId : mealId,
+          pickupOption : 1
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-31);
+          done();
+        })
+    })
+
+    it('should order the meal with pickup but get lack of phone error', function (done) {
+      var dishObj = {};
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 1 + price2 * 2,
+          contactInfo : { name : "sheng" },
+          paymentInfo : { method : 'online'},
+          method : "pickup",
+          mealId : mealId,
+          pickupOption : 1
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-31);
           done();
         })
     })
@@ -157,9 +237,15 @@ describe('OrderController', function() {
             orders : dishObj,
             subtotal : subtotal,
             pickupOption : 1,
-            customerPhone : phone,
             method : "pickup",
-            mealId : mealId
+            mealId : mealId,
+            contactInfo : {
+              name : 'sheng',
+              phone : phone
+            },
+            paymentInfo : {
+              method : 'online'
+            }
           })
           .expect(200)
           .end(function(err,res){
@@ -170,6 +256,8 @@ describe('OrderController', function() {
             var chargesTotal = Math.round(((price1 * 1 + price2 * 2 + (price4*2 + 2)) * 1.085 + 1) * 100);
             userPoints += Math.floor(chargesTotal / 100);
             res.body.tax.should.be.equal(tax);
+            res.body.customerName.should.be.equal('sheng');
+            res.body.customerPhone.should.be.equal(phone);
             res.body.customer.should.be.equal(guestId);
             Object.keys(res.body.charges).should.have.length(1);
             res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(chargesTotal);
@@ -199,7 +287,14 @@ describe('OrderController', function() {
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}]  };
       agent
         .post('/order')
-        .send({orders : dishObj, subtotal : price1 * 1 + price2 * 1, address : address, customerPhone : phone, method : "delivery", mealId : mealId, delivery_fee : 0})
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 1 + price2 * 1,
+          contactInfo : { address : address, phone : phone },
+          paymentInfo : { method : 'online'},
+          method : "delivery",
+          mealId : mealId,
+          })
         .expect(400)
         .end(function(err,res){
           if(err){
@@ -218,7 +313,15 @@ describe('OrderController', function() {
       dishObj[dishId4] = { number : 1 , preference : [{ property : 'super sweet', extra : 5}]};
       agent
         .post('/order')
-        .send({orders : dishObj, subtotal : price4 * 1, address : address, customerPhone : phone, method : "delivery", mealId : mealId, delivery_fee : 0, pickupOption : 2})
+        .send({
+          orders : dishObj,
+          subtotal : price4 * 1,
+          contactInfo : { address : address, phone : phone },
+          paymentInfo : { method : 'online'},
+          method : "delivery",
+          mealId : mealId,
+          pickupOption : 2
+        })
         .expect(400)
         .end(function(err,res){
           if(err){
@@ -237,7 +340,15 @@ describe('OrderController', function() {
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
           .post('/order')
-          .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, address : address, customerPhone : phone, method : "delivery", mealId : mealId, delivery_fee : 0, pickupOption : 2})
+          .send({
+            orders : dishObj,
+            subtotal : price1 * 1 + price2 * 2,
+            contactInfo : { address : address, phone : phone },
+            paymentInfo : { method : 'online'},
+            method : "delivery",
+            mealId : mealId,
+            pickupOption : 2
+          })
           .expect(400)
           .end(function(err,res){
             if(err){
@@ -256,7 +367,11 @@ describe('OrderController', function() {
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
           .post('/order/' + orderId + "/adjust")
-          .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, mealId : mealId, delivery_fee : 0})
+          .send({
+            orders : dishObj,
+            subtotal : price1 * 1 + price2 * 2,
+            mealId : mealId
+            })
           .expect(400)
           .end(function(err,res){
             if(err){
@@ -335,7 +450,6 @@ describe('OrderController', function() {
         })
     });
 
-
     it('should not order the meal with insufficient points', function (done) {
       var dishObj = {};
       dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
@@ -347,12 +461,11 @@ describe('OrderController', function() {
         .send({
           orders : dishObj,
           subtotal : price3 * 1,
-          address : address,
-          customerPhone : phone,
+          contactInfo : { name : "sheng", address : address, phone : phone },
+          paymentInfo : { method : 'online'},
           method : "delivery",
           pickupOption : 2,
           mealId : mealId,
-          delivery_fee : 0,
           points : 30
         })
         .expect(400)
@@ -376,12 +489,11 @@ describe('OrderController', function() {
         .send({
           orders : dishObj,
           subtotal : price1 * 1,
-          address : address,
-          customerPhone : phone,
+          contactInfo : { name : "sheng", address : address, phone : phone },
+          paymentInfo : { method : 'online'},
           method : "delivery",
           pickupOption : 2,
           mealId : mealId,
-          delivery_fee : 0,
           points : 10,
           couponCode : 'XMAS'
         })
@@ -403,7 +515,7 @@ describe('OrderController', function() {
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order/' + orderId + "/adjust")
-        .send({orders : dishObj, subtotal : price2 + price3, mealId : mealId, delivery_fee : 0})
+        .send({orders : dishObj, subtotal : price2 + price3, mealId : mealId})
         .expect(200)
         .end(function(err,res){
           if(err){
@@ -477,12 +589,11 @@ describe('OrderController', function() {
         .send({
           orders : dishObj,
           subtotal : price1 * 1 + price2 * 2,
-          address : address,
-          customerPhone : phone,
+          contactInfo : { name : "sheng", address : address, phone : phone },
+          paymentInfo : { method : 'online'},
           method : "delivery",
           pickupOption : 2,
-          mealId : mealId,
-          delivery_fee : 0
+          mealId : mealId
         })
         .expect(200)
         .end(function(err,res){
@@ -490,7 +601,7 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body.customer.should.be.equal(guestId);
-          res.body.customerName.should.be.equal("guest");
+          res.body.customerName.should.be.equal("sheng");
           orderId = res.body.id;
           done();
         })
@@ -507,8 +618,8 @@ describe('OrderController', function() {
         .send({
           orders : dishObj,
           subtotal : price3 * 1,
-          address : address,
-          customerPhone : phone,
+          contactInfo : { name : "sheng", address : address, phone : phone },
+          paymentInfo : { method : 'online'},
           method : "delivery",
           pickupOption : 2,
           mealId : mealId,
@@ -951,6 +1062,7 @@ describe('OrderController', function() {
       var price1;
       var price2;
       var price3;
+
       it('should get a order meal', function (done) {
         agent
           .get('/meal')
@@ -988,7 +1100,8 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price1 * 1 + price2 * 2,
-            customerPhone : phone,
+            contactInfo : { name : "sheng", address : address, phone : phone },
+            paymentInfo : { method : 'online'},
             method : "delivery",
             mealId : mealId,
             pickupOption : 2
@@ -1045,7 +1158,8 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price1 * 1 + price2 * 1,
-            customerPhone : phone,
+            contactInfo : { name : "sheng", address : address, phone : phone },
+            paymentInfo : { method : 'online'},
             pickupOption : 2,
             method : "delivery",
             mealId : mealId,
@@ -1183,7 +1297,8 @@ describe('OrderController', function() {
           orders : dishObj,
           subtotal : price1 * 1,
           pickupOption : 1,
-          customerPhone : phone,
+          contactInfo : { name : "sheng", address : address, phone : phone },
+          paymentInfo : { method : 'online'},
           method : "pickup",
           mealId : mealId,
           couponCode : "XMAS"
@@ -1213,7 +1328,8 @@ describe('OrderController', function() {
           orders : dishObj,
           subtotal : price1 * 1,
           pickupOption : 1,
-          customerPhone : phone,
+          contactInfo : { name : "sheng", address : address, phone : phone },
+          paymentInfo : { method : 'online'},
           method : "pickup",
           mealId : mealId,
           couponCode : "5Dollar"
@@ -1243,7 +1359,8 @@ describe('OrderController', function() {
           orders : dishObj,
           subtotal : price3 * 1,
           pickupOption : 1,
-          customerPhone : phone,
+          contactInfo : { name : "sheng", address : address, phone : phone },
+          paymentInfo : { method : 'online'},
           method : "pickup",
           mealId : mealId,
           couponCode : "XMAS"
@@ -1294,10 +1411,9 @@ describe('OrderController', function() {
           done();
         })
     });
-
   })
 
-  describe('order a meal with coupon', function() {
+  describe('order a meal with cash', function() {
     var mealId;
     var dishId1;
     var dishId2;
@@ -1376,17 +1492,17 @@ describe('OrderController', function() {
           orders : dishObj,
           subtotal : price3 * 1,
           pickupOption : 1,
-          customerPhone : phone,
+          contactInfo : {},
+          paymentInfo : { method : 'cash'},
           method : "pickup",
-          mealId : mealId,
-          paymentMethod : 'cash'
+          mealId : mealId
         })
         .expect(400)
         .end(function(err,res){
           if(err){
             return done(err);
           }
-          res.body.code.should.be.equal(-27);
+          res.body.code.should.be.equal(-31);
           done();
         })
     });
@@ -1398,7 +1514,7 @@ describe('OrderController', function() {
         .put('/user/' + userId)
         .send({
           firstname : customerName,
-          phone : phone
+          phone : customerPhone
         })
         .expect(200)
         .end(function(err,res){
@@ -1418,10 +1534,10 @@ describe('OrderController', function() {
           orders : dishObj,
           subtotal : price3 * 1,
           pickupOption : 1,
-          customerPhone : customerPhone,
+          contactInfo : {},
+          paymentInfo : { method : 'cash'},
           method : "pickup",
-          mealId : mealId,
-          paymentMethod : 'cash'
+          mealId : mealId
         })
         .expect(200)
         .end(function(err,res){
@@ -1481,10 +1597,10 @@ describe('OrderController', function() {
           orders : dishObj,
           subtotal : price3 * 1,
           pickupOption : 1,
-          customerPhone : customerPhone,
           method : "pickup",
           mealId : mealId,
-          paymentMethod : 'cash'
+          contactInfo : {},
+          paymentInfo : { method : 'cash'}
         })
         .expect(200)
         .end(function(err,res){

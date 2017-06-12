@@ -262,7 +262,6 @@ module.exports = {
             res.ok(payment[0]);
           });
         })
-
       })
     });
   },

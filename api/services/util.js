@@ -19,9 +19,28 @@ module.exports = {
     var mDate = moment(date);
     return mDate.local().format("LT");
   },
+  hourOfDay : function(m){
+    return m.hours();
+  },
+  getTimeOfDay : function(date){
+    var h = this.hourOfDay(moment(date));
+    if(h < 12){
+      return "am";
+    }else{
+      return "pm";
+    }
+  },
   formattedDate : function(date){
     var mDate = moment(date);
-    return mDate.local().format("MMM Do YYYY");
+    return mDate.local().format("MMM D");
+  },
+  getMonthNameFromDate : function(date){
+    var mDate = moment(date);
+    return moment.months()[mDate.month()];
+  },
+  getDateFromDate : function(date){
+    var mDate = moment(date);
+    return mDate.date();
   },
   monthDesc : function(value){
     var month = "";

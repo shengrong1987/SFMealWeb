@@ -783,85 +783,12 @@ var AddressView = Backbone.View.extend({
     "click .edit" : "updateAddress",
     "click [data-action='updateFromOrder']" : "updateAddressFromOrder",
     "click .newAddress" : "newAddress",
-    "submit form" : "saveAddress",
-    "keydown" : "onKeyDown",
-    "change #deliveryTab .regular-radio" : "switchAddress",
-    "click #method button" : "switchDelivery"
+    "submit form" : "saveAddress"
   },
   initialize : function() {
     var userId = this.$el.data("id");
     this.model.set({id: userId});
-    var contactTip = this.$el.find("#contact-tips");
-    contactTip.removeClass("hide");
-    contactTip.hide();
-    this.contactTip = contactTip;
-  },
-  onKeyDown : function(e){
-    if(e.which == 13) e.preventDefault();
-  },
-  switchDelivery : function(e){
-    var curMethod = $(e.target).attr("value");
-    if(curMethod == "pickup"){
-      var contactView = this.$el.find("#contact-error");
-      contactView.hide();
-    }
-    refreshMenu();
-  },
-  switchAddress : function(e){
-    this.$el.find("#contact-error").hide();
-    this.contactTip.hide();
-    var range = this.$el.data("range");
-    var $this = this;
-    var contactView = this.$el.find(".contact");
-    var deliveryLocationOption = this.$el.find("#deliveryTab .contact .regular-radio:checked");
-    if(!deliveryLocationOption.length){
-      this.contactTip.html(jQuery.i18n.prop('deliveryOptionNotSelected'));
-      this.contactTip.show();
-      return;
-    }
-    var yourAddress = deliveryLocationOption.next().next().text();
-    var deliveryOption = this.$el.find("#deliveryMethod .regular-radio:checked");
-    if(!deliveryOption.length){
-      this.contactTip.html(jQuery.i18n.prop('deliveryOptionNotSelected'));
-      this.contactTip.show();
-      return;
-    }
-    var deliveryCenter = deliveryOption.parent().data('center');
-    geocoder = new google.maps.Geocoder();
-    geocoder.geocode({address : deliveryCenter}, function(results, status){
-      if (status == google.maps.GeocoderStatus.OK) {
-        var hostLoc = {lat : results[0].geometry.location.lat(), long: results[0].geometry.location.lng()};
-        utility.distance(yourAddress, hostLoc, function(err, distance){
-          if(err){
-            $this.$el.find("#contact-error").html(err);
-            $this.$el.find("#contact-error").show();
-            return;
-          }
-          if(distance > range){
-            $this.$el.find("#contact-error").html(jQuery.i18n.prop('addressOutOfRangeError'));
-            $this.$el.find("#contact-error").show();
-            contactView.data("has-error", true);
-          }else{
-            contactView.data("has-error", false);
-          }
-        });
-      } else {
-        alert("Geocode was not successful for the following reason: " + status);
-      }
-    })
-
-  },
-  updateAddress : function(e){
-    e.data = {mt :this};
-    toggleModal(e,this.enterAddressInfo);
-  },
-  newAddress : function(e){
-    e.data = {mt : this};
-    toggleModal(e,this.enterAddressInfo);
-  },
-  updateAddressFromOrder : function(e){
-    e.data = {mt : this};
-    toggleModal(e,this.enterAddressInfoFromOrder);
+    this.isCoolDown = true;
   },
   deleteAddress : function(e){
     var target = $(event.target).closest('.address_block');
@@ -889,7 +816,7 @@ var AddressView = Backbone.View.extend({
     address_form.find(".host").hide();
     address_form.find("#new_title").removeClass("hide");
     address_form.off("submit");
-    address_form.on("submit",{ mt : event.data.mt}, event.data.mt.saveAddress);
+    address_form.on("submit", AddressView.prototype.saveAddress);
     address_form.find("button[name='cancel']").off("click");
     address_form.find("button[name='cancel']").on("click",dismissModal);
   },
@@ -903,7 +830,7 @@ var AddressView = Backbone.View.extend({
     var phone = target.data("phone");
     var address_form = $("#addressDetailView form");
     address_form.off("submit");
-    address_form.on("submit",{ mt : event.data.mt}, event.data.mt.saveAddress);
+    address_form.on("submit", AddressView.prototype.saveAddress);
     address_form.find("button[name='cancel']").off("click");
     address_form.find("button[name='cancel']").on("click",dismissModal);
     address_form.attr("data-id",id);
@@ -937,7 +864,6 @@ var AddressView = Backbone.View.extend({
     }
     submit_btn.button("loading");
     var alert_block = address_form.find(".alert");
-    var $this = e.data.mt;
     alert_block.removeClass("hide");
     alert_block.hide();
     var id = address_form.data("id");
@@ -949,10 +875,10 @@ var AddressView = Backbone.View.extend({
     var isDefault = address_form.find("#isDefault").prop("checked");
     var url = "";
     if (address_form.data("host")) {
-      $this.model = new Host();
+      addressView.model = new Host();
     }
-    $this.model.set({id: id});
-    $this.model.set({
+    addressView.model.set({id: id});
+    addressView.model.set({
       address: [{
         id: address_id,
         street: street,
@@ -962,12 +888,16 @@ var AddressView = Backbone.View.extend({
         isDefault: isDefault
       }]
     });
-    $this.model.save({}, {
+    addressView.model.save({}, {
       success: function () {
         location.reload();
       }, error: function (model, err) {
-        if(err && err.responseJSON && err.responseJSON.invalidAttributes.county && err.responseJSON.invalidAttributes.county.length > 0){
-          alert_block.html(jQuery.i18n.prop('countyNotInServiceError'));
+        if(err && err.responseJSON){
+          if(err.responseJSON.invalidAttributes.county && err.responseJSON.invalidAttributes.county.length > 0){
+            alert_block.html(jQuery.i18n.prop('countyNotInServiceError'));
+          }else if(err.responseJSON.invalidAttributes.phone && err.responseJSON.invalidAttributes.phone.length > 0){
+            alert_block.html(jQuery.i18n.prop('phoneNotValid'));
+          }
         }else{
           alert_block.html(showErrorMsg(err));
         }
@@ -1085,6 +1015,7 @@ var MealSelectionView = Backbone.View.extend({
     this.alertView = this.$el.find("#orderAlertView");
     this.alertView.removeClass("hide");
     this.alertView.hide();
+    this.initMap();
   },
   initDelivery : function(cb){
     var range = this.$el.data("range");
@@ -1095,31 +1026,31 @@ var MealSelectionView = Backbone.View.extend({
     var map;
     this.$el.find(".deliveryOption").each(function () {
       var location = $(this).data("location");
-      $.ajax({
-        url: "https://maps.googleapis.com/maps/api/geocode/json?address=" + location + "&key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA"
-      }).done(function (data) {
-        if (data.results.length > 0) {
-          var center = data.results[0].geometry.location;
-          if(!map){
-            map = new google.maps.Map($this.$el.find("#googlemap")[0], {
-              center: center,
-              scrollwheel: false,
-              zoom: 11
-            });
-            $this.googlemapDisplay.setMap(map);
+      var color = $(this).data("color");
+      var area = $(this).data("area");
+      utility.geocoding(location, function(err, center){
+        if(err){
+          makeAToast(err, 'error');
+          return;
+        }
+        utility.initMap($this.$el.find("#googlemap")[0], center, function(err, map){
+          if(err){
+            makeAToast(err, 'error');
+            return;
           }
+          var colors = { red : '#ff4001', blue : '#3fa9f5', green : '#22b571', pink : '#ff7bac', yellow : '#ffd65a', orange : '#ff931e', 'dark-blue' : '#3f80f5'};
           var deliveryCircle = new google.maps.Circle({
-            strokeColor: '#FF0000',
+            strokeColor: "#000000",
             strokeOpacity: 0.8,
             strokeWeight: 2,
-            fillColor: '#FF0000',
+            fillColor: colors[color],
             fillOpacity: 0.35,
             map: map,
             center: center,
             radius: range * 1600
           });
           var image = {
-            url : '/images/car-icon.png',
+            url : '/images/car-icon-' + color + '.png',
             size : new google.maps.Size(36, 36),
             origin: new google.maps.Point(0, 0),
             anchor: new google.maps.Point(18, 18)
@@ -1130,73 +1061,61 @@ var MealSelectionView = Backbone.View.extend({
             icon: image
           });
           var deliveryInfo = new google.maps.InfoWindow({
-            content : "<h4><span data-toggle='i18n' data-key='deliveryRange'></span></h4>"
+            content : "<h4><small><span data-toggle='i18n' data-key='deliveryRange'></span>:" + area || location + "</small></h4>"
           })
           deliveryMarker.addListener('click', function(){
             deliveryInfo.open(map, deliveryMarker);
             setupLanguage();
           })
           cb(map);
-        }
-      });
+        });
+      })
     });
   },
   initPickups : function(map){
     var mapCenter = '';
     var $this = this;
-    if(this.$el.find(".pickup").length == 0){
+    if(this.$el.find(".pickupOption").length == 0){
       mapCenter = "25 Washington St, Daly City";
     }else{
-      mapCenter = $(this.$el.find(".pickup [data-point]")[0]).data('point');
+      mapCenter = $(this.$el.find(".pickupOption")[0]).data('location');
     }
-    $.ajax({
-      url: "https://maps.googleapis.com/maps/api/geocode/json?address=" + mapCenter + "&key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA"
-    }).done(function (data) {
-      if (data.results.length > 0) {
-        var center = data.results[0].geometry.location;
-        if(!map){
-          map = new google.maps.Map($this.$el.find("#googlemap")[0], {
-            center: center,
-            scrollwheel: false,
-            zoom: 11
-          });
-          $this.googlemapDisplay.setMap(map);
-        }
-        $this.$el.find(".pickup").each(function () {
-          var location = $(this).find("[data-point]").data("point");
-          var title = '<div><h4><span data-toggle="i18n" data-key="pickup"></span>' + $(this).data("name") + '</h4><p>' + location + '</p></div>';
-          var infowindow = new google.maps.InfoWindow({
-            content: title
-          });
-          $.ajax({
-            url: "https://maps.googleapis.com/maps/api/geocode/json?address=" + location + "&key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA"
-          }).done(function (data) {
-            if (data.results.length > 0) {
-              var center = data.results[0].geometry.location;
-              var marker = new google.maps.Marker({
-                position: center,
-                title: title
-              });
-              marker.addListener('click', function () {
-                infowindow.open(map, marker);
-                setupLanguage();
-              })
-              marker.setMap(map);
-            }
-          });
-        })
+    utility.geocoding(mapCenter, function(err, center){
+      if(err){
+        makeAToast(err);
+        return;
       }
-    });
+      $this.$el.find(".pickupOption").each(function () {
+        var location = $(this).data("location");
+        var title = '<div><h4><small><span data-toggle="i18n" data-key="pickup"></span>:' + location + '</small></h4></div>';
+        var infowindow = new google.maps.InfoWindow({
+          content: title
+        });
+        utility.geocoding(location, function(err, center, map){
+          if(err){
+            makeAToast(err);
+            return;
+          }
+          var marker = new google.maps.Marker({
+            position: center,
+            title: title
+          });
+          marker.addListener('click', function () {
+            infowindow.open(map, marker);
+            setupLanguage();
+          })
+          marker.setMap(map);
+        });
+      })
+    })
   },
   initMap : function(){
     var range = this.$el.data("range") * 1609.34;
     var $this = this;
-    var directionsDisplay = new google.maps.DirectionsRenderer;
-    var directionsService = new google.maps.DirectionsService;
-    this.googlemapDisplay = directionsDisplay;
-    this.googlemapService = directionsService;
-    this.initDelivery(function(map){
-      $this.initPickups(map);
+    utility.initGoogleMapService(function(){
+      $this.initDelivery(function(map){
+        $this.initPickups(map);
+      });
     });
   },
   changePreference : function(e){
@@ -1270,17 +1189,6 @@ var MealSelectionView = Backbone.View.extend({
           $this.$el.find("#addressAlertView").show();
           $this.$el.find("#addressAlertView").html(jQuery.i18n.prop('deliveryOutOfRangeError'));
         }
-        // utility.distance(deliveryCenterAddress, destination, function(err, distance){
-        //   if(err){
-        //     $this.$el.find("#addressAlertView").show();
-        //     $this.$el.find("#addressAlertView").html(err);
-        //     return;
-        //   }
-        //   if(distance > range){
-        //     $this.$el.find("#addressAlertView").show();
-        //     $this.$el.find("#addressAlertView").html(jQuery.i18n.prop('deliveryOutOfRangeError'));
-        //   }
-        // });
       } else {
         window.alert('Directions request failed due to ' + status);
       }
@@ -2676,63 +2584,298 @@ var TransactionView = Backbone.View.extend({
 
 var ContactInfoView = Backbone.View.extend({
   events : {
-    "click [name='submit']" : "saveInfo"
-  },
-  initialize : function(options){
-    var errorView = this.$el.find(".alert.alert-danger");
-    errorView.removeClass("hide");
-    errorView.hide();
-    this.alertView = errorView;
-    this.$options = options;
+    "blur input" : "saveInfo"
   },
   saveInfo : function(e){
     e.preventDefault();
-    var isLogin = this.$el.data("id") ? true : false;
-    if(this.$el.find("button[type='submit']").hasClass("disabled")){
+    var userId = this.$el.data("user");
+    var isLogin = userId ? true : false;
+    var form = $(e.currentTarget).closest('form');
+    if(!isLogin){
       return;
     }
-    this.alertView.hide();
-    var firstname = this.$el.find("#nameInput").val();
-    var phone = this.$el.find("#phoneInput").val();
-    if(isLogin){
-      this.model.clear();
-      this.model.set({
-        id : this.$el.data("id"),
-        firstname : firstname,
-        phone : phone
-      });
-      var $this = this;
-      this.model.save({},{
-        success : function(){
-          dismissModal();
-          var btn = $("#meal-confirm-container [data-method='cash']");
-          btn.parent().find("button").removeClass('active');
-          btn.addClass('active');
-        },error : function(model, err){
-          $this.alertView.html(jQuery.i18n.prop('saveError'))
-          $this.alertView.show();
-        }
-      });
-    }else{
-      this.$options.target.find("#cashMethod").data('phone',phone);
-      $(this).find("#cashMethod").data('name',firstname);
-      dismissModal();
-      var btn = $("#meal-confirm-container [data-method='cash']");
-      btn.parent().find("button").removeClass('active');
-      btn.addClass('active');
+    if(form.find("has-error").length){
+      makeAToast(jQuery.prop.i18n('phoneNotValid'));
+      return;
     }
+    var phone = this.$el.find("input[name='phone']").val();
+    var firstname = this.$el.find("input[name='name']").val();
+    if(!firstname && !phone){
+      return;
+    }
+    this.model.clear();
+    this.model.set({
+      id : userId,
+      firstname : firstname,
+      phone : phone
+    });
+    var $this = this;
+    this.model.save({},{
+      success : function(){
+        makeAToast(jQuery.i18n.prop('saveSuccess'))
+      },error : function(model, err){
+        makeAToast(jQuery.i18n.prop('saveError'))
+      }
+    });
   }
 });
 
 var MealConfirmView = Backbone.View.extend({
   events : {
     "click #applyCouponBtn" : "applyCouponCode",
-    "click #applyPointsBtn" : "addPointsToOrder"
+    "click #applyPointsBtn" : "addPointsToOrder",
+    "change #deliveryTab .regular-radio" : "switchAddress",
+    "change #method" : "switchMethod",
+    "click #createNewContactBtn" : "createNewContact",
+    "keydown" : "onKeyDown",
+    "click #verifyAddressBtn" : "verifyAddress",
+    "change #payment-cards" : "switchPaymentMethod",
+    "click input[name='billingAddress']" : "enterBillingAddress"
   },
   initialize : function(){
     this.alertView = this.$el.find("#orderAlertView");
     this.alertView.removeClass("hide");
     this.alertView.hide();
+    this.isCoolDown = true;
+    this.initMap();
+  },
+  enterBillingAddress : function(e){
+    var isChecked = $(e.currentTarget).prop("checked");
+    if(isChecked){
+      var contactInfoView = this.$el.find("#contactInfoView");
+      var paymentInfoView = this.$el.find("#paymentInfoView");
+      var fieldsToCopy = ['input[name="street"]','input[name="city"]','input[name="state"]','input[name="zipcode"]'];
+      fieldsToCopy.forEach(function(field){
+        paymentInfoView.find(field).val(contactInfoView.find(field).val());
+      });
+    }
+  },
+  onKeyDown : function(e){
+    if(e.which == 13) e.preventDefault();
+  },
+  initDelivery : function(cb){
+    var range = this.$el.data("range");
+    var $this = this;
+    if(!this.$el.find(".deliveryOption").length){
+      return cb(null);
+    }
+    var map;
+    this.$el.find(".deliveryOption").each(function () {
+      var location = $(this).data("center");
+      var color = $(this).data("color");
+      var area = $(this).data("area");
+      utility.geocoding(location, function(err, center){
+        if(err){
+          makeAToast(err);
+          return;
+        }
+        utility.initMap($this.$el.find("#googlemap")[0], center, function(err, map){
+          if(err){
+            makeAToast(err);
+            return;
+          }
+          var colors = { red : '#ff4001', blue : '#3fa9f5', green : '#22b571', pink : '#ff7bac', yellow : '#ffd65a', orange : '#ff931e', 'dark-blue' : '#3f80f5'};
+          var deliveryCircle = new google.maps.Circle({
+            strokeColor: '#000000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: colors[color],
+            fillOpacity: 0.35,
+            map: map,
+            center: center,
+            radius: range * 1600
+          });
+          var image = {
+            url : '/images/car-icon-' + color + '.png',
+            size : new google.maps.Size(36, 36),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(18, 18)
+          }
+          var deliveryMarker = new google.maps.Marker({
+            position: center,
+            map: map,
+            icon: image
+          });
+          var deliveryInfo = new google.maps.InfoWindow({
+            content : "<h4><small><span data-toggle='i18n' data-key='deliveryRange'></span>:" + area + "</small></h4>"
+          })
+          deliveryMarker.addListener('click', function(){
+            deliveryInfo.open(map, deliveryMarker);
+            setupLanguage();
+          })
+          cb(map);
+        })
+      })
+    });
+  },
+  initPickups : function(map){
+    var mapCenter = '';
+    var $this = this;
+    if(this.$el.find(".pickupOption").length == 0){
+      mapCenter = "25 Washington St, Daly City";
+    }else{
+      mapCenter = $(this.$el.find(".pickupOption [data-location]")[0]).data('location');
+    }
+    utility.geocoding(mapCenter, function(err, center, map){
+      if(err){
+        makeAToast(err);
+        return;
+      }
+      $this.$el.find(".pickupOption").each(function () {
+        var location = $(this).data("location");
+        var title = '<div><h4><small><span data-toggle="i18n" data-key="pickup"></span>:' + location + '</small></h4></div>';
+        var infowindow = new google.maps.InfoWindow({
+          content: title
+        });
+        utility.geocoding(location, function(err, center, map){
+          if(err){
+            makeAToast(err);
+            return;
+          }
+          var marker = new google.maps.Marker({
+            position: center,
+            title: title
+          });
+          marker.addListener('click', function () {
+            infowindow.open(map, marker);
+            setupLanguage();
+          })
+          marker.setMap(map);
+        })
+      })
+    });
+  },
+  initMap : function(){
+    var $this = this;
+    utility.initGoogleMapService(function(){
+      $this.initDelivery(function(map){
+        $this.initPickups(map);
+      });
+    });
+  },
+  createNewContact : function(e){
+    e.preventDefault();
+    var value = this.$el.find("#method button.active").attr("value");
+    if(value == "pickup"){
+      $('#contactInfoView').removeClass('hide');
+    }else{
+      // e.data = {mt : this};
+      toggleModal(e, addressView.enterAddressInfoFromOrder);
+    }
+  },
+  switchMethod : function(e){
+    var isLogin = this.$el.data("user") ? true : false;
+    var value = $(e.currentTarget).find(".active").attr("value");
+    this.$el.find(".deliveryInput").removeClass('hide');
+    if(value == "delivery"){
+      this.$el.find(".deliveryInput").show();
+      if(isLogin){
+        this.switchAddress(e);
+      }else{
+        this.verifyAddress(e);
+      }
+    }else{
+      this.$el.find(".deliveryInput").hide();
+    }
+    refreshMenu();
+  },
+  verifyAddress : function(e){
+    var btn = $(e.currentTarget);
+    var street = this.$el.find("input[name='street']").val();
+    var city = this.$el.find("input[name='city']").val();
+    var state = this.$el.find("input[name='state']").val();
+    var zipcode = this.$el.find("input[name='zipcode']").val();
+    if(!street || !city || !state || !zipcode){
+      makeAToast(jQuery.i18n.prop('addressIncomplete'));
+      return;
+    }
+    var range = this.$el.data("range");
+    var yourAddress = street + ", " + city + ", " + state + " " + zipcode;
+    var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
+    if(!deliveryOption.length){
+      makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
+      return;
+    }
+    var deliveryCenter = deliveryOption.parent().data('center');
+    btn.button('loading');
+    utility.distance(deliveryCenter, yourAddress, function(err, distance) {
+      if(err) {
+        makeAToast(err, 'error');
+        return;
+      }
+      btn.button('reset');
+      if(distance > range){
+        makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
+        return;
+      }
+      makeAToast(jQuery.i18n.prop('addressValid'),'success');
+    });
+  },
+  switchPaymentMethod : function(e){
+    var method = $(e.currentTarget).find("button.active").data("method");
+    var userId = this.$el.data("user");
+    var paymentExpressForm = this.$el.find("#paymentInfoView");
+    var isLogin = userId ? true : false;
+    if(!isLogin){
+      if(method == "cash"){
+        paymentExpressForm.hide();
+      }else{
+        paymentExpressForm.show();
+      }
+    }
+  },
+  switchAddress : function(e, cb, yourAddress){
+    var range = this.$el.data("range");
+    var $this = this;
+    if(!yourAddress){
+      var deliveryLocationOption = this.$el.find("#deliveryTab .contactOption .regular-radio:checked");
+      if(!deliveryLocationOption.length){
+        makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
+        if(cb){
+          return cb(false);
+        }
+        return;
+      }
+      var yourAddress = deliveryLocationOption.next().next().text();
+    }
+    var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
+    if(!deliveryOption.length){
+      makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
+      if(cb){
+        return cb(false);
+      }
+      return;
+    }
+
+    var cdTime = 3000;
+    if(this.isCoolDown){
+      this.isCoolDown = false;
+      var deliveryCenter = deliveryOption.parent().data('center');
+      utility.distance(deliveryCenter, yourAddress, function(err, distance){
+        if(err){
+          makeAToast(err);
+          if(cb){
+            return cb(false);
+          }
+          return;
+        }
+        if(distance > range){
+          makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
+          if(cb){
+            return cb(false);
+          }
+          return;
+        }
+        makeAToast(jQuery.i18n.prop('addressValid'),'success');
+        cb(true);
+      })
+      setTimeout(function(){
+        $this.isCoolDown = true;
+      }, cdTime);
+    }else {
+      makeAToast(jQuery.i18n.prop("apiCooldown"));
+      cb(true);
+    }
   },
   applyCouponCode : function(e) {
     e.preventDefault();
@@ -2885,95 +3028,233 @@ var OrderView = Backbone.View.extend({
       }
     })
   },
+  getContactInfo : function(method, isLogin, cb){
+    var contactObj = {};
+    var contactView = isLogin ? this.$el.find("#" + method + "Tab" + " .contactOption .regular-radio:checked") : this.$el.find("#contactInfoView");
+    switch(method){
+      case "pickup":
+        if(!isLogin){
+          var name = contactView.find("input[name='name']").val();
+          var phone = contactView.find("input[name='phone']").val();
+          if(!name || !phone){
+            makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
+            return cb(false);
+          }
+          contactObj.name = name;
+          contactObj.phone = phone;
+        }else{
+          var t = contactView.next().next().text();
+          if(t){
+            var name = t.split("+")[0];
+            var phone = t.split("+")[1];
+            if(!name || !phone){
+              makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
+              return cb(false);
+            }
+            contactObj.name = name;
+            contactObj.phone = phone;
+          }else{
+            contactView = this.$el.find("#contactInfoView");
+            var name = contactView.find("input[name='name']").val();
+            var phone = contactView.find("input[name='phone']").val();
+            if(!name || !phone){
+              makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
+              return cb(false);
+            }
+            contactObj.name = name;
+            contactObj.phone = phone;
+          }
+        }
+        cb(contactObj);
+        break;
+      case "delivery":
+        if(!isLogin){
+          var name = contactView.find("input[name='name']").val();
+          var phone = contactView.find("input[name='phone']").val();
+          var street = contactView.find("input[name='street']").val();
+          var city = contactView.find("input[name='city']").val();
+          var state = contactView.find("input[name='state']").val();
+          var zipcode = contactView.find("input[name='zipcode']").val();
+          if(!street || !city || !state || !zipcode){
+            makeAToast(jQuery.i18n.prop('addressIncomplete'));
+            return cb(false);
+          }
+          if(!name || !phone){
+            makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
+            return cb(false);
+          }
+          contactObj.address = street + ", " + city + ", " + state + " " + zipcode;
+          contactObj.name = name;
+          contactObj.phone = phone;
+        }else{
+          var t = contactView.next().next().text();
+          if(t){
+            var address = t.split("+")[0];
+            var phone = t.split("+")[1];
+            if(!address || !phone){
+              makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'));
+              return cb(false);
+            }
+            contactObj.address = address;
+            contactObj.phone = phone;
+          }else{
+            makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'));
+            return cb(false);
+          }
+        }
+        mealConfirmView.switchAddress(null, function(valid) {
+          if (!valid) {
+            return cb(false);
+          }
+          return cb(contactObj);
+        }, contactObj.address);
+        break;
+    }
+  },
+  getPickupOption : function(method){
+    var pickupIndex = parseInt(this.$el.find("#" + method + "Tab" + " .option .regular-radio:checked").data("index")) + 1;
+    return pickupIndex;
+  },
+  getPaymentInfo : function(isLogin, cb){
+    var cards = this.$el.find("#payment-cards button.active");
+    var paymentMethod = cards.data("method");
+    var paymentInfo = {};
+    if(isLogin){
+      if(!cards.length){
+        makeAToast(jQuery.i18n.prop('paymentEmptyError'));
+        return cb(false);
+      }
+      paymentInfo.method = paymentMethod;
+      cb(paymentInfo);
+    }else{
+      if(paymentMethod == "online"){
+        var paymentInfoView = this.$el.find("#paymentInfoView");
+        var cardholder = paymentInfoView.find("input[name='card-holder']").val();
+        var cardnumber = paymentInfoView.find("input[name='card-number']").val();
+        var expMonth = paymentInfoView.find("select[name='month']").attr('value');
+        var expYear = paymentInfoView.find("select[name='year']").attr('value');
+        var cvv = paymentInfoView.find("input[name='cvv']").val();
+        var street = paymentInfoView.find("input[name='street']").val();
+        var city = paymentInfoView.find("input[name='city']").val();
+        var state = paymentInfoView.find("input[name='state']").val();
+        var zipcode = paymentInfoView.find("input[name='zipcode']").val();
+        var country = paymentInfoView.find(".flagstrap").data('selected-country');
+        if(!cardholder || !cardnumber || !expMonth || !expMonth || !cvv){
+          makeAToast(jQuery.i18n.prop('cardInfoIncomplete'));
+          return cb(false);
+        }
+        if(!street || !city || !state || !zipcode || !country){
+          makeAToast(jQuery.i18n.prop('billingAddressIncomplete'));
+          return cb(false);
+        }
+        if (!Stripe.card.validateCVC(cvv)) {
+          makeAToast(jQuery.i18n.prop('invalid_cvc'));
+          return cb(false);
+        }
+        Stripe.card.createToken({
+          number: cardnumber,
+          cvc: cvv,
+          exp_month: expMonth,
+          exp_year: expYear,
+          name: cardholder,
+          address_line1: street,
+          address_city: city,
+          address_zip: zipcode,
+          address_state: state,
+          address_country: country
+        }, function(status, response){
+          if (response.error) {
+            BootstrapDialog.alert(jQuery.i18n.prop(response.error.code));
+            return cb(false);
+          }
+          var token = response['id'];
+          paymentInfo.token = token;
+          paymentInfo.method = "online";
+          return cb(paymentInfo);
+        });
+      }else{
+        paymentInfo.method = "cash";
+        return cb(paymentInfo);
+      }
+    }
+  },
   takeOrder : function(e){
     e.preventDefault();
-    var form = this.$el.find("#order");
-    var orderId = form.data("order");
-    if(orderId){
-      this.model.set({id : orderId});
-    }
+    var $this = this;
+
+    var userId = this.$el.data("user");
+    var isLogin = userId ? true : false;
     var params = {};
     var method = this.$el.find("#method .active").attr("value");
-    var selectorStr = "#" + method + "Tab .contact .regular-radio:checked + label + span";
-    var contacts = this.$el.find(selectorStr).text().split("+");
-    var phone;
-    var paymentMethod = this.$el.find("#payment-cards button.active").data('method');
-    if(method == "delivery"){
-      if(contacts.length < 2){
-        makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'),'warning');
+
+    this.getContactInfo(method, isLogin, function(contactInfo){
+      if(!contactInfo){
         return;
       }
-      var pickupOption = parseInt(this.$el.find("#deliveryMethod .regular-radio:checked").data("index")) + 1;
-      var address = contacts[0];
-      phone = contacts[1].replace(" ","");
-    }else{
-      if((contacts.length == 0 || !contacts[0]) && paymentMethod=='online'){
-        makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'),'error');
-        return;
-      }
-      var pickupOption = parseInt(this.$el.find("#pickupMethod .regular-radio:checked").data("index")) + 1;
-      phone = contacts[0];
-    }
+      $this.getPaymentInfo(isLogin, function(paymentInfo) {
+        if (!paymentInfo) {
+          return;
+        }
+        var form = $this.$el.find("#order");
+        var mealId = form.data("meal");
+        var orderId = form.data("order");
+        if(orderId){ $this.model.set({id : orderId}); }
 
-    var cards = this.$el.find("#payment-cards button.active");
-    if(!cards.length){
-      makeAToast(jQuery.i18n.prop('paymentEmptyError'));
-      return;
-    }
-    var currentOrder = localOrders;
-    var mealId = form.data("meal");
-    var pickupMethod = this.$el.find("method .active").attr("value");
-    if(pickupMethod == "delivery"){
-      var delivery_fee = this.$el.find("#order .delivery").data("value");
-    }else{
-      var delivery_fee = 0;
-    }
-    var subtotal = form.find(".subtotal").data("value");
-    if(subtotal == 0) {
-      makeAToast(jQuery.i18n.prop('orderEmptyError'));
-      return;
-    }
+        //pickup option
+        var pickupOption = $this.getPickupOption(method);
+        var currentOrder = localOrders;
 
-    //coupon info
-    var couponValue = localCoupon;
-    if(couponValue){
-      var code = Object.keys(couponValue)[0];
-    }
+        //subtotal
+        var subtotal = form.find(".subtotal").data("value");
+        if (subtotal == 0) {
+          makeAToast(jQuery.i18n.prop('orderEmptyError'));
+          return;
+        }
 
-    var points = localPoints;
+        //coupon & points
+        var points = localPoints;
+        var couponValue = localCoupon;
+        if (couponValue) {
+          var code = Object.keys(couponValue)[0];
+        }
 
-    this.model.set({
-      orders : currentOrder,
-      subtotal : subtotal,
-      address : address,
-      pickupOption : pickupOption,
-      method : method,
-      mealId : mealId,
-      customerPhone : phone,
-      delivery_fee : delivery_fee,
-      couponCode : code,
-      points : points,
-      paymentMethod : paymentMethod
+        $this.model.set({
+          orders: currentOrder,
+          subtotal: subtotal,
+          contactInfo: contactInfo,
+          paymentInfo : paymentInfo,
+          pickupOption: pickupOption,
+          method: method,
+          mealId: mealId,
+          couponCode: code,
+          points: points,
+          isLogin : isLogin
+        });
+
+        $this.model.save({}, {
+          success: function (model, result) {
+            Object.keys(localOrders).forEach(function (dishId) {
+              eraseCookie(dishId);
+            });
+            eraseCookie('points');
+            localOrders = {};
+            localPoints = 0;
+            BootstrapDialog.alert(jQuery.i18n.prop('newOrderTakenSuccessfully',result.id), function () {
+              if(isLogin){
+                reloadUrl("/user/me", "#myorder");
+              }else{
+                location.href = "/order/" + result.id + '/receipt';
+              }
+            });
+          }, error: function (model, err) {
+            BootstrapDialog.show({
+              title: jQuery.i18n.prop('error'),
+              message: err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText
+            });
+          }
+        })
+      });
     });
-
-    this.model.save({},{
-      success : function(model, result){
-        Object.keys(localOrders).forEach(function(dishId){
-          eraseCookie(dishId);
-        });
-        eraseCookie('points');
-        localOrders = {};
-        localPoints = 0;
-        BootstrapDialog.alert(jQuery.i18n.prop('newOrderTakenSuccessfully'), function(){
-          reloadUrl("/user/me","#myorder");
-        });
-      },error : function(model, err){
-        BootstrapDialog.show({
-          title : jQuery.i18n.prop('error'),
-          message : err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText
-        });
-      }
-    })
   },
   adjust : function(e){
     var form = this.$el.find("#order");

@@ -29,12 +29,10 @@ module.exports = {
       type : 'Date'
     },
     firstname : {
-      type : 'string',
-      defaultsTo : ''
+      type : 'string'
     },
     lastname : {
-      type : 'string',
-      defaultsTo : ''
+      type : 'string'
     },
     status : {
       type : 'string',

@@ -18,7 +18,7 @@ describe('ReviewController', function() {
     var hostId;
     var email = 'aimbebe.r@gmail.com';
     var password = '12345678';
-    var address = "1455 Market St, San Francisco";
+    var address = "1455 Market St, San Francisco, CA 94103";
     var phone = "1-415-802-3853";
 
     var guestEmail = 'enjoymyself1987@gmail.com'
@@ -116,8 +116,8 @@ describe('ReviewController', function() {
         .send({
           orders : dishObj,
           subtotal : price2 + price3 + price4,
-          address : address,
-          customerPhone : phone,
+          contactInfo : { name : "sheng", address : address, phone : phone },
+          paymentInfo : { method : 'online'},
           method : "pickup",
           mealId : mealId,
           pickupOption : 1

@@ -13,14 +13,14 @@
 
       <div class="relative text-left col-lg-9 col-sm-8 col-xs-12 content">
         <h4 class="text-white"><strong><%__('searching-word')%></strong></h4>
-        <div class="btn-group">
-          <input class="input btn btn-default round light text-grey" placeholder="<%= __('searching-tips')%>">
-          <button class="btn btn-warning round orange text-white" onclick="javascript:search(this)">
-            <i class="fa fa-search"></i>
-            <%= __('search')%>
-          </button>
-        </div>
-        <button class="btn btn-red round" onclick="location.href='/meal'"><%= __('see-menu')%></button>
+        <!--<div class="btn-group">-->
+          <!--<input class="input btn btn-default round light text-grey" placeholder="<%= __('searching-tips')%>">-->
+          <!--<button class="btn btn-warning round orange text-white" onclick="javascript:search(this)">-->
+            <!--<i class="fa fa-search"></i>-->
+            <!--<%= __('search')%>-->
+          <!--</button>-->
+        <!--</div>-->
+        <!--<button class="btn btn-red round" onclick="location.href='/meal'"><%= __('see-menu')%></button>-->
       </div>
     </div>
   </div>
@@ -40,13 +40,11 @@
       <div class="col-md-8">
         <div class="box white">
           <div class="row">
-            <div class="col-xs-12 col-sm-6">
+            <div id="meal-detail-intro" class="col-xs-12 col-sm-6">
               <div class="row">
-                <div class="col-xs-9">
-                  <h2 class="text-left"><%= meal.title %>  <small class="text-orange"><% if(meal.type=='order'){ __('order') }else if(meal.type=='preorder'){ __('preorder') } %> <i class="fa fa-question-circle text-lightgrey"></i><%= meal.isFull()? __('full'): "" %></small></h2>
-                </div>
-                <div class="col-xs-3" style="margin-top: 20px;">
-                  <i class="fa fa-heart-o round_thumb border-red text-red fa-2x cursor-pointer" style="padding:8px;" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}else{%>false<%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
+                <div class="col-xs-12 text-left">
+                  <h2 style="display: inline-block;"><%= meal.title %><small class="text-orange"><% if(meal.type=='order'){ __('order') }else if(meal.type=='preorder'){ __('preorder') } %> <%= meal.isFull()? __('full'): "" %></small></h2>
+                  <i class="fa fa-heart-o round_thumb border-red text-red cursor-pointer relative" style="padding:8px;top:5px;" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}else{%>false<%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
                 </div>
               </div>
 
@@ -65,115 +63,70 @@
                 </div>
               </div>
 
-              <div class="row">
-                <div class="col-xs-12">
-                  <% if(meal.type=="order"){%>
-                    <h3 class="text-left"><small><%= __('provide-time')%> <span data-toggle="time-span" data-format="hourly" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>" class="text-red"> <%= meal.provideDate()%></span></small></h3>
-                  <%}else{%>
-                    <h3 class="text-left"><small><%= __('book-time')%> <span data-toggle="time-span" data-format="date" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>" class="text-red"> <%= meal.provideDate()%></span></small></h3>
-                    <h3 class="text-left"><small><%= __('pickup-time')%> <span data-toggle="time-span" data-format="day" data-date="<%= meal.pickups[0].pickupFromTime%>" class="text-red"></span></small></h3>
-                  <%}%>
-                </div>
-              </div>
+              <h3></h3>
 
               <div class="row chef-cell vertical-align text-center">
                 <div class="col-md-2 col-xs-3">
                   <img class="round_thumb size-small text-center cursor-pointer" onclick="javascript:location.href='/host/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/profile_man.png" %>>
-                  <br/>
-                  <i class="fa fa-question-circle fa-2x text-lightgrey cursor-pointer" title="<%= __('')%>"></i>
                 </div>
-                <div class="col-md-10 col-xs-8">
+                <div class="col-md-10 col-xs-9">
                   <h4 class="text-left text-dark text-box" style="margin: 0 0 10px 10px;"><%= meal.chef.shopName %><br><small><%= meal.chef.intro %></small></h4>
                 </div>
               </div>
 
               <div class="row">
-                <% if(meal.type === "order"){%>
-                  <div class="box-simple text-left">
-                    <div class="checkbox">
-                      <label>
-                        <input type="checkbox">
-                        <small class="font-small">
-                          <span class="text-black"><%= __('kitchen-pickup')%></span><br/>
-                          <%= __('ready-time')%>: <%= meal.prepareTime%><%= __('min')%><br/>
-                          <%= __('pickup-time')%>:<a class="calculateBtn" class="text-red" data-method="pickup" data-location="<%= meal.chef.full_address%>" href="javascript:void(0)"><%= __('click-to-cal')%></a>
-                        </small><br/>
-                      </label>
+                <div class="col-xs-12">
+                  <% if(meal.type=="order"){%>
+                  <h4 class="text-left"><small><%= __('provide-time')%> <span data-toggle="time-span" data-format="hourly" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>" class="text-red"> <%= meal.provideDate()%></span></small></h4>
+                  <%}else{%>
+                  <h4 class="text-left"><small><%= __('book-time')%>: <span class="text-black"><strong><%= meal.provideDate()%></strong></span></small></h4>
+                  <div class="row">
+                    <div class="col-xs-4">
+                      <h4><small><%= __('pickup-date')%>:</small></h4>
+                      <div class="pickup-date">
+                        <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%></span>
+                        <span class="col-xs-12"><%= meal.getDateFromDate(meal.pickups[0].pickupFromTime)%></span>
+                      </div>
                     </div>
-                  </div>
-                  <% if(meal.isDelivery){%>
-                  <div class="box-simple text-left">
-                    <div class="checkbox">
-                      <label>
-                        <input type="checkbox">
-                        <small class="font-small">
-                          <span class="text-black"><%= __('delivery')%></span>
-                          <%= __('delivery-fee')%>:$<%= meal.delivery_fee%><br/>
-                          <%= __('delivery-time')%>:<a class="calculateBtn" class="text-red" data-location="<%= meal.chef.full_address%>" href="javascript:void(0)"><%= __('click-to-cal')%></a><label></label><br/>
-                          <%= __('ready-time')%>: <%= meal.prepareTime%><%= __('min')%>
-                        </small>
-                      </label>
+                    <div class="col-xs-8 text-left">
+                      <h4><small><%= __('pickup-location')%>:</small></h4>
+                      <div class="pickup-location">
+                        <%
+                          var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
+                          var count = 1;
+                          meal.pickups.forEach(function(pickup){ if(pickup.method == "pickup"){ %>
+                          <div class="row">
+                            <div class="col-xs-12">
+                              <div class="option pickupOption" data-location="<%= pickup.publicLocation || pickup.location%>" data-color="<%= colors[count]%>">
+                                <label>
+                                  <i class="fa fa-hand-paper-o cursor-pointer text-<%= colors[count]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i>
+                                  <span> <%= pickup.publicLocation || pickup.location%><% if(pickup.instruction){%>(<%= pickup.instruction%>)<%}%></span>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          <%}else{%>
+                          <div class="row">
+                            <div class="col-xs-12">
+                              <div class="option deliveryOption" data-area="<%= pickup.area%>" data-location="<%= pickup.deliveryCenter%>" data-color="<%= colors[count]%>">
+                                <label>
+                                  <i class="fa fa-truck cursor-pointer text-<%= colors[count]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i>
+                                  <span> <%= pickup.area || pickup.deliveryCenter%><%= __('nearby')%></span>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        <%}count++;})%>
+                      </div>
                     </div>
                   </div>
                   <%}%>
-                  <div id="addressAlertView" class="alert alert-danger hide"><%= __('delivery-out-of-range-error')%></div>
-                <%}else{
-                var count = 1;
-                meal.pickups.forEach(function(pickup){ if(pickup.method == "pickup"){%>
-                  <div class="box-simple text-left pickup" data-location="<%= pickup.publicLocation%>" data-name="<%= __('location') + count%>">
-                    <div class="checkbox">
-                      <label>
-                        <input type="checkbox">
-                        <small class="font-small">
-                          <b><%= __('location') + count %>:</b>
-                          <% if( orders && orders.some(function(order){ if(!user){return false}; return order.customer == user.id}) || (user && user.host == meal.chef.id)){%>
-                            <span data-point="<%= pickup.location%>"><%= pickup.location || ''%></span>
-                          <%}else if(pickup.method == "pickup"){%>
-                            <span data-point="<%= pickup.publicLocation || pickup.location %>"><%= pickup.publicLocation ? (pickup.publicLocation + ' ' + __('pickup-location-after-order')): pickup.location %></span>
-                          <%}%>
-                          <br/><br/>
-                          <% if(pickup.instruction){%>
-                          <b><%= __('pickup-instruction')%>: <%= pickup.instruction || ''%></b><br/>
-                          <%}%>
-                          <b><%= __('time')%></b> <span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"></span>
-                          <br/><br/>
-                          <%= __('pickup-time')%>:<a class="text-red calculateBtn" data-location="<%= pickup.location%>" href="javascript:void(0)"><%= __('click-to-cal')%></a><label></label>
-                          <br/>
-                          <b><%= __('pickup-method')%>: <%= __('self-pickup') %></b>
-                        </small>
-                      </label>
-                    </div>
-                  </div>
-                <% }else{%>
-
-                <div class="box-simple text-left deliveryOption" data-location="<%= pickup.deliveryCenter%>">
-                  <div class="checkbox">
-                    <label>
-                      <input type="checkbox">
-                      <small class="font-small">
-                        <b><%= __('location') + count %>:</b>
-                        <span class="text-black"><%= __('delivery')%></span>
-                        <%= __('delivery-fee')%>:$<%= meal.delivery_fee%><br/>
-                        <%= __('delivery-time')%>:<a class="calculateBtn" class="text-red" data-location="<%= meal.chef.full_address%>" href="javascript:void(0)"><%= __('click-to-cal')%></a><label></label><br/>
-                        <span class="time" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>"><%= __('pickup-time') %><span data-toggle="time-span" data-format="date" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" style="margin-left: 10px;"></span></span>
-                      </small>
-                    </label>
-                  </div>
                 </div>
-
-                <%}count++;});}%>
-                <%if(meal.isShipping){%>
-                <div class="box-simple text-left">
-                  <div class="checkbox">
-                    <label>
-                      <input type="checkbox">
-                      <small class="font-small">
-                        <%= __('shipping')%> <%= __('free-shipping-policy', meal.shippingPolicy ? meal.shippingPolicy.freeAmount : '')%>
-                      </small>
-                    </label>
-                  </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 text-left">
+                  <h4><small><i class="fa fa-exclamation-circle"></i> <%= __('pickup_detail_title')%></small></h4>
                 </div>
-                <%}%>
               </div>
             </div>
 
@@ -192,7 +145,7 @@
 
               <h4 class="text-left"><small><% __('pickup-location-after-order')%></small></h4>
 
-              <div id="googlemap" style="min-height: 550px;"></div>
+              <div id="googlemap" data-target="#meal-detail-intro"></div>
             </div>
           </div>
 
@@ -375,7 +328,7 @@
     </div>
 
       <div class="col-md-4">
-        <div class="box white floater static-floater">
+        <div class="box white floater static-floater" style="margin-left:-15px;">
           <div id="order-alert" class="alert alert-danger hide" role="alert">
             <%= __('dish-out-tips')%>
           </div>
@@ -495,4 +448,3 @@
 </script>
 
 <script src="/js/jweixin-1.0.0.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA&callback=mealSelectionView.initMap" async defer></script>

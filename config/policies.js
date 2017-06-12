@@ -66,7 +66,7 @@ module.exports.policies = {
     'find' : true,
     'findOne' : true,
     'search' : true,
-    'confirm' : 'sessionAuth',
+    'confirm' : true,
     'findAll' : 'isAdmin',
     'searchAll' : 'isAdmin',
     'update' : 'or(and(sessionAuth,isHost,isOwnerOfMeal,isNotFields("isScheduled","chef","score","numberOfReviews","msg")),isAdmin)'
@@ -97,11 +97,13 @@ module.exports.policies = {
   OrderController : {
     '*' : 'or(and(sessionAuth, isBelongToOrder, isAuthorizedForAction), isAdmin)',
     'find' : 'or(and(sessionAuth, sessionSelf),isAdmin)',
-    'create' : 'or(and(sessionAuth,isNotOwnerOfMeal),isAdmin)',
+    'create' : true,
     'search' : 'isAdmin',
     'abort' : 'isAdmin',
     'refund' : 'isAdmin',
-    'update' : 'isAdmin'
+    'update' : 'isAdmin',
+    'receipt' : true,
+    'downloadReceipt' : true
   },
 
   DishController : {

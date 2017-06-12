@@ -789,6 +789,7 @@
     });
     node.addClass("active");
     $(node.data("target")).addClass("active");
+    this.element.trigger('change');
   }
 
   function Plugin(option, root){

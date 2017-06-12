@@ -101,8 +101,7 @@ module.exports = {
       type : 'json'
     },
     customer: {
-      model: 'User',
-      required: true
+      model: 'User'
     },
     meal: {
       model: 'Meal',

@@ -72,9 +72,6 @@ module.exports = function findOneRecord (req, res) {
               if(err){
                 return res.badRequest(err);
               }
-              // orders = orders.map(function(order){
-              //   return order.orders;
-              // });
               res.view('meal',{meal : matchingRecord, user : user, orders : orders});
             });
           });

@@ -64,6 +64,20 @@
           <div class="help-block with-errors"></div>
         </div>
 
+        <div class="form-group has-feedback">
+          <label class="sr-only" for="firstnameInput" data-toggle="i18n" data-key="firstname"></label>
+          <input type="text" pattern="^([A-z\s]{1,15})$" maxlength="15" data-pattern-key="nameRequirement" data-pattern-error="bad format" class="form-control" data-toggle="i18n" id="firstnameInput" placeholder="名字 (Firstname)" required>
+          <span class="form-control-feedback" aria-hidden="true" style="top: 10px;"></span>
+          <div class="help-block with-errors"></div>
+        </div>
+
+        <div class="form-group has-feedback">
+          <label class="sr-only" for="lastnameInput" data-toggle="i18n" data-key="lastname"></label>
+          <input type="text" pattern="^([A-z\s]{1,15})$" maxlength="15" data-pattern-key="nameRequirement" data-pattern-error="bad format" class="form-control" data-toggle="i18n" id="lastnameInput" placeholder="贵姓 (Lastname)" required>
+          <span class="form-control-feedback" aria-hidden="true" style="top: 10px;"></span>
+          <div class="help-block with-errors"></div>
+        </div>
+
         <div class="form-group">
           <label class="sr-only" for="phoneInput" data-toggle="i18n" data-key="phone" type="tel"></label>
           <input type="tel" class="form-control" data-minlength="10" id="phoneInput" placeholder="电话 (Phone)" data-toggle="i18n" data-key="needPhone" data-error="need phone" data-pattern-key="phoneNotValid" data-pattern-error="bad format" required>

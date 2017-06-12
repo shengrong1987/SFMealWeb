@@ -11,6 +11,7 @@ var async = require('async');
 var notification = require("../services/notification");
 var geocode = require("../services/geocode.js");
 var util = require('../services/util');
+var moment = require("moment");
 
 //-1 : quantity not enough
 //-2 : dish not valid
@@ -39,7 +40,9 @@ var util = require('../services/util');
 //-25 : redeeming points insufficient
 //-26 : can not use any discount on cash checkout
 //-27 : can not order meal with cash checkout without name & phone
-//-28 : pickup info lack of phone
+//-28 : pickup info lack of phone/name
+//-29 : requires delivery, but address is not complete
+//-31 : customer lack of contact info
 
 
 module.exports = {
@@ -136,20 +139,27 @@ module.exports = {
     });
   },
 
-  validateDeliveryMethod : function(params, meal, verifyingObj, req, cb){
+  validateDeliveryMethod : function(params, meal, req, cb){
     var method = params.method;
     if(method == "pickup"){
       cb();
     }else if(method == "delivery"){
+      var contactInfo = params.contactInfo;
+      if(!contactInfo.address){
+        return cb({responseText: req.__('order-incomplete-address'), code: -29});
+      }
+      var full_address = contactInfo.address;
       if(!meal.isDelivery) {
         return cb({responseText: req.__('order-invalid-method'), code: -11});
       }
       var range = meal.delivery_range;
-      var options = params.pickupOption;
-      if(!options){
+      var pickupOption = params.pickupOption;
+      if(!pickupOption){
         return cb({responseText : req.__('order-pickup-option-empty-error'), code : -20});
+      }else if(pickupOption > meal.pickups.length){
+        return cb({responseText : req.__('order-pickup-option-error'), code : -7});
       }
-      var pickupInfo = meal.pickups[options-1];
+      var pickupInfo = meal.pickups[pickupOption-1];
       if(!pickupInfo){
         return cb({responseText : req.__('order-pickup-option-invalid-error'), code : -22});
       }
@@ -159,7 +169,7 @@ module.exports = {
       if(pickupInfo.method != method){
         return cb({responseText : req.__('order-pickup-method-not-match-error'), code : -21});
       }
-      geocode.distance(verifyingObj.address, pickupInfo.deliveryCenter, function(err, distance){
+      geocode.distance(full_address, pickupInfo.deliveryCenter, function(err, distance){
         if(err){
           sails.log.error("verified distance err" + err);
           return cb(err);
@@ -172,6 +182,7 @@ module.exports = {
         cb();
       })
     }else{
+      var subtotal = parseFloat(params.subtotal);
       if(!meal.isShipping){
         sails.log.error("meal doesn't support shipping");
         return cb({responseText : req.__('meal-no-shipping'), code : -12});
@@ -180,7 +191,7 @@ module.exports = {
         sails.log.error("meal's shipping setup is not correct");
         return cb({responseText : req.__('meal-shipping-policy-invalid'), code : -13});
       }
-      if(verifyingObj.subtotal < parseFloat(meal.shippingPolicy.freeAmount)){
+      if(subtotal < parseFloat(meal.shippingPolicy.freeAmount)){
         sails.log.error("order's amount do not reach free shipping policy");
         return cb({responseText : req.__('order-not-qualify-shipping'), code : -14});
       }
@@ -206,8 +217,8 @@ module.exports = {
 
   buildDeliveryData : function(params, meal){
     var dishes = meal.dishes;
+    var pickUpInfo;
     if(params.method == "shipping"){
-      var pickUpInfo;
       meal.pickups.forEach(function(pickupObj){
         if(pickupObj.method == "shipping"){
           pickUpInfo = pickupObj;
@@ -224,29 +235,13 @@ module.exports = {
       }else {
         params.delivery_fee = 0;
       }
-
-      if(meal.type == 'preorder'){
-        if(!params.pickupOption || !meal.pickups || params.pickupOption-1>=meal.pickups.length){
-          return false;
-        }
-        var pickupInfo = meal.pickups[params.pickupOption-1];
-        if(!pickupInfo || pickupInfo.method != params.method){
-          return false;
-        }
-      }
-
-      if(meal.type == 'order' && params.method == 'pickup'){
-        if(!params.pickupOption || !meal.pickups || params.pickupOption-1>=meal.pickups.length){
-          return false;
-        }
-        var pickupInfo = meal.pickups[params.pickupOption-1];
-        if(!pickupInfo || pickupInfo.method != params.method){
-          return false;
-        }
-      }
+      pickUpInfo = meal.pickups[params.pickupOption-1];
     }
-    params.pickupInfo = pickupInfo;
-    sails.log.debug("building pickup data");
+    params.pickupInfo = pickUpInfo;
+    if(!pickUpInfo){
+      sails.log.debug("pickup info not exist, check meal setting");
+    }
+    sails.log.info("building pickup data");
     return params;
   },
 
@@ -336,33 +331,51 @@ module.exports = {
     });
   },
 
+  /*
+    @params:
+      orders : detail key to value order list
+      subtotal : dishes subtotal
+      method : ['pickup','delivery','shipping']
+      mealId : meal's id
+      delivery_fee : delivery fee
+      couponCode : coupon code
+      points : points to apply
+      isLogin : whether the checkout is login
+      contactInfo : {
+        name, phone, street, city, state, zipcode
+      },
+      paymentInfo : {
+        method, token(used by express checkout)
+      }
+   */
 	create : function(req, res){
 
-    var userId = req.session.user.id;
     var orders = req.body.orders;
     var mealId = req.body.mealId;
-    var email = req.session.user.auth.email;
     var method = req.body.method;
-    var address = req.body.address;
     var subtotal = parseFloat(req.body.subtotal);
     var code = req.body.couponCode;
     var pointsRedeem = req.body.points;
-    var paymentMethod = req.body.paymentMethod;
-    req.body.customer = userId;
+    var states = {};
 
+    if(req.session.authenticated){
+      var userId = req.session.user.id;
+      var email = req.session.user.auth.email;
+      req.body.customer = userId;
+      req.body.guestEmail = email;
+    }
     var $this = this;
 
     Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,m) {
       if (err) {
         return res.badRequest(err);
       }
-      $this.validateDeliveryMethod(req.body, m, { address : address, subtotal : subtotal }, req, function(err){
+      $this.validateDeliveryMethod(req.body, m, req, function(err){
         if(err){
           return res.badRequest(err);
         }
         $this.validate_meal(m, orders, undefined, subtotal, req , function(err){
           if(err){
-            sails.log.error(err.responseText);
             return res.badRequest(err);
           }
           //calculate pickup method and delivery fee
@@ -377,108 +390,216 @@ module.exports = {
           req.body.type = m.type;
           req.body.dishes = m.dishes;
           req.body.meal = m.id;
-          req.body.guestEmail = email;
           req.body.hostEmail = m.chef.email;
           req.body.phone = m.chef.phone;
+          req.body.tax = $this.getTax(req.body.subtotal, m.chef.county);
+          states.m = m;
 
-          User.findOne(userId).populate('payment').populate("coupons").exec(function (err, found) {
-            if (err) {
-              return res.badRequest(err);
-            }
-            if(paymentMethod == 'online' && (!found.payment || found.payment.length == 0)){
-              return res.badRequest({ responseText : req.__('order-lack-payment'), code : -5});
-            }
-            if(paymentMethod == 'cash' && (!found.phone || !found.firstname)){
-              return res.badRequest({ responseText : req.__('order-cash-miss-profile'), code : -27});
-            }
-            if(m.type == "order"){
-              req.body.status = "preparing";
-            }
-            if(!found.phone && !req.body.customerPhone){
-              return res.badRequest(req.__('order-lack-contact'));
-            }
-            req.body.customerName = found.firstname || '';
-            req.body.customerPhone = req.body.customerPhone || found.phone;
-
-            if(code && pointsRedeem){
-              return res.badRequest({ code : -23, responseText : req.__('order-duplicate-discount')});
-            }
-
-            if((code || pointsRedeem) && paymentMethod == 'cash'){
-              return res.badRequest({ code : -26, responseText : req.__('order-cash-no-discount')});
-            }
-
-            //validate Coupon
-            $this.verifyCoupon(req, code, found, m, function(err, coupon){
-              if(err){
-                return res.badRequest(err);
+          async.auto({
+            normalCheckOut : function(next){
+              if(!req.session.authenticated){
+                return next();
               }
-              var tax = $this.getTax(req.body.subtotal, m.chef.county);
-              var subtotalAfterTax = subtotal + tax/100;
-              $this.redeemPoints(req, pointsRedeem, found, subtotalAfterTax, function(err, discount){
-                if(err){
-                  return res.badRequest(err);
+              User.findOne(userId).populate('payment').populate("coupons").exec(function (err, found) {
+                if (err) {
+                  return next(err);
                 }
-                //calculate total
-                $this.redeemCoupon(req, code, subtotalAfterTax, coupon, found, discount, function(err, discount){
+                var contactInfo = req.body.contactInfo;
+                var paymentInfo = req.body.paymentInfo;
+                if(paymentInfo.method == 'online' && (!found.payment || found.payment.length == 0)){
+                  return next({ responseText : req.__('order-lack-payment'), code : -5});
+                }
+                // if(paymentInfo.method == 'cash' && (!contactInfo.phone || !contactInfo.name)){
+                //   return next({ responseText : req.__('order-cash-miss-profile'), code : -27});
+                // }
+                if(m.type == "order"){
+                  req.body.status = "preparing";
+                }
+                sails.log.info("user's phone: " + found.phone || contactInfo.phone);
+                if(!found.phone && !contactInfo.phone){
+                  return next({ responseText : req.__('order-lack-contact'), code : -31});
+                }
+
+                if(!found.firstname && !contactInfo.name){
+                  return next({ responseText : req.__('order-lack-contact'), code : -31});
+                }
+                req.body.customerName = contactInfo.name || found.firstname;
+                req.body.customerPhone = contactInfo.phone || found.phone;
+                req.body.customerId = found.payment[0] ? found.payment[0].customerId : null;
+                req.body.paymentMethod = paymentInfo.method;
+
+                if(code && pointsRedeem){
+                  return next({ code : -23, responseText : req.__('order-duplicate-discount')});
+                }
+
+                if((code || pointsRedeem) && paymentInfo.method == 'cash'){
+                  return next({ code : -26, responseText : req.__('order-cash-no-discount')});
+                }
+
+                //validate Coupon
+                $this.verifyCoupon(req, code, found, m, function(err, coupon){
                   if(err){
-                    return res.badRequest(err);
+                    return next(err);
                   }
-                  if(coupon){
-                    req.body.coupon = coupon.id;
-                  }
-                  Order.create(req.body).exec(function (err, order) {
-                    if (err) {
+
+                  var subtotalAfterTax = subtotal + req.body.tax/100;
+                  $this.redeemPoints(req, pointsRedeem, found, subtotalAfterTax, function(err, discount){
+                    if(err){
                       return res.badRequest(err);
                     }
-                    stripe.charge({
-                      paymentMethod : order.paymentMethod,
-                      isInitial : true,
-                      amount : subtotal * 100,
-                      deliveryFee : req.body.delivery_fee * 100,
-                      discount : discount * 100,
-                      email : email,
-                      customerId : found.payment[0] ? found.payment[0].customerId : null,
-                      destination : m.chef.accountId,
-                      meal : m,
-                      method : method,
-                      tax : tax,
-                      metadata : {
-                        mealId : m.id,
-                        hostId : m.chef.id,
-                        orderId : order.id,
-                        userId : userId,
-                        deliveryFee : (req.body.delivery_fee || 0) * 100,
-                        tax : tax
-                      }
-                    },function(err, charge, transfer){
+                    //calculate total
+                    $this.redeemCoupon(req, code, subtotalAfterTax, coupon, found, discount, function(err, discount){
                       if(err){
-                        Order.destroy(order.id).exec(function(err2){
-                          if(err2){
-                            return res.badRequest(err2);
-                          }
-                          return res.badRequest(err);
-                        });
-                      } else if(charge.status == "succeeded"){
+                        return next(err);
+                      }
+                      if(coupon){
+                        req.body.coupon = coupon.id;
+                      }
+                      req.body.discount = discount;
+                      next();
+                    });
+                  });
+                });
+              });
+            },
+            expressCheckout : function(next){
+              if(req.session.authenticated){
+                return next();
+              }
+              var contactInfo = req.body.contactInfo;
+              var paymentInfo = req.body.paymentInfo;
+              if(paymentInfo.method == 'online' && !paymentInfo.token){
+                return next({ responseText : req.__('order-lack-payment'), code : -5});
+              }
+              if(paymentInfo.method == 'cash' && (!contactInfo.phone || !contactInfo.name)){
+                return next({ responseText : req.__('order-cash-miss-profile'), code : -27});
+              }
+              if(m.type == "order"){
+                req.body.status = "preparing";
+              }
+              if(!contactInfo.phone){
+                return next(req.__('order-lack-contact'));
+              }
+              req.body.guestEmail = process.env.ADMIN_EMAIL;
+              req.body.customerName = contactInfo.name || req.__('user');
+              req.body.customerPhone = contactInfo.phone;
+              req.body.paymentMethod = paymentInfo.method;
+              stripe.newCustomerWithCard({
+                token : paymentInfo.token,
+                email : process.env.ADMIN_EMAIL
+              }, function(err, customer){
+                if(err){
+                  return next(err);
+                }
+                req.body.customerId = customer.id;
+                req.body.discount = 0;
+                next();
+              });
+            }
+          },function(err) {
+            if(err){
+              return res.badRequest(err);
+            }
+            Order.create(req.body).exec(function (err, order) {
+              if (err) {
+                return res.badRequest(err);
+              }
+              stripe.charge({
+                paymentMethod : order.paymentMethod,
+                isInitial : true,
+                amount : subtotal * 100,
+                deliveryFee : req.body.delivery_fee * 100,
+                discount : req.body.discount * 100,
+                email : email,
+                customerId : req.body.customerId,
+                destination : m.chef.accountId,
+                meal : states.m,
+                method : method,
+                tax : req.body.tax,
+                metadata : {
+                  mealId : states.m.id,
+                  hostId : states.m.chef.id,
+                  orderId : order.id,
+                  userId : userId,
+                  deliveryFee : req.body.delivery_fee * 100,
+                  tax : req.body.tax
+                }
+              },function(err, charge, transfer){
+                if(err){
+                  Order.destroy(order.id).exec(function(err2){
+                    if(err2){
+                      return res.badRequest(err2);
+                    }
+                    return res.badRequest(err);
+                  });
+                } else if(charge.status == "succeeded"){
 
-                        sails.log.info("charge succeed, gathering charging info for order");
-                        for(var i = 0; i < m.dishes.length; i++){
-                          var dishId = m.dishes[i].id;
-                          var quantity = parseInt(orders[dishId].number);
-                          m.leftQty[dishId] -= quantity;
-                        }
-                        order.tax = tax;
-                        order.transfer = transfer;
-                        order.charges = {};
-                        if(order.paymentMethod == "cash"){
-                          order.charges[charge.id] = order.charges[charge.id] || 0;
-                          order.charges[charge.id] += charge.amount;
-                        }else{
-                          order.charges[charge.id] = charge.amount;
-                        }
-                        order.application_fees = {};
-                        if(order.paymentMethod == 'cash'){
-                          order.application_fees[charge.id] = charge.application_fee;
+                  sails.log.info("charge succeed, gathering charging info for order");
+                  for(var i = 0; i < m.dishes.length; i++){
+                    var dishId = m.dishes[i].id;
+                    var quantity = parseInt(orders[dishId].number);
+                    m.leftQty[dishId] -= quantity;
+                  }
+                  order.transfer = transfer;
+                  order.charges = {};
+                  if(order.paymentMethod == "cash"){
+                    order.charges[charge.id] = order.charges[charge.id] || 0;
+                    order.charges[charge.id] += charge.amount;
+                  }else{
+                    order.charges[charge.id] = charge.amount;
+                  }
+                  order.application_fees = {};
+                  if(order.paymentMethod == 'cash'){
+                    order.application_fees[charge.id] = charge.application_fee;
+                    order.save(function(err, o){
+                      if(err){
+                        return res.badRequest(err);
+                      }
+                      o.chef = m.chef;
+                      o.dishes = m.dishes;
+                      notification.notificationCenter("Order", "new", o, true, false, req);
+                      //test only
+                      if(req.wantsJSON){
+                        return res.ok(order);
+                      }
+                      return res.ok({ id: order.id});
+                    })
+                  }else{
+                    stripe.retrieveApplicationFee(charge.application_fee, function(err, fee1){
+                      if(err){
+                        return res.badRequest(err);
+                      }
+                      if(transfer && transfer.application_fee){
+                        stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee2){
+                          if(err){
+                            return res.badRequest(err);
+                          }
+                          order.application_fees[charge.id] = fee1.amount + fee2.amount;
+                          m.save(function (err, result) {
+                            if(err){
+                              return res.badRequest(err);
+                            }
+                            order.save(function(err, o){
+                              if(err){
+                                return res.badRequest(err);
+                              }
+                              o.chef = m.chef;
+                              o.dishes = m.dishes;
+                              notification.notificationCenter("Order", "new", o, true, false, req);
+                              //test only
+                              if(req.wantsJSON){
+                                return res.ok(order);
+                              }
+                              return res.ok({ id: order.id});
+                            });
+                          });
+                        })
+                      }else{
+                        order.application_fees[charge.id] = fee1.amount;
+                        m.save(function (err, result){
+                          if(err){
+                            return res.badRequest(err);
+                          }
                           order.save(function(err, o){
                             if(err){
                               return res.badRequest(err);
@@ -490,67 +611,15 @@ module.exports = {
                             if(req.wantsJSON){
                               return res.ok(order);
                             }
-                            return res.ok({});
-                          })
-                        }else{
-                          stripe.retrieveApplicationFee(charge.application_fee, function(err, fee1){
-                            if(err){
-                              return res.badRequest(err);
-                            }
-                            if(transfer && transfer.application_fee){
-                              stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee2){
-                                if(err){
-                                  return res.badRequest(err);
-                                }
-                                order.application_fees[charge.id] = fee1.amount + fee2.amount;
-                                m.save(function (err, result) {
-                                  if(err){
-                                    return res.badRequest(err);
-                                  }
-                                  order.save(function(err, o){
-                                    if(err){
-                                      return res.badRequest(err);
-                                    }
-                                    o.chef = m.chef;
-                                    o.dishes = m.dishes;
-                                    notification.notificationCenter("Order", "new", o, true, false, req);
-                                    //test only
-                                    if(req.wantsJSON){
-                                      return res.ok(order);
-                                    }
-                                    return res.ok({});
-                                  });
-                                });
-                              })
-                            }else{
-                              order.application_fees[charge.id] = fee1.amount;
-                              m.save(function (err, result){
-                                if(err){
-                                  return res.badRequest(err);
-                                }
-                                order.save(function(err, o){
-                                  if(err){
-                                    return res.badRequest(err);
-                                  }
-                                  o.chef = m.chef;
-                                  o.dishes = m.dishes;
-                                  notification.notificationCenter("Order", "new", o, true, false, req);
-                                  //test only
-                                  if(req.wantsJSON){
-                                    return res.ok(order);
-                                  }
-                                  return res.ok({});
-                                });
-                              });
-                            }
+                            return res.ok({ id: order.id});
                           });
-                        }
-                      } else {
-                        return res.badRequest({ code : -99, responseText : req.__('order-unknown-error') });
+                        });
                       }
                     });
-                  });
-                });
+                  }
+                } else {
+                  return res.badRequest({ code : -99, responseText : req.__('order-unknown-error') });
+                }
               });
             });
           });
@@ -1339,6 +1408,34 @@ module.exports = {
       }
       return res.ok(order[0]);
     });
+  },
+
+  receipt : function(req, res){
+    var orderId = req.params.id;
+    Order.findOne(orderId).populate("dishes").populate('host').exec(function(err, order){
+      if(err){
+        return res.badRequest(err);
+      }
+      notification.transitLocaleTimeZone(order);
+      order.download = false;
+      var dateString = moment().format("ddd, hA");;
+      res.view('receipt', order);
+    })
+  },
+
+  downloadReceipt : function(req, res) {
+    var orderId = req.params.id;
+    Order.findOne(orderId).populate("dishes").populate('host').exec(function(err, order){
+      if(err){
+        return res.badRequest(err);
+      }
+      notification.transitLocaleTimeZone(order);
+      var dateString = moment().format("ddd, hA");;
+      order.layout = false;
+      order.download = true;
+      res.set('Content-Disposition','attachment; filename="' + dateString + '"-receipt.html" ')
+      res.view('receipt', order);
+    })
   },
 
   search : function(req, res){

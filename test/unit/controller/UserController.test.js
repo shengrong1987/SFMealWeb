@@ -150,7 +150,7 @@ describe('UsersController', function() {
           birthday: birthday,
           receivedEmail: false
         })
-        .expect(500)
+        .expect(400)
         .end(function (err, res) {
           if (err) {
             return done(err);
@@ -170,7 +170,7 @@ describe('UsersController', function() {
           birthday: birthday,
           receivedEmail: false
         })
-        .expect(500)
+        .expect(400)
         .end(function (err, res) {
           if (err) {
             return done(err);
@@ -191,7 +191,7 @@ describe('UsersController', function() {
           birthday: birthday,
           receivedEmail: false
         })
-        .expect(500)
+        .expect(400)
         .end(function (err, res) {
           if (err) {
             return done(err);
@@ -366,11 +366,8 @@ describe('UsersController', function() {
       agent
         .post('/auth/register')
         .send({
-          firstname: userFirstName,
-          lastname: userLastName,
           email: user5Email,
           password: password2,
-          phone: phone,
           birthday: birthday,
           receivedEmail: false
         })
