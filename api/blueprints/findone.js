@@ -76,7 +76,7 @@ module.exports = function findOneRecord (req, res) {
             });
           });
         }else{
-          res.view('meal',{meal : matchingRecord, user : undefined, orders : null});
+          res.view('meal',{meal : matchingRecord, user : null, orders : null});
         }
       }
     }else if(Model.adapter.identity == "user"){
