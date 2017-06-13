@@ -53,7 +53,7 @@ var notification = {
   },
 
   sendMsg : function(model, action, params, req){
-    var locale = req ? (params.isSendToHost ? params.host.locale : params.customer.locale) : '';
+    var locale = req ? (params.isSendToHost ? params.host.locale : ( params.customer ? params.customer.locale : params.locale)) : '';
     var phone = params.isSendToHost ? (params.host ? params.host.phone : params.chef.phone) : params.customerPhone;
     var content = "";
     if(model === "Order"){
@@ -168,7 +168,7 @@ var notification = {
       var locale = params.locale;
     }else{
       var host = params.host || params.chef;
-      var locale = req ? (params.isSendToHost ? host.locale : params.customer.locale) : '';
+      var locale = req ? (params.isSendToHost ? host.locale : ( params.customer ? params.customer.locale : params.locale)) : '';
     }
 
     this.mergeI18N(model, action, req, locale, params);
@@ -300,7 +300,7 @@ var notification = {
       info.recipientName = "SFMeal.com";
     }else{
       info.recipientEmail = params.guestEmail;
-      info.recipientName = params.customerName || params.customer.firstname || '';
+      info.recipientName = params.customerName || ( params.customer ? params.customer.firstname : '') || '';
     }
     return info;
   },

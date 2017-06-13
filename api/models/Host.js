@@ -100,8 +100,7 @@ module.exports = {
       defaultsTo : false
     },
     pocket : {
-      model : 'Pocket',
-      via : 'user'
+      model : 'Pocket'
     },
     likes : {
       type : 'integer',

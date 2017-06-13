@@ -484,6 +484,7 @@ module.exports = {
               req.body.customerName = contactInfo.name || req.__('user');
               req.body.customerPhone = contactInfo.phone;
               req.body.paymentMethod = paymentInfo.method;
+              req.body.locale = req.getLocale();
               stripe.newCustomerWithCard({
                 token : paymentInfo.token,
                 email : process.env.ADMIN_EMAIL
@@ -910,7 +911,7 @@ module.exports = {
           paymentMethod : order.paymentMethod,
           id : chargeId,
           metadata : {
-            userId : order.customer.id
+            userId : order.customer ? order.customer.id : null
           }
         },function(err, refund){
           if(err){

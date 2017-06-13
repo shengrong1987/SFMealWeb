@@ -35,14 +35,29 @@ module.exports = {
         if(err){
           return cb(err);
         }
-        cb(null, pocket);
+        User.update(user.id, { pocket : pocket}).exec(function(err, u){
+          if(err){
+            return cb(err);
+          }
+          Host.update(host.id, { pocket : pocket}).exec(function(err, h){
+            if(err){
+              return cb(err);
+            }
+            cb(null, pocket);
+          })
+        });
       })
     }else{
       Pocket.create({ user : user.id}).exec(function(err, pocket){
         if(err){
           return cb(err);
         }
-        cb(null, pocket);
+        User.update(user.id, { pocket : pocket}).exec(function(err, u){
+          if(err){
+            return cb(err);
+          }
+          cb(null, pocket);
+        });
       })
     }
   },
@@ -88,7 +103,6 @@ module.exports = {
                   charge.amount_refunded = 0;
                   charge.paymentMethod = "cash";
                   charge.status = "cash";
-                  charge.created = parseInt(new Date(order.createdAt).getTime()/1000);
                   charge.metadata = {
                     orderId : order.id,
                     deliveryFee : order.delivery_fee,
@@ -105,6 +119,7 @@ module.exports = {
                 var date = moment(order.createdAt);
                 charge.month = moment.months()[date.month()];
                 charge.day = date.date();
+                charge.created = parseInt(new Date(order.createdAt).getTime()/1000);
                 transactions.push(charge);
                 next2();
               });
@@ -120,6 +135,9 @@ module.exports = {
             return res.badRequest(err);
           }
           pocket.transactions = transactions;
+          pocket.transactions.sort(function(tran1, tran2){
+            return tran1.created < tran2.created;
+          });
           user.pocket = pocket;
           if(req.wantsJSON){
             return res.ok({pocket : pocket});
@@ -190,6 +208,7 @@ module.exports = {
                   return next(err);
                 }
                 var date = moment(order.createdAt);
+                charge.created = parseInt(new Date(order.createdAt).getTime()/1000);
                 charge.month = moment.months()[date.month()];
                 charge.day = date.date();
                 charge.type = "type-payment";
@@ -202,7 +221,6 @@ module.exports = {
                   charge.amount_refunded = 0;
                   charge.paymentMethod = "cash";
                   charge.status = "cash";
-                  charge.created = parseInt(new Date(order.createdAt).getTime()/1000);
                   charge.metadata = {
                     orderId : order.id,
                     deliveryFee : order.delivery_fee,
@@ -330,6 +348,7 @@ module.exports = {
                 if(req.wantsJSON){
                   return res.ok({pocket : pocket});
                 }
+
                 host.user.pocket = pocket;
                 host.user.payment = user.payment;
                 res.view('pocket', {user : host.user, host : host});
