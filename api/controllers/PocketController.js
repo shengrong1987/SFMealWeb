@@ -349,6 +349,10 @@ module.exports = {
                   return res.ok({pocket : pocket});
                 }
 
+                pocket.transactions.sort(function(tran1, tran2){
+                  return tran1.created < tran2.created;
+                });
+
                 host.user.pocket = pocket;
                 host.user.payment = user.payment;
                 res.view('pocket', {user : host.user, host : host});

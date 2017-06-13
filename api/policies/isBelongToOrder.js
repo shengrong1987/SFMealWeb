@@ -17,7 +17,7 @@ module.exports = function(req, res, next) {
     if(err){
       return res.badRequest(err);
     }
-    if(order && (order.customer.id == userId || order.host.id == hostId)){
+    if(order && ((order.customer && order.customer.id == userId) || order.host.id == hostId)){
       next();
     }else{
       res.forbidden('You are not permitted to perform action on this order.');
