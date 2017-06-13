@@ -788,6 +788,16 @@ function setupMixin() {
       pagerClass : 'btn btn-mixitup'
     }
   });
+  $('#transaction_container').mixItUp({
+    pagination: {
+      limit: 20,
+      pagerClass : 'btn btn-mixitup'
+    },load: {
+      sort: 'created:desc' /* default:asc */
+    },layout : {
+      display : 'block'
+    }
+  });
 }
 
 function setupLightBox(){

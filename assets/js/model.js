@@ -2570,7 +2570,7 @@ var TransactionView = Backbone.View.extend({
     var from = this.model.from;
     var to = this.model.to;
 
-    container.find(".item").each(function() {
+    container.find(".mix").each(function() {
       var title = $(this).data("title").toLowerCase();
       var date = $(this).data("created");
       if ((searchTitle && title.search(searchTitle) == -1) || (from && date < from) || (to && date > to)) {

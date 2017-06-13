@@ -62,57 +62,37 @@
                   </button>
                 </div>
               </div>
-              <!--<div class="col-xs-3">-->
-                <!--<button class="btn btn-outline text-blue white border-blue" style="margin-left:20px;width:100px;"><%= __('search-advanced')%></button>-->
-              <!--</div>-->
+            </div>
+
+            <div class="row">
+              <div class="col-xs-12">
+                <div class="btn-set">
+                  <button class="btn btn-info filter" type="button" data-filter="all">All</button>
+                  <button class="btn btn-info filter" type="button" data-filter=".comp"><%= __('type-compensation')%></button>
+                  <button class="btn btn-info filter" type="button" data-filter=".payment"><%= __('type-payment')%></button>
+                  <button class="btn btn-info filter" type="button" data-filter=".charge"><%= __('type-charge')%></button>
+                </div>
+              </div>
             </div>
 
             <h1></h1>
 
-            <div id="transaction_container">
-              <%
-              user.pocket.transactions = user.pocket.transactions || [];
-              user.pocket.transactions.sort(function(a,b){
-                return a.created < b.created;
-              });
-              %>
-
-              <div class="row">
-                <div class="col-xs-12">
-                  <h5 class="text-left"><strong><%= __('pocket-pending-bills')%></strong></h5>
-                </div>
+            <div class="row">
+              <div class="col-xs-12">
+                <h5 class="text-left"><strong><%= __('pocket-settled-bills')%></strong></h5>
               </div>
+            </div>
 
-              <%
-              user.pocket.transactions.forEach(function(tranObj){
-              if(tranObj.orderStatus != "cancel" && tranObj.status == "pending"){
-                var refund = tranObj.type == "type-compensation" ? tranObj.amount_reversed : tranObj.amount_refunded;
-              %>
-              <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
-                <div class="row vertical-align" style="padding:5px;">
-                  <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
-                  <div class="col-xs-4"><%= __(tranObj.type) %><label><%= tranObj.metadata.orderId.slice(-4)%></label> <i class="fa fa-question-circle white cursor-pointer" data-toggle="tooltip" title=<%= __('order-last-4')%>></i></div>
-                  <div class="col-xs-3"><img class="img-thumbnail round_thumb size-small" src="<%= tranObj.host.picture || "/images/profile_man.png"%>" onclick="javascript:location.href='/host/<%= tranObj.host.id %>'">&nbsp;<%= tranObj.host.shopName%></div>
-                  <div class="col-xs-3"><b>$<%= (tranObj.amount - refund - tranObj.application_fee)/100%></b> ( <%= __('order-fee')%>: $<%= Math.round(tranObj.amount - tranObj.deliveryFee * 100 - tranObj.metadata.tax)/100 %> + <%= __('tax')%>: $<%= tranObj.metadata.tax/100%> + <%= __('delivery-fee')%>: $<%= tranObj.deliveryFee %> - <%= __('application_fee')%>: $<%= tranObj.application_fee/100%><%= refund ? " - " + __('refunded')+ ": $" + refund/100 : "" %> )</div>
-                </div>
-              </div>
-              <%}});%>
-
-              <h1></h1>
-
-              <div class="row">
-                <div class="col-xs-12">
-                  <h5 class="text-left"><strong><%= __('pocket-settled-bills')%></strong></h5>
-                </div>
-              </div>
+            <div id="transaction_container" class="container">
 
               <%
               user.pocket.transactions = user.pocket.transactions || [];
-              user.pocket.transactions.forEach(function(tranObj){
-              if(tranObj.orderStatus != "cancel" && (tranObj.status == "paid" || tranObj.status == "succeeded" || tranObj.status == "cash")){
-                if(tranObj.type == "type-compensation" && !tranObj.reversed){
+              for(var i = 0; i < user.pocket.transactions.length; i++) {
+                var tranObj = user.pocket.transactions[i];
+                if(tranObj.orderStatus != "cancel" && (tranObj.status == "paid" || tranObj.status == "succeeded" || tranObj.status == "cash")){
+                  if(tranObj.type == "type-compensation" && !tranObj.reversed){
               %>
-              <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
+              <div class="background-color mix comp" style="border-radius: 5px;display: block !important;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
                   <div class="col-xs-4"><%= __(tranObj.type) %> <label><%= tranObj.metadata.orderId.slice(-4)%></label> <i class="fa fa-question-circle white cursor-pointer" data-toggle="tooltip" title=<%= __('order-last-4')%>></i></div>
@@ -121,7 +101,7 @@
                 </div>
               </div>
               <%}else if(tranObj.type == 'type-payment'){var refund = tranObj.amount_refunded;%>
-              <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
+              <div class="background-color mix payment" style="border-radius: 5px;display: block !important;;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
                   <div class="col-xs-4"><%= __(tranObj.type) %><label><%= tranObj.metadata.orderId.slice(-4)%></label> <i class="fa fa-question-circle white cursor-pointer" data-toggle="tooltip" title=<%= __('order-last-4')%>></i></div>
@@ -130,7 +110,7 @@
                 </div>
               </div>
               <%}else if(tranObj.type == 'type-charge'){var refund = tranObj.amount_refunded;%>
-              <div class="background-color item" style="border-radius: 5px;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
+              <div class="background-color mix charge" style="border-radius: 5px;display: block !important;;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
                   <div class="col-xs-4"><%= __(tranObj.type) %><label><%= tranObj.metadata.orderId.slice(-4)%></label> <i class="fa fa-question-circle white cursor-pointer" data-toggle="tooltip" title=<%= __('order-last-4')%>></i></a></div>
@@ -138,15 +118,19 @@
                   <div class="col-xs-3"><b>$<%= (tranObj.amount - refund - tranObj.application_fee)/100%></b> ( <%= __('order-fee')%>: $<%= Math.round(tranObj.amount - tranObj.deliveryFee * 100 - tranObj.metadata.tax)/100 %> + <%= __('tax')%>: $<%= tranObj.metadata.tax/100%> + <%= __('delivery-fee')%>: $<%= tranObj.deliveryFee%> <%= refund ? " - " + __('refunded')+ ": $" + refund/100 : "" %> )</div>
                 </div>
               </div>
-              <%}}});%>
+              <%}}};%>
 
             </div>
 
-            <nav class="pull-right">
-              <ul class="pagination pagination-sm" data-trigger="pagination" data-target="#transaction_container" data-npp="20">
-                <li class="active"><a href="javascript:void(0)">1</a></li>
-              </ul>
+            <nav>
+              <div class="pager-list"></div>
             </nav>
+
+            <!--<nav class="pull-right">-->
+              <!--<ul class="pagination pagination-sm" data-trigger="pagination" data-target="#transaction_container" data-npp="20">-->
+                <!--<li class="active"><a href="javascript:void(0)">1</a></li>-->
+              <!--</ul>-->
+            <!--</nav>-->
 
             <h1></h1>
 
@@ -200,4 +184,5 @@
 
 <script>
   new TransactionView({ el : $("#mydetail"), model : new Transaction()});
+  setup();
 </script>
