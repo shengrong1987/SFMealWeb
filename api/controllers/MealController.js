@@ -91,6 +91,9 @@ module.exports = {
             _host.shopName = host.shopName;
             _host.shopName_en = host.shopName_en;
             _host.shopNameI18n = host.shopNameI18n;
+            _host.intro = host.intro;
+            _host.intro_en = host.intro_en;
+            _host.introI18n = host.introI18n;
             _host.picture = host.picture;
             _host.id = host.id;
             publicHosts.push(_host);
