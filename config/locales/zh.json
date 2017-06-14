@@ -306,6 +306,7 @@
   "need-password" : "请输入密码",
   "need-six-digit" : "最少六位数",
   "need-eight-digit" : "最少八位数",
+  "password-requirement" : "密码至少需要8位且只能包含数字和字母",
   "need-same-password" : "密码不匹配",
   "need-kitchen-location" : "请输入准确厨房地址",
   "need-phone-number" : "请输入联系电话",

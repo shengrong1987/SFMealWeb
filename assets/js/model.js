@@ -98,9 +98,17 @@ var LoginView = Backbone.View.extend({
   },
   resetPassword : function(e){
     e.preventDefault();
+    this.errorView.hide();
     this.model.type = "reset";
+    var password = this.$el.find("#passwordInput").val();
+    var validator = new RegExp(/^[_A-z0-9]{8,}$/);
+    if(!validator.test(password)){
+      this.errorView.html(this.$el.find("#passwordInput").data('pattern-error'));
+      this.errorView.show();
+      return;
+    }
     this.model.set({password : this.$el.find("#passwordInput").val()});
-    $this = this;
+    var $this = this;
     this.model.save({},{
       success : function(model, result){
         if(result != "404") {

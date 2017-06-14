@@ -304,6 +304,7 @@
   "need-password": "Please enter password",
   "need-six-digit": "Six digits minimal",
   "need-eight-digit": "Eight digits minimal",
+  "password-requirement" : "Password at lease contain 8 digits and only allows number and alphabets.",
   "need-same-password": "Passwords do not match.",
   "need-kitchen-location": "Please enter exact kitchen location.",
   "need-phone-number": "Please enter contact phone number.",
