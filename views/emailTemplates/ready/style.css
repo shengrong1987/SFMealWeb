@@ -9641,6 +9641,9 @@ fieldset[disabled] .btn-red.active {
   #myorder,
   #mymeal,
   #myinfo,
+  #mydetail,
+  #mypurse,
+  #mypayment,
   #mealCreatingView,
   #mealEditingView {
     width: 90%;
@@ -9845,6 +9848,9 @@ fieldset[disabled] .btn-red.active {
   #mymeal,
   #mydish,
   #myinfo,
+  #mydetail,
+  #mypurse,
+  #mypayment,
   #mealCreatingView,
   .default-container {
     width: 100%;

@@ -1096,6 +1096,66 @@
   });
 }(jQuery);
 
++function($){
+  'user strict'
+
+  var InputToggle = function(element, options){
+    this.element = element;
+    this.options = options;
+    var targetEle = this.options.target ? $(this.options.target).children().first() : this.element.next();
+    var secondInput = targetEle.next();
+    secondInput.css('display', 'none');
+    this.element.on('click', toggleHandler);
+  }
+
+  $.fn.inputToggle              = Plugin
+  $.fn.inputToggle.Constructor  = InputToggle
+
+  InputToggle.prototype.toggle = function(){
+    var targetEle = this.options.target ? $(this.options.target).children().first() : this.element.next();
+    var firstInput = targetEle;
+    var secondInput = targetEle.next();
+    if(firstInput.css('display') == 'none'){
+      firstInput.css('display', this.options.displaystyle);
+      secondInput.css('display', 'none');
+    }else{
+      firstInput.css('display', 'none');
+      secondInput.css('display', this.options.displaystyle);
+    }
+  }
+
+  function Plugin(option, root){
+    var hasRoot = typeof root != 'undefined';
+    return this.each(function(){
+      if(!hasRoot) root = $(this);
+      var options = $.extend({}, InputToggle.DEFAULTS, root.data(), typeof option == 'object' && option);
+      var data = root.data('bs.input-toggle');
+      if(!data){
+        root.data('bs.input-toggle',(data = new InputToggle(root, options)));
+      }
+      if(typeof option == 'string'){
+        data[option]($(this));
+      }
+    });
+  }
+
+  InputToggle.DEFAULTS = {
+    displaystyle : 'block'
+  }
+
+  var toggleHandler = function(e){
+    e.preventDefault();
+    Plugin.call($(this),'toggle');
+  }
+
+  $(window).on('load',function(){
+    $('[data-toggle="input-toggle"]').each(function(){
+      var inputToggle = $(this);
+      Plugin.call(inputToggle, inputToggle.data());
+    })
+  });
+}(jQuery);
+
 (function ($) {
 
   var defaults = {

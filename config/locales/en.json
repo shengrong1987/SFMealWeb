@@ -167,6 +167,7 @@
   "host-address": "Kitchen's address",
   "host-current-address": "Your current kitchen's location:",
   "kitchen": "Kitchen",
+  "chef-story" : "Kitchen's story",
   "surface": "Preparing surface",
   "utensil": "Utensil's storage",
   "dishes": "Dishes's storage",
@@ -753,5 +754,6 @@
   "address-incomplete" : "Please enter your full address",
   "billing-address" : "Billing Address",
   "same-as-delivery-address" : "Billing address is same as delivery address.",
-  "order-receipt-help" : "If you have any questions about the order, please contact help@sfmeal.com with the order No."
+  "order-receipt-help" : "If you have any questions about the order, please contact help@sfmeal.com with the order No.",
+  "toggle-language" : "Switch language"
 }

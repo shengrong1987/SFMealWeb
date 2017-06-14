@@ -1625,6 +1625,7 @@ var MealView = Backbone.View.extend({
 
     var status = this.isActivate? "on" : "off";
     var title = form.find("#meal_title").val();
+    var title_en = form.find("#meal_title_en").val();
 
     if(mealId){
       this.model.set({id : mealId});
@@ -1644,6 +1645,7 @@ var MealView = Backbone.View.extend({
       leftQty : totalQty,
       type : type,
       title : title,
+      title_en : title_en,
       minimalOrder : min_order,
       minimalTotal : min_total,
       cover : cover,
@@ -1970,10 +1972,12 @@ var DishView = Backbone.View.extend({
     }
     var dishId = form.data("dish-id");
     var title = $("#mealTitleInput").val();
+    var titleEn = $("#mealTitleInput-en").val();
     var price = $("#priceInput").val();
     var category = $("#categoryInput").val();
     var quantity = form.find("#quantityInput").val();
     var desc = form.find("#descriptionInput").val();
+    var descEn = form.find("#descriptionInput-en").val();
     var instagram = form.find("#instagramInput").val();
     var preference = {};
     form.find(".variation .currentVar .option").each(function(){
@@ -2022,11 +2026,13 @@ var DishView = Backbone.View.extend({
 
           $this.model.set({
             title : title,
+            "title-en" : titleEn,
             price : price,
             photos : photos,
             type : category,
             quantity : quantity,
             description : desc,
+            "description-en" : descEn,
             video : instagram,
             preference : preference
           });
@@ -2311,7 +2317,9 @@ var HostProfileView = Backbone.View.extend({
     }
     var form = this.$el.find("form");
     var title = this.$el.find("input[name='story-title']").val();
+    var title_en = this.$el.find("input[name='story-title-en']").val();
     var intro = this.$el.find("textarea[name='story-intro']").val();
+    var intro_en = this.$el.find("textarea[name='story-intro-en']").val();
     var license = this.$el.find(".license .fileinput-preview").data("src");
     var shopPhoto = this.$el.find(".story .fileinput-preview").data("src");
     var feature_dishes = [];
@@ -2327,7 +2335,9 @@ var HostProfileView = Backbone.View.extend({
     this.model.set({
       id : form.data("id"),
       shopName : title,
+      shopName_en : title_en,
       intro : intro,
+      intro_en : intro_en,
       feature_dishes : feature_dishes,
       picture : shopPhoto
     });

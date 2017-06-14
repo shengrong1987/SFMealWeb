@@ -148,7 +148,7 @@
               <img class="round_thumb size-small" onclick="location.href='/host/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/profile_man.png" %>>
             </div>
             <div class="col-sm-9">
-              <h4 class="text-left text-dark"><%= meal.chef.shopName %><br><small><%= meal.chef.intro %></small></h4>
+              <h4 class="text-left text-dark"><%= meal.chef.shopNameI18n(locale) %><br><small><%= meal.chef.introI18n(locale) %></small></h4>
             </div>
           </div>
         </div>

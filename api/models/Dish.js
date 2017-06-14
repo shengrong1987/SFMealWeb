@@ -12,6 +12,13 @@ module.exports = {
       type : 'string',
       required : true
     },
+    titleI18n : function(locale){
+      var prop = "title-" + locale;
+      if(this.hasOwnProperty(prop)){
+        return this[prop];
+      }
+      return this.title;
+    },
     price : {
       type : 'float',
       required : true
@@ -20,6 +27,13 @@ module.exports = {
       type : 'string',
       defaultsTo : "",
       maxLength : 200
+    },
+    descriptionI18n : function(locale){
+      var prop = "description-" + locale;
+      if(this.hasOwnProperty(prop)){
+        return this[prop];
+      }
+      return this.description;
     },
     quantity : {
       type : 'string'

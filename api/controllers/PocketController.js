@@ -35,11 +35,11 @@ module.exports = {
         if(err){
           return cb(err);
         }
-        User.update(user.id, { pocket : pocket}).exec(function(err, u){
+        User.update(user.id, { pocket : pocket.id}).exec(function(err, u){
           if(err){
             return cb(err);
           }
-          Host.update(host.id, { pocket : pocket}).exec(function(err, h){
+          Host.update(host.id, { pocket : pocket.id}).exec(function(err, h){
             if(err){
               return cb(err);
             }
@@ -48,11 +48,11 @@ module.exports = {
         });
       })
     }else{
-      Pocket.create({ user : user.id}).exec(function(err, pocket){
+      Pocket.create({ user : user.id }).exec(function(err, pocket){
         if(err){
           return cb(err);
         }
-        User.update(user.id, { pocket : pocket}).exec(function(err, u){
+        User.update(user.id, { pocket : pocket.id}).exec(function(err, u){
           if(err){
             return cb(err);
           }
@@ -65,9 +65,9 @@ module.exports = {
   getBalance : function(req, res){
     var host = req.session.user.host;
     if(!host){
-      return this.getUserBalance(req, res);
+      this.getUserBalance(req, res);
     }else{
-      return this.getHostBalance(req, res);
+      this.getHostBalance(req, res);
     }
   },
 
@@ -115,7 +115,11 @@ module.exports = {
                 charge.orderStatus = order.status;
                 charge.application_fee = 0;
                 charge.type = "type-charge";
-                charge.host = host;
+                charge.host = {
+                  id : host.id,
+                  shopName : host.shopName,
+                  picture : host.picture
+                };
                 var date = moment(order.createdAt);
                 charge.month = moment.months()[date.month()];
                 charge.day = date.date();
@@ -135,13 +139,10 @@ module.exports = {
             return res.badRequest(err);
           }
           pocket.transactions = transactions;
-          pocket.transactions.sort(function(tran1, tran2){
-            return tran1.created < tran2.created;
-          });
-          user.pocket = pocket;
           if(req.wantsJSON){
             return res.ok({pocket : pocket});
           }
+          user.pocket = pocket;
           res.view('pocket', {user : user});
         });
       })
@@ -212,7 +213,11 @@ module.exports = {
                 charge.month = moment.months()[date.month()];
                 charge.day = date.date();
                 charge.type = "type-payment";
-                charge.host = host;
+                charge.host = {
+                  id : host.id,
+                  shopName : host.shopName,
+                  picture : host.picture
+                };
                 charge.orderStatus = order.status;
                 charge.deliveryFee = order.delivery_fee;
 
@@ -302,7 +307,11 @@ module.exports = {
                       charge.orderStatus = order.status;
                       charge.application_fee = "N/A";
                       charge.type = "type-charge";
-                      charge.host = host;
+                      charge.host = {
+                        id : host.id,
+                        shopName : host.shopName,
+                        picture : host.picture
+                      };
                       var date = moment(charge.created * 1000);
                       charge.month = moment.months()[date.month()];
                       charge.day = date.date();
@@ -323,7 +332,11 @@ module.exports = {
                       transfer.month = moment.months()[date.month()];
                       transfer.day = date.date();
                       transfer.type = "payment";
-                      transfer.host = host;
+                      transfer.host = {
+                        id : host.id,
+                        shopName : host.shopName,
+                        picture : host.picture
+                      };;
                       stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee){
                         if(err){
                           return cb(err);
@@ -348,10 +361,6 @@ module.exports = {
                 if(req.wantsJSON){
                   return res.ok({pocket : pocket});
                 }
-
-                pocket.transactions.sort(function(tran1, tran2){
-                  return tran1.created < tran2.created;
-                });
 
                 host.user.pocket = pocket;
                 host.user.payment = user.payment;

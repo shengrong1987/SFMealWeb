@@ -353,17 +353,21 @@ module.exports = {
           publicHost.dishes = host.dishes;
           publicHost.meals = host.meals;
           publicHost.shopName = host.shopName;
+          publicHost.shopName_en = host.shopName_en;
           publicHost.picture = host.picture;
           publicHost.intro = host.intro;
+          publicHost.intro_en = host.intro_en;
           publicHost.feature_dishes = host.feature_dishes;
           publicHost.shortIntro = host.shortIntro();
           publicHost.license = host.license;
           publicHost.reviews = reviews;
           publicHost.likes = host.likes;
+          publicHost.shopNameI18n = host.shopNameI18n;
+          publicHost.introI18n = host.introI18n;
           if(req.wantsJSON){
             return res.ok(publicHost);
           }
-          return res.view("profile",{host : publicHost, user : req.session.user});
+          return res.view("profile",{host : publicHost, user : req.session.user, locale : req.getLocale()});
         }
         host.reviews = reviews;
         return res.ok(host);

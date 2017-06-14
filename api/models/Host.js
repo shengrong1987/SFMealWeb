@@ -21,6 +21,13 @@ module.exports = {
       type : 'string',
       maxLength : 35
     },
+    shopNameI18n : function(locale){
+      var prop = "shopName_" + locale;
+      if(this.hasOwnProperty(prop)){
+        return this[prop];
+      }
+      return this.shopName;
+    },
     picture : {
       type : 'string'
       // url : true
@@ -28,6 +35,13 @@ module.exports = {
     intro : {
       type : 'string',
       defaultsTo : ""
+    },
+    introI18n : function(locale){
+      var prop = "intro_" + locale;
+      if(this.hasOwnProperty(prop)){
+        return this[prop];
+      }
+      return this.intro;
     },
     email : {
       type : 'email',
@@ -167,12 +181,13 @@ module.exports = {
       var d = R * c * 0.62; // Distance in miles
       return d.toFixed(1);
     },
-    shortIntro : function(){
-      var length = this.intro?this.intro.length:0;
+    shortIntro : function(locale){
+      var intro = this.introI18n(locale);
+      var length = intro?intro.length:0;
       if(length > 50){
-        return this.intro.slice(0,50) + "...";
+        return intro.slice(0,50) + "...";
       }
-      return this.intro;
+      return intro;
     }
   }
 };

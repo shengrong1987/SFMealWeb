@@ -65,7 +65,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            return res.view('meals',{meals : orders.concat(preorders), user : u, county : county});
+            return res.view('meals',{meals : orders.concat(preorders), user : u, county : county, locale : req.getLocale()});
           });
         })
       });
@@ -87,14 +87,16 @@ module.exports = {
             return false;
           })
           if(popularHost && highScore){
-            _host.shortIntro = host.shortIntro();
+            _host.shortIntro = host.shortIntro;
             _host.shopName = host.shopName;
+            _host.shopName_en = host.shopName_en;
+            _host.shopNameI18n = host.shopNameI18n;
             _host.picture = host.picture;
             _host.id = host.id;
             publicHosts.push(_host);
           }
         })
-        return res.view('home',{user : user, hosts : publicHosts});
+        return res.view('home',{user : user, hosts : publicHosts, locale : req.getLocale()});
       });
     }
   },
@@ -253,10 +255,10 @@ module.exports = {
           user[0].orders = user[0].orders.filter(function(order){
             return order.status == "schedule" || order.status == "preparing";
           })
-          res.view("confirm",{meal : m[0], user : user[0]});
+          res.view("confirm",{meal : m[0], user : user[0], locale : req.getLocale()});
         });
       }else{
-        return res.view("confirm", { meal : m[0], user : {}});
+        return res.view("confirm", { meal : m[0], user : {}, locale : req.getLocale()});
       }
     });
   },

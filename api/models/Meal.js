@@ -21,6 +21,13 @@ module.exports = {
     title : {
       type : 'string'
     },
+    titleI18n : function(locale){
+      var prop = "title_" + locale;
+      if(this.hasOwnProperty(prop)){
+        return this[prop];
+      }
+      return this.title;
+    },
     status : {
       type : 'string',
       enum : ['on','off']

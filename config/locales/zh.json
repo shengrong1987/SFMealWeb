@@ -167,6 +167,7 @@
   "host-address" : "厨房地址",
   "host-current-address" : "你当前的厨房地址为:",
   "kitchen" : "厨房",
+  "chef-story" : "厨师故事",
   "surface" : "按台表面",
   "utensil" : "餐厨具",
   "dishes" : "碗碟",
@@ -753,5 +754,6 @@
   "enter-name" : "请输入名字",
   "billing-address" : "账单地址",
   "same-as-delivery-address" : "账单地址和送餐地址一样",
-  "order-receipt-help" : "如果您点你的订单有任何问题，请附上订单号联系客服help@sfmeal.com"
+  "order-receipt-help" : "如果您点你的订单有任何问题，请附上订单号联系客服help@sfmeal.com",
+  "toggle-language" : "切换语言"
 }

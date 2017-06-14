@@ -72,11 +72,11 @@ module.exports = function findOneRecord (req, res) {
               if(err){
                 return res.badRequest(err);
               }
-              res.view('meal',{meal : matchingRecord, user : user, orders : orders});
+              res.view('meal',{meal : matchingRecord, locale : req.getLocale(), user : user, orders : orders});
             });
           });
         }else{
-          res.view('meal',{meal : matchingRecord, user : null, orders : null});
+          res.view('meal',{meal : matchingRecord, locale : req.getLocale(), user : null, orders : null});
         }
       }
     }else if(Model.adapter.identity == "user"){

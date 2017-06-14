@@ -441,13 +441,16 @@
             </div>
 
             <div class="form-group" style="margin-top: 40px;">
-              <label style="display: block;" >6.<%= __('name-your-dish')%></label>
+              <label>6.<%= __('name-your-dish')%></label>
+              <button class="btn btn-default" data-toggle="input-toggle" data-displaystyle="inline-block" title="<%= __('toggle-language')%>" data-target="#title-container"><i class="fa fa-refresh"></i> </button>
               <div class="row">
-                <div class="col-xs-12">
-                  <input id="meal_title" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="7" placeholder="<%= __('full-name')%>" data-error="<%= __('need-name')%>" required value="<%= meal.title%>"><small> &nbsp;<%= __('Ex-meal-title')%></small>
-                  <div class="help-block with-errors"></div>
+                <div class="col-xs-12" id="title-container">
+                  <input id="meal_title" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="7" placeholder="<%= __('full-name')%>" data-error="<%= __('need-name')%>" required value="<%= meal.title%>">
+                  <input id="meal_title_en" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="30" placeholder="Meal title" data-error="<%= __('need-name')%>" value="<%= meal.title_en || ''%>">
+                  <small> <%= __('Ex-meal-title')%></small>
                 </div>
               </div>
+              <div class="help-block with-errors"></div>
             </div>
 
             <div class="form-group text-center submit">
@@ -467,5 +470,5 @@
 
 <script>
   var mealView = new MealView({ el : "#mealEditingView", model : new Meal()});
-  setupAutoComplete();
+  setup();
 </script>

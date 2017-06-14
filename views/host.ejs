@@ -1716,8 +1716,10 @@
                 <div class="col-xs-12" style="margin-top:15px;">
                   <div class="story">
                     <div class="col-sm-5">
-                      <label>(1) <%= __('host-story')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                      <input class="form-control" data-error="<%= __('max-title-7')%>" name="story-title" maxlength="7" type="text" class="form-control" placeholder="<% if(typeof user.host.shopName == 'undefined'){%>标题最多七个字<%}else{%><%= user.host.shopName %><%}%>" value="<% if(typeof user.host.shopName == 'undefined'){%><%}else{%><%= user.host.shopName %><%}%>">
+                      <label>(1) <%= __('host-title')%></label>
+                      <button class="btn btn-default" style="margin-top:-3px;" data-toggle="input-toggle"><i class="fa fa-refresh"></i></button>
+                      <input class="form-control" data-error="<%= __('max-title-7')%>" name="story-title" maxlength="7" type="text" class="form-control" placeholder="<%= __('full-name')%>" value="<%= user.host.shopName || '' %>">
+                      <input class="form-control" name="story-title-en" maxlength="30" type="text" class="form-control" placeholder="Kitchen name" value="<%= user.host.shopName_en || '' %>">
                       <div class="help-block with-errors"></div>
                       <label>(2) <%= __('host-photo')%> </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" data-placement="right" title="<%= __('photo-restrition')%>"></i></label>
 
@@ -1747,7 +1749,9 @@
                     </div>
                     <div class="col-sm-7">
                       <label>(3) <%= __('host-story-content')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                      <textarea class="form-control" data-error="<%= __('host-story-content-max')%>" maxlength="300" name="story-intro" style="width: 100%;height: 360px;"><%if(typeof user.host.intro != 'undefined'){%><%= user.host.intro %><%}%></textarea>
+                      <button class="btn btn-default" style="margin-top:-3px;" data-toggle="input-toggle"><i class="fa fa-refresh"></i></button>
+                      <textarea class="form-control" data-error="<%= __('host-story-content-max')%>" maxlength="300" name="story-intro" placeholder=<%= __('chef-story')%> style="width: 100%;height: 360px;"><%= user.host.intro || '' %></textarea>
+                      <textarea class="form-control" data-error="<%= __('host-story-content-max')%>" maxlength="1000" name="story-intro-en" placeholder="Chef's story" style="width: 100%;height: 360px;"><%= user.host.intro_en || '' %></textarea>
                       <div class="help-block with-errors"></div>
                     </div>
                   </div>
@@ -1864,5 +1868,6 @@
   var myMealView = new MyMealView({ el : $("#mymeal"), model : new Meal()});
   var hostProfileView = new HostProfileView( { el : $("#myinfo"), model : new Host()})
   new AddressView({ el : $("#hostAddressView"), model : new Host()})
-  var orderView = new OrderView({ el : $("#myorder"), model : new Order()})
+  var orderView = new OrderView({ el : $("#myorder"), model : new Order()});
+  setup();
 </script>

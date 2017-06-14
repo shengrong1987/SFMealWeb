@@ -27,7 +27,7 @@
           </div>
           <div class="row">
             <div class="col-xs-12">
-              <h4 class="text-dark"><strong><%= host.shopName %></strong><br/><br/><small><%= host.shortIntro %></small></h4>
+              <h4 class="text-dark"><strong><%= host.shopNameI18n(locale) %></strong><br/><br/><small><%= host.introI18n(locale) %></small></h4>
               <p><% if(host.license && host.license.valid){%><i class="fa fa-certificate fa-2x text-yellow"></i><%= __('has-foodhandler-license')%> <%}%></p>
               <p>
                 <button id="likeBtn" class="btn btn-red"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
