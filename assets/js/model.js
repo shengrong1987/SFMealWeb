@@ -1408,7 +1408,7 @@ var MealView = Backbone.View.extend({
     });
     setupLanguage();
     setupAutoComplete();
-    $("input[type='tel']").inputmask({"mask": "(999) 999-9999"});
+    setupInputMask();
   },
   removeNewPickup : function(e){
     e.preventDefault();

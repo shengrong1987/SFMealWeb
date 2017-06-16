@@ -729,6 +729,7 @@ function setup(){
   setupValidator();
   setupCountrySelector();
   setupSelector();
+  setupInputMask();
   // $(function(){
   //   var keyStop = {
   //     // 8: ":not(input:text, textarea, input:file, input:password)", // stop backspace = back
@@ -839,6 +840,9 @@ function setupValidator(){
       }
     }
   });
+}
+
+function setupInputMask(){
   $("input[type='tel']").mask("(000)000-0000");
 }
 
