@@ -175,6 +175,11 @@
                             <input type="text" class="form-control">
                           </div>
 
+                          <div class="form-group area" data-county="<%= host.county%>">
+                            <label><%= __('area')%></label>
+                            <input class="form-control" type="text" readonly="readonly">
+                          </div>
+
                           <div class="form-group method">
                             <label><%= __('pickup-method')%></label>
                             <select class="form-control">
@@ -185,7 +190,7 @@
 
                           <div class="form-group phone">
                             <label><%= __('phone')%></label>
-                            <input type="text" class="form-control" value="<%= host.user.phone || ''%>">
+                            <input type="tel" class="form-control" value="<%= host.user.phone || ''%>">
                           </div>
 
                         </div>
@@ -237,6 +242,13 @@
                     <input type="checkbox" id="isDelivery" class="regular-checkbox" checked="checked">
                     <label for="isDelivery"></label>
                     <span style="margin-left: 10px;"><%= __('delivery-available')%></span>
+                  </div>
+                </div>
+                <div class="col-xs-12">
+                  <div class="box-compact vertical-align">
+                    <input type="checkbox" id="isDeliveryBySystem" class="regular-checkbox" checked='checked'>
+                    <label for="isDeliveryBySystem"></label>
+                    <span style="margin-left: 10px;"><%= __('delivery-by-system')%></span>
                   </div>
                 </div>
               </div>
