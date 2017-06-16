@@ -132,6 +132,9 @@ module.exports = {
       defaultsTo : ''
     },
     getTaxRate : function(){
+      if(this.meal.isTaxIncluded){
+        return 0;
+      }
       return util.getTaxRate(this.host.county);
     },
     coupon : {

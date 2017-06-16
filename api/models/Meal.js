@@ -140,6 +140,10 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
+    isTaxIncluded : {
+      type : 'boolean',
+      defaultsTo : false
+    },
     /*
       type : "fixed/custom",
       price : "5.00",
@@ -245,6 +249,9 @@ module.exports = {
     },
 
     getTaxRate : function(){
+      if(this.isTaxIncluded){
+        return 0;
+      }
       return util.getTaxRate(this.chef.county);
     },
 

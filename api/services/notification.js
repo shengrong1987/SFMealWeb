@@ -175,7 +175,8 @@ var notification = {
 
     var chef = params.chef || params.host;
     var county = chef ? chef.county : params.county;
-    params.taxRate = util.getTaxRate(county);
+    var isTaxIncluded = params.hasOwnProperty("isTaxIncluded") ? params.isTaxIncluded : ( params.meal ? params.meal.isTaxIncluded : false);
+    params.taxRate = isTaxIncluded ? 0 : util.getTaxRate(county);
     params.recipientName = basicInfo.recipientName;
     params.senderName = "SFMeal.com";
 

@@ -1132,7 +1132,8 @@ describe('OrderController', function() {
             minimalOrder : 5,
             isDelivery : true,
             status : 'on',
-            type : 'order'
+            type : 'order',
+            isTaxIncluded : true
           })
           .expect(200)
           .end(done)
@@ -1170,6 +1171,7 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
+            res.body.tax.should.be.equal(0);
             res.body.customer.should.be.equal(guestId);
             done()
           })

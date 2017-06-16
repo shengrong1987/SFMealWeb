@@ -392,7 +392,7 @@ module.exports = {
           req.body.meal = m.id;
           req.body.hostEmail = m.chef.email;
           req.body.phone = m.chef.phone;
-          req.body.tax = $this.getTax(req.body.subtotal, m.chef.county);
+          req.body.tax = $this.getTax(req.body.subtotal, m.chef.county, m.isTaxIncluded);
           states.m = m;
 
           async.auto({
@@ -671,7 +671,7 @@ module.exports = {
           //host cannot adjust the order at schedule
           //can update without permission of host or adjust by host
           var diff = parseFloat(subtotal - order.subtotal);
-          var tax = $this.getTax(diff, order.host.county);
+          var tax = $this.getTax(diff, order.host.county, order.meal.isTaxIncluded);
 
           sails.log.info("adjusting amount: " + diff);
           sails.log.info("original tax amount: " + order.tax);
@@ -745,7 +745,7 @@ module.exports = {
               }else{
                 var totalRefund = Math.abs(diff);
                 var refunded_application_fee = totalRefund * order.meal.commission;
-                tax = $this.getTax(totalRefund, order.host.county)/100;
+                tax = $this.getTax(totalRefund, order.host.county, order.meal.isTaxIncluded)/100;
                 sails.log.info("original tax amount: " + order.tax);
                 sails.log.info("tax refund amount: " + tax);
                 order.tax -= tax * 100;
@@ -1076,7 +1076,7 @@ module.exports = {
         var adjusting_subtotal = order.adjusting_subtotal;
         var adjusting_orders = order.adjusting_orders;
         var diff = adjusting_subtotal - order.subtotal;
-        var tax = $this.getTax(diff,order.host.county);
+        var tax = $this.getTax(diff, order.host.county, order.meal.isTaxIncluded);
         var customerId = order.customer.id;
         if(diff != 0){
           User.findOne(customerId).populate('payment').exec(function (err, found) {
@@ -1151,7 +1151,7 @@ module.exports = {
             }else {
               var totalRefund = Math.abs(diff);
               var refunded_application_fee = totalRefund * order.meal.commission;
-              tax = $this.getTax(totalRefund, order.host.county)/100;
+              tax = $this.getTax(totalRefund, order.host.county, order.meal.isTaxIncluded)/100;
               diff = - diff;
               diff += tax;
               sails.log.info("refunding amount plus tax: " + diff);
@@ -1459,7 +1459,10 @@ module.exports = {
     })
   },
 
-  getTax : function(subtotal, county){
+  getTax : function(subtotal, county, isTaxIncluded){
+    if(isTaxIncluded){
+      return 0;
+    }
     var tax = util.getTaxRate(county);
     return Math.round(subtotal * tax * 100);
   }
