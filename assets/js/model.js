@@ -468,7 +468,6 @@ var ApplyView = Backbone.View.extend({
   },
 
   handleDocument : function(file, cb){
-
     cb();
   },
 
@@ -526,69 +525,11 @@ var ApplyView = Backbone.View.extend({
       }
     })
   },
-
   addAddress : function(e){
-    e.data = {mt :this};
-    toggleModal(e,this.enterAddressInfo);
-  },
-  enterAddressInfo : function(event){
-    var target = $(event.target);
-    var hostId = target.data("id");
-    var address_form = $("#addressDetailView form");
-    address_form.off("submit");
-    address_form.on("submit",{ mt : event.data.mt}, event.data.mt.saveAddress);
-    address_form.find("button[name='cancel']").off("click");
-    address_form.find("button[name='cancel']").on("click",dismissModal);
-    address_form.attr("data-id",hostId);
-    address_form.attr("data-host",true);
-    address_form.find(".host").show();
-    address_form.find(".user").hide();
-  },
-  saveAddress : function(e) {
-    e.preventDefault();
-    var address_form = $("#addressDetailView form");
-    var submit_btn = address_form.find("[type='submit']");
-    var phone = address_form.find("#phoneInput").val();
-    if (submit_btn.hasClass('disabled') || !phone) {
+    if($(e.currentTarget).attr('disabled')){
       return;
     }
-    submit_btn.button("loading");
-    var alert_block = address_form.find(".alert");
-    var $this = e.data.mt;
-    alert_block.removeClass("hide");
-    alert_block.hide();
-    var id = address_form.data("id");
-    var street = address_form.find("#streetInput").val();
-    var city = address_form.find("#cityInput").val();
-    var zip = address_form.find("#postalInput").val();
-    var isDefault = address_form.find("#isDefault").prop("checked");
-    var url = "";
-    if (address_form.data("host")) {
-      $this.model = new Host();
-    }
-    $this.model.set({id: id});
-    $this.model.set({
-      address: [{
-        street: street,
-        city: city,
-        zip: zip,
-        phone: phone,
-        isDefault: isDefault
-      }]
-    });
-    $this.model.save({}, {
-      success: function () {
-        location.reload();
-      }, error: function (model, err) {
-        if(err && err.responseJSON && err.responseJSON.invalidAttributes && err.responseJSON.invalidAttributes.county && err.responseJSON.invalidAttributes.county.length > 0){
-          alert_block.html(jQuery.i18n.prop('countyNotInServiceError'));
-        }else{
-          alert_block.html(showErrorMsg(err));
-        }
-        alert_block.show();
-        submit_btn.button("reset");
-      }
-    });
+    toggleModal(e, addressView.enterAddressInfo);
   },
   applyForHost : function(e){
     e.preventDefault();
@@ -788,9 +729,6 @@ var User = Backbone.Model.extend({
 var AddressView = Backbone.View.extend({
   events : {
     "click .deleteBtn" : "deleteAddress",
-    "click .edit" : "updateAddress",
-    "click [data-action='updateFromOrder']" : "updateAddressFromOrder",
-    "click .newAddress" : "newAddress",
     "submit form" : "saveAddress"
   },
   initialize : function() {
@@ -799,7 +737,7 @@ var AddressView = Backbone.View.extend({
     this.isCoolDown = true;
   },
   deleteAddress : function(e){
-    var target = $(event.target).closest('.address_block');
+    var target = $(event.target);
     var address_id = target.data("address-id");
     this.model.set({
       address : [{
@@ -815,8 +753,8 @@ var AddressView = Backbone.View.extend({
       }
     })
   },
-  enterAddressInfoFromOrder : function (event){
-    var target = $(event.target);
+  enterAddressInfoFromOrder : function (target){
+    var target = $(target);
     var id = target.data("id");
     var address_form = $("#addressDetailView form");
     address_form.attr("data-id",id);
@@ -828,8 +766,8 @@ var AddressView = Backbone.View.extend({
     address_form.find("button[name='cancel']").off("click");
     address_form.find("button[name='cancel']").on("click",dismissModal);
   },
-  enterAddressInfo : function(event){
-    var target = $(event.target).closest('.address_block');
+  enterAddressInfo : function(target){
+    var target = $(target);
     var address_id = target.data("address-id");
     var id = target.data("id");
     var street = target.data("street") || "";
@@ -1380,6 +1318,7 @@ var MealView = Backbone.View.extend({
   },
   addNewPickup : function(e){
     e.preventDefault();
+    var county = this.$el.find(".pickup_container").data("county");
     this.$el.find("#pickupAlert").hide();
     var pickupView = '<div class="well form-group pickup"> ' +
       '<div class="col-sm-4"> <label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> ' +
@@ -1389,7 +1328,7 @@ var MealView = Backbone.View.extend({
       '<div class="form-group delivery-center delivery-item" style="display: none;"> <label data-toggle="i18n" data-key="deliveryCenter"></label> <input type="text" class="form-control"></div>' +
       '<div class="form-group public-location pickup-item"> <label data-toggle="i18n" data-key="publicLocation"></label> <input type="text" class="form-control"> </div>' +
       '<div class="form-group instruction pickup-item"><label data-toggle="i18n" data-key="pickupInstruction"></label> <input type="text" class="form-control"> </div>' +
-      '<div class="form-group area"> <label data-toggle="i18n" data-key="area"></label> <input class="form-control" type="text" readonly="readonly" value=""> </div>' +
+      '<div class="form-group area" data-county="' + county + '"> <label data-toggle="i18n" data-key="area"></label> <input class="form-control" type="text" readonly="readonly" value=""> </div>' +
       '<div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div>' +
       '<div class="form-group phone"> <label data-toggle="i18n" data-key="telephone"></label> <input type="tel" class="form-control"> </div> </div> </div>';
     this.$el.find(".pickup_container").append(pickupView);
@@ -2732,7 +2671,7 @@ var MealConfirmView = Backbone.View.extend({
     if(this.$el.find(".pickupOption").length == 0){
       mapCenter = "25 Washington St, Daly City";
     }else{
-      mapCenter = $(this.$el.find(".pickupOption [data-location]")[0]).data('location');
+      mapCenter = this.$el.find(".pickupOption").data('location');
     }
     utility.geocoding(mapCenter, function(err, center, map){
       if(err){
@@ -2778,7 +2717,6 @@ var MealConfirmView = Backbone.View.extend({
       $('#contactInfoView').removeClass('hide');
       $('#contactInfoView').show();
     }else{
-      // e.data = {mt : this};
       toggleModal(e, addressView.enterAddressInfoFromOrder);
     }
   },

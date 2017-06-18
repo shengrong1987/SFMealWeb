@@ -32,7 +32,7 @@
             <div class="form-group">
               <label for="mealTitleInput">1.<%= __('dish-name') %></label><button class="btn btn-default" data-toggle="input-toggle" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i></button>
               <input id="mealTitleInput" class="form-control" type="text" placeholder="<%= __('full-name') %>" maxlength="7" data-error="<%= __('full-name') %>" required value="<%= dish.title%>">
-              <input id="mealTitleInput-en" class="form-control" type="text" placeholder="Dish title" maxlength="30" data-error="<%= __('full-name') %>" value="<%= dish['title-en'] || ''%>">
+              <input id="mealTitleInput-en" class="form-control" type="text" placeholder="Dish title" maxlength="40" data-error="<%= __('full-name') %>" value="<%= dish['title-en'] || ''%>">
               <div class="help-block with-errors"></div>
             </div>
 

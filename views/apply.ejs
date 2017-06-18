@@ -30,11 +30,11 @@
       <div class="navbar">
         <div class="navbar-inner">
           <ul class="nav nav-pills">
-            <li class="active" style="height: 80px;"><a href="#step1" data-toggle="tab" data-pass="<%= user.host || ''%>" data-step="1">1.<%= __('step1')%></a><br/><% if(user.host){%><i class="fa fa-check text-green"></i><%}%></li>
-            <li style="height: 80px;"><a href="#step2" data-toggle="tab" data-pass="<%= hasAddress%>" data-step="2">2.<%= __('step2')%></a><br/><% if(hasAddress){%><i class="fa fa-check text-green"></i><%}%></li>
-            <li style="height: 80px;"><a href="#step3" data-toggle="tab" data-pass="<%= hasDish%>" data-step="3">3.<%= __('step3')%></a><br/><%if(hasDish){%><i class="fa fa-check text-green"></i><%}%></li>
-            <li style="height: 80px;"><a href="#step4" data-toggle="tab" data-pass="<%= hasMeal%>" data-step="4">4.<%= __('step4')%></a><br/><%if(hasMeal){%><i class="fa fa-check text-green"></i><%}%></li>
-            <li style="height: 80px;"><a href="#step5" data-toggle="tab" data-pass="<%= hasAccount%>" data-step="5">5.<%= __('step5')%></a><br/><%if(hasAccount){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li class="active nav-item" style="height: 80px;"><a href="#step1" data-toggle="tab" data-pass="<%= user.host || ''%>" data-step="1">1.<%= __('step1')%></a><br/><% if(user.host){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li class="<%= user.host?'':'disabled'%>" style="height: 80px;"><a href="#step2" data-toggle="tab" data-pass="<%= hasAddress%>" data-step="2">2.<%= __('step2')%></a><br/><% if(hasAddress){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li class="<%= user.host?'':'disabled'%>" style="height: 80px;"><a href="#step3" data-toggle="tab" data-pass="<%= hasDish%>" data-step="3">3.<%= __('step3')%></a><br/><%if(hasDish){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li class="<%= user.host?'':'disabled'%>" style="height: 80px;"><a href="#step4" data-toggle="tab" data-pass="<%= hasMeal%>" data-step="4">4.<%= __('step4')%></a><br/><%if(hasMeal){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li class="<%= user.host?'':'disabled'%>" style="height: 80px;"><a href="#step5" data-toggle="tab" data-pass="<%= hasAccount%>" data-step="5">5.<%= __('step5')%></a><br/><%if(hasAccount){%><i class="fa fa-check text-green"></i><%}%></li>
             <% if(user.host){%>
               <li style="height: 80px;"><a href="#step6" data-toggle="tab" data-pass="<%= !verification%>" data-step="6">6. <%= __('step6')%></a><br/><%if(!verification){%><i class="fa fa-check text-green"></i><%}%></li>
             <%}%>
@@ -86,7 +86,7 @@
           <div class="well">
             <label><%= __('step2-ongoing')%></label>
           </div>
-          <a id="addAddress" class="btn btn-info round" toggle="modal" data-target="#myModal" data-host="true" data-id="<%= user.host%>" data-href="/templates/user/address.html"><%= __('step2-action-btn')%></a>
+          <a id="addAddress" class="btn btn-info round" <%= user.host?'':'disabled="disabled"'%> title="<%= user.host?'':__('user-not-host')%>" toggle="modal" data-toggle="tooltip" data-target="#myModal" data-host="true" data-id="<%= user.host%>" data-href="/templates/user/address.html"><%= __('step2-action-btn')%></a>
           <%}%>
 
         </div>
@@ -105,7 +105,7 @@
             <label><%= __('step3-ongoing')%></label>
             <h4><small><%= __('step3-ongoing-tip')%></small></h4>
           </div>
-          <a target="_blank" href="/host/me/createDish" class="btn btn-info round"><%= __('step3-action-btn')%></a>
+          <a target="_blank" href=<%= user.host?"/host/me/createDish":'javascript:void(0)'%> class="btn btn-info round" <%= user.host?'':'disabled="disabled"'%> title="<%= user.host?'':__('user-not-host')%>" data-toggle="tooltip"><%= __('step3-action-btn')%></a>
           <%}%>
 
         </div>
@@ -124,7 +124,7 @@
             <label><%= __('step4-ongoing')%></label>
             <h4><small><%= __('step4-ongoing-tip')%></small></h4>
           </div>
-          <a target="_blank" href="/host/me/createMeal" class="btn btn-info round"><%= __('step4-action-btn')%></a>
+          <a target="_blank" href=<%= user.host?"/host/me/createMeal":'javascript:void(0)'%> class="btn btn-info round" <%= user.host?'':'disabled="disabled"'%> title="<%= user.host?'':__('user-not-host')%>" data-toggle="tooltip"><%= __('step4-action-btn')%></a>
           <%}%>
 
         </div>
@@ -144,7 +144,7 @@
             <h4><small><%= __('step5-ongoing-tip')%></small></h4>
           </div>
           <div class="row" style="margin-top: 20px;">
-            <a target="_blank" href="/pocket/me#mypurse" class="btn btn-info round"><%= __('step5-action-btn')%></a>
+            <a target="_blank" href=<%= user.host?"/pocket/me#mypurse":'javascript:void(0)'%> class="btn btn-info round" <%= user.host?'':'disabled="disabled"'%> title="<%= user.host?'':__('user-not-host')%>" data-toggle="tooltip"><%= __('step5-action-btn')%></a>
           </div>
           <%}%>
 
@@ -369,5 +369,6 @@
   })
   setup();
   new ApplyView({el : $("#applyView"), model : new Host()});
+  var addressView = new AddressView({ el : $("#applyView"), model : new User()})
 
 </script>

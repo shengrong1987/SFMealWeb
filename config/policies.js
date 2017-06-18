@@ -80,7 +80,7 @@ module.exports.policies = {
     'me' : ['sessionAuth','isHost'],
     'apply' : ['sessionAuth'],
     'findOne' : true,
-    'update' : 'or(and(sessionAuth, sessionSelf, isNotFields("user","accountId","bankId","long","lat","city","street","passGuide","pocket")), isAdmin)',
+    'update' : 'or(isAdmin,and(sessionAuth, sessionSelf, isNotFields("user","accountId","bankId","long","lat","city","street","passGuide","pocket")))',
     'like' : 'sessionAuth',
     'follow' : 'sessionAuth',
     'unfollow' : 'sessionAuth',

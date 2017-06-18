@@ -1353,7 +1353,7 @@
                     var address= addresses[key];
                   %>
                   <div class="text-left box-grid">
-                    <div class="address_block" data-id="<%= user.id %>" data-address-id="<%= address.id%>" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>">
+                    <div class="address_block">
                       <div class="row vertical-align">
                         <div class="col-xs-2 text-center">
                           <% if(address.isDefault){ %>
@@ -1364,8 +1364,8 @@
                           <label class="actual_address"><%= address.street%>, &nbsp;<%= address.city%> <%= address.zip%> <br/>+<%= address.phone%></label>
                         </div>
                         <div class="col-xs-4">
-                          <a class="text-red cursor-pointer edit" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html">&nbsp;&nbsp;<%= __('modify')%></a>
-                          <a class="text-red cursor-pointer deleteBtn" style="margin-left: 5px;" href="javascript:void(0)">&nbsp;<%= __('delete')%></a>
+                          <a class="text-red cursor-pointer" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>" data-address-id="<%= address.id%>" data-id="<%= user.id %>" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0);" onclick="toggleModal(this, addressView.enterAddressInfo)">&nbsp;&nbsp;<%= __('modify')%></a>
+                          <a class="text-red cursor-pointer deleteBtn" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>" data-address-id="<%= address.id%>" data-id="<%= user.id %>" style="margin-left: 5px;" href="javascript:void(0)">&nbsp;<%= __('delete')%></a>
                         </div>
                       </div>
                     </div>
@@ -1373,8 +1373,8 @@
                   <%})%>
                 </div>
 
-                <div class="text-left address_block" data-id="<%= user.id%>">
-                  <button style="margin: 10px 0 10px 0;" class="btn btn-red round newAddress" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html"><%= __('new-location-phone')%></button>
+                <div class="text-left address_block">
+                  <button style="margin: 10px 0 10px 0;" class="btn btn-red round" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0);" onclick="toggleModal(this, addressView.enterAddressInfo)" data-id="<%= user.id%>"><%= __('new-location-phone')%></button>
                 </div>
               </div>
             </div>
@@ -1386,7 +1386,7 @@
                 </div>
               </div>
               <div class="text-left box-grid">
-                <div class="address_block" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street || ""%>" data-city="<%= user.host.city || ""%>" data-zip="<%= user.host.zip || ""%>" data-phone="<%=user.phone || ""%>">
+                <div class="address_block">
                   <div class="row vertical-align">
                     <div class="col-xs-2 text-center">
                       <label class="text-green"><%= __('default')%></label>
@@ -1395,7 +1395,7 @@
                       <label><%= user.host.full_address || __('need-kitchen-location') %><br/> +<%= user.phone || __('need-phone-number') %></label>
                     </div>
                     <div class="col-xs-4">
-                      <a class="text-green cursor-pointer edit" style="margin-left:10px;" toggle="modal" data-target="#myModal" data-host="true" data-href="/templates/user/address.html"><%= __('modify')%></a>
+                      <a class="text-green cursor-pointer" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street || ""%>" data-city="<%= user.host.city || ""%>" data-zip="<%= user.host.zip || ""%>" data-phone="<%=user.phone || ""%>" style="margin-left:10px;" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0)" onclick="toggleModal(this, addressView.enterAddressInfo)"><%= __('modify')%></a>
                     </div>
                   </div>
                 </div>
@@ -1566,7 +1566,7 @@
 </div>
 
 <script>
-  new AddressView({ el : $("#myaddress"), model : new User()})
+  var addressView = new AddressView({ el : $("#myaddress"), model : new User()})
   var userProfileView = new UserProfileView( { el: $("#myinfo"), model : new User()})
   new ReviewView({ el : $("#myreview"), model : new Review()})
   var orderView = new OrderView({ el : $("#myorder"), model : new Order()});

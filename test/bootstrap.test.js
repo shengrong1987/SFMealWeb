@@ -11,7 +11,7 @@ before(function(done) {
   require('dotenv').config();
   Sails.lift({
     // configuration for testing purposes
-    log: { level: 'verbose' },
+    log: { level: 'info' },
     connections: {
       someMongodbServer : {
         database : 'test'

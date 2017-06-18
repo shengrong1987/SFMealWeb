@@ -275,10 +275,10 @@ module.exports = {
           if(err){
             return next(err);
           }
-          values.county = host.county;
           if(values.type != "order"){
             return next();
           }
+          values.county = host.county;
           var pickupOption = {
             "pickupFromTime": values.pickupFromTime,
             "pickupTillTime": values.pickupTillTime,
