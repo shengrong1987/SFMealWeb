@@ -23,7 +23,7 @@ module.exports = {
     },
     titleI18n : function(locale){
       var prop = "title_" + locale;
-      if(this.hasOwnProperty(prop)){
+      if(this.hasOwnProperty(prop) && this[prop]){
         return this[prop];
       }
       return this.title;
@@ -278,6 +278,7 @@ module.exports = {
           if(values.type != "order"){
             return next();
           }
+          sails.log.info("updating meal county to host county");
           values.county = host.county;
           var pickupOption = {
             "pickupFromTime": values.pickupFromTime,
@@ -347,10 +348,11 @@ module.exports = {
           if(err){
             return next(err);
           }
-          values.county = host.county;
           if(values.type != "order"){
             return next();
           }
+          sails.log.info("updating meal county to host county");
+          values.county = host.county;
           var pickupOption = {
             "pickupFromTime": values.provideFromTime,
             "pickupTillTime": values.provideTillTime,

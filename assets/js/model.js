@@ -838,7 +838,7 @@ var AddressView = Backbone.View.extend({
       success: function () {
         location.reload();
       }, error: function (model, err) {
-        if(err && err.responseJSON){
+        if(err && err.responseJSON && err.responseJSON.invalidAttributes){
           if(err.responseJSON.invalidAttributes.county && err.responseJSON.invalidAttributes.county.length > 0){
             alert_block.html(jQuery.i18n.prop('countyNotInServiceError'));
           }else if(err.responseJSON.invalidAttributes.phone && err.responseJSON.invalidAttributes.phone.length > 0){
@@ -1037,20 +1037,26 @@ var MealSelectionView = Backbone.View.extend({
         var infowindow = new google.maps.InfoWindow({
           content: title
         });
-        utility.geocoding(location, function(err, center, map){
-          if(err){
-            makeAToast(err);
+        utility.initMap($this.$el.find("#googlemap")[0], center, function(err, map) {
+          if (err) {
+            makeAToast(err, 'error');
             return;
           }
-          var marker = new google.maps.Marker({
-            position: center,
-            title: title
+          utility.geocoding(location, function(err, center){
+            if(err){
+              makeAToast(err);
+              return;
+            }
+            var marker = new google.maps.Marker({
+              position: center,
+              title: title
+            });
+            marker.addListener('click', function () {
+              infowindow.open(map, marker);
+              setupLanguage();
+            })
+            marker.setMap(map);
           });
-          marker.addListener('click', function () {
-            infowindow.open(map, marker);
-            setupLanguage();
-          })
-          marker.setMap(map);
         });
       })
     })
@@ -1254,6 +1260,7 @@ var MealView = Backbone.View.extend({
     var select = $(e.target);
     var container = select.closest('.pickup');
     var method = select.val();
+    container.find(".delivery-item").removeClass("hide");
     if(method == "pickup"){
       container.find(".pickup-item").show();
       container.find(".delivery-item").hide();
@@ -1261,20 +1268,6 @@ var MealView = Backbone.View.extend({
       container.find(".pickup-item").hide();
       container.find(".delivery-item").show();
     }
-    // var locationInput = select.closest('.method').parent().find('.location input');
-    // var publicLocation = select.closest('.method').parent().find('.public-location input');
-    //
-    // if(method == 'delivery'){
-    //   locationInput.prop('disabled',true);
-    //   publicLocation.prop('disabled',true);
-    //   locationInput.val('N/A');
-    //   publicLocation.val('N/A');
-    // }else{
-    //   locationInput.removeAttr('disabled');
-    //   publicLocation.removeAttr('disabled');
-    //   publicLocation.val('');
-    //   locationInput.val('');
-    // }
   },
   toggleShipping : function(e){
     var checkbox = $(e.target);
@@ -1346,7 +1339,7 @@ var MealView = Backbone.View.extend({
       showTodayButton : true,
     });
     setupLanguage();
-    setupAutoComplete();
+    initAutoComplete(google);
     setupInputMask();
   },
   removeNewPickup : function(e){
@@ -2684,21 +2677,27 @@ var MealConfirmView = Backbone.View.extend({
         var infowindow = new google.maps.InfoWindow({
           content: title
         });
-        utility.geocoding(location, function(err, center, map){
-          if(err){
-            makeAToast(err);
+        utility.initMap($this.$el.find("#googlemap")[0], center, function(err, map) {
+          if (err) {
+            makeAToast(err, 'error');
             return;
           }
-          var marker = new google.maps.Marker({
-            position: center,
-            title: title
+          utility.geocoding(location, function(err, center){
+            if(err){
+              makeAToast(err);
+              return;
+            }
+            var marker = new google.maps.Marker({
+              position: center,
+              title: title
+            });
+            marker.addListener('click', function () {
+              infowindow.open(map, marker);
+              setupLanguage();
+            })
+            marker.setMap(map);
           });
-          marker.addListener('click', function () {
-            infowindow.open(map, marker);
-            setupLanguage();
-          })
-          marker.setMap(map);
-        })
+        });
       })
     });
   },

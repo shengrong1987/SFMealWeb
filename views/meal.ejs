@@ -76,9 +76,6 @@
 
               <div class="row">
                 <div class="col-xs-12">
-                  <% if(meal.type=="order"){%>
-                  <h4 class="text-left"><small><%= __('provide-time')%> <span data-toggle="time-span" data-format="hourly" data-from="<%= meal.provideFromTime%>" data-to="<%= meal.provideTillTime%>" class="text-red"> <%= meal.provideDate()%></span></small></h4>
-                  <%}else{%>
                   <h4 class="text-left"><small><%= __('book-time')%>: <span class="text-black"><strong><%= meal.provideDate()%></strong></span></small></h4>
                   <div class="row">
                     <div class="col-xs-4">
@@ -92,35 +89,34 @@
                       <h4><small><%= __('pickup-location')%>:</small></h4>
                       <div class="pickup-location">
                         <%
-                          var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
-                          var count = 1;
-                          meal.pickups.forEach(function(pickup){ if(pickup.method == "pickup"){ %>
-                          <div class="row">
-                            <div class="col-xs-12">
-                              <div class="option pickupOption" data-location="<%= pickup.publicLocation || pickup.location%>" data-color="<%= colors[count]%>">
-                                <label>
-                                  <i class="fa fa-hand-paper-o cursor-pointer text-<%= colors[count]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i>
-                                  <span> <%= pickup.publicLocation || pickup.location%><% if(pickup.instruction){%>(<%= pickup.instruction%>)<%}%></span>
-                                </label>
-                              </div>
+                        var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
+                        var count = 1;
+                        meal.pickups.forEach(function(pickup){ if(pickup.method == "pickup"){ %>
+                        <div class="row">
+                          <div class="col-xs-12">
+                            <div class="option pickupOption" data-location="<%= pickup.publicLocation || pickup.location%>" data-color="<%= colors[count]%>">
+                              <label>
+                                <i class="fa fa-hand-paper-o cursor-pointer text-<%= colors[count]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i>
+                                <span> <%= pickup.publicLocation || pickup.location%><% if(pickup.instruction){%>(<%= pickup.instruction%>)<%}%></span>
+                              </label>
                             </div>
                           </div>
-                          <%}else{%>
-                          <div class="row">
-                            <div class="col-xs-12">
-                              <div class="option deliveryOption" data-area="<%= pickup.area%>" data-location="<%= pickup.deliveryCenter%>" data-color="<%= colors[count]%>">
-                                <label>
-                                  <i class="fa fa-truck cursor-pointer text-<%= colors[count]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i>
-                                  <span> <%= pickup.area || pickup.deliveryCenter%><%= __('nearby')%></span>
-                                </label>
-                              </div>
+                        </div>
+                        <%}else{%>
+                        <div class="row">
+                          <div class="col-xs-12">
+                            <div class="option deliveryOption" data-area="<%= pickup.area%>" data-location="<%= pickup.deliveryCenter%>" data-color="<%= colors[count]%>">
+                              <label>
+                                <i class="fa fa-truck cursor-pointer text-<%= colors[count]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i>
+                                <span> <%= pickup.area || pickup.deliveryCenter%> <%= __('nearby')%></span>
+                              </label>
                             </div>
                           </div>
+                        </div>
                         <%}count++;})%>
                       </div>
                     </div>
                   </div>
-                  <%}%>
                 </div>
               </div>
               <div class="row">

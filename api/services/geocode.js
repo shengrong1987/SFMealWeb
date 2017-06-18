@@ -16,10 +16,9 @@ module.exports = {
     geocoder.geocode(address, function(err, res) {
       sails.log.debug("finish geocoding: " + err);
       if(err){
-        cb(err);
-      }else{
-        cb(err,res);
+        return cb(err);
       }
+      cb(null,res);
     });
   },
 

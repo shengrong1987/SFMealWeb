@@ -191,9 +191,9 @@
                             <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= pickup.pickupTillTime%>">
                               <span class="input-group-addon"><%= __('end')%></span>
                               <input type='text' class="form-control" readonly="true"/>
-                            <span class="input-group-addon">
+                              <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
-                            </span>
+                              </span>
                             </div>
                           </div>
 
@@ -471,4 +471,5 @@
 <script>
   var mealView = new MealView({ el : "#mealEditingView", model : new Meal()});
   setup();
+  utility.initAutoComplete();
 </script>

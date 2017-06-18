@@ -14,7 +14,7 @@ module.exports = {
     },
     titleI18n : function(locale){
       var prop = "title-" + locale;
-      if(this.hasOwnProperty(prop)){
+      if(this.hasOwnProperty(prop) && this[prop]){
         return this[prop];
       }
       return this.title;
@@ -30,7 +30,7 @@ module.exports = {
     },
     descriptionI18n : function(locale){
       var prop = "description-" + locale;
-      if(this.hasOwnProperty(prop)){
+      if(this.hasOwnProperty(prop) && this[prop]){
         return this[prop];
       }
       return this.description;

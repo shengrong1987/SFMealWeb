@@ -23,7 +23,7 @@ module.exports = {
     },
     shopNameI18n : function(locale){
       var prop = "shopName_" + locale;
-      if(this.hasOwnProperty(prop)){
+      if(this.hasOwnProperty(prop) && this[prop]){
         return this[prop];
       }
       return this.shopName;
@@ -38,7 +38,7 @@ module.exports = {
     },
     introI18n : function(locale){
       var prop = "intro_" + locale;
-      if(this.hasOwnProperty(prop)){
+      if(this.hasOwnProperty(prop) && this[prop]){
         return this[prop];
       }
       return this.intro;

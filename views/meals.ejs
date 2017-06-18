@@ -66,13 +66,16 @@
         var meal = meals[i];
         var cover = meal.cover;
         if (!cover) {
-          var mainDish = meal.dishes[0];
+          var mainDish = meal.dishes.filter(function (dish) {
+            return dish.id == Object.keys(meal.leftQty)[0];
+          })[0];
         } else {
           var mainDish = meal.dishes.filter(function (dish) {
             return dish.id == cover;
           })[0];
         }
         if (!mainDish) {break;}
+        meal.mainDish = mainDish;
         if (typeof anchor !== 'undefined' && anchor) {
           var distance = meal.chef.getDistance(anchor.lat, anchor.long);
         } else if (user) {
@@ -121,7 +124,7 @@
           var meal = mealsInArea[k];
       %>
 
-      <div class="meal-box meal col-md-4 col-lg-3 col-xs-12 mix appetizer item <%= meal.type %>" data-distance-order=<%= distance %> data-price-order=<%= mainDish.price.toFixed(2)%>>
+      <div class="meal-box meal col-md-4 col-lg-3 col-xs-12 mix appetizer item <%= meal.type %>" data-distance-order=<%= distance %> data-price-order=<%= meal.mainDish.price.toFixed(2)%>>
         <div class="box-grid white" style="overflow: hidden;">
           <div class="relative item-image">
           <i class="fa fa-heart fa-2x fav text-white <% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
@@ -134,13 +137,13 @@
           </div>
           <div class="col-md-7 basic-info">
             <div class="col-xs-12">
-              <h3 class="text-red text-left">$<%= mainDish.price.toFixed(2) %><br>
-                <small><strong class="text-black"><%= mainDish.title %></strong> <span>( <%= mainDish.quantity || '1' + __('fen')%>)</span></small>
+              <h3 class="text-red text-left">$<%= meal.mainDish.price.toFixed(2) %><br>
+                <small><strong class="text-black"><%= meal.mainDish.title %></strong> <span>( <%= meal.mainDish.quantity || '1' + __('fen')%>)</span></small>
               </h3>
             </div>
           </div>
           <div class="col-md-5">
-            <h3><small><%= __('left')%><%= meal.leftQty[mainDish.id] + __('fen')%><br><%=  __('self-pickup') + (meal.isDelivery ? ("/" + __('delivery')) : '')%></small></h3>
+            <h3><small><%= __('left')%><%= meal.leftQty[meal.mainDish.id] + __('fen')%><br><%=  __('self-pickup') + (meal.isDelivery ? ("/" + __('delivery')) : '')%></small></h3>
           </div>
           <div class="divider"></div>
           <div class="row vertical-align chef-cell">

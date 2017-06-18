@@ -154,23 +154,28 @@
                             <div class='input-group date' data-toggle="dateTimePicker">
                               <span class="input-group-addon"><%= __('end')%></span>
                               <input type='text' class="form-control" readonly="true"/>
-                            <span class="input-group-addon">
-                                <span class="fa fa-calendar"></span>
-                            </span>
+                              <span class="input-group-addon">
+                                  <span class="fa fa-calendar"></span>
+                              </span>
                             </div>
                           </div>
 
-                          <div class="form-group location">
+                          <div class="form-group location pickup-item">
                             <label><%= __('pickup-location')%></label>
                             <input type="text" class="form-control">
                           </div>
 
-                          <div class="form-group public-location">
+                          <div class="form-group delivery-center delivery-item hide">
+                            <label><%= __('delivery-center')%></label>
+                            <input type="text" class="form-control">
+                          </div>
+
+                          <div class="form-group public-location pickup-item">
                             <label><%= __('pickup-public-location')%></label>
                             <input type="text" class="form-control">
                           </div>
 
-                          <div class="form-group instruction">
+                          <div class="form-group instruction pickup-item">
                             <label><%= __('pickup-instruction')%></label>
                             <input type="text" class="form-control">
                           </div>
@@ -359,17 +364,6 @@
 
 <script>
   new MealView({ el : "#mealCreatingView", model : new Meal()});
-  if(!googleAPILoaded){
-    jQuery.ajax({
-      url: "https://maps.googleapis.com/maps/api/js?key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA&libraries=places&callback=initAutoComplete",
-      dataType: 'script',
-      async: true,
-      defer : true,
-      success : function(){
-        googleAPILoaded = true;
-      }
-    });
-  }else{
-    initAutoComplete();
-  }
+  setup();
+  utility.initAutoComplete();
 </script>
