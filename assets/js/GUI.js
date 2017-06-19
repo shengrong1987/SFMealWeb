@@ -233,8 +233,8 @@ function lastStep(event){
   $(steps[currentStep-1]).removeClass('hide');
 }
 
-function enterDishPreference(event){
-  var preference = $(event.target).data("preference");
+function enterDishPreference(target){
+  var preference = $(target).data("preference");
   var container = $("#preferenceTable tbody");
   container.empty();
   preference.forEach(function(pre, index){
@@ -244,9 +244,9 @@ function enterDishPreference(event){
   })
 }
 
-function enterHostInfo(event){
-  var hostId = $(event.target).data("host");
-  var isUpdating = $(event.target).data("updating");
+function enterHostInfo(target){
+  var hostId = $(target).data("host");
+  var isUpdating = $(target).data("updating");
   var bank_form = $("#bankView form");
   bank_form.data("host",hostId);
   bank_form.data("updating",isUpdating);
