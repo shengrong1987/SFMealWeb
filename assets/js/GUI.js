@@ -252,45 +252,6 @@ function enterHostInfo(target){
   bank_form.data("updating",isUpdating);
 }
 
-// function enterAddressInfoFromOrder(event){
-//   var target = $(event.target);
-//   var id = target.data("id");
-//   var address_form = $("#address-form");
-//   address_form.attr("data-id",id);
-//   address_form.find("#new_title").removeClass("hide");
-// }
-//
-// function enterAddressInfo(event){
-//   var target = $(event.target).parent();
-//   var address_id = target.data("address-id");
-//   var id = target.data("id");
-//   var street = target.data("street");
-//   var city = target.data("city");
-//   var zip = target.data("zip");
-//   var phone = target.data("phone");
-//   var address_form = $("#address-form");
-//   address_form.off("submit");
-//   address_form.on("submit",{ mt : event.data.mt}, event.data.mt.saveAddress);
-//   address_form.find("button[name='cancel']").off("click");
-//   address_form.find("button[name='cancel']").on("click",dismissModal);
-//   var isHost = target.data("host");
-//   if(isHost){
-//     address_form.attr("data-host",true);
-//   }
-//   address_form.attr("data-id",id);
-//   address_form.attr("data-address-id",address_id);
-//   if(street){
-//     address_form.find("#exist_title").removeClass("hide");
-//   }else{
-//     address_form.find("#new_title").removeClass("hide");
-//   }
-//   address_form.find("#streetInput").val(street);
-//   address_form.find("#cityInput").val(city);
-//   address_form.find("#zipcodeInput").val(zip);
-//   address_form.find("#phoneInput").val(phone);
-// }
-
-
 //on user search action - redirect
 function search(target, isRegular){
   var searchContainer = $(target).parent();

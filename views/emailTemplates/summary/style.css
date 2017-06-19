@@ -9493,7 +9493,7 @@ fieldset[disabled] .btn-red.active {
   border-radius: 10px;
 }
 .box-email {
-  padding: 25px;
+  padding: 15px;
   border: none ;
 }
 .box-larger-simple {
@@ -9835,6 +9835,9 @@ fieldset[disabled] .btn-red.active {
   }
   #shoppingCartView {
     display: inline-flex;
+  }
+  .xs-hide {
+    display: none;
   }
   .xs-hide,
   #our-story img {
