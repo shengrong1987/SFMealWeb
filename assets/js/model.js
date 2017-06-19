@@ -2741,7 +2741,7 @@ var MealConfirmView = Backbone.View.extend({
     }
     refreshMenu();
   },
-  verifyAddress : function(e){
+  verifyAddress : function(e, checkOnly){
     var btn = $(e.currentTarget);
     var street = this.$el.find("input[name='street']").val();
     var city = this.$el.find("input[name='city']").val();
@@ -2749,14 +2749,17 @@ var MealConfirmView = Backbone.View.extend({
     var zipcode = this.$el.find("input[name='zipcode']").val();
     if(!street || !city || !state || !zipcode){
       makeAToast(jQuery.i18n.prop('addressIncomplete'));
-      return;
+      return false;
     }
     var range = this.$el.data("range");
     var yourAddress = street + ", " + city + ", " + state + " " + zipcode;
     var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
     if(!deliveryOption.length){
       makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
-      return;
+      return false;
+    }
+    if(checkOnly){
+      return yourAddress;
     }
     var deliveryCenter = deliveryOption.parent().data('center');
     btn.button('loading');
@@ -2789,17 +2792,27 @@ var MealConfirmView = Backbone.View.extend({
   switchAddress : function(e, cb, yourAddress){
     var range = this.$el.data("range");
     var $this = this;
-    if(!yourAddress){
-      var deliveryLocationOption = this.$el.find("#deliveryTab .contactOption .regular-radio:checked");
-      if(!deliveryLocationOption.length){
-        makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
-        if(cb){
-          return cb(false);
+    var isLogin = this.$el.data("user") ? true : false;
+    if(!yourAddress) {
+      if (isLogin) {
+        var deliveryLocationOption = this.$el.find("#deliveryTab .contactOption .regular-radio:checked");
+        if (!deliveryLocationOption.length) {
+          makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
+          if (cb) {
+            return cb(false);
+          }
+          return;
         }
-        return;
+        var yourAddress = deliveryLocationOption.next().next().text();
+      } else {
+        var yourAddress = $this.verifyAddress(e, true);
       }
-      var yourAddress = deliveryLocationOption.next().next().text();
     }
+
+    if (!yourAddress) {
+      return;
+    }
+
     var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
     if(!deliveryOption.length){
       makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));

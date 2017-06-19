@@ -74,8 +74,8 @@
             cb(null, location, utility.map);
           }
         } else {
-          console.log("Geocode was not successful for the following reason: " + status);
-          cb("Geocode was not successful for the following reason: ");
+          console.log(jQuery.i18n.prop('geocodingError') + status);
+          cb(jQuery.i18n.prop('geocodingError') + status);
         }
       })
     });
