@@ -1413,7 +1413,7 @@ module.exports = {
 
   receipt : function(req, res){
     var orderId = req.params.id;
-    Order.findOne(orderId).populate("dishes").populate('host').exec(function(err, order){
+    Order.findOne(orderId).populate("dishes").populate('host').populate('meal').exec(function(err, order){
       if(err){
         return res.badRequest(err);
       }
