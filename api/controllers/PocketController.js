@@ -24,6 +24,45 @@ module.exports = {
     });
   },
 
+  composeCharge : function(charge, order, host){
+    var chargeId = charge.id;
+    if(chargeId == "cash"){
+      charge.amount = order.charges[chargeId];
+      charge.amount_refunded = 0;
+      charge.paymentMethod = "cash";
+      charge.status = "cash";
+      charge.metadata = {
+        orderId : order.id,
+        deliveryFee : order.delivery_fee,
+        tax : order.tax
+      }
+    }else{
+      charge.paymentMethod = "online";
+    }
+    charge.deliveryFee = order.delivery_fee;
+    charge.orderStatus = order.status;
+    charge.host = {
+      id : host.id,
+      shopName : host.shopName,
+      picture : host.picture
+    };
+    var date = moment(order.createdAt);
+    charge.month = moment.months()[date.month()];
+    charge.day = date.date();
+    charge.created = parseInt(new Date(order.createdAt).getTime()/1000);
+    return charge;
+  },
+
+  composeTransfer : function(transfer, order, host){
+    var date = moment(transfer.created * 1000);
+    transfer.month = moment.months()[date.month()];
+    transfer.day = date.date();
+    transfer.type = "type-compensation";
+    transfer.host = host;
+    transfer.paymentMethod = "online";
+    return transfer;
+  },
+
   createOrGetPocket : function(user, host, isHost, cb){
     if((!isHost && user.pocket)){
       return cb(null, user.pocket);
@@ -98,32 +137,9 @@ module.exports = {
                 if(err){
                   return next2(err);
                 }
-                if(chargeId == "cash"){
-                  charge.amount = order.charges[chargeId];
-                  charge.amount_refunded = 0;
-                  charge.paymentMethod = "cash";
-                  charge.status = "cash";
-                  charge.metadata = {
-                    orderId : order.id,
-                    deliveryFee : order.delivery_fee,
-                    tax : order.tax
-                  }
-                }else{
-                  charge.paymentMethod = "online";
-                }
-                charge.deliveryFee = order.delivery_fee;
-                charge.orderStatus = order.status;
+                charge = _this.composeCharge(charge, order, host);
                 charge.application_fee = 0;
                 charge.type = "type-charge";
-                charge.host = {
-                  id : host.id,
-                  shopName : host.shopName,
-                  picture : host.picture
-                };
-                var date = moment(order.createdAt);
-                charge.month = moment.months()[date.month()];
-                charge.day = date.date();
-                charge.created = parseInt(new Date(order.createdAt).getTime()/1000);
                 transactions.push(charge);
                 next2();
               });
@@ -208,33 +224,8 @@ module.exports = {
                 if(err){
                   return next(err);
                 }
-                var date = moment(order.createdAt);
-                charge.created = parseInt(new Date(order.createdAt).getTime()/1000);
-                charge.month = moment.months()[date.month()];
-                charge.day = date.date();
+                charge = _this.composeCharge(charge, order, host);
                 charge.type = "type-payment";
-                charge.host = {
-                  id : host.id,
-                  shopName : host.shopName,
-                  picture : host.picture
-                };
-                charge.orderStatus = order.status;
-                charge.deliveryFee = order.delivery_fee;
-
-                if(chargeId == "cash"){
-                  charge.amount = order.charges[chargeId];
-                  charge.amount_refunded = 0;
-                  charge.paymentMethod = "cash";
-                  charge.status = "cash";
-                  charge.metadata = {
-                    orderId : order.id,
-                    deliveryFee : order.delivery_fee,
-                    tax : order.tax
-                  }
-                }else{
-                  charge.paymentMethod = "online";
-                }
-
                 stripe.retrieveApplicationFee(charge.application_fee, function(err, fee){
                   if(err){
                     return next(err);
@@ -257,11 +248,8 @@ module.exports = {
                   if (err) {
                     return next(err);
                   }
-                  var date = moment(transfer.created * 1000);
-                  transfer.month = moment.months()[date.month()];
-                  transfer.day = date.date();
-                  transfer.type = "type-compensation";
-                  transfer.host = host;
+
+                  transfer = _this.composeTransfer(transfer, order, host);
                   stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee){
                     if(err){
                       return cb(err);
@@ -303,18 +291,8 @@ module.exports = {
                       if(err){
                         return next(err);
                       }
-                      charge.deliveryFee = order.delivery_fee;
-                      charge.orderStatus = order.status;
-                      charge.application_fee = "N/A";
+                      charge = _this.composeCharge(charge, order, host);
                       charge.type = "type-charge";
-                      charge.host = {
-                        id : host.id,
-                        shopName : host.shopName,
-                        picture : host.picture
-                      };
-                      var date = moment(charge.created * 1000);
-                      charge.month = moment.months()[date.month()];
-                      charge.day = date.date();
                       pocket.transactions.push(charge);
                       next();
                     });
@@ -323,36 +301,27 @@ module.exports = {
                   if(err){
                     return cb(err);
                   }
-                  if(transfer){
-                    Host.findOne(transfer.metadata.hostId).exec(function(err, host) {
-                      if (err) {
-                        return next(err);
-                      }
-                      var date = moment(transfer.created * 1000);
-                      transfer.month = moment.months()[date.month()];
-                      transfer.day = date.date();
-                      transfer.type = "payment";
-                      transfer.host = {
-                        id : host.id,
-                        shopName : host.shopName,
-                        picture : host.picture
-                      };;
-                      stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee){
-                        if(err){
-                          return cb(err);
-                        }
-                        if(fee){
-                          transfer.application_fee = fee.application_fee - fee.amount_refunded;
-                        }else{
-                          transfer.application_fee = 0;
-                        }
-                        transactions.push(transfer);
-                        cb();
-                      })
-                    });
-                  }else{
-                    cb();
+                  if(!transfer){
+                    return cb();
                   }
+                  Host.findOne(transfer.metadata.hostId).exec(function(err, host) {
+                    if (err) {
+                      return next(err);
+                    }
+                    transfer = _this.composeTransfer(transfer, order, host);
+                    stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee){
+                      if(err){
+                        return cb(err);
+                      }
+                      if(fee){
+                        transfer.application_fee = fee.application_fee - fee.amount_refunded;
+                      }else{
+                        transfer.application_fee = 0;
+                      }
+                      transactions.push(transfer);
+                      cb();
+                    })
+                  });
                 });
               }, function (err) {
                 if(err){

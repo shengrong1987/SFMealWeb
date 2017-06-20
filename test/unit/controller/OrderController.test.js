@@ -1617,6 +1617,55 @@ describe('OrderController', function() {
           done();
         })
     });
+
+    it('should be able to order a meal with cash with no card', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price3 * 1,
+          pickupOption : 1,
+          method : "pickup",
+          mealId : mealId,
+          contactInfo : {},
+          paymentInfo : { method : 'cash'}
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.tax.should.be.equal(price3 * 0.085 * 100);
+          res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + 1) * 100);
+          res.body.customerPhone.should.be.equal(customerPhone);
+          res.body.customerName.should.be.equal(customerName);
+          orderId = res.body.id;
+          done();
+        })
+    });
+
+    it('should be able to cancel a cash order', function(done){
+      agent
+        .post('/order/' + orderId + '/cancel')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.paymentMethod.should.be.equal('cash');
+          res.body.charges['cash'].should.be.equal(0);
+          done();
+        })
+    });
+
+
   });
 
 });

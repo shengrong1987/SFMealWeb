@@ -100,7 +100,7 @@ module.exports = {
 
   retrieveCharge : function(attr, cb){
     if(attr == "cash"){
-      return cb(null, {});
+      return cb(null, { id: "cash" });
     }
     stripe.charges.retrieve(attr, cb);
   },

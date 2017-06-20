@@ -32,6 +32,7 @@
           <form data-id="<%= user.id %>" data-toggle="validator" data-err-container=".submit">
             <div class="form-group">
               <label for="mealTitleInput">1.<%= __('dish-name') %></label>
+              <button class="btn btn-default" data-toggle="input-toggle" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i></button>
               <input id="mealTitleInput" class="form-control" type="text" placeholder="<%= __('full-name') %>" maxlength="7" data-error="<%= __('full-name') %>" required>
               <input id="mealTitleInput-en" class="form-control" type="text" placeholder="<%= __('full-name') %>" maxlength="40" data-error="<%= __('full-name') %>">
               <div class="help-block with-errors"></div>
@@ -112,10 +113,9 @@
 
             <div class="form-group">
               <label for="desciptionInput">6.<%= __('dish-description') %></label>
-              <div class="input-group" style="width: 100%;max-width: 600px;">
-                <textarea class="form-control" id="descriptionInput" maxlength="200" style="height: 150px;"></textarea>
-                <textarea class="form-control" id="descriptionInput-en" maxlength="200" style="height: 150px;"></textarea>
-              </div>
+              <button class="btn btn-default" data-toggle="input-toggle" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i></button>
+              <textarea class="form-control" id="descriptionInput" maxlength="200" style="height: 150px;"></textarea>
+              <textarea class="form-control" id="descriptionInput-en" maxlength="800" style="height: 150px;"></textarea>
             </div>
 
             <div class="form-group variation">

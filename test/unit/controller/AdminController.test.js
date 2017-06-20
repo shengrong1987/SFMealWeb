@@ -207,7 +207,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(4);
+          res.body.should.have.length(5);
           cancelOrderId = res.body[0].id;
           done();
         })

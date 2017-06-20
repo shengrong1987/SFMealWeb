@@ -148,18 +148,18 @@
           <%
             var dishes = meal.dishes;
             var typeName = {"appetizer" : __('appetizer'), "entree" : __('main'), "dessert" : __('dessert')};
-            var header = {"appetizer" : false, "entree" : false, "dessert" : false};
+            var headers = ["appetizer", "entree", "dessert"];
+            for(var k=0; k < headers.length; k++){
+              var header = headers[k];
+          %>
+            <div class="dark category-cell">
+              <h4 class="text-white"><%= typeName[header] %></h4>
+            </div>
+          <%
             for(var i=0; i < dishes.length; i++){
               var dish = dishes[i];
-              if(!header[dish.type]){
-                header[dish.type] = true;
+              if(dish.type == header){
           %>
-
-          <div class="dark category-cell">
-            <h4 class="text-white"><%= typeName[dish.type] %></h4>
-          </div>
-
-          <% }%>
 
           <h2></h2>
 
@@ -317,7 +317,7 @@
 
             </div>
           </div>
-          <%} %>
+          <%}}} %>
 
       <h1></h1>
       </div>

@@ -1016,7 +1016,7 @@ module.exports = {
                     if(err){
                       return res.badRequest(err);
                     }
-                    return res.ok({responseText : req.__('order-cancel-ok'), tax : order.tax});
+                    return res.ok({responseText : req.__('order-cancel-ok'), tax : order.tax, paymentMethod : order.paymentMethod, charges : order.charges});
                   });
                 })
               });

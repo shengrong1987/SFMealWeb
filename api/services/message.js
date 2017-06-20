@@ -21,7 +21,11 @@ module.exports = {
       from: "+14159936325",
       body : content
     }, function (err, message) {
-      sails.log.info("sent text: " + err);
+      if(err){
+        sails.log.info("sent text: " + err);
+        return;
+      }
+      sails.log.info("sent text: " + message);
     });
   }
 }
