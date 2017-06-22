@@ -50,7 +50,6 @@
                     dishObj = dishObj["dish"+i];
                     var dish = host.dishes.forEach(function(dish){
                     if(dish.id == dishObj.id){
-
             %>
             <div class="feature-dish col-lg-6 col-md-12 col-xs-6" style="margin-top: 15px;">
               <div class="white border-round" style="overflow: hidden;">
@@ -154,6 +153,7 @@
               <div id="host-reviews">
               <%
                 host.reviews.forEach(function(review){
+                if(review.isPublic){
               %>
               <div class="item">
                 <div class="row">
@@ -167,7 +167,7 @@
                         <i class="fa fa-star"></i>
                       </div>
                     </div>
-                    <h4 style="display: inline-block;"><small style="font-size: 16px;" class="text-grey" data-id=<%= review.user %>><%= review.username %> : <%= review.title%> ( $<%= parseFloat(review.price).toFixed(2)%> )</small></h4>
+                    <h4 style="display: inline-block;"><small style="font-size: 16px;" class="text-grey" data-id=<%= review.user %>><%= review.username %> : <%= review.title%> <%= review.price ? "( $" + parseFloat(review.price).toFixed(2) + ")" : ''%> </small></h4>
                   </div>
                   <div class="col-sm-3">
                     <h3 class="text-right"><small><%= review.get_formatted_time() %></small></h3>
@@ -177,7 +177,7 @@
                 <div class="divider"></div>
               </div>
               <%
-                });
+              }});
               %>
               </div>
               <nav class="pull-right">

@@ -81,7 +81,7 @@ module.exports = {
       defaultsTo : 'entree'
     },
     isFeature : function(){
-      return this.score >= 4.8 || this.numberOfReviews > 50;
+      return this.score >= 4.8 || this.numberOfReviews > 5;
     },
     isVerified : {
       type : 'boolean',

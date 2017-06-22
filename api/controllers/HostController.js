@@ -333,7 +333,7 @@ module.exports = {
   findOne : function(req, res){
     var hostId = req.params.id;
     var isAdmin = false;
-    if(req.session.user){
+    if(req.session.authenticated){
       isAdmin = req.session.user.auth.email === 'admin@sfmeal.com';
     }
     Host.findOne(hostId).populate("dishes").populate("meals").exec(function(err, host){

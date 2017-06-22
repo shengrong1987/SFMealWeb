@@ -20,6 +20,7 @@ describe('MealController', function() {
   describe('build a meal with dishes', function() {
 
     var hostId;
+    var userId;
     var email = 'aimbebe.r@gmail.com';
     var adminEmail = 'admin@sfmeal.com';
     var user2Email = "user2@sfmeal.com";
@@ -29,6 +30,7 @@ describe('MealController', function() {
     var outOfSFAddress = {"street":"25 Washington St","city" : "Daly City", "zip" : 94014, "phone" : "(415)802-3853"};
     var invalidAddress = {"street" : "1", "city" : '', "zip" : 0, "phone" : ""};
     var guestEmail = 'enjoymyself1987@gmail.com';
+    var tempPhone = "(415)609-2357";
 
     it('should login an account', function (done) {
       agent
@@ -51,6 +53,7 @@ describe('MealController', function() {
           }
           res.body.should.have.property('host');
           hostId = res.body.host.id;
+          userId = res.body.id;
           done();
         })
     });
@@ -151,6 +154,21 @@ describe('MealController', function() {
         })
     });
 
+    it('should update phone for user and update host phone', function (done) {
+      agent
+        .put('/user/' + userId)
+        .send({
+          phone : tempPhone
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    });
+
     it('should update address info for host', function (done) {
       agent
         .put('/host/' + hostId)
@@ -176,6 +194,21 @@ describe('MealController', function() {
     var leftQty = {};
     var totalQty = {};
 
+    it('should get meal creation view', function (done){
+      agent
+        .get('/host/me/createMeal')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('dishes').with.length(4);
+          res.body.host.id.should.be.equal(hostId);
+          done();
+        })
+    })
 
     it('should create a order type meal ', function (done) {
       var now = new Date();
@@ -183,7 +216,7 @@ describe('MealController', function() {
       for(var i=1; i<=4; i++){
         switch(i){
           case 1:
-            leftQty[dish1] = i;
+            leftQty[dish1] = 5;
             totalQty[dish1] = 5;
             break;
           case 2:
@@ -229,6 +262,7 @@ describe('MealController', function() {
               return done(Error("error creating meal"));
             }
             res.body.county.should.be.equal("San Francisco County");
+            res.body.commission.should.be.equal(0.2);
             mealId = res.body.id;
             done();
           })
@@ -437,11 +471,24 @@ describe('MealController', function() {
           provideFromTime: now,
           provideTillTime: new Date(now.getTime() + 1000 * 3600),
           minimalOrder : 1,
-          status : 'off'
+          status : 'off',
+          commission : 0.1
         })
         .expect(403)
         .end(done)
     });
+
+    it('should be able to remove a dish from a meal with no active order', function(done){
+      agent
+        .delete('/meal/' + preorderMealId + '/dishes/' + dish1)
+        .expect(200, done)
+    })
+
+    it('should be able to add a dish from a meal with no active order', function(done){
+      agent
+        .post('/meal/' + preorderMealId + '/dishes/' + dish1)
+        .expect(200, done)
+    })
 
     it('should be able to update meals with no orders', function(done){
       var now = new Date();
@@ -494,6 +541,37 @@ describe('MealController', function() {
         .end(done)
     });
 
+    it('should get meals page filter by county with no results', function(done){
+      agent
+        .get('/')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('meals').with.length(0);
+          done();
+        })
+    });
+
+    it('should get home page filter by county with no results', function(done){
+      agent
+        .get('/')
+        .set('Cookie', ['county=San Francisco County'])
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          should(res.body.user).be.undefined();
+          done();
+        })
+    });
+
     it('should search the meals in San Francisco and with a keyword of 菜式 but no records are found', function (done) {
       agent
           .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County'))
@@ -507,6 +585,15 @@ describe('MealController', function() {
             done();
           })
     })
+
+    it('should login an account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
 
     it('host should not be passGuide', function(done){
       agent
@@ -722,6 +809,30 @@ describe('MealController', function() {
       agent
         .post('/auth/register')
         .send({email : guestEmail, password : password})
+        .expect(200)
+        .end(done)
+    })
+
+    it('should get user info', function(done){
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property("auth");
+          res.body.auth.email.should.be.equal(guestEmail, "login user email does not match");
+          userId = res.body.id;
+          done()
+        })
+    })
+
+    it('should be able to collect the meal', function(done){
+      agent
+        .post("/user/" + userId + "/collects/" + mealId)
         .expect(200)
         .end(done)
     })
@@ -1174,6 +1285,36 @@ describe('MealController', function() {
         .expect(200)
         .end(done)
     });
+
+    it('should get meal confirmation view', function(done){
+      agent
+        .get('/meal/' + mealId + "/confirm")
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.meal.id.should.be.equal(mealId);
+          done();
+        })
+    })
+
+    it('should not find a meal', function(done){
+      agent
+        .get('/meal/' + "123" + "/confirm")
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-3);
+          done();
+        })
+    })
   });
 
 });

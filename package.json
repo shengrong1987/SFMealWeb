@@ -72,6 +72,7 @@
     "finalize" : "./bin/finalize.sh",
     "env": "./bin/exportENV.sh",
     "unit": "grunt mochaTest:unit",
+    "coverage" : "grunt mocha_istanbul:coverage",
     "build": "grunt mochaTest:build",
     "buildEmail": "grunt mochaTest:buildEmail"
   },

@@ -42,7 +42,7 @@ describe('ReviewController', function() {
           if(err){
             return done(err);
           }
-          hostId = res.body.id;
+          hostId = res.body.host.id;
           done()
         })
     })
@@ -89,7 +89,7 @@ describe('ReviewController', function() {
         .end(done)
     });
 
-    it('should get user info', function(done){
+    it('should get user info with collects', function(done){
       agent
         .get('/user/me')
         .set('Accept', 'application/json')
@@ -99,6 +99,7 @@ describe('ReviewController', function() {
           if(err){
             return done(err);
           }
+          res.body.should.have.property('collects').with.length(1);
           guestId = res.body.id;
           done()
         })
@@ -107,7 +108,7 @@ describe('ReviewController', function() {
     var orderId;
     it('should order the meal', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 0, preference : [{ property : '', extra : 0}]};
+      dishObj[dishId1] = { number : 1, preference : [{ property : '', extra : 0}]};
       dishObj[dishId2] = { number : 1, preference : [{ property : '', extra : 0}]};
       dishObj[dishId3] = { number : 1, preference : [{ property : '', extra : 0}]};
       dishObj[dishId4] = { number : 1, preference : [{ property : '', extra : 0}]};
@@ -115,7 +116,7 @@ describe('ReviewController', function() {
         .post('/order')
         .send({
           orders : dishObj,
-          subtotal : price2 + price3 + price4,
+          subtotal : price1 + price2 + price3 + price4,
           contactInfo : { name : "sheng", address : address, phone : phone },
           paymentInfo : { method : 'online'},
           method : "pickup",
@@ -164,6 +165,7 @@ describe('ReviewController', function() {
           if(err){
             return done(err);
           }
+          res.body.should.have.property('reviewing_orders').with.length(4);
           done();
         })
     });
@@ -175,6 +177,21 @@ describe('ReviewController', function() {
         .expect(302)
         .expect('Location','/auth/done')
         .end(done)
+    });
+
+    it('should get user info including orders that need to be reviewed', function(done){
+      agent
+        .get('/user/me')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.orders.some(function(order){
+            return order.status == "review";
+          }).should.be.true();
+          done();
+        })
     });
 
     it('should leave a private review for one dish of the meal', function (done) {
@@ -190,29 +207,28 @@ describe('ReviewController', function() {
           }
           res.body.should.have.property('meal');
           res.body.meal.id.should.be.equal(mealId);
-          res.body.dish.should.be.equal(dishId4);
+          res.body.dish.id.should.be.equal(dishId4);
           res.body.isPublic.should.be.false();
           done();
         })
     })
 
-
-    it('should leave a review for one dish of the meal', function (done) {
+    it('should leave batch reviews', function (done) {
+      var reviews = [{
+        "dish" : dishId1,
+        "score" : 4.0,
+        "content" : "Very delicious could be more"
+      },{
+        "dish" : dishId2,
+        "score" : 5.0,
+        "content" : "Perfect"
+      }];
       agent
-          .post('/review')
-          .set('Accept', 'application/json')
-          .expect('Content-Type', /json/)
-          .send({meal : mealId, dish : dishId3, score : 4.0, review : "Very delicious could be more",user: guestId})
-          .expect(200)
-          .end(function(err, res){
-            if(err){
-              return done(err);
-            }
-            if(res.body.meal.id != mealId || res.body.dish != dishId3){
-              return done(Error('error reviewing dish'));
-            }
-            done();
-          })
+        .post('/review')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .send({meal : mealId, reviews : JSON.stringify(reviews),user: guestId})
+        .expect(200, done)
     })
 
     it('should leave a review for the meal', function (done) {
@@ -260,6 +276,21 @@ describe('ReviewController', function() {
           done();
         })
     })
+
+    it('should get host profile of correct number of reviews', function (done){
+      agent
+        .get('/host/' + hostId)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('reviews').with.length(4);
+          done();
+        })
+    });
 
   });
 

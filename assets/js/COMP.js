@@ -623,9 +623,7 @@
     var $this = this;
     $.ajax({
       url : "/user/" + userId + "/collects/" + mealId,
-      data : {
-
-      },
+      data : {},
       method : method,
       success : function(){
         if($this.options.cb){

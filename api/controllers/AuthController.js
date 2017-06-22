@@ -49,7 +49,11 @@ module.exports = require('waterlock').waterlocked({
             return res.badRequest(err);
           }
           var typeOfUser = params.receivedEmail ? "subscriber" : "member";
-          mailChimp.addMemberToList({ email : params.email, firstname : params.firstname, lastname : params.lastname, language : req.getLocale() }, typeOfUser);
+          if(process.env.NODE_ENV == "production"){
+            mailChimp.addMemberToList({ email : params.email, firstname : params.firstname, lastname : params.lastname, language : req.getLocale() }, typeOfUser);
+          }else{
+            //in development mode, skipping subscription
+          }
           User.cloneToUser(user,params,function(err,s){
             if(err){
               return res.badRequest(err);
@@ -67,6 +71,7 @@ module.exports = require('waterlock').waterlocked({
     console.log("login success...");
     var auth = req.session.user.auth;
     var county = req.session.user.county;
+    sails.log.info("county: " + county);
     if(county && (!req.cookies['county'] || req.cookies['county'] == 'undefined')){
       res.cookie('county',county);
     }
@@ -99,21 +104,21 @@ module.exports = require('waterlock').waterlocked({
       nonce = req.query.nonce,
       echostr = req.query.echostr;
 
-    console.log("signature: " + signature, "timestamp: " + timestamp, "nonce: " + nonce, 'echostr: ' + echostr );
-    console.log("token:" + wechatToken);
+    sails.log.info("signature: " + signature, "timestamp: " + timestamp, "nonce: " + nonce, 'echostr: ' + echostr );
+    sails.log.info("token:" + wechatToken);
 
     var sha1 = crypto.createHash('sha1'),
       sha1Str = sha1.update([wechatToken, timestamp, nonce].sort().join('')).digest('hex');
 
-    console.log(sha1Str, signature);
+    sails.log.info(sha1Str, signature);
 
     if (sha1Str == signature) {
       res.set('Content-Type', 'text/plain');
-      console.log('validation success');
+      sails.log.info('validation success');
       return res.ok(echostr);
     } else {
-      console.log('validation error');
-      return res.notFound();
+      sails.log.info('validation error');
+      return res.badRequest({ responseText : "validation error"});
     }
   },
 

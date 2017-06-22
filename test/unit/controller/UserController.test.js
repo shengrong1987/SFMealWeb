@@ -35,6 +35,12 @@ describe('UsersController', function() {
         })
     })
 
+    it('should have access to admin view', function(){
+      agent
+        .get('/auth/admin')
+        .expect(200)
+    })
+
     it('should create a coupon with $1 off', function(done){
       agent
         .post('/coupon')
@@ -282,6 +288,17 @@ describe('UsersController', function() {
           })
     })
 
+    it('should not able to upload url without login', function (done){
+      agent
+        .post('/user/getSignedUrl')
+        .send({
+          name : "test.jpg",
+          type : "png",
+          module : "thumbnail"
+        })
+        .expect(403, done)
+    })
+
     it('should pop authenticated error trying to log out when no one is logged in', function (done) {
       agent
         .post('/auth/logout')
@@ -418,14 +435,59 @@ describe('UsersController', function() {
         })
     })
 
+    it('should not have county info by default', function(done){
+      agent
+        .get('/auth/done')
+        .expect(200)
+        .end(function(err, res){
+          should.not.exist(res.body.county);
+          done();
+        })
+    })
+
+    var defaultPhone = "(415)218-6379";
+    var newPhone = "(888)888-8888";
     var addresses = [
       {"street":"1974 palou ave","city" : "San Francisco", "zip" : '94124', "phone" : '(415)802-3853',"isDefault": false },
       {"street":"7116 Tiant Way","city" : "Elk Grove", "zip" : '95758', "phone" : '(415)802-3853', "isDefault" : false },
-      {"street":"7118 Tiant Way","city" : "Elk Grove", "zip" : '95758', "phone" : '(415)802-3853', "isDefault" : true }
+      {"street":"7118 Tiant Way","city" : "Elk Grove", "zip" : '95758', "phone" : defaultPhone, "isDefault" : true }
     ];
     var deletedAddresses;
+    var updatingAddresses;
     var firstname = "sheng";
     var lastname = "rong";
+    var addressId;
+
+    it('should get image upload url', function (done){
+      agent
+        .post('/user/getSignedUrl')
+        .send({
+          name : "test.jpg",
+          type : "png",
+          module : "thumbnail"
+        })
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          should.exist(res.body.url);
+          should.exist(res.body.key);
+          should.exist(res.body.policy);
+          should.exist(res.body.signature);
+          done();
+        })
+    })
+
+    it('should get delete image url', function (done){
+      agent
+        .post('/user/me/delete')
+        .send({
+          filename : "test.jpg",
+          module : "thumbnail"
+        })
+        .expect(200, done)
+    })
 
     it('should update the address info', function (done) {
       agent
@@ -433,8 +495,7 @@ describe('UsersController', function() {
           .send({
             address : addresses,
             firstname : firstname,
-            lastname : lastname,
-            phone : '(415)802-3853'
+            lastname : lastname
           })
           .expect(200)
           .end(function(err,res){
@@ -442,6 +503,7 @@ describe('UsersController', function() {
             should(res.body.address[0]).which.is.a.Object();
             (true).should.be.equalOneOf(res.body.address[0].isDefault, res.body.address[1].isDefault, res.body.address[2].isDefault);
             res.body.city.should.be.equal("Elk Grove");
+            res.body.phone.should.be.equal(defaultPhone);
             deletedAddresses = res.body.address;
             deletedAddresses = deletedAddresses.filter(function(address){
               if(address.isDefault){
@@ -450,8 +512,59 @@ describe('UsersController', function() {
               }
               return false;
             });
+            updatingAddresses = res.body.address.filter(function(address){
+              if(!address.isDefault){
+                address.phone = newPhone;
+                return true;
+              }
+              return false;
+            })
             done();
           })
+    })
+
+    it('should update other user info', function (done) {
+      agent
+        .put('/user/' + userId)
+        .send({
+          firstname : firstname,
+          lastname : lastname,
+          phone : defaultPhone
+        })
+        .expect(200)
+        .end(function(err,res){
+          res.body.phone.should.be.equal(defaultPhone)
+          done();
+        })
+    })
+
+    it('should have county info now', function(done){
+      agent
+        .get('/auth/done')
+        .expect('set-cookie','county=San Francisco; Path=/auth/done')
+        .expect(200)
+        .end(function(err, res){
+          console.log(res.body.county);
+          res.body.county.should.be.equal('Sacramento County');
+          done();
+        })
+    })
+
+    it('should update a non-default address', function (done) {
+      agent
+        .put('/user/' + userId)
+        .send({
+          address : updatingAddresses,
+          phone : defaultPhone
+        })
+        .expect(200)
+        .end(function(err,res){
+          res.body.should.have.property("address").with.length(3);
+          should(res.body.address[0]).which.is.a.Object();
+          (newPhone).should.be.equalOneOf(res.body.address[0].phone, res.body.address[1].phone);
+          res.body.phone.should.be.equal(defaultPhone);
+          done();
+        })
     })
 
     it('should delete a default address', function (done) {
@@ -513,6 +626,33 @@ describe('UsersController', function() {
           .put('/user/' + anotherUserId)
           .send({address : "1974 palou ave, San Francisco"})
           .expect(403, done)
+    })
+
+    it('should have access to resetForm view', function(){
+      agent
+        .get('/auth/resetForm')
+        .expect(200)
+    })
+
+    it('should request and verify wechat api', function(done){
+      agent
+        .get('/auth/wechatSignature?url=https://sfmeal.com')
+        .expect(200)
+        .end(function(err, res){
+          console.log(res.body);
+          res.body.url.should.be.equal('https://sfmeal.com');
+          should.exist(res.body.appid);
+          should.exist(res.body.timestamp);
+          should.exist(res.body.nonceStr);
+          should.exist(res.body.signature);
+          done();
+        })
+    })
+
+    it('should test wechat platform API', function(done) {
+      agent
+        .get('/auth/wechat?signature=aerneQiK37rmpQgVuClSeOfXRxIbLycHSConuMHQTFA&nonce=wxfdb1d9c9775ec634&echostr=wxfdb1d9c9775ec634&timestamp=' + new Date().getTime())
+        .expect(400, done)
     })
   });
   //need manual test for facebook and google login

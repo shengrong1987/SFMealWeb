@@ -287,7 +287,7 @@ module.exports = {
                     if(err){
                       return next(err);
                     }
-                    Host.findOne(charge.metadata.hostId).exec(function(err, host){
+                    Host.findOne(order.host).exec(function(err, host){
                       if(err){
                         return next(err);
                       }

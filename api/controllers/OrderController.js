@@ -112,6 +112,8 @@ module.exports = {
               return next2({ responseText : req.__('order-preference-not-exist'), code : -20});
             }
             var diff = qty - lastQty;
+            sails.log.info("order qty: " + qty, + " last qty: " + lastQty);
+            sails.log.info("order number: " + diff, " leftQty: " + meal.leftQty[dishId]);
             if(diff > meal.leftQty[dishId]){
               return next2({responseText : req.__('order-dish-not-enough',dishId, qty), code : -1});
             }
@@ -119,7 +121,10 @@ module.exports = {
           }
           next2();
         }, function(err){
-          next(err);
+          if(err){
+            return next(err);
+          }
+          next();
         });
       }else{
         next();
@@ -427,6 +432,7 @@ module.exports = {
                 req.body.customerPhone = contactInfo.phone || found.phone;
                 req.body.customerId = found.payment[0] ? found.payment[0].customerId : null;
                 req.body.paymentMethod = paymentInfo.method;
+                req.body.isExpressCheckout = false;
 
                 if(code && pointsRedeem){
                   return next({ code : -23, responseText : req.__('order-duplicate-discount')});
@@ -485,6 +491,7 @@ module.exports = {
               req.body.customerPhone = contactInfo.phone;
               req.body.paymentMethod = paymentInfo.method;
               req.body.locale = req.getLocale();
+              req.body.isExpressCheckout = true;
               stripe.newCustomerWithCard({
                 token : paymentInfo.token,
                 email : process.env.ADMIN_EMAIL
@@ -1394,6 +1401,9 @@ module.exports = {
       order.save(function(err,result){
         if(err){
           return res.badRequest(err);
+        }
+        if(req.wantsJSON){
+          return res.ok(order);
         }
         notification.notificationCenter("Order", "receive", result, false, false, req);
         return res.ok({responseText : req.__('order-receive')});

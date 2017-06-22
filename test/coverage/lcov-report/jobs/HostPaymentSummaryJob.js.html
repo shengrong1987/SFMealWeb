@@ -20,14 +20,14 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">8.25% </span>
+        <span class="strong">8% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>8/97</span>
+        <span class='fraction'>8/100</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/30</span>
+        <span class='fraction'>0/32</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">5.26% </span>
@@ -35,9 +35,9 @@
         <span class='fraction'>1/19</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">8.25% </span>
+        <span class="strong">8% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>8/97</span>
+        <span class='fraction'>8/100</span>
       </div>
     </div>
   </div>
@@ -208,7 +208,13 @@
 163
 164
 165
-166</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+166
+167
+168
+169
+170
+171
+172</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
@@ -298,6 +304,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -307,6 +316,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -460,18 +472,24 @@ module.exports = function(agenda) {
 <span class="cstat-no" title="statement not covered" >                  if (err) {</span>
 <span class="cstat-no" title="statement not covered" >                    return next3(err);</span>
                   }
-<span class="cstat-no" title="statement not covered" >                  var hostId = charge.metadata.hostId;</span>
-<span class="cstat-no" title="statement not covered" >                  Host.findOne(hostId).exec(<span class="fstat-no" title="function not covered" >function (err, host) {</span></span>
+<span class="cstat-no" title="statement not covered" >                  Host.findOne(host.id).exec(<span class="fstat-no" title="function not covered" >function (err, host) {</span></span>
 <span class="cstat-no" title="statement not covered" >                    if (err) {</span>
 <span class="cstat-no" title="statement not covered" >                      return next3(err);</span>
                     }
-<span class="cstat-no" title="statement not covered" >                    charge.income = (charge.amount - charge.amount_refunded);</span>
 <span class="cstat-no" title="statement not covered" >                    stripe.retrieveApplicationFee(charge.application_fee, <span class="fstat-no" title="function not covered" >function(err, fee){</span></span>
 <span class="cstat-no" title="statement not covered" >                      if(err){</span>
 <span class="cstat-no" title="statement not covered" >                        return next(err);</span>
                       }
-<span class="cstat-no" title="statement not covered" >                      var date = moment(charge.created * 1000);</span>
-<span class="cstat-no" title="statement not covered" >                      charge.application_fee = fee.amount - fee.amount_refunded;</span>
+<span class="cstat-no" title="statement not covered" >                      if(chargeId == "cash"){</span>
+<span class="cstat-no" title="statement not covered" >                        var date = moment(new Date(order.createdAt).getTime());</span>
+<span class="cstat-no" title="statement not covered" >                        charge.income = order.charges['cash'];</span>
+<span class="cstat-no" title="statement not covered" >                        charge.application_fee = order.application_fees['cash'];</span>
+                      }else {
+<span class="cstat-no" title="statement not covered" >                        var date = moment(charge.created * 1000);</span>
+<span class="cstat-no" title="statement not covered" >                        charge.application_fee = fee.amount - fee.amount_refunded;</span>
+<span class="cstat-no" title="statement not covered" >                        charge.income = (charge.amount - charge.amount_refunded);</span>
+                      }
+&nbsp;
 <span class="cstat-no" title="statement not covered" >                      charge.month = moment.months()[date.month()];</span>
 <span class="cstat-no" title="statement not covered" >                      charge.day = date.date();</span>
 <span class="cstat-no" title="statement not covered" >                      charge.type = "payment";</span>
@@ -544,7 +562,7 @@ module.exports = function(agenda) {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sat Apr 08 2017 01:41:35 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jun 21 2017 18:26:21 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

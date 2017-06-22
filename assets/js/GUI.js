@@ -877,7 +877,6 @@ function setupWechat(imgSrc, title, desc){
     }
     var domain = location.href.split('#')[0];
     var res = encodeURIComponent(domain);
-    // res = 'api/wechat/signature?url='+ res;
     $.ajax({
       url: "/auth/wechatSignature?url=" + res,//  此处url请求地址需要替换成你自己实际项目中服务器数字签名服务地址
       type: 'get'

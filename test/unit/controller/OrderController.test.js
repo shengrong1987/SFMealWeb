@@ -334,15 +334,15 @@ describe('OrderController', function() {
 
     it('should order the full dish and get not enough quantity error', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
-      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}] };
       dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
           .post('/order')
           .send({
             orders : dishObj,
-            subtotal : price1 * 1 + price2 * 2,
+            subtotal : price2 * 5,
             contactInfo : { address : address, phone : phone },
             paymentInfo : { method : 'online'},
             method : "delivery",
@@ -358,18 +358,18 @@ describe('OrderController', function() {
             done();
           })
     })
-
+  //
     it('should adjust the full dish and get not enough quantity error', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 2 , preference : [{ property : '', extra : 0}] };
-      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}] };
       dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
           .post('/order/' + orderId + "/adjust")
           .send({
             orders : dishObj,
-            subtotal : price1 * 1 + price2 * 2,
+            subtotal : price2 * 5,
             mealId : mealId
             })
           .expect(400)
@@ -416,7 +416,7 @@ describe('OrderController', function() {
           done()
         })
     });
-
+  //
     it('should adjust the dish with equal amount successfully', function (done) {
       var dishObj = {};
       dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
@@ -1318,6 +1318,12 @@ describe('OrderController', function() {
         })
     });
 
+    it('should get adjust order view', function (done){
+      agent
+        .get('/order/' + orderId + '/adjust-form')
+        .expect(200, done)
+    })
+
     it('should be able to order a meal with coupon greater than original order', function(done){
       var dishObj = {};
       dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
@@ -1644,6 +1650,7 @@ describe('OrderController', function() {
           res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + 1) * 100);
           res.body.customerPhone.should.be.equal(customerPhone);
           res.body.customerName.should.be.equal(customerName);
+          res.body.isExpressCheckout.should.be.false();
           orderId = res.body.id;
           done();
         })
@@ -1665,6 +1672,100 @@ describe('OrderController', function() {
         })
     });
 
+    it('should get home page filter by county with no results', function(done){
+      agent
+        .get('/')
+        .set('Cookie', ['county=San Francisco County'])
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('hosts').with.length(1);
+          done();
+        })
+    });
+
+  });
+
+  describe('order a meal with express checkout', function() {
+
+    var mealId;
+    var dishId1;
+    var dishId2;
+    var dishId3;
+    var dishId4;
+    var price1;
+    var price2;
+    var price3;
+    var orderId;
+
+    it('should logged out current user', function (done) {
+      agent
+        .post('/auth/logout')
+        .expect(200)
+        .end(function(err,res){
+          done();
+        })
+    })
+
+    it('should get a meal', function (done) {
+      agent
+        .get('/meal')
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            console.log(err);
+            return done(err);
+          }
+          if(res.body.meals.length == 0){
+            return done(Error("error getting any meal"));
+          }
+          var meal = res.body.meals[1];
+          mealId = meal.id;
+          dishId1 = meal.dishes[0].id;
+          dishId2 = meal.dishes[1].id;
+          dishId3 = meal.dishes[2].id;
+          dishId4 = meal.dishes[3].id;
+          price1 = meal.dishes[0].price;
+          price2 = meal.dishes[1].price;
+          price3 = meal.dishes[2].price;
+          done();
+        })
+    })
+
+    it('should be able to order a meal', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price3 * 1,
+          pickupOption : 1,
+          method : "pickup",
+          mealId : mealId,
+          contactInfo : { phone : "(415)111-1111", name : "abc"},
+          paymentInfo : { method : 'cash'}
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.tax.should.be.equal(price3 * 0.085 * 100);
+          res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + 1) * 100);
+          res.body.customerPhone.should.be.equal("(415)111-1111");
+          res.body.customerName.should.be.equal("abc");
+          res.body.isExpressCheckout.should.be.true();
+          done();
+        })
+    });
 
   });
 

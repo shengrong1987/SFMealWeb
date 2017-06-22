@@ -69,7 +69,7 @@ module.exports.policies = {
     'confirm' : true,
     'findAll' : 'isAdmin',
     'searchAll' : 'isAdmin',
-    'update' : 'or(and(sessionAuth,isHost,isOwnerOfMeal,isNotFields("isScheduled","chef","score","numberOfReviews","msg")),isAdmin)'
+    'update' : 'or(and(sessionAuth,isHost,isOwnerOfMeal,isNotFields("isScheduled","chef","score","numberOfReviews","msg","commission")),isAdmin)'
   },
 
   HostController : {
@@ -80,7 +80,7 @@ module.exports.policies = {
     'me' : ['sessionAuth','isHost'],
     'apply' : ['sessionAuth'],
     'findOne' : true,
-    'update' : 'or(isAdmin,and(sessionAuth, sessionSelf, isNotFields("user","accountId","bankId","long","lat","city","street","passGuide","pocket")))',
+    'update' : 'or(isAdmin,and(sessionAuth, sessionSelf, isNotFields("user","accountId","bankId","long","lat","city","street","passGuide","pocket","commission")))',
     'like' : 'sessionAuth',
     'follow' : 'sessionAuth',
     'unfollow' : 'sessionAuth',

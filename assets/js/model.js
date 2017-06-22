@@ -2413,6 +2413,9 @@ var ReviewView = Backbone.View.extend({
         }
         reviews.push(reviewObj);
       });
+      if(reviews.length > 0){
+        reviews = JSON.stringify(reviews);
+      }
     }
     var $this = this;
     if((!score || score == 0) && scoreNotRated){

@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">66.86% </span>
+        <span class="strong">67.23% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>113/169</span>
+        <span class='fraction'>119/177</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">51.9% </span>
+        <span class="strong">52.94% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>41/79</span>
+        <span class='fraction'>45/85</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">88.89% </span>
+        <span class="strong">89.19% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>32/36</span>
+        <span class='fraction'>33/37</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">66.86% </span>
+        <span class="strong">67.23% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>113/169</span>
+        <span class='fraction'>119/177</span>
       </div>
     </div>
   </div>
@@ -344,7 +344,18 @@
 299
 300
 301
-302</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -540,6 +551,8 @@
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
@@ -569,6 +582,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
@@ -578,6 +592,7 @@
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -592,10 +607,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -840,6 +862,8 @@ module.exports = {
       }
       var customerId = payment.customerId;
       var cardId = payment.cardId;
+      var updatedParam = {};
+      updatedParam.isDefaultPayment = false;
       async.auto({
         updateCard : function(cb){
           delete params.id;
@@ -852,7 +876,7 @@ module.exports = {
             if(err){
               return cb(err);
             }
-            params.last4 = card.last4;
+            updatedParam.last4 = card.last4;
             switch (card.brand) {
               case "MasterCard":
 <span class="cstat-no" title="statement not covered" >                card.brand = "master";</span>
@@ -864,12 +888,13 @@ module.exports = {
 <span class="cstat-no" title="statement not covered" >                card.brand = "DC"</span>
 <span class="cstat-no" title="statement not covered" >                break;</span>
             }
-            params.brand = card.brand;
+            updatedParam.brand = card.brand;
             cb();
           });
         },
         updateDefaultSource : function(cb){
-          if(!isDefaultPayment){
+          sails.log.info("is default card: " + isDefaultPayment);
+          if(!isDefaultPayment || isDefaultPayment == "false"){
             return cb();
           }
           stripe.updateDefaultSource({
@@ -879,6 +904,7 @@ module.exports = {
             <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
 <span class="cstat-no" title="statement not covered" >              return cb(err);</span>
             }
+            updatedParam.isDefaultPayment = true;
             Payment.update({user:userId},{isDefaultPayment : false}).exec(function(err,payments) {
               <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
 <span class="cstat-no" title="statement not covered" >                return cb(err);</span>
@@ -891,13 +917,20 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        params.isDefaultPayment = isDefaultPayment;
-        Payment.update(paymentId, params).exec(function(err, payment){
+        Payment.count({user:userId}).exec(function(err, number){
           <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
 <span class="cstat-no" title="statement not covered" >            return res.badRequest(err);</span>
           }
-          res.ok(payment[0]);
-        });
+          <span class="missing-if-branch" title="if path not taken" >I</span>if(number == 1){
+<span class="cstat-no" title="statement not covered" >            updatedParam.isDefaultPayment = true;</span>
+          }
+          Payment.update(paymentId, updatedParam).exec(function(err, payment){
+            <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >              return res.badRequest(err);</span>
+            }
+            res.ok(payment[0]);
+          });
+        })
       })
     });
   },
@@ -952,7 +985,7 @@ module.exports = {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sat Apr 08 2017 01:41:35 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jun 21 2017 18:26:21 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

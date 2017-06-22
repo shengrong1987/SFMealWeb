@@ -36,6 +36,9 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
+      if(req.wantsJSON){
+        return res.ok({ dishes : host.dishes, host : host});
+      }
       return res.view("meal_new",{dishes : host.dishes, host : host});
     });
   },
@@ -65,6 +68,9 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
+            if(req.wantsJSON){
+              return res.ok({meals : orders.concat(preorders), user : u, county : county, locale : req.getLocale()});
+            }
             return res.view('meals',{meals : orders.concat(preorders), user : u, county : county, locale : req.getLocale()});
           });
         })
@@ -86,6 +92,7 @@ module.exports = {
             }
             return false;
           })
+          sails.log.info("host has high score: " + highScore);
           if(popularHost && highScore){
             _host.shortIntro = host.shortIntro;
             _host.shopName = host.shopName;
@@ -99,46 +106,49 @@ module.exports = {
             publicHosts.push(_host);
           }
         })
+        if(req.wantsJSON){
+          return res.ok({user : user, hosts : publicHosts, locale : req.getLocale()});
+        }
         return res.view('home',{user : user, hosts : publicHosts, locale : req.getLocale()});
       });
     }
   },
 
-	current : function(req, res){
-    var county;
-    var now = new Date();
-    if(req.session.user && req.session.user.county){
-      county = req.session.user.county;
-    }else{
-      county = "San Francisco";
-    }
-
-    Meal.find({status : "on",provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).exec(function(err, found){
-      if(err){
-        res.badRequest(err);
-      }else{
-        found = found.filter(function(meal){
-          return meal.county.split("+").indexOf(county) != -1;
-        })
-        res.view("meals",{meals : found, county : county});
-      }
-    });
-  },
-
-  county : function(req, res){
-    var county = req.param('county');
-    var now = new Date();
-    Meal.find({status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).exec(function(err, found){
-      if(err){
-        res.badRequest(err);
-      }else{
-        found = found.filter(function(meal){
-          return meal.county.split("+").indexOf(county) != -1;
-        })
-        res.view("meals",{meals : found, county : county});
-      }
-    });
-  },
+	// current : function(req, res){
+  //   var county;
+  //   var now = new Date();
+  //   if(req.session.user && req.session.user.county){
+  //     county = req.session.user.county;
+  //   }else{
+  //     county = "San Francisco";
+  //   }
+  //
+  //   Meal.find({status : "on",provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).exec(function(err, found){
+  //     if(err){
+  //       res.badRequest(err);
+  //     }else{
+  //       found = found.filter(function(meal){
+  //         return meal.county.split("+").indexOf(county) != -1;
+  //       })
+  //       res.view("meals",{meals : found, county : county});
+  //     }
+  //   });
+  // },
+  //
+  // county : function(req, res){
+  //   var county = req.param('county');
+  //   var now = new Date();
+  //   Meal.find({status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).exec(function(err, found){
+  //     if(err){
+  //       res.badRequest(err);
+  //     }else{
+  //       found = found.filter(function(meal){
+  //         return meal.county.split("+").indexOf(county) != -1;
+  //       })
+  //       res.view("meals",{meals : found, county : county});
+  //     }
+  //   });
+  // },
 
   searchAll : function(req, res){
     var keyword = req.query.keyword;
@@ -250,7 +260,7 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(m.length==0){
+      if(!m || m.length==0){
         return res.badRequest({ code : -3, responseText : req.__('meal-not-found')});
       }
       if(user){
@@ -258,9 +268,15 @@ module.exports = {
           user[0].orders = user[0].orders.filter(function(order){
             return order.status == "schedule" || order.status == "preparing";
           })
+          if(req.wantsJSON){
+            return res.ok({meal : m[0], user : user[0], locale : req.getLocale()});
+          }
           res.view("confirm",{meal : m[0], user : user[0], locale : req.getLocale()});
         });
       }else{
+        if(req.wantsJSON){
+          return res.ok({meal : m[0], user : {}, locale : req.getLocale()});
+        }
         return res.view("confirm", { meal : m[0], user : {}, locale : req.getLocale()});
       }
     });
@@ -350,52 +366,6 @@ module.exports = {
         });
       });
     });
-
-    // var hostId = req.session.user.host;
-    // var now = new Date();
-    // Host.findOne(hostId).populate("meals").populate("dishes").exec(function(err, host){
-    //   if(err){
-    //     return res.badRequest(err);
-    //   }
-    //   host.checkGuideRequirement(function(err){
-    //     if(err){
-    //       return res.badRequest(err);
-    //     }
-    //     if(!host.passGuide || !host.dishVerifying){
-    //       return res.redirect("/apply");
-    //     }
-    //     Meal.findOne(mealId).populate("dishes").exec(function(err,meal){
-    //       if(err){
-    //         return res.badRequest(err);
-    //       }
-    //       if(!meal.dateIsValid()){
-    //         console.log("Date format of meal is not valid");
-    //         return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
-    //       }
-    //       if(!meal.dishIsValid()){
-    //         console.log("meal contain unverified dishes");
-    //         return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
-    //       }
-    //
-    //       $this.cancelMealJobs(mealId, function(err){
-    //         if(err){
-    //           return res.badRequest(err);
-    //         }
-    //         meal.status = "on";
-    //         meal.isScheduled = false;
-    //         meal.save(function(err,result){
-    //           if(err){
-    //             return res.badRequest(err);
-    //           }
-    //           if(req.wantsJSON){
-    //             return res.ok(meal);
-    //           }
-    //           return res.redirect("/host/me#mymeal");
-    //         });
-    //       })
-    //     });
-    //   });
-    // });
   },
 
   find : function(req, res){

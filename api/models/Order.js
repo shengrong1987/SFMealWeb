@@ -86,6 +86,9 @@ module.exports = {
       type : 'boolean',
       defaultsTo : true
     },
+    isExpressCheckout : {
+      type : 'boolean'
+    },
     eta: {
       type: 'Date'
     },

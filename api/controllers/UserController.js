@@ -25,9 +25,9 @@ module.exports = require('waterlock').actions.user({
 
     }
   */
-  session : function(req, res){
-    return res.json(req.session.user);
-  },
+  // session : function(req, res){
+  //   return res.json(req.session.user);
+  // },
 
   becomeHost : function(req, res){
     var userId = req.session.user.id;
@@ -80,7 +80,7 @@ module.exports = require('waterlock').actions.user({
               },
               transfer_schedule : {
                 interval : "weekly",
-                weekly_anchor : "wednesday"
+                weekly_anchor : "monday"
               }
             }
             if(user.firstname){
@@ -110,6 +110,7 @@ module.exports = require('waterlock').actions.user({
                     res.badRequest(err);
                   }
                   mailChimp.addMemberToList({ email : host.email, shopName : shopName, firstname : user[0].firstname, lastname : user[0].lastname, language : req.getLocale() }, "chef");
+                  user[0].host = host;
                   req.session.user = user[0];
                   res.ok({user:user[0]});
                 });
@@ -152,7 +153,7 @@ module.exports = require('waterlock').actions.user({
           if (err) {
             return cb(err);
           }
-          if(params.isReceivedEmail && !user.receivedEmail){
+          if(params.isReceivedEmail && !user.receivedEmail && process.env.NODE_ENV == "production"){
             mailChimp.addMemberToList({ email : user.auth.email, firstname : user.firstname, lastname: user.lastname, language : req.getLocale()}, "subscriber");
             user.receivedEmail = true;
           }
@@ -234,32 +235,11 @@ module.exports = require('waterlock').actions.user({
         });
       }],
       updateUser : ['handleAddress',function(cb, results){
-        if(results && results.handleAddress) {
-          results.handleAddress.save(function(err, u){
-            if(err){
-              return cb(err);
-            }
-            var auth = req.session.user.auth;
-            User.update({id: userId}, params).exec(function (err, user) {
-              if (err) {
-                return cb(err);
-              }
-              if(user[0].host && user[0].phone){
-                var hostId = user[0].host.id || user[0].host;
-                Host.update(hostId, {phone : user[0].phone}).exec(function(err, host){
-                  if(err){
-                    return cb(err);
-                  }
-                  user[0].auth = auth;
-                  cb(null, user[0]);
-                })
-              }else{
-                user[0].auth = auth;
-                cb(null, user[0]);
-              }
-            });
-          })
-        }else{
+
+        results.handleAddress.save(function(err, u){
+          if(err){
+            return cb(err);
+          }
           var auth = req.session.user.auth;
           User.update({id: userId}, params).exec(function (err, user) {
             if (err) {
@@ -279,11 +259,13 @@ module.exports = require('waterlock').actions.user({
               cb(null, user[0]);
             }
           });
-        }
+        })
+
       }]}, function(err, results){
         if(err){
           return res.badRequest(err);
         }
+        sails.log.info("updating user county: " + results.updateUser.county);
         req.session.user = results.updateUser;
         return res.ok(results.updateUser);
       })
@@ -297,9 +279,6 @@ module.exports = require('waterlock').actions.user({
       }
       found.featureDishes = [];
       if(found.orders.length == 0 && found.collects.length == 0) {
-        if(req.wantsJSON){
-          return res.ok(found);
-        }
         found.locale = req.getLocale();
         found.save(function(err, result){
           if(err){
@@ -308,6 +287,9 @@ module.exports = require('waterlock').actions.user({
           Notification.destroy({user : userId}).exec(function(err){
             if(err){
               console.log(err);
+            }
+            if(req.wantsJSON){
+              return res.ok(found);
             }
             return res.view('user', {user: found});
           });

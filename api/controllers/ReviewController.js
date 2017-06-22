@@ -27,14 +27,18 @@ module.exports = {
         return order.status == "review" && order.customer == userId;
       });
       if(orders.length == 0){
-        console.log("no available orders for review");
+        sails.log.debug("no available orders for review");
         return res.badRequest({ code : -1, responseText : req.__('review-no-available')});
       }
+      if(reviews){
+        sails.log.info("reviews: " + reviews);
+        reviews = JSON.parse(reviews);
+      }
       if(reviews && reviews.length > 0){
-        async.each(reviews, function(review, next){
-          var dishId = review.dish;
-          var score = review.score;
-          var review = review.content;
+        async.each(reviews, function(r, next){
+          var dishId = r.dish;
+          var score = r.score;
+          var review = r.content;
           $this.reviewForDish(dishId, mealId, user, orders, score, review, function(err, results){
             if(err){
               return next(err);
@@ -56,6 +60,7 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
+            sails.log.info("successfully leave a review");
             return res.ok({});
           });
         }, req);
@@ -110,11 +115,17 @@ module.exports = {
         }
       },
       checkReviewForDish : function(cb){
+        sails.log.info("checking dish: " + dishId);
         if(!dishId){
           return cb();
         }
+        sails.log.info("orders length: " + orders.length);
         isValidReview = orders.some(function(order){
+          order.reviewing_orders.forEach(function(dishId){
+            sails.log.info("dish: " + dishId + " to be reviewed");
+          });
           if(order.reviewing_orders.indexOf(dishId) != -1){
+            sails.log.info("removing dish id: " + dishId + "from review.");
             order.reviewing_orders.splice(order.reviewing_orders.indexOf(dishId),1);
             if(order.reviewing_orders.length == 0){
               order.status = "complete";
@@ -140,7 +151,7 @@ module.exports = {
         });
       },
       getMeal : function(cb){
-        console.log("getting meal");
+        sails.log.info("getting meal");
         Meal.findOne(mealId).populate('chef').exec(function(err, meal){
           if(err){
             return cb(err);
@@ -160,7 +171,7 @@ module.exports = {
         Review.create({
           dish : dish ? dish.id : null,
           title : dish ? dish.title : meal.title,
-          price : dish ? dish.price.toString() : 'N/A',
+          price : dish ? dish.price.toString() : '',
           meal : mealId,
           score : score,
           review : content,
@@ -170,7 +181,6 @@ module.exports = {
           isPublic : isPublic
         }).exec(function(err, review){
           if(err){
-            console.log(err);
             return cb(err);
           }
           var host = dish?dish.chef:meal.chef;
@@ -178,10 +188,12 @@ module.exports = {
           if(meal){
             review.meal = meal;
             review.hostEmail = host.email;
-          }else if(dish){
+          }
+          if(dish){
             review.dish = dish;
             review.hostEmail = host.email;
-          }else{
+          }
+          if(!meal && !dish){
             return cb({code : -2, responseText : req.__('review-invalid')})
           }
           sails.log.info("sending review email");

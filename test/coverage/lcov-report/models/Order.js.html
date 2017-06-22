@@ -20,28 +20,28 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">66.67% </span>
+        <span class="strong">80% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>2/3</span>
+        <span class='fraction'>4/5</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">50% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>1/2</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
-        <span class="quiet">Branches</span>
-        <span class='fraction'>0/0</span>
-      </div>
-      <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/1</span>
+        <span class='fraction'>1/1</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">66.67% </span>
+        <span class="strong">80% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>2/3</span>
+        <span class='fraction'>4/5</span>
       </div>
     </div>
   </div>
-  <div class='status-line medium'></div>
+  <div class='status-line high'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -178,7 +178,28 @@
 133
 134
 135
-136</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -301,7 +322,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -339,6 +381,11 @@ module.exports = {
       enum: ['order', 'preorder'],
       defaultsTo: 'preorder'
     },
+    paymentMethod : {
+      type : 'string',
+      enum : ['cash','online'],
+      defaultsTo : 'online'
+    },
     dishes: {
       collection: 'Dish',
       required: true
@@ -355,6 +402,10 @@ module.exports = {
     },
     adjusting_subtotal : {
       type : 'float'
+    },
+    service_fee : {
+      type : 'float',
+      defaultsTo : 1.0
     },
     delivery_fee: {
       type: 'float'
@@ -377,6 +428,9 @@ module.exports = {
       type : 'string',
       required : true
     },
+    customerName : {
+      type : 'string'
+    },
     guestEmail : {
       type : 'string',
       required : true
@@ -388,6 +442,9 @@ module.exports = {
     isSendToHost : {
       type : 'boolean',
       defaultsTo : true
+    },
+    isExpressCheckout : {
+      type : 'boolean'
     },
     eta: {
       type: 'Date'
@@ -404,8 +461,7 @@ module.exports = {
       type : 'json'
     },
     customer: {
-      model: 'User',
-      required: true
+      model: 'User'
     },
     meal: {
       model: 'Meal',
@@ -435,13 +491,20 @@ module.exports = {
       type : 'string',
       defaultsTo : ''
     },
-    getTaxRate : <span class="fstat-no" title="function not covered" >function(){</span>
-<span class="cstat-no" title="statement not covered" >      return util.getTaxRate(this.host.county);</span>
+    getTaxRate : function(){
+      <span class="missing-if-branch" title="if path not taken" >I</span>if(this.meal.isTaxIncluded){
+<span class="cstat-no" title="statement not covered" >        return 0;</span>
+      }
+      return util.getTaxRate(this.host.county);
     },
     coupon : {
       model : 'Coupon'
     },
     discountAmount : {
+      type : 'float',
+      defaultsTo : 0
+    },
+    tax : {
       type : 'float',
       defaultsTo : 0
     }
@@ -454,7 +517,7 @@ module.exports = {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sat Apr 08 2017 01:41:35 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jun 21 2017 18:26:21 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

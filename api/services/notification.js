@@ -57,6 +57,7 @@ var notification = {
     var phone = params.isSendToHost ? (params.host ? params.host.phone : params.chef.phone) : params.customerPhone;
     var content = "";
     if(model === "Order"){
+      var userOrderUrl = params.isExpressCheckout ? "https://www.sfmeal.com/order/" + params.id + "/receipt" : "https://www.sfmeal.com/user/me#myorder";
       switch(action){
         case "new":
           content = sails.__({
@@ -79,7 +80,7 @@ var notification = {
           }, params.id) : sails.__({
             phrase : 'orderAdjustRequestMessageToGuest',
             locale : locale
-          }, params.id);
+          }, params.id, userOrderUrl);
           message.sendMessage(phone, content);
           break;
         case "cancel":
@@ -96,7 +97,7 @@ var notification = {
           }, params.id) : sails.__({
             phrase : 'orderCancelRequestMessageToGuest',
             locale : locale
-          }, params.id);
+          }, params.id, userOrderUrl);
           message.sendMessage(phone, content);
           break;
         case "confirm":
@@ -106,17 +107,17 @@ var notification = {
           }, params.id) : sails.__({
             phrase : 'orderConfirmMessageToGuest',
             locale : locale
-          }, params.id);
+          }, params.id, userOrderUrl);
           message.sendMessage(phone, content);
           break;
         case "ready":
           content = params.method == 'pickup' ? sails.__({
             phrase : 'orderReadyPickupReminderMessageToGuest',
             locale : locale
-          }, params.id, params.pickupInfo.location, params.pickupInfo.phone, params.pickupInfo.pickupFromTime + ' - ' + params.pickupInfo.pickupTillTime) : sails.__({
+          }, params.id, params.pickupInfo.location, params.pickupInfo.phone, params.pickupInfo.pickupFromTime + ' - ' + params.pickupInfo.pickupTillTime, userOrderUrl) : sails.__({
             phrase : 'orderArriveReminderMessageToGuest',
             locale : locale
-          }, params.phone);
+          }, params.phone, userOrderUrl);
           message.sendMessage(phone, content);
           break;
         case "reject":
@@ -126,7 +127,7 @@ var notification = {
           }, params.id, params.msg) : sails.__({
             phrase : 'orderRejectMessageToGuest',
             locale : locale
-          }, params.id, params.msg);
+          }, params.id, params.msg, userOrderUrl);
           message.sendMessage(phone, content);
           break;
         case "reminder":
@@ -134,7 +135,7 @@ var notification = {
             content = sails.__({
               phrase : 'orderPickupReminderMessageToGuestInHour',
               locale : locale
-            }, params.id, params.pickupInfo.location, params.pickupInfo.phone);
+            }, params.id, params.pickupInfo.location, params.pickupInfo.phone, userOrderUrl);
             message.sendMessage(phone, content);
           }
           break;

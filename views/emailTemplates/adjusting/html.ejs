@@ -21,25 +21,63 @@
     <table class="table table-email">
       <% Object.keys(orders).forEach(function(dishId){
         var lastAmount = parseInt(orders[dishId].number);
+        var lastPreference = orders[dishId].preference;
+        var lastTitle = '';
+        if(lastPreference && lastPreference.length > 0) {
+          lastPreference.forEach(function (pref) {
+            lastTitle += "(" + pref.property + ')';
+          });
+          var lastExtra = lastPreference.reduce(function (total, next) {
+            return total + parseInt(next.extra);
+          }, 0);
+        }
+
         var currentAmount = parseInt(adjusting_orders[dishId].number);
-      if(lastAmount > 0 || currentAmount > 0){
-        var dish;
-        dishes.forEach(function(d){
-          if(d.id == dishId){
-            dish = d;
-            return;
-          }
-        });
+        var preference = adjusting_orders[dishId].preference;
+        var title = '';
+        if(preference && preference.length > 0) {
+          preference.forEach(function (pref) {
+            title += "(" + pref.property + ')';
+          });
+          var extra = preference.reduce(function (total, next) {
+            return total + parseInt(next.extra);
+          }, 0);
+        }
+        if(lastAmount > 0 || currentAmount > 0){
+          var dish;
+          dishes.forEach(function(d){
+            if(d.id == dishId){
+              dish = d;
+              return;
+            }
+          });
       %>
       <tr>
         <td><img src="<%= dish.photos[0].v%>" style="width: 100px;"></td>
         <td class="text-green" style="vertical-align: middle;"><%= dish.title%></td>
         <%if(lastAmount != currentAmount){%>
         <td style="vertical-align: middle;"><s><%= lastAmount%><%= fen%></s> <br/><%= currentAmount%><%= fen%></td>
-        <td style="vertical-align: middle;text-align: right;"><s>$<%= (lastAmount * dish.price).toFixed(2)%></s> <br/>$<%= (currentAmount * dish.price).toFixed(2)%></td>
+        <td style="vertical-align: middle;text-align: right;">
+          <s>
+            $<%= (lastAmount * dish.price).toFixed(2)%>
+            <% if(lastExtra){%>
+            (+$<%= lastExtra.toFixed(2)%>)<br/>
+            <% }%>
+          </s><br/>
+          $<%= (currentAmount * dish.price).toFixed(2)%>
+          <% if(extra){%>
+          (+$<%= extra.toFixed(2)%>)<br/>
+          <% }%>
+        </td>
+
         <%}else{%>
         <td style="vertical-align: middle;"><%= currentAmount%><%= fen%></td>
-        <td style="vertical-align: middle;text-align: right;">$<%= (currentAmount * dish.price).toFixed(2)%></td>
+        <td style="vertical-align: middle;text-align: right;">
+          $<%= (currentAmount * dish.price).toFixed(2)%>
+          <% if(extra){%>
+          (+$<%= extra.toFixed(2)%>)<br/>
+          <% }%>
+        </td>
         <%}%>
         </tr>
       <%}});%>

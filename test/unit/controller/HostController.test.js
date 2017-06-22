@@ -40,7 +40,8 @@ describe('UsersController', function() {
           res.body.should.have.property("user");
           should.exist(res.body.user.host);
           res.body.user.phone.should.be.equal("(415)802-3853");
-          hostId = res.body.user.host;
+          hostId = res.body.user.host.id;
+          res.body.user.host.commission.should.be.equal(0.2);
           done();
         })
     })
@@ -117,10 +118,20 @@ describe('UsersController', function() {
         .send({
           license : JSON.stringify({
             url : "/images/license.jpeg"
-          })
+          }),
+          intro : "This is a host introduction."
         })
         .expect(200)
         .end(done)
+    })
+
+    it('should not update certain host field', function(done){
+      agent
+        .put('/host/' + hostId)
+        .send({
+          commission : 0.1
+        })
+        .expect(403, done)
     })
 
     it('should get host info', function(done){
@@ -218,7 +229,6 @@ describe('UsersController', function() {
           done();
         })
     })
-
   })
 
   describe('host managed account verification', function() {
