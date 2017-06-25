@@ -47,8 +47,10 @@
         });
         utility.directionsDisplay.setMap(map);
         var alignmentHeight = $($(ele).data("target")).height();
-        $(ele).on("shown.bs.collapse", function(e){
+        $(ele).parent().on("shown.bs.collapse", function(e){
           e.preventDefault();
+          google.maps.event.trigger(utility.map, "resize");
+          utility.map.setCenter(center);
         })
         $(ele).height(alignmentHeight);
         $(ele).parent().height(alignmentHeight);
