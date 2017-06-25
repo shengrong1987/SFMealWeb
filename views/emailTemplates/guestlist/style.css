@@ -3899,7 +3899,7 @@ input[type="button"].btn-block {
   display: none;
 }
 .collapse.in {
-  display: block;
+  display: block !important;
 }
 tr.collapse.in {
   display: table-row;
@@ -8243,6 +8243,12 @@ hovereffect p {
 .search-container {
   text-align: center;
 }
+.pickup-map {
+  display: none;
+}
+#googlemapContainer {
+  display: block;
+}
 .fa-facebook-remote {
   background: url("https://www.sfmeal.com/images/fa-facebook.png") no-repeat center / 70% auto;
 }
@@ -8788,6 +8794,13 @@ label {
 }
 .btn-group input {
   text-align: left !important;
+}
+.search-btn-group .zipCode {
+  width: 100px;
+  display: inline;
+}
+.search-btn-group .keyword {
+  max-width: 150px;
 }
 /*bootstrap button extension*/
 .btn-green {
@@ -9610,9 +9623,6 @@ fieldset[disabled] .btn-red.active {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  #googlemap {
-    display: block;
-  }
   #shoppingCartView {
     display: none;
   }
@@ -9808,8 +9818,19 @@ fieldset[disabled] .btn-red.active {
   }
 }
 @media (max-width: 767px) {
-  #googlemap {
+  .search-btn-group .zipCode {
+    width: 70px;
+    display: inline;
+  }
+  .pickup-map {
+    display: block;
+  }
+  #googlemapContainer {
     display: none;
+    height: 300px;
+  }
+  #googlemapContainer #googlemap {
+    max-height: 300px;
   }
   .pickup-date {
     width: 100%;

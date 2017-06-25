@@ -8,11 +8,11 @@
   var Pagination = function(element, options){
     this.$element = $(element);
     this.$options = options;
-    this.$curPage = this.$options.index;
+    this.$curPage = parseInt(this.$options.index);
     if(this.$options.target){
       this.render(false);
     }
-  }
+  };
 
   Pagination.prototype.render = function(isUpdate){
     if(!isUpdate){
@@ -21,7 +21,7 @@
       var npp = this.$options.npp;
       this.$element.empty();
       this.$element.hide();
-      if(itemCount == 0 || itemCount <= npp){
+      if(itemCount === 0 || itemCount <= npp){
         return
       }else{
         var pages = Math.floor(itemCount / npp);
@@ -35,9 +35,9 @@
         this.$element.show();
         for(var i = 0; i < this.$pages; i++){
           var li = $("<li><a href='javascript:void(0)'></a></li>");
-          if(this.$curPage && i==this.$curPage-1){
+          if(this.$curPage && i===this.$curPage-1){
             li.addClass("active");
-          }else if(i==0 && !this.$curPage){
+          }else if(i===0 && !this.$curPage){
             this.$curPage = i+1;
             li.addClass("active");
           }
@@ -53,7 +53,7 @@
         this.$element.find("li").each(function(){
           $(this).removeClass('active');
           var index = $(this).data('index');
-          if(index == curPage){
+          if(index === curPage){
             $(this).addClass('active');
           }
         });
@@ -62,7 +62,7 @@
       }
     }
     this.showContent();
-  }
+  };
 
   Pagination.prototype.showContent = function (){
     var curPage = this.$curPage;
@@ -74,35 +74,35 @@
         $(this).show();
       }
     });
-  }
+  };
 
   Pagination.prototype.change = function(node){
     this.$curPage = node.data("index");
     this.render(true);
-  }
+  };
 
   Pagination.DEFAULTS = {
     npp : 5,
     index : 1
-  }
+  };
 
-  $.fn.pagination           = Plugin
-  $.fn.pagination.Constructor = Pagination
+  $.fn.pagination           = Plugin;
+  $.fn.pagination.Constructor = Pagination;
 
   function Plugin(option ,root){
     return this.each(function(){
       var $this = $(this);
-      var options = $.extend({},Pagination.DEFAULTS, root.data(), typeof option == 'object' && option);
+      var options = $.extend({},Pagination.DEFAULTS, root.data(), typeof option === 'object' && option);
       var data = root.data("bs.pagination");
       if(!data) root.data("bs.pagination",(data = new Pagination(root, options)));
-      if(typeof option == 'string') data[option]($this);
+      if(typeof option === 'string') data[option]($this);
     });
   }
 
   var pageChangeHandler = function(e){
     e.preventDefault();
     Plugin.call($(this),'change',$(this).parentsUntil('[data-trigger="pagination"]').length > 0 ? $(this).parentsUntil('[data-trigger="pagination"]').parent() : $(this).parent());
-  }
+  };
 
   $(window).on('load',function(){
     $('[data-trigger="pagination"]').each(function(){
@@ -116,7 +116,7 @@
 }(jQuery);
 
 +function($){
-  'use strict'
+  'use strict';
 
   var DatePicker = function(element, options){
     this.$element = $(element);
@@ -125,11 +125,11 @@
       this.$element.find(".date a").on("change",this.dateChangeHandler);
       this.show();
     }
-  }
+  };
 
   DatePicker.DEFAULTS = {
     from : new Date()
-  }
+  };
 
   DatePicker.dateData = {
     dayInMonth : {
@@ -146,7 +146,7 @@
       11 : "29",
       12 : "31"
     }
-  }
+  };
 
   //select today's date
   DatePicker.prototype.pickNow = function(){
@@ -156,10 +156,10 @@
     var year = from.getUTCFullYear();
     this.$element.find(".date").each(function(){
       var date_format = $(this).data("date-format");
-      if(date_format=="month"){
+      if(date_format==="month"){
         $(this).find("a").html(month + "月");
         $(this).find("a").attr("value",month);
-      }else if(date_format=="day"){
+      }else if(date_format==="day"){
         $(this).find("a").html(day + "日");
         $(this).find("a").attr("value",day);
       }else{
@@ -167,13 +167,13 @@
         $(this).find("a").attr("value",year);
       }
     });
-  }
+  };
 
   DatePicker.prototype.dateChangeHandler = function(e){
     e.preventDefault();
     var ele = $(this).parentsUntil($("[data-toggle='date-picker']")).parent();
     Plugin.call($(this),"show",ele);
-  }
+  };
 
   DatePicker.prototype.addEvent = function(){
     $('[data-toggle="date-picker"] .date .dropdown-menu li').click(function(e){
@@ -185,7 +185,7 @@
       parent.attr("value",value);
       parent.trigger("change");
     });
-  }
+  };
 
   //show date result from select date
   DatePicker.prototype.show = function(){
@@ -196,14 +196,14 @@
     var yearDropDownBtn = yearSection.find("[data-toggle='dropdown']");
     var monthDropDownBtn = monthSection.find("[data-toggle='dropdown']");
 
-    var yearSelected = yearDropDownBtn.attr("value");
-    var monthSelected = monthSection.find("[data-toggle='dropdown']").attr("value");
+    var yearSelected = parseInt(yearDropDownBtn.attr("value"));
+    var monthSelected = parseInt(monthSection.find("[data-toggle='dropdown']").attr("value"));
 
     if(monthSection.length>0){
-      if(yearSelected == from.getUTCFullYear()){
+      if(yearSelected === from.getUTCFullYear()){
         var month = parseInt(from.getMonth()) + 1;
       }else{
-        var month = 1;
+        month = 1;
       }
       var list = monthSection.find("ul");
       list.empty();
@@ -214,20 +214,20 @@
     }
     var daySection = this.$element.find("[data-date-format='day']");
     if(daySection.length>0){
-      if(monthSelected == from.getMonth() + 1){
+      if(monthSelected === from.getMonth() + 1){
         var day = parseInt(from.getDate());
         var curMonth = monthSelected;
       }else if(monthSelected){
-        var day = 1;
-        var curMonth = monthSelected;
+        day = 1;
+        curMonth = monthSelected;
       }else{
-        var day = parseInt(from.getDate());
-        var curMonth = from.getMonth() + 1;
+        day = parseInt(from.getDate());
+        curMonth = from.getMonth() + 1;
       }
       var dayInMonth = DatePicker.dateData.dayInMonth[curMonth];
-      var list = daySection.find("ul");
+      list = daySection.find("ul");
       list.empty();
-      for(var i= day; i <= dayInMonth; i++){
+      for(i= day; i <= dayInMonth; i++){
         var dayItem = "<li><a value='" + i + "'>" + i + "日</a></li>";
         list.append(dayItem);
       }
@@ -235,9 +235,9 @@
 
     if(yearSection.length>0){
       var year = from.getUTCFullYear();
-      var list = yearSection.find("ul");
+      list = yearSection.find("ul");
       list.empty();
-      for(var i= year; i <= year+1; i++){
+      for(i= year; i <= year+1; i++){
         var yearItem = "<li><a value='" + i + "'>" + i + "年</a></li>";
         list.append(yearItem);
       }
@@ -245,33 +245,33 @@
 
     var hourSection = this.$element.find("[data-date-format='hour']");
     if(hourSection.length > 0){
-      var list = hourSection.find("ul");
+      list = hourSection.find("ul");
       list.empty();
-      for(var i=0; i <= 24; i++){
+      for(i=0; i <= 24; i++){
         var hourItem = "<li><a value='" + i + "'>" + i + ":00</a></li>";
         list.append(hourItem);
       }
     }
     this.addEvent();
-  }
+  };
 
   function Plugin(option, root){
-    var hasRoot = typeof root != 'undefined';
+    var hasRoot = typeof root !== 'undefined';
     return this.each(function(){
       if(!hasRoot) root = $(this);
       var $this = $(this);
-      var options = $.extend({}, DatePicker.DEFAULTS, root.data(), typeof option == 'object' && option);
+      var options = $.extend({}, DatePicker.DEFAULTS, root.data(), typeof option === 'object' && option);
       var data = root.data("bs.amount-input");
       if(!data) root.data("bs.amount-input",(data = new DatePicker(root, options)));
-      if(typeof option == 'string') data[option]($this);
+      if(typeof option === 'string') data[option]($this);
     });
   }
 
-  $.fn.datePickup             = Plugin
-  $.fn.datePickup.Constructor = DatePicker
+  $.fn.datePickup             = Plugin;
+  $.fn.datePickup.Constructor = DatePicker;
 
   $(window).on('load',function(){
-    $('[data-toggle="date-picker"]').each(function(){
+    $("[data-toggle='date-picker']").each(function(){
       var datePicker = $(this);
       Plugin.call(datePicker,datePicker.data());
     });
@@ -280,7 +280,7 @@
 }(jQuery);
 
 +function($){
-  'use strict'
+  'use strict';
 
   var AmountInput = function(element, options){
     this.$element = $(element);
@@ -288,15 +288,15 @@
     this.$value = parseInt(this.$element.find("input").val());
     this.$element.find(".add").on('click',addHandler);
     this.$element.find(".minus").on('click',minusHandler);
-  }
+  };
 
   AmountInput.DEFAULTS = {
     init : 1
-  }
+  };
 
   AmountInput.prototype.update = function(){
     this.$value = parseInt(this.$element.find("input").val());
-  }
+  };
 
   AmountInput.prototype.add = function(node){
     if(this.$options.max){
@@ -308,37 +308,37 @@
       this.$value = this.$value + 1;
       node.prev().val(this.$value);
     }
-  }
+  };
 
   AmountInput.prototype.minus = function(node){
     if(this.$value > 0) this.$value = this.$value - 1;
     node.next().val(this.$value);
-  }
+  };
 
   var addHandler = function(e){
     e.preventDefault();
     Plugin.call($(this),'add',$(this).parentsUntil("[data-toggle='amount-input']").length > 0 ? $(this).parentsUntil("[data-toggle='amount-input']").parent() : $(this).parent())
-  }
+  };
 
   var minusHandler = function(e){
     e.preventDefault();
     Plugin.call($(this),'minus',$(this).parentsUntil("[data-toggle='amount-input']").length > 0 ? $(this).parentsUntil("[data-toggle='amount-input']").parent() : $(this).parent());
-  }
+  };
 
   function Plugin(option,root){
-    var hasRoot = typeof root != 'undefined';
+    var hasRoot = typeof root !== 'undefined';
     return this.each(function(){
       if(!hasRoot) root = $(this);
       var $this = $(this);
-      var options = $.extend({}, AmountInput.DEFAULTS, root.data(), typeof option == 'object' && option);
+      var options = $.extend({}, AmountInput.DEFAULTS, root.data(), typeof option === 'object' && option);
       var data = root.data("bs.amount-input");
       if(!data) root.data("bs.amount-input",(data = new AmountInput(root, options)));
-      if(typeof option == 'string') data[option]($this);
+      if(typeof option === 'string') data[option]($this);
     });
   }
 
-  $.fn.amountInput             = Plugin
-  $.fn.amountInput.Constructor = AmountInput
+  $.fn.amountInput             = Plugin;
+  $.fn.amountInput.Constructor = AmountInput;
 
   $(window).on('load',function(){
     $('[data-toggle="amount-input"]').each(function(){
@@ -350,43 +350,41 @@
 }(jQuery);
 
 +function($){
-  'use strict'
+  'use strict';
   var ExclusiveInput = function(element, options){
     this.$element = $(element);
     this.$options = $.extend({},ExclusiveInput.DEFAULTS, options);
     this.$element.find(".input-group").off('change');
     this.$element.find(".input-group").on('change',onchangeHandler);
-  }
+  };
 
-  ExclusiveInput.DEFAULTS = {
-
-  }
+  ExclusiveInput.DEFAULTS = {};
 
   ExclusiveInput.prototype.change = function(node){
     var ele = this.$element;
     ele.find(".input-group").each(function(){
-      if($(this).attr('name')!=node.attr('name')){
+      if($(this).attr('name')!==node.attr('name')){
         $(this).find("input").val('');
       }
     });
-  }
+  };
 
   function Plugin(option,root){
     return this.each(function(){
-      var options = $.extend({}, ExclusiveInput.DEFAULTS, root.data(), typeof option == 'object' && option);
+      var options = $.extend({}, ExclusiveInput.DEFAULTS, root.data(), typeof option === 'object' && option);
       var data = root.data("bs.exclusive-input");
       if(!data) root.data("bs.exclusive-input",(data = new ExclusiveInput(root, options)));
-      if(typeof option == 'string') data[option]($(this));
+      if(typeof option === 'string') data[option]($(this));
     });
   }
 
-  $.fn.exclusiveInput           = Plugin
-  $.fn.exclusiveInput.Constructor = ExclusiveInput
+  $.fn.exclusiveInput           = Plugin;
+  $.fn.exclusiveInput.Constructor = ExclusiveInput;
 
   var onchangeHandler = function(e){
     e.preventDefault();
     Plugin.call($(this),'change',$(this).parentsUntil('[data-toggle="exclusive-input"]').parent());
-  }
+  };
 
   $(window).on('load',function(){
     $('[data-toggle="exclusive-input"]').each(function(){
@@ -398,18 +396,16 @@
 }(jQuery);
 
 +function($){
-  'use strict'
+  'use strict';
 
   var ManipulateItem = function(element, options){
     this.$element = $(element);
     this.$options = $.extend({},ManipulateItem.DEFAULTS, options);
     this.$element.find(".manipulate-button").off('click');
     this.$element.find(".manipulate-button").on('click',clickHandler);
-  }
+  };
 
-  ManipulateItem.DEFAULTS = {
-
-  }
+  ManipulateItem.DEFAULTS = {};
 
   ManipulateItem.reset = function(){
     $("[data-toggle='manipulate-item'] .manipulate-button[data-type='cover']").each(function(){
@@ -420,12 +416,12 @@
         element.data($(this).data().type,false);
       }
     });
-  }
+  };
 
   ManipulateItem.prototype.operate = function(button){
     var element = this.$element;
     if(button.hasClass("text-grey")){
-      if(button.data().type == "cover"){
+      if(button.data().type === "cover"){
         ManipulateItem.reset();
       }
       button.removeClass("text-grey");
@@ -436,30 +432,30 @@
       button.addClass("text-grey");
       element.data(button.data().type,false);
     }
-  }
+  };
 
   function Plugin(option,root){
-    var hasRoot = typeof root != 'undefined';
+    var hasRoot = typeof root !== 'undefined';
     return this.each(function(){
       if(!hasRoot) root = $(this);
-      var options = $.extend({}, ManipulateItem.DEFAULTS, root.data(), typeof option == 'object' && option);
+      var options = $.extend({}, ManipulateItem.DEFAULTS, root.data(), typeof option === 'object' && option);
       var data = root.data('bs.manipulate-item');
       if(!data){
         root.data('bs.manipulate-item',(data = new ManipulateItem(root, options)));
       }
-      if(typeof option == 'string'){
+      if(typeof option === 'string'){
         data[option]($(this));
       }
     });
   }
 
-  $.fn.manipulate             = Plugin
-  $.fn.manipulate.Constructor = ManipulateItem
+  $.fn.manipulate             = Plugin;
+  $.fn.manipulate.Constructor = ManipulateItem;
 
   var clickHandler = function(e){
     e.preventDefault();
     Plugin.call($(this),'operate', $(this).parentsUntil("[data-toggle='manipulate-item']").parent());
-  }
+  };
 
   $(window).on('load',function(){
     $('[data-toggle="manipulate-item"]').each(function(){
@@ -471,7 +467,7 @@
 }(jQuery);
 
 +function($){
-  'use strict'
+  'use strict';
 
   var StarSet = function(element, options){
     this.element = $(element);
@@ -483,11 +479,9 @@
       this.element.find("i").on('click',clickHandler);
       this.element.find("i").on('mouseover',overHandler);
     }
-  }
+  };
 
-  StarSet.DEFAULTS = {
-
-  }
+  StarSet.DEFAULTS = {};
 
   //show star based on rating
   StarSet.prototype.show = function(){
@@ -504,17 +498,17 @@
       }else{
         var left = index - i;
         var count = left / 0.25;
-        if(count==1){
+        if(count===1){
           //over 0.75
           star.removeClass("fa-star").addClass("fa-star text-yellow");
-        }else if(count == 2 || count==3){
+        }else if(count === 2 || count===3){
           star.removeClass("fa-star text-yellow").addClass("fa-star-half-empty text-yellow");
         }else{
           star.removeClass("fa-star text-yellow").addClass("fa-star text-lightgrey");
         }
       }
     }
-  }
+  };
 
   //mouse over on star
   StarSet.prototype.over = function(node){
@@ -528,7 +522,7 @@
         star.removeClass("fa-star text-yellow").addClass("fa-star text-lightgrey");
       }
     }
-  }
+  };
 
   //click on star
   StarSet.prototype.click = function(node){
@@ -543,34 +537,34 @@
       }
     }
     ele.data("rate",5-index);
-  }
-
-  $.fn.starSet              = Plugin
-  $.fn.starSet.Constructor  = StarSet
-
-  function Plugin(option, root){
-    var hasRoot = typeof root != 'undefined';
-    return this.each(function(){
-      if(!hasRoot) root = $(this);
-      var options = $.extend({}, StarSet.DEFAULTS, root.data(), typeof option == 'object' && option);
-      var data = root.data('bs.star-set');
-      if(!data){
-        root.data('bs.star-set',(data = new StarSet(root, options)));
-      }
-      if(typeof option == 'string'){
-        data[option]($(this));
-      }
-    });
-  }
+  };
 
   var clickHandler = function(e){
     e.preventDefault();
     Plugin.call($(this),'click',$(this).parentsUntil('[data-toggle="star-set"]').length > 0 ? $(this).parentsUntil('[data-toggle="star-set"]').parent() : $(this).parent());
-  }
+  };
 
   var overHandler = function(e){
     e.preventDefault();
     Plugin.call($(this),'over',$(this).parentsUntil('[data-toggle="star-set"]').length > 0 ? $(this).parentsUntil('[data-toggle="star-set"]').parent() : $(this).parent());
+  };
+
+  $.fn.starSet              = Plugin;
+  $.fn.starSet.Constructor  = StarSet;
+
+  function Plugin(option, root){
+    var hasRoot = typeof root !== 'undefined';
+    return this.each(function(){
+      if(!hasRoot) root = $(this);
+      var options = $.extend({}, StarSet.DEFAULTS, root.data(), typeof option === 'object' && option);
+      var data = root.data('bs.star-set');
+      if(!data){
+        root.data('bs.star-set',(data = new StarSet(root, options)));
+      }
+      if(typeof option === 'string'){
+        data[option]($(this));
+      }
+    });
   }
 
   $(window).on('load',function(){
@@ -582,7 +576,7 @@
 }(jQuery);
 
 +function($){
-  'use strict'
+  'use strict';
 
   var CollectItem = function(element, options){
     this.element = $(element);
@@ -595,18 +589,18 @@
 
     }
     this.element.on("click",clickHandler);
-  }
+  };
 
   CollectItem.DEFAULTS = {
 
-  }
+  };
 
   //click on star
   CollectItem.prototype.click = function(node){
     var ele = this.element;
     var mealId = ele.data("meal");
     var userId = ele.data("user");
-    if(!userId || userId == "undefined"){
+    if(!userId || userId === "undefined"){
       return;
     }
     if(this.options.select === "true" || this.options.select === true){
@@ -631,21 +625,21 @@
         }
       },error : function(err){}
     });
-  }
+  };
 
-  $.fn.collectItem              = Plugin
-  $.fn.collectItem.Constructor  = CollectItem
+  $.fn.collectItem              = Plugin;
+  $.fn.collectItem.Constructor  = CollectItem;
 
   function Plugin(option, root){
-    var hasRoot = typeof root != 'undefined';
+    var hasRoot = typeof root !== 'undefined';
     return this.each(function(){
       if(!hasRoot) root = $(this);
-      var options = $.extend({}, CollectItem.DEFAULTS, root.data(), typeof option == 'object' && option);
+      var options = $.extend({}, CollectItem.DEFAULTS, root.data(), typeof option === 'object' && option);
       var data = root.data('bs.collect-item');
       if(!data){
         root.data('bs.collect-item',(data = new CollectItem(root, options)));
       }
-      if(typeof option == 'string'){
+      if(typeof option === 'string'){
         data[option]($(this));
       }
     });
@@ -654,7 +648,7 @@
   var clickHandler = function(e){
     e.preventDefault();
     Plugin.call($(this),'click',$(this));
-  }
+  };
 
   $(window).on('load',function(){
     $('[data-toggle="collect-item"]').each(function(){
@@ -665,7 +659,7 @@
 }(jQuery);
 
 +function($){
-  'user strict'
+  'user strict';
 
   var AlertButton = function(element, options){
     this.element = $(element);
@@ -678,27 +672,27 @@
       trigger : "click",
       placement : "bottom"
     });
-  }
+  };
 
-  $.fn.alertButton              = Plugin
-  $.fn.alertButton.Constructor  = AlertButton
+  $.fn.alertButton              = Plugin;
+  $.fn.alertButton.Constructor  = AlertButton;
 
   var template = function(options){
     var popover = '<div class="popover" role="tooltip"><div class="arrow"></div> <div class="text-center"><h3 class="popover-title">$title</h3> <div style="width: 200px;padding: 5px;"> <input id="popover_msg" class="form-control" type="text" name="msg" maxlength="20"></div> <button class="btn btn-info middle" data-target="#popover_msg" style="margin-bottom: 5px;" onclick="$actionFn(event)" data-error-container="$error-container" data-order=$argument">确认</button></div></div>';
     popover = popover.replace("$title",options["title"]).replace("$content",options["content"]).replace("$actionFn",options["actionfn"]).replace("$argument","'" + options["argument"] + "'").replace("$error-container", options["errorContainer"]);
     return popover;
-  }
+  };
 
   function Plugin(option, root){
-    var hasRoot = typeof root != 'undefined';
+    var hasRoot = typeof root !== 'undefined';
     return this.each(function(){
       if(!hasRoot) root = $(this);
-      var options = $.extend({}, AlertButton.DEFAULTS, root.data(), typeof option == 'object' && option);
+      var options = $.extend({}, AlertButton.DEFAULTS, root.data(), typeof option === 'object' && option);
       var data = root.data('bs.alert-button');
       if(!data){
         root.data('bs.alert-button',(data = new AlertButton(root, options)));
       }
-      if(typeof option == 'string'){
+      if(typeof option === 'string'){
         data[option]($(this));
       }
     });

@@ -12,12 +12,12 @@ function geolocate(autocomplete) {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       };
-      var circle = new google.maps.Circle({
+      var circle = new google["maps"]["Circle"]({
         center: geolocation,
         radius: position.coords.accuracy
       });
       if(autocomplete){
-        autocomplete.setBounds(circle.getBounds());
+        autocomplete["setBounds"](circle["getBounds"]());
       }
     });
   }
@@ -63,11 +63,11 @@ function initAutoComplete(googleService){
     autoCompleteEle.forEach(function (eles) {
       if ($(eles).length) {
         $(eles).toArray().forEach(function (ele) {
-          autocomplete = new googleService.maps.places.Autocomplete(ele, options);
+          autocomplete = new googleService["maps"]["places"].Autocomplete(ele, options);
           geolocate(autocomplete);
           autocomplete.addListener('place_changed', function () {
-            var place = this.getPlace();
-            if(!place.geometry) {
+            var place = this["getPlace"]();
+            if(!place["geometry"]) {
               window.alert("No details available for input: '" + place.name + "'");
               return;
             }
@@ -81,23 +81,23 @@ function initAutoComplete(googleService){
             }
             // Get each component of the address from the place details
             // and fill the corresponding field on the form.
-            for (var i = 0; i < place.address_components.length; i++) {
-              var addressType = place.address_components[i].types[0];
+            for (var i = 0; i < place["address_components"].length; i++) {
+              var addressType = place["address_components"][i].types[0];
               if (componentForm[addressType]) {
-                var val = place.address_components[i].long_name;
-                if (addressType == "postal_code") {
+                var val = place["address_components"][i]["long_name"];
+                if (addressType === "postal_code") {
                   Object.keys(zipCodeToArea).forEach(function (area) {
                     var zipcodes = zipCodeToArea[area];
-                    if (zipcodes.indexOf(val) != -1) {
+                    if (zipcodes.indexOf(val) !== -1) {
                       $(ele).parent().parent().find(".area input").val(area);
                     }
                   })
-                } else if (addressType == "administrative_area_level_2") {
+                } else if (addressType === "administrative_area_level_2") {
                   $(ele).parent().parent().find(".area").data("county", val);
-                }else if(addressType == "administrative_area_level_1"){
-                  val = place.address_components[i].short_name;
+                }else if(addressType === "administrative_area_level_1"){
+                  val = place["address_components"][i]["short_name"];
                 }
-                var formContainer = $(ele).closest('form');
+                formContainer = $(ele).closest('form');
                 componentForm[addressType].forEach(function (selector) {
                   var inputToFill = formContainer.find(selector);
                   if (inputToFill.length) {
@@ -117,13 +117,14 @@ function initAutoComplete(googleService){
 
 function makeAToast(msg, type){
   type = type || 'warning';
-  if(typeof toastr[type] == 'function'){
+  if(typeof toastr[type] === 'function'){
     toastr[type](msg);
   }
 }
 
 function showErrorMsg(err){
-  return err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText
+  var responseJSON = err['responseJSON'];
+  return responseJSON ? (responseJSON.responseText || responseJSON.summary) : err.responseText
 }
 
 //Modal open/switch
@@ -168,9 +169,9 @@ function dismissModal(event, cb){
 
 function reloadUrl(url, tag){
   var hash = location.hash;
-  if(location.href.indexOf(url)==-1){
+  if(location.href.indexOf(url)===-1){
     location.href = url + tag;
-  }else if(tag != hash){
+  }else if(tag !== hash){
     location.href = url + tag;
     location.reload();
   }else{
@@ -179,30 +180,20 @@ function reloadUrl(url, tag){
   return false;
 }
 
-function getZipCode(){
-  var zip = $(".zipCode").val();
-  var isValidZip = /(^\d{5}$)|(^\d{5}-\d{4}$)/.test(zip);
-  if(isValidZip){
-    zip = zip.match(/(^\d{5}$)|(^\d{5}-\d{4}$)/)[0];
-  }else{
-    zip = undefined;
-  }
-  return zip;
-}
-
 function getCountyInfo(){
   var county = readCookie("county");
   if(county){
-    var countyName = $("#citySelector ul a[value='" + county  + "']").text();
-    $("#citySelector>a").html(countyName + "&nbsp;<span class='caret'></span>");
-    $("#citySelector>a").attr("value",county);
+    var $citySelector = $("#citySelector");
+    var countyName = $citySelector.find("ul a[value='" + county  + "']").text();
+    var $citySelectorText = $citySelector.find(">a");
+    $citySelectorText.html(countyName + "&nbsp;<span class='caret'></span>");
+    $citySelectorText.attr("value",county);
   }
   return county || "San Francisco County";
 }
 
 //UI Components setup
 function stepContainer(){
-  var stepsContainer = $(".step-container");
   var steps = $(".step-container .step");
   var count = steps.length;
   for( var i=0; i < count ; i++){
@@ -235,7 +226,7 @@ function lastStep(event){
 
 function enterDishPreference(target){
   var preference = $(target).data("preference");
-  var container = $("#preferenceTable tbody");
+  var container = $("#preferenceTable").find("tbody");
   container.empty();
   preference.forEach(function(pre, index){
     var element = "<tr><th>$index</th><td>$extra</td><td>$preference</td></tr>";
@@ -247,7 +238,7 @@ function enterDishPreference(target){
 function enterHostInfo(target){
   var hostId = $(target).data("host");
   var isUpdating = $(target).data("updating");
-  var bank_form = $("#bankView form");
+  var bank_form = $("#bankView").find("form");
   bank_form.data("host",hostId);
   bank_form.data("updating",isUpdating);
 }
@@ -266,14 +257,15 @@ function search(target, isRegular){
       url: "https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURI(zip)
       + "&sensor=false&language=en",
       success: function (response) {
-        if (response.results.length == 0) {
+        if (response.results.length === 0) {
           alert(jQuery.i18n.prop('zipcodeGeoError'));
           return;
         }
-        var county = response.results[0].address_components[2]["long_name"];
+        var result = response.results[0];
+        var county = result["address_components"][2]["long_name"];
         query += "&county=" + county;
         location.href = "/meal/search?" + query;
-      }, error: function (err) {
+      }, error: function () {
         alert(jQuery.i18n.prop('notAvailable'));
       }
     });
@@ -291,7 +283,7 @@ var localCoupon = {};
 var localPoints = false;
 //load previous order from cookies
 function loadOrder(fromCache){
-  $("#order .item").each(function(){
+  $("#order").find(".item").each(function(){
     var dishId = $(this).data("id");
     if(fromCache){
       var localDish = readCookie(dishId);
@@ -305,7 +297,7 @@ function loadOrder(fromCache){
       refreshOrder(dishId);
     }else{
       localOrders[dishId] = {
-        number : $(this).find(".amount").data("value"),
+        number : parseInt($(this).find(".amount").data("value")),
         preference : $(this).data("preference")
       };
     }
@@ -316,7 +308,7 @@ function loadOrder(fromCache){
 }
 
 function loadPreference(){
-  $("#order .item").each(function(){
+  $("#order").find(".item").each(function(){
     var dishId = $(this).data("id");
       refreshPreference(dishId);
   });
@@ -362,7 +354,7 @@ function loadCoupon(fromCache){
       coupon = {};
     }
   }else{
-    var coupon = {};
+    coupon = {};
     //set code and amount as key & value
   }
   localCoupon = coupon;
@@ -372,7 +364,7 @@ function loadPoints(fromCache){
   if(fromCache){
     var hasPoints = readCookie('points');
   }else{
-    var hasPoints = false;
+    hasPoints = false;
     //set code and amount as key & value
   }
   localPoints = hasPoints;
@@ -380,7 +372,7 @@ function loadPoints(fromCache){
 
 //order food
 function orderFood(id,number,initial){
-  var dishItem = $("#meal-detail-container .dish[data-id='" + id + "']");
+  var dishItem = $("#meal-detail-container").find(".dish[data-id='" + id + "']");
   if(initial){
     if(number > 0){
       $(this).amountInput('add',dishItem.find("[data-toggle='amount-input']"));
@@ -388,8 +380,9 @@ function orderFood(id,number,initial){
       $(this).amountInput('minus',dishItem.find("[data-toggle='amount-input']"));
     }
   }
-  var item = $("#order .item[data-id=" + id + "]");
-  var alertView = $($("#order").data("err-container"));
+  var $order = $("#order");
+  var item = $order.find(".item[data-id=" + id + "]");
+  var alertView = $($order.data("err-container"));
   alertView.removeClass("hide");
   alertView.hide();
   localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : [{ property : '', extra : 0}]};
@@ -449,7 +442,6 @@ function applyCoupon(isApply, amount, code){
 
 function applyPoints(isApply, amount){
   if(isApply){
-    localPoints = localPoints || {};
     localPoints = amount;
     createCookie('points',localPoints,5);
   }else{
@@ -463,71 +455,74 @@ function applyPoints(isApply, amount){
 var refreshMenu = function(){
   var numberOfItem = 0;
   for(var key in localOrders){
-    if(localOrders[key].number==0){
-      $("#meal-detail-container .dish[data-id=" + key + "]").find(".untake-order").hide('slow');
+    var $meal = $("#meal-detail-container");
+    if(localOrders[key].number===0){
+      $meal.find(".dish[data-id=" + key + "]").find(".untake-order").hide('slow');
     }else{
       numberOfItem += localOrders[key].number;
-      $("#meal-detail-container .dish[data-id=" + key + "]").find(".untake-order").show('slow');
+      $meal.find(".dish[data-id=" + key + "]").find(".untake-order").show('slow');
     }
   }
   var subtotal = 0;
-  var method = $("#meal-confirm-container #method .active").attr("value");
-  $("#order .item").each(function(){
+  var method = $("#method").find(".active").attr("value");
+  var $order = $("#order");
+  $order.find(".item").each(function(){
     var unitPrice = parseInt($(this).find(".price").attr("value"));
     subtotal += parseFloat($(this).find(".amount").text()) * unitPrice + parseInt($(this).find(".price").data("extra"));
   });
-  $("#order .subtotal").html("$" + subtotal.toFixed(2));
-  $("#order .subtotal").data("value", subtotal.toFixed(2));
-  if(method == "delivery"){
-    var delivery = $("#order .delivery").data("value");
-    $("#order .deliveryOpt").show();
-    $("#order .pickupOpt").hide();
+  $order.find(".subtotal").html("$" + subtotal.toFixed(2));
+  $order.find(".subtotal").data("value", subtotal.toFixed(2));
+  if(method === "delivery"){
+    var delivery = $order.find(".delivery").data("value");
+    $order.find(".deliveryOpt").show();
+    $order.find(".pickupOpt").hide();
   }else{
-    $("#order .deliveryOpt").hide();
-    $("#order .pickupOpt").show();
+    $order.find(".deliveryOpt").hide();
+    $order.find(".pickupOpt").show();
     delivery = 0;
   }
   $(".delivery").text("$" + delivery.toFixed(2));
-  var taxRate = $("#order .tax").data("taxrate");
+  var taxRate = $order.find(".tax").data("taxrate");
   var tax = parseFloat(subtotal * taxRate);
   var serviceFee = 1;
-  $("#order .tax").text(" $" + tax.toFixed(2));
+  $order.find(".tax").text(" $" + tax.toFixed(2));
   var coupons = Object.keys(localCoupon);
+  var $orderTotal = $order.find(".total");
   if(coupons.length > 0){
     $("#applyCouponBtn").hide();
     $("#disApplyCouponBtn").show();
-    $("#order .coupon-code").val(coupons[0]);
+    $order.find(".coupon-code").val(coupons[0]);
     var discount = localCoupon[coupons[0]];
     var total = subtotal+delivery+tax-discount;
     if(total < 0){total = 0;}
     total = (total + serviceFee).toFixed(2);
-    $("#order .total").data("value",total);
-    $("#order .total").html(" $" + total + "( -$" + discount.toFixed(2) + " )");
-    $("#meal-confirm-container .total").text(" $" + total + "( -$" + discount.toFixed(2) + " )");
+    $orderTotal.data("value",total);
+    $orderTotal.html(" $" + total + "( -$" + discount.toFixed(2) + " )");
+    $("#meal-confirm-container").find(".total").text(" $" + total + "( -$" + discount.toFixed(2) + " )");
   }else{
     $("#applyCouponBtn").show();
     $("#disApplyCouponBtn").hide();
-    var total = (subtotal+delivery+tax+serviceFee).toFixed(2);
-    $("#order .total").data("value",(subtotal+delivery+tax+serviceFee).toFixed(2));
-    $("#order .total").html(" $" + (subtotal+delivery+tax+serviceFee).toFixed(2));
-    $("#meal-confirm-container .total").text(total);
+    total = (subtotal+delivery+tax+serviceFee).toFixed(2);
+    $orderTotal.data("value",(subtotal+delivery+tax+serviceFee).toFixed(2));
+    $orderTotal.html(" $" + (subtotal+delivery+tax+serviceFee).toFixed(2));
+    $("#meal-confirm-container").find(".total").text(total);
   }
   if(localPoints){
-    var discount = localPoints/10;
+    discount = localPoints/10;
     $("#applyPointsBtn").hide();
     $("#disApplyPointsBtn").show();
-    var total = subtotal+delivery+tax-discount;
+    total = subtotal+delivery+tax-discount;
     if(total < 0){total = 0;}
     total = (total + serviceFee).toFixed(2);
-    $("#order .total").data("value",total);
-    $("#order .total").html(" $" + total + "( -$" + discount.toFixed(2) + " )");
-    $("#meal-confirm-container .total").text(" $" + total + "( -$" + discount.toFixed(2) + " )");
+    $orderTotal.data("value",total);
+    $orderTotal.html(" $" + total + "( -$" + discount.toFixed(2) + " )");
+    $("#meal-confirm-container").find(".total").text(" $" + total + "( -$" + discount.toFixed(2) + " )");
   }else{
     $("#applyPointsBtn").show();
     $("#disApplyPointsBtn").hide();
   }
   refreshCart(total, numberOfItem);
-}
+};
 
 function refreshCart(subtotal, numberOfItem){
   var shoppingCart = $("#shoppingCartView");
@@ -540,7 +535,7 @@ function refreshCart(subtotal, numberOfItem){
 //render order view
 function refreshOrder(id){
   var number = localOrders[id].number;
-  var item = $("#order .item[data-id=" + id + "]");
+  var item = $("#order").find(".item[data-id=" + id + "]");
   var left = item.data("left-amount");
   item.find(".amount").html(number);
   var price = item.find(".price");
@@ -559,7 +554,7 @@ function refreshOrder(id){
     price.data("extra", 0);
     price.html("$" + price.attr('value'));
   }
-  var dishItem = $("#meal-detail-container .dish[data-id='" + id + "']");
+  var dishItem = $("#meal-detail-container").find(".dish[data-id='" + id + "']");
   if(number > 0){
     dishItem.find(".beforeOrder").hide();
     dishItem.find(".afterOrder").show();
@@ -574,14 +569,14 @@ function refreshOrder(id){
 
 function tapController(){
   var tapName = location.hash;
-  if(tapName && tapName != ""){
+  if(tapName && tapName !== ""){
     $("a[href='" + tapName + "']").tab('show');
   }
 }
 
 function setupDishSelector(){
-  $("#myinfo .dishes a").each(function(){
-    if($(this).data("toggle")=="dropdown"){
+  $("#myinfo").find(".dishes a").each(function(){
+    if($(this).data("toggle")==="dropdown"){
       $(this).next().find("li").click(function(){
 
         //get selected value
@@ -593,15 +588,14 @@ function setupDishSelector(){
 
         //reset other dropdown buttons if selected value is the same as their current value
         var index = 0;
-        $("#myinfo .dishes a[data-toggle='dropdown']").each(function(){
-          if(this!= dropBtn[0]){
+        $("#myinfo").find(".dishes a[data-toggle='dropdown']").each(function(){
+          if(this !== dropBtn[0]){
             var otherDropBtn = $(this);
             var curValue = otherDropBtn.data("value");
-            if(curValue == selectedDishId){
-              var indexChar = "";
-              if(index==0){
-                key = "firstDish";
-              }else if(index==1){
+            if(curValue === selectedDishId){
+              if(index===0){
+                var key = "firstDish";
+              }else if(index===1){
                 key = "secondDish";
               }else{
                 key = "thirdDish";
@@ -619,11 +613,12 @@ function setupDishSelector(){
 }
 
 function adjustLayout(){
-  var dishes = $("#myinfo .dishes .signatureDish li");
+  var $myinfo = $("#myinfo");
+  var dishes = $myinfo.find(".dishes .signatureDish li");
   if(dishes){
     var count = dishes.length;
     var height = count * 50 < 50 ? 50 : count * 50;
-    $("#myinfo .dishes").css("height",height);
+    $myinfo.find(".dishes").css("height",height);
   }
 }
 
@@ -642,9 +637,9 @@ function resetDropdownMenu(target){
 }
 
 function setupDropdownMenu(){
-  $('[data-toggle="dropdown"][data-selected="true"]').next().find("li a").off("click");
-  $('[data-toggle="dropdown"][data-selected="true"]').next().find("li a").click(function(e){
-    //e.preventDefault();
+  var $dropdownMenu = $('[data-toggle="dropdown"][data-selected="true"]').next().find("li a");
+  $dropdownMenu.off("click");
+  $dropdownMenu.click(function(){
     if($(this).attr('disabled')){
       return;
     }
@@ -652,7 +647,6 @@ function setupDropdownMenu(){
     var value = $(this).attr("value") || $(this).data("value");
     var data = $(this).data();
     var parent = $(this).closest('.dropdown-menu').prev();
-    var previousValue = parent.attr('value');
     if(!value){
       return;
     }
@@ -685,22 +679,6 @@ function setup(){
   setupCountrySelector();
   setupSelector();
   setupInputMask();
-  // $(function(){
-  //   var keyStop = {
-  //     // 8: ":not(input:text, textarea, input:file, input:password)", // stop backspace = back
-  //     13: "input:text, input:password", // stop enter = submit
-  //
-  //     end: null
-  //   };
-  //   $(document).bind("keydown", function(event){
-  //     var selector = keyStop[event.which];
-  //
-  //     if(selector !== undefined && $(event.target).is(selector)) {
-  //       event.preventDefault(); //stop event
-  //     }
-  //     return true;
-  //   });
-  // });
   $('.lazyload').each(function(){
     $(this).attr('src', $(this).data('src'));
   });
@@ -717,14 +695,13 @@ function setupSelector(){
 
 function setupSubmenu(){
   $('[data-submenu]').submenupicker();
-  $('[data-submenu][data-selected="true"]').next().find("li a").on("click", function(e){
+  $('[data-submenu][data-selected="true"]').next().find("li a").on("click", function(){
     if($(this).attr('disabled')){
       return;
     }
     var text = $(this).text();
     var value = $(this).attr("value") || $(this).data("value");
     var parent = $(this).closest('.dropdown-menu').prev();
-    var previousValue = parent.attr('value');
     if(value){
       parent.attr("value",value);
       parent.html(text);
@@ -776,7 +753,7 @@ function setupValidator(){
       wantsimage : function($el){
         var requiredImg = $el.data("wantsimage");
         var ext = $el[0].value.match(/\.(.+)$/)[1].toLowerCase();
-        if(requiredImg && ext != 'jpg' && ext != 'jpeg' && ext != 'png' && ext !='gif'&& ext !='pdf'){
+        if(requiredImg && ext !== 'jpg' && ext !== 'jpeg' && ext !== 'png' && ext !=='gif'&& ext !=='pdf'){
           return jQuery.i18n.prop('imageTypeRequire');
         }
       },strictimage : function($el){
@@ -789,7 +766,7 @@ function setupValidator(){
           return jQuery.i18n.prop('strictImageTypeRequire');
         }
         var ext = exts[1].toLowerCase();
-        if(requiredImg && ext != 'jpeg' && ext != 'png' && ext != 'jpg'){
+        if(requiredImg && ext !== 'jpeg' && ext !== 'png' && ext !== 'jpg'){
           return jQuery.i18n.prop('strictImageTypeRequire');
         }
       }
@@ -803,7 +780,7 @@ function setupInputMask(){
 
 function setupCountrySelector(){
   $('.flagstrap').flagStrap({
-    onSelect : function(value, ele){
+    onSelect : function(value){
       $('.flagstrap').data('selected-country', value);
     },
     buttonType : 'btn-red'
@@ -835,7 +812,7 @@ function setupLanguage(){
         }
       });
 
-      if(typeof userBarView != 'undefined' && userBarView){
+      if(typeof userBarView !== 'undefined' && userBarView){
         userBarView.clearBadges();
         userBarView.getNotification();
       }
@@ -859,7 +836,7 @@ function setupLanguage(){
 }
 
 $("document").ready(function(){
-  if(typeof Stripe != 'undefined'){
+  if(typeof Stripe !== 'undefined'){
     Stripe.setPublishableKey('pk_live_AUWn3rb2SLc92lXsocPCDUcw');
     // Stripe.setPublishableKey('pk_test_ztZDHzxIInBmBRrkuEKBee8G');
   }
@@ -868,7 +845,7 @@ $("document").ready(function(){
 
 function setupWechat(imgSrc, title, desc){
   var gm_ua = navigator.userAgent.toLowerCase();
-  if(gm_ua.match(/MicroMessenger/i)=="micromessenger") {
+  if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger") {
     if(imgSrc){
       $('body').prepend('<div style="overflow:hidden;width:0px;height:0px;margin:0 auto;position:absolute;top:-800px;"><img src="' + imgSrc + '"></div>');
     }
@@ -928,7 +905,7 @@ function setupWechat(imgSrc, title, desc){
           }
         });
       });
-      wx.error(function(res){
+      wx.error(function(){
         console.log("error");
         // The callback function of error API will be executed if config authentication fails. If authentication failure is due to an expired signature, the detailed error information can be viewed by enabling the debugging mode within config API, or via the returned res parameter. The signature can be updated here for the SPA.
 
@@ -973,31 +950,23 @@ $(window).on('hashchange', function() {
 });
 
 $(window).scroll(function () {
-  if($('.footer').length==0){
+  var $footer = $('.footer');
+  if($footer.length===0){
     return;
   }
   var headerHeight = $('.compact-banner').height() + $("#myUserBar").height() - 3;
-  var footertotop = ($('.footer').position().top);
-  var footerHeight = $('.footer').height();
-  var fixedElementHeight = $('.floater').height();
-  var scrolltop = $(document).scrollTop();
-  var difference = scrolltop-footertotop;
+  var footertotop = ($footer.position().top);
+  var $floater = $('.floater');
+  var fixedElementHeight = $floater.height();
+  var scrollTop = $(document).scrollTop();
 
-  // console.log("scrolling height: " + scrolltop);
-  // console.log("header height: " + headerHeight);
-
-  if (scrolltop + fixedElementHeight > footertotop) {
-    // $('.floater').css('top', '');
-    // $('.floater').css('top', 0);
-    // $('.floater').css('bottom',  25);
-    // $('.floater').removeClass("fix-floater");
-    // $('.floater').addClass("static-floater");
-  }else if (scrolltop > headerHeight){
-    $('.floater').removeClass("static-floater");
-    $('.floater').addClass("fix-floater");
-    $('.floater').css('top', -20);
+  if (scrollTop + fixedElementHeight > footertotop) {
+  }else if (scrollTop > headerHeight){
+    $floater.removeClass("static-floater");
+    $floater.addClass("fix-floater");
+    $floater.css('top', -20);
   }else{
-    $('.floater').removeClass("fix-floater");
-    $('.floater').addClass("static-floater");
+    $floater.removeClass("fix-floater");
+    $floater.addClass("static-floater");
   }
 });

@@ -84,6 +84,13 @@
                         <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%></span>
                         <span class="col-xs-12"><%= meal.getDateFromDate(meal.pickups[0].pickupFromTime)%></span>
                       </div>
+                      <div class="pickup-map">
+                        <h4><small><%= __('pickup-map')%></small></h4>
+                        <a data-toggle="collapse" data-parent="#meal-detail-container" href="#googlemapContainer" aria-expanded="false" aria-controls="googlemapContainer">
+                          <i class="fa fa-2x fa-map"></i>
+                        </a>
+                      </div>
+
                     </div>
                     <div class="col-xs-8 text-left">
                       <h4><small><%= __('pickup-location')%>:</small></h4>
@@ -141,7 +148,10 @@
 
               <h4 class="text-left"><small><% __('pickup-location-after-order')%></small></h4>
 
-              <div id="googlemap" data-target="#meal-detail-intro"></div>
+              <div id="googlemapContainer" class="collapse">
+                <div id="googlemap" data-target="#meal-detail-intro"></div>
+              </div>
+
             </div>
           </div>
 

@@ -430,6 +430,14 @@ input:focus{
   text-align: center;
 }
 
+.pickup-map{
+  display: none;
+}
+
+#googlemapContainer{
+  display: block;
+}
+
 .fa-facebook-remote{
   background: url("@{fa-facebook}") no-repeat center/70% auto;
 }
@@ -1098,6 +1106,16 @@ label {
 .btn-group{
   input{
     text-align: left !important;
+  }
+}
+
+.search-btn-group{
+  .zipCode{
+    width: 100px;
+    display: inline;
+  }
+  .keyword{
+    max-width: 150px;
   }
 }
 
@@ -2091,10 +2109,6 @@ fieldset[disabled] .btn-red.active {
     text-overflow: ellipsis;
   }
 
-  #googlemap{
-    display: block;
-  }
-
   #shoppingCartView{
     display: none;;
   }
@@ -2320,8 +2334,23 @@ fieldset[disabled] .btn-red.active {
 
 @media (max-width: 767px){
 
-  #googlemap{
+  .search-btn-group{
+    .zipCode{
+      width: 70px;
+      display: inline;
+    }
+  }
+
+  .pickup-map{
+    display: block;
+  }
+
+  #googlemapContainer{
     display: none;
+    height: 300px;
+    #googlemap{
+      max-height: 300px;
+    }
   }
 
   .pickup-date{

@@ -148,6 +148,7 @@
   "pickup-date" : "取餐日期",
   "from-time" : "开始时间",
   "end-time" : "结束时间",
+  "pickup-map" : "取餐地图",
   "from" : "开始",
   "end" : "结束",
   "method-order" : "方式:即点",

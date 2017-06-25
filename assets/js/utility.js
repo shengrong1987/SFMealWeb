@@ -47,7 +47,11 @@
         });
         utility.directionsDisplay.setMap(map);
         var alignmentHeight = $($(ele).data("target")).height();
+        $(ele).on("shown.bs.collapse", function(e){
+          e.preventDefault();
+        })
         $(ele).height(alignmentHeight);
+        $(ele).parent().height(alignmentHeight);
       }
       return cb(null, utility.map);
     })

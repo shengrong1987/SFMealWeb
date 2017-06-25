@@ -148,6 +148,7 @@
   "pickup-date" : "Pickup Date",
   "from-time": "Start time",
   "end-time": "End time",
+  "pickup-map" : "Pickup map",
   "from": "From",
   "end": "End",
   "method-order": "Type:Order",
