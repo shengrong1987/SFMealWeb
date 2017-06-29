@@ -42,6 +42,14 @@ module.exports = {
     var mDate = moment(date);
     return mDate.date();
   },
+  getDaysAfterDate : function(date, day){
+    var mDate = date.add(day, 'days');
+    return mDate.date();
+  },
+  getDateFromDaysAfterNow : function(date, day){
+    var mDate = date.add(day, 'days').hour(0).minute(0).second(0).millisecond(0);
+    return mDate;
+  },
   monthDesc : function(value){
     var month = "";
     switch(value){

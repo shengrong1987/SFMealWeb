@@ -19,8 +19,13 @@
       var list = order.orders;
       order.dishes.forEach(function(dish){
         var dishId = dish.id;
-        var number = list[dishId].number;
-        var preference = list[dishId].preference;
+        if(list.hasOwnProperty(dishId)) {
+          var number = list[dishId].number;
+          var preference = list[dishId].preference;
+        }else{
+          number = 0;
+          preference = null;
+        }
         var preferenceTitle = "";
         var extra = 0;
         if(preference && preference.length){

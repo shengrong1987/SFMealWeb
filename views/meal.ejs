@@ -45,6 +45,11 @@
                 <div class="col-xs-12 text-left">
                   <h2 style="display: inline-block;"><%= meal.titleI18n(locale) %><small class="text-orange"><% if(meal.type=='order'){ __('order') }else if(meal.type=='preorder'){ __('preorder') } %> <%= meal.isFull()? __('full'): "" %></small></h2>
                   <i class="fa fa-heart-o round_thumb border-red text-red cursor-pointer relative" style="padding:8px;top:5px;" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}else{%>false<%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
+                  <% if(meal.isPartyMode){%>
+                    <button class="btn btn-red pull-right" style="margin-top: 20px;" onclick="javascript:location.href='/meal/<%= meal.id%>'"><%= __('switchToNormal')%></button>
+                  <%}else{%>
+                  <button class="btn btn-red pull-right" style="margin-top: 20px;" onclick="javascript:location.href='/meal/<%= meal.id%>?party=true'"><%= __('switchToCatering')%></button>
+                  <%}%>
                 </div>
               </div>
 
@@ -82,7 +87,11 @@
                       <h4><small><%= __('pickup-date')%>:</small></h4>
                       <div class="pickup-date">
                         <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%></span>
+                        <% if(meal.isPartyMode){%>
+                        <span class="col-xs-12"> > <%= meal.getDaysAfterNow(1)%>  <i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" title="<%= __('party-pickup-date-tip')%>"></i></span>
+                        <%}else{%>
                         <span class="col-xs-12"><%= meal.getDateFromDate(meal.pickups[0].pickupFromTime)%></span>
+                        <%}%>
                       </div>
                       <div class="pickup-map">
                         <a data-toggle="collapse" data-parent="#meal-detail-container" href="#googlemapContainer" aria-expanded="false" aria-controls="googlemapContainer">
@@ -97,7 +106,7 @@
                         <%
                         var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
                         var count = 1;
-                        meal.pickups.forEach(function(pickup){ if(pickup.method == "pickup"){ %>
+                        meal.pickups.forEach(function(pickup){ if(pickup.method === "pickup" && !meal.isPartyMode){ %>
                         <div class="row">
                           <div class="col-xs-12">
                             <div class="option pickupOption" data-location="<%= pickup.publicLocation || pickup.location%>" data-color="<%= colors[count]%>">
@@ -108,7 +117,7 @@
                             </div>
                           </div>
                         </div>
-                        <%}else{%>
+                        <%}else if(pickup.method === "delivery"){%>
                         <div class="row">
                           <div class="col-xs-12">
                             <div class="option deliveryOption" data-area="<%= pickup.area%>" data-location="<%= pickup.deliveryCenter%>" data-color="<%= colors[count]%>">
@@ -120,6 +129,7 @@
                           </div>
                         </div>
                         <%}count++;})%>
+
                       </div>
                     </div>
                   </div>
@@ -127,7 +137,7 @@
               </div>
               <div class="row">
                 <div class="col-xs-12 text-left">
-                  <h4><small><i class="fa fa-exclamation-circle"></i> <%= __('pickup_detail_title')%></small></h4>
+                  <h4><small><i class="fa fa-exclamation-circle"></i> <%= meal.isPartyMode === true ? __('party-meal-pickup-tip', meal.partyRequirement.minimal) : __('pickup_detail_title')%></small></h4>
                 </div>
               </div>
             </div>
@@ -216,7 +226,7 @@
 
                     <div class="row">
                       <div class="col-xs-12">
-                        <h4><small class="left-amount"><%= __('left')%><span class="text-red" value=<%= meal.leftQty[dish.id] %>><%= meal.leftQty[dish.id] %></span><%= __('fen')%></small></h4>
+                        <h4><small class="left-amount"><%= __('left')%><span class="text-red" value=<%= meal.isPartyMode === true ? "100" : meal.leftQty[dish.id] %>><%= meal.isPartyMode === true ? 100 : meal.leftQty[dish.id] %></span><%= __('fen')%></small></h4>
                       </div>
                     </div>
 
@@ -228,7 +238,7 @@
 
                     <div class="row afterOrder">
                       <div class="col-xs-12" style="margin-top:10px;">
-                        <div class="input-group input-group-lg amount-input round" data-toggle="amount-input" data-max="<%= meal.leftQty[dish.id] %>" data-dish="<%= dish.id%>" style="width:150px;margin:auto;">
+                        <div class="input-group input-group-lg amount-input round" data-toggle="amount-input" data-max="<%= meal.isPartyMode === true ? 100 : meal.leftQty[dish.id] %>" data-dish="<%= dish.id%>" style="width:150px;margin:auto;">
                           <div class="input-group-addon minus" onclick="javascript:orderFood('<%= dish.id %>',-1)">-</div>
                           <input class="form-control text-center dish-number" type="number" pattern="[0-9]*" inputmode="numeric" value="0" style="min-width: 75px;">
                           <div class="input-group-addon add" onclick="javascript:orderFood('<%= dish.id %>',1)">+</div>
@@ -356,7 +366,7 @@
               for(var i=0; i < dishes.length; i++){
                 var dish = dishes[i];
             %>
-            <tr class="success item" data-id=<%= dish.id %> data-left-amount=<%= meal.leftQty[dish.id] %>>
+            <tr class="success item" data-id=<%= dish.id %> data-left-amount=<%= meal.isPartyMode === true ? "100" : meal.leftQty[dish.id] %>>
               <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span> </td>
               <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
               <td>
@@ -404,7 +414,7 @@
             </tbody>
           </table>
 
-          <button type="button" data-id="<%= meal.id%>" class="btn btn-red" onclick="javascript:location.href='/meal/' + $(this).data('id') + '/confirm'"><%= __('checkout')%></button>
+          <button type="button" data-id="<%= meal.id%>" class="btn btn-red" onclick="javascript:location.href='/meal/' + $(this).data('id') + '/confirm' + '<%= meal.isPartyMode === true ? '?party=true' : ''%>'"><%= __('checkout')%></button>
 
           <div id="orderAlertView" class="alert alert-danger hide" style="margin-top: 10px;"></div>
 

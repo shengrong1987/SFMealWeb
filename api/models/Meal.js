@@ -36,6 +36,10 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
+    isPartyMode : {
+      type : 'boolean',
+      defaultsTo : false
+    },
     /*
       Array of object
      Date pickupFromTime,
@@ -49,6 +53,12 @@ module.exports = {
      */
     pickups : {
      type : 'json'
+    },
+    /*
+     { minimal : $100, range : 5, deliveryCenter : “123 ave”, area : '10 miles from Sacramento downtown'}
+     */
+    partyRequirement : {
+      type : 'json'
     },
     features : {
       type : 'string',
@@ -144,6 +154,10 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
+    supportPartyOrder : {
+      type : 'boolean',
+      defaultsTo : false
+    },
     /*
       type : "fixed/custom",
       price : "5.00",
@@ -219,20 +233,22 @@ module.exports = {
       var valid = true;
       if(params.pickups){
         params.pickups.forEach(function(pickup){
-          var pickupFromTime = pickup.pickupFromTime;
-          var pickupTillTime = pickup.pickupTillTime;
-          if(pickupFromTime >= pickupTillTime){
-            console.log("pickup time not valid");
-            valid = false;
-            return;
-          }else if(moment.duration(moment(pickupTillTime).diff(moment(pickupFromTime))).asMinutes() < 30){
-            console.log("pickup time too short");
-            valid = false;
-            return;
-          }else if(pickupFromTime <= provideTillTime && params.type == "preorder"){
-            console.log("pickup time too early");
-            valid = false;
-            return;
+          if(!pickup.isDateCustomized){
+            var pickupFromTime = pickup.pickupFromTime;
+            var pickupTillTime = pickup.pickupTillTime;
+            if(pickupFromTime >= pickupTillTime){
+              console.log("pickup time not valid");
+              valid = false;
+              return;
+            }else if(moment.duration(moment(pickupTillTime).diff(moment(pickupFromTime))).asMinutes() < 30){
+              console.log("pickup time too short");
+              valid = false;
+              return;
+            }else if(pickupFromTime <= provideTillTime && params.type == "preorder"){
+              console.log("pickup time too early");
+              valid = false;
+              return;
+            }
           }
         });
       }
@@ -261,6 +277,14 @@ module.exports = {
 
     getDateFromDate : function(date){
       return util.getDateFromDate(date);
+    },
+
+    getDaysAfterNow : function(day){
+      return util.getDaysAfterDate(moment(),day);
+    },
+
+    getDateFromDaysAfterNow : function(day){
+      return util.getDateFromDaysAfterNow(moment(),day);
     }
   },
 
@@ -287,7 +311,8 @@ module.exports = {
             "phone": host.user.phone,
             "method": "pickup",
             "county" : host.county,
-            "area" : ''
+            "area" : '',
+            'index' : 1
           };
           var deliveryOption = {
             "pickupFromTime": values.provideFromTime,
@@ -296,7 +321,8 @@ module.exports = {
             "phone": host.user.phone,
             "method": "delivery",
             "county" : host.county,
-            "area" : ''
+            "area" : '',
+            "index" : 2
           }
           if(values.isDelivery){
             values.pickups = [pickupOption, deliveryOption];
@@ -360,7 +386,8 @@ module.exports = {
             "phone": host.user.phone,
             "method": "pickup",
             "county" : host.county,
-            "area" : ''
+            "area" : '',
+            "index" : 1
           };
           var deliveryOption = {
             "pickupFromTime": values.provideFromTime,
@@ -369,7 +396,8 @@ module.exports = {
             "phone": host.user.phone,
             "method": "delivery",
             "county" : host.county,
-            "area" : ''
+            "area" : '',
+            "index" : 2
           }
           if(values.isDelivery){
             values.pickups = [pickupOption, deliveryOption];

@@ -44,6 +44,7 @@ module.exports.policies = {
 
   UserController : {
     '*' : 'or(and(sessionAuth, sessionSelf),isAdmin)',
+    'create' : false,
     'calculateSignature' : 'sessionAuth',
     'becomeHost' : 'or(and(sessionAuth, notHost),isAdmin)',
     'pocket' : 'or(sessionAuth,isAdmin)',

@@ -90,7 +90,14 @@ describe('OrderController', function() {
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order')
-        .send({orders : dishObj, subtotal : price1 * 1 + price2 * 2, contactInfo : { address : address, phone : phone }, method : "delivery", mealId : mealId, pickupOption : 1})
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 1 + price2 * 2,
+          contactInfo : { address : address, phone : phone },
+          method : "delivery",
+          mealId : mealId,
+          pickupOption : 1
+        })
         .expect(400)
         .end(function(err,res){
           if(err){
@@ -294,6 +301,7 @@ describe('OrderController', function() {
           paymentInfo : { method : 'online'},
           method : "delivery",
           mealId : mealId,
+          pickupOption : 2
           })
         .expect(400)
         .end(function(err,res){
@@ -558,14 +566,14 @@ describe('OrderController', function() {
 
     it('should not adjust the cancelled order', function (done) {
       agent
-          .post('/order/' + orderId + "/adjust")
-          .expect(403)
-          .end(function(err,res){
-            if(err){
-              return done(err);
-            }
-            done();
-          })
+        .post('/order/' + orderId + "/adjust")
+        .expect(403)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
     })
 
     it('should update the user name', function (done) {
@@ -1763,6 +1771,225 @@ describe('OrderController', function() {
           res.body.customerPhone.should.be.equal("(415)111-1111");
           res.body.customerName.should.be.equal("abc");
           res.body.isExpressCheckout.should.be.true();
+          orderId = res.body.id;
+          done();
+        })
+    });
+
+    it("should get an order receipt", function(done){
+      agent
+        .get('/order/' + orderId + "/receipt")
+        .expect(200, done)
+    });
+
+    it("should download an order receipt", function(done){
+      agent
+        .get('/order/' + orderId + "/receipt/download")
+        .expect(200, done)
+    });
+
+  });
+
+  describe('order a meal with express checkout', function() {
+
+    var mealId;
+    var dishId1;
+    var dishId2;
+    var dishId3;
+    var dishId4;
+    var price1;
+    var price2;
+    var price3;
+    var price5;
+    var orderId;
+    var dishId5;
+
+    it('should get meals', function (done) {
+      agent
+        .get('/meal')
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            console.log(err);
+            return done(err);
+          }
+          if(res.body.meals.length == 0){
+            return done(Error("error getting any meal"));
+          }
+          var meal = res.body.meals[1];
+          mealId = meal.id;
+          dishId1 = meal.dishes[0].id;
+          dishId2 = meal.dishes[1].id;
+          dishId3 = meal.dishes[2].id;
+          dishId4 = meal.dishes[3].id;
+          price1 = meal.dishes[0].price;
+          price2 = meal.dishes[1].price;
+          price3 = meal.dishes[2].price;
+          done();
+        })
+    })
+
+    it('should get a meal"s catering menu', function(done){
+      agent
+        .get('/meal/' + mealId + '?party=true')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('partyRequirement');
+          res.body.should.have.property('dishes').with.length(5);
+          var dish5 = res.body.dishes[4];
+          dishId5 = dish5.id;
+          price5 = dish5.price;
+          done();
+        })
+    })
+
+    it('should be able to order a catering meal', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId5] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 5 + price2 * 5 + price3 * 5 + price5 * 5,
+          pickupOption : 5,
+          method : "delivery",
+          mealId : mealId,
+          contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+          paymentInfo : { method : 'cash'},
+          customInfo : { time : new Date(2018, 5, 29), comment : "so exciting, please bring some utensils"},
+          isPartyMode : true
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.isPartyMode.should.be.true();
+          new Date(res.body.pickupInfo.pickupFromTime).getTime().should.be.equal(new Date(2018, 5, 29).getTime());
+          res.body.pickupInfo.deliveryCenter.should.be.equal("1974 Palou Ave, San Francisco, CA 94124, USA");
+          done();
+        })
+    });
+
+    it('should not be able to order a catering meal with less than minimal amount', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId5] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1,
+          pickupOption : 5,
+          method : "delivery",
+          mealId : mealId,
+          contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+          paymentInfo : { method : 'cash'},
+          customInfo : { time : new Date(2018, 5, 29), comment : "so exciting, please bring some utensils"},
+          isPartyMode : true
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-33);
+          done();
+        })
+    });
+
+    it('should not be able to order a catering meal within 24 hours from now', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId5] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 5 + price2 * 5 + price3 * 5 + price5 * 5,
+          pickupOption : 5,
+          method : "delivery",
+          mealId : mealId,
+          contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+          paymentInfo : { method : 'cash'},
+          customInfo : { time : new Date(), comment : "so exciting, please bring some utensils"},
+          isPartyMode : true
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-34);
+          done();
+        })
+    });
+
+    it('should not be able to order a catering meal without custom info', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId5] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 5 + price2 * 5 + price3 * 5 + price5 * 5,
+          pickupOption : 5,
+          method : "delivery",
+          mealId : mealId,
+          contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+          paymentInfo : { method : 'cash'},
+          isPartyMode : true
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-35);
+          done();
+        })
+    });
+
+    it('should not be able to order a catering meal with wrong pickup method', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId5] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 5 + price2 * 5 + price3 * 5 + price5 * 5,
+          pickupOption : 4,
+          method : "pickup",
+          mealId : mealId,
+          contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+          paymentInfo : { method : 'cash'},
+          customInfo : { time : new Date(2017, 5, 29), comment : "so exciting, please bring some utensils"},
+          isPartyMode : true
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-36);
           done();
         })
     });

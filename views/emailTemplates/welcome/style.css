@@ -9118,6 +9118,9 @@ fieldset[disabled] .btn-red.active {
 #birthdayInput select:nth-child(3) {
   width: 30%;
 }
+.normal-number-input {
+  min-width: 80px;
+}
 .banner .img-wrapper {
   height: 600px;
   position: relative;

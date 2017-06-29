@@ -170,7 +170,7 @@
                     </div>
 
                     <div class="pickup_container">
-                      <% if(meal.pickups) { meal.pickups.forEach(function(pickup){%>
+                      <% if(meal.pickups) { meal.pickups.forEach(function(pickup){ if(pickup.isDateCustomized){return}%>
                       <div class="well form-group pickup">
                         <div class="col-sm-4">
                           <label><%= __('pickup-time')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
@@ -317,25 +317,51 @@
               <label style="display: block;">3.<%= __('meal-minimal-requirement-title')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
               <div class="row">
                 <div class="order-require">
-                  <div class="col-xs-12" data-toggle="exclusive-input" style="padding-top: 5px;">
-                    <div class="row">
+                  <div class="col-xs-12" data-toggle="exclusive-input">
+                    <div class="row box-compact">
                       <div class="col-sm-4">
                         <div class="input-group" name="1">
-                          <input id="min-order" class="form-control" type="number" min="1" max="999" style="min-width: 100px;" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.minimalOrder || ''%>">
+                          <input id="min-order" class="form-control normal-number-input" type="number" min="1" max="999" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.minimalOrder || ''%>">
                           <div class="input-group-addon"><%= __('fen')%></div>
                         </div>
                       </div>
                       <div class="col-sm-1 vertical-align" style="height: 35px;"><label class="middle"><%= __('or')%></label></div>
                       <div class="col-sm-4">
                         <div class="input-group" name="2">
-                          <input id="min-total" class="form-control" type="number" min="1" max="9999" style="min-width: 100px;" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.minimalTotal || ''%>">
-                          <div class="input-group-addon">.00<%= __('dollar')%></div>
+                          <input id="min-total" class="form-control normal-number-input" type="number" min="1" max="9999" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.minimalTotal || ''%>">
+                          <div class="input-group-addon"><%= __('dollar')%></div>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div class="col-xs-12">
-                    <div class="alert alert-danger" style="margin-top: 10px;" data-toggle="alert"></div>
+                    <div class="row">
+                      <div class="col-xs-12 col-md-4">
+                        <input type="checkbox" data-toggle="switch-button" id="supportParty" <%= meal.supportPartyOrder===true?"checked='checked'":""%>>
+                        <label for="supportParty"></label>
+                        <span style="margin-left: 10px;"><%= __('support-party')%></span>
+                        <i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" title="<%= __('party-order-tip')%>"></i>
+                      </div>
+                      <div class="col-xs-12 col-md-6 <%= meal.supportPartyOrder===true ? '' : 'hide'%>" id="partyRequirementView">
+                        <div class="row vertical-align">
+                          <div class="col-xs-6">
+                            <div class="input-group">
+                              <input id="cateringMinimal" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="9999" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.isSupportParty === true ? meal.partyRequirement.minimal : ''%>">
+                              <div class="input-group-addon"><%= __('dollar')%></div>
+                            </div>
+                          </div>
+                          <div class="col-xs-6">
+                            <label><%= __('party-minimal-requirement')%></label>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-xs-12">
+                    <div class="box-compact">
+                      <div class="alert alert-danger" data-toggle="alert"></div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -348,39 +374,41 @@
                 </div>
                 <div class="col-xs-12">
                   <div class="box-compact vertical-align">
-                    <input type="checkbox" id="isDelivery" class="regular-checkbox" <%= meal.isDelivery ? "checked=''" : ""%> >
+                    <input type="checkbox" id="isDelivery" data-toggle="switch-button" class="regular-checkbox" <%= meal.isDelivery ? "checked=''" : ""%> >
                     <label for="isDelivery"></label>
                     <span style="margin-left: 10px;"><%= __('delivery-available')%></span>
                   </div>
                 </div>
+              </div>
+              <div id="deliverySettingView" class="row">
                 <div class="col-xs-12">
-                  <div class="box-compact vertical-align">
-                    <input type="checkbox" id="isDeliveryBySystem" class="regular-checkbox" <%= meal.isDeliveryBySystem ? "checked=''" : ""%> <%= !meal.isDelivery ? "disabled='disabled'" : ""%>>
+                  <div class="vertical-align">
+                    <input type="checkbox" data-toggle="switch-button" id="isDeliveryBySystem" class="regular-checkbox" <%= meal.isDeliveryBySystem ? "checked=''" : ""%>>
                     <label for="isDeliveryBySystem"></label>
                     <span style="margin-left: 10px;"><%= __('delivery-by-system')%></span>
                   </div>
                 </div>
-              </div>
-
-              <div class="row">
                 <div class="col-sm-12 col-md-10 col-lg-8">
-                  <div class="col-sm-6">
-                    <div class="input-group">
-                      <div class="input-group-addon"><%= __('delivery-fee')%>: $</div>
-                      <input id="deliveryFeeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="5" value="<%= meal.delivery_fee%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
-                    </div>
-                  </div>
-                  <div class=col-sm-6>
-                    <div class="input-group">
-                      <div class="input-group-addon"><%= __('delivery-range')%>:</div>
-                      <input id="deliveryRangeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="5" value="<%= meal.delivery_range%>" <%= meal.isDelivery ? "" : "disabled=''"%>>
-                      <div class="input-group-addon">Miles</div>
+                  <div class="well setting <%= (meal.isDelivery && !meal.isDeliveryBySystem) ? '' : 'hide'%>" style="margin-top:45px;">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <div class="input-group">
+                          <div class="input-group-addon"><%= __('delivery-fee')%>: $</div>
+                          <input id="deliveryFeeInput" class="form-control" type="number" inputmode="numeric" placeholder="5" value="<%= meal.delivery_fee%>">
+                        </div>
+                      </div>
+                      <div class=col-sm-6>
+                        <div class="input-group">
+                          <div class="input-group-addon"><%= __('delivery-range')%>:</div>
+                          <input id="deliveryRangeInput" class="form-control" type="number" inputmode="numeric" placeholder="5" value="<%= meal.delivery_range%>">
+                          <div class="input-group-addon"><%= __('miles')%></div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <div class="help-block with-errors"></div>
               </div>
-
-              <div class="help-block with-errors"></div>
             </div>
 
             <div class="form-group" style="margin-top: 40px;">

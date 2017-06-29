@@ -8,6 +8,7 @@
 var GeoCoder = require("../services/geocode.js");
 var moment = require("moment");
 var notification = require("../services/notification");
+var util = require("../services/util");
 /*
  error
  * -1 : geo service not available
@@ -25,6 +26,8 @@ var notification = require("../services/notification");
  * -13 : support delivery but no delivery time was added
  * -14 : fail to modify info on active meal
  * -15 : meal support delivery but no delivery option was provided
+ * -16 : meal query is invalid
+ * -17 : meal lack of party requirement
  */
 
 module.exports = {
@@ -256,12 +259,17 @@ module.exports = {
   confirm : function(req, res){
     var mealId = req.param("id");
     var user = req.session.user;
-    Meal.find(mealId).populate("dishes").populate("chef").exec(function(err,m){
+    Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,m){
       if(err){
         return res.badRequest(err);
       }
-      if(!m || m.length==0){
+      if(!m){
         return res.badRequest({ code : -3, responseText : req.__('meal-not-found')});
+      }
+      var isPartyMode = req.query['party'];
+      if(isPartyMode === 'true'){
+        m.isPartyMode = true;
+        m.delivery_range = m.delivery_range * 5;
       }
       if(user){
         User.find(user.id).populate("payment").populate("orders").exec(function(err,user){
@@ -269,15 +277,15 @@ module.exports = {
             return order.status == "schedule" || order.status == "preparing";
           })
           if(req.wantsJSON){
-            return res.ok({meal : m[0], user : user[0], locale : req.getLocale()});
+            return res.ok({meal : m, user : user[0], locale : req.getLocale()});
           }
-          res.view("confirm",{meal : m[0], user : user[0], locale : req.getLocale()});
+          res.view("confirm",{meal : m, user : user[0], locale : req.getLocale()});
         });
       }else{
         if(req.wantsJSON){
-          return res.ok({meal : m[0], user : {}, locale : req.getLocale()});
+          return res.ok({meal : m, user : {}, locale : req.getLocale()});
         }
-        return res.view("confirm", { meal : m[0], user : {}, locale : req.getLocale()});
+        return res.view("confirm", { meal : m, user : {}, locale : req.getLocale()});
       }
     });
   },
@@ -376,7 +384,7 @@ module.exports = {
         return res.badRequest(err);
       }
       found = found.filter(function(meal){
-        return meal.county.split("+").indexOf(county) != -1;
+        return meal.county.split("+").indexOf(county) !== -1;
       });
       //test only
       if(req.wantsJSON){
@@ -473,10 +481,10 @@ module.exports = {
                 return res.badRequest(err);
               }
               req.body = params;
-              if(status == "on"){
+              if(status === "on"){
                 async.auto({
                   updateQty : function(cb){
-                    if(!req.body.totalQty && meal.status != "on"){
+                    if(!req.body.totalQty && meal.status !== "on"){
                       return cb();
                     }
                     req.body.leftQty = $this.updateDishQty(meal.leftQty, meal.totalQty, req.body.totalQty);
@@ -551,7 +559,7 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(meal.status == 'on'){
+      if(meal.status === 'on'){
         return res.badRequest({responseText : req.__('meal-active-update-dish'), code : -10});
       }
       meal.dishes.add(dishId);
@@ -577,12 +585,12 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(meal.status == 'on'){
+      if(meal.status === 'on'){
         return res.badRequest({responseText : req.__('meal-active-update-dish'), code : -10});
       }
       if(meal.dishes.filter(function(dish){
-        return dish.id != dishId;
-      }) == 0){
+        return dish.id !== dishId;
+      }) === 0){
         return res.badRequest({responseText : req.__('meal-dishes-empty'), code : -11});
       }
       if(meal.leftQty.hasOwnProperty(dishId)){
@@ -620,26 +628,34 @@ module.exports = {
           return cb();
         }
         var pickupArrays = JSON.parse(params.pickups);
-        async.each(pickupArrays, function(pickup, next){
+        pickupArrays.forEach(function(pickup, index){
           if(!pickup.county){
-            return next();
+            return;
           }
           if(!pickup.phone || pickup.phone == 'undefined'){
             pickup.phone = host.user.phone;
           }
+          pickup.index = index+1;
           sails.log.info("phone is : " + pickup.phone);
           sails.log.info("county is : " + pickup.county);
-          if(counties.indexOf(pickup.county) == -1){
+          if(counties.indexOf(pickup.county) === -1){
             counties.push(pickup.county);
           }
-          next();
-        }, function(err){
-          if(err){
-            return cb(err);
+        })
+        if(params.supportPartyOrder){
+          var kitchenDelivery = {
+            deliveryCenter : host.full_address,
+            method : "delivery",
+            area : host.city,
+            phone : host.phone,
+            county : host.county,
+            index : pickupArrays.length + 1,
+            isDateCustomized : true
           }
-          params.pickups = pickupArrays;
-          cb();
-        });
+          pickupArrays.push(kitchenDelivery);
+        }
+        params.pickups = pickupArrays;
+        cb();
       }
     }, function(err){
       if(err){
@@ -687,6 +703,10 @@ module.exports = {
       return cb({ code : -12, responseText : req.__('meal-delivery-conflict')});
     }
 
+    if(params.isPartyMode && !params.partyRequirement){
+      return cb({ code : -17, responseText : req.__('meal-lack-of-party-requirement')});
+    }
+
     if(!params.isDelivery && params.pickups && JSON.parse(params.pickups).some(function(pickup){
       return pickup.method == "delivery";})
     ){
@@ -722,6 +742,7 @@ module.exports = {
     var provideFromTime = params.provideFromTime;
     var provideTillTime = params.provideTillTime;
     var now = new Date();
+
     if(provideFromTime >= provideTillTime){
       return false;
     }else if(new Date(provideTillTime) < now){
@@ -732,20 +753,22 @@ module.exports = {
     var valid = true;
     if(params.pickups){
       JSON.parse(params.pickups).forEach(function(pickup){
-        var pickupFromTime = pickup.pickupFromTime;
-        var pickupTillTime = pickup.pickupTillTime;
-        if(pickupFromTime >= pickupTillTime){
-          console.log("pickup time not valid");
-          valid = false;
-          return;
-        }else if(moment.duration(moment(pickupTillTime).diff(moment(pickupFromTime))).asMinutes() < 30){
-          console.log("pickup time too short");
-          valid = false;
-          return;
-        }else if(pickupFromTime <= provideTillTime && params.type == "preorder"){
-          console.log("pickup time too early");
-          valid = false;
-          return;
+        if(!pickup.isDateCustomized){
+          var pickupFromTime = pickup.pickupFromTime;
+          var pickupTillTime = pickup.pickupTillTime;
+          if(pickupFromTime >= pickupTillTime){
+            console.log("pickup time not valid");
+            valid = false;
+            return;
+          }else if(moment.duration(moment(pickupTillTime).diff(moment(pickupFromTime))).asMinutes() < 30){
+            console.log("pickup time too short");
+            valid = false;
+            return;
+          }else if(pickupFromTime <= provideTillTime && params.type == "preorder"){
+            console.log("pickup time too early");
+            valid = false;
+            return;
+          }
         }
       });
     }
@@ -801,6 +824,103 @@ module.exports = {
         return res.view('report',{ meal : meal });
       });
     })
+  },
+
+  findOne : function(req, res){
+
+    var mealId = req.param('id');
+    if(!mealId){
+      return res.badRequest({ code : -3, responseText : req.__('meal-not-found')})
+    }
+
+    var isEditMode = req.query["edit"];
+    if(isEditMode === 'true'){
+      var user = req.session.user;
+      if(!user){
+        return res.forbidden();
+      }
+      var host = user.host;
+      var hostId = host ? (host.id ? host.id : host) : null;
+      if(!hostId){
+        return res.forbidden();
+      }
+    }
+    var isPartyMode = req.query['party'];
+    if(isPartyMode && isEditMode){
+      return res.notFound(req.__('meal-query-invalid'));
+    }
+
+    Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err, meal){
+      if(err){
+        return res.badRequest(err);
+      }
+      var orders;
+      var _user;
+      async.auto({
+        isEditMode : function(cb){
+          if(!isEditMode){
+            return cb();
+          }
+          meal.userId = user.id;
+          Host.findOne(hostId).populate("user").populate("dishes").exec(function(err,host){
+            if(err){
+              return cb(err);
+            }
+            meal.kitchen_address = host.full_address;
+            meal.allDishes = host.dishes;
+            meal.phone = host.user.phone;
+            cb();
+          });
+        },
+        isPartyMode : function(cb){
+          if(!isPartyMode){
+            return cb();
+          }
+          Dish.find({ chef : meal.chef.id }).exec(function(err, dishes){
+            if(err){
+              return cb(err);
+            }
+            meal.dishes = dishes;
+            meal.isPartyMode = true;
+            meal.delivery_range = meal.delivery_range * 5;
+            cb();
+          });
+        },
+        getMealExtraInfo : ['isPartyMode', function(cb){
+          if(!req.session.authenticated || isEditMode){
+            return cb();
+          }
+          var userId = req.session.user.id;
+          User.findOne(userId).populate("collects").exec(function(err,user){
+            if(err){
+              return cb(err);
+            }
+            Order.find({meal : meal.id, status : ["schedule","preparing"]}).exec(function(err, orders){
+              if(err){
+                return res.badRequest(err);
+              }
+              orders = orders;
+              _user = user;
+              cb();
+            });
+          });
+        }]
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        if(req.wantsJSON){
+          return res.ok(meal);
+        }
+        if(isEditMode){
+          res.view('meal_edit',{ meal : meal});
+        }else if(req.session.authenticated){
+          res.view('meal',{ meal : meal, locale : req.getLocale(), user : _user, orders : orders});
+        }else{
+          res.view('meal',{ meal : meal, locale : req.getLocale(), user : null, orders : null});
+        }
+      });
+    });
   }
 
   //To test after finishing review model

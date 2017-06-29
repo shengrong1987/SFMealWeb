@@ -49,36 +49,6 @@ module.exports = function findOneRecord (req, res) {
 
     if(req.wantsJSON && sails.config.environment === 'development'){
      res.ok(matchingRecord);
-    }else if(Model.adapter.identity == "meal"){
-      if(isEditMode){
-        matchingRecord.userId = user.id;
-        Host.findOne(hostId).populate("user").populate("dishes").exec(function(err,host){
-          if(err){
-            return res.badRequest(err);
-          }
-          matchingRecord.kitchen_address = host.full_address;
-          matchingRecord.allDishes = host.dishes;
-          matchingRecord.phone = host.user.phone;
-          res.view('meal_edit',{meal : matchingRecord});
-        });
-      }else{
-        if(req.session.authenticated){
-          var userId = req.session.user.id;
-          User.findOne(userId).populate("collects").exec(function(err,user){
-            if(err){
-              return res.badRequest(err);
-            }
-            Order.find({meal : matchingRecord.id, status : ["schedule","preparing"]}).exec(function(err, orders){
-              if(err){
-                return res.badRequest(err);
-              }
-              res.view('meal',{meal : matchingRecord, locale : req.getLocale(), user : user, orders : orders});
-            });
-          });
-        }else{
-          res.view('meal',{meal : matchingRecord, locale : req.getLocale(), user : null, orders : null});
-        }
-      }
     }else if(Model.adapter.identity == "user"){
       res.view('user',{user : matchingRecord});
     }else if(Model.adapter.identity == "payment"){

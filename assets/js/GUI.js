@@ -679,6 +679,10 @@ function setup(){
   setupCountrySelector();
   setupSelector();
   setupInputMask();
+  setupSwitchButton({
+    onText : "Yes",
+    offText : "No"
+  });
   $('.lazyload').each(function(){
     $(this).attr('src', $(this).data('src'));
   });
@@ -776,6 +780,10 @@ function setupValidator(){
 
 function setupInputMask(){
   $("input[type='tel']").mask("(000)000-0000");
+}
+
+function setupSwitchButton(){
+  $("[data-toggle='switch-button']").bootstrapSwitch();
 }
 
 function setupCountrySelector(){

@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">20% </span>
+        <span class="strong">13.04% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>13/65</span>
+        <span class='fraction'>9/69</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">5.56% </span>
@@ -30,14 +30,14 @@
         <span class='fraction'>1/18</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">30.77% </span>
+        <span class="strong">13.33% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>4/13</span>
+        <span class='fraction'>2/15</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">20% </span>
+        <span class="strong">13.04% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>13/65</span>
+        <span class='fraction'>9/69</span>
       </div>
     </div>
   </div>
@@ -162,7 +162,15 @@
 117
 118
 119
-120</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+120
+121
+122
+123
+124
+125
+126
+127
+128</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2×</span>
@@ -210,8 +218,10 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -247,25 +257,31 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2×</span>
-<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2×</span>
-<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3×</span>
-<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">60×</span>
-<span class="cline-any cline-yes">60×</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-yes">66×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">51×</span>
-<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-yes">57×</span>
+<span class="cline-any cline-yes">57×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -276,7 +292,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">60×</span>
+<span class="cline-any cline-yes">66×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -325,6 +341,14 @@ module.exports = {
 <span class="cstat-no" title="statement not covered" >    var mDate = moment(date);</span>
 <span class="cstat-no" title="statement not covered" >    return mDate.date();</span>
   },
+  getDaysAfterDate : <span class="fstat-no" title="function not covered" >function(date, day){</span>
+<span class="cstat-no" title="statement not covered" >    var mDate = date.add(day, 'days');</span>
+<span class="cstat-no" title="statement not covered" >    return mDate.date();</span>
+  },
+  getDateFromDaysAfterNow : <span class="fstat-no" title="function not covered" >function(date, day){</span>
+<span class="cstat-no" title="statement not covered" >    var mDate = date.add(day, 'days').hour(0).minute(0).second(0).millisecond(0);</span>
+<span class="cstat-no" title="statement not covered" >    return mDate;</span>
+  },
   monthDesc : <span class="fstat-no" title="function not covered" >function(value){</span>
 <span class="cstat-no" title="statement not covered" >    var month = "";</span>
 <span class="cstat-no" title="statement not covered" >    switch(value){</span>
@@ -367,13 +391,13 @@ module.exports = {
     }
 <span class="cstat-no" title="statement not covered" >    return month;</span>
   },
-  oneHourBefore : function(date){
-    var mDate = moment(date).subtract(1, 'hour');
-    return mDate._d;
+  oneHourBefore : <span class="fstat-no" title="function not covered" >function(date){</span>
+<span class="cstat-no" title="statement not covered" >    var mDate = moment(date).subtract(1, 'hour');</span>
+<span class="cstat-no" title="statement not covered" >    return mDate._d;</span>
   },
-  oneDayBefore : function(date){
-    var mDate = moment(date).subtract(1, 'day');
-    return mDate._d;
+  oneDayBefore : <span class="fstat-no" title="function not covered" >function(date){</span>
+<span class="cstat-no" title="statement not covered" >    var mDate = moment(date).subtract(1, 'day');</span>
+<span class="cstat-no" title="statement not covered" >    return mDate._d;</span>
   },
   minutesBefore : function(date, minutes){
     var mDate = moment(date).subtract(minutes, 'minute');
@@ -406,7 +430,7 @@ module.exports = {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jun 21 2017 18:26:21 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jun 29 2017 15:17:45 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

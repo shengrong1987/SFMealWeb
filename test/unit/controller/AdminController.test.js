@@ -84,7 +84,7 @@ describe('UsersController', function() {
             return done(err);
           }
           res.body.should.have.property('reviews');
-          done();s
+          done();
         })
     })
 
@@ -98,7 +98,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(4);
+          res.body.should.have.length(5);
           mealId = res.body[0].id;
           done();
         })
@@ -112,7 +112,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(3);
+          res.body.should.have.length(4);
           done();
         })
     })
@@ -125,7 +125,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(4);
+          res.body.should.have.length(5);
           done();
         })
     })
@@ -165,7 +165,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(5);
+          res.body.should.have.length(6);
           scheduledOrderId = res.body[0].id;
           done();
         })

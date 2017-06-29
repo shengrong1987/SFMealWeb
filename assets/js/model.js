@@ -1210,7 +1210,9 @@ var MealView = Backbone.View.extend({
     "click button[name='save']" : "off",
     "click #addNewPickupBtn" : "addNewPickup",
     "click #removeNewPickupBtn" : "removeNewPickup",
-    "click #isDelivery" : "toggleDelivery",
+    "switchChange.bootstrapSwitch #isDelivery" : "toggleDelivery",
+    "switchChange.bootstrapSwitch #isDeliveryBySystem" : "toggleDelivery",
+    "switchChange.bootstrapSwitch #supportParty" : "togglePartyOrder",
     "click #isShipping" : "toggleShipping",
     "click #freeShippingOption" : "toggleFreeShippingOpt",
     "change #shippingTypeOpt" : "changeTypeOfShippingFee",
@@ -1276,12 +1278,8 @@ var MealView = Backbone.View.extend({
     var freeAmountInput = this.$el.find("#freeAmount");
     if(checkbox.prop("checked")){
       freeAmountInput.prop('disabled', false);
-      // shippingTypeOptSelect.prop('disabled', false);
-      // shippingFeeInput.prop('disabled', false);
     }else{
       freeAmountInput.prop('disabled', true);
-      // shippingTypeOptSelect.prop('disabled', true);
-      // shippingFeeInput.prop('disabled', true);
     }
   },
   toggleFreeShippingOpt : function(e){
@@ -1294,19 +1292,34 @@ var MealView = Backbone.View.extend({
       freeAmountInput.prop('disabled', true);
     }
   },
+  togglePartyOrder : function(e){
+    var isSupportPartyOrder = this.$el.find("#supportParty").prop("checked");
+    var partyRequirementView = this.$el.find("#partyRequirementView");
+    partyRequirementView.removeClass("hide");
+    if(isSupportPartyOrder){
+      partyRequirementView.show('1000');
+    }else{
+      partyRequirementView.hide();
+    }
+  },
   toggleDelivery : function(e){
-    var checkbox = $(e.target);
+    var isDelivery = this.$el.find("#isDelivery").prop("checked");
+    var isDeliveryBySystem = this.$el.find("#isDeliveryBySystem").prop("checked");
     var deliveryFeeInput = this.$el.find("#deliveryFeeInput");
     var deliveryRangeInput = this.$el.find("#deliveryRangeInput");
-    var deliveryBySysCheckbox = this.$el.find("#isDeliveryBySystem");
-    if(checkbox.prop("checked")){
-      deliveryBySysCheckbox.prop("disabled", false);
-      deliveryFeeInput.prop('disabled', false);
-      deliveryRangeInput.prop('disabled', false);
+
+    var deliverySettingView = this.$el.find("#deliverySettingView");
+    var settingButton = deliverySettingView.find(".setting");
+    settingButton.removeClass("hide")
+    if(isDelivery){
+      deliverySettingView.show("1000");
+      if(isDeliveryBySystem){
+        settingButton.hide();
+      }else{
+        settingButton.show("1000");
+      }
     }else{
-      deliveryBySysCheckbox.prop("disabled", true);
-      deliveryFeeInput.prop('disabled', true);
-      deliveryRangeInput.prop('disabled', true);
+      deliverySettingView.hide();
     }
   },
   addNewPickup : function(e){
@@ -1563,6 +1576,19 @@ var MealView = Backbone.View.extend({
       return;
     }
 
+    var supportPartyOrder = form.find("#supportParty").prop("checked");
+    if(supportPartyOrder){
+      var minimal = form.find("#cateringMinimal").val();
+      if(!minimal){
+        form.find(".order-require .alert").show();
+        form.find(".order-require .alert").html(form.find("#min-order").data("error"));
+        return;
+      }
+      var partyRequirement = {
+        minimal : minimal
+      }
+    }
+
     var status = this.isActivate? "on" : "off";
     var title = form.find("#meal_title").val();
     var title_en = form.find("#meal_title_en").val();
@@ -1595,7 +1621,9 @@ var MealView = Backbone.View.extend({
       delivery_fee : deliveryFee,
       delivery_range : deliveryRange,
       isShipping : isShipping,
-      shippingPolicy : shippingPolicy
+      shippingPolicy : shippingPolicy,
+      supportPartyOrder : supportPartyOrder,
+      partyRequirement : partyRequirement
     });
     var $this = this;
     this.model.save({},{
@@ -3097,6 +3125,20 @@ var OrderView = Backbone.View.extend({
     var pickupIndex = parseInt(this.$el.find("#" + method + "Tab" + " .option .regular-radio:checked").data("index")) + 1;
     return pickupIndex;
   },
+  getCustomizedInfo : function(partyMode, cb){
+    if(!partyMode){
+      return cb({});
+    }
+    var customerInfo = {};
+    var customDate = this.$el.find(".customDeliveryDate").data("DateTimePicker").date();
+    if(!customDate){
+      makeAToast(jQuery.i18n.prop('deliveryAddressEmptyError'));
+      return cb(false);
+    }
+    customerInfo.time = customDate;
+    customerInfo.comment = "comment";
+    return cb(customerInfo);
+  },
   getPaymentInfo : function(isLogin, cb){
     var cards = this.$el.find("#payment-cards button.active");
     var paymentMethod = cards.data("method");
@@ -3179,62 +3221,78 @@ var OrderView = Backbone.View.extend({
         }
         var form = $this.$el.find("#order");
         var mealId = form.data("meal");
+        var partyMode = form.data("party");
         var orderId = form.data("order");
         if(orderId){ $this.model.set({id : orderId}); }
 
         //pickup option
         var pickupOption = $this.getPickupOption(method);
-        var currentOrder = localOrders;
-
-        //subtotal
-        var subtotal = form.find(".subtotal").data("value");
-        if (subtotal == 0) {
-          makeAToast(jQuery.i18n.prop('orderEmptyError'));
-          return;
-        }
-
-        //coupon & points
-        var points = localPoints;
-        var couponValue = localCoupon;
-        if (couponValue) {
-          var code = Object.keys(couponValue)[0];
-        }
-
-        $this.model.set({
-          orders: currentOrder,
-          subtotal: subtotal,
-          contactInfo: contactInfo,
-          paymentInfo : paymentInfo,
-          pickupOption: pickupOption,
-          method: method,
-          mealId: mealId,
-          couponCode: code,
-          points: points,
-          isLogin : isLogin
-        });
-
-        $this.model.save({}, {
-          success: function (model, result) {
-            Object.keys(localOrders).forEach(function (dishId) {
-              eraseCookie(dishId);
-            });
-            eraseCookie('points');
-            localOrders = {};
-            localPoints = 0;
-            BootstrapDialog.alert(jQuery.i18n.prop('newOrderTakenSuccessfully',result.id), function () {
-              if(isLogin){
-                reloadUrl("/user/me", "#myorder");
-              }else{
-                location.href = "/order/" + result.id + '/receipt';
-              }
-            });
-          }, error: function (model, err) {
-            BootstrapDialog.show({
-              title: jQuery.i18n.prop('error'),
-              message: err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText
-            });
+        $this.getCustomizedInfo(partyMode, function(customInfo){
+          if(!customInfo){
+            return;
           }
-        })
+          var currentOrder = localOrders;
+
+          //subtotal
+          var subtotal = form.find(".subtotal").data("value");
+          if (subtotal == 0) {
+            makeAToast(jQuery.i18n.prop('orderEmptyError'));
+            return;
+          }
+
+          if(partyMode){
+            var minimal = form.data("minimal");
+            if(subtotal < minimal){
+              makeAToast(jQuery.i18n.prop('orderAmountInsufficient', minimal));
+              return;
+            }
+          }
+
+          //coupon & points
+          var points = localPoints;
+          var couponValue = localCoupon;
+          if (couponValue) {
+            var code = Object.keys(couponValue)[0];
+          }
+
+          $this.model.set({
+            orders: currentOrder,
+            subtotal: subtotal,
+            contactInfo: contactInfo,
+            paymentInfo : paymentInfo,
+            customInfo : customInfo,
+            pickupOption: pickupOption,
+            method: method,
+            mealId: mealId,
+            couponCode: code,
+            points: points,
+            isLogin : isLogin,
+            isPartyMode : partyMode
+          });
+
+          $this.model.save({}, {
+            success: function (model, result) {
+              Object.keys(localOrders).forEach(function (dishId) {
+                eraseCookie(dishId);
+              });
+              eraseCookie('points');
+              localOrders = {};
+              localPoints = 0;
+              BootstrapDialog.alert(jQuery.i18n.prop('newOrderTakenSuccessfully',result.id), function () {
+                if(isLogin){
+                  reloadUrl("/user/me", "#myorder");
+                }else{
+                  location.href = "/order/" + result.id + '/receipt';
+                }
+              });
+            }, error: function (model, err) {
+              BootstrapDialog.show({
+                title: jQuery.i18n.prop('error'),
+                message: err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText
+              });
+            }
+          })
+        });
       });
     });
   },

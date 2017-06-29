@@ -44,29 +44,39 @@
 
           <div class="row">
             <div class="col-xs-12">
-              <h4 class="text-left"><strong><%= __('choose-method') %></strong></h4>
+              <h4 class="text-left"><u><%= __('choose-method') %></u></h4>
             </div>
           </div>
 
-          <div class="btn-set text-left" id="method" data-toggle="btn-set">
-            <%if(meal.isDelivery){%>
-            <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
-            <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;" value="delivery"><strong><%= __('delivery') %></strong></button>
-            <%}else if(meal.isShipping){%>
-            <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
-            <button data-toggle="tab" href="#shippingTab" class="btn btn-disable btn-fat btn-lg active" value="shipping"><strong><%= __('shipping') %></strong></button>
-            <%}else{%>
-            <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
-            <%}%>
+          <h4></h4>
+
+          <div class="row">
+            <div class="col-xs-12">
+              <div class="btn-set text-left" id="method" data-toggle="btn-set">
+                <% if(meal.isPartyMode){%>
+                <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="delivery"><strong><%= __('delivery') %></strong></button>
+                <%}else{%>
+                <%if(meal.isDelivery){%>
+                <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
+                <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;" value="delivery"><strong><%= __('delivery') %></strong></button>
+                <%}else if(meal.isShipping){%>
+                <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
+                <button data-toggle="tab" href="#shippingTab" class="btn btn-disable btn-fat btn-lg active" value="shipping"><strong><%= __('shipping') %></strong></button>
+                <%}else{%>
+                <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
+                <%}}%>
+              </div>
+            </div>
           </div>
+
           <h3></h3>
           <div class="row">
             <div class="col-sm-6">
               <div class="tab-content" id="googleMapAlignView">
-                <div id="pickupTab" class="tab-pane active">
+                <div id="pickupTab" class="tab-pane <%= meal.isPartyMode === true ? '' : 'active'%>">
                   <div class="row text-left">
                     <div class="col-xs-12">
-                      <h4 class="text-left"><strong><%= __('choose-pickup-location') %></strong></h4>
+                      <h4 class="text-left"><u><%= __('choose-pickup-location') %></u></h4>
                     </div>
                     <div class="col-xs-12">
                       <div class="radio-box" id="pickupMethod" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
@@ -103,7 +113,7 @@
                     <% if(user.id){%>
 
                     <div class="col-xs-12" style="margin-top: 10px;">
-                      <h4 class="text-left"><strong><%= __('choose-contact-info') %></strong></h4>
+                      <h4 class="text-left"><u><%= __('choose-contact-info') %></u></h4>
                     </div>
 
                     <%}%>
@@ -135,7 +145,7 @@
                   </div>
                 </div>
 
-                <div id="deliveryTab" class="tab-pane">
+                <div id="deliveryTab" class="tab-pane <%= meal.isPartyMode === true ? 'active' : ''%>">
 
                   <div class="row text-left">
 
@@ -150,9 +160,10 @@
                         var i= 0;var j = 0;
                         if(meal.pickups){ meal.pickups.forEach(function(pickup){ if(pickup.method == 'delivery'){ %>
                         <label class="btn btn-outline-light option deliveryOption" data-area="<%= pickup.area %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
-                          <input type="radio" id="delivery-2-<%= i%>" data-index="<%= i%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>
+                          <input type="radio" id="delivery-2-<%= i%>" data-index="<%= pickup.index%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>
                           <i class="fa fa-truck cursor-pointer text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i>
                           <span> <%= pickup.area || pickup.deliveryCenter%> <%= __('nearby')%></span>
+                          <% if(!meal.isPartyMode){%>
                           <div class="vertical-align" style="margin-top:15px;">
                             <div class="pickup-date" style="width: 70px;">
                               <span class="col-xs-12"><%= meal.getMonthName(pickup.pickupFromTime)%></span>
@@ -160,9 +171,39 @@
                             </div>
                             <%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>
                           </div>
+                          <%}%>
                         </label>
                         <%j++;}i++;})}; %>
                       </div>
+                    </div>
+
+                    <% if(meal.isPartyMode){%>
+                    <div class="col-xs-12">
+                      <h3></h3>
+                    </div>
+                    <div class="col-xs-12">
+                      <div class="row">
+                        <div class="col-xs-12 col-sm-4">
+                          <div class="pickup-date" style="width: 120px;">
+                            <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%></span>
+                            <span class="col-xs-12"> > <%= meal.getDaysAfterNow(1)%>  <i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" title="<%= __('party-pickup-date-tip')%>"></i></span>
+                          </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-8">
+                          <span><%= __('enter-time')%></span>
+                          <div class='input-group customDeliveryDate' data-toggle="dateTimePicker" data-min="<%= meal.getDateFromDaysAfterNow(2)%>">
+                            <input type='text' class="form-control" readonly="true"/>
+                            <span class="input-group-addon">
+                                <span class="fa fa-calendar"></span>
+                              </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <%}%>
+
+                    <div class="col-xs-12">
+                      <h3></h3>
                     </div>
 
                     <div class="col-xs-12">
@@ -218,7 +259,7 @@
 
                 <div class="row text-left" style="margin-top: 20px;">
                   <form class="col-xs-12 <%= user.id ? 'hide' : ''%>" id="contactInfoView" data-user="<%= user.id || null%>" data-toggle="validator" role="form">
-                    <div class="row deliveryInput hide">
+                    <div class="row deliveryInput <%= meal.isPartyMode ? '' : 'hide'%>">
                       <div class="col-xs-12">
                         <div class="form-group">
                           <label><%= __('street')%> *</label>
@@ -227,7 +268,7 @@
                       </div>
                     </div>
 
-                    <div class="row deliveryInput hide">
+                    <div class="row deliveryInput <%= meal.isPartyMode ? '' : 'hide'%>">
                       <div class="col-xs-6">
                         <div class="form-group">
                           <label><%= __('city')%> *</label>
@@ -242,7 +283,7 @@
                       </div>
                     </div>
 
-                    <div class="row deliveryInput hide">
+                    <div class="row deliveryInput <%= meal.isPartyMode ? '' : 'hide'%>">
                       <div class="col-xs-6">
                         <div class="form-group">
                           <label><%= __('zipcode')%> *</label>
@@ -492,7 +533,7 @@
           <%}%>
           <button type="button" data-action="takeOrder" class="btn btn-danger red"><%= __('placeorder') %></button>
 
-          <table id="order" class="table tableBodyScroll" data-meal="<%= meal.id%>" data-err-container="#alert-order">
+          <table id="order" class="table tableBodyScroll" data-meal="<%= meal.id%>" data-party="<%= meal.isPartyMode%>" data-minimal="<%= meal.partyRequirement ? meal.partyRequirement['minimal'] : 0%>" data-err-container="#alert-order">
             <thead>
             <tr>
               <th><%= __('name') %></th>
@@ -506,7 +547,7 @@
             for(var i=0; i < dishes.length; i++){
               var dish = dishes[i];
             %>
-            <tr class="success item" data-id=<%= dish.id %> data-left-amount=<%= meal.leftQty[dish.id] %>>
+            <tr class="success item" data-id=<%= dish.id %> data-left-amount=<%= meal.isPartyMode === true ? "100" : meal.leftQty[dish.id] %>>
               <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span> </td>
               <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
               <td>
@@ -600,4 +641,5 @@
   var addressView = new AddressView({ el : $("#meal-confirm-container"), model : new User()})
   var mealConfirmView = new MealConfirmView( { el : $("#meal-confirm-container"), model : new Meal()})
   new ContactInfoView({ el : $("#contactInfoView"), model : new User()});
+  setup();
 </script>

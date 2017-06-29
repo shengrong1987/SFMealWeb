@@ -836,7 +836,8 @@
         },
         stepping : 30,
         showTodayButton : true,
-        defaultDate : mDate
+        defaultDate : mDate,
+        minDate : $(this).data("min")
       });
     })
   });

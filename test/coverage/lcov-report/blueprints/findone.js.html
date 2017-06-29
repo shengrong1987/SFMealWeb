@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">3.64% </span>
+        <span class="strong">5.71% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>2/55</span>
+        <span class='fraction'>2/35</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/42</span>
+        <span class='fraction'>0/30</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/5</span>
+        <span class='fraction'>0/2</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">3.77% </span>
+        <span class="strong">6.06% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>2/53</span>
+        <span class='fraction'>2/33</span>
       </div>
     </div>
   </div>
@@ -111,37 +111,7 @@
 66
 67
 68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79
-80
-81
-82
-83
-84
-85
-86
-87
-88
-89
-90
-91
-92
-93
-94
-95
-96
-97
-98
-99</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+69</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
@@ -192,36 +162,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -290,36 +230,6 @@ module.exports = <span class="fstat-no" title="function not covered" >function f
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if(req.wantsJSON &amp;&amp; sails.config.environment === 'development'){</span>
 <span class="cstat-no" title="statement not covered" >     res.ok(matchingRecord);</span>
-    }else <span class="cstat-no" title="statement not covered" >if(Model.adapter.identity == "meal"){</span>
-<span class="cstat-no" title="statement not covered" >      if(isEditMode){</span>
-<span class="cstat-no" title="statement not covered" >        matchingRecord.userId = user.id;</span>
-<span class="cstat-no" title="statement not covered" >        Host.findOne(hostId).populate("user").populate("dishes").exec(<span class="fstat-no" title="function not covered" >function(err,host){</span></span>
-<span class="cstat-no" title="statement not covered" >          if(err){</span>
-<span class="cstat-no" title="statement not covered" >            return res.badRequest(err);</span>
-          }
-<span class="cstat-no" title="statement not covered" >          matchingRecord.kitchen_address = host.full_address;</span>
-<span class="cstat-no" title="statement not covered" >          matchingRecord.allDishes = host.dishes;</span>
-<span class="cstat-no" title="statement not covered" >          matchingRecord.phone = host.user.phone;</span>
-<span class="cstat-no" title="statement not covered" >          res.view('meal_edit',{meal : matchingRecord});</span>
-        });
-      }else{
-<span class="cstat-no" title="statement not covered" >        if(req.session.authenticated){</span>
-<span class="cstat-no" title="statement not covered" >          var userId = req.session.user.id;</span>
-<span class="cstat-no" title="statement not covered" >          User.findOne(userId).populate("collects").exec(<span class="fstat-no" title="function not covered" >function(err,user){</span></span>
-<span class="cstat-no" title="statement not covered" >            if(err){</span>
-<span class="cstat-no" title="statement not covered" >              return res.badRequest(err);</span>
-            }
-<span class="cstat-no" title="statement not covered" >            Order.find({meal : matchingRecord.id, status : ["schedule","preparing"]}).exec(<span class="fstat-no" title="function not covered" >function(err, orders){</span></span>
-<span class="cstat-no" title="statement not covered" >              if(err){</span>
-<span class="cstat-no" title="statement not covered" >                return res.badRequest(err);</span>
-              }
-<span class="cstat-no" title="statement not covered" >              res.view('meal',{meal : matchingRecord, locale : req.getLocale(), user : user, orders : orders});</span>
-            });
-          });
-        }else{
-<span class="cstat-no" title="statement not covered" >          res.view('meal',{meal : matchingRecord, locale : req.getLocale(), user : null, orders : null});</span>
-        }
-      }
     }else <span class="cstat-no" title="statement not covered" >if(Model.adapter.identity == "user"){</span>
 <span class="cstat-no" title="statement not covered" >      res.view('user',{user : matchingRecord});</span>
     }else <span class="cstat-no" title="statement not covered" >if(Model.adapter.identity == "payment"){</span>
@@ -343,7 +253,7 @@ module.exports = <span class="fstat-no" title="function not covered" >function f
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jun 21 2017 18:26:21 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jun 29 2017 15:17:45 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>
