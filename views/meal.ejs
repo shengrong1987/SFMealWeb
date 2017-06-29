@@ -45,11 +45,11 @@
                 <div class="col-xs-12 text-left">
                   <h2 style="display: inline-block;"><%= meal.titleI18n(locale) %><small class="text-orange"><% if(meal.type=='order'){ __('order') }else if(meal.type=='preorder'){ __('preorder') } %> <%= meal.isFull()? __('full'): "" %></small></h2>
                   <i class="fa fa-heart-o round_thumb border-red text-red cursor-pointer relative" style="padding:8px;top:5px;" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}else{%>false<%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
-                  <% if(meal.isPartyMode){%>
+                  <% if(meal.supportPartyOrder){ if(meal.isPartyMode){%>
                     <button class="btn btn-red pull-right" style="margin-top: 20px;" onclick="javascript:location.href='/meal/<%= meal.id%>'"><%= __('switchToNormal')%></button>
                   <%}else{%>
                   <button class="btn btn-red pull-right" style="margin-top: 20px;" onclick="javascript:location.href='/meal/<%= meal.id%>?party=true'"><%= __('switchToCatering')%></button>
-                  <%}%>
+                  <%}}%>
                 </div>
               </div>
 

@@ -772,6 +772,6 @@
   "party-minimal-requirement" : "Minimal catering amount",
   "support-party" : "Is Catering Provided",
   "party-order-tip" : "Catering order is a large order with any chef's verified dishes and custom delivery time( at least 24 hours in advanced )",
-  "switchToCatering" : "Switch to catering",
-  "switchToNormal" : "Switch to normal"
+  "switchToCatering" : "Catering",
+  "switchToNormal" : "Normal"
 }

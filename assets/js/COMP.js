@@ -820,6 +820,7 @@
       if(typeof dateString != "undefined" && dateString != "undefined"){
         var date = new Date(dateString);
         var mDate = moment(date.toISOString());
+        var minDate = $(this).data("min");
         // if(mDate.isBefore(moment()) && $(this).data("min") == "now"){
         //   mDate = moment();
         // }
@@ -837,7 +838,7 @@
         stepping : 30,
         showTodayButton : true,
         defaultDate : mDate,
-        minDate : $(this).data("min")
+        minDate : minDate
       });
     })
   });
