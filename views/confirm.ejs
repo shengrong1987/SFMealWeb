@@ -85,7 +85,7 @@
                         var j = i+1;
                         if(meal.pickups){
                           var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
-                        meal.pickups.forEach(function(pickup){ if(pickup.method == 'pickup'){ %>
+                        meal.pickups.forEach(function(pickup){ if(pickup.method == 'pickup' && !meal.isPartyMode){ %>
                         <label class="btn btn-outline-light vertical-inline option pickupOption" data-color="<%= colors[i]%>" data-location="<%= pickup.publicLocation || pickup.location%>">
                           <input type="radio" id="pickup-1-<%= i%>" data-index="<%= i%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
                           <span class="content">

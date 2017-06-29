@@ -703,7 +703,7 @@ module.exports = {
       return cb({ code : -12, responseText : req.__('meal-delivery-conflict')});
     }
 
-    if(params.isPartyMode && !params.partyRequirement){
+    if(params.supportPartyOrder && !params.partyRequirement){
       return cb({ code : -17, responseText : req.__('meal-lack-of-party-requirement')});
     }
 

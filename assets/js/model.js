@@ -1309,6 +1309,7 @@ var MealView = Backbone.View.extend({
     var deliveryRangeInput = this.$el.find("#deliveryRangeInput");
 
     var deliverySettingView = this.$el.find("#deliverySettingView");
+    deliverySettingView.removeClass("hide");
     var settingButton = deliverySettingView.find(".setting");
     settingButton.removeClass("hide")
     if(isDelivery){

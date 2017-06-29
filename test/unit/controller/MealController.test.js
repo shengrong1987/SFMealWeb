@@ -290,7 +290,7 @@ describe('MealController', function() {
           })
     })
 
-    it('should create an preorder type meal with lack of catering requirement', function (done) {
+    it('should not create an preorder type meal with lack of catering requirement', function (done) {
       var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
       var now = new Date();
       var pickups = [{
@@ -348,19 +348,9 @@ describe('MealController', function() {
           minimalOrder : 1,
           supportPartyOrder : true
         })
-        .expect(200)
+        .expect(400)
         .end(function(err,res){
-          if(res.body.chef != hostId){
-            return done(Error("error creating meal"));
-          }
-          res.body.should.have.property('pickups').with.length(5);
-          res.body.pickups[0].publicLocation.should.be.equal("Uber HQ");
-          res.body.pickups[0].phone.should.be.equal("(415)802-3853");
-          res.body.should.have.property('county');
-          res.body.county.should.containEql('San Francisco County');
-          res.body.county.should.containEql('San Mateo County');
-          res.body.county.should.containEql('Santa Clara County');
-          preorderMealId = res.body.id;
+          res.body.code.should.be.equal(-17)
           done();
         })
     })
@@ -637,10 +627,11 @@ describe('MealController', function() {
           pickups : JSON.stringify(pickups),
           isDelivery : true,
           minimalTotal : 1,
-          partyRequirement : JSON.stringify({
-            "minimal" : 50
-          }),
           supportPartyOrder : true,
+          partyRequirement : JSON.stringify({
+            "minimal" : 50,
+            "delivery_center" : "1974 Palou Ave, San Francisco, CA 94124"
+          }),
           status : 'off'
         })
         .expect(200)

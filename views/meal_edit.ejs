@@ -346,7 +346,7 @@
                         <div class="row vertical-align">
                           <div class="col-xs-6">
                             <div class="input-group">
-                              <input id="cateringMinimal" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="9999" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.isSupportParty === true ? meal.partyRequirement.minimal : ''%>">
+                              <input id="cateringMinimal" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="9999" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.supportPartyOrder === true ? meal.partyRequirement.minimal : ''%>">
                               <div class="input-group-addon"><%= __('dollar')%></div>
                             </div>
                           </div>
@@ -380,7 +380,7 @@
                   </div>
                 </div>
               </div>
-              <div id="deliverySettingView" class="row">
+              <div id="deliverySettingView hide" class="row">
                 <div class="col-xs-12">
                   <div class="vertical-align">
                     <input type="checkbox" data-toggle="switch-button" id="isDeliveryBySystem" class="regular-checkbox" <%= meal.isDeliveryBySystem ? "checked=''" : ""%>>

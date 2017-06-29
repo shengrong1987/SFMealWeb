@@ -98,7 +98,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(5);
+          res.body.should.have.length(4);
           mealId = res.body[0].id;
           done();
         })
@@ -112,7 +112,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(4);
+          res.body.should.have.length(3);
           done();
         })
     })
