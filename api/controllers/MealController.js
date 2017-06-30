@@ -258,7 +258,7 @@ module.exports = {
 
   confirm : function(req, res){
     var mealId = req.param("id");
-    var user = req.session.user;
+    var u = req.session.user;
     Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,m){
       if(err){
         return res.badRequest(err);
@@ -267,26 +267,49 @@ module.exports = {
         return res.badRequest({ code : -3, responseText : req.__('meal-not-found')});
       }
       var isPartyMode = req.query['party'];
-      if(isPartyMode === 'true'){
-        m.isPartyMode = true;
-        m.delivery_range = m.delivery_range * 5;
-      }
-      if(user){
-        User.find(user.id).populate("payment").populate("orders").exec(function(err,user){
-          user[0].orders = user[0].orders.filter(function(order){
-            return order.status == "schedule" || order.status == "preparing";
-          })
-          if(req.wantsJSON){
-            return res.ok({meal : m, user : user[0], locale : req.getLocale()});
+      async.auto({
+        getPartyMeal : function(cb){
+          if(isPartyMode !== 'true'){
+            return cb();
           }
-          res.view("confirm",{meal : m, user : user[0], locale : req.getLocale()});
-        });
-      }else{
-        if(req.wantsJSON){
-          return res.ok({meal : m, user : {}, locale : req.getLocale()});
+          Dish.find({ chef : m.chef.id, isVerified : true}).exec(function(err, dishes){
+            if(err){
+              return res.badRequest(err);
+            }
+            m.isPartyMode = true;
+            m.delivery_range = m.delivery_range * 5;
+            m.delivery_fee = 0;
+            m.dishes = dishes;
+            cb();
+          })
+        },
+        getMeal : function(cb){
+          if(!req.session.authenticated){
+            return cb();
+          }
+          User.find(u.id).populate("payment").populate("orders").exec(function(err,user){
+            if(err){
+              return cb(err);
+            }
+            user[0].orders = user[0].orders.filter(function(order){
+              return order.status == "schedule" || order.status == "preparing";
+            })
+            u = user[0];
+            cb();
+          });
         }
-        return res.view("confirm", { meal : m, user : {}, locale : req.getLocale()});
-      }
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        if(req.wantsJSON){
+          return res.ok({meal : m, user : u, locale : req.getLocale()});
+        }
+        if(!req.session.authenticated){
+          u = {}
+        }
+        return res.view("confirm",{meal : m, user : u, locale : req.getLocale()});
+      });
     });
   },
 
@@ -853,6 +876,9 @@ module.exports = {
     Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err, meal){
       if(err){
         return res.badRequest(err);
+      }
+      if(!meal){
+        return res.notFound();
       }
       var orders;
       var _user;

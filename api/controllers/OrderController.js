@@ -280,7 +280,8 @@ module.exports = {
         }
       });
     }else{
-      if(params.method == "delivery"){
+      sails.log.info("method: " + params.method, " party mode: " + params.isPartyMode);
+      if(params.method === "delivery" && params.isPartyMode !== true){
         if(params.isDeliveryBySystem){
           params.delivery_fee = stripe.SYSTEM_DELIVERY_FEE;
         }else{

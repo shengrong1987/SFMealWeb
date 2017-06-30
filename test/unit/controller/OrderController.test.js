@@ -1873,6 +1873,7 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body.isPartyMode.should.be.true();
+          res.body.delivery_fee.should.be.equal(0);
           new Date(res.body.pickupInfo.pickupFromTime).getTime().should.be.equal(new Date(2018, 5, 29).getTime());
           res.body.pickupInfo.deliveryCenter.should.be.equal("1974 Palou Ave, San Francisco, CA 94124, USA");
           done();
