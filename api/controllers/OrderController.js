@@ -184,7 +184,7 @@ module.exports = {
         return cb({responseText: req.__('order-incomplete-address'), code: -29});
       }
       var full_address = contactInfo.address;
-      if(!meal.isDelivery) {
+      if(!meal.isDelivery && !params.isPartyMode) {
         return cb({responseText: req.__('order-invalid-method'), code: -11});
       }
       if(params.isPartyMode){
@@ -204,10 +204,10 @@ module.exports = {
           pickupInfo = pickup;
         }
       });
-      sails.log.info("pickup method: " + pickupInfo.method);
       if(!pickupInfo){
         return cb({responseText : req.__('order-pickup-option-invalid-error'), code : -22});
       }
+      sails.log.info("pickup method: " + pickupInfo.method);
       if(!pickupInfo.phone){
         return cb({responseText : req.__('order-pickup-option-invalid-error'), code : -28});
       }

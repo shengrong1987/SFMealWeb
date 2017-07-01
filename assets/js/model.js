@@ -3123,7 +3123,7 @@ var OrderView = Backbone.View.extend({
     }
   },
   getPickupOption : function(method){
-    var pickupIndex = parseInt(this.$el.find("#" + method + "Tab" + " .option .regular-radio:checked").data("index")) + 1;
+    var pickupIndex = parseInt(this.$el.find("#" + method + "Tab" + " .option .regular-radio:checked").data("index"));
     return pickupIndex;
   },
   getCustomizedInfo : function(partyMode, cb){
