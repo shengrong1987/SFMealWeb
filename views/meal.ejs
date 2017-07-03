@@ -117,7 +117,7 @@
                             </div>
                           </div>
                         </div>
-                        <%}else if(pickup.method === "delivery"){%>
+                        <%}else if(pickup.method === "delivery"){if(pickup.isDateCustomized && !meal.isPartyMode){return}%>
                         <div class="row">
                           <div class="col-xs-12">
                             <div class="option deliveryOption" data-area="<%= pickup.area%>" data-location="<%= pickup.deliveryCenter%>" data-color="<%= colors[count]%>">
