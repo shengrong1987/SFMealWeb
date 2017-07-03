@@ -158,7 +158,7 @@
                         <%
                         var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
                         var i= 0;var j = 0;
-                        if(meal.pickups){ meal.pickups.forEach(function(pickup){ if(pickup.method == 'delivery'){ %>
+                        if(meal.pickups){ meal.pickups.forEach(function(pickup){ if(pickup.method == 'delivery'){ if(pickup.isDateCustomized && !meal.isPartyMode){return} %>
                         <label class="btn btn-outline-light option deliveryOption" data-area="<%= pickup.area %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
                           <input type="radio" id="delivery-2-<%= i%>" data-index="<%= pickup.index%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>
                           <i class="fa fa-truck cursor-pointer text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i>
