@@ -3131,7 +3131,10 @@ var OrderView = Backbone.View.extend({
       return cb({});
     }
     var customerInfo = {};
-    var customDate = this.$el.find(".customDeliveryDate").data("DateTimePicker").date();
+    var customDate = this.$el.find(".customDeliveryDate").data("DateTimePicker");
+    if(customDate){
+      customDate = customDate.date();
+    }
     if(!customDate){
       makeAToast(jQuery.i18n.prop('deliveryAddressEmptyError'));
       return cb(false);

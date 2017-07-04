@@ -290,7 +290,13 @@ module.exports = {
       }else {
         params.delivery_fee = 0;
       }
-      pickUpInfo = meal.pickups[params.pickupOption-1];
+      meal.pickups.forEach(function(pickup){
+        if(pickup.index === params.pickupOption){
+          pickUpInfo = pickup;
+          return;
+        }
+      });
+
     }
     params.pickupInfo = pickUpInfo;
     if(!pickUpInfo){
