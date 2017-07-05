@@ -665,7 +665,7 @@
   "orderConfirmMessageToGuest" : "厨师确认了调整或取消申请, 订单号: %s, %s",
   "orderRejectMessageToGuest" : "厨师拒绝了调整或取消申请, 订单号: %s, 拒绝原因: %s, %s",
   "orderArriveReminderMessageToGuest" : "您的订单已在送餐中, 请准备好享受美食, 联系电话: %s",
-  "orderPickupReminderMessageToGuestInHour" : "您的预定订单将于一小时后自取, 领取时请核对订单号: %s, 地址: %s, 联系电话: %s, %s",
+  "orderPickupReminderMessageToGuestInHour" : "您的预定订单将于一小时后自取, 领取时请核对订单号: %s, 地址: %s, 联系电话: %s, 领取时间: %s, %s",
   "orderReadyPickupReminderMessageToGuest" : "您之前在SFMeal下的订单已准备好了, 领取时请核对订单号: %s, 地址: %s, 联系电话: %s, 领取时间: %s, %s",
   "help-menu" : "帮助列表",
   "help-menu-collapse" : "隐藏列表",

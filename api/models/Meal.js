@@ -198,12 +198,13 @@ module.exports = {
       }
     },
 
-    finishDate : function(){
-      if(this.type == "preorder"){
-        if(this.pickupFromTime.getDate() == this.pickupTillTime.getDate()){
-          return dateUtil.formattedDate(this.pickupTillTime);
+    finishDate : function(short){
+      if(this.type === "preorder"){
+        var pickupDate = this.pickups.length ? this.pickups[0] : null;
+        if(pickupDate && (short || new Date(pickupDate.pickupFromTime).getDate() ===  new Date(this.pickupTillTime).getDate())){
+          return dateUtil.formattedDate(pickupDate.pickupTillTime);
         }else{
-          return dateUtil.formattedDate(this.pickupFromTime) + " - " + dateUtil.formattedDate(this.pickupTillTime);
+          return dateUtil.formattedDate(pickupDate.pickupFromTime) + " - " + dateUtil.formattedDate(pickupDate.pickupTillTime);
         }
       }else{
         return dateUtil.formattedHour(this.provideFromTime) + " - " + dateUtil.formattedHour(this.provideTillTime)

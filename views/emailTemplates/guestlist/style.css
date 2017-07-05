@@ -9292,7 +9292,7 @@ fieldset[disabled] .btn-red.active {
   padding: 5px 0 5px 0;
 }
 .meal-box.meal .desc {
-  top: 10px;
+  top: 35%;
   line-height: 50px;
   width: 100px;
 }
@@ -9939,7 +9939,7 @@ fieldset[disabled] .btn-red.active {
     line-height: 80px;
   }
   .meal-box.meal .desc {
-    top: 50px;
+    top: 20%;
     line-height: 80px;
     width: 100px;
   }

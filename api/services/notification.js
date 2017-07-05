@@ -135,7 +135,7 @@ var notification = {
             content = sails.__({
               phrase : 'orderPickupReminderMessageToGuestInHour',
               locale : locale
-            }, params.id, params.pickupInfo.location, params.pickupInfo.phone, userOrderUrl);
+            }, params.id, params.pickupInfo.location, params.pickupInfo.phone, params.pickupInfo.pickupFromTime + ' - ' + params.pickupInfo.pickupTillTime, userOrderUrl);
             message.sendMessage(phone, content);
           }
           break;

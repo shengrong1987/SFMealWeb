@@ -32,7 +32,7 @@ module.exports = {
   },
   formattedDate : function(date){
     var mDate = moment(date);
-    return mDate.local().format("MMM D");
+    return mDate.local().format("MMM D ddd");
   },
   getMonthNameFromDate : function(date){
     var mDate = moment(date);
