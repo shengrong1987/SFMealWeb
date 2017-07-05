@@ -95,7 +95,6 @@ module.exports = {
             }
             return false;
           })
-          sails.log.info("host has high score: " + highScore);
           if(popularHost && highScore){
             _host.shortIntro = host.shortIntro;
             _host.shopName = host.shopName;
@@ -880,7 +879,7 @@ module.exports = {
       if(!meal){
         return res.notFound();
       }
-      var orders;
+      var _orders;
       var _user;
       async.auto({
         isEditMode : function(cb){
@@ -925,7 +924,7 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
-              orders = orders;
+              _orders = orders;
               _user = user;
               cb();
             });
@@ -941,7 +940,7 @@ module.exports = {
         if(isEditMode){
           res.view('meal_edit',{ meal : meal});
         }else if(req.session.authenticated){
-          res.view('meal',{ meal : meal, locale : req.getLocale(), user : _user, orders : orders});
+          res.view('meal',{ meal : meal, locale : req.getLocale(), user : _user, orders : _orders});
         }else{
           res.view('meal',{ meal : meal, locale : req.getLocale(), user : null, orders : null});
         }
