@@ -817,13 +817,15 @@
   $(window).on('load',function(){
     $('[data-toggle="dateTimePicker"]').each(function(){
       var dateString = $(this).data("date");
+      var minDate;
       if(typeof dateString != "undefined" && dateString != "undefined"){
         var date = new Date(dateString);
         var mDate = moment(date.toISOString());
-        var minDate = $(this).data("min");
         // if(mDate.isBefore(moment()) && $(this).data("min") == "now"){
         //   mDate = moment();
         // }
+      }else{
+        minDate = $(this).data("min");
       }
       $(this).datetimepicker({
         icons:{
