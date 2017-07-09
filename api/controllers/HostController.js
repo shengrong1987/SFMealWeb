@@ -139,7 +139,7 @@ module.exports = {
           sails.log.error(err);
           return res.badRequest({code : -1, responseText : req.__('meal-error-address')});
         }else{
-          if(result.length == 0){
+          if(result.length === 0){
             return res.badRequest({ code : -2, responseText : req.__('meal-error-address2')});
           }
           var administration= result[0].administrativeLevels;
@@ -216,7 +216,7 @@ module.exports = {
                 if(err){
                   return cb(err);
                 }
-                if(files.length == 0){
+                if(files.length === 0){
                   return cb();
                 }
                 var file = files[0];

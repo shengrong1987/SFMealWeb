@@ -534,6 +534,7 @@
   "order-party-time-invalid" : "团餐必须提前至少24小时预定",
   "order-party-lack-of-info" : "缺少团餐自定义订餐信息",
   "order-catering-must-delivery" : "团餐必须使用送餐方式",
+  "order-adjust-stripe-error" : "订单调整时遇到平台错误: %s",
   "user-checkout-auth-error" : "用户登录标识与用户登录情况不匹配",
   "adjust-with-coupon-error" : "使用折扣券的订单无法调整",
   "cancel-with-coupon-error" : "使用折扣券的订单无法取消",
@@ -729,6 +730,7 @@
   "type-payment" : "订单收入",
   "type-compensation" : "收入补充",
   "type-charge" : "订单支出",
+  "type-fee" : "现金订单手续费",
   "application_fee" : "手续费",
   "refunded" : "退款",
   "has-foodhandler-license" : "已获得食品操作安全证书",
@@ -771,5 +773,8 @@
   "support-party" : "是否提供团餐",
   "party-order-tip" : "团餐是大额订单，可以任选厨师的认证菜式和自选送餐时间(现在起24小时后)",
   "switchToCatering" : "切换到团餐",
-  "switchToNormal" : "切换到普通"
+  "switchToNormal" : "切换到普通",
+  "order-more" : "点击展开菜单",
+  "order-less" : "收起菜单",
+  "order-list-tip" : "绿色高亮为已点菜式，可以点-/+按钮调整订单"
 }

@@ -534,6 +534,7 @@
   "order-party-time-invalid" : "Catering meal must be ordered at least 24 hours in advanced.",
   "order-party-lack-of-info" : "Catering order lack of custom info",
   "order-catering-must-delivery" : "Catering order has to be with delivery method",
+  "order-adjust-stripe-error" : "A Stripe Error occurs adjusting order: %s",
   "user-checkout-auth-error" : "User checkout method doesn't match user session",
   "adjust-with-coupon-error" : "Can not adjust an order with coupon",
   "cancel-with-coupon-error" : "Can not cancel an order with coupon",
@@ -730,6 +731,7 @@
   "type-payment" : "Income",
   "type-compensation" : "Compensation",
   "type-charge" : "Expense",
+  "type-fee" : "Cash Order Fee",
   "application_fee" : "fee",
   "refunded" : "Refund",
   "has-foodhandler-license" : "Valid California Food Handler's Certificate",
@@ -773,5 +775,8 @@
   "support-party" : "Is Catering Provided",
   "party-order-tip" : "Catering order is a large order with any chef's verified dishes and custom delivery time( at least 24 hours in advanced )",
   "switchToCatering" : "Catering",
-  "switchToNormal" : "Normal"
+  "switchToNormal" : "Normal",
+  "order-more" : "See more dish",
+  "order-less" : "Collapse menu",
+  "order-list-tip" : "Ordered dish is highlighted, you can adjust dish by clicking -/+ buttons."
 }

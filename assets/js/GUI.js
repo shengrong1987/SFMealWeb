@@ -283,6 +283,16 @@ var localCoupon = {};
 var localPoints = false;
 //load previous order from cookies
 function loadOrder(fromCache){
+  refreshOrderList(fromCache);
+  loadCoupon(fromCache);
+  loadPoints(fromCache);
+  refreshMenu();
+}
+
+function refreshOrderList(fromCache, isTrigger){
+  if(isTrigger){
+    refreshCollapseBtn(false);
+  }
   $("#order").find(".item").each(function(){
     var dishId = $(this).data("id");
     if(fromCache){
@@ -294,7 +304,7 @@ function loadOrder(fromCache){
       }
       localOrders[dishId] = localDish;
       $(this).data("left-amount",$(this).data("left-amount") - localOrders[dishId].number);
-      refreshOrder(dishId);
+      refreshOrder(dishId, isTrigger);
     }else{
       localOrders[dishId] = {
         number : parseInt($(this).find(".amount").data("value")),
@@ -302,9 +312,6 @@ function loadOrder(fromCache){
       };
     }
   });
-  loadCoupon(fromCache);
-  loadPoints(fromCache);
-  refreshMenu();
 }
 
 function loadPreference(){
@@ -532,8 +539,19 @@ function refreshCart(subtotal, numberOfItem){
   shoppingCart.find(".order-preview").data('item',numberOfItem);
 }
 
+function refreshCollapseBtn(initialize){
+  var expandMenuBtn = $("#order").find("#expandMenuBtn");
+  var collapseMenuBtn = $("#order").find("#collapseMenuBtn");
+  if(initialize){
+    collapseMenuBtn.toggle();
+  }else{
+    collapseMenuBtn.toggle();
+    expandMenuBtn.toggle();
+  }
+}
+
 //render order view
-function refreshOrder(id){
+function refreshOrder(id, triggerExpand){
   var number = localOrders[id].number;
   var item = $("#order").find(".item[data-id=" + id + "]");
   var left = item.data("left-amount");
@@ -559,9 +577,17 @@ function refreshOrder(id){
     dishItem.find(".beforeOrder").hide();
     dishItem.find(".afterOrder").show();
     dishItem.find(".dish-number").val(number);
+    item.addClass("success");
+    item.show();
   }else{
     dishItem.find(".beforeOrder").show();
     dishItem.find(".afterOrder").hide();
+    item.removeClass("success");
+    if(triggerExpand){
+      item.toggle();
+    }else{
+      item.hide();
+    }
   }
   dishItem.find(".left-amount span").attr("value",left);
   dishItem.find(".left-amount span").html(left);
@@ -679,6 +705,7 @@ function setup(){
   setupCountrySelector();
   setupSelector();
   setupInputMask();
+  refreshCollapseBtn(true);
   setupSwitchButton({
     onText : "Yes",
     offText : "No"
@@ -845,8 +872,8 @@ function setupLanguage(){
 
 $("document").ready(function(){
   if(typeof Stripe !== 'undefined'){
-    Stripe.setPublishableKey('pk_live_AUWn3rb2SLc92lXsocPCDUcw');
-    // Stripe.setPublishableKey('pk_test_ztZDHzxIInBmBRrkuEKBee8G');
+    // Stripe.setPublishableKey('pk_live_AUWn3rb2SLc92lXsocPCDUcw');
+    Stripe.setPublishableKey('pk_test_ztZDHzxIInBmBRrkuEKBee8G');
   }
   setup();
 });

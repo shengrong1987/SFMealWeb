@@ -13,7 +13,7 @@ before(function(done) {
 describe('OrderController', function() {
 
   this.timeout(20000);
-  var address = "1974 Palou Ave, San Francisco, CA 94124";
+  var address = "221 Woodrow St, Daly City, CA 94014";
 
   describe('', function() {
 
@@ -65,7 +65,7 @@ describe('OrderController', function() {
               console.log(err);
               return done(err);
             }
-            if(res.body.meals.length == 0){
+            if(res.body.meals.length === 0){
               return done(Error("error getting any meal"));
             }
             var meal = res.body.meals[1];
@@ -142,7 +142,7 @@ describe('OrderController', function() {
             return done(err);
           }
           console.log(res.body);
-          if(res.body.code != -6){
+          if(res.body.code !== -6){
             return done(Error("not getting address out of range error"));
           }
           done();
@@ -366,7 +366,7 @@ describe('OrderController', function() {
             done();
           })
     })
-  //
+
     it('should adjust the full dish and get not enough quantity error', function (done) {
       var dishObj = {};
       dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
@@ -585,7 +585,7 @@ describe('OrderController', function() {
         .expect(200)
         .end(done)
     })
-
+  //
     it('should order the meal again', function (done) {
       var dishObj = {};
       dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}] };
@@ -614,7 +614,7 @@ describe('OrderController', function() {
           done();
         })
     })
-
+  //
     it('should order the meal again with points', function (done) {
       var dishObj = {};
       dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
@@ -1319,6 +1319,7 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body.discountAmount.should.be.equal(1);
+          res.body.transfer[Object.keys(res.body.transfer)[0]].should.be.equal(100);
           res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(Math.round(400*1.085));
           res.body.application_fees[Object.keys(res.body.application_fees)[0]].should.be.equal(180);
           orderId = res.body.id;
@@ -1356,6 +1357,7 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body.discountAmount.should.be.equal(4.34);
+          res.body.transfer[Object.keys(res.body.transfer)[0]].should.be.equal(434);
           res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(100);
           res.body.application_fees[Object.keys(res.body.application_fees)[0]].should.be.equal(180);
           orderId = res.body.id;
@@ -1480,7 +1482,7 @@ describe('OrderController', function() {
             console.log(err);
             return done(err);
           }
-          if(res.body.meals.length == 0){
+          if(res.body.meals.length === 0){
             return done(Error("error getting any meal"));
           }
           var meal = res.body.meals[1];
@@ -1562,12 +1564,38 @@ describe('OrderController', function() {
           }
           res.body.tax.should.be.equal(price3 * 0.085 * 100);
           res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + 1) * 100);
+          res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal((price3 * 0.2 + 1) * 100);
           res.body.customerPhone.should.be.equal(customerPhone);
           res.body.customerName.should.be.equal(customerName);
           orderId = res.body.id;
           done();
         })
     });
+
+    it('should adjust the dish with more amount successfully', function (done) {
+      var dishObj = {};
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      agent
+        .post('/order/' + orderId + "/adjust")
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .send({orders : dishObj, subtotal : price1+price3, mealId : mealId, delivery_fee : 0})
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          var tax = Math.round((price1+price3) * 0.085 * 100);
+          res.body.tax.should.be.equal(tax);
+          Object.keys(res.body.feeCharges).should.have.length(2);
+          res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal(((price3) * 0.2 + 1) * 100);
+          res.body.feeCharges[Object.keys(res.body.feeCharges)[1]].should.be.equal(((price2) * 0.2) * 100);
+          done();
+        })
+    })
 
     it('should adjust the dish with less amount successfully', function (done) {
       var dishObj = {};
@@ -1577,6 +1605,8 @@ describe('OrderController', function() {
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}] };
       agent
         .post('/order/' + orderId + "/adjust")
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
         .send({orders : dishObj, subtotal : price1 * 1, mealId : mealId, delivery_fee : 0})
         .expect(200)
         .end(function(err,res){
@@ -1585,6 +1615,8 @@ describe('OrderController', function() {
           }
           var tax = Math.round(price1 * 0.085 * 100);
           res.body.tax.should.be.equal(tax);
+          res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal(100);
+          res.body.feeCharges[Object.keys(res.body.feeCharges)[1]].should.be.equal((price2 * 0.2) * 100);
           done();
         })
     })
@@ -1656,6 +1688,7 @@ describe('OrderController', function() {
           }
           res.body.tax.should.be.equal(price3 * 0.085 * 100);
           res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + 1) * 100);
+          res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal((price3 * 0.2 + 1) * 100);
           res.body.customerPhone.should.be.equal(customerPhone);
           res.body.customerName.should.be.equal(customerName);
           res.body.isExpressCheckout.should.be.false();
@@ -1675,7 +1708,11 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body.paymentMethod.should.be.equal('cash');
+          res.body.should.have.property('feeCharges');
+          Object.keys(res.body.feeCharges).should.have.length(1);
+          res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal(0);
           res.body.charges['cash'].should.be.equal(0);
+          res.body.application_fees['cash'].should.be.equal(0);
           done();
         })
     });
@@ -1728,7 +1765,7 @@ describe('OrderController', function() {
             console.log(err);
             return done(err);
           }
-          if(res.body.meals.length == 0){
+          if(res.body.meals.length === 0){
             return done(Error("error getting any meal"));
           }
           var meal = res.body.meals[1];
@@ -1813,7 +1850,7 @@ describe('OrderController', function() {
             console.log(err);
             return done(err);
           }
-          if(res.body.meals.length == 0){
+          if(res.body.meals.length === 0){
             return done(Error("error getting any meal"));
           }
           var meal = res.body.meals[1];

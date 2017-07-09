@@ -5,7 +5,7 @@
 var geocoderProvider = 'google';
 var httpAdapter = 'https';
 var extra = {
-  apiKey: 'AIzaSyC-VZJQI2nbr25QpGJBJh8LMFum4l3x2t4', // for Mapquest, OpenCage, Google Premier
+  apiKey: 'AIzaSyC5vopyoqRXjpYBRgtrjCXtnxGCNGWfnMk', // for Mapquest, OpenCage, Google Premier
   formatter: null         // 'gpx', 'string', ...
 };
 var geocoder = require('node-geocoder')(geocoderProvider, httpAdapter, extra);
@@ -45,7 +45,8 @@ module.exports = {
       if (err) {
         return cb(err);
       }
-      if(res.length == 0 ){
+      sails.log.info("respond:" + res);
+      if(res.length === 0 ){
         return cb("cannot connect to Internet");
       }
       var userLoc = {lat : res[0].latitude, long: res[0].longitude};
@@ -53,7 +54,7 @@ module.exports = {
         if(err){
           return cb(err);
         }
-        if(res.length == 0){
+        if(res.length === 0){
           return cb("cannot connect to Internet");
         }
         var deliveryLoc = {lat : res[0].latitude, long: res[0].longitude};

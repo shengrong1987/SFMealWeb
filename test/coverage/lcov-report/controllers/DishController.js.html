@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">76.39% </span>
+        <span class="strong">68.06% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>55/72</span>
+        <span class='fraction'>49/72</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">53.49% </span>
+        <span class="strong">48.84% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>23/43</span>
+        <span class='fraction'>21/43</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">90.91% </span>
+        <span class="strong">81.82% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>20/22</span>
+        <span class='fraction'>18/22</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">76.39% </span>
+        <span class="strong">68.06% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>55/72</span>
+        <span class='fraction'>49/72</span>
       </div>
     </div>
   </div>
@@ -251,22 +251,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2×</span>
-<span class="cline-any cline-yes">2×</span>
-<span class="cline-any cline-yes">2×</span>
-<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -274,16 +274,16 @@
 <span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-yes">6×</span>
-<span class="cline-any cline-yes">6×</span>
-<span class="cline-any cline-yes">6×</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -296,8 +296,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2×</span>
-<span class="cline-any cline-yes">6×</span>
-<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-yes">9×</span>
@@ -386,15 +386,15 @@ module.exports = {
     });
   },
 &nbsp;
-  search : function(req, res){
-    var keyword = req.query.keyword;
-    delete req.query.keyword;
-    Dish.find(req.query).exec(function(err,found){
-      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+  search : <span class="fstat-no" title="function not covered" >function(req, res){</span>
+<span class="cstat-no" title="statement not covered" >    var keyword = req.query.keyword;</span>
+<span class="cstat-no" title="statement not covered" >    delete req.query.keyword;</span>
+<span class="cstat-no" title="statement not covered" >    Dish.find(req.query).exec(<span class="fstat-no" title="function not covered" >function(err,found){</span></span>
+<span class="cstat-no" title="statement not covered" >      if(err){</span>
 <span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
       }
 &nbsp;
-      <span class="missing-if-branch" title="if path not taken" >I</span>if(keyword) {
+<span class="cstat-no" title="statement not covered" >      if(keyword) {</span>
 <span class="cstat-no" title="statement not covered" >        found = found.filter(<span class="fstat-no" title="function not covered" >function(dish){</span></span>
 <span class="cstat-no" title="statement not covered" >          if(dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){</span>
 <span class="cstat-no" title="statement not covered" >            return true;</span>
@@ -402,7 +402,7 @@ module.exports = {
 <span class="cstat-no" title="statement not covered" >          return false;</span>
         });
       }
-      return res.ok(found);
+<span class="cstat-no" title="statement not covered" >      return res.ok(found);</span>
     });
   },
 &nbsp;
@@ -457,7 +457,7 @@ module.exports = {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jun 29 2017 15:17:45 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jul 07 2017 14:40:27 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

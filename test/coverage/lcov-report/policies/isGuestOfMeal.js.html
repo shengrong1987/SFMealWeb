@@ -20,28 +20,28 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">80.95% </span>
+        <span class="strong">9.52% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>17/21</span>
+        <span class='fraction'>2/21</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">66.67% </span>
+        <span class="strong">0% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>8/12</span>
+        <span class='fraction'>0/12</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">100% </span>
+        <span class="strong">0% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>5/5</span>
+        <span class='fraction'>0/5</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">80.95% </span>
+        <span class="strong">9.52% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>17/21</span>
+        <span class='fraction'>2/21</span>
       </div>
     </div>
   </div>
-  <div class='status-line high'></div>
+  <div class='status-line low'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -100,31 +100,31 @@
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5×</span>
-<span class="cline-any cline-yes">5×</span>
-<span class="cline-any cline-yes">5×</span>
-<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5×</span>
-<span class="cline-any cline-yes">5×</span>
-<span class="cline-any cline-yes">35×</span>
-<span class="cline-any cline-yes">35×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">35×</span>
-<span class="cline-any cline-yes">10×</span>
-<span class="cline-any cline-yes">10×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">25×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5×</span>
-<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -141,34 +141,34 @@
  *
  */
 var async = require('async');
-module.exports = function(req, res, next) {
+module.exports = <span class="fstat-no" title="function not covered" >function(req, res, next) {</span>
   // User is allowed, proceed to the next policy,
   // or if this is the lagrunt st policy, the controller
-  var userId = req.session.user.id;
-  var meal = req.param('id') || req.body.meal;
-  User.findOne(userId).populate("orders").exec(function(err,user){
-    <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >  var userId = req.session.user.id;</span>
+<span class="cstat-no" title="statement not covered" >  var meal = req.param('id') || req.body.meal;</span>
+<span class="cstat-no" title="statement not covered" >  User.findOne(userId).populate("orders").exec(<span class="fstat-no" title="function not covered" >function(err,user){</span></span>
+<span class="cstat-no" title="statement not covered" >    if(err){</span>
 <span class="cstat-no" title="statement not covered" >      return res.badRequest(err);</span>
     }
-    var guestOfMeal = false;
-    async.each(user.orders, function(o, loopNext){
-      Order.findOne(o.id).exec(function(err, order){
-        <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+<span class="cstat-no" title="statement not covered" >    var guestOfMeal = false;</span>
+<span class="cstat-no" title="statement not covered" >    async.each(user.orders, <span class="fstat-no" title="function not covered" >function(o, loopNext){</span></span>
+<span class="cstat-no" title="statement not covered" >      Order.findOne(o.id).exec(<span class="fstat-no" title="function not covered" >function(err, order){</span></span>
+<span class="cstat-no" title="statement not covered" >        if(err){</span>
 <span class="cstat-no" title="statement not covered" >          return loopNext(err);</span>
         }
-        if(order.meal == meal){
-          guestOfMeal = true;
-          loopNext();
+<span class="cstat-no" title="statement not covered" >        if(order.meal == meal){</span>
+<span class="cstat-no" title="statement not covered" >          guestOfMeal = true;</span>
+<span class="cstat-no" title="statement not covered" >          loopNext();</span>
         }else{
-          return loopNext();
+<span class="cstat-no" title="statement not covered" >          return loopNext();</span>
         }
       })
-    }, function(err){
-      <span class="missing-if-branch" title="if path not taken" >I</span>if(err){
+    }, <span class="fstat-no" title="function not covered" >function(err){</span>
+<span class="cstat-no" title="statement not covered" >      if(err){</span>
 <span class="cstat-no" title="statement not covered" >        return res.badRequest(err);</span>
       }
-      <span class="missing-if-branch" title="else path not taken" >E</span>if(guestOfMeal){
-        next();
+<span class="cstat-no" title="statement not covered" >      if(guestOfMeal){</span>
+<span class="cstat-no" title="statement not covered" >        next();</span>
       }else{
 <span class="cstat-no" title="statement not covered" >        res.forbidden("You are not guests of the meal.");</span>
       }
@@ -181,7 +181,7 @@ module.exports = function(req, res, next) {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jun 29 2017 15:17:45 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jul 07 2017 14:40:27 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

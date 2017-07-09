@@ -54,7 +54,7 @@
           <%}});%>
         </td>
         <td><%= order.customerPhone%></td>
-        <td><%= order.address%></td>
+        <td><%= order.contactInfo.address%></td>
         <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
       </tr>
       <%}})%>

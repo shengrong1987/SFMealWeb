@@ -20,14 +20,14 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">81.82% </span>
+        <span class="strong">57.58% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>27/33</span>
+        <span class='fraction'>19/33</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">86% </span>
+        <span class="strong">62% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>43/50</span>
+        <span class='fraction'>31/50</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -35,13 +35,13 @@
         <span class='fraction'>2/2</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">81.82% </span>
+        <span class="strong">57.58% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>27/33</span>
+        <span class='fraction'>19/33</span>
       </div>
     </div>
   </div>
-  <div class='status-line high'></div>
+  <div class='status-line medium'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -111,14 +111,14 @@
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">29×</span>
-<span class="cline-any cline-yes">29×</span>
-<span class="cline-any cline-yes">29×</span>
-<span class="cline-any cline-yes">29×</span>
-<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">28×</span>
+<span class="cline-any cline-yes">28×</span>
+<span class="cline-any cline-yes">28×</span>
+<span class="cline-any cline-yes">28×</span>
+<span class="cline-any cline-yes">28×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-yes">28×</span>
 <span class="cline-any cline-yes">7×</span>
 <span class="cline-any cline-yes">7×</span>
 <span class="cline-any cline-yes">5×</span>
@@ -127,29 +127,29 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">20×</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19×</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">17×</span>
-<span class="cline-any cline-yes">2×</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">18×</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -183,7 +183,7 @@ module.exports = function(req, res, next) {
       }else{
         return res.forbidden('You are not permitted to perform this action.');
       }
-    }else if(action == "adjust" || action == "cancel" || action == "adjust-form"){
+    }else <span class="missing-if-branch" title="else path not taken" >E</span>if(action == "adjust" || action == "cancel" || action == "adjust-form"){
       if(order.status != "schedule" &amp;&amp; order.status != "preparing"){
         return res.forbidden('order can only be adjusted at schedule or preparing');
       }
@@ -191,21 +191,21 @@ module.exports = function(req, res, next) {
         return res.forbidden(req.__('order-adjust-cancel-at-schedule-by-host'));
       }
       return next();
-    }else if(action == "ready"){
-      <span class="missing-if-branch" title="if path not taken" >I</span>if(order.status != "preparing"){
+    }else <span class="cstat-no" title="statement not covered" >if(action == "ready"){</span>
+<span class="cstat-no" title="statement not covered" >      if(order.status != "preparing"){</span>
 <span class="cstat-no" title="statement not covered" >        return res.forbidden("order can only be ready at preparing");</span>
-      }else <span class="missing-if-branch" title="if path not taken" >I</span>if(!hostId || hostId != order.host.id){
+      }else <span class="cstat-no" title="statement not covered" >if(!hostId || hostId != order.host.id){</span>
 <span class="cstat-no" title="statement not covered" >        return res.forbidden("you are not permitted to perform this action");</span>
       }
-      return next();
-    }else <span class="missing-if-branch" title="else path not taken" >E</span>if(action == "receive"){
-      <span class="missing-if-branch" title="if path not taken" >I</span>if(order.status != "ready"){
+<span class="cstat-no" title="statement not covered" >      return next();</span>
+    }else <span class="cstat-no" title="statement not covered" >if(action == "receive"){</span>
+<span class="cstat-no" title="statement not covered" >      if(order.status != "ready"){</span>
 <span class="cstat-no" title="statement not covered" >        return res.forbidden("order can only be received when ready");</span>
       }
-      <span class="missing-if-branch" title="if path not taken" >I</span>if(!hostId || hostId != order.host.id){
+<span class="cstat-no" title="statement not covered" >      if(!hostId || hostId != order.host.id){</span>
 <span class="cstat-no" title="statement not covered" >        return res.forbidden("you are not permitted to perform this action");</span>
       }
-      return next();
+<span class="cstat-no" title="statement not covered" >      return next();</span>
     }else{
 <span class="cstat-no" title="statement not covered" >      return res.forbidden('unauthorized action');</span>
     }
@@ -217,7 +217,7 @@ module.exports = function(req, res, next) {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jun 29 2017 15:17:45 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jul 07 2017 14:40:27 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

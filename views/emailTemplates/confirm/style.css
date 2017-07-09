@@ -9587,6 +9587,11 @@ fieldset[disabled] .btn-red.active {
   padding-left: 15px;
   margin-left: 0;
 }
+.scroll-container {
+  max-height: 200px;
+  overflow: -moz-scrollbars-vertical;
+  overflow: auto;
+}
 .dropdown-backdrop {
   position: static;
 }

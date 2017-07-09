@@ -7,6 +7,7 @@
 
 var stripe = require("../services/stripe.js");
 var moment = require("moment");
+var async = require("async");
 
 module.exports = {
 
@@ -54,6 +55,8 @@ module.exports = {
   },
 
   composeTransfer : function(transfer, order, host){
+    host.pocket = null;
+    host.orders = null;
     var date = moment(transfer.created * 1000);
     transfer.month = moment.months()[date.month()];
     transfer.day = date.date();
@@ -61,6 +64,24 @@ module.exports = {
     transfer.host = host;
     transfer.paymentMethod = "online";
     return transfer;
+  },
+
+  composeFee : function(fee, order, host){
+    host.pocket = null;
+    host.orders = null;
+    var date = moment(fee.created * 1000);
+    fee.month = moment.months()[date.month()];
+    fee.day = date.date();
+    fee.type = "type-fee";
+    fee.host = host;
+    fee.paymentMethod = "cash";
+    fee.deliveryFee = order.delivery_fee;
+    fee.metadata = {
+      orderId : order.id,
+      deliveryFee : order.delivery_fee,
+      tax : order.tax
+    }
+    return fee;
   },
 
   createOrGetPocket : function(user, host, isHost, cb){
@@ -190,10 +211,10 @@ module.exports = {
 
   getHostBalance : function(req, res){
     var _this = this;
-    if(req.session.user.auth.email != "admin@sfmeal.com" && req.params.id){
+    if(req.session.user.auth.email !== "admin@sfmeal.com" && req.params.id){
       return res.forbidden();
     }
-    var isAdmin = req.session.user.auth.email == "admin@sfmeal.com";
+    var isAdmin = req.session.user.auth.email === "admin@sfmeal.com";
     var hostId = isAdmin ? req.params.id : (req.session.user.host.id ? req.session.user.host.id : req.session.user.host);
     Host.findOne(hostId).populate("orders").populate('user').populate('pocket').exec(function(err, host){
       if(err || !host){
@@ -217,56 +238,105 @@ module.exports = {
           }
           var transactions = [];
           async.each(host.orders, function (order, cb) {
+            if(order.status === "cancel"){
+              return cb();
+            }
             var charges = order.charges;
             var transfer = order.transfer;
-            async.each(Object.keys(charges), function(chargeId , next){
-              stripe.retrieveCharge(chargeId, function(err, charge){
-                if(err){
-                  return next(err);
+            var feeCharges = order.feeCharges;
+            sails.log.info("begin retrieving order: " + order.id);
+            async.auto({
+              retrieveCharge : function(next){
+                if(!charges){
+                  return next();
                 }
-                charge = _this.composeCharge(charge, order, host);
-                charge.type = "type-payment";
-                stripe.retrieveApplicationFee(charge.application_fee, function(err, fee){
-                  if(err){
-                    return next(err);
-                  }
-                  if(chargeId == "cash"){
-                    charge.application_fee = order.application_fees['cash'];
-                  }else{
-                    charge.application_fee = fee.amount - fee.amount_refunded;
-                  }
-                  transactions.push(charge);
-                  next();
-                });
-              });
-            },function(err){
-              if(err){
-                return cb(err);
-              }
-              if(transfer){
-                Host.findOne(transfer.metadata.hostId).exec(function(err, host) {
+                async.each(Object.keys(charges), function(chargeId , next2){
+                  stripe.retrieveCharge(chargeId, function(err, charge){
+                    if(err){
+                      return next2(err);
+                    }
+                    charge.type = "type-payment";
+                    charge = _this.composeCharge(charge, order, host);
+                    stripe.retrieveApplicationFee(charge.application_fee, function(err, fee){
+                      if(err){
+                        return next2(err);
+                      }
+                      if(chargeId === "cash"){
+                        charge.application_fee = order.application_fees['cash'];
+                      }else{
+                        charge.application_fee = fee.amount - fee.amount_refunded;
+                      }
+                      transactions.push(charge);
+                      next2();
+                    });
+                  });
+                }, function(err){
                   if (err) {
                     return next(err);
                   }
-
-                  transfer = _this.composeTransfer(transfer, order, host);
-                  stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee){
-                    if(err){
-                      return cb(err);
-                    }
-                    if(fee){
-                      transfer.application_fee = fee.application_fee - fee.amount_refunded;
-                    }else{
-                      transfer.application_fee = 0;
-                    }
-                    transactions.push(transfer);
-                    cb();
-                  })
+                  sails.log.info("finish retrieving charges");
+                  next();
                 });
-              }else{
-                cb();
+              },
+              retrieveTransfer : function(next){
+                if(!transfer){
+                  return next();
+                }
+                async.each(Object.keys(transfer), function(transferId, next2){
+                  stripe.retrieveTransfer(transferId, function(err, tran){
+                    if(err){
+                      return next2(err);
+                    }
+                    tran = _this.composeTransfer(tran, order, host);
+                    stripe.retrieveApplicationFee(tran.application_fee, function(err, fee){
+                      if(err){
+                        return next2(err);
+                      }
+                      if(fee){
+                        tran.application_fee = fee.application_fee - fee.amount_refunded;
+                      }else{
+                        tran.application_fee = 0;
+                      }
+                      transactions.push(tran);
+                      next2();
+                    })
+                  })
+                }, function(err){
+                  if(err){
+                    return next(err);
+                  }
+                  sails.log.info("finish retrieving transfer");
+                  next();
+                });
+              },
+              retrieveFee : function(next){
+                if(!feeCharges){
+                  return next();
+                }
+                async.each(Object.keys(feeCharges), function(chargeId, next2){
+                  stripe.retrieveCharge(chargeId, function(err, fee){
+                    if(err){
+                      return next2(err);
+                    }
+                    fee = _this.composeFee(fee, order, host);
+                    transactions.push(fee);
+                    next2();
+                  });
+                }, function(err){
+                  if(err){
+                    return next(err);
+                  }
+                  sails.log.info("finish retrieving fees");
+                  next();
+                })
               }
-            });
+            }, function(err){
+              if(err){
+                return cb(err);
+              }
+              sails.log.info("finish retrieving an order: " + order.id);
+              cb();
+            })
           },function(err){
             if(err){
               return res.badRequest(err);
@@ -301,27 +371,7 @@ module.exports = {
                   if(err){
                     return cb(err);
                   }
-                  if(!transfer){
-                    return cb();
-                  }
-                  Host.findOne(transfer.metadata.hostId).exec(function(err, host) {
-                    if (err) {
-                      return next(err);
-                    }
-                    transfer = _this.composeTransfer(transfer, order, host);
-                    stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee){
-                      if(err){
-                        return cb(err);
-                      }
-                      if(fee){
-                        transfer.application_fee = fee.application_fee - fee.amount_refunded;
-                      }else{
-                        transfer.application_fee = 0;
-                      }
-                      transactions.push(transfer);
-                      cb();
-                    })
-                  });
+                  cb();
                 });
               }, function (err) {
                 if(err){

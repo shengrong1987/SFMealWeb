@@ -2633,7 +2633,7 @@ var MealConfirmView = Backbone.View.extend({
     }
   },
   onKeyDown : function(e){
-    if(e.which == 13) e.preventDefault();
+    if(e.which === 13) e.preventDefault();
   },
   initDelivery : function(cb){
     var range = this.$el.data("range");

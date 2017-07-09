@@ -343,7 +343,7 @@
     </div>
 
       <div class="col-md-4">
-        <div class="box white floater static-floater" style="margin-left:-15px;">
+        <div class="box white floater static-floater">
           <div id="order-alert" class="alert alert-danger hide" role="alert">
             <%= __('dish-out-tips')%>
           </div>
@@ -355,18 +355,19 @@
           <table id="order" class="table tableBodyScroll" data-err-container="#order-alert">
             <thead>
             <tr>
-              <th><%= __('name')%></th>
+              <th><%= __('name')%><i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" data-placement="buttom" title="<%= __('order-list-tip')%>"></i></th>
               <td><%= __('price')%></td>
               <td><%= __('quantity')%></td>
             </tr>
             </thead>
-            <tbody class="scroll">
+
+            <tbody id="toOrderList" class="scroll">
             <%
               var dishes = meal.dishes;
               for(var i=0; i < dishes.length; i++){
                 var dish = dishes[i];
             %>
-            <tr class="success item" data-id=<%= dish.id %> data-left-amount=<%= meal.isPartyMode === true ? "100" : meal.leftQty[dish.id] %>>
+            <tr class="item" data-id=<%= dish.id %> data-left-amount=<%= meal.isPartyMode === true ? "100" : meal.leftQty[dish.id] %>>
               <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span> </td>
               <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
               <td>
@@ -376,6 +377,12 @@
               </td>
             </tr>
             <% }%>
+            <tr>
+              <th class="text-center">
+                <button class="btn btn-green" id="expandMenuBtn" onclick="refreshOrderList(true, true)"><%= __('order-more')%></button>
+                <button class="btn btn-green" id="collapseMenuBtn" onclick="refreshOrderList(true, true)"><%= __('order-less')%></button>
+              </th>
+            </tr>
             </tbody>
             <tbody>
             <tr></tr>
@@ -414,11 +421,15 @@
             </tbody>
           </table>
 
-          <button type="button" data-id="<%= meal.id%>" class="btn btn-red" onclick="javascript:location.href='/meal/' + $(this).data('id') + '/confirm' + '<%= meal.isPartyMode === true ? '?party=true' : ''%>'"><%= __('checkout')%></button>
+          <div class="row">
+            <div class="col-xs-12">
+              <button type="button" data-id="<%= meal.id%>" class="btn btn-red" onclick="javascript:location.href='/meal/' + $(this).data('id') + '/confirm' + '<%= meal.isPartyMode === true ? '?party=true' : ''%>'"><%= __('checkout')%></button>
+            </div>
+          </div>
 
           <div id="orderAlertView" class="alert alert-danger hide" style="margin-top: 10px;"></div>
 
-          <div style="max-height: 200px;overflow: -moz-scrollbars-vertical;overflow: auto;">
+          <div class="scroll-container">
             <table id="confirm-order" class="table text-grey" style="margin-top: 10px;">
               <thead class="text-left">
               <tr><td><b><%= __('meal-orders')%></b></td></tr>

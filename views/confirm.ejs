@@ -531,7 +531,7 @@
               <%= __('no-meal-left') %>
             </div>
           <%}%>
-          <button type="button" data-action="takeOrder" class="btn btn-danger red"><%= __('placeorder') %></button>
+          <button type="button" data-action="takeOrder" class="btn btn-red xs-hide"><%= __('placeorder') %></button>
 
           <table id="order" class="table tableBodyScroll" data-meal="<%= meal.id%>" data-party="<%= meal.isPartyMode%>" data-minimal="<%= meal.partyRequirement ? meal.partyRequirement['minimal'] : 0%>" data-err-container="#alert-order">
             <thead>
@@ -557,6 +557,12 @@
               </td>
             </tr>
             <% }%>
+            <tr>
+              <th class="text-center">
+                <button class="btn btn-green" id="expandMenuBtn" onclick="refreshOrderList(true, true)"><%= __('order-more')%></button>
+                <button class="btn btn-green" id="collapseMenuBtn" onclick="refreshOrderList(true, true)"><%= __('order-less')%></button>
+              </th>
+            </tr>
             </tbody>
             <tbody>
             <tr></tr>
@@ -641,5 +647,4 @@
   var addressView = new AddressView({ el : $("#meal-confirm-container"), model : new User()})
   var mealConfirmView = new MealConfirmView( { el : $("#meal-confirm-container"), model : new Meal()})
   new ContactInfoView({ el : $("#contactInfoView"), model : new User()});
-  setup();
 </script>

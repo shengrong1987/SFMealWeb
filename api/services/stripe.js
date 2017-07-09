@@ -130,7 +130,7 @@ module.exports = {
     //declare all fees
     var delivery_application_fee = (attr.method && attr.method == "delivery" && meal.isDeliveryBySystem) ? SYSTEM_DELIVERY_FEE : 0;
     var delivery_fee = attr.deliveryFee || 0;
-    var discount = attr.discount;
+    var discount = attr.discount || 0;
     var tax = attr.tax;
 
     sails.log.info("delivery application fee is: " + delivery_application_fee);
@@ -151,67 +151,78 @@ module.exports = {
     //apply discount
     var total = originalTotal - discount;
 
-    if(attr.paymentMethod == "cash"){
-      return cb(null, { id : 'cash', status : 'succeeded', amount : total, application_fee : application_fee});
-    }
-
-    var $this = this;
-    stripe.charges.create({
-      amount: total,
-      currency: "usd",
-      receipt_email: attr.email,
-      customer: attr.customerId,
-      destination : attr.destination,
-      metadata : attr.metadata,
-      application_fee : application_fee
-    }, function (err, charge) {
-      if(err){
-        return cb(err);
-      }
-      if(discount != 0){
-        $this.retrieveApplicationFee(charge.application_fee, function(err, fee){
-          if(err){
-            return cb(err);
-          }
-          var leftFee = application_fee - fee.amount;
-          sails.log.info("charge remain application fee: " + leftFee);
-          stripe.transfers.create(
-            {
-              amount: discount,
-              currency: 'usd',
-              destination: attr.destination,
-              application_fee : leftFee,
-              metadata : attr.metadata
-            }, function(err, transfer){
-              if(err){
-                return cb(err);
-              }
-              sails.log.info("extra transfer created: " + transfer.amount);
-              $this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
+    if(attr.paymentMethod === "cash"){
+      attr.metadata.total = total;
+      stripe.charges.create({
+        amount : application_fee,
+        currency : 'usd',
+        source : attr.destination,
+        metadata : attr.metadata
+      }, function(err, charge){
+        if(err){
+          return cb(err);
+        }
+        return cb(null, { id : 'cash', status : 'succeeded', amount : total, application_fee : application_fee}, charge);
+      });
+    }else{
+      var $this = this;
+      stripe.charges.create({
+        amount: total,
+        currency: "usd",
+        receipt_email: attr.email,
+        customer: attr.customerId,
+        destination : attr.destination,
+        metadata : attr.metadata,
+        application_fee : application_fee
+      }, function (err, charge) {
+        if(err){
+          return cb(err);
+        }
+        if(discount !== 0){
+          $this.retrieveApplicationFee(charge.application_fee, function(err, fee){
+            if(err){
+              return cb(err);
+            }
+            var leftFee = application_fee - fee.amount;
+            sails.log.info("charge remain application fee: " + leftFee);
+            stripe.transfers.create(
+              {
+                amount: discount,
+                currency: 'usd',
+                destination: attr.destination,
+                application_fee : leftFee,
+                metadata : attr.metadata
+              }, function(err, transfer){
                 if(err){
                   return cb(err);
                 }
-                cb(null, charge, transfer);
-              });
-            }
-          );
-        });
-      }else{
-        if(!attr.metadata.userId){
-          return cb(null, charge);
-        }
-        $this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
-          if(err){
-            return cb(err);
+                sails.log.info("extra transfer created: " + transfer.amount);
+                $this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
+                  if(err){
+                    return cb(err);
+                  }
+                  cb(null, charge, transfer);
+                });
+              }
+            );
+          });
+        }else{
+          if(!attr.metadata.userId){
+            return cb(null, charge);
           }
-          cb(null, charge);
-        });
-      }
-    });
+          $this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
+            if(err){
+              return cb(err);
+            }
+            cb(null, charge);
+          });
+        }
+      });
+    }
   },
 
   handlePoint : function(charge, userId, isCharge, cb){
-    if(charge.status != "succeeded"){
+    if(charge.status !== "succeeded"){
       return cb();
     }
     User.findOne(userId).exec(function(err, user){
@@ -223,7 +234,7 @@ module.exports = {
       if(isCharge){
         var newPoints = points + earnedPoints;
       }else{
-        var newPoints = points - earnedPoints;
+        newPoints = points - earnedPoints;
       }
       sails.log.info("user old points: " + points);
       sails.log.info("points difference: " + earnedPoints);
@@ -233,8 +244,33 @@ module.exports = {
     })
   },
 
+  batchRefund : function(refunds, metadata, cb){
+    var _this = this;
+    var refundsId = Object.keys(refunds);
+    async.each(refundsId, function(refundId, next){
+      if(refunds[refundId] === 0){
+        return next();
+      }
+      _this.refund({
+        id : refundId,
+        amount : refunds[refundId],
+        metadata : metadata
+      },function(err, refund){
+        if(err){
+          return next(err);
+        }
+        next();
+      });
+    },function(err){
+      if(err){
+        return cb(err);
+      }
+      cb();
+    })
+  },
+
   refund : function(attr, cb){
-    if(attr.paymentMethod == "cash"){
+    if(attr.id === "cash"){
       return cb(null, { amount : attr.amount });
     }
     var $this = this;
@@ -242,11 +278,15 @@ module.exports = {
     stripe.refunds.create({
       charge : attr.id,
       amount : attr.amount,
-      reverse_transfer : true,
-      refund_application_fee : true
+      metadata : attr.metadata,
+      reverse_transfer : attr.metadata.reverse_transfer || false,
+      refund_application_fee : attr.metadata.refund_application_fee || false
     },function(err,refund) {
       if(err){
         return cb(err);
+      }
+      if(!attr.metadata.userId){
+        return cb(null, refund);
       }
       $this.handlePoint(refund, attr.metadata.userId, false, function(err, user){
         if(err){
