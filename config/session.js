@@ -56,7 +56,7 @@ module.exports.session = {
   port: 6379,
   // ttl: <redis session TTL in seconds>,
   // db: 2
-  pass: process.env.REDIS_SERVER_PWD
+  pass: process.env.NODE_ENV === 'production' ? process.env.REDIS_SERVER_PWD : ''
   // prefix: 'sess:',
 
 
