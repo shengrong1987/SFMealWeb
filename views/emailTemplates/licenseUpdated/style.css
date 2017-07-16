@@ -9272,7 +9272,7 @@ fieldset[disabled] .btn-red.active {
 .meal .desc {
   top: 50px;
   line-height: 50px;
-  width: 100px;
+  width: 40%;
 }
 .meal .fav {
   right: 40px;
@@ -9294,7 +9294,7 @@ fieldset[disabled] .btn-red.active {
 .meal-box.meal .desc {
   top: 35%;
   line-height: 50px;
-  width: 100px;
+  width: 40%;
 }
 .meal-box.meal .fav {
   right: 40px;
@@ -9305,7 +9305,7 @@ fieldset[disabled] .btn-red.active {
 .preorder-box.meal .desc {
   top: 30px;
   line-height: 40px;
-  width: 100px;
+  width: 40%;
 }
 .preorder-box.meal .fav {
   right: 10px;
