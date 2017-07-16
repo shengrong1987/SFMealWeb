@@ -5,9 +5,7 @@
 
 var React = require('react'),
   TablePanel = require('./TablePanel'),
-  Tab = require('./Tab'),
-  UserStore = require('../stores/UserStore'),
-  ActionCreators = require('../actions/ActionCreators');
+  Tab = require('./Tab')
 
 var AdminPanel = React.createClass({
 

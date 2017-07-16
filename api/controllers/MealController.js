@@ -9,6 +9,7 @@ var GeoCoder = require("../services/geocode.js");
 var moment = require("moment");
 var notification = require("../services/notification");
 var util = require("../services/util");
+var stripe = require("../services/stripe");
 /*
  error
  * -1 : geo service not available
@@ -276,7 +277,7 @@ module.exports = {
               return res.badRequest(err);
             }
             m.isPartyMode = true;
-            m.delivery_range = m.delivery_range * 5;
+            m.delivery_range = m.delivery_range * stripe.PARTY_ORDER_RANGE_MULTIPLIER;
             m.delivery_fee = 0;
             m.dishes = dishes;
             cb();
@@ -315,8 +316,8 @@ module.exports = {
   off : function(req, res){
     var mealId = req.param("id");
     var user = req.session.user;
-    var hostId = user.host.id || user.host;
     var isAdmin = user.auth.email === 'admin@sfmeal.com';
+    var hostId;
     var $this = this;
     Order.find({meal : mealId, status : { '!' : ['complete','review','cancel']}}).exec(function(err,orders){
       if(err){
@@ -327,20 +328,39 @@ module.exports = {
         return res.badRequest({ code : -4, responseText : req.__('meal-active-error')});
       }
 
-      Meal.update({id : mealId},{status : "off", isScheduled : false, chef : hostId }).exec(function(err, meal){
+      async.auto({
+        findHost : function(next){
+          if(!isAdmin){
+            hostId = user.host.id || user.host;
+            return next();
+          }
+          Meal.findOne(mealId).exec(function(err, meal){
+            if(err){
+              return next(err);
+            }
+            hostId = meal.chef;
+            next();
+          });
+        }
+      }, function(err){
         if(err){
           return res.badRequest(err);
         }
-        $this.cancelMealJobs( mealId, function(err){
+        Meal.update({id : mealId },{status : "off", isScheduled : false, chef : hostId }).exec(function(err, meal){
           if(err){
             return res.badRequest(err);
           }
-          if(isAdmin) {
-            return res.ok(meal);
-          }
-          return res.redirect("/host/me#mymeal");
+          $this.cancelMealJobs(mealId, function(err){
+            if(err){
+              return res.badRequest(err);
+            }
+            if(isAdmin) {
+              return res.ok(meal[0]);
+            }
+            return res.redirect("/host/me#mymeal");
+          });
         });
-      });
+      })
 
     });
   },
@@ -437,7 +457,7 @@ module.exports = {
                   return res.badRequest(err);
                 }
                 req.body = params;
-                req.body.commision = host.commision;
+                req.body.commission = host.commission;
                 req.body.chef = host.id;
                 if(req.body.status == 'on'){
                   host.checkGuideRequirement(function(err){
@@ -683,7 +703,7 @@ module.exports = {
       if(err){
         return cb(err);
       }
-      if(counties.length != 0){
+      if(counties.length !== 0){
         params.county = counties.join("+");
       }
       sails.log.info("counties are: " + counties.join("+"))
@@ -706,15 +726,15 @@ module.exports = {
   },
 
   requirementIsValid : function(params, meal, req, cb){
-    var minOrderNumber = parseInt(params.minimalOrder);
-    var minOrderTotal = parseFloat(params.minimalTotal);
-    if(!minOrderNumber && !minOrderTotal){
-      console.log("minimal order number and minimal order bill amount are required(one of them)");
-      return cb({ code : -6, responseText : req.__('')});
-    }
+    // var minOrderNumber = parseInt(params.minimalOrder);
+    // var minOrderTotal = parseFloat(params.minimalTotal);
+    // if(!minOrderNumber && !minOrderTotal){
+    //   console.log("minimal order number and minimal order bill amount are required(one of them)");
+    //   return cb({ code : -6, responseText : req.__('')});
+    // }
     var type = params.type;
-    if(params.isDelivery && type == 'preorder' && !JSON.parse(params.pickups).some(function(pickup){
-        return pickup.method == 'delivery';
+    if(params.isDelivery && type === 'preorder' && !JSON.parse(params.pickups).some(function(pickup){
+        return pickup.method === 'delivery';
       })){
       sails.log.debug("support delivery but no delivery time was added");
       return cb({ code : -13, responseText : req.__('meal-delivery-lack-of-method')});
@@ -730,7 +750,7 @@ module.exports = {
     }
 
     if(!params.isDelivery && params.pickups && JSON.parse(params.pickups).some(function(pickup){
-      return pickup.method == "delivery";})
+      return pickup.method === "delivery";})
     ){
       return cb({ code : -12, responseText : req.__('meal-delivery-conflict')});
     }
@@ -739,7 +759,7 @@ module.exports = {
 
   dishIsValid : function(params, cb){
     var dishes = params.dishes.split(",");
-    if(dishes.length == 0){
+    if(dishes.length === 0){
       return cb(false);
     }
     async.each(dishes, function(dishId, next){
@@ -781,15 +801,12 @@ module.exports = {
           if(pickupFromTime >= pickupTillTime){
             console.log("pickup time not valid");
             valid = false;
-            return;
           }else if(moment.duration(moment(pickupTillTime).diff(moment(pickupFromTime))).asMinutes() < 30){
             console.log("pickup time too short");
             valid = false;
-            return;
-          }else if(pickupFromTime <= provideTillTime && params.type == "preorder"){
+          }else if(pickupFromTime <= provideTillTime && params.type === "preorder"){
             console.log("pickup time too early");
             valid = false;
-            return;
           }
         }
       });
@@ -907,7 +924,7 @@ module.exports = {
             }
             meal.dishes = dishes;
             meal.isPartyMode = true;
-            meal.delivery_range = meal.delivery_range * 5;
+            meal.delivery_range = meal.delivery_range * stripe.PARTY_ORDER_RANGE_MULTIPLIER;
             cb();
           });
         },

@@ -121,7 +121,7 @@
           trafficModel: "optimistic"
         }
       }, function(response, status){
-        if (status == google.maps.DirectionsStatus.OK) {
+        if (status === google.maps.DirectionsStatus.OK) {
           utility.directionsDisplay.setDirections(response);
           var distance = response.routes[0].legs[0].distance.value * 0.0006;
           return cb(null, distance);

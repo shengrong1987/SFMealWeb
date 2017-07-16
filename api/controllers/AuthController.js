@@ -112,7 +112,7 @@ module.exports = require('waterlock').waterlocked({
 
     sails.log.info(sha1Str, signature);
 
-    if (sha1Str == signature) {
+    if (sha1Str === signature) {
       res.set('Content-Type', 'text/plain');
       sails.log.info('validation success');
       return res.ok(echostr);

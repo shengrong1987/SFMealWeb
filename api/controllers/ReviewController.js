@@ -26,7 +26,7 @@ module.exports = {
       var orders = user.orders.filter(function(order){
         return order.status == "review" && order.customer == userId;
       });
-      if(orders.length == 0){
+      if(orders.length === 0){
         sails.log.debug("no available orders for review");
         return res.badRequest({ code : -1, responseText : req.__('review-no-available')});
       }

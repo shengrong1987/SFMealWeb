@@ -120,7 +120,7 @@ module.exports = function(agenda) {
           if(err){
             return done();
           }
-          if(orders.length == 0){
+          if(orders.length === 0){
             meal.orders = [];
             notification.notificationCenter("Meal","mealScheduleEnd",meal,true);
             return done();

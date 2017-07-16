@@ -175,9 +175,9 @@ module.exports = {
   },
 
   getTransactions : function(criteria, value){
-    if(criteria == "hostId" && value){
+    if(criteria === "hostId" && value){
       var url = "/host/" + value + "/balance";
-    }else if(criteria == "userId" && value) {
+    }else if(criteria === "userId" && value) {
       var url = "/user/" + value + "/balance";
     }else{
       return;
@@ -281,16 +281,16 @@ module.exports = {
   },
 
   command : function(model, id, action, detail, data){
-    if(action == "create"){
+    if(action === "create"){
       var url = '/' + model.toLowerCase();
     }else{
-      var url = '/' + model.toLowerCase() + '/' + id + '/' + action;
+      url = '/' + model.toLowerCase() + '/' + id + '/' + action;
     }
     $.ajax({
       url: url,
       type: 'POST',
       data : data,
-      dataType: 'json',
+      dataType: 'json'
     }).done(function (data) {
       switch(model) {
         case "User":
@@ -371,63 +371,63 @@ module.exports = {
     var skip = pageIndex * 30;
     switch (model){
       case "User":
-        if(criteria == "id" && content){
+        if(criteria === "id" && content){
           this.getUser(content);
         }else{
           this.getUsers(criteria,content,skip);
         }
         break;
       case "Host":
-        if(criteria == "id" && content){
+        if(criteria === "id" && content){
           this.getHost(content)
         }else{
           this.getHosts(criteria,content,skip);
         }
         break;
       case "Meal":
-        if(criteria == "id" && content){
+        if(criteria === "id" && content){
           this.getMeal(content);
         }else{
           this.getMeals(criteria,content,skip);
         }
         break;
       case "Dish":
-        if(criteria == "id" && content){
+        if(criteria === "id" && content){
           this.getDish(content);
         }else{
           this.getDishes(criteria,content,skip);
         }
         break;
       case "Order":
-        if(criteria == "id" && content){
+        if(criteria === "id" && content){
           this.getOrder(content);
         }else{
           this.getOrders(criteria,content,skip);
         }
         break;
       case "Transaction":
-        if(criteria == "id" && content){
+        if(criteria === "id" && content){
           this.getTransaction(content);
         }else{
           this.getTransactions(criteria,content,skip);
         }
         break;
       case "Job":
-        if(criteria == "id" && content){
+        if(criteria === "id" && content){
           this.getJob(content);
         }else{
           this.getJobs(criteria, content,skip);
         }
         break;
       case "Checklist":
-        if(criteria == "id" && content){
+        if(criteria === "id" && content){
           this.getCheckList(content);
         }else{
           this.getCheckLists(criteria, content,skip);
         }
         break;
       case "Coupon":
-        if(criteria == "id" && content){
+        if(criteria === "id" && content){
           this.getCoupon(content);
         }else{
           this.getCoupons(criteria, content,skip);

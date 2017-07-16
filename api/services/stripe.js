@@ -6,11 +6,15 @@ var async = require('async');
 
 const SERVICE_FEE = 100;
 const SYSTEM_DELIVERY_FEE = 399;
+const MILEAGE_FEE = 1.18;
+const PARTY_ORDER_RANGE_MULTIPLIER = 3;
 
 module.exports = {
 
   SYSTEM_DELIVERY_FEE : SYSTEM_DELIVERY_FEE,
   SERVICE_FEE : SERVICE_FEE,
+  MILEAGE_FEE : MILEAGE_FEE,
+  PARTY_ORDER_RANGE_MULTIPLIER : PARTY_ORDER_RANGE_MULTIPLIER,
 
   createManagedAccount : function(attr,cb){
     stripe.accounts.create(attr,function(err, account) {
@@ -99,7 +103,7 @@ module.exports = {
   },
 
   retrieveCharge : function(attr, cb){
-    if(attr == "cash"){
+    if(attr === "cash"){
       return cb(null, { id: "cash" });
     }
     stripe.charges.retrieve(attr, cb);

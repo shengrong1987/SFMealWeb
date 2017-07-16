@@ -88,11 +88,11 @@ module.exports = {
     },
     minimalOrder : {
       type : 'integer',
-      defaultsTo : 1
+      defaultsTo : 0
     },
     minimalTotal : {
       type : 'float',
-      defaultsTo : 1
+      defaultsTo : 0
     },
     delivery_min : {
       type : 'float'
@@ -245,7 +245,7 @@ module.exports = {
               console.log("pickup time too short");
               valid = false;
               return;
-            }else if(pickupFromTime <= provideTillTime && params.type == "preorder"){
+            }else if(pickupFromTime <= provideTillTime && params.type === "preorder"){
               console.log("pickup time too early");
               valid = false;
               return;
@@ -300,7 +300,7 @@ module.exports = {
           if(err){
             return next(err);
           }
-          if(values.type != "order"){
+          if(values.type !== "order"){
             return next();
           }
           sails.log.info("updating meal county to host county");
@@ -354,7 +354,7 @@ module.exports = {
   beforeUpdate : function(values,cb){
     async.auto({
       updateCover : function(next){
-        if(values.cover && values.cover != ""){
+        if(values.cover && values.cover !== ""){
           Dish.findOne(values.cover).exec(function(err,dish){
             if(err){
               return next(err);

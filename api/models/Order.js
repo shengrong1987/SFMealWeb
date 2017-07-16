@@ -150,6 +150,10 @@ module.exports = {
     tax : {
       type : 'float',
       defaultsTo : 0
+    },
+    isPartyMode : {
+      type : 'boolean',
+      defaultsTo : false
     }
   }
 };

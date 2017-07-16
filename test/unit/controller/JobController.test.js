@@ -84,4 +84,38 @@ describe('JobController', function() {
         })
     });
   });
+
+  describe('check order related jobs', function(){
+
+    var partyModeOrderId;
+    it('should get party order', function (done) {
+      agent
+        .get('/order?isPartyMode=true&limit=1')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          partyModeOrderId = res.body[0].id;
+          done();
+        })
+    })
+
+    it('should run party order reminder job', function(done){
+      agent
+        .post('/job/PartyOrderStartReminderJob/run')
+        .send({
+          orderId : partyModeOrderId
+        })
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          setTimeout(function(){
+            done();
+          }, 1000)
+        })
+    });
+  })
 });

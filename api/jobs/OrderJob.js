@@ -3,6 +3,7 @@
  */
 var util = require('../services/util');
 var async = require('async');
+var moment = require("moment");
 module.exports = function(agenda) {
   var job = {
 
@@ -41,26 +42,32 @@ module.exports = function(agenda) {
             if(err){
               return cb(err);
             }
-            if(order.type == "order"){
+            if(order.type === "order"){
               var fifteenMinutesBeforePickup = util.minutesBefore(order.eta, 15);
               console.log("scheduling pickup reminding Job at: " + fifteenMinutesBeforePickup);
               Jobs.schedule(fifteenMinutesBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "minute"});
             }else{
-              if(order.method == "pickup"){
-                var oneHourBeforePickup = new Date(util.oneHourBefore(order.pickupInfo.pickupFromTime));
-                var oneDayBeforePickup = new Date(util.oneDayBefore(order.pickupInfo.pickupFromTime));
-                if(now < oneDayBeforePickup){
-                  console.log("scheduling pickup reminding Job at: " + oneDayBeforePickup);
-                  Jobs.schedule(oneDayBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "day"});
+              if(!order.isPartyMode){
+                if(order.method === "pickup"){
+                  var oneHourBeforePickup = new Date(util.oneHourBefore(order.pickupInfo.pickupFromTime));
+                  var oneDayBeforePickup = new Date(util.oneDayBefore(order.pickupInfo.pickupFromTime));
+                  if(now < oneDayBeforePickup){
+                    console.log("scheduling pickup reminding Job at: " + oneDayBeforePickup);
+                    Jobs.schedule(oneDayBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "day"});
+                  }
+                  if(now < oneHourBeforePickup){
+                    console.log("scheduling pickup reminding Job at: " + oneHourBeforePickup);
+                    Jobs.schedule(oneHourBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "hour"});
+                  }
+                }else if(order.method === "delivery"){
+                  var startDeliveryTime = new Date(order.pickupInfo.pickupFromTime);
+                  console.log("scheduling delivering reminder Job at: " + startDeliveryTime);
+                  Jobs.schedule(startDeliveryTime, 'OrderDeliveringReminderJob', {orderId : order.id, period : "minute"});
                 }
-                if(now < oneHourBeforePickup){
-                  console.log("scheduling pickup reminding Job at: " + oneHourBeforePickup);
-                  Jobs.schedule(oneHourBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "hour"});
-                }
-              }else if(order.method == "delivery"){
-                var startDeliveryTime = new Date(order.pickupInfo.pickupFromTime);
-                console.log("scheduling delivering reminder Job at: " + startDeliveryTime);
-                Jobs.schedule(startDeliveryTime, 'OrderDeliveringReminderJob', {orderId : order.id, period : "minute"});
+              }else{
+                var orderDeliveryTime = moment(order.pickupInfo.pickupFromTime).subtract(10, 'hours');
+                console.log("scheduling party order start reminder job at: " + orderDeliveryTime.format('LLLL'));
+                Jobs.schedule(orderDeliveryTime._d, 'PartyOrderStartReminderJob', {orderId : order.id});
               }
             }
             cb();

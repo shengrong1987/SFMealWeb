@@ -79,7 +79,8 @@ module.exports = {
     fee.metadata = {
       orderId : order.id,
       deliveryFee : order.delivery_fee,
-      tax : order.tax
+      tax : order.tax,
+      total : fee.metadata.total
     }
     return fee;
   },
@@ -274,7 +275,6 @@ module.exports = {
                   if (err) {
                     return next(err);
                   }
-                  sails.log.info("finish retrieving charges");
                   next();
                 });
               },
@@ -305,7 +305,6 @@ module.exports = {
                   if(err){
                     return next(err);
                   }
-                  sails.log.info("finish retrieving transfer");
                   next();
                 });
               },
@@ -326,7 +325,6 @@ module.exports = {
                   if(err){
                     return next(err);
                   }
-                  sails.log.info("finish retrieving fees");
                   next();
                 })
               }

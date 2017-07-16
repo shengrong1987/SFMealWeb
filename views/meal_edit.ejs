@@ -321,14 +321,14 @@
                     <div class="row box-compact">
                       <div class="col-sm-4">
                         <div class="input-group" name="1">
-                          <input id="min-order" class="form-control normal-number-input" type="number" min="1" max="999" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.minimalOrder || ''%>">
+                          <input id="min-order" class="form-control normal-number-input" type="number" min="0" max="999" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.minimalOrder %>">
                           <div class="input-group-addon"><%= __('fen')%></div>
                         </div>
                       </div>
                       <div class="col-sm-1 vertical-align" style="height: 35px;"><label class="middle"><%= __('or')%></label></div>
                       <div class="col-sm-4">
                         <div class="input-group" name="2">
-                          <input id="min-total" class="form-control normal-number-input" type="number" min="1" max="9999" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.minimalTotal || ''%>">
+                          <input id="min-total" class="form-control normal-number-input" type="number" min="0" max="9999" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.minimalTotal %>">
                           <div class="input-group-addon"><%= __('dollar')%></div>
                         </div>
                       </div>

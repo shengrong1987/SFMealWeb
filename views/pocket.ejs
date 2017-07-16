@@ -116,7 +116,7 @@
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
                   <div class="col-xs-4"><%= __(tranObj.type) %>(<%= __(tranObj.paymentMethod || '')%>) <label><%= tranObj.metadata.orderId.slice(-4)%></label> <i class="fa fa-question-circle white cursor-pointer" data-toggle="tooltip" title=<%= __('order-last-4')%>></i></div>
                   <div class="col-xs-3"><img class="img-thumbnail round_thumb size-small" src="<%= tranObj.host.picture || "/images/profile_man.png"%>" onclick="javascript:location.href='/host/<%= tranObj.host.id %>'">&nbsp;<%= tranObj.host.shopName%></div>
-                  <div class="col-xs-3"><b>$<%= (tranObj.amount - refund - tranObj.application_fee)/100%></b> ( <%= __('order-fee')%>: $<%= Math.round(tranObj.amount - tranObj.deliveryFee * 100 - tranObj.metadata.tax)/100 %> + <%= __('tax')%>: $<%= tranObj.metadata.tax/100%> + <%= __('delivery-fee')%>: $<%= tranObj.deliveryFee%> <%= refund ? " - " + __('refunded')+ ": $" + refund/100 : "" %> )</div>
+                  <div class="col-xs-3"><b>$<%= (tranObj.amount - refund)/100%></b> ( <%= __('order-fee')%>: $<%= Math.round(tranObj.amount - tranObj.deliveryFee * 100 - tranObj.metadata.tax)/100 %> + <%= __('tax')%>: $<%= tranObj.metadata.tax/100%> + <%= __('delivery-fee')%>: $<%= tranObj.deliveryFee%> <%= refund ? " - " + __('refunded')+ ": $" + refund/100 : "" %> )</div>
                 </div>
               </div>
               <%}else if(tranObj.type == 'type-fee'){ %>

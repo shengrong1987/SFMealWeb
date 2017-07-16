@@ -95,7 +95,7 @@ module.exports = {
       var customDate = req.body.customInfo.time;
       now = moment();
       sails.log.info("now: " + now.format() + ", delivery date: " + moment(customDate).format());
-      var ms = Math.abs(now.diff(moment(customDate)));
+      var ms = moment(customDate).diff(now);
       var d = moment.duration(ms);
       sails.log.info("hours in advanced: " + d.asHours())
       if(d.asHours() < 24){
@@ -175,7 +175,7 @@ module.exports = {
     });
   },
 
-  validateDeliveryMethod : function(params, meal, req, cb){
+  validateOption : function(params, meal, req, cb){
     var method = params.method;
     if(method === "pickup"){
       if(params.isPartyMode){
@@ -191,11 +191,7 @@ module.exports = {
       if(!meal.isDelivery && !params.isPartyMode) {
         return cb({responseText: req.__('order-invalid-method'), code: -11});
       }
-      if(params.isPartyMode){
-        var range = meal.delivery_range * 5;
-      }else{
-        range = meal.delivery_range;
-      }
+      var range = params.isPartyMode ? meal.delivery_range * stripe.PARTY_ORDER_RANGE_MULTIPLIER : meal.delivery_range;
       var pickupOption = params.pickupOption;
       if(!pickupOption){
         return cb({responseText : req.__('order-pickup-option-empty-error'), code : -20});
@@ -226,6 +222,7 @@ module.exports = {
         pickupInfo.pickupFromTime = customInfo.time;
         pickupInfo.pickupTillTime = customInfo.time;
         pickupInfo.comment = customInfo.comment;
+        pickupInfo.isDateCustomized = true;
       }
       geocode.distance(full_address, pickupInfo.deliveryCenter, function(err, distance){
         if(err){
@@ -234,8 +231,15 @@ module.exports = {
         }
         sails.log.debug("distance:" + distance, range);
         if(distance > range){
-          sails.log.error("distance verification failed");
-          return cb({responseText : req.__('order-invalid-address'), code : -6});
+          if(!params.isPartyMode){
+            sails.log.error("distance verification failed");
+            return cb({responseText : req.__('order-invalid-address'), code : -6});
+          }else{
+            params.delivery_fee = (distance - range) * stripe.MILEAGE_FEE;
+            sails.log.info("charged distance: " + (distance - range) + " in a total of: " + params.delivery_fee);
+          }
+        }else if(params.isPartyMode){
+          params.delivery_fee = 0;
         }
         cb();
       })
@@ -260,7 +264,7 @@ module.exports = {
   updateMealLeftQty : function(meal, lastorder, order, cb){
     var leftQty = meal.leftQty;
     Object.keys(lastorder).forEach(function(dishId){
-      leftQty[dishId] += (lastorder[dishId].number - order[dishId].number);
+      leftQty[dishId] += parseInt(lastorder[dishId].number - order[dishId].number);
       sails.log.info("updating dish " + dishId + "to quantity of " + leftQty[dishId]);
     });
     meal.leftQty = leftQty;
@@ -289,7 +293,9 @@ module.exports = {
         }else{
           params.delivery_fee = parseFloat(meal.delivery_fee);
         }
-      }else {
+      }else if(params.isPartyMode){
+        // skip calculating delivery fee
+      }else{
         params.delivery_fee = 0;
       }
       meal.pickups.forEach(function(pickup){
@@ -432,7 +438,7 @@ module.exports = {
       if (err) {
         return res.badRequest(err);
       }
-      $this.validateDeliveryMethod(req.body, m, req, function(err){
+      $this.validateOption(req.body, m, req, function(err){
         if(err){
           return res.badRequest(err);
         }
@@ -577,7 +583,7 @@ module.exports = {
                   paymentMethod : order.paymentMethod,
                   isInitial : true,
                   amount : subtotal * 100,
-                  deliveryFee : req.body.delivery_fee * 100,
+                  deliveryFee : parseInt(req.body.delivery_fee * 100),
                   discount : req.body.discount * 100,
                   email : email,
                   customerId : req.body.customerId,
@@ -590,7 +596,7 @@ module.exports = {
                     hostId : states.m.chef.id,
                     orderId : order.id,
                     userId : userId,
-                    deliveryFee : req.body.delivery_fee * 100,
+                    deliveryFee : parseInt(req.body.delivery_fee * 100),
                     tax : req.body.tax
                   }
                 },function(err, charge, transfer){
@@ -628,8 +634,6 @@ module.exports = {
                         order.transfer[transfer.id] = transfer.amount;
                       }
                     }
-
-                    //build transfer obj
 
                     if(order.paymentMethod === 'cash'){
                       order.save(function(err, o){
@@ -959,7 +963,7 @@ module.exports = {
       }
       if(order.paymentMethod !== "cash"){
         var metadata = {
-          userId : order.customer.id,
+          userId : order.customer ? order.customer.id : null,
           reverse_transfer : true,
           refund_application_fee : true
         }
@@ -1476,6 +1480,9 @@ module.exports = {
           return res.badRequest(err);
         }
         notification.notificationCenter("Order", "ready", result, false, false, req);
+        if(req.wantsJSON && process.env.NODE_ENV === "development"){
+          return res.ok(result);
+        }
         if(order.method === "pickup"){
           return res.ok({responseText : req.__('order-ready')});
         }else{
@@ -1500,10 +1507,10 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
+        notification.notificationCenter("Order", "receive", result, false, false, req);
         if(req.wantsJSON && process.env.NODE_ENV === "development"){
           return res.ok(order);
         }
-        notification.notificationCenter("Order", "receive", result, false, false, req);
         return res.ok({responseText : req.__('order-receive')});
       });
     });

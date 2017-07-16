@@ -1113,7 +1113,7 @@ var MealSelectionView = Backbone.View.extend({
     var originAddress = target.data("location");
     var uLat = $this.$el.data("user-lat");
     var uLong = $this.$el.data("user-long");
-    if(!uLat || uLat == 'undefined' || !uLong || uLong == 'undefined'){
+    if(!uLat || uLat === 'undefined' || !uLong || uLong === 'undefined'){
       return;
     }
     var method = target.data("method");
@@ -1129,12 +1129,12 @@ var MealSelectionView = Backbone.View.extend({
         trafficModel: "optimistic"
       }
     }, function(response, status){
-      if (status == google.maps.DirectionsStatus.OK) {
+      if (status === google.maps.DirectionsStatus.OK) {
         $this.googlemapDisplay.setDirections(response);
         var travelTime = response.routes[0].legs[0].duration.text;
         var distance = response.routes[0].legs[0].distance.value * 0.0006;
         $(e.currentTarget).find("+ label").text(travelTime + " " + response.routes[0].legs[0].distance.text);
-        if(method && method == 'pickup'){
+        if(method && method === 'pickup'){
           return;
         }
         if(distance > range){
@@ -1569,13 +1569,8 @@ var MealView = Backbone.View.extend({
       }
     }
 
-    var min_order = form.find("#min-order").val() || null;
-    var min_total = form.find("#min-total").val() || null;
-    if(!min_order && !min_total){
-      form.find(".order-require .alert").show();
-      form.find(".order-require .alert").html(form.find("#min-order").data("error"));
-      return;
-    }
+    var min_order = form.find("#min-order").val();
+    var min_total = form.find("#min-total").val();
 
     var supportPartyOrder = form.find("#supportParty").prop("checked");
     if(supportPartyOrder){
@@ -2693,7 +2688,7 @@ var MealConfirmView = Backbone.View.extend({
   initPickups : function(map){
     var mapCenter = '';
     var $this = this;
-    if(this.$el.find(".pickupOption").length == 0){
+    if(this.$el.find(".pickupOption").length === 0){
       mapCenter = "25 Washington St, Daly City";
     }else{
       mapCenter = this.$el.find(".pickupOption").data('location');
@@ -2738,13 +2733,14 @@ var MealConfirmView = Backbone.View.extend({
     utility.initGoogleMapService(function(){
       $this.initDelivery(function(map){
         $this.initPickups(map);
+        $this.switchAddress()
       });
     });
   },
   createNewContact : function(e){
     e.preventDefault();
     var value = this.$el.find("#method button.active").attr("value");
-    if(value == "pickup"){
+    if(value === "pickup"){
       $('#contactInfoView').removeClass('hide');
       $('#contactInfoView').show();
     }else{
@@ -2755,7 +2751,7 @@ var MealConfirmView = Backbone.View.extend({
     var isLogin = this.$el.data("user") ? true : false;
     var value = $(e.currentTarget).find(".active").attr("value");
     this.$el.find(".deliveryInput").removeClass('hide');
-    if(value == "delivery"){
+    if(value === "delivery"){
       this.$el.find(".deliveryInput").show();
       if(isLogin){
         $('#contactInfoView').hide();
@@ -2779,6 +2775,8 @@ var MealConfirmView = Backbone.View.extend({
     var city = this.$el.find("input[name='city']").val();
     var state = this.$el.find("input[name='state']").val();
     var zipcode = this.$el.find("input[name='zipcode']").val();
+    var form = this.$el.find("#order");
+    var isPartyMode = form.data("party");
     if(!street || !city || !state || !zipcode){
       makeAToast(jQuery.i18n.prop('addressIncomplete'));
       return false;
@@ -2802,8 +2800,17 @@ var MealConfirmView = Backbone.View.extend({
       }
       btn.button('reset');
       if(distance > range){
-        makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
-        return;
+        if(!isPartyMode){
+          makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
+          return;
+        }else{
+          var delivery_fee = (distance - range) * MILEAGE_FEE;
+          form.find(".delivery").data("value", delivery_fee);
+          refreshMenu();
+        }
+      }else if(isPartyMode){
+        form.find(".delivery").data("value", 0);
+        refreshMenu();
       }
       makeAToast(jQuery.i18n.prop('addressValid'),'success');
     });
@@ -2825,6 +2832,8 @@ var MealConfirmView = Backbone.View.extend({
     var range = this.$el.data("range");
     var $this = this;
     var isLogin = this.$el.data("user") ? true : false;
+    var form = this.$el.find("#order");
+    var isPartyMode = form.data("party");
     if(!yourAddress) {
       if (isLogin) {
         var deliveryLocationOption = this.$el.find("#deliveryTab .contactOption .regular-radio:checked");
@@ -2837,7 +2846,7 @@ var MealConfirmView = Backbone.View.extend({
         }
         var yourAddress = deliveryLocationOption.next().next().text();
       } else {
-        var yourAddress = $this.verifyAddress(e, true);
+        yourAddress = $this.verifyAddress(e, true);
       }
     }
 
@@ -2867,11 +2876,20 @@ var MealConfirmView = Backbone.View.extend({
           return;
         }
         if(distance > range){
-          makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
-          if(cb){
-            return cb(false);
+          if(!isPartyMode){
+            makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
+            if(cb){
+              return cb(false);
+            }
+            return;
+          }else{
+            var delivery_fee = (distance - range) * MILEAGE_FEE;
+            form.find(".delivery").data("value", delivery_fee);
+            refreshMenu();
           }
-          return;
+        }else if(isPartyMode){
+          form.find(".delivery").data("value", 0);
+          refreshMenu();
         }
         makeAToast(jQuery.i18n.prop('addressValid'),'success');
         if(cb){
@@ -3155,7 +3173,7 @@ var OrderView = Backbone.View.extend({
       paymentInfo.method = paymentMethod;
       cb(paymentInfo);
     }else{
-      if(paymentMethod == "online"){
+      if(paymentMethod === "online"){
         var paymentInfoView = this.$el.find("#paymentInfoView");
         var cardholder = paymentInfoView.find("input[name='card-holder']").val();
         var cardnumber = paymentInfoView.find("input[name='card-number']").val();
@@ -3239,7 +3257,7 @@ var OrderView = Backbone.View.extend({
 
           //subtotal
           var subtotal = form.find(".subtotal").data("value");
-          if (subtotal == 0) {
+          if (subtotal === 0) {
             makeAToast(jQuery.i18n.prop('orderEmptyError'));
             return;
           }

@@ -267,18 +267,16 @@ var TableItem = React.createClass({
       isCreate = this.props.isCreate,
       cols = attributes.map(function (col, i){
         var attrs = col.split('.');
-        if(attrs.length == 1){
-          var rowContent = item[col];
-          rowContent = this._renderRow(rowContent, col, item, isCreate);
+        var rowContent;
+        if(attrs.length === 1){
+          rowContent = this._renderRow(item[col], col, item, isCreate);
         }else{
           var tmpItem = Object.assign({}, item);
           attrs.map(function(attr){
-            if(!tmpItem){
-              return;
-            }
-            tmpItem = tmpItem[attr]?tmpItem[attr]:null;
+            if(!tmpItem){return;}
+            tmpItem = tmpItem[attr] || null;
           },this);
-          var rowContent = this._renderRow(tmpItem, col, null, isCreate);
+          rowContent = this._renderRow(tmpItem, col, null, isCreate);
         }
         return (
           <td key={i} className="col-md-1">{rowContent}</td>

@@ -2,7 +2,8 @@
 var assert = require('assert'),
     sinon = require('sinon'),
     should = require('should'),
-    request = require('supertest');
+    request = require('supertest'),
+    moment = require('moment');
 var agent;
 
 before(function(done) {
@@ -1079,7 +1080,7 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
-            if(res.body.meals.length == 0){
+            if(res.body.meals.length === 0){
               return done(Error("error getting any meal"));
             }
             var meal = res.body.meals[0];
@@ -1260,6 +1261,8 @@ describe('OrderController', function() {
     var guestEmail = 'enjoymyself1987@gmail.com';
     var adminEmail = 'admin@sfmeal.com';
     var password = '12345678';
+    var email = 'aimbebe.r@gmail.com';
+    var password = '12345678';
 
     it('should login a guest account', function (done) {
       agent
@@ -1279,7 +1282,7 @@ describe('OrderController', function() {
             console.log(err);
             return done(err);
           }
-          if(res.body.meals.length == 0){
+          if(res.body.meals.length === 0){
             return done(Error("error getting any meal"));
           }
           var meal = res.body.meals[1];
@@ -1429,6 +1432,65 @@ describe('OrderController', function() {
           done();
         })
     });
+
+    it('should login as administrator', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : adminEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should change the order to preparing', function (done) {
+      agent
+        .put('/order/' + orderId)
+        .send({status : "preparing"})
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.status.should.be.equal('preparing');
+          orderId = res.body.id;
+          done();
+        })
+    })
+
+    it('should login as host', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should update the order to ready', function(done){
+      agent
+        .put('/order/' + orderId + '/ready')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.status.should.be.equal('ready');
+          done();
+        })
+    })
+
+    it('should update the order to received', function(done){
+      agent
+        .put('/order/' + orderId + '/receive')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.status.should.be.equal('review');
+          done();
+        })
+    })
   })
 
   describe('order a meal with cash', function() {
@@ -1891,6 +1953,7 @@ describe('OrderController', function() {
       dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}] };
       dishObj[dishId3] = { number : 5 , preference : [{ property : '', extra : 0}] };
       dishObj[dishId5] = { number : 5 , preference : [{ property : '', extra : 0}] };
+      var deliveryDate = moment().add(2,'days')._d;
       agent
         .post('/order')
         .send({
@@ -1899,9 +1962,9 @@ describe('OrderController', function() {
           pickupOption : 5,
           method : "delivery",
           mealId : mealId,
-          contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+          contactInfo : { phone : "(415)111-1111", name : "abc", address : "7116 tiant way, Elk Grove, CA 95758"},
           paymentInfo : { method : 'cash'},
-          customInfo : { time : new Date(2018, 5, 29), comment : "so exciting, please bring some utensils"},
+          customInfo : { time : deliveryDate, comment : "so exciting, please bring some utensils"},
           isPartyMode : true
         })
         .expect(200)
@@ -1910,8 +1973,8 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body.isPartyMode.should.be.true();
-          res.body.delivery_fee.should.be.equal(0);
-          new Date(res.body.pickupInfo.pickupFromTime).getTime().should.be.equal(new Date(2018, 5, 29).getTime());
+          res.body.delivery_fee.should.be.above(30);
+          new Date(res.body.pickupInfo.pickupFromTime).getTime().should.be.equal(deliveryDate.getTime());
           res.body.pickupInfo.deliveryCenter.should.be.equal("1974 Palou Ave, San Francisco, CA 94124, USA");
           done();
         })

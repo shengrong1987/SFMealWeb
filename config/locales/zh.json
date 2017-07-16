@@ -668,6 +668,8 @@
   "orderArriveReminderMessageToGuest" : "您的订单已在送餐中, 请准备好享受美食, 联系电话: %s",
   "orderPickupReminderMessageToGuestInHour" : "您的预定订单将于一小时后自取, 领取时请核对订单号: %s, 地址: %s, 联系电话: %s, 领取时间: %s, %s",
   "orderReadyPickupReminderMessageToGuest" : "您之前在SFMeal下的订单已准备好了, 领取时请核对订单号: %s, 地址: %s, 联系电话: %s, 领取时间: %s, %s",
+  "orderReceiveMessageToGuest" : "您的订单已到达，请您享受完美食给我们的菜式评个分或者留下任何建议或意见，点击 %s",
+  "partyOrderStartReminder" : " 您的party订单在10小时后即将送餐，请注意准备，订单号：%s，送餐时间：%s。",
   "help-menu" : "帮助列表",
   "help-menu-collapse" : "隐藏列表",
   "cant-find-option" : "找不到口味?",

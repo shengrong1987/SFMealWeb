@@ -89,6 +89,7 @@ describe('UsersController', function() {
     })
 
     var mealId;
+    var offlineMealId;
 
     it('should be able to search all meals', function (done) {
       agent
@@ -100,6 +101,8 @@ describe('UsersController', function() {
           }
           res.body.should.have.length(4);
           mealId = res.body[0].id;
+          res.body[2].status.should.be.equal("off");
+          offlineMealId = res.body[2].id;
           done();
         })
     })
@@ -139,6 +142,32 @@ describe('UsersController', function() {
             return done(err);
           }
           res.body.should.have.length(1);
+          done();
+        })
+    })
+
+    it('should NOT be able to turn a meal off', function (done) {
+      agent
+        .get(encodeURI('/meal/' + mealId + '/off'))
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-4);
+          done();
+        })
+    })
+
+    it('should be able to turn a meal off', function (done) {
+      agent
+        .get(encodeURI('/meal/' + offlineMealId + '/off'))
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.id.should.be.equal(offlineMealId);
           done();
         })
     })

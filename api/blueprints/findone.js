@@ -49,11 +49,11 @@ module.exports = function findOneRecord (req, res) {
 
     if(req.wantsJSON && sails.config.environment === 'development'){
      res.ok(matchingRecord);
-    }else if(Model.adapter.identity == "user"){
+    }else if(Model.adapter.identity === "user"){
       res.view('user',{user : matchingRecord});
-    }else if(Model.adapter.identity == "payment"){
+    }else if(Model.adapter.identity === "payment"){
       res.view('payment',{payment: matchingRecord,layout:false});
-    }else if(Model.adapter.identity == "dish"){
+    }else if(Model.adapter.identity === "dish"){
       if(isEditMode){
         matchingRecord.userId = user.id;
         res.view('dish_edit',{dish : matchingRecord});

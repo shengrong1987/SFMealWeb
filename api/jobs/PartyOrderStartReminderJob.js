@@ -26,28 +26,24 @@ module.exports = function(agenda) {
 
     // execute job
     run: function(job, done) {
-      sails.log.info("running order pickup reminder");
+
       var orderId = job.attrs.data.orderId;
-      var period = job.attrs.data.period;
+
+      sails.log.info("running party order start reminder with order id: " + orderId);
+
       Order.findOne(orderId).populate('host').populate('dishes').populate("customer").exec(function(err, order){
         if(err || !order){
           return done();
         }
-        if(order.type === "order"){
-          if(order.method === "pickup"){
-            notification.notificationCenter("Order","ready",order,false,false,null);
-          }else{
-            sails.log.info("dispatching delivery for the pickup");
+        sails.log.info("order found");
+        order.status = 'preparing';
+        order.save(function(err, o){
+          if(err){
+            return done();
           }
-        }else{
-          if(order.method === "pickup"){
-            order.period = period;
-            notification.notificationCenter("Order","reminder",order,false,false,null);
-          }else{
-            sails.log.info("dispatching delivery for the pickup");
-          }
-        }
-        done();
+          notification.notificationCenter("Order","startReminder",o,true,false);
+          done();
+        })
       })
     }
   };

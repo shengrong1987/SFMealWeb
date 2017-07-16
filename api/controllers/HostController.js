@@ -311,7 +311,7 @@ module.exports = {
     var params = req.body;
     var hostId = req.params.id;
     var myHostId = req.session.user.host.id ? req.session.user.host.id : req.session.user.host;
-    if(hostId != myHostId){
+    if(hostId !== myHostId){
       return res.forbidden();
     }
     var token = params.token;

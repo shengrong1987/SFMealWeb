@@ -53,11 +53,13 @@ var notification = {
   },
 
   sendMsg : function(model, action, params, req){
+    sails.log.info("start to send msg with action:" + action);
     var locale = req ? (params.isSendToHost ? params.host.locale : ( params.customer ? params.customer.locale : params.locale)) : '';
     var phone = params.isSendToHost ? (params.host ? params.host.phone : params.chef.phone) : params.customerPhone;
     var content = "";
     if(model === "Order"){
       var userOrderUrl = params.isExpressCheckout ? "https://www.sfmeal.com/order/" + params.id + "/receipt" : "https://www.sfmeal.com/user/me#myorder";
+      var userReviewUrl = "https://www.sfmeal.com/user/me#myreview";
       switch(action){
         case "new":
           content = sails.__({
@@ -111,7 +113,7 @@ var notification = {
           message.sendMessage(phone, content);
           break;
         case "ready":
-          content = params.method == 'pickup' ? sails.__({
+          content = params.method === 'pickup' ? sails.__({
             phrase : 'orderReadyPickupReminderMessageToGuest',
             locale : locale
           }, params.id, params.pickupInfo.location, params.pickupInfo.phone, params.pickupInfo.pickupFromTime + ' - ' + params.pickupInfo.pickupTillTime, userOrderUrl) : sails.__({
@@ -131,7 +133,7 @@ var notification = {
           message.sendMessage(phone, content);
           break;
         case "reminder":
-          if(params.method == 'pickup' && params.period == 'hour'){
+          if(params.method === 'pickup' && params.period === 'hour'){
             content = sails.__({
               phrase : 'orderPickupReminderMessageToGuestInHour',
               locale : locale
@@ -139,8 +141,24 @@ var notification = {
             message.sendMessage(phone, content);
           }
           break;
+        case "receive":
+          if(!params.isExpressCheckout){
+            content = sails.__({
+              phrase : 'orderReceiveMessageToGuest',
+              locale : locale
+            },userReviewUrl);
+            message.sendMessage(phone, content);
+          }
+          break;
+        case "startReminder":
+          content = sails.__({
+            phrase : 'partyOrderStartReminder',
+            locale : locale
+          },params.id, params.pickupInfo.pickupFromTime);
+          message.sendMessage(phone, content);
+          break;
       }
-    }else if(model == "Meal"){
+    }else if(model === "Meal"){
       switch(action){
         case "mealScheduleEnd":
           content = sails.__({
