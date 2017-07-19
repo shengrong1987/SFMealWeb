@@ -929,19 +929,20 @@ module.exports = {
           });
         },
         getMealExtraInfo : ['isPartyMode', function(cb){
-          if(!req.session.authenticated || isEditMode){
-            return cb();
-          }
-          var userId = req.session.user.id;
-          User.findOne(userId).populate("collects").exec(function(err,user){
+
+          Order.find({meal : meal.id, status : ["schedule","preparing"]}).exec(function(err, orders){
             if(err){
-              return cb(err);
+              return res.badRequest(err);
             }
-            Order.find({meal : meal.id, status : ["schedule","preparing"]}).exec(function(err, orders){
+            _orders = orders;
+            if(!req.session.authenticated || isEditMode){
+              return cb();
+            }
+            var userId = req.session.user.id;
+            User.findOne(userId).populate("collects").exec(function(err,user){
               if(err){
-                return res.badRequest(err);
+                return cb(err);
               }
-              _orders = orders;
               _user = user;
               cb();
             });
@@ -959,7 +960,7 @@ module.exports = {
         }else if(req.session.authenticated){
           res.view('meal',{ meal : meal, locale : req.getLocale(), user : _user, orders : _orders});
         }else{
-          res.view('meal',{ meal : meal, locale : req.getLocale(), user : null, orders : null});
+          res.view('meal',{ meal : meal, locale : req.getLocale(), user : null, orders : _orders});
         }
       });
     });
