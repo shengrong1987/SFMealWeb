@@ -5,7 +5,7 @@
 var Auth = Backbone.Model.extend({
   urlRoot : "/auth",
   url : function(){
-    if(this.type == "login"){
+    if(this.type === "login"){
       return this.urlRoot + "/login?type=" + this.method + '&originUrl=' + encodeURI(this.originUrl);
     }else{
       return this.urlRoot + "/" + this.type;
@@ -111,7 +111,7 @@ var LoginView = Backbone.View.extend({
     var $this = this;
     this.model.save({},{
       success : function(model, result){
-        if(result != "404") {
+        if(result !== "404") {
           BootstrapDialog.alert(jQuery.i18n.prop('resetPasswordSuccess'), function(){
             location.href = "/";
           });
