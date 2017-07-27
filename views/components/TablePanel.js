@@ -3,7 +3,8 @@
  */
 'use strict';
 
-var React = require('react/addons'),
+var React = require('react'),
+  createReactClass = require('create-react-class'),
   Table = require('./Table'),
   Search = require('./Search'),
   TabStore = require('../stores/TabStore'),
@@ -13,7 +14,7 @@ var _getStateFromStores = function () {
   return TabStore.getCurrentTab();
 };
 
-var TablePanel = React.createClass({
+var TablePanel = createReactClass({
   /*
     Validation to ensure that the properties sent from the
       parent component is the correct type.
@@ -49,23 +50,23 @@ var TablePanel = React.createClass({
         criterias = ['id','firstname','lastname','phone','email'];
         break;
       case "Host":
-      headers = {id : 'Host ID', shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email',passGuide : 'Status',command : 'Command'};
-      details = {id : 'Host ID', shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email', "license.url" : 'License', "license.exp" : 'Expire', passGuide : 'passGuide', "license.valid" : "licenseVerified", command : 'Command'};
-      criterias = ['id','shopName','email'];
+        headers = {id : 'Host ID', shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email', passGuide : 'passGuide', command : 'Command'};
+        details = {id : 'Host ID', userId: "User ID", shopName :'Shop Name',intro : 'Intro',full_address : 'Address',email : 'Email', passGuide : 'passGuide', "license.url" : 'License', "license.exp" : 'Expire', "license.valid" : "licenseVerified", dishVerifying : "dishVerifying", accountId : "accountId", bankId : "bankId", picture : "picture", locale : "locale", command : 'Command'};
+        criterias = ['id','shopName','email'];
       break;
       case "Meal":
-        headers = {id : 'Meal ID', 'chef.id' : 'Host ID', title : 'Title', type : 'MealType', score : 'Score', county : 'County', status : 'Status', command : 'Command'};
-        details = {id : 'Meal ID', 'chef.id' : 'Host ID', title : 'Title', type : 'MealType', coverString : 'Cover', score : 'Score', delivery_fee : 'Fee', delivery_range : 'Range', isDelivery : 'isDelivery', county : 'County', provideFromTime : 'provideFrom', provideTillTime : 'provideTill', totalQty : 'totalSupply', leftQty: 'leftSupply', status : 'Status', command : 'Command'};
+        headers = {id : 'Meal ID', 'chef' : 'Host ID', title : 'Title', type : 'MealType', score : 'Score', county : 'County', pickups : 'pickups', status : 'Status', command : 'Command'};
+        details = {id : 'Meal ID', 'chef' : 'Host ID', title : 'Title', type : 'MealType', coverString : 'Cover', score : 'Score', delivery_fee : 'Fee', delivery_range : 'Range', isDelivery : 'isDelivery', county : 'County', provideFromTime : 'provideFrom', provideTillTime : 'provideTill', totalQty : 'totalSupply', leftQty: 'leftSupply', pickups : 'pickups', status : 'Status', command : 'Command'};
         criterias = ['id','hostId','keyword','county'];
         break;
       case "Dish":
         headers = {id : 'Dish ID', 'chef.id' : 'Host ID', title :'Title',price : 'Price',score : 'Score', isVerified : 'Status',command : 'Command'};
-        details = {id : 'Dish ID', 'chef.id' : 'Host ID', title :'Title',price : 'Price',score : 'Score', photos : 'Photos', isVerified : 'Status', command : 'Command', sold : 'Sold', numberOfReviews : 'numberOfReviews',description : 'Description', type : 'DishType'};
+        details = {id : 'Dish ID', 'chef.id' : 'Host ID', title :'Title',price : 'Price',score : 'Score', photos : 'Photos', isVerified : 'Status', sold : 'Sold', numberOfReviews : 'numberOfReviews',description : 'Description', type : 'DishType', command : 'Command'};
         criterias = ['id','hostId','mealId','keyword'];
         break;
       case "Order":
-        headers = {id : 'Order ID', 'host.id' : 'Host ID', 'customer.id' : 'User ID', 'meal.id' : 'Meal ID', subtotal : 'SubTotal', type : 'OrderType', delivery_fee : 'DeliveryFee', method : 'DeliveryMethod', address : 'DeliveryAddress', status : 'Status', command : 'Command'};
-        details = {id : 'Order ID', 'host.id' : 'Host ID', 'customer.id' : 'User ID', 'meal.id' : 'Meal ID', subtotal : 'SubTotal', type : 'OrderType', delivery_fee : 'DeliveryFee', method : 'DeliveryMethod', address : 'DeliveryAddress', orders : 'OrderDishes', pickupInfo : 'pickupMethods', guestEmail : 'UserEmail', hostEmail : 'ChefEmail', status : 'Status',lastStatus : 'lastStatus', msg : 'Message', command : 'Command'};
+        headers = {id : 'Order ID', 'meal.id' : 'Meal ID', subtotal : 'SubTotal', type : 'OrderType', delivery_fee : 'DeliveryFee', method : 'DeliveryMethod', address : 'DeliveryAddress', pickupInfo : 'pickupInfo', tax : 'tax', status : 'Status', command : 'Command'};
+        details = {id : 'Order ID', 'mealId' : 'Meal ID', subtotal : 'SubTotal', type : 'OrderType', delivery_fee : 'DeliveryFee', method : 'DeliveryMethod', address : 'DeliveryAddress', orders : 'OrderDishes', pickupInfo : 'pickupInfo', tax : 'tax', guestEmail : 'UserEmail', hostEmail : 'ChefEmail', status : 'Status', lastStatus : 'lastStatus', msg : 'Message', 'host.id' : 'Host ID', 'customer.id' : 'User ID', command : 'Command'};
         criterias = ['id','hostId','userId','mealId','status','hostEmail', 'guestEmail'];
         break;
       case "Transaction":
@@ -74,7 +75,7 @@ var TablePanel = React.createClass({
         criterias = ['id','hostId','userId'];
         break;
       case "Job":
-        headers = {_id : 'Job ID', name : 'name', "nextRunAt" : 'nextRunAt', "lastFinishedAt" : "lastFinishedAt", data : "data" };
+        headers = {_id : 'Job ID', name : 'name', "nextRunAt" : 'nextRunAt', "lastFinishedAt" : "lastFinishedAt", data : "data", lastRunAt : "lastRunAt", command : 'Command' };
         details = {_id : 'Job ID', name : 'name', "nextRunAt" : 'nextRunAt', "lastFinishedAt" : "lastFinishedAt", data : "data", lastRunAt : "lastRunAt", command : 'Command'} ;
         criterias = ['id', 'name', 'orderId', 'mealId'];
         break;
@@ -92,6 +93,11 @@ var TablePanel = React.createClass({
         headers = {id : 'Email ID', model : 'model', action : 'action', metaData : 'meta', command : 'Command' };
         details = {id : 'Email ID', model : 'model', action : 'action', metaData : 'meta', command : 'Command' };
         criterias = ['model', 'action', "meta"];
+        break;
+      case "Review":
+        headers = {id : 'Review ID', title : 'title', price : 'price', score : 'score', review : 'review', isPublic : "isPublic", command : 'Command' };
+        details = {id : 'Review ID', title : 'title', price : 'price', score : 'score', review : 'review', isPublic : "isPublic", dish : 'dish', meal : 'meal', username : 'username',  command : 'Command' };
+        criterias = ['id', 'score', "dishId", "mealId", "hostId", "userId"];
         break;
     }
 

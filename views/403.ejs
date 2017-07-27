@@ -46,7 +46,17 @@
           <% if (typeof error !== 'undefined') { %>
           <%= error %>
           <% } else { %>
-          <%= data || __('authorizedError')%>
+          <%
+            var errorMsg = __('authorizedError');
+            if(data){
+              if(data.error){
+                errorMsg = data.error;
+              }else{
+                errorMsg = data;
+              }
+            }
+          %>
+          <%= errorMsg%>
           <% } %>
           <br/>
           <small><span data-toggle="i18n" data-key="newlyJoin">第一次使用? 点这里</span><a toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)" data-toggle="i18n" data-key="register">注册</a></small>

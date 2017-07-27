@@ -3,17 +3,19 @@
  */
 'use strict';
 
-var React = require('react/addons');
+var React = require('react'),
+  createReactClass = require('create-react-class'),
+  PropTypes = require('prop-types');
 
-var TableHeader = React.createClass({
+var TableHeader = createReactClass({
 
   /*
     Validation to ensure that the properties sent from the
       parent component is the correct type.
   */
   propTypes: {
-    cols: React.PropTypes.array,
-    data : React.PropTypes.object
+    cols: PropTypes.array,
+    data : PropTypes.object
   },
 
   getDefaultProps: function () {

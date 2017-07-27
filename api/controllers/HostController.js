@@ -132,7 +132,10 @@ module.exports = {
       //use googlemap api to geocode address
       //store it into lat, long
       params.address = params.address[0];
-      var actual_address = params.address.street + params.address.city + ", " + params.address.zip;
+      if(!params.address.street || !params.address.city || !params.address.zip){
+        return res.badRequest({ code : -2, responseText : req.__('meal-error-address2')});
+      }
+      var actual_address = params.address.street + ", " + params.address.city + ", " + params.address.zip;
       var cellphone = params.address.phone;
       require('../services/geocode').geocode(actual_address,function(err,result){
         if(err){
@@ -490,7 +493,7 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(user.host && user.host == hostId){
+      if(user.host && user.host === hostId){
         return res.badRequest({ code : -4, responseText : req.__('host-like-himself-error')});
       }
 
@@ -510,36 +513,35 @@ module.exports = {
     });
   },
 
-  //to-test
-  // cashout : function(req, res){
-  //   //check account balance
-  //   var hostId = req.params.id;
-  //   Host.findOne(hostId).exec(function(err,host){
-  //     if(err){
-  //       return res.badRequest(err);
-  //     }
-  //     var bankId = host.bankId;
-  //     var accountId = host.accountId;
-  //     stripe.balance.retrieve({stripe_account: accountId},
-  //         function(err, balance) {
-  //           var totalAva = balance.available[0].amount;
-  //           stripe.transfers.create({
-  //             amount: totalAva,
-  //             application_fee : 50,
-  //             currency: "usd",
-  //             destination: "default_for_currency",
-  //             description: "Thanks for your housemade food - SFMeal.com"
-  //           }, function(err, transfer) {
-  //             // asynchronously called
-  //             if(err){
-  //               return res.badRequest(err);
-  //             }
-  //             //for testing only
-  //             res.ok(transfer);
-  //           });
-  //         });
-  //   });
-  // }
+  findReview : function(req, res){
+    var hostId = req.params.id;
+    Review.find({ host : hostId}).exec(function(err, reviews){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(reviews);
+    })
+  },
+
+  findMeal : function(req, res){
+    var hostId = req.params.id;
+    Meal.find({ chef : hostId}).exec(function(err, meals){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(meals);
+    })
+  },
+
+  findDish : function(req, res){
+    var hostId = req.params.id;
+    Dish.find({ chef : hostId}).exec(function(err, dishes){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(dishes);
+    })
+  }
 
 };
 

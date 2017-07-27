@@ -28,7 +28,7 @@ describe('MealController', function() {
     var password = '12345678';
     var address = {"street":"1974 palou ave","city" : "San Francisco", "zip" : 94124, "phone" : "(415)802-3853"};
     var outOfSFAddress = {"street":"25 Washington St","city" : "Daly City", "zip" : 94014, "phone" : "(415)802-3853"};
-    var invalidAddress = {"street" : "1", "city" : '', "zip" : 0, "phone" : ""};
+    var invalidAddress = {"street" : "", "city" : '', "zip" : -1, "phone" : ""};
     var guestEmail = 'enjoymyself1987@gmail.com';
     var tempPhone = "(415)609-2357";
 
@@ -69,9 +69,7 @@ describe('MealController', function() {
           .send({title : '韭菜盒子',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
           .expect(200)
           .end(function(err,res){
-            if(res.body.id == undefined){
-              return done(Error("error creating dish"))
-            }
+            should.exist(res.body.id);
             dish1 = res.body.id;
           })
 
@@ -80,9 +78,7 @@ describe('MealController', function() {
           .send({title : '猪肉馅饼',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
           .expect(200)
           .end(function(err,res){
-            if(res.body.id == undefined){
-              return done(Error("error creating dish"))
-            }
+            should.exist(res.body.id);
             dish2 = res.body.id;
           })
 
@@ -91,9 +87,7 @@ describe('MealController', function() {
           .send({title : '五彩面',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'entree', chef : hostId})
           .expect(200)
           .end(function(err,res){
-            if(res.body.id == undefined){
-              return done(Error("error creating dish"))
-            }
+            should.exist(res.body.id);
             dish3 = res.body.id;
           })
 
@@ -112,9 +106,7 @@ describe('MealController', function() {
           })
           .expect(200)
           .end(function(err,res){
-            if(res.body.id == undefined){
-              return done(Error("error creating dish"))
-            }
+            should.exist(res.body.id);
             dish4 = res.body.id;
           })
 
@@ -133,9 +125,7 @@ describe('MealController', function() {
         })
         .expect(200)
         .end(function(err,res){
-          if(res.body.id == undefined){
-            return done(Error("error creating dish"))
-          }
+          should.exist(res.body.id);
           dish5 = res.body.id;
           done();
         })
@@ -280,7 +270,7 @@ describe('MealController', function() {
             if(err){
               return done(err);
             }
-            if(res.body.chef != hostId){
+            if(res.body.chef !== hostId){
               return done(Error("error creating meal"));
             }
             res.body.county.should.be.equal("San Francisco County");
@@ -366,7 +356,8 @@ describe('MealController', function() {
         "pickupInstruction" : "11th st and Market st",
         "method" : "pickup",
         "area" : "Market & Downtown",
-        "county" : "San Francisco County"
+        "county" : "San Francisco County",
+        "phone" : "(415)222-2222"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
@@ -419,7 +410,7 @@ describe('MealController', function() {
           })
           .expect(200)
           .end(function(err,res){
-            if(res.body.chef != hostId){
+            if(res.body.chef !== hostId){
               return done(Error("error creating meal"));
             }
             res.body.should.have.property('pickups').with.length(5);
@@ -465,7 +456,7 @@ describe('MealController', function() {
         })
         .expect(200)
         .end(function(err,res){
-          if(res.body.chef != hostId){
+          if(res.body.chef !== hostId){
             return done(Error("error creating meal"));
           }
           sysDeliveryMealId = res.body.id;
@@ -592,14 +583,16 @@ describe('MealController', function() {
         "pickupInstruction" : "11th st and Market st",
         "method" : "pickup",
         "area" : "Market & Downtown",
-        "county" : "San Francisco County"
+        "county" : "San Francisco County",
+        "phone" : "(415)123-1234"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
         "method" : "delivery",
         "deliveryCenter" : "1974 Palou Ave, San Francisco, CA 94124, USA",
         "area" : "Bay View",
-        "county" : "San Francisco County"
+        "county" : "San Francisco County",
+        "phone" : "(415)123-1234"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
@@ -608,7 +601,8 @@ describe('MealController', function() {
         "pickupInstruction" : "John Daly Blvd",
         "method" : "pickup",
         "county" : "San Mateo County",
-        "area" : "Daly City"
+        "area" : "Daly City",
+        "phone" : "(415)123-1234"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 4),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 5),
@@ -617,7 +611,8 @@ describe('MealController', function() {
         "pickupInstruction" : "Sunnyvalue library",
         "method" : "pickup",
         "county" : "Santa Clara County",
-        "area" : "Sunnyvale"
+        "area" : "Sunnyvale",
+        "phone" : "(415)123-1234"
       }];
       agent
         .put('/meal/' + preorderMealId)

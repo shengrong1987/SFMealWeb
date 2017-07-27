@@ -6,6 +6,7 @@
  *
  * @docs        :
  */
+var ObjectID = require('mongodb').ObjectID;
 module.exports = {
   find : function(req, res){
     var skip = req.query.skip;
@@ -37,5 +38,35 @@ module.exports = {
       }
       return res.ok(job);
     });
+  },
+
+  deleteJob : function(req, res){
+    var jobId = req.params.id;
+    Jobs.cancel({ _id : ObjectID(jobId)}, function(err, numberRemoved){
+      if(err){
+        return res.badRequest(err);
+      }
+      Jobs.jobs({}, function(err, jobs){
+        if(err){
+          return res.badRequest(err);
+        }
+        return res.ok(jobs);
+      });
+    })
+  },
+
+  cleanJobs : function(req, res){
+    Jobs.cancel(req.body, function(err, numberRemoved){
+      if(err){
+        return res.badRequest(err);
+      }
+      Jobs.jobs({}, function(err, jobs){
+        if(err){
+          return res.badRequest(err);
+        }
+        sails.log.info("execute jobs cleaning, " + numberRemoved + " jobs cleaned");
+        return res.ok(jobs);
+      });
+    })
   }
 };

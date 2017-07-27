@@ -670,7 +670,7 @@
   "orderPickupReminderMessageToGuestInHour": "Your booking order will be ready for pickup in one hour, please check when you receive it. the order number: %s,  address: %s,  contact phone number: %s, Pick up time: %s, %s",
   "orderReadyPickupReminderMessageToGuest": "Your SFMeal order is ready, please check order number during pickup. The order number: %s, address: %s, Contact phone number: %s, Pick up time: %s, %s",
   "orderReceiveMessageToGuest" : "Your order is received, please give us a review of the dishes at: %s",
-  "partyOrderStartReminder" : " Your catering order need to be delivery in 10 hours, please prepare. Order id: %s, delivery time: %s",
+  "partyOrderStartReminder" : " Your catering order need to be delivery in 10 hours, please prepare. Order detail: https://sfmeal.com/order/%s/receipt, delivery time: %s",
   "help-menu": "Help list",
   "help-menu-collapse": "Hide list",
   "cant-find-option": "Can't find an option?",

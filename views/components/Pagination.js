@@ -3,19 +3,21 @@
  */
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
+var PropTypes = require('prop-types');
+var createReactClass = require('create-react-class');
 var SFMealAPI = require('../helpers/SFMealAPI');
 
-var Pagination = React.createClass({
+var Pagination = createReactClass({
 
   /*
     Validation to ensure that the properties sent from the
       parent component is the correct type.
   */
   propTypes: {
-    index: React.PropTypes.number,
-    model : React.PropTypes.string,
-    maxIndex : React.PropTypes.number
+    index: PropTypes.number,
+    model : PropTypes.string,
+    maxIndex : PropTypes.number
   },
 
   getDefaultProps: function () {
@@ -50,7 +52,7 @@ var Pagination = React.createClass({
         activeClass = [''];
       }
       return (
-        <li className={activeClass.join(' ')}><a href="javascript:void(0)" data-index={i} onClick={this._change}>{i+1}</a></li>
+        <li key={i} className={activeClass.join(' ')}><a href="javascript:void(0)" data-index={i} onClick={this._change}>{i+1}</a></li>
       );
     }, this);
 

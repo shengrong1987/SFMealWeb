@@ -42,7 +42,7 @@ module.exports = {
     desc : {
       type : 'string',
       maxLength : 140,
-      defaultsTo : '我是来自San Francisco, California的吃货,最喜欢吃的是'
+      defaultsTo : '我是来自%s的吃货,最喜欢吃的是'
     },
     hometown : {
       type : 'string'
@@ -138,7 +138,7 @@ module.exports = {
     },
     isCollect : function(mealId){
       return this.collects.some(function(meal){
-        return meal.id == mealId;
+        return meal.id === mealId;
       });
     },
     points : {
@@ -148,50 +148,42 @@ module.exports = {
     }
   }),
 
-  cloneToUser : function(user,data,cb){
-    delete user.auth.password;
-    delete data.password;
-    delete data.id;
-    delete data.email;
-    delete data.facebookId;
-    async.each(Object.keys(data), function(key, next){
-      if(typeof user[key] != 'undefined' || user[key]) {
-        return next();
-      }
-      if(key == 'name'){
-        var names = data[key].split(' ');
-        if(names.length > 1){
-          user['firstname'] = user['firstname'] || names[0];
-          user['lastname'] = user['lastname'] || names[1];
-        }
-        next();
-      }else if(key == 'picture'){
-        user[key] = data[key].data.url;
-        next();
-      }else if(key == 'hometown'){
-        user[key] = data[key].name;
-        if(!user['desc']){
-          user['desc'] = "我是来自" + data[key].name + "的吃货, 最喜欢吃的是";
-        }
-        next();
-      }else if(key == 'location'){
-        geocode.geocodeCity(data[key].name, function(err, result){
-          if(err){
-            console.log("err geocoding city:" + data[key].name);
-            return next(err);
-          }
-          user['county'] = result[0].administrativeLevels.level2long;
-          next();
-        });
-      }else{
-        user[key] = data[key];
-        next();
-      }
-    }, function(err){
+  afterCreate : function(user, cb){
+    Auth.findOne(user.auth).exec(function(err, auth){
       if(err){
         return cb(err);
       }
-      user.save(cb);
-    });
+      var params = {
+        firstname: auth.firstname || ( auth.name ? auth.name.split(' ')[0] : auth.username) ,
+        lastname: auth.lastname || ( auth.name ? auth.name.split(' ')[1] : ''),
+        gender: auth.gender,
+        hometown: auth.hometown ? auth.hometown.name : "San Francisco, California",
+        desc : user.desc.replace('%s', auth.hometown ? auth.hometown.name : "San Francisco, California"),
+        picture: auth.picture ? auth.picture.data.url : '',
+        city: auth.location ? ( auth.location.name ? auth.location.name.split(",")[0] : '') : 'San Francisco',
+        state: auth.location ? ( auth.location.name ? auth.location.name.split(",")[1] : '') : 'California'
+      }
+      User.update(user.id, params).exec(function(err, user){
+        if(err){
+          return cb(err);
+        }
+        Auth.native(function(err, collection){
+          if(err){
+            return cb(err);
+          }
+          var objectId = ObjectID = require('mongodb').ObjectID;
+          collection.updateOne({_id : objectId(auth.id)}, { $unset : {
+            firstname : "",
+            lastname : "",
+            gender : "",
+            username : "",
+            name : "",
+            location : "",
+            hometown : "",
+            picture : ""
+          }}, cb);
+        });
+      })
+    })
   }
 };

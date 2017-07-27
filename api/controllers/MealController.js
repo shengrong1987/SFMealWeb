@@ -95,7 +95,7 @@ module.exports = {
               return true;
             }
             return false;
-          })
+          });
           if(popularHost && highScore){
             _host.shortIntro = host.shortIntro;
             _host.shopName = host.shopName;
@@ -108,7 +108,7 @@ module.exports = {
             _host.id = host.id;
             publicHosts.push(_host);
           }
-        })
+        });
         if(req.wantsJSON){
           return res.ok({user : user, hosts : publicHosts, locale : req.getLocale()});
         }
@@ -189,7 +189,7 @@ module.exports = {
       status : 'on',
       provideFromTime : {'<' : now},
       provideTillTime : {'>' : now}
-    }
+    };
     if(type){
       params.type = type;
     }
@@ -199,7 +199,7 @@ module.exports = {
       }
 
       found = found.filter(function(meal){
-        return meal.county.split("+").indexOf(county) != -1;
+        return meal.county.split("+").indexOf(county) !== -1;
       })
 
       if(typeof zipcode !== 'undefined' && zipcode && zipcode !== 'undefined' && typeof county !== 'undefined' && county && county !== 'undefined'){
@@ -207,7 +207,7 @@ module.exports = {
           if (err) {
             return res.badRequest({ code : -1, responseText : req.__('meal-error-address')});
           }  else {
-            if(result.length==0){
+            if(result.length===0){
               return res.badRequest({ code : -2, responseText : req.__('meal-error-address2')});
             }
             var location = { lat : result[0].latitude, long : result[0].longitude };
@@ -217,7 +217,7 @@ module.exports = {
                 var valid = false;
                 for(var i=0; i < dishes.length; i++){
                   var dish = dishes[i];
-                  if(meal.title.indexOf(keyword) != -1 || dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
+                  if(meal.title.indexOf(keyword) !== -1 || dish.title.indexOf(keyword) !== -1 || dish.description.indexOf(keyword) !== -1 || dish.type.indexOf(keyword) !== -1){
                     valid = true;
                     break;
                   }
@@ -239,7 +239,7 @@ module.exports = {
             var valid = false;
             for(var i=0; i < dishes.length; i++){
               var dish = dishes[i];
-              if(meal.title.indexOf(keyword) != -1 || dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
+              if(meal.title.indexOf(keyword) !== -1 || dish.title.indexOf(keyword) !== -1 || dish.description.indexOf(keyword) !== -1 || dish.type.indexOf(keyword) !== -1){
                 valid = true;
                 break;
               }
@@ -459,7 +459,7 @@ module.exports = {
                 req.body = params;
                 req.body.commission = host.commission;
                 req.body.chef = host.id;
-                if(req.body.status == 'on'){
+                if(req.body.status === 'on'){
                   host.checkGuideRequirement(function(err){
                     if(err){
                       return res.badRequest(err);
@@ -498,62 +498,109 @@ module.exports = {
 
   update : function(req, res){
     var mealId = req.param("id");
-    var hostId = req.session.user.host.id? req.session.user.host.id : req.session.user.host;
+    var isAdmin = req.session.user.auth.email === "admin@sfmeal.com";
     var user = req.session.user;
     var status = req.body.status;
     var $this = this;
-    if(this.dateIsValid(req.body)){
-      Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,meal){
-        if(err){
-          return res.badRequest(err);
+    var hostId;
+    sails.log.info("meal id: " + mealId);
+    async.auto({
+      findChef : function(next){
+        if(!isAdmin){
+          return next();
         }
-        !$this.mealActiveCheck(req.body, meal, req, function(err){
+        Meal.findOne(mealId).populate("chef").exec(function(err, meal){
+          if(err){
+            return next(err);
+          }
+          hostId = meal.chef.id;
+          next();
+        })
+      },
+      getChef : function(next){
+        if(isAdmin){
+          return next();
+        }
+        hostId = req.session.user.host.id? req.session.user.host.id : req.session.user.host;
+        next();
+      }
+    },function(err){
+      if(err){
+        return res.badRequest(err);
+      }
+      sails.log.info("chef id: " + hostId);
+      if($this.dateIsValid(req.body)){
+        Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,meal){
           if(err){
             return res.badRequest(err);
           }
-          $this.requirementIsValid(req.body, meal, req, function (err) {
+          !$this.mealActiveCheck(req.body, meal, req, function(err){
             if(err){
               return res.badRequest(err);
             }
-            meal.chef.user = {
-              phone : user.phone
-            };
-            $this.updateDelivery(req.body, meal.chef, req, function(err, params){
+            $this.requirementIsValid(req.body, meal, req, function (err) {
               if(err){
                 return res.badRequest(err);
               }
-              req.body = params;
-              if(status === "on"){
-                async.auto({
-                  updateQty : function(cb){
-                    if(!req.body.totalQty && meal.status !== "on"){
-                      return cb();
-                    }
-                    req.body.leftQty = $this.updateDishQty(meal.leftQty, meal.totalQty, req.body.totalQty);
-                    if(!req.body.leftQty){
-                      return cb({responseText : req.__('meal-adjust-qty-fail'), code : -9});
-                    }
-                    cb();
-                  }
-                }, function(err){
+              Host.findOne(meal.chef.id).populate("user").exec(function(err, host){
+                if(err){
+                  return res.badRequest(err);
+                }
+                $this.updateDelivery(req.body, host, req, function(err, params){
                   if(err){
                     return res.badRequest(err);
                   }
-                  meal.chef.dishes = meal.dishes;
-                  if(!meal.dishIsValid()){
-                    sails.log.debug("meal contain unverified dishes");
-                    return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
-                  }
-                  meal.chef.checkGuideRequirement(function(err){
-                    if(err){
-                      return res.badRequest(err);
-                    }
-                    if(!meal.chef.passGuide){
-                      return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
-                    }
+                  req.body = params;
+                  if(status === "on"){
+                    async.auto({
+                      updateQty : function(cb){
+                        if(!req.body.totalQty && meal.status !== "on"){
+                          return cb();
+                        }
+                        req.body.leftQty = $this.updateDishQty(meal.leftQty, meal.totalQty, req.body.totalQty);
+                        if(!req.body.leftQty){
+                          return cb({responseText : req.__('meal-adjust-qty-fail'), code : -9});
+                        }
+                        cb();
+                      }
+                    }, function(err){
+                      if(err){
+                        return res.badRequest(err);
+                      }
+                      meal.chef.dishes = meal.dishes;
+                      if(!meal.dishIsValid()){
+                        sails.log.debug("meal contain unverified dishes");
+                        return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
+                      }
+                      meal.chef.checkGuideRequirement(function(err){
+                        if(err){
+                          return res.badRequest(err);
+                        }
+                        if(!meal.chef.passGuide){
+                          return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
+                        }
+                        $this.cancelMealJobs(mealId, function(err){
+                          if(err){
+                            return res.badRequest(err);
+                          }
+                          req.body.isScheduled = false;
+                          req.body.chef = hostId;
+                          Meal.update({id : mealId}, req.body).exec(function(err, result){
+                            if(err){
+                              return res.badRequest(err);
+                            }
+                            return res.ok(result[0]);
+                          });
+                        })
+                      })
+                    });
+                  }else{
                     $this.cancelMealJobs(mealId, function(err){
                       if(err){
                         return res.badRequest(err);
+                      }
+                      if(req.body.totalQty){
+                        req.body.leftQty = req.body.totalQty;
                       }
                       req.body.isScheduled = false;
                       req.body.chef = hostId;
@@ -564,34 +611,17 @@ module.exports = {
                         return res.ok(result[0]);
                       });
                     })
-                  })
-                });
-              }else{
-                $this.cancelMealJobs(mealId, function(err){
-                  if(err){
-                    return res.badRequest(err);
                   }
-                  if(req.body.totalQty){
-                    req.body.leftQty = req.body.totalQty;
-                  }
-                  req.body.isScheduled = false;
-                  req.body.chef = hostId;
-                  Meal.update({id : mealId}, req.body).exec(function(err, result){
-                    if(err){
-                      return res.badRequest(err);
-                    }
-                    return res.ok(result[0]);
-                  });
                 })
-              }
-            })
+              })
+            });
           });
         });
-      });
-    }else{
-      console.log("Date format of meal is not valid");
-      return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
-    }
+      }else{
+        console.log("Date format of meal is not valid");
+        return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
+      }
+    });
   },
 
   add : function(req, res){
@@ -657,8 +687,8 @@ module.exports = {
       params.delivery_fee = "3.99";
     }
 
-    if(params.isDelivery && params.type == "preorder" && (!params.pickups || (params.pickups && !JSON.parse(params.pickups).some(function(pickup){
-      return pickup.method == "delivery";
+    if(params.isDelivery && params.type === "preorder" && (!params.pickups || (params.pickups && !JSON.parse(params.pickups).some(function(pickup){
+      return pickup.method === "delivery";
     })))){
       return cb({ responseText : req.__('meal-delivery-on-option'), code : -15})
     }
@@ -674,7 +704,7 @@ module.exports = {
           if(!pickup.county){
             return;
           }
-          if(!pickup.phone || pickup.phone == 'undefined'){
+          if(!pickup.phone || pickup.phone === 'undefined'){
             pickup.phone = host.user.phone;
           }
           pickup.index = index+1;
@@ -821,7 +851,7 @@ module.exports = {
       }
 
       if (orders.length > 0) {
-        if(params.status == "on"){
+        if(params.status === "on"){
           if(params.pickups || params.title || meal.type || params.minimalOrder || params.minimalTotal){
             cb({ code : -14, responseText : req.__("meal-modify-active-error")});
           }else{
@@ -858,9 +888,15 @@ module.exports = {
         if(err){
           return done();
         }
-        meal.orders = orders;
-        notification.transitLocaleTimeZone(meal);
-        return res.view('report',{ meal : meal });
+        Dish.find({ chef : meal.chef.id }).exec(function(err, dishes) {
+          if (err) {
+            return cb(err);
+          }
+          meal.dishes = dishes;
+          meal.orders = orders;
+          notification.transitLocaleTimeZone(meal);
+          return res.view('report',{ meal : meal });
+        });
       });
     })
   },
@@ -964,6 +1000,26 @@ module.exports = {
         }
       });
     });
+  },
+
+  findReview : function(req, res){
+    var mealId = req.params.id;
+    Review.find({ meal : mealId} ).exec(function(err, reviews){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(reviews);
+    })
+  },
+
+  findOrder : function(req, res){
+    var mealId = req.params.id;
+    Order.find({ meal : mealId} ).exec(function(err, orders){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(orders);
+    })
   }
 
   //To test after finishing review model

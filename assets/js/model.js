@@ -66,7 +66,7 @@ var LoginView = Backbone.View.extend({
     this.errorView.hide();
     this.model.type = "login";
     this.model.method = "facebook";
-    this.model.originUrl = location.href.indexOf('oauth2') != -1 ? 'https://sfmeal.com' : location.href;
+    this.model.originUrl = location.href.indexOf('oauth2') !== -1 ? 'https://sfmeal.com' : location.href;
     location.href = this.model.url();
   },
   GoogleLogin : function(e){
@@ -74,7 +74,7 @@ var LoginView = Backbone.View.extend({
     this.errorView.hide();
     this.model.type = "login";
     this.model.method = "google";
-    this.model.originUrl = location.href.indexOf('oauth2') != -1 ? 'https://sfmeal.com' : location.href;
+    this.model.originUrl = location.href.indexOf('oauth2') !== -1 ? 'https://sfmeal.com' : location.href;
     var $this = this;
     location.href = this.model.url();
   },
@@ -1403,26 +1403,25 @@ var MealView = Backbone.View.extend({
     dishesItems.each(function(){
       var dishItem = $(this);
       var id = dishItem.data("id");
-      var hasCover = dishItem.data().cover == true;
-      var hasFeature = dishItem.data().feature == true;
+      var hasCover = !!dishItem.data().cover;
+      var hasFeature = !!dishItem.data().feature;
       if(hasCover){
         cover = id;
       }if(hasFeature){
-        if(features!=""){
+        if(features!==""){
           features += ",";
         }
         features += id;
       }
-      var number = dishItem.find(".amount-input input").val();
-      totalQty[id] = number;
-      if(dishes!=""){
+      totalQty[id] = dishItem.find(".amount-input input").val();;
+      if(dishes!==""){
         dishes += ",";
       }
       dishes += dishItem.data("id");
       index ++;
     });
 
-    if(cover == ""){
+    if(cover === ""){
       cover = $(dishesItems[0]).data("id");
     }
 

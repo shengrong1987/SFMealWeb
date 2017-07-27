@@ -8,9 +8,13 @@
     <%}%>
 
     <% if(meal.orders.length != 0){ if(meal.isDelivery){
-    meal.pickups.forEach(function(pickup){if(pickup.method == "delivery"){%>
+    meal.pickups.forEach(function(pickup){ %>
 
-    <p><%= __('delivery-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%></p>
+    <% if(pickup.method === "delivery"){ if(!pickup.isDateCustomized){ %>
+      <p><%= __('delivery-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%></p>
+    <%}else{
+      return
+    }%>
     <table class="table table-bordered">
       <thead>
       <tr>
@@ -23,9 +27,9 @@
       </tr>
       </thead>
       <tbody>
-      <%}})%>
       <% meal.orders.forEach(function(order){
-      if(order.method == 'delivery'){%>
+      if(order.method === 'delivery'){
+          if(!pickup.isDateCustomized && !order.isPartyMode){ %>
       <tr>
         <td><%= order.customerName %></td>
         <td><%= order.id%></td>
@@ -57,9 +61,12 @@
         <td><%= order.contactInfo.address%></td>
         <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
       </tr>
-      <%}})%>
+      <%}else{%>
+
+      <%}}})%>
       </tbody>
     </table>
+    <%}})%>
     <%} meal.pickups.forEach(function(pickup, index){if(pickup.method == "pickup"){%>
     <p>
       <%= __('pickup-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/>

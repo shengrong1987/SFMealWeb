@@ -14,7 +14,7 @@ module.exports = {
   geocode : function(address, cb){
     sails.log.debug("starting geocoding: " + address);
     geocoder.geocode(address, function(err, res) {
-      sails.log.debug("finish geocoding: " + err);
+      sails.log.debug("finish geocoding with error: " + err);
       if(err){
         return cb(err);
       }

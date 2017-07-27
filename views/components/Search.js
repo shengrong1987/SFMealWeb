@@ -3,7 +3,9 @@
  */
 'use strict';
 
-var React = require('react/addons'),
+var React = require('react'),
+  PropTypes = require('prop-types'),
+  createReactClass = require('create-react-class'),
   SearchStore = require('../stores/SearchStore'),
   SFMealAPI = require('../helpers/SFMealAPI');
 
@@ -11,14 +13,14 @@ var _getStateFromStores = function(){
   return SearchStore.getSearchData();
 }
 
-var Search = React.createClass({
+var Search = createReactClass({
   /*
     Validation to ensure that the properties sent from the
       parent component is the correct type.
   */
   propTypes: {
-    criteria : React.PropTypes.array,
-    model : React.PropTypes.string
+    criteria : PropTypes.array,
+    model : PropTypes.string
   },
 
   getDefaultProps: function() {
@@ -30,6 +32,12 @@ var Search = React.createClass({
 
   getInitialState: function () {
     return {data: _getStateFromStores(), model:'User', message: 'nothing yet'};
+  },
+
+  componentWillReceiveProps : function(nextPro){
+    this.setState({
+      data : { msg : ''}
+    })
   },
 
   componentDidMount: function () {
@@ -58,8 +66,8 @@ var Search = React.createClass({
   render: function () {
     var divStyle = {
       width : '100%'
-    }, criterias = this.props.criteria.map(function(c){
-      return (<label className="radio-inline"><input type="radio" name="criteriaOpt" value={c}/>{c}</label>);
+    }, criterias = this.props.criteria.map(function(c, i){
+      return (<label key={i} className="radio-inline"><input type="radio" name="criteriaOpt" value={c}/>{c}</label>);
     }, this);
     var buttonStyle = {
       marginLeft: 5 + 'px'

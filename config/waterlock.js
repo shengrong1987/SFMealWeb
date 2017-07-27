@@ -45,7 +45,10 @@ module.exports.waterlock = {
       redirectUri : process.env.NODE_ENV === 'production' ? process.env.BASE_URL + '/auth/google_oauth2' : 'http://localhost:1337/auth/google_oauth2',
       allow: ['*'],
       fieldMap : {
-        email : 'email'
+        'email' : 'email',
+        'firstname': 'given_name',
+        'lastname': 'family_name',
+        'gender': 'gender'
       }
     },
     {
@@ -55,17 +58,11 @@ module.exports.waterlock = {
         mail: {
           protocol: 'SMTP',
           options:{
-            // host : "smtp.office365.com",
-            // secureConnection : false,
-            // port : 587,
             auth: {
               user: process.env.ADMIN_EMAIL,
               pass: process.env.ADMIN_EMAIL_PWD
             },
             service : 'gmail'
-            // tls : {
-            //   ciphers : 'SSLv3'
-            // }
           },
           from: process.env.ADMIN_EMAIL,
           subject: 'Your password reset!',

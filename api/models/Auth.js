@@ -5,7 +5,7 @@
  * @description :: Holds all authentication methods for a User
  * @docs        :: http://waterlock.ninja/documentation
  */
-
+var mailChimp = require("../services/mailchimp");
 module.exports = {
 
   attributes: require('waterlock').models.auth.attributes({
@@ -27,6 +27,18 @@ module.exports = {
     },
     wechatToken : {
       type : 'string'
+    },
+    firstName: {
+      type : 'string'
+    },
+    lastName: {
+      type: 'string'
+    },
+    gender: {
+      type : 'string'
+    },
+    timezone: {
+      type :'number'
     }
   }),
 

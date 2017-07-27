@@ -3,7 +3,9 @@
  */
 'use strict';
 
-var React = require('react/addons'),
+var React = require('react'),
+  PropTypes = require('prop-types'),
+  createReactClass = require('create-react-class'),
   TableHeader = require('./TableHeader'),
   UserStore = require('../stores/UserStore'),
   HostStore = require('../stores/HostStore'),
@@ -15,17 +17,18 @@ var React = require('react/addons'),
   CheckListStore = require('../stores/CheckListStore'),
   CouponStore = require('../stores/CouponStore'),
   EmailStore = require('../stores/EmailStore'),
+  ReviewStore = require('../stores/ReviewStore'),
   TableItem = require('./TableItem');
 
-var Table = React.createClass({
+var Table = createReactClass({
   /*
     Validation to ensure that the properties sent from the
       parent component is the correct type.
   */
   propTypes: {
-    model : React.PropTypes.string,
-    attrs : React.PropTypes.array,
-    header : React.PropTypes.object
+    model : PropTypes.string,
+    attrs : PropTypes.array,
+    header : PropTypes.object
   },
 
   getDefaultProps: function() {
@@ -68,6 +71,9 @@ var Table = React.createClass({
       case "Email":
         return {data : EmailStore.getAllEmails(), isCreate : EmailStore.isCreate()};
         break;
+      case "Review":
+        return {data : ReviewStore.getAllReviews(), detail : ReviewStore.isShowDetail()};
+        break;
     }
   },
 
@@ -90,6 +96,7 @@ var Table = React.createClass({
     CheckListStore.addChangeListener(this._onChange);
     CouponStore.addChangeListener(this._onChange);
     EmailStore.addChangeListener(this._onChange);
+    ReviewStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount: function () {
@@ -103,10 +110,11 @@ var Table = React.createClass({
     CheckListStore.removeChangeListener(this._onChange);
     CouponStore.removeChangeListener(this._onChange);
     EmailStore.removeChangeListener(this._onChange);
+    ReviewStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function () {
-    this.setState(this.getStateFromStore());
+    this.setState(this.getStateFromStore(this.props.model));
   },
 
   render: function () {
@@ -148,7 +156,7 @@ var Table = React.createClass({
 
     return (
         <table className="table table-striped table-bordered table-hover">
-          <tr><td colSpan={header.length}>{this.state.headData}</td></tr>
+          <tbody><tr><td colSpan={header.length}>{this.state.headData}</td></tr></tbody>
           <TableHeader cols={header}/>
           <tbody>
             {tableRows}

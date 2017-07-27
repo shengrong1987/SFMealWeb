@@ -272,7 +272,7 @@ module.exports = {
     $.ajax({
       url: url,
       type: 'GET',
-      dataType: 'json',
+      dataType: 'json'
     }).done(function (data) {
       ActionCreators.getCoupons(data);
     }).fail(function(jqXHR, textStatus){
@@ -280,67 +280,135 @@ module.exports = {
     });
   },
 
+  getReview : function(id){
+    $.ajax({
+      url: '/review/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getReview(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getReviews : function(criteria, value, skip){
+    if(criteria === "dishId" && value){
+      var url = "/dish/" + value + "/review?skip=" + skip;
+    }else if(criteria === "mealId"){
+      url = "/meal/" + value + "/review?skip=" + skip;
+    }else if(criteria === "hostId"){
+      url = "/host/" + value + "/review?skip=" + skip;
+    }else if(value) {
+      url = "/review?skip=" + skip + "&" + criteria + "=" + value;
+    }else{
+      url = "/review?skip=" + skip;
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json'
+    }).done(function (data) {
+      ActionCreators.getReviews(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
   command : function(model, id, action, detail, data){
+    var httpMethod = "POST";
     if(action === "create"){
       var url = '/' + model.toLowerCase();
+    }else if(action === 'view'){
+      url = '/' + model.toLowerCase() + '/' + id;
+      httpMethod = "GET";
     }else{
       url = '/' + model.toLowerCase() + '/' + id + '/' + action;
     }
     $.ajax({
       url: url,
-      type: 'POST',
+      type: httpMethod,
       data : data,
       dataType: 'json'
     }).done(function (data) {
-      switch(model) {
-        case "User":
-          if(detail){
-            ActionCreators.getUser(data);
-          }else{
-            ActionCreators.getUsers(data);
-          }
-          break;
-        case "Host":
-          if(detail){
-            ActionCreators.getHost(data);
-          }else{
-            ActionCreators.getHosts(data);
-          }
-          break;
-        case "Meal":
-          if(detail){
-            ActionCreators.getMeal(data);
-          }else{
-            ActionCreators.getMeals(data);
-          }
-          break;
-        case "Dish":
-          if(detail){
-            ActionCreators.getDish(data);
-          }else{
-            ActionCreators.getDishes(data);
-          }
-          break;
-        case "Order":
-          if(detail){
-            ActionCreators.getOrder(data);
-          }else{
-            ActionCreators.getOrders(data);
-          }
-          break;
-        case "Checklist":
-          if(detail){
-            ActionCreators.getCheckList(data);
-          }else{
-            ActionCreators.getCheckLists(data);
-          }
-          break;
-        case "Coupon":
-          if(detail){
-            ActionCreators.getCoupon(data);
-          }else{
-            ActionCreators.getCoupons(data);
-          }
+      if(action === "review"){
+        ActionCreators.switchTab("Review");
+        ActionCreators.getReviews(data);
+      }else if(action === "meal"){
+        ActionCreators.switchTab("Meal");
+        ActionCreators.getMeals(data);
+      }else if(action === "dish"){
+        ActionCreators.switchTab("Dish");
+        ActionCreators.getDishes(data);
+      }else if(action === "order"){
+        ActionCreators.switchTab("Order");
+        ActionCreators.getOrders(data);
+      }else{
+        switch(model) {
+          case "User":
+            if(detail){
+              ActionCreators.getUser(data);
+            }else{
+              ActionCreators.getUsers(data);
+            }
+            break;
+          case "Host":
+            if(detail){
+              ActionCreators.getHost(data);
+            }else{
+              ActionCreators.getHosts(data);
+            }
+            break;
+          case "Meal":
+            if(detail){
+              ActionCreators.getMeal(data);
+            }else{
+              ActionCreators.getMeals(data);
+            }
+            break;
+          case "Dish":
+            if(detail){
+              ActionCreators.getDish(data);
+            }else{
+              ActionCreators.getDishes(data);
+            }
+            break;
+          case "Order":
+            if(detail){
+              ActionCreators.getOrder(data);
+            }else{
+              ActionCreators.getOrders(data);
+            }
+            break;
+          case "Checklist":
+            if(detail){
+              ActionCreators.getCheckList(data);
+            }else{
+              ActionCreators.getCheckLists(data);
+            }
+            break;
+          case "Coupon":
+            if(detail){
+              ActionCreators.getCoupon(data);
+            }else{
+              ActionCreators.getCoupons(data);
+            }
+            break;
+          case "Job":
+            if(detail){
+              ActionCreators.getJob(data);
+            }else{
+              ActionCreators.getJobs(data);
+            }
+            break;
+          case "Review":
+            if(detail){
+              ActionCreators.getReview(data);
+            }else{
+              ActionCreators.getReviews(data);
+            }
+            break;
+        }
       }
     }).fail(function(jqXHR, textStatus){
       ActionCreators.badRequest(jqXHR.responseText);
@@ -433,10 +501,14 @@ module.exports = {
           this.getCoupons(criteria, content,skip);
         }
         break;
+      case "Review":
+        if(criteria === "id" && content){
+          this.getReview(content);
+        }else{
+          this.getReviews(criteria, content, skip);
+        }
+        break;
     }
     ActionCreators.search(criteria, content);
   }
-
-
-
 };

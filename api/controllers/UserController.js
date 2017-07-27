@@ -361,6 +361,28 @@ module.exports = require('waterlock').actions.user({
     });
   },
 
+  activate : function(req, res){
+    var userId = req.params.id;
+    var msg = req.body.msg;
+    User.update(userId, { status : 'active', msg : msg }).exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(user);
+    })
+  },
+
+  deactivate : function(req, res){
+    var userId = req.params.id;
+    var msg = req.body.msg;
+    User.update(userId, { status : 'frozen', msg : msg }).exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(user);
+    })
+  },
+
   // getSignedUrl : function(req, res){
   //   var bucket = sails.config.aws.bucket;
   //   var userId = req.session.user.id;

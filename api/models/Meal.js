@@ -257,7 +257,7 @@ module.exports = {
     },
 
     dishIsValid : function(){
-      if(this.dishes.length == 0){
+      if(this.dishes.length === 0){
         return false;
       }
       return this.dishes.every(function(dish){
@@ -375,7 +375,7 @@ module.exports = {
           if(err){
             return next(err);
           }
-          if(values.type != "order"){
+          if(values.type !== "order"){
             return next();
           }
           sails.log.info("updating meal county to host county");

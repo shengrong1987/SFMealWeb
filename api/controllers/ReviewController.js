@@ -24,7 +24,7 @@ module.exports = {
         return res.badRequest(err);
       }
       var orders = user.orders.filter(function(order){
-        return order.status == "review" && order.customer == userId;
+        return order.status === "review" && order.customer === userId;
       });
       if(orders.length === 0){
         sails.log.debug("no available orders for review");
@@ -207,6 +207,16 @@ module.exports = {
       }
       cb(null, results.createReview);
     });
+  },
+
+  private : function(req, res){
+    var reviewId = req.params.id;
+    Review.update(reviewId, { isPublic : false}).exec(function(err, review){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(review[0]);
+    })
   }
 };
 

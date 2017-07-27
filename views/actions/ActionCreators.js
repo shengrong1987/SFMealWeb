@@ -139,6 +139,20 @@ var ActionsCreators = {
     });
   },
 
+  getReview: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_REVIEW,
+      records: records
+    });
+  },
+
+  getReviews: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_REVIEWS,
+      records: records
+    });
+  },
+
   switchTab : function(tab){
     AppDispatcher.handleViewAction({
       type : ActionTypes.TAB_CHANGE,

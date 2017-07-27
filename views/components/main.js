@@ -4,12 +4,12 @@
 'use strict';
 
 var React = require('react'),
-  AdminPanel = require('./AdminPanel'),
-  SFMealApi = require('../helpers/SFMealAPI');
+  ReactDOM = require('react-dom'),
+  AdminPanel = require('./AdminPanel');
 
 var container = document.getElementById('container');
 
-React.render(
+ReactDOM.render(
   <AdminPanel title="SF Meal CMS" version="1.0" />,
   container
 );

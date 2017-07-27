@@ -45,28 +45,54 @@ module.exports = {
 
   update : function(req, res){
     var dishId = req.params.id;
-    var hostId = req.session.user.host.id ? req.session.user.host.id : req.session.user.host;
-    Meal.find({chef : hostId}).populate("dishes").exec(function(err, meals){
+    var hostId;
+    var isAdmin = req.session.user.auth.email === "admin@sfmeal.com";
+    async.auto({
+      findChef : function(next){
+        if(!isAdmin){
+          return next();
+        }
+        Dish.findOne(dishId).populate("chef").exec(function(err, dish){
+          if(err){
+            return next(err);
+          }
+          hostId = dish.chef.id;
+          next();
+        })
+      },
+      getChef : function(next){
+        if(isAdmin){
+          return next();
+        }
+        hostId = req.session.user.host.id ? req.session.user.host.id : req.session.user.host;
+        next();
+      }
+    }, function(err){
       if(err){
         return res.badRequest(err);
       }
-      if(!meals.every(function(meal){
-          if(meal.status == "off"){
-            return true;
-          }
-          return meal.dishes.every(function(dish){
-            return dish.id != dishId;
-          });
-        })){
-        return res.badRequest({ code : -2, responseText : req.__("meal-active-update-dish")});
-      }
-      Dish.update(dishId, req.body).exec(function(err, dish){
+      Meal.find({chef : hostId}).populate("dishes").exec(function(err, meals){
         if(err){
           return res.badRequest(err);
         }
-        return res.ok({dishId : dish[0].id});
-      })
-    });
+        if(!meals.every(function(meal){
+            if(meal.status == "off"){
+              return true;
+            }
+            return meal.dishes.every(function(dish){
+              return dish.id != dishId;
+            });
+          })){
+          return res.badRequest({ code : -2, responseText : req.__("meal-active-update-dish")});
+        }
+        Dish.update(dishId, req.body).exec(function(err, dish){
+          if(err){
+            return res.badRequest(err);
+          }
+          return res.ok({dishId : dish[0].id});
+        })
+      });
+    })
   },
 
   search : function(req, res){
@@ -115,11 +141,11 @@ module.exports = {
         return res.badRequest(err);
       }
       if(!meals.every(function(meal){
-          if(meal.status == "off"){
+          if(meal.status === "off"){
             return true;
           }
           return meal.dishes.every(function(dish){
-            return dish.id != dishId;
+            return dish.id !== dishId;
           });
       })){
         return res.badRequest({ code : -1, responseText : req.__("meal-active-delete-dish")});
@@ -131,6 +157,16 @@ module.exports = {
         return res.ok({dishId : dish.id});
       })
     });
+  },
+
+  findReview : function(req, res){
+    var dishId = req.params.id;
+    Review.find({ dish : dishId} ).exec(function(err, reviews){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(reviews);
+    })
   }
 };
 

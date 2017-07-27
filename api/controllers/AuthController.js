@@ -54,11 +54,12 @@ module.exports = require('waterlock').waterlocked({
           }else{
             //in development mode, skipping subscription
           }
-          User.cloneToUser(user,params,function(err,s){
+          delete params.password;
+          User.update(user.id, params).exec(function(err, u){
             if(err){
               return res.badRequest(err);
             }
-            req.session.user = s;
+            req.session.user = user;
             req.session.authenticated = true;
             return res.ok(user);
           });
@@ -72,12 +73,12 @@ module.exports = require('waterlock').waterlocked({
     var auth = req.session.user.auth;
     var county = req.session.user.county;
     sails.log.info("county: " + county);
-    if(county && (!req.cookies['county'] || req.cookies['county'] == 'undefined')){
+    if(county && (!req.cookies['county'] || req.cookies['county'] === 'undefined')){
       res.cookie('county',county);
     }
     if(auth.facebookId){
-      if(req.query.state){
-        res.redirect(req.query.state);
+      if(req.session.user.redirectUrl){
+        res.redirect(req.session.user.redirectUrl);
       }else{
         res.redirect('back');
       }
