@@ -83,7 +83,11 @@ module.exports = require('waterlock').waterlocked({
         res.redirect('back');
       }
     }else if(auth.googleEmail){
-      res.redirect('back');
+      if(req.session.user.redirectUrl){
+        res.redirect(req.session.user.redirectUrl);
+      }else{
+        res.redirect('back');
+      }
     }else{
       res.ok(req.session.user);
     }
