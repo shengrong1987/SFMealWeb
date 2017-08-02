@@ -339,6 +339,9 @@ module.exports = {
   },
 
   batchRefund : function(refunds, metadata, cb){
+    if(!refunds){
+      return cb();
+    }
     var _this = this;
     var refundsId = Object.keys(refunds);
     async.each(refundsId, function(refundId, next){
@@ -389,6 +392,52 @@ module.exports = {
         cb(null,refund);
       });
     });
+  },
+
+  batchReverse : function(reverses, metadata, cb){
+    if(!reverses){
+      return cb();
+    }
+    var _this = this;
+    var refundsId = Object.keys(reverses);
+    async.each(refundsId, function(reverseId, next){
+      if(reverses[reverseId] === 0){
+        return next();
+      }
+      _this.reverse({
+        id : reverseId,
+        amount : reverses[reverseId],
+        metadata : metadata
+      },function(err, refund){
+        if(err){
+          return next(err);
+        }
+        next();
+      });
+    },function(err){
+      if(err){
+        return cb(err);
+      }
+      cb();
+    })
+  },
+
+  reverse : function(attr, cb){
+    sails.log.info("reversing transfer: " + (typeof attr.amount === 'undefined' || "fully"));
+    stripe.transfers.createReversal(
+      attr.id,
+      {
+        amount : attr.amount,
+        metadata : attr.metadata,
+        refund_application_fee : attr.metadata.refund_application_fee || false
+      },
+      function(err, reversal){
+        if(err){
+          return cb(err);
+        }
+        cb(null, reversal);
+      }
+    );
   },
 
   newCustomerWithCard : function(attr, cb){

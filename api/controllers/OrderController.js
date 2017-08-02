@@ -399,7 +399,7 @@ module.exports = {
       if(err){
         return cb(err);
       }
-      req.body.discountAmount = points/10;
+      req.body.redeemPoints = parseInt(points);
       cb(null, points/10);
     });
   },
@@ -727,7 +727,7 @@ module.exports = {
       if(err){
         return res.badRequest(err)
       }
-      if(order.discountAmount){
+      if(order.coupon){
         return res.badRequest({ code : -18, responseText : req.__('adjust-with-coupon-error')});
       }
       order.meal.dishes = order.dishes;
@@ -946,7 +946,7 @@ module.exports = {
       if (err) {
         return res.badRequest(err)
       }
-      if(!order.charges || order.charges.length === 0){
+      if((!order.charges || order.charges.length === 0) && (!order.transfer || order.transfer.length === 0)){
         return res.badRequest(req.__('order-refund-fail'));
       }
       if(order.paymentMethod !== "cash"){
@@ -959,14 +959,19 @@ module.exports = {
           if (err) {
             return res.badRequest(err);
           }
-          order.tax = 0;
-          order.msg = "Order refunded by admin, please see email for detail, order id:" + order.id;
-          order.save(function (err, result) {
-            if (err) {
+          stripe.batchReverse(order.transfer, metadata, function(err){
+            if(err){
               return res.badRequest(err);
             }
-            return res.ok(order);
-          })
+            order.tax = 0;
+            order.msg = "Order refunded by admin, please see email for detail, order id:" + order.id;
+            order.save(function (err, result) {
+              if (err) {
+                return res.badRequest(err);
+              }
+              return res.ok(order);
+            })
+          });
         });
       }else{
         metadata = {
@@ -1019,11 +1024,11 @@ module.exports = {
         //can cancel without permission of host
         var amount = (order.subtotal + order.delivery_fee).toFixed(2);
         if(amount > 0){
-          User.findOne(order.customer.id).populate('payment').exec(function (err, found) {
+          User.findOne(order.customer.id).populate('payment').exec(function (err, user) {
             if(err) {
               return res.badRequest(err);
             }
-            if(order.paymentMethod === 'online' && (!found.payment || found.payment.length === 0)){
+            if(order.paymentMethod === 'online' && (!user.payment || user.payment.length === 0)){
               return res.badRequest({ responseText : req.__('order-lack-payment'), code : -5});
             }
 
@@ -1037,7 +1042,7 @@ module.exports = {
                   paymentMethod : order.paymentMethod,
                   reverse_transfer : true,
                   refund_application_fee : true
-                }
+                };
                 stripe.batchRefund(order.charges, metadata, function(err){
                   if(err){
                     return next(err);
@@ -1054,49 +1059,69 @@ module.exports = {
                 if (err) {
                   return res.badRequest(err);
                 }
-                async.auto({
-                  refundApplicationFeeForCashOrder: function (cb) {
-                    if (order.paymentMethod !== "cash") {
-                      return cb();
-                    }
-                    var metadata = {
-                      userName: order.customerName,
-                      userPhone: order.customerPhone,
-                      paymentMethod : order.paymentMethod,
-                      reverse_transfer : false,
-                      refund_application_fee : false
-                    };
-                    stripe.batchRefund(order.feeCharges, metadata, function (err) {
-                      if (err) {
-                        return cb(err);
-                      }
-                      order.charges['cash'] = 0;
-                      order.application_fees['cash'] = 0;
-                      $this.clearCharges(order.feeCharges);
-                      cb();
-                    });
-                  }
-                }, function(err){
-                  if(err){
+                User.findOne(order.customer.id).populate('payment').exec(function (err, user) {
+                  if (err) {
                     return res.badRequest(err);
                   }
-                  order.tax = 0;
-                  order.status = "cancel";
-                  order.meal = m.id;
-                  order.subtotal = 0;
-                  order.save(function (err, result) {
+                  var metadata = {
+                    userName: order.customerName,
+                    userPhone: order.customerPhone,
+                    paymentMethod : order.paymentMethod,
+                    reverse_transfer : false,
+                    refund_application_fee : false
+                  };
+                  async.auto({
+                    refundApplicationFeeForCashOrder: function (cb) {
+                      if (order.paymentMethod !== "cash") {
+                        return cb();
+                      }
+                      stripe.batchRefund(order.feeCharges, metadata, function (err) {
+                        if (err) {
+                          return cb(err);
+                        }
+                        order.charges['cash'] = 0;
+                        order.application_fees['cash'] = 0;
+                        $this.clearCharges(order.feeCharges);
+                        cb();
+                      });
+                    },
+                    refundPoints : function(next){
+                      if(order.redeemPoints === 0){
+                        return next();
+                      }
+                      stripe.batchReverse(order.transfer, metadata, function(err) {
+                        if (err) {
+                          return next(err);
+                        }
+                        sails.log.info("refunding points: " + order.redeemPoints);
+                        sails.log.info("user old points: " + user.points);
+                        user.points += parseInt(order.redeemPoints);
+                        sails.log.info("user new points: " + user.points);
+                        user.save(next);
+                      });
+                    }
+                  }, function(err){
                     if(err){
                       return res.badRequest(err);
                     }
-                    notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
-                    $this.cancelOrderJob(result.id, function(err){
+                    order.tax = 0;
+                    order.status = "cancel";
+                    order.meal = m.id;
+                    order.redeemPoints = 0;
+                    order.save(function (err, result) {
                       if(err){
                         return res.badRequest(err);
                       }
-                      return res.ok({responseText : req.__('order-cancel-ok'), tax : order.tax, paymentMethod : order.paymentMethod, charges : order.charges, feeCharges : order.feeCharges, application_fees : order.application_fees});
-                    });
+                      notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
+                      $this.cancelOrderJob(result.id, function(err){
+                        if(err){
+                          return res.badRequest(err);
+                        }
+                        return res.ok({responseText : req.__('order-cancel-ok'), tax : order.tax, paymentMethod : order.paymentMethod, charges : order.charges, feeCharges : order.feeCharges, application_fees : order.application_fees});
+                      });
+                    })
                   })
-                })
+                });
               });
             })
           });
@@ -1150,6 +1175,7 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
+      var customerId = order.customer.id;
       if(order.status === "adjust"){
         var adjusting_subtotal = order.adjusting_subtotal;
         var adjusting_orders = order.adjusting_orders;
@@ -1158,13 +1184,12 @@ module.exports = {
         netDiff *= 100;
         var adjustAmount = netDiff + tax;
 
-        var customerId = order.customer.id;
         if(netDiff !== 0){
-          User.findOne(customerId).populate('payment').exec(function (err, found) {
+          User.findOne(customerId).populate('payment').exec(function (err, user) {
             if (err) {
               return res.badRequest(err);
             }
-            if(order.paymentMethod === 'online' && (!found.payment || found.payment.length === 0)){
+            if(order.paymentMethod === 'online' && (!user.payment || user.payment.length === 0)){
               return res.badRequest({ responseText : req.__('order-lack-payment'), code : -5});
             }
             if(netDiff>0){
@@ -1175,7 +1200,7 @@ module.exports = {
                 amount : netDiff,
                 email : email,
                 discount : 0,
-                customerId : found.payment[0] ?  found.payment[0].customerId : null,
+                customerId : user.payment[0] ?  user.payment[0].customerId : null,
                 destination : order.host.accountId,
                 meal : order.meal,
                 tax : tax,
@@ -1245,7 +1270,7 @@ module.exports = {
                     paymentMethod : order.paymentMethod,
                     reverse_transfer : true,
                     refund_application_fee : true
-                  }
+                  };
                   stripe.batchRefund(refundCharges, metadata, function(err){
                     if(err){
                       return next(err);
@@ -1341,22 +1366,22 @@ module.exports = {
       }else if(order.status === "cancelling"){
         var amount = order.subtotal + order.delivery_fee;
         if(amount > 0){
-          User.findOne(userId).populate('payment').exec(function (err, found) {
-            if (err) {
-              return res.badRequest(err);
-            }
-            //refund all charges of customer
-            var metadata = {
-              userId : order.customer.id,
-              paymentMethod : order.paymentMethod,
-              reverse_transfer : true,
-              refund_application_fee : true
-            }
-            stripe.batchRefund(order.charges, metadata, function(err){
-                if(err){
+          var metadata = {
+            userId : order.customer.id,
+            paymentMethod : order.paymentMethod,
+            reverse_transfer : true,
+            refund_application_fee : true
+          };
+          //refund all charges of customer
+          stripe.batchRefund(order.charges, metadata, function(err){
+              if(err){
+                return res.badRequest(err);
+              }
+              $this.updateMealLeftQty(order.meal, order.orders, $this.clearOrder(order.orders), function (err, m) {
+                if (err) {
                   return res.badRequest(err);
                 }
-                $this.updateMealLeftQty(order.meal, order.orders, $this.clearOrder(order.orders), function (err, m) {
+                User.findOne(customerId).populate('payment').exec(function (err, user) {
                   if (err) {
                     return res.badRequest(err);
                   }
@@ -1380,6 +1405,21 @@ module.exports = {
                         order.application_fees['cash'] = 0;
                         cb();
                       })
+                    },
+                    refundPoints : function(cb){
+                      if(order.redeemPoints === 0){
+                        return cb();
+                      }
+                      stripe.batchReverse(order.transfer, metadata, function(err) {
+                        if (err) {
+                          return next(err);
+                        }
+                        sails.log.info("refunding points: " + order.redeemPoints);
+                        sails.log.info("user old points: " + user.points);
+                        user.points += parseInt(order.redeemPoints);
+                        sails.log.info("user new points: " + user.points);
+                        user.save(cb);
+                      });
                     }
                   }, function(err){
                     if(err){
@@ -1389,6 +1429,7 @@ module.exports = {
                     order.status = "cancel";
                     order.lastStatus = "cancelling";
                     order.meal = order.meal.id;
+                    order.redeemPoints = 0;
                     order.save(function (err, result) {
                       if (err) {
                         return res.badRequest(err);
@@ -1403,9 +1444,9 @@ module.exports = {
                     })
                   })
                 });
-              }
-            )
-          });
+              });
+            }
+          )
         }else{
           order.tax = 0;
           order.status = "cancel";

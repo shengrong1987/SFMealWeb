@@ -3231,7 +3231,6 @@ var OrderView = Backbone.View.extend({
     e.preventDefault();
     var $this = this;
     var button = $(e.currentTarget);
-    button.button('loading');
 
     var userId = this.$el.data("user");
     var isLogin = !!userId;
@@ -3281,7 +3280,7 @@ var OrderView = Backbone.View.extend({
           if (couponValue) {
             var code = Object.keys(couponValue)[0];
           }
-
+          button.button('loading');
           $this.model.set({
             orders: currentOrder,
             subtotal: subtotal,

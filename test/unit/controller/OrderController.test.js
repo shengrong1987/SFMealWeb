@@ -643,7 +643,7 @@ describe('OrderController', function() {
           if(res.body.customer !== guestId){
             return done(Error("error making order"));
           }
-          res.body.discountAmount.should.be.equal(1.3);
+          res.body.redeemPoints.should.be.equal("13");
           var chargesTotal = ((price3 * 1)*1.085 + 1) + 3.99 - 1.3;
           res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(Math.round(chargesTotal * 100));
           res.body.application_fees[Object.keys(res.body.application_fees)[0]].should.be.equal(260);

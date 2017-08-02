@@ -130,6 +130,9 @@ module.exports = {
     charges : {
       type : 'json'
     },
+    transfers : {
+      type : 'json'
+    },
     msg : {
       type : 'string',
       defaultsTo : ''
@@ -142,6 +145,10 @@ module.exports = {
     },
     discountAmount : {
       type : 'float',
+      defaultsTo : 0
+    },
+    redeemPoints : {
+      type : 'int',
       defaultsTo : 0
     },
     tax : {
