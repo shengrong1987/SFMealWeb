@@ -357,7 +357,7 @@ describe('MealController', function() {
         "method" : "pickup",
         "area" : "Market & Downtown",
         "county" : "San Francisco County",
-        "phone" : "(415)222-2222"
+        "phone" : "(415)802-3853"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
@@ -365,7 +365,7 @@ describe('MealController', function() {
         "deliveryCenter" : "1974 Palou Ave, San Francisco, CA 94124, USA",
         "area" : "Bay View",
         "county" : "San Francisco County",
-        "phone" : "(415)222-2222"
+        "phone" : "(415)802-3854"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
@@ -375,7 +375,7 @@ describe('MealController', function() {
         "method" : "pickup",
         "county" : "San Mateo County",
         "area" : "Daly City",
-        "phone" : "(415)333-3333"
+        "phone" : "(415)802-3853"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 4),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 5),
@@ -385,7 +385,7 @@ describe('MealController', function() {
         "method" : "pickup",
         "county" : "Santa Clara County",
         "area" : "Sunnyvale",
-        "phone" : "(415)444-4444"
+        "phone" : "(415)802-3853"
       }];
       agent
           .post('/meal')
@@ -416,6 +416,7 @@ describe('MealController', function() {
             res.body.should.have.property('pickups').with.length(5);
             res.body.pickups[0].publicLocation.should.be.equal("Uber HQ");
             res.body.pickups[0].phone.should.be.equal("(415)802-3853");
+            res.body.pickups[1].phone.should.be.equal("(415)802-3854");
             res.body.should.have.property('county');
             res.body.county.should.containEql('San Francisco County');
             res.body.county.should.containEql('San Mateo County');

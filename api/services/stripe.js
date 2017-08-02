@@ -125,6 +125,152 @@ module.exports = {
     });
   },
 
+  chargeCash : function(attr, cb){
+    stripe.charges.create({
+      amount : attr.metadata.application_fee,
+      currency : 'usd',
+      source : attr.destination,
+      metadata : attr.metadata
+    }, function(err, charge){
+      if(err){
+        return cb(err);
+      }
+      return cb(null, { id : 'cash', status : 'succeeded', amount : attr.metadata.total, application_fee : attr.metadata.application_fee}, charge);
+    });
+  },
+
+  chargeCreditCard : function(attr, cb){
+    var _this = this;
+    stripe.charges.create({
+      amount: attr.metadata.total,
+      currency: "usd",
+      receipt_email: attr.email,
+      customer: attr.customerId,
+      destination : attr.destination,
+      metadata : attr.metadata,
+      application_fee : attr.metadata.application_fee
+    }, function (err, charge) {
+      if(err){
+        return cb(err);
+      }
+      if(attr.metadata.discount !== 0){
+        _this.retrieveApplicationFee(charge.application_fee, function(err, fee){
+          if(err){
+            return cb(err);
+          }
+          var leftFee = attr.metadata.application_fee - fee.amount;
+          var total = attr.metadata.discount - leftFee;
+          sails.log.info("charge remain application fee: " + leftFee);
+          attr.metadata.application_fee = leftFee;
+          stripe.transfers.create(
+            {
+              amount: total,
+              currency: 'usd',
+              destination: attr.destination,
+              metadata : attr.metadata
+            }, function(err, transfer){
+              if(err){
+                return cb(err);
+              }
+              sails.log.info("extra transfer created: " + transfer.amount);
+              _this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
+                if(err){
+                  return cb(err);
+                }
+                cb(null, charge, transfer);
+              });
+            }
+          );
+        });
+      }else{
+        if(!attr.metadata.userId){
+          return cb(null, charge);
+        }
+        _this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
+          if(err){
+            return cb(err);
+          }
+          cb(null, charge);
+        });
+      }
+    });
+  },
+
+  chargeOthers : function(attr, cb){
+    var _this = this;
+    stripe.charges.create({
+      amount: attr.metadata.total,
+      currency: "usd",
+      receipt_email: attr.email,
+      customer: attr.customerId,
+      destination : attr.destination,
+      metadata : attr.metadata,
+      application_fee : attr.metadata.application_fee
+    }, function (err, charge) {
+      if(err){
+        return cb(err);
+      }
+      if(attr.metadata.discount !== 0){
+        _this.retrieveApplicationFee(charge.application_fee, function(err, fee){
+          if(err){
+            return cb(err);
+          }
+          var leftFee = attr.metadata.application_fee - fee.amount;
+          var total = attr.metadata.discount - leftFee;
+          sails.log.info("charge remain application fee: " + leftFee);
+          attr.metadata.application_fee = leftFee;
+          stripe.transfers.create(
+            {
+              amount: total,
+              currency: 'usd',
+              destination: attr.destination,
+              metadata : attr.metadata
+            }, function(err, transfer){
+              if(err){
+                return cb(err);
+              }
+              sails.log.info("extra transfer created: " + transfer.amount);
+              _this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
+                if(err){
+                  return cb(err);
+                }
+                cb(null, charge, transfer);
+              });
+            }
+          );
+        });
+      }else{
+        if(!attr.metadata.userId){
+          return cb(null, charge);
+        }
+        _this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
+          if(err){
+            return cb(err);
+          }
+          cb(null, charge);
+        });
+      }
+    });
+  },
+
+  newSource : function(attr, cb){
+    var _this = this;
+    stripe.sources.create({
+      type: attr.type,
+      amount: attr.amount,
+      currency: 'usd',
+      redirect: {
+        return_url: 'https://sfmeal.com/order/process'
+      },
+      metadata : attr.metadata
+    }, function(err, source){
+      if(err){
+        return cb(err);
+      }
+      cb(null, source);
+    })
+  },
+
   charge : function(attr, cb){
 
     var meal = attr.meal;
@@ -132,7 +278,7 @@ module.exports = {
     var serviceFee = isInitial ? SERVICE_FEE : 0;
 
     //declare all fees
-    var delivery_application_fee = (attr.method && attr.method == "delivery" && meal.isDeliveryBySystem) ? SYSTEM_DELIVERY_FEE : 0;
+    var delivery_application_fee = (attr.method && attr.method === "delivery" && meal.isDeliveryBySystem) ? SYSTEM_DELIVERY_FEE : 0;
     var delivery_fee = attr.deliveryFee || 0;
     var discount = attr.discount || 0;
     var tax = attr.tax;
@@ -146,6 +292,8 @@ module.exports = {
     //calculate application fee
     var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee;
 
+    sails.log.info("application fee is: " + application_fee);
+
     //calculate subtotal after tax
     var subtotalAfterTax = attr.amount + tax;
 
@@ -153,75 +301,17 @@ module.exports = {
     var originalTotal = subtotalAfterTax + delivery_fee + serviceFee;
 
     //apply discount
-    var total = originalTotal - discount;
+
+    attr.metadata.discount = discount;
+    attr.metadata.total = originalTotal - discount;
+    attr.metadata.application_fee = application_fee;
 
     if(attr.paymentMethod === "cash"){
-      attr.metadata.total = total;
-      stripe.charges.create({
-        amount : application_fee,
-        currency : 'usd',
-        source : attr.destination,
-        metadata : attr.metadata
-      }, function(err, charge){
-        if(err){
-          return cb(err);
-        }
-        return cb(null, { id : 'cash', status : 'succeeded', amount : total, application_fee : application_fee}, charge);
-      });
+      this.chargeCash(attr, cb);
+    }else if(attr.paymentMethod === "online"){
+      this.chargeCreditCard(attr, cb);
     }else{
-      var $this = this;
-      stripe.charges.create({
-        amount: total,
-        currency: "usd",
-        receipt_email: attr.email,
-        customer: attr.customerId,
-        destination : attr.destination,
-        metadata : attr.metadata,
-        application_fee : application_fee
-      }, function (err, charge) {
-        if(err){
-          return cb(err);
-        }
-        if(discount !== 0){
-          $this.retrieveApplicationFee(charge.application_fee, function(err, fee){
-            if(err){
-              return cb(err);
-            }
-            var leftFee = application_fee - fee.amount;
-            sails.log.info("charge remain application fee: " + leftFee);
-            stripe.transfers.create(
-              {
-                amount: discount,
-                currency: 'usd',
-                destination: attr.destination,
-                application_fee : leftFee,
-                metadata : attr.metadata
-              }, function(err, transfer){
-                if(err){
-                  return cb(err);
-                }
-                sails.log.info("extra transfer created: " + transfer.amount);
-                $this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
-                  if(err){
-                    return cb(err);
-                  }
-                  cb(null, charge, transfer);
-                });
-              }
-            );
-          });
-        }else{
-          if(!attr.metadata.userId){
-            return cb(null, charge);
-          }
-          $this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
-            if(err){
-              return cb(err);
-            }
-            cb(null, charge);
-          });
-        }
-      });
+      this.chargeOthers(attr, cb);
     }
   },
 

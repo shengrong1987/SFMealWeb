@@ -80,6 +80,7 @@ module.exports.routes = {
   '/order/:id/refund' : 'OrderController.refund',
   '/order/:id/receipt' : "OrderController.receipt",
   '/order/:id/receipt/download' : "OrderController.downloadReceipt",
+  '/order/process' : "OrderController.process",
   '/job/:name/run' : 'JobController.run',
   '/job/:id/delete' : 'JobController.deleteJob',
   '/job/clean' : 'JobController.cleanJobs',

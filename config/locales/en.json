@@ -753,6 +753,8 @@
   "check-out-fast-btn" : "View Cart",
   "check-out-sold-btn" : "Sold out",
   "cash-method" : "Paid Cash",
+  "alipay-method" : "AliPay",
+  "wechatpay-method" : "WechatPay",
   "cash" : "Cash",
   "online" : "Online",
   "amount-owe" : "Owe",

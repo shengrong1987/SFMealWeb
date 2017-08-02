@@ -640,7 +640,7 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          if(res.body.customer != guestId){
+          if(res.body.customer !== guestId){
             return done(Error("error making order"));
           }
           res.body.discountAmount.should.be.equal(1.3);
@@ -1262,7 +1262,6 @@ describe('OrderController', function() {
     var adminEmail = 'admin@sfmeal.com';
     var password = '12345678';
     var email = 'aimbebe.r@gmail.com';
-    var password = '12345678';
 
     it('should login a guest account', function (done) {
       agent
@@ -1360,7 +1359,7 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body.discountAmount.should.be.equal(4.34);
-          res.body.transfer[Object.keys(res.body.transfer)[0]].should.be.equal(434);
+          res.body.transfer[Object.keys(res.body.transfer)[0]].should.be.equal(354);
           res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(100);
           res.body.application_fees[Object.keys(res.body.application_fees)[0]].should.be.equal(180);
           orderId = res.body.id;

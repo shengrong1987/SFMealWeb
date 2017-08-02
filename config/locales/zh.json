@@ -752,6 +752,8 @@
   "check-out-fast-btn" : "查看购物车",
   "check-out-sold-btn" : "已售罄",
   "cash-method" : "现金支付",
+  "alipay-method" : "支付宝支付",
+  "wechatpay-method" : "微信支付",
   "cash" : "现金",
   "online" : "线上支付",
   "amount-owe" : "需付",

@@ -68,7 +68,7 @@ module.exports = require('waterlock').actions.user({
             var hostId = host.id;
             var ip = req.ip;
             var params = {
-              managed : true,
+              type : "custom",
               country : 'US',
               email : email,
               legal_entity :{
@@ -78,7 +78,7 @@ module.exports = require('waterlock').actions.user({
                 date : parseInt(new Date().getTime()/1000),
                 ip : ip
               },
-              transfer_schedule : {
+              payout_schedule : {
                 interval : "weekly",
                 weekly_anchor : "monday"
               }

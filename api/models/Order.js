@@ -26,7 +26,7 @@ module.exports = {
     },
     paymentMethod : {
       type : 'string',
-      enum : ['cash','online'],
+      enum : ['cash','online','alipay','wechatpay'],
       defaultsTo : 'online'
     },
     dishes: {
@@ -140,9 +140,6 @@ module.exports = {
       }
       return util.getTaxRate(this.host.county);
     },
-    coupon : {
-      model : 'Coupon'
-    },
     discountAmount : {
       type : 'float',
       defaultsTo : 0
@@ -154,6 +151,9 @@ module.exports = {
     isPartyMode : {
       type : 'boolean',
       defaultsTo : false
+    },
+    clientSecret : {
+      type : 'string'
     }
   }
 };

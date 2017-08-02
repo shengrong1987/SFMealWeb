@@ -49,6 +49,10 @@ var moment = require("moment");
 //-35 : party order lack of order custom info
 //-36 : party order has to be with delivery
 //-37 : stripe error status
+//-38 : stripe invalid payment callback
+//-39 : stripe payment failed
+//-40 : stripe payment cancel
+//-41 : stripe payment unknown error
 
 
 module.exports = {
@@ -143,7 +147,8 @@ module.exports = {
               return next2({ responseText : req.__('order-preference-not-exist'), code : -20});
             }
             var diff = qty - lastQty;
-            sails.log.info("order qty: " + qty, + " last qty: " + lastQty);
+            sails.log.info("dish id: " + dishId, " meal id:" + meal.id);
+            sails.log.info("order qty: " + qty, " last qty: " + lastQty);
             sails.log.info("order number: " + diff, " leftQty: " + meal.leftQty[dishId]);
             if(!isPartyMode && diff > meal.leftQty[dishId]){
               return next2({responseText : req.__('order-dish-not-enough',dishId, qty), code : -1});
@@ -579,137 +584,120 @@ module.exports = {
                 if (err) {
                   return res.badRequest(err);
                 }
-                stripe.charge({
-                  paymentMethod : order.paymentMethod,
-                  isInitial : true,
-                  amount : subtotal * 100,
-                  deliveryFee : parseInt(req.body.delivery_fee * 100),
-                  discount : req.body.discount * 100,
-                  email : email,
-                  customerId : req.body.customerId,
-                  destination : m.chef.accountId,
-                  meal : states.m,
-                  method : method,
-                  tax : req.body.tax,
-                  metadata : {
-                    mealId : states.m.id,
-                    hostId : states.m.chef.id,
-                    orderId : order.id,
-                    userId : userId,
-                    deliveryFee : parseInt(req.body.delivery_fee * 100),
-                    tax : req.body.tax
-                  }
-                },function(err, charge, transfer){
-                  if(err){
-                    Order.destroy(order.id).exec(function(err2){
-                      if(err2){
-                        return res.badRequest(err2);
-                      }
+                if(order.paymentMethod === "alipay" || order.paymentMethod === "wechatpay"){
+                  stripe.newSource({
+                    type : order.paymentMethod,
+                    amount : subtotal * 100,
+                    metadata : {
+                      mealId : states.m.id,
+                      hostId : states.m.chef.id,
+                      orderId : order.id,
+                      userId : userId,
+                      deliveryFee : parseInt(req.body.delivery_fee * 100),
+                      tax : req.body.tax,
+                      discount : req.body.discount * 100
+                    }
+                  }, function(err, source){
+                    if(err){
                       return res.badRequest(err);
+                    }
+                    order.client_secret = source.client_secret;
+                    order.save(function(err, o){
+                      if(err){
+                        return res.badRequest(err);
+                      }
+                      res.redirect(source.redirect.url);
                     });
-                  } else if(charge.status === "succeeded"){
-
-                    sails.log.info("charge succeed, gathering charging info for order");
-                    for(var i = 0; i < m.dishes.length; i++){
-                      var dishId = m.dishes[i].id;
-                      if(orders.hasOwnProperty(dishId)){
-                        m.leftQty[dishId] -= parseInt(orders[dishId].number);
-                      }
+                  });
+                }else{
+                  stripe.charge({
+                    paymentMethod : order.paymentMethod,
+                    isInitial : true,
+                    amount : subtotal * 100,
+                    deliveryFee : parseInt(req.body.delivery_fee * 100),
+                    discount : req.body.discount * 100,
+                    email : email,
+                    customerId : req.body.customerId,
+                    destination : m.chef.accountId,
+                    meal : states.m,
+                    method : method,
+                    tax : req.body.tax,
+                    metadata : {
+                      mealId : states.m.id,
+                      hostId : states.m.chef.id,
+                      orderId : order.id,
+                      userId : userId,
+                      deliveryFee : parseInt(req.body.delivery_fee * 100),
+                      tax : req.body.tax
                     }
-                    //build charges obj & application_fees obj
-                    order.charges = {};
-                    order.transfer = {};
-                    order.feeCharges = {};
-                    order.application_fees = {};
-                    if(order.paymentMethod === "cash"){
-                      order.charges['cash'] = order.charges['cash'] || 0;
-                      order.charges['cash'] += charge.amount;
-                      order.application_fees[charge.id] = charge.application_fee;
-                      if(transfer){
-                        order.feeCharges[transfer.id] = transfer.amount;
-                      }
-                    }else{
-                      order.charges[charge.id] = charge.amount;
-                      if(transfer){
-                        order.transfer[transfer.id] = transfer.amount;
-                      }
-                    }
-
-                    if(order.paymentMethod === 'cash'){
-                      order.save(function(err, o){
-                        if(err){
-                          return res.badRequest(err);
+                  },function(err, charge, transfer){
+                    if(err){
+                      Order.destroy(order.id).exec(function(err2){
+                        if(err2){
+                          return res.badRequest(err2);
                         }
-                        o.chef = m.chef;
-                        o.dishes = m.dishes;
-                        notification.notificationCenter("Order", "new", o, true, false, req);
-                        //test only
-                        if(req.wantsJSON){
-                          return res.ok(order);
-                        }
-                        return res.ok({ id: order.id});
-                      })
-                    }else{
-                      stripe.retrieveApplicationFee(charge.application_fee, function(err, fee1){
-                        if(err){
-                          return res.badRequest(err);
-                        }
-                        if(transfer && transfer.application_fee){
-                          stripe.retrieveApplicationFee(transfer.application_fee, function(err, fee2){
-                            if(err){
-                              return res.badRequest(err);
-                            }
-                            order.application_fees[charge.id] = fee1.amount + fee2.amount;
-                            m.save(function (err, result) {
-                              if(err){
-                                return res.badRequest(err);
-                              }
-                              order.save(function(err, o){
-                                if(err){
-                                  return res.badRequest(err);
-                                }
-                                o.chef = m.chef;
-                                o.dishes = m.dishes;
-                                notification.notificationCenter("Order", "new", o, true, false, req);
-                                //test only
-                                if(req.wantsJSON){
-                                  return res.ok(order);
-                                }
-                                return res.ok({ id: order.id});
-                              });
-                            });
-                          })
-                        }else{
-                          order.application_fees[charge.id] = fee1.amount;
-                          m.save(function (err, result){
-                            if(err){
-                              return res.badRequest(err);
-                            }
-                            order.save(function(err, o){
-                              if(err){
-                                return res.badRequest(err);
-                              }
-                              o.chef = m.chef;
-                              o.dishes = m.dishes;
-                              notification.notificationCenter("Order", "new", o, true, false, req);
-                              //test only
-                              if(req.wantsJSON){
-                                return res.ok(order);
-                              }
-                              return res.ok({ id: order.id});
-                            });
-                          });
-                        }
+                        return res.badRequest(err);
                       });
+                    } else if(charge.status === "succeeded"){
+                      $this.afterSuccessCharge(order, orders, m, charge, transfer, req, res);
+                    } else {
+                      return res.badRequest({ code : -99, responseText : req.__('order-unknown-error') });
                     }
-                  } else {
-                    return res.badRequest({ code : -99, responseText : req.__('order-unknown-error') });
-                  }
-                });
+                  });
+                }
               });
             });
           });
         });
+      });
+    });
+  },
+
+  afterSuccessCharge : function(order, orders, m, charge, transfer, req, res){
+    sails.log.info("charge succeed, gathering charging info for order");
+    for(var i = 0; i < m.dishes.length; i++){
+      var dishId = m.dishes[i].id;
+      if(orders.hasOwnProperty(dishId)){
+        m.leftQty[dishId] -= parseInt(orders[dishId].number);
+      }
+    }
+    //build charges obj & application_fees obj
+    order.charges = {};
+    order.transfer = {};
+    order.feeCharges = {};
+    order.application_fees = {};
+
+    if(order.paymentMethod === "cash"){
+      order.charges['cash'] = order.charges['cash'] || 0;
+      order.charges['cash'] += charge.amount;
+      order.application_fees[charge.id] = charge.application_fee;
+      if(transfer){
+        order.feeCharges[transfer.id] = transfer.amount;
+      }
+    }else{
+      order.charges[charge.id] = charge.amount;
+      order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
+      if(transfer){
+        order.transfer[transfer.id] = transfer.amount;
+      }
+    }
+
+    m.save(function (err, result) {
+      if(err){
+        return res.badRequest(err);
+      }
+      order.save(function(err, o){
+        if(err){
+          return res.badRequest(err);
+        }
+        o.chef = m.chef;
+        o.dishes = m.dishes;
+        notification.notificationCenter("Order", "new", o, true, false, req);
+        //test only
+        if(req.wantsJSON){
+          return res.ok(order);
+        }
+        return res.ok({ id: order.id});
       });
     });
   },
@@ -981,7 +969,7 @@ module.exports = {
           })
         });
       }else{
-        var metadata = {
+        metadata = {
           userName: order.customerName,
           userPhone: order.customerPhone,
           reverse_transfer : false,
@@ -1552,6 +1540,48 @@ module.exports = {
       res.set('Content-Disposition','attachment; filename="' + dateString + '"-receipt.html" ')
       res.view('receipt', order);
     })
+  },
+
+  process : function(req, res){
+    var params = req.body;
+    var source = params.source;
+    var orderId = source.metadata.orderId;
+    var client_secret = params.client_secret;
+    var _this = this;
+    Order.findOne(orderId).populate("meal").exec(function(err, order){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(!order.client_secret || order.client_secret !== client_secret){
+        return res.badRequest({ code : -38, responseText : req.__('invalid-payment-callback')});
+      }
+      if(source.status !== "chargable"){
+        Order.destroy(orderId).exec(function(err, order){
+          if(err){
+            return res.badRequest(err);
+          }
+          return res.badRequest({ code : -39, response : req.__('ali-payment-failure')});
+        })
+      }else{
+        var attr = {
+          amount : source.amount,
+          currency : "usd",
+          source : source.id,
+          isInitial : true,
+          paymentMethod : source.type
+        }
+        stripe.charge(attr, function(err, charge, transfer){
+          if(err){
+            return res.badRequest(err);
+          }
+          if(charge.status === "succeed"){
+            _this.afterSuccessCharge(order, order.orders, order.meal, charge, transfer, req, res);
+          }else{
+            res.badRequest({ code : -99, responseText : req.__('order-unknown-error')})
+          }
+        });
+      }
+    });
   },
 
   search : function(req, res){

@@ -414,19 +414,19 @@ var ApplyView = Backbone.View.extend({
     var birthDay = this.$el.find("#bDayInput").attr('value');
     var birthYear = this.$el.find("#bYearInput").attr('value');
     this.$el.find("#bMonthInput option").each(function(){
-      if(parseInt($(this).val()) == birthMonth){
+      if(parseInt($(this).val()) === birthMonth){
         $(this).attr('selected', true);
       }
     });
 
     this.$el.find("#bDayInput option").each(function(){
-      if(parseInt($(this).val()) == birthDay){
+      if(parseInt($(this).val()) === birthDay){
         $(this).attr('selected', true);
       }
     });
 
     this.$el.find("#bYearInput option").each(function(){
-      if(parseInt($(this).val()) == birthYear){
+      if(parseInt($(this).val()) === birthYear){
         $(this).attr('selected', true);
       }
     });
@@ -2769,7 +2769,7 @@ var MealConfirmView = Backbone.View.extend({
     refreshMenu();
   },
   verifyAddress : function(e, checkOnly){
-    var btn = $(e.currentTarget);
+    var btn = e ? $(e.currentTarget) : null;
     var street = this.$el.find("input[name='street']").val();
     var city = this.$el.find("input[name='city']").val();
     var state = this.$el.find("input[name='state']").val();
@@ -2791,13 +2791,17 @@ var MealConfirmView = Backbone.View.extend({
       return yourAddress;
     }
     var deliveryCenter = deliveryOption.parent().data('center');
-    btn.button('loading');
+    if(btn){
+      btn.button('loading');
+    }
     utility.distance(deliveryCenter, yourAddress, function(err, distance) {
       if(err) {
         makeAToast(err, 'error');
         return;
       }
-      btn.button('reset');
+      if(btn){
+        btn.button('reset');
+      }
       if(distance > range){
         if(!isPartyMode){
           makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
@@ -2818,9 +2822,9 @@ var MealConfirmView = Backbone.View.extend({
     var method = $(e.currentTarget).find("button.active").data("method");
     var userId = this.$el.data("user");
     var paymentExpressForm = this.$el.find("#paymentInfoView");
-    var isLogin = userId ? true : false;
+    var isLogin = !!userId;
     if(!isLogin){
-      if(method == "cash"){
+      if(method !== "online"){
         paymentExpressForm.hide();
       }else{
         paymentExpressForm.show();
@@ -3161,6 +3165,7 @@ var OrderView = Backbone.View.extend({
     return cb(customerInfo);
   },
   getPaymentInfo : function(isLogin, cb){
+    var $this = this;
     var cards = this.$el.find("#payment-cards button.active");
     var paymentMethod = cards.data("method");
     var paymentInfo = {};
@@ -3212,13 +3217,12 @@ var OrderView = Backbone.View.extend({
             BootstrapDialog.alert(jQuery.i18n.prop(response.error.code));
             return cb(false);
           }
-          var token = response['id'];
-          paymentInfo.token = token;
+          paymentInfo.token = response['id'];
           paymentInfo.method = "online";
           return cb(paymentInfo);
         });
       }else{
-        paymentInfo.method = "cash";
+        paymentInfo.method = paymentMethod;
         return cb(paymentInfo);
       }
     }
@@ -3226,9 +3230,11 @@ var OrderView = Backbone.View.extend({
   takeOrder : function(e){
     e.preventDefault();
     var $this = this;
+    var button = $(e.currentTarget);
+    button.button('loading');
 
     var userId = this.$el.data("user");
-    var isLogin = userId ? true : false;
+    var isLogin = !!userId;
     var params = {};
     var method = this.$el.find("#method .active").attr("value");
 
@@ -3296,6 +3302,7 @@ var OrderView = Backbone.View.extend({
               Object.keys(localOrders).forEach(function (dishId) {
                 eraseCookie(dishId);
               });
+              button.button('reset');
               eraseCookie('points');
               localOrders = {};
               localPoints = 0;
