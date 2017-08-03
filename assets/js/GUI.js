@@ -710,6 +710,9 @@ function setup(){
     onText : "Yes",
     offText : "No"
   });
+  echo.init({
+    offset: 1000
+  });
   $('.lazyload').each(function(){
     $(this).attr('src', $(this).data('src'));
   });

@@ -2,7 +2,7 @@
 
   <div class="compact-banner">
     <div class="img-wrapper row">
-      <img src="/images/homecover-1.jpg" class="relative middle">
+      <img src="/images/blank.gif" data-echo="/images/homecover-1.jpg" class="relative middle">
     </div>
 
     <div class="absolute logo-container">
@@ -74,7 +74,7 @@
 
               <div class="row chef-cell vertical-align text-center">
                 <div class="col-md-2 col-xs-3">
-                  <img class="round_thumb size-small text-center cursor-pointer" onclick="javascript:location.href='/host/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/profile_man.png" %>>
+                  <img class="round_thumb size-small text-center cursor-pointer" onclick="javascript:location.href='/host/<%= meal.chef.id%>'" src="/images/blank.gif" data-echo=<%= meal.chef.picture || "/images/profile_man.png" %>>
                 </div>
                 <div class="col-md-10 col-xs-9">
                   <h4 class="text-left text-dark text-box" style="margin: 0 0 10px 10px;"><%= meal.chef.shopNameI18n(locale) %><br><small><%= meal.chef.shortIntro(locale) %></small></h4>
@@ -192,7 +192,7 @@
               <div class="round-container dish" data-id=<%= dish.id %>>
                 <% dish.photos.forEach(function(photo, index){if(photo.v){%>
                 <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image" style="display: <%= index==0?'block':'none'%>">
-                  <img src="<%= index==0?photo.v:''%>" style="width:100%;" class="<%= index!=0?'lazyload':''%>" data-src=<%= photo.v%>>
+                  <img src="/images/blank.gif" data-echo="<%= index==0?photo.v:''%>" style="width:100%;">
                 </a>
                 <%}});%>
                 <% if(dish.video){%>
