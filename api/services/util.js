@@ -36,11 +36,15 @@ module.exports = {
   },
   getMonthNameFromDate : function(date){
     var mDate = moment(date);
-    return moment.months()[mDate.month()];
+    return mDate.format('MMM');
   },
   getDateFromDate : function(date){
     var mDate = moment(date);
     return mDate.date();
+  },
+  getWeekFromDate : function(date){
+    var mDate = moment(date);
+    return mDate.format('ddd');
   },
   getDaysAfterDate : function(date, day){
     var mDate = date.add(day, 'days');

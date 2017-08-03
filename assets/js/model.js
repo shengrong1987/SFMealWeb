@@ -955,7 +955,8 @@ var MealSelectionView = Backbone.View.extend({
     "click .calculateBtn" : "calculateDelivery",
     "change .variation a" : "changePreference",
     "click #applyCouponBtn" : "applyCouponCode",
-    "click #applyPointsBtn" : "addPointsToOrder"
+    "click #applyPointsBtn" : "addPointsToOrder",
+    "switchChange.bootstrapSwitch #cateringModeBtn" : "toggleCatering",
   },
   initialize : function(){
     this.alertView = this.$el.find("#orderAlertView");
@@ -1145,6 +1146,19 @@ var MealSelectionView = Backbone.View.extend({
         window.alert('Directions request failed due to ' + status);
       }
     })
+  },
+  toggleCatering : function(e){
+    e.preventDefault();
+    var button = $(e.currentTarget);
+    var isCatering = button.prop("checked");
+    var mealId = button.data("meal");
+    setTimeout(function(){
+      if(isCatering){
+        location.href = "/meal/" + mealId + "?party=true";
+      }else{
+        location.href = "/meal/" + mealId;
+      }
+    },500);
   },
   applyCouponCode : function(e){
     e.preventDefault();
@@ -3280,7 +3294,7 @@ var OrderView = Backbone.View.extend({
           if (couponValue) {
             var code = Object.keys(couponValue)[0];
           }
-          button.button('loading');
+
           $this.model.set({
             orders: currentOrder,
             subtotal: subtotal,

@@ -605,13 +605,11 @@
     }
     if(this.options.select === "true" || this.options.select === true){
       var method = "DELETE";
-      ele.removeClass('fa-heart');
-      ele.addClass('fa-heart-o');
+      ele.removeClass('text-red');
       this.options.select = false;
     }else{
       method = "POST";
-      ele.removeClass('fa-heart-o');
-      ele.addClass('fa-heart');
+      ele.addClass('text-red');
       this.options.select = true;
     }
     var $this = this;

@@ -42,15 +42,17 @@
           <div class="row">
             <div id="meal-detail-intro" class="col-xs-12 col-sm-6">
               <div class="row">
-                <div class="col-xs-12 text-left">
+                <div class="col-xs-7 text-left">
                   <h2 style="display: inline-block;"><%= meal.titleI18n(locale) %><small class="text-orange"><% if(meal.type=='order'){ __('order') }else if(meal.type=='preorder'){ __('preorder') } %> <%= meal.isFull()? __('full'): "" %></small></h2>
-                  <i class="fa fa-heart-o round_thumb border-red text-red cursor-pointer relative" style="padding:8px;top:5px;" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}else{%>false<%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
-                  <% if(meal.supportPartyOrder){ if(meal.isPartyMode){%>
-                    <button class="btn btn-red pull-right" style="margin-top: 20px;" onclick="javascript:location.href='/meal/<%= meal.id%>'"><%= __('switchToNormal')%></button>
-                  <%}else{%>
-                  <button class="btn btn-red pull-right" style="margin-top: 20px;" onclick="javascript:location.href='/meal/<%= meal.id%>?party=true'"><%= __('switchToCatering')%></button>
-                  <%}}%>
+                  <% if(meal.isPartyMode){%>
+                  <img class="pop-icon" src="/images/group-icon-<%= locale%>.png">
+                  <%}%>
                 </div>
+                <% if(meal.supportPartyOrder){%>
+                <h2 class="col-xs-5">
+                  <input id="cateringModeBtn" type="checkbox" data-on-text="<%= __('catering_on')%>" data-off-text="<%= __('catering_off')%>" data-meal="<%= meal.id%>" data-toggle="switch-button" <%= meal.isPartyMode ? "checked=checked" : ""%>>
+                </h2>
+                <%}%>
               </div>
 
               <div class="row vertical-align-base">
@@ -81,21 +83,23 @@
 
               <div class="row">
                 <div class="col-xs-12">
-                  <h4 class="text-left"><small><%= __('book-time')%>: <span class="text-black"><strong><%= meal.provideDate()%></strong></span></small></h4>
+                  <!--<h4 class="text-left"><small><%= __('book-time')%>: <span class="text-black"><strong><%= meal.provideDate()%></strong></span></small></h4>-->
                   <div class="row">
                     <div class="col-xs-4">
                       <h4><small><%= __('pickup-date')%>:</small></h4>
                       <div class="pickup-date">
-                        <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%></span>
                         <% if(meal.isPartyMode){%>
+                        <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%></span>
                         <span class="col-xs-12"> > <%= meal.getDaysAfterNow(1)%>  <i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" title="<%= __('party-pickup-date-tip')%>"></i></span>
                         <%}else{%>
-                        <span class="col-xs-12"><%= meal.getDateFromDate(meal.pickups[0].pickupFromTime)%></span>
+                        <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%> <%= meal.getDateFromDate(meal.pickups[0].pickupFromTime)%></span>
+                        <span class="col-xs-12"><%= __(meal.getWeekFromDate(meal.pickups[0]))%></span>
                         <%}%>
                       </div>
                       <div class="pickup-map">
                         <a data-toggle="collapse" data-parent="#meal-detail-container" href="#googlemapContainer" aria-expanded="false" aria-controls="googlemapContainer">
-                          <i class="fa fa-2x fa-map-signs"></i>
+                          <i class="fa fa-2x fa-map-pin"></i><br/>
+                          <span><%= __('nav_me')%></span>
                         </a>
                       </div>
 
@@ -146,6 +150,7 @@
               <div class="vertical-align">
                 <h4><small><%= __('share-to-all')%></small></h4>
                 <div id="social-share"></div>
+                <i class="fa fa-heart fa-2x cursor-pointer" style="margin-left:10px;" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}else{%>false<%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
                 <script>
                   $("#social-share").jsSocials({
                     shareIn: "popup",

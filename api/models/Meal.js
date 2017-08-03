@@ -280,6 +280,10 @@ module.exports = {
       return util.getDateFromDate(date);
     },
 
+    getWeekFromDate : function(date){
+      return util.getWeekFromDate(date);
+    },
+
     getDaysAfterNow : function(day){
       return util.getDaysAfterDate(moment(),day);
     },

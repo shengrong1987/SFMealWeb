@@ -145,7 +145,6 @@
   "last-update-time" : "最后发布时间:",
   "provide-time" : "供应时间",
   "book-time" : "预订时间",
-  "pickup-time" : "取餐时间",
   "pickup-date" : "取餐日期",
   "from-time" : "开始时间",
   "end-time" : "结束时间",
@@ -685,7 +684,6 @@
   "cancellationPolicy" : "取消与退款政策",
   "valid" : "已验证",
   "pending" : "已提交，验证中",
-  "fail" : "验证失败",
   "landing-title-1-1" : "家的味道",
   "landing-title-1-2" : "从放心开始",
   "landing-user-1-1" : "私房菜怕吃坏了肚子？",
@@ -781,5 +779,15 @@
   "switchToNormal" : "切换到普通",
   "order-more" : "点击展开菜单",
   "order-less" : "收起菜单",
-  "order-list-tip" : "绿色高亮为已点菜式，可以点-/+按钮调整订单"
+  "order-list-tip" : "绿色高亮为已点菜式，可以点-/+按钮调整订单",
+  "Sun" : "周日",
+  "Mon" : "周一",
+  "Tue" : "周二",
+  "Wed" : "周三",
+  "Thu" : "周四",
+  "Fri" : "周五",
+  "Sat" : "周六",
+  "catering_on" : "团餐",
+  "catering_off" : "普通",
+  "nav_me" : "取餐地图"
 }
