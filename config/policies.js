@@ -111,7 +111,9 @@ module.exports.policies = {
     'refund' : 'isAdmin',
     'update' : 'isAdmin',
     'receipt' : true,
-    'downloadReceipt' : true
+    'downloadReceipt' : true,
+    'process' : true,
+    'verifyOrder' : true
   },
 
   DishController : {

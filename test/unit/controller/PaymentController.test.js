@@ -11,7 +11,7 @@ before(function(done) {
 
 describe('PaymentController', function() {
 
-  this.timeout(12000);
+  this.timeout(25000);
 
   describe('create a payment profile', function() {
 

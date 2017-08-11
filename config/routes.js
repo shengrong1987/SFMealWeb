@@ -81,6 +81,7 @@ module.exports.routes = {
   '/order/:id/receipt' : "OrderController.receipt",
   '/order/:id/receipt/download' : "OrderController.downloadReceipt",
   '/order/process' : "OrderController.process",
+  '/order/:id/verifyOrder' : 'OrderController.verifyOrder',
   '/job/:name/run' : 'JobController.run',
   '/job/:id/delete' : 'JobController.deleteJob',
   '/job/clean' : 'JobController.cleanJobs',

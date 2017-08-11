@@ -93,7 +93,7 @@
                         <span class="col-xs-12"> > <%= meal.getDaysAfterNow(1)%>  <i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" title="<%= __('party-pickup-date-tip')%>"></i></span>
                         <%}else{%>
                         <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%> <%= meal.getDateFromDate(meal.pickups[0].pickupFromTime)%></span>
-                        <span class="col-xs-12"><%= __(meal.getWeekFromDate(meal.pickups[0]))%></span>
+                        <span class="col-xs-12"><%= __(meal.getWeekFromDate(meal.pickups[0].pickupFromTime))%></span>
                         <%}%>
                       </div>
                       <div class="pickup-map">

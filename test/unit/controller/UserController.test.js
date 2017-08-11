@@ -12,7 +12,7 @@ before(function(done) {
 
 describe('UsersController', function() {
 
-  this.timeout(20000);
+  this.timeout(30000);
 
   var newEmail = "shengrong1225" + new Date().getTime() + "@gmail.com";
   var password = "12345678";

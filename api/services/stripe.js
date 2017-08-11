@@ -8,6 +8,11 @@ const SERVICE_FEE = 100;
 const SYSTEM_DELIVERY_FEE = 399;
 const MILEAGE_FEE = 1.18;
 const PARTY_ORDER_RANGE_MULTIPLIER = 3;
+const SOURCE_FAIL = "failed";
+const SOURCE_CANCEL = "canceled";
+const SOURCE_PENDING = "pending";
+const SOURCE_CHARGEABLE = "chargeable";
+const SOURCE_CONSUMED = "consumed";
 
 module.exports = {
 
@@ -15,6 +20,11 @@ module.exports = {
   SERVICE_FEE : SERVICE_FEE,
   MILEAGE_FEE : MILEAGE_FEE,
   PARTY_ORDER_RANGE_MULTIPLIER : PARTY_ORDER_RANGE_MULTIPLIER,
+  SOURCE_FAIL : SOURCE_FAIL,
+  SOURCE_CANCEL : SOURCE_CANCEL,
+  SOURCE_PENDING : SOURCE_PENDING,
+  SOURCE_CHARGEABLE : SOURCE_CHARGEABLE,
+  SOURCE_CONSUMED : SOURCE_CONSUMED,
 
   createManagedAccount : function(attr,cb){
     stripe.accounts.create(attr,function(err, account) {
@@ -202,7 +212,7 @@ module.exports = {
       amount: attr.metadata.total,
       currency: "usd",
       receipt_email: attr.email,
-      customer: attr.customerId,
+      source: attr.source,
       destination : attr.destination,
       metadata : attr.metadata,
       application_fee : attr.metadata.application_fee
@@ -260,7 +270,7 @@ module.exports = {
       amount: attr.amount,
       currency: 'usd',
       redirect: {
-        return_url: 'https://sfmeal.com/order/process'
+        return_url:  (process.env.NODE_ENV === 'production' ? 'https://sfmeal.com/' : 'http://localhost:1337/') + 'order/process'
       },
       metadata : attr.metadata
     }, function(err, source){
@@ -269,6 +279,18 @@ module.exports = {
       }
       cb(null, source);
     })
+  },
+
+  getSource : function(attr, cb){
+    stripe.sources.retrieve(
+      attr.id,
+      function(err, source){
+        if(err){
+          return cb(err);
+        }
+        cb(null, source);
+      }
+    )
   },
 
   charge : function(attr, cb){

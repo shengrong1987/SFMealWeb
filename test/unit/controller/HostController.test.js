@@ -11,9 +11,9 @@ before(function(done) {
   done();
 })
 
-describe('UsersController', function() {
+describe('Host register', function() {
 
-  this.timeout(10000);
+  this.timeout(30000);
 
   var email = 'aimbebe.r@gmail.com';
   var adminEmail = 'admin@sfmeal.com';

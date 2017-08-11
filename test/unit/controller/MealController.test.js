@@ -15,7 +15,7 @@ before(function(done){
 
 describe('MealController', function() {
 
-  this.timeout(15000);
+  this.timeout(35000);
 
   describe('build a meal with dishes', function() {
 
@@ -240,8 +240,8 @@ describe('MealController', function() {
             totalQty[dish3] = 5;
             break;
           case 4:
-            leftQty[dish4] = i;
-            totalQty[dish4] = 5;
+            leftQty[dish4] = 10;
+            totalQty[dish4] = 10;
             break;
         }
       }

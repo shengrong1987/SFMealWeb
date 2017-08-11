@@ -535,9 +535,8 @@
   "order-party-lack-of-info" : "缺少团餐自定义订餐信息",
   "order-catering-must-delivery" : "团餐必须使用送餐方式",
   "order-adjust-stripe-error" : "订单调整时遇到平台错误: %s",
+  "order-not-found" : "没有找到订单",
   "user-checkout-auth-error" : "用户登录标识与用户登录情况不匹配",
-  "adjust-with-coupon-error" : "使用折扣券的订单无法调整",
-  "cancel-with-coupon-error" : "使用折扣券的订单无法取消",
   "payment-card-exist" : "银行卡已存在",
   "payment-unique-card" : "不能删除唯一的支付方式",
   "coupon-invalid-error" : "找不到这个折扣码",
@@ -789,5 +788,9 @@
   "Sat" : "周六",
   "catering_on" : "团餐",
   "catering_off" : "普通",
-  "nav_me" : "取餐地图"
+  "nav_me" : "取餐地图",
+  "payment-error-title" : "支付失败，5秒后自动跳转至订单确认页",
+  "ali-payment-failure" : "支付宝支付失败了，请关闭此窗口并确认支付宝操作无误。",
+  "ali-payment-cancel" : "支付宝支付取消了，请关闭此窗口并重新下订单。",
+  "ali-payment-awaiting" : "等待付款中，请前往支付宝页面完成支付。"
 }

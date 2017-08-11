@@ -1277,7 +1277,7 @@ var MealView = Backbone.View.extend({
     var container = select.closest('.pickup');
     var method = select.val();
     container.find(".delivery-item").removeClass("hide");
-    if(method == "pickup"){
+    if(method === "pickup"){
       container.find(".pickup-item").show();
       container.find(".delivery-item").hide();
     }else{
@@ -1325,7 +1325,7 @@ var MealView = Backbone.View.extend({
     var deliverySettingView = this.$el.find("#deliverySettingView");
     deliverySettingView.removeClass("hide");
     var settingButton = deliverySettingView.find(".setting");
-    settingButton.removeClass("hide")
+    settingButton.removeClass("hide");
     if(isDelivery){
       deliverySettingView.show("1000");
       if(isDeliveryBySystem){
@@ -1364,7 +1364,7 @@ var MealView = Backbone.View.extend({
         today : "fa fa-calendar-times-o"
       },
       stepping : 30,
-      showTodayButton : true,
+      showTodayButton : true
     });
     setupLanguage();
     initAutoComplete(google);
@@ -1374,7 +1374,7 @@ var MealView = Backbone.View.extend({
     e.preventDefault();
     this.$el.find("#pickupAlert").hide();
     var pickupContainers = this.$el.find(".pickup_container .well");
-    if(pickupContainers.length == 1){
+    if(pickupContainers.length === 1){
       this.$el.find("#pickupAlert").show();
       return;
     }
@@ -1403,7 +1403,7 @@ var MealView = Backbone.View.extend({
     this.dishAlert.hide();
 
     var dishesItems = form.find("#dishSelected li");
-    if(dishesItems.length == 0){
+    if(dishesItems.length === 0){
       this.dishAlert.html(form.find("#dishSelected").data("error"));
       this.dishAlert.show();
       return;
@@ -1427,7 +1427,7 @@ var MealView = Backbone.View.extend({
         }
         features += id;
       }
-      totalQty[id] = dishItem.find(".amount-input input").val();;
+      totalQty[id] = dishItem.find(".amount-input input").val();
       if(dishes!==""){
         dishes += ",";
       }
@@ -1496,7 +1496,7 @@ var MealView = Backbone.View.extend({
         }
         var method = $(this).find('.method select').val();
         var phone = $(this).find('.phone input').val();
-        if(method == "pickup" && !location){
+        if(method === "pickup" && !location){
           pickupValid = false;
           $this.scheduleAlert.show();
           $this.scheduleAlert.html(jQuery.i18n.prop('pickupLocationEmptyError'));
@@ -1557,11 +1557,10 @@ var MealView = Backbone.View.extend({
       type = "preorder";
 
     }else{
-      var startBookingDatePicker = form.find("#order .start-booking [data-toggle='dateTimePicker']");
-      var startBookingDate = startBookingDatePicker.data("DateTimePicker").date();
-
-      var endBookingDatePicker = form.find("#order .end-booking [data-toggle='dateTimePicker']");
-      var endBookingDate = endBookingDatePicker.data("DateTimePicker").date();
+      startBookingDatePicker = form.find("#order .start-booking [data-toggle='dateTimePicker']");
+      startBookingDate = startBookingDatePicker.data("DateTimePicker").date();
+      endBookingDatePicker = form.find("#order .end-booking [data-toggle='dateTimePicker']");
+      endBookingDate = endBookingDatePicker.data("DateTimePicker").date();
 
       if(!startBookingDate || !endBookingDate){
         this.scheduleAlert.show();
@@ -1634,7 +1633,6 @@ var MealView = Backbone.View.extend({
       supportPartyOrder : supportPartyOrder,
       partyRequirement : partyRequirement
     });
-    var $this = this;
     this.model.save({},{
       success : function(){
         if(mealId) {
@@ -3241,6 +3239,14 @@ var OrderView = Backbone.View.extend({
       }
     }
   },
+  clear : function(){
+    Object.keys(localOrders).forEach(function (dishId) {
+      eraseCookie(dishId);
+    });
+    eraseCookie('points');
+    localOrders = {};
+    localPoints = 0;
+  },
   takeOrder : function(e){
     e.preventDefault();
     var $this = this;
@@ -3263,7 +3269,6 @@ var OrderView = Backbone.View.extend({
         var mealId = form.data("meal");
         var partyMode = form.data("party");
         var orderId = form.data("order");
-        if(orderId){ $this.model.set({id : orderId}); }
 
         //pickup option
         var pickupOption = $this.getPickupOption(method);
@@ -3295,6 +3300,7 @@ var OrderView = Backbone.View.extend({
             var code = Object.keys(couponValue)[0];
           }
 
+          $this.model.clear();
           $this.model.set({
             orders: currentOrder,
             subtotal: subtotal,
@@ -3310,23 +3316,58 @@ var OrderView = Backbone.View.extend({
             isPartyMode : partyMode
           });
 
+          button.button('loading');
           $this.model.save({}, {
             success: function (model, result) {
-              Object.keys(localOrders).forEach(function (dishId) {
-                eraseCookie(dishId);
-              });
               button.button('reset');
-              eraseCookie('points');
-              localOrders = {};
-              localPoints = 0;
-              BootstrapDialog.alert(jQuery.i18n.prop('newOrderTakenSuccessfully',result.id), function () {
-                if(isLogin){
-                  reloadUrl("/user/me", "#myorder");
-                }else{
-                  location.href = "/order/" + result.id + '/receipt';
-                }
-              });
+              if(paymentInfo.method === "alipay" || paymentInfo.method === "wechatpay"){
+                var source = result.source;
+                var redirectUrl = source.redirect.url;
+                var orderId = source.metadata.orderId;
+                var mealId = source.metadata.mealId;
+                BootstrapDialog.show({
+                  title: jQuery.i18n.prop('pendingPaymentTitle'),
+                  message : jQuery.i18n.prop('pendingPaymentContent'),
+                  buttons: [
+                    {
+                      label: jQuery.i18n.prop('confirmPayment'),
+                      action: function(dialog) {
+                        $.get(
+                          '/order/' + orderId + '/verifyOrder'
+                        ).done(function(){
+                          $this.clear();
+                          if(isLogin){
+                            reloadUrl("/user/me", "#myorder");
+                          }else{
+                            location.href = "/order/" + result.id + '/receipt';
+                          }
+                        }).fail(function(err){
+                          dialog.setMessage(err.responseJSON.responseText);
+                          dialog.setType(BootstrapDialog.TYPE_DANGER);
+                        })
+                      }
+                    },
+                    {
+                      label: jQuery.i18n.prop('cancelPayment'),
+                      action: function(dialog) {
+                        dialog.close();
+                      }
+                    }
+                  ]
+                });
+                window.open(redirectUrl);
+              }else{
+                $this.clear();
+                BootstrapDialog.alert(jQuery.i18n.prop('newOrderTakenSuccessfully',result.id), function () {
+                  if(isLogin){
+                    reloadUrl("/user/me", "#myorder");
+                  }else{
+                    location.href = "/order/" + result.id + '/receipt';
+                  }
+                });
+              }
             }, error: function (model, err) {
+              button.button('reset');
               BootstrapDialog.show({
                 title: jQuery.i18n.prop('error'),
                 message: err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText

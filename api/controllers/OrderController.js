@@ -53,6 +53,8 @@ var moment = require("moment");
 //-39 : stripe payment failed
 //-40 : stripe payment cancel
 //-41 : stripe payment unknown error
+//-42 : stripe awaiting payment
+//-98 : result not found
 
 
 module.exports = {
@@ -596,17 +598,20 @@ module.exports = {
                       deliveryFee : parseInt(req.body.delivery_fee * 100),
                       tax : req.body.tax,
                       discount : req.body.discount * 100
-                    }
+                    },
+                    email : process.env.ADMIN_EMAIL
                   }, function(err, source){
                     if(err){
                       return res.badRequest(err);
                     }
+                    order.sourceId = source.id;
                     order.client_secret = source.client_secret;
                     order.save(function(err, o){
                       if(err){
                         return res.badRequest(err);
                       }
-                      res.redirect(source.redirect.url);
+                      order.source = source;
+                      return res.ok(order)
                     });
                   });
                 }else{
@@ -697,7 +702,15 @@ module.exports = {
         if(req.wantsJSON){
           return res.ok(order);
         }
-        return res.ok({ id: order.id});
+        if(order.paymentMethod === 'alipay' || order.paymentMethod === 'wechatpay'){
+          if(req.authenticated){
+            return res.redirect('/user/me#myorder');
+          }else{
+            return res.redirect('/order/' + order.id + "/receipt");
+          }
+        }else{
+          return res.ok({ id: order.id});
+        }
       });
     });
   },
@@ -1561,6 +1574,9 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
+      if(!order){
+        return res.notFound();
+      }
       notification.transitLocaleTimeZone(order);
       order.download = false;
       var dateString = moment().format("ddd, hA");;
@@ -1575,7 +1591,7 @@ module.exports = {
         return res.badRequest(err);
       }
       notification.transitLocaleTimeZone(order);
-      var dateString = moment().format("ddd, hA");;
+      var dateString = moment().format("ddd, hA");
       order.layout = false;
       order.download = true;
       res.set('Content-Disposition','attachment; filename="' + dateString + '"-receipt.html" ')
@@ -1583,46 +1599,104 @@ module.exports = {
     })
   },
 
-  process : function(req, res){
-    var params = req.body;
-    var source = params.source;
-    var orderId = source.metadata.orderId;
-    var client_secret = params.client_secret;
+  verifyOrder : function(req, res){
+    var orderId = req.params.id;
     var _this = this;
-    Order.findOne(orderId).populate("meal").exec(function(err, order){
+    Order.findOne(orderId).exec(function(err, order){
       if(err){
         return res.badRequest(err);
       }
-      if(!order.client_secret || order.client_secret !== client_secret){
-        return res.badRequest({ code : -38, responseText : req.__('invalid-payment-callback')});
+      if(!order){
+        return res.badRequest({ code : -39, responseText : req.__('ali-payment-failure'), mealId : null});
       }
-      if(source.status !== "chargable"){
-        Order.destroy(orderId).exec(function(err, order){
-          if(err){
-            return res.badRequest(err);
-          }
-          return res.badRequest({ code : -39, response : req.__('ali-payment-failure')});
-        })
-      }else{
-        var attr = {
-          amount : source.amount,
-          currency : "usd",
-          source : source.id,
-          isInitial : true,
-          paymentMethod : source.type
+      var source = stripe.getSource({
+        id : order.sourceId
+      }, function(err, source){
+        if(err){
+          return res.badRequest(err);
         }
-        stripe.charge(attr, function(err, charge, transfer){
-          if(err){
-            return res.badRequest(err);
-          }
-          if(charge.status === "succeed"){
-            _this.afterSuccessCharge(order, order.orders, order.meal, charge, transfer, req, res);
-          }else{
-            res.badRequest({ code : -99, responseText : req.__('order-unknown-error')})
-          }
-        });
-      }
+        if(source.status === stripe.SOURCE_FAIL){
+          return res.badRequest({ code : -39, responseText : req.__('ali-payment-failure'), mealId : order.meal.id})
+        }else if(source.status === stripe.SOURCE_CANCEL){
+          return res.badRequest({ code : -40, responseText : req.__('ali-payment-cancel'), mealId : order.meal.id})
+        }else if(source.status === stripe.SOURCE_PENDING){
+          return res.badRequest({ code : -42, responseText : req.__('ali-payment-awaiting'), mealId : order.meal.id})
+        }else if(source.status === stripe.SOURCE_CONSUMED){
+          return res.ok(order);
+        }else if(source.status === stripe.SOURCE_CHARGEABLE){
+          return res.redirect('/order/' + orderId + '/process?sourceId='+source.id + '&client_secret=' + order.client_secret);
+        }else{
+          return res.badRequest({ code : -99, responseText : req.__('order-unknown-error')});
+        }
+      })
     });
+  },
+
+  process : function(req, res){
+    var params = req.query;
+    var sourceId = params.source;
+    var client_secret = params.client_secret;
+    var _this = this;
+
+    stripe.getSource({
+      id : sourceId
+    }, function(err, source){
+      if(err){
+        return res.badRequest(err);
+      }
+      var orderId = source.metadata.orderId;
+      Order.findOne(orderId).populate("meal").populate("host").exec(function(err, order){
+        if(err){
+          return res.badRequest(err);
+        }
+        if(!order){
+          return res.view('redirectPopup', { code : -98, responseText : req.__('order-not-found'), mealId : order.meal.id});
+        }
+        if(!order.client_secret || order.client_secret !== client_secret){
+          return res.badRequest({ code : -38, responseText : req.__('invalid-payment-callback')});
+        }
+        if(source.status === stripe.SOURCE_CONSUMED){
+          if(req.authenticated){
+            return res.redirect('/user/me#myorder');
+          }else{
+            return res.redirect('/order/' + order.id + "/receipt");
+          }
+        }else if(source.status !== stripe.SOURCE_CHARGEABLE){
+          Order.destroy(orderId).exec(function(err, o){
+            if(err){
+              return res.view('redirectPopup', { code : -99, responseText : err.responseText, mealId : order.meal.id} );
+            }
+            if(req.wantsJSON){
+              return res.badRequest({ code : -39, responseText : req.__('ali-payment-failure'), mealId : order.meal.id})
+            }else{
+              return res.view('redirectPopup', { code : -39, responseText : req.__('ali-payment-failure'), mealId : order.meal.id});
+            }
+          })
+        }else{
+          var attr = {
+            amount : source.amount,
+            currency : "usd",
+            source : source.id,
+            isInitial : true,
+            paymentMethod : source.type,
+            meal : order.meal,
+            destination : order.host.accountId,
+            metadata : source.metadata
+          };
+          stripe.charge(attr, function(err, charge, transfer){
+            if(err){
+              return res.badRequest(err);
+            }
+            if(charge.status === "succeeded"){
+              _this.afterSuccessCharge(order, order.orders, order.meal, charge, transfer, req, res);
+            }else{
+              res.badRequest({ code : -99, responseText : req.__('order-unknown-error')})
+            }
+          });
+        }
+      });
+    });
+
   },
 
   search : function(req, res){

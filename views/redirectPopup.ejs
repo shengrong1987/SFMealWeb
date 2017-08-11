@@ -1,0 +1,12 @@
+<div class="container text-center" data-meal="<%= mealId%>" style="min-height: 500px;">
+  <h3><%= __('payment-error-title')%></h3>
+  <p><%= __(responseText)%></p>
+</div>
+
+<script>
+  window.setTimeout(function(){
+    // Move to a new location or you can do something else
+    var mealId = $("[data-meal]").data("meal");
+    window.location.href = "http://localhost:1337/meal/" + mealId + "/confirm";
+  }, 5000);
+</script>

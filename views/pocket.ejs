@@ -71,7 +71,7 @@
                   <button class="btn btn-info filter" type="button" data-filter=".comp"><%= __('type-compensation')%></button>
                   <button class="btn btn-info filter" type="button" data-filter=".payment"><%= __('type-payment')%></button>
                   <button class="btn btn-info filter" type="button" data-filter=".charge"><%= __('type-charge')%></button>
-                  <button class="btn btn-info filter" type="button" data-filter=".fee"><%= __('type-fee')%></button>
+                  <!--<button class="btn btn-info filter" type="button" data-filter=".fee"><%= __('type-fee')%></button>-->
                 </div>
               </div>
             </div>
@@ -90,8 +90,8 @@
               user.pocket.transactions = user.pocket.transactions || [];
               for(var i = 0; i < user.pocket.transactions.length; i++) {
                 var tranObj = user.pocket.transactions[i];
-                if(tranObj.orderStatus != "cancel" && (tranObj.status == "paid" || tranObj.status == "succeeded" || tranObj.status == "cash")){
-                  if(tranObj.type == "type-compensation" && !tranObj.reversed){
+                if(tranObj.orderStatus !== "cancel" && (tranObj.status === "paid" || tranObj.status === "succeeded" || tranObj.status === "cash")){
+                  if(tranObj.type === "type-compensation" && !tranObj.reversed){
               %>
               <div class="background-color mix comp" style="border-radius: 5px;display: block !important;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
@@ -101,7 +101,7 @@
                   <div class="col-xs-3"><b>$<%= tranObj.amount/100 %></b> ( <%= __('compensation-amount')%>: $<%= Math.round(tranObj.amount)/100 %>)</div>
                 </div>
               </div>
-              <%}else if(tranObj.type == 'type-payment'){var refund = tranObj.amount_refunded;%>
+              <%}else if(tranObj.type === 'type-payment'){var refund = tranObj.amount_refunded;%>
               <div class="background-color mix payment" style="border-radius: 5px;display: block !important;;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
@@ -110,7 +110,7 @@
                   <div class="col-xs-3"><b>$<%= (tranObj.amount - refund - tranObj.application_fee)/100%></b> ( <%= __('order-fee')%>: $<%= Math.round(tranObj.amount - tranObj.deliveryFee * 100 - tranObj.metadata.tax)/100 %> + <%= __('tax')%>: $<%= tranObj.metadata.tax/100%> + <%= __('delivery-fee')%>: $<%= tranObj.deliveryFee%> - <%= __('application_fee')%>: $<%= tranObj.application_fee/100%><%= refund ? " - " + __('refunded')+ ": $" + refund/100 : "" %> )</div>
                 </div>
               </div>
-              <%}else if(tranObj.type == 'type-charge'){var refund = tranObj.amount_refunded;%>
+              <%}else if(tranObj.type === 'type-charge'){var refund = tranObj.amount_refunded;%>
               <div class="background-color mix charge" style="border-radius: 5px;display: block !important;;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
@@ -119,16 +119,7 @@
                   <div class="col-xs-3"><b>$<%= (tranObj.amount - refund)/100%></b> ( <%= __('order-fee')%>: $<%= Math.round(tranObj.amount - tranObj.deliveryFee * 100 - tranObj.metadata.tax)/100 %> + <%= __('tax')%>: $<%= tranObj.metadata.tax/100%> + <%= __('delivery-fee')%>: $<%= tranObj.deliveryFee%> <%= refund ? " - " + __('refunded')+ ": $" + refund/100 : "" %> )</div>
                 </div>
               </div>
-              <%}else if(tranObj.type == 'type-fee'){ %>
-              <div class="background-color mix fee" style="border-radius: 5px;display: block !important;;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
-                <div class="row vertical-align" style="padding:5px;">
-                  <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
-                  <div class="col-xs-4"><%= __(tranObj.type) %>(<%= __(tranObj.paymentMethod || '')%>) <label><%= tranObj.metadata.orderId.slice(-4)%></label> <i class="fa fa-question-circle white cursor-pointer" data-toggle="tooltip" title=<%= __('order-last-4')%>></i></div>
-                  <div class="col-xs-3"><img class="img-thumbnail round_thumb size-small" src="<%= tranObj.host.picture || "/images/profile_man.png"%>" onclick="javascript:location.href='/host/<%= tranObj.host.id %>'">&nbsp;<%= tranObj.host.shopName%></div>
-                  <div class="col-xs-3"><b>$<%= (tranObj.amount-tranObj.amount_refunded)/100%></b>( <%= __('order-fee')%>: $<%= Math.round(tranObj.metadata.total - tranObj.deliveryFee * 100 - tranObj.metadata.tax)/100 %> + <%= __('tax')%>: $<%= tranObj.metadata.tax/100%> + <%= __('delivery-fee')%>: $<%= tranObj.deliveryFee%> <%= tranObj.amount_refunded ? " - " + __('refunded')+ ": $" + tranObj.amount_refunded/100 : "" %> )</div>
-                </div>
-              </div>
-              <%}}};%>
+              <%}}}%>
 
             </div>
 

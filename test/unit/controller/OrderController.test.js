@@ -1885,7 +1885,6 @@ describe('OrderController', function() {
         .get('/order/' + orderId + "/receipt/download")
         .expect(200, done)
     });
-
   });
 
   describe('order a meal with express checkout', function() {
@@ -2095,5 +2094,122 @@ describe('OrderController', function() {
     });
 
   });
+
+  describe('order a meal with Alipay', function(){
+    var mealId;
+    var dishId1;
+    var dishId2;
+    var dishId3;
+    var dishId4;
+    var price1;
+    var price2;
+    var price3;
+    var price5;
+    var orderId;
+    var dishId5;
+
+    it('should get meals', function (done) {
+      agent
+        .get('/meal')
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            console.log(err);
+            return done(err);
+          }
+          if(res.body.meals.length === 0){
+            return done(Error("error getting any meal"));
+          }
+          var meal = res.body.meals[1];
+          mealId = meal.id;
+          dishId1 = meal.dishes[0].id;
+          dishId2 = meal.dishes[1].id;
+          dishId3 = meal.dishes[2].id;
+          dishId4 = meal.dishes[3].id;
+          price1 = meal.dishes[0].price;
+          price2 = meal.dishes[1].price;
+          price3 = meal.dishes[2].price;
+          done();
+        })
+    });
+
+    var sourceId,client_secret;
+
+    it('should be able to submit order with Alipay', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}] };
+      dishObj[dishId4] = { number : 1 , preference : [{ property : '', extra : 0}] };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price3 ,
+          pickupOption : 1,
+          method : "pickup",
+          mealId : mealId,
+          contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+          paymentInfo : { method : 'alipay'}
+        })
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('sourceId');
+          res.body.should.have.property('source');
+          res.body.source.status.should.be.equal('pending');
+          sourceId = res.body.source.id;
+          client_secret = res.body.source.client_secret;
+          done();
+        })
+    })
+
+    it('should response to alipay callback with error with wrong sourceId', function(done){
+      agent
+        .get('/order/process?source=123123' + '&client_secret' + client_secret)
+        .expect(400, done)
+    })
+
+    it('should response to Alipay callback with error with no secret', function(done){
+      agent
+        .get('/order/process?source='+sourceId)
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-38);
+          done();
+        })
+    })
+
+    it('should response to alipay callback with error with wrong secret', function(done){
+      agent
+        .get('/order/process?source='+sourceId+"&client_secret=123123123")
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-38);
+          done();
+        })
+    })
+
+    it('should response to alipay callback waiting payment by default', function(done){
+      agent
+        .get('/order/process?source='+sourceId+"&client_secret="+client_secret)
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-39);
+          done();
+        })
+    })
+  })
 
 });
