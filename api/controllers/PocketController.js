@@ -63,6 +63,8 @@ module.exports = {
     transfer.type = "type-compensation";
     transfer.host = host;
     transfer.paymentMethod = "online";
+    transfer.orderStatus = order.status;
+    transfer.status = "succeeded";
     return transfer;
   },
 

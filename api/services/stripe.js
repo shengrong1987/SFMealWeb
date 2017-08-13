@@ -209,7 +209,7 @@ module.exports = {
   chargeOthers : function(attr, cb){
     var _this = this;
     stripe.charges.create({
-      amount: attr.metadata.total,
+      amount: attr.amount,
       currency: "usd",
       receipt_email: attr.email,
       source: attr.source,
@@ -289,6 +289,7 @@ module.exports = {
         if(err){
           return cb(err);
         }
+        sails.log.info("source: " + source + ", amount: " + source.amount);
         cb(null, source);
       }
     )
@@ -330,12 +331,11 @@ module.exports = {
   },
 
   charge : function(attr, cb){
-
-    this.calculateTotal(attr);
-
     if(attr.paymentMethod === "cash"){
+      this.calculateTotal(attr);
       this.chargeCash(attr, cb);
     }else if(attr.paymentMethod === "online"){
+      this.calculateTotal(attr);
       this.chargeCreditCard(attr, cb);
     }else{
       this.chargeOthers(attr, cb);
