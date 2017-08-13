@@ -1679,6 +1679,11 @@ module.exports = {
             }
           })
         }else{
+          source.metadata.deliveryFee = parseInt(source.metadata.deliveryFee);
+          source.metadata.tax = parseInt(source.metadata.tax);
+          source.metadata.discount = parseInt(source.metadata.discount);
+          source.metadata.total = parseInt(source.metadata.total);
+          source.metadata.application_fee = parseInt(source.metadata.application_fee);
           var attr = {
             amount : source.amount,
             currency : "usd",

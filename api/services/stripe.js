@@ -208,6 +208,7 @@ module.exports = {
 
   chargeOthers : function(attr, cb){
     var _this = this;
+    sails.log.info("charge amount by source: " + attr.amount);
     stripe.charges.create({
       amount: attr.amount,
       currency: "usd",
@@ -289,7 +290,6 @@ module.exports = {
         if(err){
           return cb(err);
         }
-        sails.log.info("source: " + source + ", amount: " + source.amount);
         cb(null, source);
       }
     )
