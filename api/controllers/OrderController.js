@@ -589,7 +589,14 @@ module.exports = {
                 if(order.paymentMethod === "alipay" || order.paymentMethod === "wechatpay"){
                   stripe.newSource({
                     type : order.paymentMethod,
+                    isInitial : true,
                     amount : subtotal * 100,
+                    deliveryFee : parseInt(req.body.delivery_fee * 100),
+                    discount : req.body.discount * 100,
+                    email : process.env.ADMIN_EMAIL,
+                    meal : states.m,
+                    method : method,
+                    tax : req.body.tax,
                     metadata : {
                       mealId : states.m.id,
                       hostId : states.m.chef.id,
@@ -598,8 +605,7 @@ module.exports = {
                       deliveryFee : parseInt(req.body.delivery_fee * 100),
                       tax : req.body.tax,
                       discount : req.body.discount * 100
-                    },
-                    email : process.env.ADMIN_EMAIL
+                    }
                   }, function(err, source){
                     if(err){
                       return res.badRequest(err);

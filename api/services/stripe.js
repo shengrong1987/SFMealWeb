@@ -265,9 +265,10 @@ module.exports = {
 
   newSource : function(attr, cb){
     var _this = this;
+    this.calculateTotal(attr);
     stripe.sources.create({
       type: attr.type,
-      amount: attr.amount,
+      amount: attr.metadata.total,
       currency: 'usd',
       redirect: {
         return_url:  (process.env.NODE_ENV === 'production' ? 'https://sfmeal.com/' : 'http://localhost:1337/') + 'order/process'
@@ -293,8 +294,7 @@ module.exports = {
     )
   },
 
-  charge : function(attr, cb){
-
+  calculateTotal : function(attr){
     var meal = attr.meal;
     var isInitial = attr.isInitial;
     var serviceFee = isInitial ? SERVICE_FEE : 0;
@@ -327,6 +327,11 @@ module.exports = {
     attr.metadata.discount = discount;
     attr.metadata.total = originalTotal - discount;
     attr.metadata.application_fee = application_fee;
+  },
+
+  charge : function(attr, cb){
+
+    this.calculateTotal(attr);
 
     if(attr.paymentMethod === "cash"){
       this.chargeCash(attr, cb);
