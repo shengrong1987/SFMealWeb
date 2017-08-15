@@ -1457,7 +1457,7 @@
 
                             <div class="row text-center" style="margin-top: 15px;">
                               <button class="btn btn-red round switch-button" style="width:120px;margin-right:10px;"><strong><%= __('review-switch')%></strong></button>
-                              <button class="btn btn-red round leaveReview" style="width:120px;margin-left:10px;" data-host="<%= featureDish.chef%>" data-err-container="#feature-review-error-<%= i%>" data-meal="<%= featureDish.meal.id%>" data-dish="<%= featureDish.id%>" data-target="#rating<%= i%>"><strong><%= __('review-done')%></strong></button>
+                              <button class="btn btn-red round leaveReview" style="width:120px;margin-left:10px;" data-host="<%= featureDish.chef%>" data-err-container="#feature-review-error-<%= i%>" data-meal="<%= featureDish.meal ? featureDish.meal.id : null%>" data-dish="<%= featureDish.id%>" data-target="#rating<%= i%>"><strong><%= __('review-done')%></strong></button>
                             </div>
                           </div>
               <%}})}})})}%>
@@ -1468,7 +1468,7 @@
             <%
               var j = 0;
               user.orders.forEach(function(order){
-                if(order.status == "review"){
+                if(order.status == "review" && order.meal){
             %>
             <div class="item border-round" id="i<%= j%>">
               <div class="row" style="padding:10px;">

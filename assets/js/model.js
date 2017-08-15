@@ -3355,7 +3355,7 @@ var OrderView = Backbone.View.extend({
                     }
                   ]
                 });
-                window.open(redirectUrl);
+                location.href = redirectUrl;
               }else{
                 $this.clear();
                 BootstrapDialog.alert(jQuery.i18n.prop('newOrderTakenSuccessfully',result.id), function () {

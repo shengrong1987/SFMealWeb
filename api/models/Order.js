@@ -138,7 +138,7 @@ module.exports = {
       defaultsTo : ''
     },
     getTaxRate : function(){
-      if(this.meal.isTaxIncluded){
+      if(this.meal && this.meal.isTaxIncluded){
         return 0;
       }
       return util.getTaxRate(this.host.county);
