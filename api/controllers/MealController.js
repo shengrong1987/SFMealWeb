@@ -52,32 +52,23 @@ module.exports = {
     var county = req.cookies['county'] || req.param('county') || "San Francisco County";
     var user = req.session.user;
     if(req.session.authenticated){
-      Meal.find({type : 'order', status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
+      Meal.find({status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
         if(err){
           return res.badRequest(err);
         }
         orders = orders.filter(function(meal){
-          return meal.county.split("+").indexOf(county) != -1;
-        })
-        Meal.find({type : 'preorder',status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>=' : now}}).sort('score DESC').limit(6).populate('dishes').populate('chef').exec(function(err, preorders){
+          return meal.county.split("+").indexOf(county) !== -1;
+        });
+
+        User.findOne(user.id).populate("collects").exec(function(err,u){
           if(err){
             return res.badRequest(err);
           }
-
-          preorders = preorders.filter(function(meal){
-            return meal.county.split("+").indexOf(county) != -1;
-          })
-
-          User.findOne(user.id).populate("collects").exec(function(err,u){
-            if(err){
-              return res.badRequest(err);
-            }
-            if(req.wantsJSON){
-              return res.ok({meals : orders.concat(preorders), user : u, county : county, locale : req.getLocale()});
-            }
-            return res.view('meals',{meals : orders.concat(preorders), user : u, county : county, locale : req.getLocale()});
-          });
-        })
+          if(req.wantsJSON){
+            return res.ok({meals : orders, user : u, county : county, locale : req.getLocale()});
+          }
+          return res.view('meals',{meals : orders, user : u, county : county, locale : req.getLocale()});
+        });
       });
     }else{
       Host.find({ passGuide : true, intro : { '!' : ''}}).populate("orders").populate("meals").exec(function(err, hosts){
@@ -167,7 +158,7 @@ module.exports = {
           var valid = false;
           for(var i=0; i < dishes.length; i++){
             var dish = dishes[i];
-            if(meal.title.indexOf(keyword) != -1 || dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
+            if(meal.title.indexOf(keyword) !== -1 || dish.title.indexOf(keyword) !== -1 || dish.description.indexOf(keyword) !== -1 || dish.type.indexOf(keyword) !== -1){
               valid = true;
               break;
             }
@@ -182,7 +173,7 @@ module.exports = {
   search : function(req, res){
     var keyword = req.param('keyword');
     var zipcode = req.param('zipcode');
-    var county = req.cookies['county'] || req.param('county') || "San Francisco County";;
+    var county = req.cookies['county'] || req.param('county') || "San Francisco County";
     var type = req.param('type');
     var now = new Date();
     var params = {
@@ -200,7 +191,7 @@ module.exports = {
 
       found = found.filter(function(meal){
         return meal.county.split("+").indexOf(county) !== -1;
-      })
+      });
 
       if(typeof zipcode !== 'undefined' && zipcode && zipcode !== 'undefined' && typeof county !== 'undefined' && county && county !== 'undefined'){
         GeoCoder.geocode(zipcode, function(err, result){
@@ -292,7 +283,7 @@ module.exports = {
               return cb(err);
             }
             user[0].orders = user[0].orders.filter(function(order){
-              return order.status == "schedule" || order.status == "preparing";
+              return order.status === "schedule" || order.status === "preparing";
             })
             u = user[0];
             cb();

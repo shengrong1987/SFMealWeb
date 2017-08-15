@@ -60,7 +60,7 @@ module.exports = function findRecords (req, res) {
 
     if(req.wantsJSON){
       res.ok(matchingRecords);
-    }else if(Model.adapter.identity == "meal"){
+    }else if(Model.adapter.identity === "meal"){
       res.view('meals',{meals : matchingRecords, user : req.session.user});
     }else{
       res.ok(matchingRecords);

@@ -1411,7 +1411,7 @@
             <div data-toggle="switch-box">
               <%
                 var ordersNeedReview = user.orders.filter(function(order){
-                  return order.status == "review";
+                  return order.status == "review" && order.meal;
                 }).length;
                 if((!user.featureDishes || user.featureDishes.length == 0) && ordersNeedReview == 0){
               %>
