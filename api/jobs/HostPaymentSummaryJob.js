@@ -43,12 +43,12 @@ module.exports = function(agenda) {
 
         hosts = hosts.filter(function (host) {
           host.orders = host.orders.filter(function (order) {
-            return !order.isPaid && (order.status == "review" || order.status == "complete") && order.createdAt.getTime() > fromDate && order.createdAt < toDate;
-          })
-          return host.orders.length != 0;
+            return !order.isPaid && (order.status === "review" || order.status === "complete") && order.createdAt.getTime() > fromDate && order.createdAt < toDate;
+          });
+          return host.orders.length !== 0;
         });
 
-        if (hosts.length == 0) {
+        if (hosts.length === 0) {
           return done();
         }
 
@@ -93,12 +93,12 @@ module.exports = function(agenda) {
                       if(err){
                         return next(err);
                       }
-                      if(chargeId == "cash"){
+                      if(chargeId === "cash"){
                         var date = moment(new Date(order.createdAt).getTime());
                         charge.income = order.charges['cash'];
                         charge.application_fee = order.application_fees['cash'];
                       }else {
-                        var date = moment(charge.created * 1000);
+                        date = moment(charge.created * 1000);
                         charge.application_fee = fee.amount - fee.amount_refunded;
                         charge.income = (charge.amount - charge.amount_refunded);
                       }
@@ -110,9 +110,9 @@ module.exports = function(agenda) {
                       var paidInPeriod = false;
                       for(var i=0; i < 7; i++){
                         var dateObj = showDates[i];
-                        var date = dateObj.date;
+                        date = dateObj.date;
                         var dateInfos = date.split(" ");
-                        if(dateInfos.length > 1 && dateInfos[0] == charge.month && dateInfos[1] == charge.day){
+                        if(dateInfos.length > 1 && dateInfos[0] === charge.month && dateInfos[1] === charge.day){
                           orderTotalPayment += charge.income - charge.application_fee;
                           dateObj.income += charge.income;
                           dateObj.fee += charge.application_fee;
@@ -140,7 +140,7 @@ module.exports = function(agenda) {
               }
               var meals = host.meals.filter(function(meal){
                 return host.orders.some(function(order){
-                  return order.meal == meal.id;
+                  return order.meal === meal.id;
                 })
               });
               var score = 0;

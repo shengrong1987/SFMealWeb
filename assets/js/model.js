@@ -1088,7 +1088,7 @@ var MealSelectionView = Backbone.View.extend({
     var option = {
       property : preference,
       extra : extra
-    }
+    };
     var dishId = $(e.currentTarget).data("dish");
     this.saveOption(orderIndex, option, dishId);
     refreshOrder(dishId);
@@ -1100,7 +1100,7 @@ var MealSelectionView = Backbone.View.extend({
       var localDishObj = JSON.parse(localDish);
       var options = localDishObj.preference;
     }else{
-      var options = [];
+      options = [];
     }
     options[index] = option;
     localOrders[dishId] = localDishObj;
@@ -2744,7 +2744,7 @@ var MealConfirmView = Backbone.View.extend({
     utility.initGoogleMapService(function(){
       $this.initDelivery(function(map){
         $this.initPickups(map);
-        $this.switchAddress()
+        //$this.switchAddress()
       });
     });
   },
@@ -2759,7 +2759,7 @@ var MealConfirmView = Backbone.View.extend({
     }
   },
   switchMethod : function(e){
-    var isLogin = this.$el.data("user") ? true : false;
+    var isLogin = !!this.$el.data("user");
     var value = $(e.currentTarget).find(".active").attr("value");
     this.$el.find(".deliveryInput").removeClass('hide');
     if(value === "delivery"){
@@ -2846,7 +2846,7 @@ var MealConfirmView = Backbone.View.extend({
   switchAddress : function(e, cb, yourAddress){
     var range = this.$el.data("range");
     var $this = this;
-    var isLogin = this.$el.data("user") ? true : false;
+    var isLogin = !!this.$el.data("user");
     var form = this.$el.find("#order");
     var isPartyMode = form.data("party");
     if(!yourAddress) {
@@ -2859,7 +2859,7 @@ var MealConfirmView = Backbone.View.extend({
           }
           return;
         }
-        var yourAddress = deliveryLocationOption.next().next().text();
+        yourAddress = deliveryLocationOption.next().next().text();
       } else {
         yourAddress = $this.verifyAddress(e, true);
       }
