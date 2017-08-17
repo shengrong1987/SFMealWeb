@@ -766,7 +766,7 @@
     this.element = element;
     this.options = options;
     this.element.find("button").on("click",clickHandler);
-
+    this.element.find("button").removeClass("disabled");
   }
 
   $.fn.btnSet              = Plugin

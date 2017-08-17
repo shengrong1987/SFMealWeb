@@ -58,16 +58,16 @@
             <div class="col-xs-12">
               <div class="btn-set text-left" id="method" data-toggle="btn-set">
                 <% if(meal.isPartyMode){%>
-                <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="delivery"><strong><%= __('delivery') %></strong></button>
+                <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active disabled" style="margin-right: 10px;" value="delivery"><strong><%= __('delivery') %></strong></button>
                 <%}else{%>
                 <%if(meal.isDelivery){%>
-                <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
-                <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;" value="delivery"><strong><%= __('delivery') %></strong></button>
+                <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg active disabled" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
+                <button data-toggle="tab" href="#deliveryTab" class="btn btn-disable btn-fat btn-lg disabled" style="margin-right: 10px;" value="delivery"><strong><%= __('delivery') %></strong></button>
                 <%}else if(meal.isShipping){%>
-                <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
-                <button data-toggle="tab" href="#shippingTab" class="btn btn-disable btn-fat btn-lg active" value="shipping"><strong><%= __('shipping') %></strong></button>
+                <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg disabled" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
+                <button data-toggle="tab" href="#shippingTab" class="btn btn-disable btn-fat btn-lg active disabled" value="shipping"><strong><%= __('shipping') %></strong></button>
                 <%}else{%>
-                <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg active" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
+                <button data-toggle="tab" href="#pickupTab" class="btn btn-disable btn-fat btn-lg active disabled" style="margin-right: 10px;" value="pickup"><strong><%= __('self-pickup') %></strong></button>
                 <%}}%>
               </div>
             </div>
@@ -369,15 +369,15 @@
                   var card = cards[j];
                   var last4 = card.last4;
                 %>
-                <button class="btn btn-disable btn-fat btn-lg <%if(card.isDefaultPayment){%> active<%}%>" data-method="online" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
+                <button class="btn btn-disable btn-fat btn-lg <%if(card.isDefaultPayment){%> active<%}%> disabled" data-method="online" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
                 <%}}%>
-                <button class="btn btn-disable btn-fat btn-lg" data-method="online" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
+                <button class="btn btn-disable btn-fat btn-lg disabled" data-method="online" style="margin-right: 10px;height: 80px;" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
                 <%}else{%>
-                <button class="btn btn-disable btn-fat btn-lg active" data-method="online" style="margin-right: 10px;height: 80px;"><strong><i class="fa fa-credit-card fa-2x"></i></strong><br/><%= __('bank-card') %></button>
+                <button class="btn btn-disable btn-fat btn-lg active disabled" data-method="online" style="margin-right: 10px;height: 80px;"><strong><i class="fa fa-credit-card fa-2x"></i></strong><br/><%= __('bank-card') %></button>
                 <%}%>
-                <button class="btn btn-disable btn-fat btn-lg" data-method="cash" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('cash-method') %></button>
-                <button class="btn btn-disable btn-fat btn-lg" data-method="alipay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('alipay-method') %></button>
-                <button class="btn btn-disable btn-fat btn-lg hide" data-method="wechatpay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('wechatpay-method') %></button>
+                <button class="btn btn-disable btn-fat btn-lg disabled" data-method="cash" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('cash-method') %></button>
+                <button class="btn btn-disable btn-fat btn-lg disabled" data-method="alipay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('alipay-method') %></button>
+                <button class="btn btn-disable btn-fat btn-lg hide disabled" data-method="wechatpay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('wechatpay-method') %></button>
               </div>
             </div>
           </div>

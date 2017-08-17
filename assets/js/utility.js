@@ -54,6 +54,8 @@
         })
         $(ele).height(alignmentHeight);
         $(ele).parent().height(alignmentHeight);
+        google.maps.event.trigger(utility.map, "resize");
+        utility.map.setCenter(center);
       }
       return cb(null, utility.map);
     })
@@ -74,7 +76,7 @@
         return cb(err);
       }
       utility.geocoder.geocode({ address : address}, function(data, status){
-        if (status == google.maps.GeocoderStatus.OK) {
+        if (status === google.maps.GeocoderStatus.OK) {
           if (data.length > 0) {
             var location = data[0].geometry.location;
             cb(null, location, utility.map);

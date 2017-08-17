@@ -2744,7 +2744,6 @@ var MealConfirmView = Backbone.View.extend({
     utility.initGoogleMapService(function(){
       $this.initDelivery(function(map){
         $this.initPickups(map);
-        //$this.switchAddress()
       });
     });
   },
@@ -2752,8 +2751,7 @@ var MealConfirmView = Backbone.View.extend({
     e.preventDefault();
     var value = this.$el.find("#method button.active").attr("value");
     if(value === "pickup"){
-      $('#contactInfoView').removeClass('hide');
-      $('#contactInfoView').show();
+      $('#contactInfoView').removeClass('hide').show();
     }else{
       toggleModal(e, addressView.enterAddressInfoFromOrder);
     }
