@@ -118,7 +118,7 @@
                           <span class="preference"><%= preference.property || ""%></span>
                         </td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + order.meal ? order.meal.serviceFee : 0.00).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : 0.00%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : "0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.status == "schedule" || order.status == "preparing"){ %>
@@ -229,7 +229,7 @@
                           <span class="preference"><%= preference.property || ''%></span>
                         </td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + order.meal ? order.meal.serviceFee : 0.00).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : 0.00%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : "0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.status === "pending-payment"){%>
@@ -307,7 +307,7 @@
                         </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + order.meal ? order.meal.serviceFee : 0.00).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : 0.00%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : "0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
@@ -380,7 +380,7 @@
                         </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + order.meal ? order.meal.serviceFee : 0.00).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : 0.00%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : "0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                           <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                             <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
@@ -454,7 +454,7 @@
                         </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + order.meal ? order.meal.serviceFee : 0.00).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : 0.00%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : "0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'pickup'){%>
@@ -529,7 +529,7 @@
                         </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + order.meal ? order.meal.serviceFee : 0.00).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : 0.00%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : "0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'pickup'){%>
@@ -633,7 +633,7 @@
                           <span class="preference"><%= preference.property || ""%></span>
                         </td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + order.meal.serviceFee).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal.serviceFee%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal?order.meal.serviceFee:0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal?order.meal.serviceFee:"0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                           <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                             <% if(order.status == "schedule" || order.status == "preparing"){ %>
@@ -741,7 +741,7 @@
                           <br/>
                           <span class="preference"><%= preference.property || ''%></span></td>
                         <%if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + order.meal.serviceFee).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal.serviceFee%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal?order.meal.serviceFee:0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal?order.meal.serviceFee:"0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.status === "pending-payment"){%>
@@ -821,7 +821,7 @@
                         </td>
                         <td class="minWid50"><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + order.meal.serviceFee).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal.serviceFee%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal?order.meal.serviceFee:0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal?order.meal.serviceFee:"0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
                           <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                             <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
@@ -896,7 +896,7 @@
                         </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + order.meal.serviceFee).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal.serviceFee%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal?order.meal.serviceFee:0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal?order.meal.serviceFee:"0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
@@ -970,7 +970,7 @@
                         </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + order.meal.serviceFee).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal.serviceFee%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal?order.meal.serviceFee:0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= (order.meal?order.meal.serviceFee:"0.00")%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%><br/><%= __('pickup-method')%>: <%= __(order.method)%></td>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'pickup'){%>
@@ -1048,7 +1048,7 @@
                         </td>
                         <td><%= number%><br/><span class="preference"><%= preference.property || ''%></span></td>
                         <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + order.meal.serviceFee).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal.serviceFee%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
+                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal?order.meal.serviceFee:0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal?order.meal.serviceFee:"0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%>
                         <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                           <% if(order.method == 'pickup'){%>
@@ -1086,7 +1086,7 @@
                 <img src=<%= meal.coverString%> style="width: 100%;">
               </div>
               <div class="col-xs-4">
-                <h2 class="text-left"><%= meal.title%>  <small class="text-orange"><%= meal.type=="order"?__('order'): __('preorder')%></small></h2>
+                <h2 class="text-left"><%= meal.title%>  <small class="text-orange"><%= meal.type==="order"?__('order'): __('preorder')%></small></h2>
                 <div class="row text-left">
                   <div class="col-xs-12">
                     <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(2)%>">
@@ -1513,7 +1513,7 @@
                   </div>
                   <div class="row">
                     <div class="col-xs-12">
-                      <h3><small><%= __('total') %></small><span class="text-red"> $<%= (order.subtotal * ( 1 + order.getTaxRate()) + order.meal ? order.meal.serviceFee : 0.00).toFixed(2)%></span></h3>
+                      <h3><small><%= __('total') %></small><span class="text-red"> $<%= (order.subtotal * ( 1 + order.getTaxRate()) + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)%></span></h3>
                     </div>
                   </div>
                 </div>
