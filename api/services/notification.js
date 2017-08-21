@@ -187,7 +187,7 @@ var notification = {
       var locale = params.locale;
     }else{
       var host = params.host || params.chef;
-      var locale = req ? (params.isSendToHost ? host.locale : ( params.customer ? params.customer.locale : params.locale)) : '';
+      locale = req ? (params.isSendToHost ? host.locale : ( params.customer ? params.customer.locale : params.locale)) : '';
     }
 
     this.mergeI18N(model, action, req, locale, params);
@@ -256,7 +256,7 @@ var notification = {
           Order.publishUpdate( params.id, { id : params.id, action : "has an new review!", host : params.host});
           break;
       }
-    }else if(model == "Meal"){
+    }else if(model === "Meal"){
       switch(action){
         case "mealScheduleEnd":
           Meal.publishUpdate( params.id, { id : params.id, action: "mealScheduleEnd", host: params.host || params.chef });
@@ -265,7 +265,7 @@ var notification = {
           Meal.publishUpdate( params.id, { id : params.id, action: "mealStart", host: params.host || params.chef });
           break;
       }
-    }else if(model == "User"){
+    }else if(model === "User"){
       switch(action){
         case "licenseUpdated":
           User.publishUpdate( params.admin, { id : params.id, action: "licenseUpdated"});
@@ -277,37 +277,32 @@ var notification = {
       Notification.create({ recordId : params.id, host : params.host, action : action, model : model, verb : verb }).exec(function(err, noti){
         if(err){
           console.log(err);
-          return;
         }
       });
       Notification.create({ recordId : params.id, user : params.customer, action : action, model : model, verb : verb}).exec(function(err, noti){
         if(err){
           console.log(err);
-          return;
         }
       });
     }else if(isSendToHost){
       Notification.create({ recordId : params.id, host : params.host, action : action, model : model, verb : verb }).exec(function(err, noti){
         if(err){
           console.log(err);
-          return;
         }
       });
     }else if(isSendToAdmin){
-      if(model == "User"){
+      if(model === "User"){
         Notification.create({ recordId : params.id, user : params.admin, action : action, model : model, verb : verb}).exec(function(err, noti){
           if(err){
             console.log(err);
-            return;
           }
         });
       }
     }else{
-      if(model == "Order"){
+      if(model === "Order"){
         Notification.create({ recordId : params.id, user : params.customer, action : action, model : model, verb : verb}).exec(function(err, noti){
           if(err){
             console.log(err);
-            return;
           }
         });
       }
@@ -331,7 +326,7 @@ var notification = {
 
   inquireTemplate : function(model,action){
     var template = "";
-    if(model == "Order"){
+    if(model === "Order"){
       switch(action){
         case "abort":
           template = "cancel";
@@ -339,7 +334,7 @@ var notification = {
         default:
           template = action;
       }
-    }else if(model == "Meal"){
+    }else if(model === "Meal"){
       switch(action){
         case "mealScheduleEnd":
           template = "guestlist";
@@ -350,9 +345,9 @@ var notification = {
         default:
           template = action;
       }
-    }else if(model == "Host"){
+    }else if(model === "Host"){
       template = action;
-    }else if(model == "User"){
+    }else if(model === "User"){
       template = action;
     }
     return template;
@@ -360,7 +355,7 @@ var notification = {
 
   mergeI18N : function(model, action, req, locale, params){
     var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','our-mailing-address','tax','service-fee','question-email','click-enter-info','click-upload-info','click-apply'];
-    if(model == "Order"){
+    if(model === "Order"){
       switch(action){
         case "new":
           i18ns = i18ns.concat(['new-order-title','new-order-context','order-time','ready-time','order','preorder']);

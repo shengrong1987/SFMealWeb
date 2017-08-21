@@ -491,7 +491,7 @@ var refreshMenu = function(){
   $(".delivery").text("$" + delivery.toFixed(2));
   var taxRate = $order.find(".tax").data("taxrate");
   var tax = parseFloat(subtotal * taxRate);
-  var serviceFee = 1;
+  var serviceFee = 0;
   $order.find(".tax").text(" $" + tax.toFixed(2));
   var coupons = Object.keys(localCoupon);
   var $orderTotal = $order.find(".total");
@@ -717,6 +717,10 @@ function setup(){
     $(this).attr('src', $(this).data('src'));
   });
   $('body').on('touchstart.dropdown', '.dropdown-menu', function (e) { e.stopPropagation(); });
+  $(document).on({
+    ajaxStart: function() { $('body').addClass("loading");  },
+    ajaxStop: function() { $('body').removeClass("loading"); }
+  });
 }
 
 function setupSelector(){

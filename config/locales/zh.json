@@ -84,6 +84,8 @@
   "delete" : "删除",
   "submit" : "提交",
   "property" : "属性",
+  "deleteOrder" : "取消订单",
+  "pending-payment" : "待付款",
   "reject-reason" : "拒绝原因",
   "confirm-pickup" : "确认取货",
   "confirm-delete" : "确认删除?",
@@ -114,7 +116,7 @@
   "order-nav-order" : "即点订单",
   "order-nav-preorder" : "预售订单",
   "order-nav-all" : "所有订单",
-  "order-nav-waiting" : "待确认",
+  "order-nav-waiting" : "待确认/付款",
   "order-nav-schedule" : "待煮",
   "order-nav-preparing" : "烹饪中",
   "order-nav-prepared" : "等自取/送餐中",
@@ -792,5 +794,6 @@
   "payment-error-title" : "支付失败，5秒后自动跳转至订单确认页",
   "ali-payment-failure" : "支付宝支付失败了，请关闭此窗口并确认支付宝操作无误。",
   "ali-payment-cancel" : "支付宝支付取消了，请关闭此窗口并重新下订单。",
-  "ali-payment-awaiting" : "等待付款中，请前往支付宝页面完成支付。"
+  "ali-payment-awaiting" : "等待付款中，请前往支付宝页面完成支付。",
+  "pay" : "付款"
 }

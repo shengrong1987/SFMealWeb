@@ -432,6 +432,7 @@ module.exports = {
     var code = req.body.couponCode;
     var pointsRedeem = req.body.points;
     var states = {};
+    var $this = this;
 
     if(req.session.authenticated){
       var userId = req.session.user.id;
@@ -439,7 +440,6 @@ module.exports = {
       req.body.customer = userId;
       req.body.guestEmail = email;
     }
-    var $this = this;
 
     Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,m) {
       if (err) {
@@ -490,9 +490,6 @@ module.exports = {
                   var paymentInfo = req.body.paymentInfo;
                   if(paymentInfo.method === 'online' && (!found.payment || found.payment.length === 0)){
                     return next({ responseText : req.__('order-lack-payment'), code : -5});
-                  }
-                  if(m.type === "order"){
-                    req.body.status = "preparing";
                   }
                   sails.log.info("user's phone: " + found.phone || contactInfo.phone);
                   if(!found.phone && !contactInfo.phone){
@@ -554,9 +551,6 @@ module.exports = {
                 if(paymentInfo.method === 'cash' && (!contactInfo.phone || !contactInfo.name)){
                   return next({ responseText : req.__('order-cash-miss-profile'), code : -27});
                 }
-                if(m.type === "order"){
-                  req.body.status = "preparing";
-                }
                 if(!contactInfo.phone){
                   return next(req.__('order-lack-contact'));
                 }
@@ -610,15 +604,20 @@ module.exports = {
                     if(err){
                       return res.badRequest(err);
                     }
-                    order.sourceId = source.id;
-                    order.client_secret = source.client_secret;
-                    order.save(function(err, o){
-                      if(err){
-                        return res.badRequest(err);
-                      }
-                      order.source = source;
-                      return res.ok(order)
-                    });
+                    if(!source){
+                      $this.afterSuccessCharge(order, orders, m, null, null, req, res);
+                    }else{
+                      order.status = "pending-payment";
+                      order.sourceId = source.id;
+                      order.client_secret = source.client_secret;
+                      order.save(function(err, o){
+                        if(err){
+                          return res.badRequest(err);
+                        }
+                        order.source = source;
+                        return res.ok(order);
+                      });
+                    }
                   });
                 }else{
                   stripe.charge({
@@ -649,11 +648,8 @@ module.exports = {
                         }
                         return res.badRequest(err);
                       });
-                    } else if(charge.status === "succeeded"){
-                      $this.afterSuccessCharge(order, orders, m, charge, transfer, req, res);
-                    } else {
-                      return res.badRequest({ code : -99, responseText : req.__('order-unknown-error') });
                     }
+                    $this.afterSuccessCharge(order, orders, m, charge, transfer, req, res);
                   });
                 }
               });
@@ -678,16 +674,24 @@ module.exports = {
     order.feeCharges = {};
     order.application_fees = {};
 
+    if(m.type === "order"){
+      order.status = "preparing";
+    }else{
+      order.status = "schedule";
+    }
+
     if(order.paymentMethod === "cash"){
       order.charges['cash'] = order.charges['cash'] || 0;
       order.charges['cash'] += charge.amount;
-      order.application_fees[charge.id] = charge.application_fee;
+      order.application_fees['cash'] = charge.application_fee;
       if(transfer){
         order.feeCharges[transfer.id] = transfer.amount;
       }
     }else{
-      order.charges[charge.id] = charge.amount;
-      order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
+      if(charge){
+        order.charges[charge.id] = charge.amount;
+        order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
+      }
       if(transfer){
         order.transfer[transfer.id] = transfer.amount;
       }
@@ -717,6 +721,54 @@ module.exports = {
         }else{
           return res.ok({ id: order.id});
         }
+      });
+    });
+  },
+
+  pay : function(req, res){
+    var orderId = req.params.id;
+    Order.findOne(orderId).exec(function(err, order){
+      if(err){
+        return res.badRequest(err);
+      }
+      var sourceId = order.sourceId;
+      stripe.getSource({
+        id : sourceId
+      }, function(err, source){
+        if(err){
+          return res.badRequest(err);
+        }
+        if(source.status !== "pending"){
+          return res.badRequest({ code : -39, responseText : req.__('ali-payment-failure')});
+        }
+        order.source = source;
+        res.ok(order);
+      });
+    });
+  },
+
+  deleteOrder : function(req, res){
+    var orderId = req.params.id;
+    Order.findOne(orderId).exec(function(err, order){
+      if(err){
+        return res.badRequest(err);
+      }
+      var sourceId = order.sourceId;
+      stripe.getSource({
+        id : sourceId
+      }, function(err, source){
+        if(err){
+          return res.badRequest(err);
+        }
+        if(source.status !== "pending"){
+          return res.badRequest({ code : -39, responseText : req.__('ali-payment-failure')});
+        }
+        Order.destroy(orderId).exec(function(err, order){
+          if(err){
+            return res.badRequest(err);
+          }
+          return res.ok({});
+        })
       });
     });
   },
@@ -1518,7 +1570,7 @@ module.exports = {
   ready : function(req, res){
     var orderId = req.params.id;
     var email = req.session.user.auth.email;
-    Order.findOne(orderId).populate("customer").populate("host").exec(function(err,order){
+    Order.findOne(orderId).populate("customer").populate("host").populate("meal").exec(function(err,order){
       if(err){
         return res.badRequest(err);
       }
@@ -1543,7 +1595,7 @@ module.exports = {
   receive : function(req, res){
     var orderId = req.params.id;
     var email = req.session.user.auth.email;
-    Order.findOne(orderId).populate("customer").populate("host").exec(function(err,order){
+    Order.findOne(orderId).populate("customer").populate("host").populate("meal").exec(function(err,order){
       if(err){
         return res.badRequest(err);
       }
@@ -1592,7 +1644,7 @@ module.exports = {
 
   downloadReceipt : function(req, res) {
     var orderId = req.params.id;
-    Order.findOne(orderId).populate("dishes").populate('host').exec(function(err, order){
+    Order.findOne(orderId).populate("dishes").populate('host').populate("meal").exec(function(err, order){
       if(err){
         return res.badRequest(err);
       }

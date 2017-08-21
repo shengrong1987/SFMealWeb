@@ -15,6 +15,7 @@ describe('OrderController', function() {
 
   this.timeout(20000);
   var address = "221 Woodrow St, Daly City, CA 94014";
+  const SERVICE_FEE = 0
 
   describe('', function() {
 
@@ -261,7 +262,7 @@ describe('OrderController', function() {
               return done(err);
             }
             var tax = Math.round((price1 + price2 * 2 + (price4*2+2))*0.085*100);
-            var chargesTotal = Math.round(((price1 * 1 + price2 * 2 + (price4*2 + 2)) * 1.085 + 1) * 100);
+            var chargesTotal = Math.round(((price1 + price2 * 2 + (price4*2 + 2)) * 1.085 + SERVICE_FEE) * 100);
             userPoints += Math.floor(chargesTotal / 100);
             res.body.tax.should.be.equal(tax);
             res.body.customerName.should.be.equal('sheng');
@@ -407,8 +408,7 @@ describe('OrderController', function() {
             }
             var tax = Math.round(price1 * 0.085 * 100);
             res.body.tax.should.be.equal(tax);
-            var points = Math.floor((price2 * 2 + ((price4+1) * 2)) * 1.085);
-            userPoints -= points;
+            userPoints -= Math.floor((price2 * 2 + (price4 + 1) * 2) * 1.085);
             done();
           })
     })
@@ -644,9 +644,9 @@ describe('OrderController', function() {
             return done(Error("error making order"));
           }
           res.body.redeemPoints.should.be.equal("13");
-          var chargesTotal = ((price3 * 1)*1.085 + 1) + 3.99 - 1.3;
+          var chargesTotal = ((price3 * 1)*1.085 + SERVICE_FEE) + 3.99 - 1.3;
           res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(Math.round(chargesTotal * 100));
-          res.body.application_fees[Object.keys(res.body.application_fees)[0]].should.be.equal(260);
+          res.body.application_fees[Object.keys(res.body.application_fees)[0]].should.be.equal(160);
           done();
         })
     })
@@ -1322,8 +1322,8 @@ describe('OrderController', function() {
           }
           res.body.discountAmount.should.be.equal(1);
           res.body.transfer[Object.keys(res.body.transfer)[0]].should.be.equal(100);
-          res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(Math.round(400*1.085));
-          res.body.application_fees[Object.keys(res.body.application_fees)[0]].should.be.equal(180);
+          res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(Math.round((price1*1.085+SERVICE_FEE-1)*100));
+          res.body.application_fees[Object.keys(res.body.application_fees)[0]].should.be.equal(80);
           orderId = res.body.id;
           done();
         })
@@ -1360,8 +1360,6 @@ describe('OrderController', function() {
           }
           res.body.discountAmount.should.be.equal(4.34);
           res.body.transfer[Object.keys(res.body.transfer)[0]].should.be.equal(354);
-          res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(100);
-          res.body.application_fees[Object.keys(res.body.application_fees)[0]].should.be.equal(180);
           orderId = res.body.id;
           done();
         })
@@ -1624,8 +1622,8 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body.tax.should.be.equal(price3 * 0.085 * 100);
-          res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + 1) * 100);
-          res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal((price3 * 0.2 + 1) * 100);
+          res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
+          res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
           res.body.customerPhone.should.be.equal(customerPhone);
           res.body.customerName.should.be.equal(customerName);
           orderId = res.body.id;
@@ -1652,7 +1650,7 @@ describe('OrderController', function() {
           var tax = Math.round((price1+price3) * 0.085 * 100);
           res.body.tax.should.be.equal(tax);
           Object.keys(res.body.feeCharges).should.have.length(2);
-          res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal(((price3) * 0.2 + 1) * 100);
+          res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal(((price3) * 0.2 + SERVICE_FEE) * 100);
           res.body.feeCharges[Object.keys(res.body.feeCharges)[1]].should.be.equal(((price2) * 0.2) * 100);
           done();
         })
@@ -1676,7 +1674,7 @@ describe('OrderController', function() {
           }
           var tax = Math.round(price1 * 0.085 * 100);
           res.body.tax.should.be.equal(tax);
-          res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal(100);
+          res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal(SERVICE_FEE * 100);
           res.body.feeCharges[Object.keys(res.body.feeCharges)[1]].should.be.equal((price2 * 0.2) * 100);
           done();
         })
@@ -1717,7 +1715,7 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body.tax.should.be.equal(price3 * 0.085 * 100);
-          res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + 1) * 100);
+          res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
           res.body.customerPhone.should.be.equal(customerPhone);
           res.body.customerName.should.be.equal(customerName);
           orderId = res.body.id;
@@ -1748,8 +1746,8 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body.tax.should.be.equal(price3 * 0.085 * 100);
-          res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + 1) * 100);
-          res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal((price3 * 0.2 + 1) * 100);
+          res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
+          res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
           res.body.customerPhone.should.be.equal(customerPhone);
           res.body.customerName.should.be.equal(customerName);
           res.body.isExpressCheckout.should.be.false();
@@ -1865,7 +1863,7 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body.tax.should.be.equal(price3 * 0.085 * 100);
-          res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + 1) * 100);
+          res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
           res.body.customerPhone.should.be.equal("(415)111-1111");
           res.body.customerName.should.be.equal("abc");
           res.body.isExpressCheckout.should.be.true();

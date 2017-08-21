@@ -84,6 +84,8 @@
   "delete": "Delete",
   "submit": "Submit",
   "property": "Property",
+  "deleteOrder" : "Cancel",
+  "pending-payment" : "Waiting Payment",
   "reject-reason": "The reason for reject",
   "confirm-pickup": "Confirm pickup?",
   "confirm-delete": "Confirm delete?",
@@ -792,5 +794,6 @@
   "payment-error-title" : "Payment error, redirect to order confirmation page in 5s.",
   "ali-payment-failure" : "Alipay payment failed, please close this window and verify your payment process.",
   "ali-payment-cancel" : "Alipay payment canceled, please close this window and take your order again.",
-  "ali-payment-awaiting" : "Alipay payment is pending, please go to Alipay to finish the payment."
+  "ali-payment-awaiting" : "Alipay payment is pending, please go to Alipay to finish the payment.",
+  "pay" : "Pay"
 }

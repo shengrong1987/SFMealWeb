@@ -9,6 +9,7 @@ var dateUtil = require("../services/util.js");
 var moment = require("moment");
 var async = require("async");
 var geoService = require("../services/geocode.js");
+var stripe = require("../services/stripe");
 
 module.exports = {
 
@@ -143,6 +144,10 @@ module.exports = {
       defaultsTo : 0.2,
       decimal2 : true
     },
+    serviceFee : {
+      type : 'float',
+      defaultsTo : (stripe.SERVICE_FEE/100).toFixed(2)
+    },
     isDelivery : {
       type : 'boolean'
     },
@@ -187,8 +192,8 @@ module.exports = {
     },
 
     provideDate : function(){
-      if(this.type == "preorder"){
-        if(this.provideFromTime.getDate() == this.provideTillTime.getDate()){
+      if(this.type === "preorder"){
+        if(this.provideFromTime.getDate() === this.provideTillTime.getDate()){
           return dateUtil.formattedDate(this.provideFromTime);
         }else{
           return dateUtil.formattedDate(this.provideFromTime) + " - " + dateUtil.formattedDate(this.provideTillTime);

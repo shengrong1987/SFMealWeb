@@ -607,7 +607,7 @@
             <tr>
               <th></th>
               <td></td>
-              <th class="text-right"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('tip-service-fee')%>"></i> <%= __('service-fee')%>:<span class="service-fee" data-value="0"> $1.00</span></th>
+              <th class="text-right"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('tip-service-fee')%>"></i> <%= __('service-fee')%>:<span class="service-fee" data-value="0"> $<%= meal.serviceFee%></span></th>
             </tr>
             <tr></tr>
             <% if(user.id){%>

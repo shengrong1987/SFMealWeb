@@ -358,14 +358,14 @@ var UserBarView = Backbone.View.extend({
       }
     }
     var hostBadge = hostBadgeView.data("badge");
-    if(hostBadge == 0){
+    if(hostBadge === 0){
       hostBadgeView.hide();
     }else{
       hostBadgeView.text(hostBadge);
       hostBadgeView.show();
     }
     var userBadge = userBadgeView.data("badge");
-    if(userBadge == 0){
+    if(userBadge === 0){
       userBadgeView.hide();
     }else{
       userBadgeView.text(userBadge);
@@ -1191,13 +1191,13 @@ var MealSelectionView = Backbone.View.extend({
     var subtotal = this.$el.find(".subtotal").data("value");
     var tax = this.$el.find(".tax").data("value");
     var subtotalAfterTax = parseFloat(subtotal + tax);
-    if(subtotalAfterTax == 0){
+    if(subtotalAfterTax === 0){
       this.alertView.show();
       this.alertView.html(jQuery.i18n.prop('orderEmptyError'));
       return;
     }
     var point = parseFloat(this.$el.find(".points").val());
-    if(point==-1){
+    if(point===-1){
       this.alertView.show();
       this.alertView.html(jQuery.i18n.prop('notAuthorize'));
       return;
@@ -1254,7 +1254,7 @@ var MealView = Backbone.View.extend({
     var targetHref = $(e.currentTarget).data('href');
     $(targetHref).parent().find('.tab-pane').hide();
     $(targetHref).show();
-    if(targetHref == "#order"){
+    if(targetHref === "#order"){
       this.$el.find(".order-require input").prop('disabled', true);
       this.$el.find(".order-require input").val('1');
     }else{
@@ -1265,7 +1265,7 @@ var MealView = Backbone.View.extend({
     var select = $(e.target);
     var method = select.val();
     var shippingFeeInput = this.$el.find("#shippingFee");
-    if(method == "custom"){
+    if(method === "custom"){
       shippingFeeInput.val("");
       shippingFeeInput.prop('disabled', true);
     }else{
@@ -1760,7 +1760,7 @@ var DishView = Backbone.View.extend({
         return;
       }
     });
-    if(property == "custom"){
+    if(property === "custom"){
       var $this = this;
       this.addCustomPropertyInput(variation);
     }else{
@@ -2950,12 +2950,12 @@ var MealConfirmView = Backbone.View.extend({
     var subtotal = this.$el.find(".subtotal").data("value");
     var tax = this.$el.find(".tax").data("value");
     var subtotalAfterTax = parseFloat(subtotal + tax);
-    if(subtotalAfterTax == 0){
+    if(subtotalAfterTax === 0){
       makeAToast(jQuery.i18n.prop('orderEmptyError'));
       return;
     }
     var point = parseFloat(this.$el.find(".points").val());
-    if(point==-1){
+    if(point===-1){
       makeAToast(jQuery.i18n.prop('notAuthorize'));
       return;
     }
@@ -2981,6 +2981,8 @@ var OrderView = Backbone.View.extend({
     "click [data-action='confirm']" : "confirm",
     "click [data-action='cancel']" : "cancel",
     "click [data-action='adjust']" : "adjust",
+    "click [data-action='deleteOrder']" : "deleteOrder",
+    "click [data-action='pay']" : "pay",
     "click [data-action='takeOrder']" : "takeOrder"
   },
   receive : function(e){
@@ -3087,8 +3089,8 @@ var OrderView = Backbone.View.extend({
         }else{
           var t = contactView.next().next().text();
           if(t){
-            var name = t.split("+")[0];
-            var phone = t.split("+")[1];
+            name = t.split("+")[0];
+            phone = t.split("+")[1];
             if(!name || !phone){
               makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
               return cb(false);
@@ -3097,8 +3099,8 @@ var OrderView = Backbone.View.extend({
             contactObj.phone = phone;
           }else{
             contactView = this.$el.find("#contactInfoView");
-            var name = contactView.find("input[name='name']").val();
-            var phone = contactView.find("input[name='phone']").val();
+            name = contactView.find("input[name='name']").val();
+            phone = contactView.find("input[name='phone']").val();
             if(!name || !phone){
               makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
               return cb(false);
@@ -3111,8 +3113,8 @@ var OrderView = Backbone.View.extend({
         break;
       case "delivery":
         if(!isLogin){
-          var name = contactView.find("input[name='name']").val();
-          var phone = contactView.find("input[name='phone']").val();
+          name = contactView.find("input[name='name']").val();
+          phone = contactView.find("input[name='phone']").val();
           var street = contactView.find("input[name='street']").val();
           var city = contactView.find("input[name='city']").val();
           var state = contactView.find("input[name='state']").val();
@@ -3132,7 +3134,7 @@ var OrderView = Backbone.View.extend({
           var t = contactView.next().next().text();
           if(t){
             var address = t.split("+")[0];
-            var phone = t.split("+")[1];
+            phone = t.split("+")[1];
             if(!address || !phone){
               makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'));
               return cb(false);
@@ -3154,8 +3156,7 @@ var OrderView = Backbone.View.extend({
     }
   },
   getPickupOption : function(method){
-    var pickupIndex = parseInt(this.$el.find("#" + method + "Tab" + " .option .regular-radio:checked").data("index"));
-    return pickupIndex;
+    return parseInt(this.$el.find("#" + method + "Tab" + " .option .regular-radio:checked").data("index"));
   },
   getCustomizedInfo : function(partyMode, cb){
     if(!partyMode){
@@ -3381,7 +3382,7 @@ var OrderView = Backbone.View.extend({
     var orderId = form.data("order");
     var delivery_fee = this.$el.find("#order .delivery").data("value");
     var subtotal = form.find(".subtotal").data("value");
-    if(subtotal == 0){
+    if(subtotal===0){
       makeAToast(jQuery.i18n.prop('orderAdjustZeroError'));
       return;
     }
@@ -3395,12 +3396,45 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         BootstrapDialog.alert(result.responseText, function(){
-          if(location.href.indexOf("host/me")==-1){
+          if(location.href.indexOf("host/me")===-1){
             reloadUrl("/user/me", "#myorder");
           }else{
             reloadUrl("/host/me","#myorder");
           }
         });
+      },error : function(model, err){
+        BootstrapDialog.alert(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+      }
+    })
+  },
+  deleteOrder : function(e){
+    var orderId = $(e.currentTarget).data("order");
+    this.model.set({
+      id : orderId
+    });
+    this.model.action = "deleteOrder";
+    this.model.save({},{
+      success : function(model,result){
+        if(location.href.indexOf("host/me")===-1){
+          reloadUrl("/user/me", "#myorder");
+        }else{
+          reloadUrl("/host/me","#myorder");
+        }
+      },error : function(model, err){
+        BootstrapDialog.alert(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+      }
+    })
+  },
+  pay : function(e){
+    var orderId = $(e.currentTarget).data("order");
+    this.model.set({
+      id : orderId
+    });
+    this.model.action = "pay";
+    this.model.save({},{
+      success : function(model,result){
+        var source = result.source;
+        location.href = source.redirect.url;
       },error : function(model, err){
         BootstrapDialog.alert(err.responseJSON ? err.responseJSON.responseText : err.responseText);
       }
@@ -3483,7 +3517,7 @@ function uploadImage(modual,file,progressBar,cb,error,index,name){
       filename = "story." + fileType;
       break;
     case "dish":
-      if(name && name!=""){
+      if(name && name!==""){
         filename = name;
       }
       break;

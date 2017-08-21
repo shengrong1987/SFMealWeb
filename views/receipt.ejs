@@ -62,13 +62,13 @@
         <td class="xs-hide"></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= __('service-fee')%>: $<%= service_fee.toFixed(2)%></td>
+        <td style="text-align: right;"><%= __('service-fee')%>: $<%= meal.serviceFee%></td>
       </tr>
       <tr class="border-less">
         <td class="xs-hide"></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= __('total')%> $<%= (subtotal * (1 + getTaxRate()) + delivery_fee + service_fee).toFixed(2)%></td>
+        <td style="text-align: right;"><%= __('total')%> $<%= (subtotal * (1 + getTaxRate()) + delivery_fee + meal.serviceFee).toFixed(2)%></td>
       </tr>
       <tr>
         <td><%= __('payment-method')%>: <%= __(paymentInfo.method)%></td>

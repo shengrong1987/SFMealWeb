@@ -17,36 +17,40 @@ module.exports = function(req, res, next) {
     if(err){
       return res.badRequest(err);
     }
-    if(action == "confirm" || action == "reject"){
-      console.log(order.isSendToHost, hostId);
-      if(order.isSendToHost && hostId && hostId == order.host.id){
+    if(action === "confirm" || action === "reject"){
+      if(order.isSendToHost && hostId && hostId === order.host.id){
         return next();
-      }else if(!order.isSendToHost && (!hostId || hostId != order.host.id)){
+      }else if(!order.isSendToHost && (!hostId || hostId !== order.host.id)){
         return next();
       }else{
         return res.forbidden('You are not permitted to perform this action.');
       }
-    }else if(action == "adjust" || action == "cancel" || action == "adjust-form"){
-      if(order.status != "schedule" && order.status != "preparing"){
+    }else if(action === "adjust" || action === "cancel" || action === "adjust-form"){
+      if(order.status !== "schedule" && order.status !== "preparing"){
         return res.forbidden('order can only be adjusted at schedule or preparing');
       }
-      if(order.status == "schedule" && hostId && hostId == order.host.id){
+      if(order.status === "schedule" && hostId && hostId === order.host.id){
         return res.forbidden(req.__('order-adjust-cancel-at-schedule-by-host'));
       }
       return next();
-    }else if(action == "ready"){
-      if(order.status != "preparing"){
+    }else if(action === "ready"){
+      if(order.status !== "preparing"){
         return res.forbidden("order can only be ready at preparing");
-      }else if(!hostId || hostId != order.host.id){
+      }else if(!hostId || hostId !== order.host.id){
         return res.forbidden("you are not permitted to perform this action");
       }
       return next();
-    }else if(action == "receive"){
-      if(order.status != "ready"){
+    }else if(action === "receive"){
+      if(order.status !== "ready"){
         return res.forbidden("order can only be received when ready");
       }
-      if(!hostId || hostId != order.host.id){
+      if(!hostId || hostId !== order.host.id){
         return res.forbidden("you are not permitted to perform this action");
+      }
+      return next();
+    }else if(action === "deleteOrder" || action === "pay"){
+      if(order.status !== "pending-payment"){
+        return res.forbidden("you can only delete order that is not paid.");
       }
       return next();
     }else{

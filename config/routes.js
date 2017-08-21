@@ -79,6 +79,8 @@ module.exports.routes = {
   '/order/:id/abort' : 'OrderController.abort',
   '/order/:id/refund' : 'OrderController.refund',
   '/order/:id/receipt' : "OrderController.receipt",
+  '/order/:id/pay' : "OrderController.pay",
+  '/order/:id/deleteOrder' : "OrderController.deleteOrder",
   '/order/:id/receipt/download' : "OrderController.downloadReceipt",
   '/order/process' : "OrderController.process",
   '/order/:id/verifyOrder' : 'OrderController.verifyOrder',

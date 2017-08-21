@@ -4,7 +4,7 @@
 var stripe = require('stripe')(sails.config.StripeKeys.secretKey);
 var async = require('async');
 
-const SERVICE_FEE = 100;
+const SERVICE_FEE = 0;
 const SYSTEM_DELIVERY_FEE = 399;
 const MILEAGE_FEE = 1.18;
 const PARTY_ORDER_RANGE_MULTIPLIER = 3;
@@ -136,6 +136,9 @@ module.exports = {
   },
 
   chargeCash : function(attr, cb){
+    if(attr.metadata.application_fee === 0){
+      return cb(null, { id : 'cash', status : 'succeeded', amount : attr.metadata.total, application_fee : attr.metadata.application_fee}, { amount : 0, application_fee : 0});
+    }
     stripe.charges.create({
       amount : attr.metadata.application_fee,
       currency : 'usd',
@@ -149,66 +152,100 @@ module.exports = {
     });
   },
 
-  chargeCreditCard : function(attr, cb){
+  chargeCreditCard : function(attr, final){
     var _this = this;
-    stripe.charges.create({
-      amount: attr.metadata.total,
-      currency: "usd",
-      receipt_email: attr.email,
-      customer: attr.customerId,
-      destination : attr.destination,
-      metadata : attr.metadata,
-      application_fee : attr.metadata.application_fee
-    }, function (err, charge) {
-      if(err){
-        return cb(err);
-      }
-      if(attr.metadata.discount !== 0){
-        _this.retrieveApplicationFee(charge.application_fee, function(err, fee){
-          if(err){
+    var charge = null, transfer = null;
+
+    async.auto({
+      createCharge : function(cb){
+        if(attr.metadata.total === 0){
+          return cb();
+        }
+        stripe.charges.create({
+          amount: attr.metadata.total,
+          currency: "usd",
+          receipt_email: attr.email,
+          customer: attr.customerId,
+          destination : attr.destination,
+          metadata : attr.metadata,
+          application_fee : attr.metadata.application_fee
+        }, function (err, c) {
+          if (err) {
             return cb(err);
           }
-          var leftFee = attr.metadata.application_fee - fee.amount;
-          var total = attr.metadata.discount - leftFee;
-          sails.log.info("charge remain application fee: " + leftFee);
-          attr.metadata.application_fee = leftFee;
+          charge = c;
+          cb(null, c);
+        });
+      },
+      createTransfer : ['createCharge', function(cb, results){
+        if(attr.metadata.discount === 0){
+          return cb();
+        }
+        var charge = results.createCharge;
+        sails.log.info("charge: " + charge);
+        async.auto({
+          calculateChargedFee : function(next){
+            if(!charge){
+              return next(null, 0);
+            }
+            _this.retrieveApplicationFee(charge.application_fee, function(err, fee) {
+              if (err) {
+                return next(err);
+              }
+              next(null, fee.amount);
+            });
+          },
+          calculateFee : ['calculateChargedFee', function(next, results){
+            var chargedFee = results.calculateChargedFee;
+            sails.log.info("charged application fee: " + chargedFee);
+            attr.metadata.application_fee = attr.metadata.application_fee - chargedFee;
+            next();
+          }]
+        }, function(err){
+          if(err){
+            return cb(err)
+          }
+          sails.log.info("charge remain application fee: " + attr.metadata.application_fee);
+          var total = attr.metadata.discount - attr.metadata.application_fee;
           stripe.transfers.create(
             {
               amount: total,
               currency: 'usd',
               destination: attr.destination,
               metadata : attr.metadata
-            }, function(err, transfer){
+            }, function(err, t){
               if(err){
                 return cb(err);
               }
-              sails.log.info("extra transfer created: " + transfer.amount);
-              _this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
-                if(err){
-                  return cb(err);
-                }
-                cb(null, charge, transfer);
-              });
+              transfer = t;
+              sails.log.info("extra transfer created: " + t.amount);
+              cb();
             }
           );
         });
-      }else{
-        if(!attr.metadata.userId){
-          return cb(null, charge);
-        }
-        _this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
-          if(err){
-            return cb(err);
-          }
-          cb(null, charge);
-        });
+      }]
+    }, function(err){
+      if(err){
+        return final(err);
       }
+      if(!attr.metadata.userId){
+        return final(null, charge);
+      }
+      _this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
+        if(err){
+          return final(err);
+        }
+        final(null, charge, transfer);
+      });
     });
   },
 
   chargeOthers : function(attr, cb){
     var _this = this;
     sails.log.info("charge amount by source: " + attr.amount);
+    if(attr.amount === 0){
+      return cb(null, null);
+    }
     stripe.charges.create({
       amount: attr.amount,
       currency: "usd",
@@ -267,6 +304,9 @@ module.exports = {
   newSource : function(attr, cb){
     var _this = this;
     this.calculateTotal(attr);
+    if(attr.metadata.total === 0){
+      return cb(null, null);
+    }
     stripe.sources.create({
       type: attr.type,
       amount: attr.metadata.total,
@@ -328,6 +368,9 @@ module.exports = {
     attr.metadata.discount = discount;
     attr.metadata.total = originalTotal - discount;
     attr.metadata.application_fee = application_fee;
+    attr.metadata.total = attr.metadata.total < 0 ? 0 : attr.metadata.total;
+
+    sails.log.info("charge total: " + attr.metadata.total);
   },
 
   charge : function(attr, cb){
@@ -343,7 +386,7 @@ module.exports = {
   },
 
   handlePoint : function(charge, userId, isCharge, cb){
-    if(charge.status !== "succeeded"){
+    if(!charge || charge.status !== "succeeded"){
       return cb();
     }
     User.findOne(userId).exec(function(err, user){

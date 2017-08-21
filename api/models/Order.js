@@ -46,10 +46,6 @@ module.exports = {
     adjusting_subtotal : {
       type : 'float'
     },
-    service_fee : {
-      type : 'float',
-      defaultsTo : 1.0
-    },
     delivery_fee: {
       type: 'float'
     },
@@ -116,7 +112,7 @@ module.exports = {
     },
     status: {
       type: 'string',
-      enum: ['schedule', 'preparing', 'ready', 'adjust', 'cancelling', 'cancel', 'review', 'complete'],
+      enum: ['schedule', 'preparing', 'ready', 'adjust', 'cancelling', 'cancel', 'review', 'complete','pending-payment'],
       defaultsTo : 'schedule'
     },
     isPaid : {
@@ -125,7 +121,7 @@ module.exports = {
     },
     lastStatus : {
       type : 'string',
-      enum: ['schedule', 'preparing', 'ready', 'adjust', 'cancelling', 'cancel', 'review', 'complete']
+      enum: ['schedule', 'preparing', 'ready', 'adjust', 'cancelling', 'cancel', 'review', 'complete','pending-payment']
     },
     charges : {
       type : 'json'

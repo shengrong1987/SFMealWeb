@@ -50,7 +50,6 @@ module.exports = {
                 return res.badRequest(err);
               }
               host.host_orders = fullOrders;
-              host.adjusting_orders = host.adjusting_orders;
               host.host_dishes = host.dishes;
               Notification.destroy({host : hostId}).exec(function(err){
                 if(err){

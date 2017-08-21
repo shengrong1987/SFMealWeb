@@ -83,14 +83,13 @@ module.exports = {
         ];
         break;
     }
-    if(calls.length == 0){
+    if(calls.length === 0){
       sails.log.debug("ListID doesn't exist, you probably enter the wrong type of list");
       return;
     }
     mailChimp.batch(calls, function(err, result){
       if(err){
         sails.log.debug(err);
-        return;
       }
     }, {
       wait : true,
