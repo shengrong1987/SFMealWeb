@@ -718,8 +718,14 @@ function setup(){
   });
   $('body').on('touchstart.dropdown', '.dropdown-menu', function (e) { e.stopPropagation(); });
   $(document).on({
-    ajaxStart: function() { $('body').addClass("loading");  },
-    ajaxStop: function() { $('body').removeClass("loading"); }
+    ajaxStart: function() {
+      console.log("ajax start");
+      $('body').addClass("loading");
+      },
+    ajaxStop: function() {
+      console.log("ajax stop");
+      $('body').removeClass("loading");
+    }
   });
 }
 

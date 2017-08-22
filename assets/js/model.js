@@ -1633,6 +1633,7 @@ var MealView = Backbone.View.extend({
       supportPartyOrder : supportPartyOrder,
       partyRequirement : partyRequirement
     });
+    $this = this;
     this.model.save({},{
       success : function(){
         if(mealId) {

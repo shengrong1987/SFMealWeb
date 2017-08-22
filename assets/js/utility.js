@@ -64,7 +64,8 @@
   utility.initAutoComplete = function(){
     utility.initGoogleMapService(function(err, google) {
       if (err) {
-        return cb(err);
+        console.log(err);
+        return;
       }
       initAutoComplete(google);
     });
