@@ -610,6 +610,7 @@ module.exports = {
                       order.status = "pending-payment";
                       order.sourceId = source.id;
                       order.client_secret = source.client_secret;
+                      order.service_fee = m.serviceFee;
                       order.save(function(err, o){
                         if(err){
                           return res.badRequest(err);
@@ -707,6 +708,7 @@ module.exports = {
         }
         o.chef = m.chef;
         o.dishes = m.dishes;
+        o.service_fee = m.serviceFee;
         notification.notificationCenter("Order", "new", o, true, false, req);
         //test only
         if(req.wantsJSON){
@@ -802,6 +804,7 @@ module.exports = {
         return res.badRequest({ code : -18, responseText : req.__('adjust-with-coupon-error')});
       }
       order.meal.dishes = order.dishes;
+      order.service_fee = order.meal.serviceFee;
       $this.validate_meal(order.meal, params.orders, order.orders, subtotal, req, function(err){
         if(err){
           sails.log.error(err.responseText);
@@ -906,7 +909,7 @@ module.exports = {
                     paymentMethod: order.paymentMethod,
                     reverse_transfer : false,
                     refund_application_fee : false
-                  }
+                  };
                   stripe.batchRefund(refundFees, metadata, function (err) {
                     if (err) {
                       return next2(err);
@@ -959,6 +962,7 @@ module.exports = {
           order.isSendToHost = isSendToHost;
           order.adjusting_orders = params.orders;
           order.adjusting_subtotal = params.subtotal;
+          order.service_fee = order.meal.serviceFee;
           order.meal = order.meal.id;
           order.save(function(err,result){
             if(err){
@@ -993,6 +997,7 @@ module.exports = {
         if (err) {
           return res.badRequest(err);
         }
+        order.service_fee = order.meal.serviceFee;
         order.meal = m.id;
         order.save(function(err, result){
           if(err){
@@ -1177,6 +1182,7 @@ module.exports = {
                     }
                     order.tax = 0;
                     order.status = "cancel";
+                    order.service_fee = order.meal.serviceFee;
                     order.meal = m.id;
                     order.redeemPoints = 0;
                     order.save(function (err, result) {
@@ -1204,6 +1210,7 @@ module.exports = {
               return res.badRequest(err);
             }
             //send notification
+            result.service_fee = result.meal.serviceFee;
             notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
             $this.cancelOrderJob(result.id, function(err){
               if(err){
@@ -1222,6 +1229,7 @@ module.exports = {
             return res.badRequest(err);
           }
           //send notification
+          result.service_fee = result.meal.serviceFee;
           notification.notificationCenter("Order", "cancelling", result, isSendToHost, false, req);
           // if(req.wantsJSON){
           //   return res.ok(result);
@@ -1308,6 +1316,7 @@ module.exports = {
                       order.charges[charge.id] = charge.amount;
                     }
                     order.tax += tax * 100;
+                    order.service_fee = order.meal.serviceFee;
                     order.meal = order.meal.id;
                     order.save(function(err,result){
                       if(err){
@@ -1390,6 +1399,7 @@ module.exports = {
                     var tmpLastStatus = order.status;
                     order.status = order.lastStatus;
                     order.lastStatus = tmpLastStatus;
+                    order.service_fee = order.meal.serviceFee;
                     order.meal = order.meal.id;
                     order.tax -= tax * 100;
                     order.save(function (err, result) {
@@ -1420,6 +1430,7 @@ module.exports = {
             var tmpLastStatus = order.status;
             order.status = order.lastStatus;
             order.lastStatus = tmpLastStatus;
+            order.service_fee = order.meal.serviceFee;
             order.meal = m.id;
             order.save(function(err,result){
               if(err){
@@ -1499,6 +1510,7 @@ module.exports = {
                     order.tax = 0;
                     order.status = "cancel";
                     order.lastStatus = "cancelling";
+                    order.service_fee = order.meal.serviceFee;
                     order.meal = order.meal.id;
                     order.redeemPoints = 0;
                     order.save(function (err, result) {
@@ -1522,6 +1534,7 @@ module.exports = {
           order.tax = 0;
           order.status = "cancel";
           order.lastStatus = "cancelling";
+          order.service_fee = order.meal.serviceFee;
           order.meal = order.meal.id;
           order.save(function(err,result){
             if(err){
@@ -1546,7 +1559,7 @@ module.exports = {
     var orderId = req.params.id;
     var params = req.body;
     var $this = this;
-    Order.findOne(orderId).populate("customer").populate("host").exec(function(err,order){
+    Order.findOne(orderId).populate("meal").populate("customer").populate("host").exec(function(err,order){
       if(err){
         return res.badRequest(err);
       }
@@ -1554,6 +1567,7 @@ module.exports = {
       order.lastStatus = order.status;
       order.status = lastStatus;
       order.msg = params.msg;
+      order.service_fee = order.meal.serviceFee;
       order.save(function(err,result){
         if(err){
           return res.badRequest(err);
@@ -1575,6 +1589,7 @@ module.exports = {
         return res.badRequest(err);
       }
       order.status = "ready";
+      order.service_fee = order.meal.serviceFee;
       order.save(function(err,result){
         if(err){
           return res.badRequest(err);
@@ -1600,6 +1615,7 @@ module.exports = {
         return res.badRequest(err);
       }
       order.status = "review";
+      order.service_fee = order.meal.serviceFee;
       order.reviewing_orders = Object.keys(order.orders).filter(function(orderId){
         return order.orders[orderId].number > 0;
       });
