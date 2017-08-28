@@ -704,7 +704,7 @@ module.exports = {
           if(counties.indexOf(pickup.county) === -1){
             counties.push(pickup.county);
           }
-        })
+        });
         if(params.supportPartyOrder){
           var kitchenDelivery = {
             deliveryCenter : host.full_address,

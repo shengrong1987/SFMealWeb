@@ -4,7 +4,14 @@
 (function(global){
 
   var utility  = {
-
+    componentForm : {
+      "street_number" : [["form","#streetInput"],["form","input[name='street']"],['.pickup','.location input']],
+      "route" : [["form","#streetInput"],["form","input[name='street']"],['.pickup','.location input']],
+      "locality" : [["form","#cityInput"],["form","input[name='city']"],['.pickup','.public-location input'],['.pickup','.location input']],
+      "postal_code" : [["form","#postalInput"],["form","input[name='zipcode']"],['.pickup','.public-location input']],
+      "administrative_area_level_2" : [],
+      "administrative_area_level_1" : [["form","input[name='state']"]]
+    }
   };
 
   utility.googleMapLoaded = false;
@@ -22,7 +29,7 @@
           $this.directionsDisplay = new google.maps.DirectionsRenderer;
           $this.directionsService = new google.maps.DirectionsService;
           $this.geocoder = new google.maps.Geocoder();
-          initAutoComplete(google);
+          $this.getAutoComplete(google);
           cb(null, google);
         },error : function(err){
           cb(err);
@@ -31,7 +38,7 @@
     }else if(typeof google === 'object' && typeof google.maps === 'object'){
       cb(null, google);
     }
-  }
+  };
 
   utility.initMap = function(ele, center, cb){
     utility.initGoogleMapService(function(err){
@@ -51,7 +58,7 @@
           e.preventDefault();
           google.maps.event.trigger(utility.map, "resize");
           utility.map.setCenter(center);
-        })
+        });
         $(ele).height(alignmentHeight);
         $(ele).parent().height(alignmentHeight);
         google.maps.event.trigger(utility.map, "resize");
@@ -59,7 +66,7 @@
       }
       return cb(null, utility.map);
     })
-  },
+  };
 
   utility.initAutoComplete = function(){
     utility.initGoogleMapService(function(err, google) {
@@ -67,9 +74,134 @@
         console.log(err);
         return;
       }
-      initAutoComplete(google);
+      utility.getAutoComplete(google);
     });
-  },
+  };
+
+  utility.getPlaceDetail = function(id, ele){
+    utility.placesService.getDetails({
+      placeId : id
+    }, function(place, status){
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        utility.clearField(utility.componentForm, ele);
+        utility.fillFromPlace(place.address_components, utility.componentForm, ele);
+      }else{
+        console.log("place detail status: " + status);
+      }
+    });
+  };
+
+  utility.getAutoComplete = function(googleService){
+    var options = {
+      componentRestrictions: {country: 'us'},
+      type: ['address']
+    };
+
+    var autocomplete;
+    var autoCompleteEle = [
+      "#streetInput",
+      ".location input",
+      ".delivery-center input",
+      "#paymentInfoView input[name='street']",
+      "#contactInfoView input[name='street']"
+    ];
+    if(!utility.autoCompletePlaceService){
+      utility.autoCompletePlaceService = new google.maps.places.AutocompleteService();
+    }
+    if(!utility.placesService){
+      utility.placesService = new google.maps.places.PlacesService($("#placeServiceHelper").get(0));
+    }
+    autoCompleteEle.forEach(function (eles) {
+      if ($(eles).length) {
+        $(eles).toArray().forEach(function (ele) {
+          autocomplete = new googleService["maps"]["places"].Autocomplete(ele, options);
+          geolocate(autocomplete);
+          $(ele).off("blur");
+          $(ele).blur(function(e){
+            e.preventDefault();
+            var locationInput = $(this).val();
+            if(locationInput){
+              utility.autoCompletePlaceService.getQueryPredictions({ input : locationInput }, function(p, status){
+                if(status !== google.maps.places.PlacesServiceStatus.OK){
+                  alert(status);
+                  return;
+                }
+                if(p && p.length > 0){
+                  utility.getPlaceDetail(p[0].place_id, ele);
+                }else{
+                  console.log("zero results");
+                }
+              });
+            }
+          });
+          autocomplete.addListener('place_changed', function () {
+            var place = this["getPlace"]();
+            if(!place["geometry"]) {
+              window.alert("No details available for input: '" + place.name + "'");
+              return;
+            }
+            utility.clearField(utility.componentForm, ele);
+            utility.fillFromPlace(place.address_components, utility.componentForm, ele);
+          });
+        });
+      }
+    });
+  };
+
+  utility.clearField = function(compsForm, ele){
+    for (var key in compsForm) {
+      compsForm[key].forEach(function (selectors) {
+        var container = $(ele).closest(selectors[0]);
+        var inputField = container.find(selectors[1]);
+        inputField.val("");
+        inputField.attr("disabled",false);
+      });
+    }
+  };
+
+  utility.fillFromPlace = function(comps, compsForm, ele){
+    for(var i=0; i < comps.length; i++){
+      var compoType = comps[i].types[0];
+      if(compsForm[compoType]){
+        //find match component
+        var compoValue = comps[i]['long_name'];
+        switch (compoType){
+          case "postal_code":
+            $.getJSON("/files/zipcode.json", function(zipCodeToArea) {
+              var options = {
+                componentRestrictions: {country: 'us'},
+                type: ['address']
+              };
+              Object.keys(zipCodeToArea).forEach(function (area) {
+                var zipCodes = zipCodeToArea[area];
+                if (zipCodes.indexOf(compoValue) !== -1) {
+                  $(ele).closest(".autoCompleteTarget").find(".area input").val(area);
+                  console.log("fill value:" + area);
+                }
+              })
+            });
+            break;
+          case "administrative_area_level_1":
+            compoValue = comps[i]["short_name"];
+            break;
+          case "administrative_area_level_2":
+            $(ele).closest(".autoCompleteTarget").find(".area").data("county", compoValue);
+            console.log("fill value:" + compoValue);
+            break;
+        }
+        compsForm[compoType].forEach(function (selectors) {
+          var container = $(ele).closest(selectors[0]);
+          var inputField = container.find(selectors[1]);
+          if (inputField.length) {
+            var oldValue = inputField.val();
+            var newValue = oldValue ? oldValue + " " + compoValue : compoValue;
+            inputField.val(newValue);
+            console.log("fill value:" + newValue);
+          }
+        });
+      }
+    }
+  };
 
   utility.geocoding = function(address, cb){
     this.initGoogleMapService(function(err){

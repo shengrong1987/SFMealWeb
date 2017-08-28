@@ -2,8 +2,6 @@
  * Created by shengrong on 11/16/15.
  */
 
-//utility
-
 var googleAPILoaded;
 function geolocate(autocomplete) {
   if (navigator.geolocation) {
@@ -36,83 +34,10 @@ function browserVersion(){
       return 'standalone';
     } else if ( !standalone && !safari ) {
       return 'uiwebview';
-    };
+    }
   } else {
     return 'not iOS';
-  };
-}
-
-function initAutoComplete(googleService){
-  var componentForm = {
-    "street_number" : ["#streetInput","input[name='street']"],
-    "route" : ["#streetInput","input[name='street']"],
-    "locality" : ["#cityInput","input[name='city']"],
-    "postal_code" : ["#postalInput","input[name='zipcode']"],
-    "administrative_area_level_2" : [],
-    "administrative_area_level_1" : ["input[name='state']"]
-  };
-  $.getJSON("/files/zipcode.json", function(zipCodeToArea) {
-    var options = {
-      componentRestrictions: {country: 'us'},
-      type: ['address']
-    }
-
-    var autocomplete;
-    var autoCompleteEle = ["#streetInput", ".location input", ".delivery-center input", "#paymentInfoView input[name='street']","#contactInfoView input[name='street']"];
-
-    autoCompleteEle.forEach(function (eles) {
-      if ($(eles).length) {
-        $(eles).toArray().forEach(function (ele) {
-          autocomplete = new googleService["maps"]["places"].Autocomplete(ele, options);
-          geolocate(autocomplete);
-          autocomplete.addListener('place_changed', function () {
-            var place = this["getPlace"]();
-            if(!place["geometry"]) {
-              window.alert("No details available for input: '" + place.name + "'");
-              return;
-            }
-            for (var key in componentForm) {
-              var formContainer = $(ele).closest('form');
-              var components = componentForm[key];
-              components.forEach(function (component) {
-                formContainer.find(component).val("");
-                formContainer.find(component).attr("disabled", false);
-              });
-            }
-            // Get each component of the address from the place details
-            // and fill the corresponding field on the form.
-            for (var i = 0; i < place["address_components"].length; i++) {
-              var addressType = place["address_components"][i].types[0];
-              if (componentForm[addressType]) {
-                var val = place["address_components"][i]["long_name"];
-                if (addressType === "postal_code") {
-                  Object.keys(zipCodeToArea).forEach(function (area) {
-                    var zipcodes = zipCodeToArea[area];
-                    if (zipcodes.indexOf(val) !== -1) {
-                      $(ele).parent().parent().find(".area input").val(area);
-                    }
-                  })
-                } else if (addressType === "administrative_area_level_2") {
-                  $(ele).parent().parent().find(".area").data("county", val);
-                }else if(addressType === "administrative_area_level_1"){
-                  val = place["address_components"][i]["short_name"];
-                }
-                formContainer = $(ele).closest('form');
-                componentForm[addressType].forEach(function (selector) {
-                  var inputToFill = formContainer.find(selector);
-                  if (inputToFill.length) {
-                    var oldValue = inputToFill.val();
-                    var newValue = oldValue ? oldValue + " " + val : val;
-                    inputToFill.val(newValue);
-                  }
-                });
-              }
-            }
-          });
-        });
-      }
-    });
-  });
+  }
 }
 
 function makeAToast(msg, type){
@@ -719,11 +644,9 @@ function setup(){
   $('body').on('touchstart.dropdown', '.dropdown-menu', function (e) { e.stopPropagation(); });
   $(document).on({
     ajaxStart: function() {
-      console.log("ajax start");
       $('body').addClass("loading");
       },
     ajaxStop: function() {
-      console.log("ajax stop");
       $('body').removeClass("loading");
     }
   });

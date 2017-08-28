@@ -176,7 +176,7 @@
                           <label><%= __('pickup-time')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
                         </div>
 
-                        <div class="col-sm-8 start-pickup">
+                        <div class="col-sm-8 start-pickup autoCompleteTarget">
                           <div class="form-group">
                             <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= pickup.pickupFromTime%>">
                               <span class="input-group-addon"><%= __('from')%></span>
@@ -217,7 +217,7 @@
                             <input type="text" class="form-control" value="<%= pickup.instruction || '' %>">
                           </div>
 
-                          <div class="form-group area" data-county="<%= pickup.county%>">
+                          <div class="form-group area" data-county="<%= pickup.county || ''%>">
                             <label><%= __('area')%></label>
                             <input class="form-control" type="text" readonly="readonly" value="<%= pickup.area || ''%>">
                           </div>
@@ -498,6 +498,6 @@
 
 <script>
   var mealView = new MealView({ el : "#mealEditingView", model : new Meal()});
-  setup();
   utility.initAutoComplete();
+  setup();
 </script>

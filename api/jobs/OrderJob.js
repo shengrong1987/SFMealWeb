@@ -31,7 +31,7 @@ module.exports = function(agenda) {
       sails.log.info("Order check executed");
       var now = new Date();
 
-      Order.find({ status : ["schedule","preparing"], isScheduled : false}).exec(function(err, orders){
+      Order.find({ status : ["schedule","preparing"], isScheduled : false }).exec(function(err, orders){
         if(err || !orders){
           return done();
         }
@@ -51,6 +51,7 @@ module.exports = function(agenda) {
                 if(order.method === "pickup"){
                   var oneHourBeforePickup = new Date(util.oneHourBefore(order.pickupInfo.pickupFromTime));
                   var oneDayBeforePickup = new Date(util.oneDayBefore(order.pickupInfo.pickupFromTime));
+                  var orderPickupTime = new Date(order.pickupInfo.pickupFromTime);
                   if(now < oneDayBeforePickup){
                     console.log("scheduling pickup reminding Job at: " + oneDayBeforePickup);
                     Jobs.schedule(oneDayBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "day"});
@@ -58,6 +59,10 @@ module.exports = function(agenda) {
                   if(now < oneHourBeforePickup){
                     console.log("scheduling pickup reminding Job at: " + oneHourBeforePickup);
                     Jobs.schedule(oneHourBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "hour"});
+                  }
+                  if(now < orderPickupTime){
+                    console.log("scheduling order ready Job at: " + orderPickupTime);
+                    Jobs.schedule(orderPickupTime, 'OrderReadyJob', {orderId : order.id});
                   }
                 }else if(order.method === "delivery"){
                   var startDeliveryTime = new Date(order.pickupInfo.pickupFromTime);

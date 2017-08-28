@@ -649,8 +649,9 @@ module.exports = {
                         }
                         return res.badRequest(err);
                       });
+                    }else{
+                      $this.afterSuccessCharge(order, orders, m, charge, transfer, req, res);
                     }
-                    $this.afterSuccessCharge(order, orders, m, charge, transfer, req, res);
                   });
                 }
               });
@@ -1379,7 +1380,7 @@ module.exports = {
                         paymentMethod : order.paymentMethod,
                         reverse_transfer : false,
                         refund_application_fee : false
-                      }
+                      };
                       stripe.batchRefund(refundFeeArray, metadata, function (err) {
                         if(err) {
                           return cb(err);

@@ -88,28 +88,28 @@
                         var i = 0;
                         var j = i+1;
                         if(meal.pickups){
-                          var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
-                        meal.pickups.forEach(function(pickup){ if(pickup.method == 'pickup' && !meal.isPartyMode){ %>
-                        <label class="btn btn-outline-light vertical-inline option pickupOption" data-color="<%= colors[i]%>" data-location="<%= pickup.publicLocation || pickup.location%>">
-                          <input type="radio" id="pickup-1-<%= i%>" data-index="<%= pickup.index%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
-                          <span class="content">
-                            <i class="fa fa-hand-paper-o cursor-pointer text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i>
-                            <% if( (user.orders && user.orders.some(function(order){ return order.meal == meal.id})) || (user && user.host == meal.chef.id)){%>
-                            <span class="location" data-value="<%= pickup.location%>"> <%= pickup.location%></span>
-                            <%}else{%>
-                            <span class="location" data-value="<%= pickup.publicLocation || pickup.location%>"> <%= pickup.publicLocation || pickup.location%></span>
-                            <%}%>
-                            <br/>
-                            <span class="pickupInstruction" data-value="<%= pickup.instruction%>"><strong><%= __('pickup-instruction') %></strong>:&nbsp; <%= pickup.instruction || ''%></span>
-                            <div class="vertical-align" style="margin-top:15px;">
-                              <div class="pickup-date" style="width: 70px;">
-                                <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%> <%= meal.getDateFromDate(meal.pickups[0].pickupFromTime)%></span>
-                                <span class="col-xs-12"><%= __(meal.getWeekFromDate(meal.pickups[0].pickupFromTime))%></span>
+                          colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
+                          meal.pickups.forEach(function(pickup){ if(pickup.method == 'pickup' && !meal.isPartyMode){ %>
+                          <label class="btn btn-outline-light vertical-inline option pickupOption" data-color="<%= colors[i]%>" data-location="<%= pickup.publicLocation || pickup.location%>">
+                            <input type="radio" id="pickup-1-<%= i%>" data-index="<%= pickup.index%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
+                            <span class="content">
+                              <i class="fa fa-hand-paper-o cursor-pointer text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i>
+                              <% if( (user.orders && user.orders.some(function(order){ return order.meal == meal.id})) || (user && user.host == meal.chef.id)){%>
+                              <span class="location" data-value="<%= pickup.location%>"> <%= pickup.location%></span>
+                              <%}else{%>
+                              <span class="location" data-value="<%= pickup.publicLocation || pickup.location%>"> <%= pickup.publicLocation || pickup.location%></span>
+                              <%}%>
+                              <br/>
+                              <span class="pickupInstruction" data-value="<%= pickup.instruction%>"><strong><%= __('pickup-instruction') %></strong>:&nbsp; <%= pickup.instruction || ''%></span>
+                              <div class="vertical-align" style="margin-top:15px;">
+                                <div class="pickup-date" style="width: 70px;">
+                                  <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%> <%= meal.getDateFromDate(meal.pickups[0].pickupFromTime)%></span>
+                                  <span class="col-xs-12"><%= __(meal.getWeekFromDate(meal.pickups[0].pickupFromTime))%></span>
+                                </div>
+                                <%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>
                               </div>
-                              <%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>
-                            </div>
-                          </span>
-                        </label>
+                            </span>
+                          </label>
                         <%}i++;j++;})}; %>
                       </div>
                     </div>
@@ -128,7 +128,7 @@
                         var firstname = user.firstname;
                         var addresses = user.address;
                         if(addresses && addresses.length != 0){
-                          var keys = Object.keys(addresses);
+                          keys = Object.keys(addresses);
                           for(var i=0; i < keys.length; i++){
                             var key = keys[i];
                             var addressObj = addresses[key];
@@ -138,7 +138,7 @@
                           <input type="radio" id="pickup-2-<%= i%>" name="pickup-contact-set" data-color="red" data-index="<%= i%>" class="regular-radio" <%= phone == user.phone ? "checked=''" : ''%>><label for="pickup-2-<%= i%>"></label>
                           <span style="margin-left: 10px;"><%= firstname + "+" + phone %></span>
                         </label>
-                        <%}}else{var phone = user.phone;if(phone){ %>
+                        <%}}else{phone = user.phone;if(phone){ %>
                         <label class="btn btn-default fixed-label vertical-align option contactOption">
                           <input type="radio" id="pickup-2-<%= i%>" name="pickup-contact-set" data-index="<%= i%>" class="regular-radio" checked=''><label for="pickup-2-<%= i%>"></label>
                           <span style="margin-left: 10px;"><%= firstname + "+" + phone %></span>
@@ -160,8 +160,8 @@
                     <div class="col-xs-12">
                       <div class="radio-box" id="deliveryMethod">
                         <%
-                        var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
-                        var i= 0;var j = 0;
+                        colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
+                        i= 0;j = 0;
                         if(meal.pickups){ meal.pickups.forEach(function(pickup){ if(pickup.method == 'delivery'){ if((pickup.isDateCustomized && !meal.isPartyMode) || (!pickup.isDateCustomized && meal.isPartyMode) ){return} %>
                         <label class="btn btn-outline-light option deliveryOption" data-area="<%= pickup.area %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
                           <input type="radio" id="delivery-2-<%= i%>" data-index="<%= pickup.index%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>

@@ -1,7 +1,6 @@
 /**
  * Created by shengrong on 3/7/16.
  */
-
 var Auth = Backbone.Model.extend({
   urlRoot : "/auth",
   url : function(){
@@ -50,7 +49,7 @@ var LoginView = Backbone.View.extend({
     var $this = this;
     this.model.save({},{
       success : function(){
-        if(location.href.indexOf('oauth2') != -1){
+        if(location.href.indexOf('oauth2') !== -1){
           location.href = '/';
         }else{
           location.reload();
@@ -167,7 +166,7 @@ var RegisterView = Backbone.View.extend({
     });
     this.model.save({},{
       success : function(){
-        if(location.href.indexOf('oauth2') != -1){
+        if(location.href.indexOf('oauth2') !== -1){
           location.href = '/';
         }else{
           location.reload();
@@ -719,11 +718,17 @@ var Host = Backbone.Model.extend({
     }else{
       return this.urlRoot + "/" + this.get("id");
     }
+  },
+  validate : function(attrs, options){
+
   }
 });
 
 var User = Backbone.Model.extend({
-  urlRoot : "/user"
+  urlRoot : "/user",
+  validate : function(attrs, options){
+
+  }
 });
 
 var AddressView = Backbone.View.extend({
@@ -1367,8 +1372,8 @@ var MealView = Backbone.View.extend({
       showTodayButton : true
     });
     setupLanguage();
-    initAutoComplete(google);
     setupInputMask();
+    utility.initAutoComplete();
   },
   removeNewPickup : function(e){
     e.preventDefault();
@@ -3024,7 +3029,7 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         BootstrapDialog.alert(result.responseText, function(){
-          if(location.href.indexOf("host/me")==-1){
+          if(location.href.indexOf("host/me")===-1){
             reloadUrl("/user/me", "#myorder");
           }else{
             reloadUrl("/host/me","#myorder");
@@ -3043,7 +3048,7 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         BootstrapDialog.alert(result.responseText, function(){
-          if(location.href.indexOf("host/me")==-1){
+          if(location.href.indexOf("host/me")===-1){
             reloadUrl("/user/me", "#myorder");
           }else{
             reloadUrl("/host/me","#myorder");
@@ -3062,7 +3067,7 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         BootstrapDialog.alert(result.responseText, function(){
-          if(location.href.indexOf("host/me")==-1){
+          if(location.href.indexOf("host/me")===-1){
             reloadUrl("/user/me", "#myorder");
           }else{
             reloadUrl("/host/me","#myorder");
