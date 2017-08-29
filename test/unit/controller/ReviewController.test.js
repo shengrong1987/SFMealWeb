@@ -7,7 +7,7 @@ var agent;
 before(function(done) {
   agent = request.agent(sails.hooks.http.app);
   done();
-})
+});
 
 describe('ReviewController', function() {
 
@@ -21,7 +21,7 @@ describe('ReviewController', function() {
     var address = "1455 Market St, San Francisco, CA 94103";
     var phone = "1-415-802-3853";
 
-    var guestEmail = 'enjoymyself1987@gmail.com'
+    var guestEmail = 'enjoymyself1987@gmail.com';
 
     it('should login host account', function (done) {
       agent
@@ -61,7 +61,7 @@ describe('ReviewController', function() {
           .get('/meal')
           .expect(200)
           .end(function(err,res){
-            if(res.body.length == 0){
+            if(res.body.length === 0){
               return done(Error("error getting any meal"));
             }
             var meal = res.body.meals[0];
@@ -108,10 +108,10 @@ describe('ReviewController', function() {
     var orderId;
     it('should order the meal', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 1, preference : [{ property : '', extra : 0}]};
-      dishObj[dishId2] = { number : 1, preference : [{ property : '', extra : 0}]};
-      dishObj[dishId3] = { number : 1, preference : [{ property : '', extra : 0}]};
-      dishObj[dishId4] = { number : 1, preference : [{ property : '', extra : 0}]};
+      dishObj[dishId1] = { number : 1, preference : [{ property : '', extra : 0}], price : price1};
+      dishObj[dishId2] = { number : 1, preference : [{ property : '', extra : 0}], price : price2};
+      dishObj[dishId3] = { number : 1, preference : [{ property : '', extra : 0}], price : price3};
+      dishObj[dishId4] = { number : 1, preference : [{ property : '', extra : 0}], price : price4};
       agent
         .post('/order')
         .send({
@@ -188,7 +188,7 @@ describe('ReviewController', function() {
             return done(err);
           }
           res.body.orders.some(function(order){
-            return order.status == "review";
+            return order.status === "review";
           }).should.be.true();
           done();
         })
@@ -242,7 +242,7 @@ describe('ReviewController', function() {
           if(err){
             return done(err);
           }
-          if(res.body.meal.id != mealId){
+          if(res.body.meal.id !== mealId){
             return done(Error("error creating review"));
           }
           done();

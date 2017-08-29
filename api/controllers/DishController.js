@@ -105,7 +105,7 @@ module.exports = {
 
       if(keyword) {
         found = found.filter(function(dish){
-          if(dish.title.indexOf(keyword) != -1 || dish.description.indexOf(keyword) != -1 || dish.type.indexOf(keyword) != -1){
+          if(dish.title.indexOf(keyword) !== -1 || dish.description.indexOf(keyword) !== -1 || dish.type.indexOf(keyword) !== -1){
             return true;
           }
           return false;

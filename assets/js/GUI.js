@@ -117,6 +117,17 @@ function getCountyInfo(){
   return county || "San Francisco County";
 }
 
+function setCountyInfo(county){
+  var $citySelector = $("#citySelector");
+  var countyName = $citySelector.find("ul a[value='" + county  + "']").text();
+  var $citySelectorText = $citySelector.find(">a");
+  $citySelectorText.html(countyName + "&nbsp;<span class='caret'></span>");
+  $citySelectorText.attr("value",county);
+  createCookie("county", county, 1);
+  location.hash = "";
+  location.reload();
+}
+
 //UI Components setup
 function stepContainer(){
   var steps = $(".step-container .step");
@@ -225,7 +236,7 @@ function refreshOrderList(fromCache, isTrigger){
       if(localDish){
         localDish = JSON.parse(localDish);
       }else{
-        localDish = {number : 0, preference : []};
+        localDish = {number : 0, preference : [], price : $(this).find(".price").attr("price")};
       }
       localOrders[dishId] = localDish;
       $(this).data("left-amount",$(this).data("left-amount") - localOrders[dishId].number);
@@ -233,7 +244,8 @@ function refreshOrderList(fromCache, isTrigger){
     }else{
       localOrders[dishId] = {
         number : parseInt($(this).find(".amount").data("value")),
-        preference : $(this).data("preference")
+        preference : $(this).data("preference"),
+        price : $(this).find(".price").attr("price")
       };
     }
   });
@@ -304,6 +316,11 @@ function loadPoints(fromCache){
 
 //order food
 function orderFood(id,number,initial){
+
+  var alertView = $($order.data("err-container"));
+  alertView.removeClass("hide");
+  alertView.hide();
+
   var dishItem = $("#meal-detail-container").find(".dish[data-id='" + id + "']");
   if(initial){
     if(number > 0){
@@ -314,10 +331,8 @@ function orderFood(id,number,initial){
   }
   var $order = $("#order");
   var item = $order.find(".item[data-id=" + id + "]");
-  var alertView = $($order.data("err-container"));
-  alertView.removeClass("hide");
-  alertView.hide();
-  localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : [{ property : '', extra : 0}]};
+  var price = parseInt(item.find(".price").attr("value"));
+  localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : [{ property : '', extra : 0}], price : price};
   localOrders[id].number += number;
   var preferenceBtn = $('[data-submenu][data-dish="' + id + '"]');
   preferenceBtn.data('value', jQuery.i18n.prop('the') + localOrders[id].number + jQuery.i18n.prop('fen'));
@@ -612,6 +627,16 @@ function setupDropdownMenu(){
   });
 }
 
+function setupAnchor(){
+  var anchor = location.hash;
+  if(anchor){
+    anchor = anchor.replace("#","");
+  }
+  if(anchor === "Sacramento" || anchor === "San Francisco"){
+    setCountyInfo(anchor + " County");
+  }
+}
+
 function setup(){
   setupLanguage();
   tapController();
@@ -631,15 +656,13 @@ function setup(){
   setupSelector();
   setupInputMask();
   refreshCollapseBtn(true);
+  setupAnchor();
   setupSwitchButton({
     onText : "Yes",
     offText : "No"
   });
   echo.init({
     offset: 1000
-  });
-  $('.lazyload').each(function(){
-    $(this).attr('src', $(this).data('src'));
   });
   $('body').on('touchstart.dropdown', '.dropdown-menu', function (e) { e.stopPropagation(); });
   $(document).on({

@@ -264,7 +264,7 @@ var UserBarView = Backbone.View.extend({
       return;
     }
     createCookie("county",$(e.currentTarget).attr("value"),30);
-    if(location.href.indexOf('search') != -1){
+    if(location.href.indexOf('search') !== -1){
       search($(".search-container .searchBtn")[0], true);
     }else{
       location.reload();

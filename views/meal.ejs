@@ -368,9 +368,9 @@
 
             <tbody id="toOrderList" class="scroll">
             <%
-              var dishes = meal.dishes;
-              for(var i=0; i < dishes.length; i++){
-                var dish = dishes[i];
+              dishes = meal.dishes;
+              for(i=0; i < dishes.length; i++){
+                dish = dishes[i];
             %>
             <tr class="item" data-id=<%= dish.id %> data-left-amount=<%= meal.isPartyMode === true ? "100" : meal.leftQty[dish.id] %>>
               <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span> </td>

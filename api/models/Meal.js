@@ -333,7 +333,7 @@ module.exports = {
             "county" : host.county,
             "area" : '',
             "index" : 2
-          }
+          };
           if(values.isDelivery){
             values.pickups = [pickupOption, deliveryOption];
           }else{
@@ -417,7 +417,7 @@ module.exports = {
           sails.log.info("pickups: " + JSON.stringify(values.pickups));
           next();
         });
-      },
+      }
     },function(err){
       cb(err);
     });

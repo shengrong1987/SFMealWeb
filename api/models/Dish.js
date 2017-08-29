@@ -23,6 +23,20 @@ module.exports = {
       type : 'float',
       required : true
     },
+    dynamicPrice : {
+      type : 'float'
+    },
+    minimalPrice : {
+      type : 'float'
+    },
+    priceAlterRate : {
+      type : 'integer',
+      defaultsTo : 5
+    },
+    isDynamic : {
+      type : 'boolean',
+      defaultsTo : false
+    },
     description : {
       type : 'string',
       defaultsTo : "",
@@ -80,17 +94,27 @@ module.exports = {
       enum : ['appetizer','entree','dessert'],
       defaultsTo : 'entree'
     },
-    isFeature : function(){
-      return this.score >= 4.8 || this.numberOfReviews > 5;
-    },
     isVerified : {
       type : 'boolean',
       defaultsTo : false
     },
-    beforeCreate : function(values, cb){
-      values.isVerified = false;
-      cb();
+    updatePrice : function(number){
+      var p = Math.ceil(this.price - number / this.priceAlterRate);
+      if(p < this.minimalPrice){
+        p = this.minimalPrice;
+      }
+      this.dynamicPrice = p;
+    },
+    isFeature : function(){
+      return this.score >= 4.8 || this.numberOfReviews > 5;
     }
+  },
+
+  beforeCreate : function(values, cb){
+    values.isVerified = false;
+    values.minimalPrice = values.price * 2/3;
+    values.dynamicPrice = values.price;
+    cb();
   }
 };
 
