@@ -23,10 +23,12 @@ module.exports = function(req, res, next) {
       }else if(!order.isSendToHost && (!hostId || hostId !== order.host.id)){
         return next();
       }else{
+        sails.log.warn("You are not the right party to perform this action");
         return res.forbidden('You are not permitted to perform this action.');
       }
     }else if(action === "adjust" || action === "cancel" || action === "adjust-form"){
       if(order.status !== "schedule" && order.status !== "preparing"){
+        sails.log.warn("order can only be adjusted at schedule or preparing");
         return res.forbidden('order can only be adjusted at schedule or preparing');
       }
       if(order.status === "schedule" && hostId && hostId === order.host.id){
@@ -35,6 +37,7 @@ module.exports = function(req, res, next) {
       return next();
     }else if(action === "ready"){
       if(order.status !== "preparing"){
+        sails.log.warn("order can only be ready at preparing");
         return res.forbidden("order can only be ready at preparing");
       }else if(!hostId || hostId !== order.host.id){
         return res.forbidden("you are not permitted to perform this action");

@@ -204,7 +204,7 @@ var notification = {
       sails.log.info("sending email to: " + basicInfo.recipientEmail + " with email template: " + template);
       return;
     }
-    sails.hooks.email.send(template,params,{
+    sails.hooks.email.send(template, params,{
       to : basicInfo.recipientEmail,
       subject : "SFMeal.com"
     },function(err){
@@ -391,7 +391,7 @@ var notification = {
           i18ns = i18ns.concat(['order-pickup-reminder-title','order-pickup-reminder-hourly-context','order-pickup-reminder-daily-context','order-arrive-reminder-title','order-arrive-reminder-context','pickup-location','pickup-time','contact-phone','delivery-location']);
           break;
       }
-    }else if(model == "Meal"){
+    }else if(model === "Meal"){
       switch(action){
         case "mealScheduleEnd":
           i18ns = i18ns.concat(['guest-list-title','guest-list-context','guest-list-no-title','guest-list-no-context','guest-list-no-tips','delivery-location','delivery-time','pickup-time','pickup-location','print-list','content','contact','amount-owe','open-meal']);
@@ -406,7 +406,7 @@ var notification = {
           i18ns = i18ns.concat(['search','searching-tips','yourfollowedchef','menuoftheweek','hometaste1','see-more']);
           break;
       }
-    }else if(model == "Host"){
+    }else if(model === "Host"){
       switch(action){
         case "summary":
           i18ns = i18ns.concat([]);
@@ -418,7 +418,7 @@ var notification = {
           i18ns = i18ns.concat(['congrat-context','congrat-good-luck','view-dish','publish-meal','view-dish-context','publish-meal-context','manage-dish','manage-meal']);
           break;
       }
-    }else if(model == "User"){
+    }else if(model === "User"){
       switch (action){
         case "licenseUpdated":
           i18ns = i18ns.concat(['open-admin']);

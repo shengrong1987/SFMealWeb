@@ -17,7 +17,7 @@
         <small>------------------<span data-toggle="i18n" data-key="or"></span>------------------</small>
       </h4>
 
-      <button class="popline btn btn-lg btn-danger round red light next-step" data-step="1" onclick="nextStep(event)" data-toggle="i18n" data-key="emailRegister">邮箱注册</button>
+      <button class="popline btn btn-lg btn-danger round red light next-step" data-step="1" onclick="stepContainer.nextStep(event)" data-toggle="i18n" data-key="emailRegister">邮箱注册</button>
 
       <h6 class="text-center" data-toggle="i18n" data-key="registerAgreement"></h6><a href="/help#terms" data-toggle="i18n" data-key="terms"></a>
 
@@ -34,7 +34,7 @@
       <a class="close relative" onclick="javascript:dismissModal()" style="right: -15px;"><i class="fa fa-close"></i></a>
 
       <h3 class="text-center">
-        <small><a href="#" class="last-step" data-step="2" onclick="lastStep(event)">Facebook </a><span data-toggle="i18n" data-key="register"></span> <span data-toggle="i18n" data-key="or"></span> <a href="#" class="last-step" data-step="2" onclick="lastStep(event)">Google </a></span><span data-toggle="i18n" data-key="register"></span></small>
+        <small><a href="#" class="last-step" data-step="2" onclick="stepContainer.lastStep(event)">Facebook </a><span data-toggle="i18n" data-key="register"></span> <span data-toggle="i18n" data-key="or"></span> <a href="#" class="last-step" data-step="2" onclick="stepContainer.lastStep(event)">Google </a></span><span data-toggle="i18n" data-key="register"></span></small>
       </h3>
 
       <h4 class="text-center">
@@ -108,6 +108,7 @@
 
 <script>
   new RegisterView({el : $("#registerView"), model : new Auth()});
-  setup();
+  var stepContainer = setupStepContainer();
   if(browserVersion()=="uiwebview"){$("#GoogleBtn").hide();}
+  setup();
 </script>

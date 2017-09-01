@@ -55,7 +55,7 @@ var LoginView = Backbone.View.extend({
           location.reload();
         }
       },error : function(model,err){
-        $this.errorView.html(showErrorMsg(err));
+        $this.errorView.html(getMsgFromError(err));
         $this.errorView.show();
       }
     });
@@ -91,7 +91,7 @@ var LoginView = Backbone.View.extend({
         $this.successView.html(jQuery.i18n.prop('emailSent'))
       },error : function(model, err){
         $this.errorView.show();
-        $this.errorView.html(showErrorMsg(err));
+        $this.errorView.html(getMsgFromError(err));
       }
     })
   },
@@ -118,7 +118,7 @@ var LoginView = Backbone.View.extend({
           $this.errorView.show();
         }
       },error : function(model, err){
-        $this.errorView.html(showErrorMsg(err));
+        $this.errorView.html(getMsgFromError(err));
         $this.errorView.show();
       }
     })
@@ -172,7 +172,7 @@ var RegisterView = Backbone.View.extend({
           location.reload();
         }
       },error : function(model,err){
-        alertView.html(showErrorMsg(err));
+        alertView.html(getMsgFromError(err));
         alertView.show();
       }
     })
@@ -519,7 +519,7 @@ var ApplyView = Backbone.View.extend({
       success : function(){
         reloadUrl("/apply","#step6");
       },error : function(model,err){
-        $this.alertView.html(showErrorMsg(err));
+        $this.alertView.html(getMsgFromError(err));
         $this.alertView.show();
       }
     })
@@ -646,7 +646,7 @@ var PaymentView = Backbone.View.extend({
         if(err.status == 200){
           location.reload();
         }else{
-          $this.alertView.html(showErrorMsg(err));
+          $this.alertView.html(getMsgFromError(err));
           $this.alertView.show();
         }
       }
@@ -683,7 +683,7 @@ var PaymentView = Backbone.View.extend({
         }
       }, error: function (model, err) {
         button.button('reset');
-        $this.alertView.html(showErrorMsg(err));
+        $this.alertView.html(getMsgFromError(err));
         $this.alertView.show();
       }
     });
@@ -702,7 +702,7 @@ var PaymentView = Backbone.View.extend({
         location.reload();
       }, error: function (model, err) {
         button.button('reset');
-        $this.alertView.html(showErrorMsg(err));
+        $this.alertView.html(getMsgFromError(err));
         $this.alertView.show();
       }
     });
@@ -850,7 +850,7 @@ var AddressView = Backbone.View.extend({
             alert_block.html(jQuery.i18n.prop('phoneNotValid'));
           }
         }else{
-          alert_block.html(showErrorMsg(err));
+          alert_block.html(getMsgFromError(err));
         }
         alert_block.show();
         submit_btn.button("reset");
@@ -897,7 +897,7 @@ var CheckListView = Backbone.View.extend({
         success : function (model) {
           location.reload();
         }, error: function (model, err) {
-          $this.errorView.html(showErrorMsg(err));
+          $this.errorView.html(getMsgFromError(err));
           $this.errorView.show();
         }
       });
@@ -925,12 +925,12 @@ var CheckListView = Backbone.View.extend({
         success : function (model) {
           location.reload();
         }, error: function (model, err) {
-          $this.errorView.html(showErrorMsg(err));
+          $this.errorView.html(getMsgFromError(err));
           $this.errorView.show();
         }
       });
     }, function(err){
-      $this.errorView.html(showErrorMsg(err));
+      $this.errorView.html(getMsgFromError(err));
       $this.errorView.show();
       return;
     },0,name,true);
@@ -1096,7 +1096,7 @@ var MealSelectionView = Backbone.View.extend({
     };
     var dishId = $(e.currentTarget).data("dish");
     this.saveOption(orderIndex, option, dishId);
-    refreshOrder(dishId);
+    updateMenuView(dishId);
     refreshMenu();
   },
   saveOption : function(index, option, dishId){
@@ -1187,7 +1187,7 @@ var MealSelectionView = Backbone.View.extend({
     },
     error : function(model, err){
       $this.alertView.show();
-      $this.alertView.html(showErrorMsg(err));
+      $this.alertView.html(getMsgFromError(err));
     }});
   },
   addPointsToOrder : function(e){
@@ -1651,7 +1651,7 @@ var MealView = Backbone.View.extend({
       },error : function(model, err){
         $this.successAlert.hide();
         $this.formAlert.show();
-        $this.formAlert.html(showErrorMsg(err));
+        $this.formAlert.html(getMsgFromError(err));
       }
     });
   }
@@ -2053,7 +2053,7 @@ var DishView = Backbone.View.extend({
               }
             },error : function(model, err){
               $this.progressAlert.hide();
-              $this.formAlert.html(showErrorMsg(err));
+              $this.formAlert.html(getMsgFromError(err));
               $this.formAlert.show();
             }
           });
@@ -2146,7 +2146,7 @@ var BankView = Backbone.View.extend({
 
             }
           },error : function(model, err){
-            $this.alertForm.html(showErrorMsg(err));
+            $this.alertForm.html(getMsgFromError(err));
             $this.alertForm.show();
           }
         });
@@ -2368,7 +2368,7 @@ var HostPageView = Backbone.View.extend({
       },
       error : function(model, err){
         $this.alertView.show();
-        $this.alertView.html(showErrorMsg(err));
+        $this.alertView.html(getMsgFromError(err));
       }
     })
   },
@@ -2395,7 +2395,7 @@ var HostPageView = Backbone.View.extend({
             error : function(model, err){
               dialog.close();
               $this.alertView.show();
-              $this.alertView.html(showErrorMsg(err));
+              $this.alertView.html(getMsgFromError(err));
             }
           })
         }
@@ -2482,7 +2482,7 @@ var ReviewView = Backbone.View.extend({
               success : function(){
                 reloadUrl("/user/me","#myreview");
               },error : function(model, err){
-                alertView.html(showErrorMsg(err));
+                alertView.html(getMsgFromError(err));
                 alertView.show();
               }
             })
@@ -2508,7 +2508,7 @@ var ReviewView = Backbone.View.extend({
       success : function(){
         reloadUrl("/user/me","#myreview");
       },error : function(model, err){
-        alertView.html(showErrorMsg(err));
+        alertView.html(getMsgFromError(err));
         alertView.show();
       }
     })
@@ -2946,7 +2946,7 @@ var MealConfirmView = Backbone.View.extend({
       },
       error: function (model, err) {
         $this.alertView.show();
-        $this.alertView.html(showErrorMsg(err));
+        $this.alertView.html(getMsgFromError(err));
       }
     });
   },
@@ -3002,7 +3002,7 @@ var OrderView = Backbone.View.extend({
           reloadUrl("/host/me", "#myorder");
         });
       },error : function(model, err){
-        BootstrapDialog.alert(showErrorMsg(err));
+        BootstrapDialog.alert(getMsgFromError(err));
       }
     })
   },
@@ -3017,7 +3017,7 @@ var OrderView = Backbone.View.extend({
           reloadUrl("/host/me", "#myorder");
         });
       },error : function(model, err){
-        BootstrapDialog.alert(showErrorMsg(err));
+        BootstrapDialog.alert(getMsgFromError(err));
       }
     })
   },
@@ -3036,7 +3036,7 @@ var OrderView = Backbone.View.extend({
           }
         });
       },error : function(model, err){
-        BootstrapDialog.alert(showErrorMsg(err));
+        BootstrapDialog.alert(getMsgFromError(err));
       }
     })
   },
@@ -3055,7 +3055,7 @@ var OrderView = Backbone.View.extend({
           }
         });
       },error : function(model, err){
-        BootstrapDialog.alert(showErrorMsg(err));
+        BootstrapDialog.alert(getMsgFromError(err));
       }
     })
   },
@@ -3074,7 +3074,7 @@ var OrderView = Backbone.View.extend({
           }
         });
       },error : function(model, err){
-        BootstrapDialog.alert(showErrorMsg(err));
+        BootstrapDialog.alert(getMsgFromError(err));
       }
     })
   },
@@ -3467,7 +3467,7 @@ function deleteHandler(id, module, alertView){
       location.reload();
     },error : function(err){
       alertView.show();
-      alertView.html(showErrorMsg(err));
+      alertView.html(getMsgFromError(err));
     }
   })
 }

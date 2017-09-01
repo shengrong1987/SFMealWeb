@@ -77,8 +77,10 @@
                         var dishes = order.dishes;
                         var index = -1;
                           list.forEach(function(key){
-                            var number = order.orders[key].number;
-                            var preference = order.orders[key].preference;
+                            var dishOrdered = order.orders[key];
+                            var price = dishOrdered.price;
+                            var number = dishOrdered.number;
+                            var preference = dishOrdered.preference;
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -99,7 +101,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>
-                          $<%= dish.price.toFixed(2)%><br/>
+                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
@@ -189,8 +191,10 @@
                         var dishes = order.dishes;
                         var index = -1;
                         list.forEach(function(key){
-                          var number = order.orders[key].number;
-                          var preference = order.orders[key].preference;
+                          var dishOrdered = order.orders[key];
+                          var price = dishOrdered.price;
+                          var number = dishOrdered.number;
+                          var preference = dishOrdered.preference;
                           if(!preference.length){preference = [preference];}
                           var extra = preference.reduce(function(total,next){
                             return total + parseInt(next.extra);
@@ -210,7 +214,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td style="vertical-align:middle;"><%= dish.title%></td>
                         <td style="vertical-align:middle;">
-                          $<%= dish.price.toFixed(2)%><br/>
+                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
@@ -282,8 +286,10 @@
                         var dishes = order.dishes;
                         var index = -1;
                           list.forEach(function(key){
-                            var number = order.orders[key].number;
-                            var preference = order.orders[key].preference;
+                            var dishOrdered = order.orders[key];
+                            var price = dishOrdered.price;
+                            var number = dishOrdered.number;
+                            var preference = dishOrdered.preference;
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -299,7 +305,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>
-                          $<%= dish.price.toFixed(2)%><br/>
+                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
@@ -355,8 +361,10 @@
                         var dishes = order.dishes;
                         var index = -1;
                           list.forEach(function(key){
-                          var number = order.orders[key].number;
-                          var preference = order.orders[key].preference;
+                          var dishOrdered = order.orders[key];
+                          var price = dishOrdered.price;
+                          var number = dishOrdered.number;
+                          var preference = dishOrdered.preference;
                           if(!preference.length){preference = [preference];}
                           var extra = preference.reduce(function(total,next){
                             return total + parseInt(next.extra);
@@ -372,7 +380,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>
-                          $<%= dish.price.toFixed(2)%><br/>
+                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
@@ -429,8 +437,10 @@
                         var dishes = order.dishes;
                         var index = -1;
                           list.forEach(function(key){
-                            var number = order.orders[key].number;
-                            var preference = order.orders[key].preference;
+                            var dishOrdered = order.orders[key];
+                            var price = dishOrdered.price;
+                            var number = dishOrdered.number;
+                            var preference = dishOrdered.preference;
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -446,7 +456,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>
-                          $<%= dish.price.toFixed(2)%><br/>
+                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
@@ -504,8 +514,10 @@
                         var dishes = order.dishes;
                         var index = -1;
                           list.forEach(function(key){
-                            var number = order.orders[key].number;
-                            var preference = order.orders[key].preference;
+                            var dishOrdered = order.orders[key];
+                            var price = dishOrdered.price;
+                            var number = dishOrdered.number;
+                            var preference = dishOrdered.preference;
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -521,7 +533,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>
-                          $<%= dish.price.toFixed(2)%><br/>
+                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
@@ -591,8 +603,10 @@
                         var dishes = order.dishes;
                         var index = -1;
                           list.forEach(function(key){
-                            var number = order.orders[key].number;
-                            var preference = order.orders[key].preference;
+                            var dishOrdered = order.orders[key];
+                            var price = dishOrdered.price;
+                            var number = dishOrdered.number;
+                            var preference = dishOrdered.preference;
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -613,7 +627,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>
-                          $<%= dish.price.toFixed(2)%><br/>
+                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
@@ -702,8 +716,10 @@
                         var dishes = order.dishes;
                         var index = -1;
                         list.forEach(function(key){
-                          var number = order.orders[key].number;
-                          var preference = order.orders[key].preference;
+                          var dishOrdered = order.orders[key];
+                          var price = dishOrdered.price;
+                          var number = dishOrdered.number;
+                          var preference = dishOrdered.preference;
                           if(!preference.length){preference = [preference];}
                           var extra = preference.reduce(function(total,next){
                             return total + parseInt(next.extra);
@@ -723,7 +739,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td style="vertical-align: middle;"><%= dish.title%></td>
                         <td style="vertical-align: middle;">
-                          $<%= dish.price.toFixed(2)%><br/>
+                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
@@ -796,8 +812,10 @@
                         var dishes = order.dishes;
                         var index = -1;
                           list.forEach(function(key){
-                            var number = order.orders[key].number;
-                            var preference = order.orders[key].preference;
+                            var dishOrdered = order.orders[key];
+                            var price = dishOrdered.price;
+                            var number = dishOrdered.number;
+                            var preference = dishOrdered.preference;
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -813,7 +831,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>
-                          $<%= dish.price.toFixed(2)%><br/>
+                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
@@ -871,8 +889,10 @@
                         var dishes = order.dishes;
                         var index = -1;
                           list.forEach(function(key){
-                            var number = order.orders[key].number;
-                            var preference = order.orders[key].preference;
+                            var dishOrdered = order.orders[key];
+                            var price = dishOrdered.price;
+                            var number = dishOrdered.number;
+                            var preference = dishOrdered.preference;
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -888,7 +908,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>
-                          $<%= dish.price.toFixed(2)%><br/>
+                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
@@ -945,8 +965,10 @@
                         var dishes = order.dishes;
                         var index = -1;
                           list.forEach(function(key){
-                            var number = order.orders[key].number;
-                            var preference = order.orders[key].preference;
+                            var dishOrdered = order.orders[key];
+                            var price = dishOrdered.price;
+                            var number = dishOrdered.number;
+                            var preference = dishOrdered.preference;
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -962,7 +984,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>
-                          $<%= dish.price.toFixed(2)%><br/>
+                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
@@ -1022,8 +1044,10 @@
                         var dishes = order.dishes;
                         var index = -1;
                           list.forEach(function(key){
-                            var number = order.orders[key].number;
-                            var preference = order.orders[key].preference;
+                            var dishOrdered = order.orders[key];
+                            var price = dishOrdered.price;
+                            var number = dishOrdered.number;
+                            var preference = dishOrdered.preference;
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -1040,7 +1064,7 @@
                         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>
-                          $<%= dish.price.toFixed(2)%><br/>
+                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
                           <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>

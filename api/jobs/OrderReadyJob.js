@@ -29,7 +29,7 @@ module.exports = function(agenda) {
       sails.log.info("running order ready notification");
       var orderId = job.attrs.data.orderId;
       Order.findOne(orderId).populate("customer").populate("host").populate("meal").exec(function(err,order){
-        if(err){
+        if(err || !order){
           return done();
         }
         order.status = "ready";

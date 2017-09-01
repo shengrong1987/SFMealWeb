@@ -35,6 +35,7 @@
     <%}%>
     <table class="table table-email">
       <% Object.keys(orders).forEach(function(dishId){
+        var price = orders[dishId].price;
         var amount = parseInt(orders[dishId].number);
         var preference = orders[dishId].preference;
         var title = "";
@@ -52,7 +53,6 @@
           dishes.forEach(function(d){
             if(d.id == dishId){
               dish = d;
-              return;
             }
           });
       %>
@@ -61,7 +61,7 @@
         <td class="text-green" style="vertical-align: middle;"><%= dish.title%><%= title%></td>
         <td style="vertical-align: middle;"><%= amount%><%= fen%></td>
         <td style="vertical-align: middle;text-align: right;">
-          $<%= (amount * dish.price).toFixed(2)%>
+          $<%= (amount * (price || dish.price)).toFixed(2)%>
           <% if(extra){%>
           (+$<%= extra.toFixed(2)%>)<br/>
           <% }%>

@@ -121,7 +121,7 @@ module.exports.policies = {
     'verify' : 'isAdmin',
     'fail' : 'isAdmin',
     'destroy' : 'or(and(sessionAuth, isHost, isOwnerOfDish), isAdmin)',
-    'update' : 'or(and(sessionAuth, isHost, isOwnerOfDish, isNotFields("sold","numberOfReviews","score","chef", "isFeature", "isVerified")), isAdmin)',
+    'update' : 'or(and(sessionAuth, isHost, isOwnerOfDish, isNotFields("sold","numberOfReviews","score","chef", "isFeature", "isVerified","dynamicPrice")), isAdmin)',
     'findReview' : 'isAdmin'
   },
 

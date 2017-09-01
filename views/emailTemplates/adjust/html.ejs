@@ -21,6 +21,7 @@
     <table class="table table-email">
       <% Object.keys(orders).forEach(function(dishId){
         var preference = orders[dishId].preference;
+        var price = orders[dishId].price;
         var title = '';
         if(preference && preference.length > 0) {
           preference.forEach(function (pref) {
@@ -47,7 +48,6 @@
           dishes.forEach(function(d){
             if(d.id == dishId){
               dish = d;
-              return;
             }
           });
       %>
@@ -59,12 +59,12 @@
           <%if(lastAmount != currentAmount){%>
           <td style="vertical-align: middle;"><s><%= lastAmount%><%= fen%></s> <br/><%= currentAmount%><%= fen%></td>
           <td style="vertical-align: middle;text-align: right;"><s>
-              $<%= (lastAmount * dish.price).toFixed(2)%>
+              $<%= (lastAmount * (price || dish.price)).toFixed(2)%>
               <% if(lastExtra){%>
               (+$<%= lastExtra.toFixed(2)%>)<br/>
               <% }%>
             </s><br/>
-            $<%= (currentAmount * dish.price).toFixed(2)%>
+            $<%= (currentAmount * (price || dish.price)).toFixed(2)%>
             <% if(extra){%>
             (+$<%= extra.toFixed(2)%>)<br/>
             <% }%>
@@ -73,7 +73,7 @@
           <%}else{%>
           <td style="vertical-align: middle;"><%= currentAmount%><%= fen%></td>
           <td style="vertical-align: middle;text-align: right;">
-            $<%= (currentAmount * dish.price).toFixed(2)%>
+            $<%= (currentAmount * (price || dish.price)).toFixed(2)%>
             <% if(extra){%>
             (+$<%= extra.toFixed(2)%>)<br/>
             <% }%>

@@ -76,11 +76,11 @@ module.exports = {
           return res.badRequest(err);
         }
         if(!meals.every(function(meal){
-            if(meal.status == "off"){
+            if(meal.status === "off" || !req.body.price){
               return true;
             }
             return meal.dishes.every(function(dish){
-              return dish.id != dishId;
+              return dish.id !== dishId;
             });
           })){
           return res.badRequest({ code : -2, responseText : req.__("meal-active-update-dish")});
@@ -89,7 +89,11 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          return res.ok({dishId : dish[0].id});
+          sails.log.info("env:" + process.env.NODE_ENV);
+          if(req.wantsJSON && process.env.NODE_ENV === "development"){
+            return res.ok(dish[0]);
+          }
+          return res.ok({ dishId : dish[0].id });
         })
       });
     })

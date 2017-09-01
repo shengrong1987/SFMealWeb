@@ -124,7 +124,7 @@
             <label><%= __('step4-ongoing')%></label>
             <h4><small><%= __('step4-ongoing-tip')%></small></h4>
           </div>
-          <a target="_blank" href=<%= user.host?"/host/me/createMeal":'javascript:void(0)'%> class="btn btn-info round" <%= user.host?'':'disabled="disabled"'%> title="<%= user.host?'':__('user-not-host')%>" data-toggle="tooltip"><%= __('step4-action-btn')%></a>
+          <a target="_blank" href="<%= user.host?'/host/me/createMeal':'javascript:void(0)'%>" class="btn btn-info round" <%= user.host?'':'disabled="disabled"'%> title="<%= user.host?'':__('user-not-host')%>" data-toggle="tooltip"><%= __('step4-action-btn')%></a>
           <%}%>
 
         </div>
@@ -367,7 +367,7 @@
     <%}%>
     //e.relatedTarget // previous tab
   })
-  setup();
+  var stepContainer = setupStepContainer();
   new ApplyView({el : $("#applyView"), model : new Host()});
   var addressView = new AddressView({ el : $("#applyView"), model : new User()})
 

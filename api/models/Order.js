@@ -147,6 +147,10 @@ module.exports = {
       type : 'int',
       defaultsTo : 0
     },
+    discount : {
+      type : 'float',
+      defaultsTo : 0
+    },
     tax : {
       type : 'float',
       defaultsTo : 0
