@@ -28,7 +28,7 @@
       </thead>
       <tbody>
       <% meal.orders.forEach(function(order){
-      if(order.method === 'delivery'){
+        if(order.method === 'delivery'){
           if(!pickup.isDateCustomized && !order.isPartyMode){ %>
       <tr>
         <td><%= order.customerName %></td>
@@ -37,14 +37,14 @@
           <% Object.keys(order.orders).forEach(function(dishId){
             var amount = order.orders[dishId].number;
             var preference = order.orders[dishId].preference;
-          if(amount > 0){
-            var dish;
-            meal.dishes.forEach(function(d){
-              if(d.id == dishId){
-                dish = d;
-                return;
-              }
-            })%>
+            if(amount > 0){
+              var dish;
+              meal.dishes.forEach(function(d){
+                if(d.id == dishId){
+                  dish = d;
+                  return;
+                }
+              })%>
           <% if(preference && preference.length > 0){
             var title = '';
             preference.forEach(function(pref){
@@ -97,7 +97,6 @@
               meal.dishes.forEach(function(d){
                 if(d.id == dishId){
                   dish = d;
-                  return;
                 }
               })%>
               <% if(preference && preference.length > 0){

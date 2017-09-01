@@ -134,18 +134,19 @@ describe('MealController', function() {
     it('should update a dish with preference', function(done){
       agent
         .put('/dish/' + dish1)
+        .set('Accept', 'application/json')
         .send({
           preference : {
             "馅料" : ["猪肉","素"]
           }
         })
+        .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err, res){
           if(err){
             return done(err);
           }
-          res.body.should.have.property("dishId");
-          res.body.dishId.should.be.equal(dish1);
+          res.body.id.should.be.equal(dish1);
           done();
         })
     });
@@ -193,7 +194,7 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          if(res.body.city != "San Francisco"){
+          if(res.body.city !== "San Francisco"){
             return done(Error("error geocoding or updating address"));
           }
           done();
@@ -256,14 +257,15 @@ describe('MealController', function() {
             provideTillTime: new Date(now.getTime() + 1000 * 60 * 120),
             leftQty: leftQty,
             totalQty: totalQty,
-            title : "私房面馆",
+            title : "即点单",
             type : "order",
             dishes : dishes,
             cover : dish1,
             minimalOrder : 5,
             status : 'off',
             isDelivery : false,
-            preference : preference
+            preference : preference,
+            isTaxIncluded : true
           })
           .expect(200)
           .end(function(err,res){
@@ -396,7 +398,7 @@ describe('MealController', function() {
             isDelivery : true,
             leftQty: leftQty,
             totalQty: totalQty,
-            title : "私房面馆",
+            title : "预定订单四点",
             type : "preorder",
             dishes : dishes,
             status : "off",
@@ -406,7 +408,8 @@ describe('MealController', function() {
               "minimal" : 50,
               "delivery_center" : "1974 Palou Ave, San Francisco, CA 94124"
             }),
-            supportPartyOrder : true
+            supportPartyOrder : true,
+            isTaxIncluded : true
           })
           .expect(200)
           .end(function(err,res){
@@ -453,7 +456,8 @@ describe('MealController', function() {
           dishes : dishes,
           status : "off",
           cover : dish1,
-          minimalOrder : 1
+          minimalOrder : 1,
+          isTaxIncluded : true
         })
         .expect(200)
         .end(function(err,res){
@@ -541,7 +545,7 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          res.body.code.should.be.equal(-7);
+          res.body.code.should.be.equal(-8);
           done();
         })
     })
@@ -672,7 +676,7 @@ describe('MealController', function() {
           .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err,res){
-            if(res.body.meals.length != 0){
+            if(res.body.meals.length !== 0){
               return done(Error("error searching for meal"));
             }
             done();
@@ -1093,7 +1097,7 @@ describe('MealController', function() {
           status : 'on',
           provideFromTime : fiveMinutesLater,
           provideTillTime : twoHourLater,
-          minimalOrder : 5
+          minimalOrder : 1
         })
         .expect(200)
         .end(done)
@@ -1133,7 +1137,7 @@ describe('MealController', function() {
           status : 'on',
           provideFromTime : now,
           provideTillTime : twoHourLater,
-          minimalOrder : 5
+          minimalOrder : 1
         })
         .expect(200)
         .toPromise()
@@ -1144,7 +1148,7 @@ describe('MealController', function() {
             .expect('Content-Type', /json/)
             .expect(200)
             .end(function(err,res){
-              if(res.body.meals.length != 1){
+              if(res.body.meals.length !== 1){
                 return done(Error("meal should be not active yet"));
               }
               done();
@@ -1167,7 +1171,7 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          if(res.body.city != "Daly City"){
+          if(res.body.city !== "Daly City"){
             return done(Error("error geocoding or updating address"));
           }
           done();
@@ -1250,7 +1254,7 @@ describe('MealController', function() {
           .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err,res){
-            if(res.body.meals.length != 2){
+            if(res.body.meals.length !== 2){
               return done(Error("error searching for meal"));
             }
             done();
@@ -1421,6 +1425,76 @@ describe('MealController', function() {
           done();
         })
     })
+  });
+
+
+  describe('Update meal and dish to support dynamic prices', function(){
+
+    var mealId;
+    var anotherMealId;
+    var dishId1;
+    var guestEmail = 'enjoymyself1987@gmail.com';
+    var adminEmail = 'admin@sfmeal.com';
+    var hostEmail = 'aimbebe.r@gmail.com';
+    var password = '12345678';
+
+    it('should get a meal', function (done) {
+      agent
+        .get('/meal')
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            console.log(err);
+            return done(err);
+          }
+          if(res.body.meals.length === 0){
+            return done(Error("error getting any meal"));
+          }
+          var meal = res.body.meals[1];
+          mealId = meal.id;
+          dishId1 = meal.dishes[0].id;
+          done();
+        })
+    });
+
+    it('should get another meal', function (done) {
+      agent
+        .get('/meal')
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            console.log(err);
+            return done(err);
+          }
+          if(res.body.meals.length === 0){
+            return done(Error("error getting any meal"));
+          }
+          var meal = res.body.meals[2];
+          anotherMealId = meal.id;
+          done();
+        })
+    });
+
+    it('should login an account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : hostEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should update dish to support dynamic price on active meal', function(done){
+      agent
+        .put('/dish/' + dishId1)
+        .send({
+          isDynamic : true
+        })
+        .expect(200)
+        .end(done)
+    });
+
+
   });
 
 });

@@ -15,17 +15,16 @@ describe('OrderController', function() {
 
   this.timeout(20000);
   var address = "221 Woodrow St, Daly City, CA 94014";
+  var guestEmail = 'enjoymyself1987@gmail.com';
+  var adminEmail = 'admin@sfmeal.com';
+  var hostEmail = 'aimbebe.r@gmail.com';
+  var password = '12345678';
+  var guestId = "";
+  var farAddress = "7116 Tiant way, Elk Grove, CA 95758";
+  var phone = "1-415-802-3853";
   const SERVICE_FEE = 0
 
   describe('', function() {
-
-    var guestEmail = 'enjoymyself1987@gmail.com';
-    var adminEmail = 'admin@sfmeal.com';
-    var hostEmail = 'aimbebe.r@gmail.com';
-    var password = '12345678';
-    var guestId = "";
-    var farAddress = "7116 Tiant way, Elk Grove, CA 95758";
-    var phone = "1-415-802-3853";
 
     it('should login as guest', function (done) {
       agent
@@ -58,6 +57,7 @@ describe('OrderController', function() {
     var price2;
     var price3;
     var price4;
+    var dish1LeftQty;
     it('should get a meal', function (done) {
       agent
           .get('/meal')
@@ -80,6 +80,7 @@ describe('OrderController', function() {
             price2 = meal.dishes[1].price;
             price3 = meal.dishes[2].price;
             price4 = meal.dishes[3].price;
+            dish1LeftQty = meal.leftQty[dishId1];
             done();
           })
     });
@@ -238,7 +239,7 @@ describe('OrderController', function() {
       dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
       dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}], price : price2 };
       dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
-      dishObj[dishId4] = { number : 2, preference : [{ property : 'super sweet', extra : 1 },{ property : 'super sweet', extra : 1 }], price : price4 };
+      dishObj[dishId4] = { number : 2,  preference : [{ property : 'super sweet', extra : 1 },{ property : 'super sweet', extra : 1 }], price : price4 };
       var subtotal = parseFloat(price1*1) + parseFloat(price2*2) + parseFloat((price4*2+2));
       agent
           .post('/order')
@@ -261,20 +262,22 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
-            var tax = Math.round((price1 + price2 * 2 + (price4*2+2))*0.085*100);
-            var chargesTotal = Math.round(((price1 + price2 * 2 + (price4*2 + 2)) * 1.085 + SERVICE_FEE) * 100);
+            // var tax = Math.round((price1 + price2 * 2 + (price4*2+2))*0.085*100);
+            var chargesTotal = Math.round(((price1 + price2 * 2 + (price4*2 + 2)) + SERVICE_FEE) * 100);
             userPoints += Math.floor(chargesTotal / 100);
-            res.body.tax.should.be.equal(tax);
+            // res.body.tax.should.be.equal(tax);
             res.body.customerName.should.be.equal('sheng');
             res.body.customerPhone.should.be.equal(phone);
             res.body.customer.should.be.equal(guestId);
             Object.keys(res.body.charges).should.have.length(1);
             res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(chargesTotal);
+            dish1LeftQty = dish1LeftQty - 1;
+            res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
             orderId = res.body.id;
             done();
           })
     });
-
+  //
     it('user should get certain reward points', function(done){
       agent
         .get('/user/me')
@@ -399,18 +402,21 @@ describe('OrderController', function() {
       dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
       agent
-          .post('/order/' + orderId + "/adjust")
-          .send({orders : dishObj, subtotal : price1 * 1, mealId : mealId, delivery_fee : 0})
-          .expect(200)
-          .end(function(err,res){
-            if(err){
-              return done(err);
-            }
-            var tax = Math.round(price1 * 0.085 * 100);
-            res.body.tax.should.be.equal(tax);
-            userPoints -= Math.floor((price2 * 2 + (price4 + 1) * 2) * 1.085);
-            done();
-          })
+        .post('/order/' + orderId + "/adjust")
+        .set('Accept','application/json')
+        .send({orders : dishObj, subtotal : price1 * 1, mealId : mealId, delivery_fee : 0})
+        .expect('Content-type',/json/)
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          // var tax = Math.round(price1 * 0.085 * 100);
+          // res.body.tax.should.be.equal(tax);
+          userPoints -= Math.floor((price2 * 2 + (price4 + 1) * 2));
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
+          done();
+        })
     })
 
     it('user should get certain reward points', function(done){
@@ -433,17 +439,21 @@ describe('OrderController', function() {
       dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
       agent
-          .post('/order/' + orderId + "/adjust")
-          .send({orders : dishObj, subtotal : price2 * 1, mealId : mealId, delivery_fee : 0})
-          .expect(200)
-          .end(function(err,res){
-            if(err){
-              return done(err);
-            }
-            var tax = Math.round(price2 * 0.085 * 100);
-            res.body.tax.should.be.equal(tax);
-            done();
-          })
+        .post('/order/' + orderId + "/adjust")
+        .set('Accept', 'application/json')
+        .send({orders : dishObj, subtotal : price2 * 1, mealId : mealId, delivery_fee : 0})
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          // var tax = Math.round(price2 * 0.085 * 100);
+          // res.body.tax.should.be.equal(tax);
+          dish1LeftQty++;
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
+          done();
+        })
     })
 
     it('user should get certain reward points', function(done){
@@ -524,16 +534,18 @@ describe('OrderController', function() {
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
       agent
         .post('/order/' + orderId + "/adjust")
+        .set('Accept', 'application/json')
         .send({orders : dishObj, subtotal : price2 + price3, mealId : mealId})
+        .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
           if(err){
             return done(err);
           }
-          var points = Math.floor(price3 * 1 * 1.085);
-          userPoints += points;
-          var tax = Math.round((price2 + price3) * 0.085 * 100);
-          res.body.tax.should.be.equal(tax);
+          userPoints += Math.floor(price3 * 1);
+          // var tax = Math.round((price2 + price3) * 0.085 * 100);
+          // res.body.tax.should.be.equal(tax);
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
     });
@@ -554,15 +566,17 @@ describe('OrderController', function() {
 
     it('should cancel the order at schedule successfully', function (done) {
       agent
-          .post('/order/' + orderId + "/cancel")
-          .expect(200)
-          .end(function(err,res){
-            if(err){
-              return done(err);
-            }
-            res.body.tax.should.be.equal(0);
-            done();
-          })
+        .post('/order/' + orderId + "/cancel")
+        .set('Accept','application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
+          done();
+        })
     });
 
     it('should not adjust the cancelled order', function (done) {
@@ -611,6 +625,8 @@ describe('OrderController', function() {
           }
           res.body.customer.should.be.equal(guestId);
           res.body.customerName.should.be.equal("sheng");
+          dish1LeftQty--;
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
           orderId = res.body.id;
           done();
         })
@@ -644,9 +660,10 @@ describe('OrderController', function() {
             return done(Error("error making order"));
           }
           res.body.redeemPoints.should.be.equal("13");
-          var chargesTotal = ((price3 * 1)*1.085 + SERVICE_FEE) + 3.99 - 1.3;
+          var chargesTotal = ((price3 * 1) + SERVICE_FEE) + 3.99 - 1.3;
           res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(Math.round(chargesTotal * 100));
           res.body.application_fees[Object.keys(res.body.application_fees)[0]].should.be.equal(160);
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
     });
@@ -683,7 +700,7 @@ describe('OrderController', function() {
     });
 
     it('should not update any thing on meal with orders', function(done){
-      var now = new Date()
+      var now = new Date();
       agent
         .put('/meal/' + mealId)
         .send({
@@ -692,12 +709,12 @@ describe('OrderController', function() {
           provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
           delivery_fee : 10.00
         })
-        .expect(400)
+        .expect(200)
         .end(function(err, res){
-          res.body.code.should.be.equal(-14);
+          res.body.delivery_fee.should.be.equal(10.00);
           done();
         })
-    })
+    });
 
     it('should not cancel the order at schedule as a host', function(done){
       agent
@@ -903,11 +920,14 @@ describe('OrderController', function() {
 
     it('should confirm an adjusting order', function (done) {
       agent
-          .put('/order/' + orderId + "/confirm")
-          .expect(200)
-          .end(function(err,res){
-            done();
-          })
+        .put('/order/' + orderId + "/confirm")
+        .set('Accept','application/json')
+        .expect('Content-type',/json/)
+        .expect(200)
+        .end(function(err,res){
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
+          done();
+        })
     });
 
     it('should login or register an account for guest', function (done) {
@@ -956,8 +976,11 @@ describe('OrderController', function() {
     it('should confirm an adjusting order', function (done) {
       agent
         .put('/order/' + orderId + "/confirm")
+        .set('Accept','application/json')
+        .expect('Content-type',/json/)
         .expect(200)
         .end(function(err,res){
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
     });
@@ -971,7 +994,7 @@ describe('OrderController', function() {
         .end(done)
     });
 
-    it('should request for adjusting for lesser order amount', function (done) {
+    it('should request for adjusting for less order amount', function (done) {
       var dishObj = {};
       dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}], price : price1 };
       dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
@@ -1008,8 +1031,12 @@ describe('OrderController', function() {
     it('should confirm an adjusting order', function (done) {
       agent
         .put('/order/' + orderId + "/confirm")
+        .set('Accept','application/json')
+        .expect('Content-type',/json/)
         .expect(200)
         .end(function(err,res){
+          dish1LeftQty++;
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
     });
@@ -1047,13 +1074,21 @@ describe('OrderController', function() {
     it('should confirm an cancelling order', function (done) {
       agent
         .put('/order/' + orderId + "/confirm")
+        .set('Accept', 'application/json')
+        .expect('Content-type', /json/)
         .expect(200)
-        .end(function(err,res){
+        .end(function (err, res) {
+          if (err) {
+            return done(err);
+          }
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
+      });
     });
-
+  //
     describe('order with delivery option', function(){
+
       it('should login or register an account for guest', function (done) {
         agent
           .post('/auth/login?type=local')
@@ -1072,6 +1107,7 @@ describe('OrderController', function() {
       var price2;
       var price3;
       var price4;
+      var dish1LeftQty;
 
       it('should get a order meal', function (done) {
         agent
@@ -1094,6 +1130,7 @@ describe('OrderController', function() {
             price2 = meal.dishes[1].price;
             price3 = meal.dishes[2].price;
             price4 = meal.dishes[3].price;
+            dish1LeftQty = meal.leftQty[dishId1];
             console.log("meal id: " + mealId);
             done();
           })
@@ -1182,71 +1219,14 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
+            dish1LeftQty--;
             res.body.tax.should.be.equal(0);
             res.body.customer.should.be.equal(guestId);
+            res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
             done()
           })
       })
     })
-
-    // describe('update dish number on active meal', function(){
-    //
-    //   var dishObj = {};
-    //   it('should login or register an account', function (done) {
-    //     agent
-    //       .post('/auth/login?type=local')
-    //       .send({email : email, password: password})
-    //       .expect(302)
-    //       .expect('Location','/auth/done')
-    //       .end(done)
-    //   });
-    //
-    //   // it('should be able to set dish that is not ordered to 0', function(done){
-    //   //   var now = new Date();
-    //   //   dishObj[dishId1] = 5;
-    //   //   dishObj[dishId2] = 5;
-    //   //   dishObj[dishId3] = 5;
-    //   //   dishObj[dishId4] = 1;
-    //   //   agent
-    //   //     .put("/meal/" + mealId)
-    //   //     .send({
-    //   //       provideFromTime : now,
-    //   //       provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
-    //   //       totalQty : dishObj,
-    //   //       minimalOrder : 5,
-    //   //       status : 'on'
-    //   //     })
-    //   //     .expect(200)
-    //   //     .end(done);
-    //   // });
-    //
-    //   // it('should not set dish number lower than ordered number', function(done){
-    //   //   var now = new Date();
-    //   //   dishObj[dishId1] = 0;
-    //   //   dishObj[dishId2] = 0;
-    //   //   dishObj[dishId3] = 1;
-    //   //   dishObj[dishId4] = 1;
-    //   //   agent
-    //   //     .put("/meal/" + mealId)
-    //   //     .send({
-    //   //       provideFromTime : now,
-    //   //       provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
-    //   //       totalQty : dishObj,
-    //   //       minimalOrder : 5,
-    //   //       status : 'on'
-    //   //     })
-    //   //     .expect(400)
-    //   //     .end(function(err, res){
-    //   //       if(err){
-    //   //         return done(err);
-    //   //       }
-    //   //       res.body.should.have.property("code");
-    //   //       res.body.code.should.be.equal(-9);
-    //   //       done();
-    //   //     });
-    //   // });
-    // })
-  });
 
   describe('order a meal with coupon', function() {
 
@@ -1265,6 +1245,7 @@ describe('OrderController', function() {
     var adminEmail = 'admin@sfmeal.com';
     var password = '12345678';
     var email = 'aimbebe.r@gmail.com';
+    var dish1LeftQty;
 
     it('should login a guest account', function (done) {
       agent
@@ -1297,6 +1278,7 @@ describe('OrderController', function() {
           price2 = meal.dishes[1].price;
           price3 = meal.dishes[2].price;
           price4 = meal.dishes[3].price;
+          dish1LeftQty = meal.leftQty[dishId1];
           done();
         })
     })
@@ -1326,8 +1308,10 @@ describe('OrderController', function() {
           }
           res.body.discountAmount.should.be.equal(1);
           res.body.transfer[Object.keys(res.body.transfer)[0]].should.be.equal(100);
-          res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(Math.round((price1*1.085+SERVICE_FEE-1)*100));
+          res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(Math.round((price1+SERVICE_FEE-1)*100));
           res.body.application_fees[Object.keys(res.body.application_fees)[0]].should.be.equal(80);
+          dish1LeftQty--;
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
           orderId = res.body.id;
           done();
         })
@@ -1337,7 +1321,7 @@ describe('OrderController', function() {
       agent
         .get('/order/' + orderId + '/adjust-form')
         .expect(200, done)
-    })
+    });
 
     it('should be able to order a meal with coupon greater than original order', function(done){
       var dishObj = {};
@@ -1362,9 +1346,10 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          res.body.discountAmount.should.be.equal(4.34);
-          res.body.transfer[Object.keys(res.body.transfer)[0]].should.be.equal(354);
+          res.body.discountAmount.should.be.equal(price2);
+          res.body.transfer[Object.keys(res.body.transfer)[0]].should.be.equal((price2 - price2*0.2)*100);
           orderId = res.body.id;
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
     });
@@ -1627,7 +1612,7 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          res.body.tax.should.be.equal(price3 * 0.085 * 100);
+          // res.body.tax.should.be.equal(price3 * 0.085 * 100);
           res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
           res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
           res.body.customerPhone.should.be.equal(customerPhone);
@@ -1653,8 +1638,8 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          var tax = Math.round((price1+price3) * 0.085 * 100);
-          res.body.tax.should.be.equal(tax);
+          // var tax = Math.round((price1+price3) * 0.085 * 100);
+          // res.body.tax.should.be.equal(tax);
           Object.keys(res.body.feeCharges).should.have.length(2);
           res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal(((price3) * 0.2 + SERVICE_FEE) * 100);
           res.body.feeCharges[Object.keys(res.body.feeCharges)[1]].should.be.equal(((price2) * 0.2) * 100);
@@ -1678,8 +1663,8 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          var tax = Math.round(price1 * 0.085 * 100);
-          res.body.tax.should.be.equal(tax);
+          // var tax = Math.round(price1 * 0.085 * 100);
+          // res.body.tax.should.be.equal(tax);
           res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal(SERVICE_FEE * 100);
           res.body.feeCharges[Object.keys(res.body.feeCharges)[1]].should.be.equal((price2 * 0.2) * 100);
           done();
@@ -1720,7 +1705,7 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          res.body.tax.should.be.equal(price3 * 0.085 * 100);
+          // res.body.tax.should.be.equal(price3 * 0.085 * 100);
           res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
           res.body.customerPhone.should.be.equal(customerPhone);
           res.body.customerName.should.be.equal(customerName);
@@ -1751,7 +1736,7 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          res.body.tax.should.be.equal(price3 * 0.085 * 100);
+          // res.body.tax.should.be.equal(price3 * 0.085 * 100);
           res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
           res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
           res.body.customerPhone.should.be.equal(customerPhone);
@@ -1870,7 +1855,7 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          res.body.tax.should.be.equal(price3 * 0.085 * 100);
+          // res.body.tax.should.be.equal(price3 * 0.085 * 100);
           res.body.application_fees['cash'].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
           res.body.customerPhone.should.be.equal("(415)111-1111");
           res.body.customerName.should.be.equal("abc");
@@ -1893,7 +1878,7 @@ describe('OrderController', function() {
     });
   });
 
-  describe('order a meal with express checkout', function() {
+  describe('order a meal with party order', function() {
 
     var mealId;
     var dishId1;
@@ -1907,6 +1892,7 @@ describe('OrderController', function() {
     var price5;
     var orderId;
     var dishId5;
+    var dish1LeftQty;
 
     it('should get meals', function (done) {
       agent
@@ -1930,6 +1916,7 @@ describe('OrderController', function() {
           price2 = meal.dishes[1].price;
           price3 = meal.dishes[2].price;
           price4 = meal.dishes[3].price;
+          dish1LeftQty = meal.leftQty[dishId1];
           done();
         })
     })
@@ -1982,6 +1969,7 @@ describe('OrderController', function() {
           res.body.delivery_fee.should.be.above(30);
           new Date(res.body.pickupInfo.pickupFromTime).getTime().should.be.equal(deliveryDate.getTime());
           res.body.pickupInfo.deliveryCenter.should.be.equal("1974 Palou Ave, San Francisco, CA 94124, USA");
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
     });
@@ -2100,7 +2088,315 @@ describe('OrderController', function() {
           done();
         })
     });
+  });
 
+  describe('order a meal with dynamic price dish', function(){
+    var mealId;
+    var dishId1;
+    var dishId2;
+    var dishId3;
+    var dishId4;
+    var price1;
+    var dynamicPrice1;
+    var minimalPrice1;
+    var priceAlterRate1;
+    var price2;
+    var price3;
+    var price4;
+    var price5;
+    var orderId;
+    var dishId5;
+    var guestEmail = 'enjoymyself1987@gmail.com';
+    var adminEmail = 'admin@sfmeal.com';
+    var hostEmail = 'aimbebe.r@gmail.com';
+    var password = '12345678';
+    var dish1LeftQty;
+
+    it('should get meals', function (done) {
+      agent
+        .get('/meal')
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            console.log(err);
+            return done(err);
+          }
+          if(res.body.meals.length === 0){
+            return done(Error("error getting any meal"));
+          }
+          var meal = res.body.meals[1];
+          mealId = meal.id;
+          dishId1 = meal.dishes[0].id;
+          dishId2 = meal.dishes[1].id;
+          dishId3 = meal.dishes[2].id;
+          dishId4 = meal.dishes[3].id;
+          price1 = meal.dishes[0].price;
+          dynamicPrice1 = price1;
+          minimalPrice1 = Math.ceil(price1 * 2 / 3);
+          priceAlterRate1 = 5;
+          price2 = meal.dishes[1].price;
+          price3 = meal.dishes[2].price;
+          price4 = meal.dishes[3].price;
+          dish1LeftQty = meal.leftQty[dishId1];
+          meal.dishes[0].priceAlterRate.should.be.equal(priceAlterRate1);
+          meal.dishes[0].minimalPrice.should.be.equal(minimalPrice1);
+          meal.dishes[0].dynamicPrice.should.be.equal(dynamicPrice1);
+          done();
+        })
+    });
+
+    it('should login as host', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : hostEmail, password: password})
+        .expect(302)
+        .expect("Location","/auth/done")
+        .end(done)
+    });
+
+    it('should be able to update dish left qty on active meal', function(done){
+      var totalQty = {};
+      totalQty[dishId1] = 10;
+      totalQty[dishId2] = 10;
+      totalQty[dishId3] = 10;
+      totalQty[dishId4] = 25;
+      var now = new Date();
+      agent
+        .put('/meal/' + mealId)
+        .send({
+          totalQty : totalQty,
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          status : "on",
+          supportDynamicPrice : true
+        })
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.totalQty[dishId1].should.be.equal(10);
+          dish1LeftQty += 9;
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
+          done();
+        })
+    });
+
+    it('should be able to enable dynamic price on a dish', function(done){
+      agent
+        .put('/dish/' + dishId1)
+        .set('Accept', 'application/json')
+        .send({
+          isDynamic : true
+        })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.isDynamic.should.be.true();
+          done();
+        })
+    });
+
+    it('should be able to enable dynamic price on a dish', function(done){
+      agent
+        .put('/dish/' + dishId4)
+        .set('Accept', 'application/json')
+        .send({
+          isDynamic : true
+        })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.isDynamic.should.be.true();
+          done();
+        })
+    });
+
+    it('should login as guest', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect("Location","/auth/done")
+        .end(done)
+    });
+
+    it('should be able to order a meal', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 5 , preference : [{ property : '', extra : 0}], price : price1 };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 5,
+          pickupOption : 1,
+          method : "pickup",
+          mealId : mealId,
+          contactInfo : { phone : "(415)111-1111", name : "abc"},
+          paymentInfo : { method : 'online'}
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          dish1LeftQty -= 5;
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
+          orderId = res.body.id;
+          done();
+        })
+    });
+
+    var mealProvideFrom;
+    it('should get meal with dynamic price', function (done) {
+      agent
+        .get('/meal/' + mealId)
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            console.log(err);
+            return done(err);
+          }
+          var meal = res.body;
+          var dish1 = meal.dishes[0];
+          var dish1TotalQty = meal.totalQty[dish1.id];
+          var orderNumber = dish1TotalQty - dish1LeftQty;
+          meal.leftQty[dish1.id].should.be.equal(dish1LeftQty);
+          dish1.dynamicPrice.should.be.equal(price1 - parseInt(orderNumber / priceAlterRate1));
+          dynamicPrice1 = dish1.dynamicPrice;
+          mealProvideFrom = meal.provideFromTime;
+          done();
+        })
+    });
+
+    it('should order a meal with dynamic price', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : dynamicPrice1 };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+      dishObj[dishId4] = { number : 5 , preference : [{ property : '', extra : 0}], price : price4 };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : dynamicPrice1 * 1 + price4 * 5,
+          pickupOption : 1,
+          method : "pickup",
+          mealId : mealId,
+          contactInfo : { phone : "(415)111-1111", name : "abc"},
+          paymentInfo : { method : 'online'}
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          dish1LeftQty -= 1;
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
+          orderId = res.body.id;
+          done();
+        })
+    });
+
+    it('should order a meal with outdated dynamic price', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : 10 };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+      dishObj[dishId4] = { number : 4 , preference : [{ property : '', extra : 0}], price : price4 };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : 10 + 4 * price4,
+          pickupOption : 1,
+          method : "pickup",
+          mealId : mealId,
+          contactInfo : { phone : "(415)111-1111", name : "abc"},
+          paymentInfo : { method : 'online'}
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          dish1LeftQty -= 1;
+          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
+          res.body.subtotal.should.be.equal(dynamicPrice1+4*(price4-1));
+          done();
+        })
+    });
+
+    it('should logged out current user', function (done) {
+      agent
+        .post('/auth/logout')
+        .expect(200)
+        .end(function(err,res){
+          done();
+        })
+    });
+
+    it('should order a meal of dynamic price with cash', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}], price : price1 };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+      dishObj[dishId4] = { number : 2 , preference : [{ property : '', extra : 0}], price : price4 };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price4 * 2,
+          pickupOption : 2,
+          method : "delivery",
+          mealId : mealId,
+          contactInfo : { phone : "(415)111-1111", name : "abc", address : address},
+          paymentInfo : { method : 'cash'}
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          var newTotal = (price4 - parseInt(11 / 5)) * 2;
+          res.body.subtotal.should.be.equal(newTotal);
+          done();
+        })
+    });
+
+    it('should login as host', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : hostEmail, password: password})
+        .expect(302)
+        .expect("Location","/auth/done")
+        .end(done)
+    });
+
+    it('should update the meals provideTillTime to 2 minute later and see meal schedule end job', function(done){
+      var now = moment()._d;
+      var twoMinuteLater = moment().add('2','minutes')._d;
+      mealProvideFrom = moment(mealProvideFrom).subtract('30','minutes')._d;
+      agent
+        .put('/meal/' + mealId)
+        .send({
+          status : 'on',
+          provideFromTime : mealProvideFrom,
+          provideTillTime : twoMinuteLater,
+          minimalOrder : 5
+        })
+        .expect(200)
+        .end(done)
+    })
   });
 
   describe('order a meal with Alipay', function(){
@@ -2221,5 +2517,4 @@ describe('OrderController', function() {
         })
     })
   })
-
 });

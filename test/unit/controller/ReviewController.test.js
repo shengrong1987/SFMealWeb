@@ -128,7 +128,7 @@ describe('ReviewController', function() {
           if(err){
             return done(err);
           }
-          if(res.body.customer != guestId){
+          if(res.body.customer !== guestId){
             return done(Error("error making order"));
           }
           orderId = res.body.id;

@@ -298,11 +298,11 @@ function refreshPreference(id){
   var number = localOrders[id].number;
   var preferences = localOrders[id].preference;
   var preferenceBtn = $('[data-submenu][data-dish="' + id + '"]');
-  preferenceBtn.data('value', jQuery.i18n.prop('the') + number + jQuery.i18n.prop('fen'));
-  // if(number > 1){
-  //   preferenceBtn.submenupicker('updateMenu', preferenceBtn);
-  // }
-  preferenceBtn.submenupicker('updateMenu', preferenceBtn);
+  preferenceBtn.data("key", jQuery.i18n.prop('orderNo', number));
+  preferenceBtn.data('value', number);
+  if(number > 1){
+    preferenceBtn.submenupicker('updateMenu', preferenceBtn);
+  }
   if(preferences){
     preferences.forEach(function(preference, index){
       var props = preference.property;
@@ -407,6 +407,7 @@ function orderFood(id,number,initial){
   createCookie(id,JSON.stringify(localOrders[id]),1);
   updateMenuView(id);
   refreshMenu();
+  setupDropdownMenu();
 }
 
 function applyCoupon(isApply, amount, code){

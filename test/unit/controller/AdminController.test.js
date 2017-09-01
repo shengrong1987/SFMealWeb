@@ -10,7 +10,7 @@ before(function(done) {
   done();
 })
 
-describe('UsersController', function() {
+describe('AdminController', function() {
 
   this.timeout(20000);
 
@@ -115,7 +115,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(3);
+          res.body.should.have.length(1);
           done();
         })
     })
@@ -186,6 +186,7 @@ describe('UsersController', function() {
     })
 
     var scheduledOrderId;
+    var redeemPoints;
     it('should be able to search orders that is scheduled', function (done) {
       agent
         .get(encodeURI('/order/search?status=schedule'))
@@ -194,8 +195,9 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(4);
+          res.body.should.have.length(8);
           scheduledOrderId = res.body[0].id;
+          redeemPoints = res.body[0].redeemPoints;
           done();
         })
     })
@@ -217,13 +219,19 @@ describe('UsersController', function() {
       agent
         .get('/order/' + scheduledOrderId + '/refund')
         .expect(200)
-        .end(done)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.transfer[Object.keys(res.body.transfer)[0]].should.be.equal(0);
+          done();
+        })
     })
 
     it('should not be able to refund a refunded order', function (done) {
       agent
         .get('/order/' + scheduledOrderId + '/refund')
-        .expect(400)
+        .expect(200)
         .end(done)
     })
 

@@ -961,19 +961,19 @@ var MealSelectionView = Backbone.View.extend({
     "change .variation a" : "changePreference",
     "click #applyCouponBtn" : "applyCouponCode",
     "click #applyPointsBtn" : "addPointsToOrder",
-    "switchChange.bootstrapSwitch #cateringModeBtn" : "toggleCatering",
+    "switchChange.bootstrapSwitch #cateringModeBtn" : "toggleCatering"
   },
   initialize : function(){
     this.alertView = this.$el.find("#orderAlertView");
     this.alertView.removeClass("hide");
     this.alertView.hide();
-    this.initMap();
+    utility.initGoogleMapService();
   },
-  initDelivery : function(cb){
+  initDelivery : function(){
     var range = this.$el.data("range");
     var $this = this;
     if(!this.$el.find(".deliveryOption").length){
-      return cb(null);
+      return;
     }
     var map;
     this.$el.find(".deliveryOption").each(function () {
@@ -1019,15 +1019,14 @@ var MealSelectionView = Backbone.View.extend({
             deliveryInfo.open(map, deliveryMarker);
             setupLanguage();
           })
-          cb(map);
         });
       })
     });
   },
-  initPickups : function(map){
+  initPickups : function(){
     var mapCenter = '';
     var $this = this;
-    if(this.$el.find(".pickupOption").length == 0){
+    if(this.$el.find(".pickupOption").length === 0){
       mapCenter = "25 Washington St, Daly City";
     }else{
       mapCenter = $(this.$el.find(".pickupOption")[0]).data('location');
@@ -1066,15 +1065,6 @@ var MealSelectionView = Backbone.View.extend({
         });
       })
     })
-  },
-  initMap : function(){
-    var range = this.$el.data("range") * 1609.34;
-    var $this = this;
-    utility.initGoogleMapService(function(){
-      $this.initDelivery(function(map){
-        $this.initPickups(map);
-      });
-    });
   },
   changePreference : function(e){
     var target = $(e.currentTarget);
@@ -2631,7 +2621,7 @@ var MealConfirmView = Backbone.View.extend({
     this.alertView.removeClass("hide");
     this.alertView.hide();
     this.isCoolDown = true;
-    this.initMap();
+    utility.initGoogleMapService();
   },
   enterBillingAddress : function(e){
     var isChecked = $(e.currentTarget).prop("checked");
@@ -2647,11 +2637,11 @@ var MealConfirmView = Backbone.View.extend({
   onKeyDown : function(e){
     if(e.which === 13) e.preventDefault();
   },
-  initDelivery : function(cb){
+  initDelivery : function(){
     var range = this.$el.data("range");
     var $this = this;
     if(!this.$el.find(".deliveryOption").length){
-      return cb(null);
+      return;
     }
     var map;
     this.$el.find(".deliveryOption").each(function () {
@@ -2697,12 +2687,11 @@ var MealConfirmView = Backbone.View.extend({
             deliveryInfo.open(map, deliveryMarker);
             setupLanguage();
           })
-          cb(map);
         })
       })
     });
   },
-  initPickups : function(map){
+  initPickups : function(){
     var mapCenter = '';
     var $this = this;
     if(this.$el.find(".pickupOption").length === 0){
@@ -2743,14 +2732,6 @@ var MealConfirmView = Backbone.View.extend({
           });
         });
       })
-    });
-  },
-  initMap : function(){
-    var $this = this;
-    utility.initGoogleMapService(function(){
-      $this.initDelivery(function(map){
-        $this.initPickups(map);
-      });
     });
   },
   createNewContact : function(e){

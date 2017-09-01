@@ -166,7 +166,7 @@
     insertMenu : function(layer, value, wait){
       var parentMenu = this.findParentSubmenu(layer);
       var children = this.tract(parentMenu, layer);
-      this.insert(parentMenu, value, children, layer, desc);
+      this.insert(parentMenu, value, children, layer);
       setupDropdownMenu();
       if(!wait){
         this.init();
@@ -177,15 +177,15 @@
       this.remove(parentMenu, layer);
     },
     updateMenu : function(layer, value){
-      var numberOnly = value.match(/\d+/) ? value.match(/\d+/)[0] : 0;
-      for(var i=2; i <= numberOnly; i++){
-        this.insertMenu(layer, value.replace(/\d+/,i), true);
+      // var numberOnly = value.match(/\d+/) ? value.match(/\d+/)[0] : 0;
+      for(var i=2; i <= value; i++){
+        this.insertMenu(layer, i, true);
       }
       setupDropdownMenu();
       this.init();
     },
     findParentSubmenu : function(layer){
-      if(layer==0){ return this.$menu };
+      if(layer===0){ return this.$menu };
       var parentMenu =  this.$menu.find(".dropdown-submenu[data-layer='" +  layer + "']").parent();
       return parentMenu;
     },
@@ -195,7 +195,8 @@
     },
     insert : function(parent,value,children,layer){
       var newSubmenu = '<li class="dropdown-submenu" data-layer="' + layer + '">' +
-      '<a tabindex="0" data-toggle="dropdown" data-selected="true">' + value + '</a>' + '<ul class="dropdown-menu"></ul></li>';
+        '<a tabindex="0" data-toggle="dropdown" data-select="true"><span data-toggle="i18n" data-key="orderNo" data-param=' + value + '>' + value + '</span></a>' + '<ul class="dropdown-menu"></ul></li>';
+
       parent.append(newSubmenu);
       parent.children().last().find(".dropdown-menu").append(children);
     },

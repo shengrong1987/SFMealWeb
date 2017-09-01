@@ -2,8 +2,8 @@
  * Created by shengrong on 2017/9/1.
  */
 $("document").ready(function(){
-  setup();
   initData();
+  setup();
   initEventHandler();
   initLayout();
 });
@@ -31,6 +31,7 @@ function initData(){
   getCountyInfo();
   loadOrder(true);
   configStripe();
+  loadPreference();
 }
 
 function initEventHandler(){
@@ -57,7 +58,11 @@ function setupLanguage(){
     callback: function() {
 
       $("[data-toggle='i18n']").each(function(){
-        $(this).text(jQuery.i18n.prop($(this).data("key")));
+        if($(this).data('param')){
+          $(this).text(jQuery.i18n.prop($(this).data("key"), $(this).data('param')));
+        }else{
+          $(this).text(jQuery.i18n.prop($(this).data("key")));
+        }
         if($(this).data("error")){
           $(this).data("error", jQuery.i18n.prop($(this).data("key")));
         }
@@ -73,8 +78,6 @@ function setupLanguage(){
         userBarView.clearBadges();
         userBarView.getNotification();
       }
-
-      loadPreference();
 
       // We specified mode: 'both' so translated values will be
       // available as JS vars/functions and as a map
@@ -164,7 +167,6 @@ function setupDishSelector(){
 
 function setupDropdownMenu(){
   var $dropdownMenu = $('[data-toggle="dropdown"][data-selected="true"]').next().find("li a");
-  $dropdownMenu.off("click");
   $dropdownMenu.click(function(){
     if($(this).attr('disabled')){
       return;

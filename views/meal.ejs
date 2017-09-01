@@ -151,13 +151,6 @@
                 <h4><small><%= __('share-to-all')%></small></h4>
                 <div id="social-share"></div>
                 <i class="fa fa-heart fa-2x cursor-pointer" style="margin-left:10px;" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}else{%>false<%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>
-                <script>
-                  $("#social-share").jsSocials({
-                    shareIn: "popup",
-                    text : "SFMeal.com",
-                    shares: ["facebook", "pinterest","twitter","pocket"]
-                  });
-                </script>
               </div>
 
               <h4 class="text-left"><small><% __('pickup-location-after-order')%></small></h4>
@@ -478,6 +471,11 @@
   var dishTitle = coverDish.data("title");
   var desc = coverDish.data("footer");
   setupWechat($("#meal-detail-container").data("coverstring"),$("#meal-detail-container").data("title"), dishTitle + ":" + desc);
+//  $("#social-share").jsSocials({
+//    shareIn: "popup",
+//    text : "SFMeal.com",
+//    shares: ["facebook", "pinterest","twitter","pocket"]
+//  });
 </script>
 
 <script src="/js/jweixin-1.0.0.js"></script>

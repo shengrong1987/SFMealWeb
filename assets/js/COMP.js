@@ -104,7 +104,7 @@
     Plugin.call($(this),'change',$(this).parentsUntil('[data-trigger="pagination"]').length > 0 ? $(this).parentsUntil('[data-trigger="pagination"]').parent() : $(this).parent());
   };
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-trigger="pagination"]').each(function(){
       var pagination = $(this);
       Plugin.call(pagination,pagination.data(),pagination);
@@ -270,7 +270,7 @@
   $.fn.datePickup             = Plugin;
   $.fn.datePickup.Constructor = DatePicker;
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $("[data-toggle='date-picker']").each(function(){
       var datePicker = $(this);
       Plugin.call(datePicker,datePicker.data());
@@ -340,7 +340,7 @@
   $.fn.amountInput             = Plugin;
   $.fn.amountInput.Constructor = AmountInput;
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-toggle="amount-input"]').each(function(){
       var amountInput = $(this);
       Plugin.call(amountInput,amountInput.data());
@@ -386,7 +386,7 @@
     Plugin.call($(this),'change',$(this).parentsUntil('[data-toggle="exclusive-input"]').parent());
   };
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-toggle="exclusive-input"]').each(function(){
       var exclusive_input = $(this);
       Plugin.call(exclusive_input,exclusive_input.data(),exclusive_input);
@@ -457,7 +457,7 @@
     Plugin.call($(this),'operate', $(this).parentsUntil("[data-toggle='manipulate-item']").parent());
   };
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-toggle="manipulate-item"]').each(function(){
       var manipulate_item = $(this);
       Plugin.call(manipulate_item,manipulate_item.data());
@@ -567,7 +567,7 @@
     });
   }
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-toggle="star-set"]').each(function(){
       var starSet = $(this);
       Plugin.call(starSet,starSet.data());
@@ -648,7 +648,7 @@
     Plugin.call($(this),'click',$(this));
   };
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-toggle="collect-item"]').each(function(){
       var collectItem = $(this);
       Plugin.call(collectItem,collectItem.data());
@@ -696,7 +696,7 @@
     });
   }
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-toggle="alert-button"]').each(function(){
       var alertButton = $(this);
       Plugin.call(alertButton,alertButton.data());
@@ -751,7 +751,7 @@
     Plugin.call($(this),'switch',$(this).parentsUntil('[data-toggle="switch-box"]').length > 0 ? $(this).parentsUntil('[data-toggle="switch-box"]').parent() : $(this).parent());
   }
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-toggle="switch-box"]').each(function(){
       var switchBox = $(this);
       Plugin.call(switchBox, switchBox.data());
@@ -802,7 +802,7 @@
     Plugin.call($(this),'switch',$(this).parentsUntil('[data-toggle="btn-set"]').length > 0 ? $(this).parentsUntil('[data-toggle="btn-set"]').parent() : $(this).parent());
   }
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-toggle="btn-set"]').each(function(){
       var btnSet = $(this);
       Plugin.call(btnSet, btnSet.data());
@@ -812,7 +812,7 @@
 
 +function($){
   'user strict'
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-toggle="dateTimePicker"]').each(function(){
       var dateString = $(this).data("date");
       var minDate;
@@ -877,7 +877,7 @@
     });
   }
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-toggle="time-span"]').each(function(){
       var timeSpan = $(this);
       Plugin.call(timeSpan, timeSpan.data());
@@ -946,7 +946,7 @@
     Plugin.call($(this),'filter',$(this).parentsUntil('[data-toggle="duration-filter"]').length > 0 ? $(this).parentsUntil('[data-toggle="duration-filter"]').parent() : $(this).parent());
   }
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-toggle="duration-filter"]').each(function(){
       var durationFilter = $(this);
       Plugin.call(durationFilter, durationFilter.data());
@@ -1082,7 +1082,7 @@
     }
   }
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-toggle="dish-selector"]').each(function(){
       var dishSelector = $(this);
       Plugin.call(dishSelector, dishSelector.data());
@@ -1142,7 +1142,7 @@
     Plugin.call($(this),'toggle');
   }
 
-  $(window).on('load',function(){
+  $("document").ready(function(){
     $('[data-toggle="input-toggle"]').each(function(){
       var inputToggle = $(this);
       Plugin.call(inputToggle, inputToggle.data());
