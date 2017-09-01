@@ -317,10 +317,6 @@ function loadPoints(fromCache){
 //order food
 function orderFood(id,number,initial){
 
-  var alertView = $($order.data("err-container"));
-  alertView.removeClass("hide");
-  alertView.hide();
-
   var dishItem = $("#meal-detail-container").find(".dish[data-id='" + id + "']");
   if(initial){
     if(number > 0){
@@ -330,6 +326,9 @@ function orderFood(id,number,initial){
     }
   }
   var $order = $("#order");
+  var alertView = $($order.data("err-container"));
+  alertView.removeClass("hide");
+  alertView.hide();
   var item = $order.find(".item[data-id=" + id + "]");
   var price = parseInt(item.find(".price").attr("value"));
   localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : [{ property : '', extra : 0}], price : price};
