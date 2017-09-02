@@ -30,7 +30,6 @@ function setup(){
 function initData(){
   getCountyInfo();
   loadOrder(true);
-  configStripe();
   loadPreference();
 }
 
@@ -283,7 +282,7 @@ function setupEchoBox(){
   });
 }
 function setupGlobalLoading(){
-  $("body").on({
+  $("document").on({
     ajaxStart: function() {
       $('body').addClass("loading");
     },
@@ -306,13 +305,6 @@ function getCountyInfo(){
     $citySelectorText.attr("value",county);
   }
   return county || "San Francisco County";
-}
-
-function configStripe(){
-  if(typeof Stripe !== 'undefined'){
-    Stripe.setPublishableKey('pk_live_AUWn3rb2SLc92lXsocPCDUcw');
-    // Stripe.setPublishableKey('pk_test_ztZDHzxIInBmBRrkuEKBee8G');
-  }
 }
 
 function adjustLayout(){

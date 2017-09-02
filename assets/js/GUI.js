@@ -15,6 +15,7 @@
   - createCookie : "create new cookie by name"
   - readCookie : "get cookie by name"
   - eraseCookie : "remove a cookie by name"
+  - loadStripeJS : "load Stripe js"
  */
 
 var googleAPILoaded;
@@ -178,6 +179,29 @@ function readCookie(name) {
 
 function eraseCookie(name) {
   createCookie(name, "", -1);
+}
+
+var isStripeLoaded = false;
+function loadStripeJS(cb){
+  if(!isStripeLoaded){
+    $('body').addClass("loading");
+    isStripeLoaded = true;
+    $.ajax({
+      url: "https://js.stripe.com/v2/",
+      dataType: 'script',
+      async : true,
+      defer : true,
+      success : function(){
+        $('body').removeClass("loading");
+        Stripe.setPublishableKey('pk_live_AUWn3rb2SLc92lXsocPCDUcw');
+        // Stripe.setPublishableKey('pk_test_ztZDHzxIInBmBRrkuEKBee8G');
+        cb();
+      },error : function(err){
+        $('body').removeClass("loading");
+        cb(err);
+      }
+    });
+  }
 }
 
 function setCountyInfo(county){

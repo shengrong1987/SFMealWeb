@@ -430,6 +430,11 @@ var ApplyView = Backbone.View.extend({
       }
     });
     $('[href="#step'+curStep+'"]').tab('show');
+    loadStripeJS(function(err){
+      if(err){
+        console.log("error loading stripe.js");
+      }
+    })
 
   },
   handleAdditional : function(e){
@@ -580,6 +585,11 @@ var PaymentView = Backbone.View.extend({
     if(payment_form.data("id")){
       this.model.set({id: payment_form.data("id")});
     }
+    loadStripeJS(function(err){
+      if(err){
+        console.log("error loading stripe.js");
+      }
+    })
   },
   submitProfile: function (e) {
     e.preventDefault();
@@ -624,7 +634,7 @@ var PaymentView = Backbone.View.extend({
             brandInput.attr("value", brand);
           }
           var stripeTokenInput = form.find("input[name='stripeToken']");
-          if (stripeTokenInput.length == 0) {
+          if (stripeTokenInput.length === 0) {
             form.append("<input type='hidden' name='stripeToken' value='" + token + "' />");
           }else {
             stripeTokenInput.attr("value", token);
@@ -643,7 +653,7 @@ var PaymentView = Backbone.View.extend({
         location.reload();
         // reloadUrl('/pocket/me','#mypayment');
       },error : function(model,err){
-        if(err.status == 200){
+        if(err.status === 200){
           location.reload();
         }else{
           $this.alertView.html(getMsgFromError(err));
@@ -2080,6 +2090,11 @@ var BankView = Backbone.View.extend({
     alertForm.removeClass("hide");
     alertForm.hide();
     this.alertForm = alertForm;
+    loadStripeJS(function(err){
+      if(err){
+        console.log("error loading stripe.js");
+      }
+    })
   },
   saveBank : function(e){
     e.preventDefault();
@@ -2168,19 +2183,19 @@ var UserProfileView = Backbone.View.extend({
     var birthDay = this.$el.find("#bDayInput").attr('value');
     var birthYear = this.$el.find("#bYearInput").attr('value');
     this.$el.find("#bMonthInput option").each(function(){
-      if(parseInt($(this).val()) == birthMonth){
+      if(parseInt($(this).val()) === birthMonth){
         $(this).attr('selected', true);
       }
     });
 
     this.$el.find("#bDayInput option").each(function(){
-      if(parseInt($(this).val()) == birthDay){
+      if(parseInt($(this).val()) === birthDay){
         $(this).attr('selected', true);
       }
     });
 
     this.$el.find("#bYearInput option").each(function(){
-      if(parseInt($(this).val()) == birthYear){
+      if(parseInt($(this).val()) === birthYear){
         $(this).attr('selected', true);
       }
     });
@@ -2449,7 +2464,7 @@ var ReviewView = Backbone.View.extend({
       }
     }
     var $this = this;
-    if((!score || score == 0) && scoreNotRated){
+    if((!score || score === 0) && scoreNotRated){
       makeAToast(jQuery.i18n.prop('reviewScoreEmpty'));
       return;
     }
@@ -2971,6 +2986,13 @@ var OrderView = Backbone.View.extend({
     "click [data-action='deleteOrder']" : "deleteOrder",
     "click [data-action='pay']" : "pay",
     "click [data-action='takeOrder']" : "takeOrder"
+  },
+  initialize : function(){
+    loadStripeJS(function(err){
+      if(err){
+        console.log("error loading stripe.js");
+      }
+    })
   },
   receive : function(e){
     e.preventDefault();

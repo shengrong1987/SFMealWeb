@@ -7910,7 +7910,7 @@ body {
   left: 0;
   height: 100%;
   width: 100%;
-  background: rgba(255, 255, 255, 0.8) url('https://i.stack.imgur.com/FhHRx.gif') 50% 50% no-repeat;
+  background: rgba(255, 255, 255, 0.8) url('../images/loadingGif.gif') 50% 50% no-repeat;
 }
 /* When the body has the loading class, we turn
    the scrollbar off with overflow:hidden */
