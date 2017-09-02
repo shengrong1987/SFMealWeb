@@ -29,6 +29,7 @@ var stripe = require("../services/stripe");
  * -15 : meal support delivery but no delivery option was provided
  * -16 : meal query is invalid
  * -17 : meal lack of party requirement
+ * -18 : meal contain invalid dish which is with dynamic price in another open meal that support dynamic price
  */
 
 module.exports = {
@@ -384,26 +385,27 @@ module.exports = {
             console.log("Date format of meal is not valid");
             return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
           }
-          if(!meal.dishIsValid()){
-            console.log("meal contain unverified dishes");
-            return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
-          }
-          $this.cancelMealJobs( mealId, function(err){
+          meal.dishIsValid(meal.supportDynamicPrice, req, function(err){
             if(err){
               return res.badRequest(err);
             }
-            meal.status = "on";
-            meal.isScheduled = false;
-            meal.save(function(err,result){
+            $this.cancelMealJobs( mealId, function(err){
               if(err){
                 return res.badRequest(err);
               }
-              if(isAdmin || req.wantsJSON){
-                return res.ok(meal);
-              }
-              return res.redirect("/host/me#mymeal");
-            });
-          })
+              meal.status = "on";
+              meal.isScheduled = false;
+              meal.save(function(err,result){
+                if(err){
+                  return res.badRequest(err);
+                }
+                if(isAdmin || req.wantsJSON){
+                  return res.ok(meal);
+                }
+                return res.redirect("/host/me#mymeal");
+              });
+            })
+          });
         });
       });
     });
@@ -437,48 +439,46 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        $this.dishIsValid(req.body, function(valid){
-          if(valid){
-            Host.findOne(hostId).populate("meals").populate("dishes").populate("user").exec(function(err, host){
+        $this.dishIsValid(req.body, req, function(err){
+          if(err){
+            return res.badRequest(err);
+          }
+          Host.findOne(hostId).populate("meals").populate("dishes").populate("user").exec(function(err, host){
+            if(err){
+              return res.badRequest(err);
+            }
+            $this.updateDelivery(req.body, host, req, function(err, params){
               if(err){
                 return res.badRequest(err);
               }
-              $this.updateDelivery(req.body, host, req, function(err, params){
-                if(err){
-                  return res.badRequest(err);
-                }
-                req.body = params;
-                req.body.commission = host.commission;
-                req.body.chef = host.id;
-                if(req.body.status === 'on'){
-                  host.checkGuideRequirement(function(err){
-                    if(err){
-                      return res.badRequest(err);
-                    }
-                    if(!host.passGuide || !host.dishVerifying){
-                      return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
-                    }
-                    Meal.create(req.body).exec(function(err,meal){
-                      if(err){
-                        return res.badRequest(err);
-                      }
-                      return res.ok(meal);
-                    });
-                  })
-                }else{
+              req.body = params;
+              req.body.commission = host.commission;
+              req.body.chef = host.id;
+              if(req.body.status === 'on'){
+                host.checkGuideRequirement(function(err){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  if(!host.passGuide || !host.dishVerifying){
+                    return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
+                  }
                   Meal.create(req.body).exec(function(err,meal){
                     if(err){
                       return res.badRequest(err);
                     }
                     return res.ok(meal);
                   });
-                }
-              });
+                })
+              }else{
+                Meal.create(req.body).exec(function(err,meal){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  return res.ok(meal);
+                });
+              }
             });
-          }else{
-            console.log("meal contain unverified dishes");
-            return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
-          }
+          });
         });
       });
     }else{
@@ -559,29 +559,30 @@ module.exports = {
                         return res.badRequest(err);
                       }
                       meal.chef.dishes = meal.dishes;
-                      if(!meal.dishIsValid()){
-                        sails.log.debug("meal contain unverified dishes");
-                        return res.badRequest({responseText : req.__('meal-unverify-dish'), code : -8});
-                      }
-                      meal.chef.checkGuideRequirement(function(err){
+                      meal.dishIsValid(req.body.supportDynamicPrice, req, function(err){
                         if(err){
                           return res.badRequest(err);
                         }
-                        if(!meal.chef.passGuide){
-                          return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
-                        }
-                        $this.cancelMealJobs(mealId, function(err){
+                        meal.chef.checkGuideRequirement(function(err){
                           if(err){
                             return res.badRequest(err);
                           }
-                          req.body.isScheduled = false;
-                          req.body.chef = hostId;
-                          Meal.update({id : mealId}, req.body).exec(function(err, result){
+                          if(!meal.chef.passGuide){
+                            return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
+                          }
+                          $this.cancelMealJobs(mealId, function(err){
                             if(err){
                               return res.badRequest(err);
                             }
-                            return res.ok(result[0]);
-                          });
+                            req.body.isScheduled = false;
+                            req.body.chef = hostId;
+                            Meal.update({id : mealId}, req.body).exec(function(err, result){
+                              if(err){
+                                return res.badRequest(err);
+                              }
+                              return res.ok(result[0]);
+                            });
+                          })
                         })
                       })
                     });
@@ -737,10 +738,10 @@ module.exports = {
       return leftQty;
     }
     Object.keys(newTotalQty).forEach(function(dishId){
+      sails.log.info("left qty: " + leftQty[dishId], " & new total: " + newTotalQty[dishId], " & old total: " + oldTotalQty[dishId]);
       leftQty[dishId] = parseInt(leftQty[dishId] || 0) + parseInt(newTotalQty[dishId]) - parseInt(oldTotalQty[dishId]);
       if(leftQty[dishId] < 0){
         leftQty = false;
-        return;
       }
     });
     return leftQty;
@@ -778,26 +779,48 @@ module.exports = {
     cb();
   },
 
-  dishIsValid : function(params, cb){
+  dishIsValid : function(params, req, cb){
+    if(params.status === 'off'){
+      return cb();
+    }
     var dishes = params.dishes.split(",");
     if(dishes.length === 0){
-      return cb(false);
+      return cb({ code : -11, responseText : req.__('meal-dishes-empty')});
     }
+    var dynamicDishes = [];
     async.each(dishes, function(dishId, next){
       Dish.findOne(dishId).exec(function(err, dish){
         if(err){
           return next(err);
         }
         if(!dish.isVerified){
-          return next(err);
+          return next({ code : -8, responseText : req.__('meal-unverify-dish')});
+        }
+        if(dish.isDynamic){
+          dynamicDishes.push(dishId);
         }
         next();
       });
     }, function(err){
       if(err){
-        return cb(false);
+        return cb(err);
       }
-      cb(true);
+      if(params.supportDynamicPrice){
+        Meal.find({ status : 'on', supportDynamicPrice : true }).populate("dishes",{ id : dynamicDishes }).exec(function(err, meals){
+          if(err){
+            return cb(err);
+          }
+          var hasDish = meals.some(function(meal){
+            return meal.dishes.length !== 0;
+          });
+          if(hasDish){
+            return cb({ code : -18, responseText : req.__('meal-invalid-dynamic-dish')});
+          }
+          cb();
+        });
+      }else{
+        cb();
+      }
     });
   },
 
@@ -806,11 +829,16 @@ module.exports = {
     var provideTillTime = params.provideTillTime;
     var now = new Date();
 
+    sails.log.info("start: " + provideFromTime, " end: " + provideTillTime);
+
     if(provideFromTime >= provideTillTime){
+      sails.log.warn("provide from time is later than provide till time");
       return false;
     }else if(new Date(provideTillTime) < now){
+      sails.log.warn("provide till time should be in the future");
       return false;
     }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
+      sails.log.warn("provide from time and provide till time is too short");
       return false;
     }
     var valid = true;
@@ -843,7 +871,7 @@ module.exports = {
 
       if (orders.length > 0) {
         if(params.status === "on"){
-          if(params.pickups || params.title || meal.type || params.minimalOrder || params.minimalTotal){
+          if(params.pickups || params.type){
             cb({ code : -14, responseText : req.__("meal-modify-active-error")});
           }else{
             cb();

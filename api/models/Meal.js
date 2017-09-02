@@ -159,6 +159,10 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
+    supportDynamicPrice : {
+      type : 'boolean',
+      defaultsTo : false
+    },
     supportPartyOrder : {
       type : 'boolean',
       defaultsTo : false
@@ -261,13 +265,38 @@ module.exports = {
       return valid;
     },
 
-    dishIsValid : function(){
+    dishIsValid : function(supportDynamicPrice, req, cb){
       if(this.dishes.length === 0){
-        return false;
+        return cb({ code : -11, responseText : req.__('meal-dishes-empty')});
       }
-      return this.dishes.every(function(dish){
+      var dynamicDishes = [];
+      var isVerify = this.dishes.every(function(dish){
+        if(dish.isDynamic){
+          dynamicDishes.push(dish);
+        }
         return dish.isVerified;
       });
+
+      if(!isVerify){
+        return cb({ code : -8, responseText : req.__('meal-unverify-dish')});
+      }
+
+      if(supportDynamicPrice){
+        Meal.find({ status : 'on', supportDynamicPrice : true }).populate("dishes",{ id : dynamicDishes }).exec(function(err, meals){
+          if(err){
+            return cb(err);
+          }
+          var hasDish = meals.some(function(meal){
+            return meal.dishes.length !== 0;
+          });
+          if(hasDish){
+            return cb({ code : -18, responseText : req.__('meal-invalid-dynamic-dish')});
+          }
+          cb();
+        });
+      }else{
+        cb();
+      }
     },
 
     getTaxRate : function(){

@@ -1469,7 +1469,7 @@ describe('MealController', function() {
           if(res.body.meals.length === 0){
             return done(Error("error getting any meal"));
           }
-          var meal = res.body.meals[2];
+          var meal = res.body.meals[0];
           anotherMealId = meal.id;
           done();
         })
@@ -1492,6 +1492,40 @@ describe('MealController', function() {
         })
         .expect(200)
         .end(done)
+    });
+
+    it('should update a meal to support dynamic price dishes', function(done){
+      var now = new Date();
+      agent
+        .put('/meal/' + mealId)
+        .send({
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          status : "on",
+          supportDynamicPrice : true
+        })
+        .expect(200)
+        .end(done)
+    });
+
+    it('should not update another meal to support dynamic price dishes with the same dynamic price dish', function(done){
+      var now = new Date();
+      agent
+        .put('/meal/' + anotherMealId)
+        .send({
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          status : "on",
+          supportDynamicPrice : true
+        })
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-18);
+          done();
+        })
     });
 
 

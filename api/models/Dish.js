@@ -99,7 +99,8 @@ module.exports = {
       defaultsTo : false
     },
     updatePrice : function(number){
-      var p = Math.ceil(this.price - number / this.priceAlterRate);
+      var p = Math.ceil(this.price - parseInt(number / this.priceAlterRate));
+      sails.log.info("origin price: " + this.price, "discount: " + parseInt(number / this.priceAlterRate), "minimal price: " + this.minimalPrice);
       if(p < this.minimalPrice){
         p = this.minimalPrice;
       }
@@ -112,7 +113,7 @@ module.exports = {
 
   beforeCreate : function(values, cb){
     values.isVerified = false;
-    values.minimalPrice = values.price * 2/3;
+    values.minimalPrice = Math.ceil(values.price * 2/3);
     values.dynamicPrice = values.price;
     cb();
   }

@@ -305,7 +305,7 @@ module.exports = {
     var _this = this;
     this.calculateTotal(attr);
     if(attr.metadata.total === 0){
-      return cb(null, null);
+      return cb(null, "no-charge");
     }
     stripe.sources.create({
       type: attr.type,
@@ -408,31 +408,54 @@ module.exports = {
     })
   },
 
-  batchRefund : function(refunds, metadata, cb){
-    if(!refunds){
+  batchRefund : function(charges, transfers, metadata, cb){
+    if(!charges && !transfers){
       return cb();
     }
     var _this = this;
-    var refundsId = Object.keys(refunds);
-    async.each(refundsId, function(refundId, next){
-      if(refunds[refundId] === 0){
+    var chargeIds = Object.keys(charges);
+    var amount = metadata.amount || -1;
+    sails.log.info("total money to refund: " + amount/100);
+    async.each(chargeIds, function(chargeId, next){
+      var thisAmount = charges[chargeId];
+      sails.log.info("refund amount in this charge: " + chargeId, " is: " + thisAmount);
+      var refundAmount;
+      if(thisAmount === 0){
         return next();
+      }else if(amount !== -1){
+        if(amount === 0){
+          return next();
+        }else if(thisAmount <= amount){
+          refundAmount = thisAmount;
+        }else if(thisAmount > amount){
+          refundAmount = amount;
+        }
+        amount -= refundAmount;
+      }else{
+        refundAmount = thisAmount;
       }
       _this.refund({
-        id : refundId,
-        amount : refunds[refundId],
+        id : chargeId,
+        amount : refundAmount,
         metadata : metadata
       },function(err, refund){
         if(err){
           return next(err);
         }
+        charges[chargeId] -= refund.amount;
         next();
       });
     },function(err){
       if(err){
         return cb(err);
       }
-      cb();
+      if((amount === -1 || amount > 0) && transfers){
+        //if refund amount still left or need fully refund, then check transfer.
+        metadata.amount = amount;
+        _this.batchReverse(transfers, metadata, cb);
+      }else{
+        cb();
+      }
     })
   },
 
@@ -441,7 +464,7 @@ module.exports = {
       return cb(null, { amount : attr.amount });
     }
     var $this = this;
-    sails.log.debug("refunding customer : " + (typeof attr.amount === 'undefined' || "fully"));
+    sails.log.debug("refunding customer : $" + attr.amount/100 );
     stripe.refunds.create({
       charge : attr.id,
       amount : attr.amount,
@@ -464,24 +487,41 @@ module.exports = {
     });
   },
 
-  batchReverse : function(reverses, metadata, cb){
-    if(!reverses){
+  batchReverse : function(transfers, metadata, cb){
+    if(!transfers){
       return cb();
     }
     var _this = this;
-    var refundsId = Object.keys(reverses);
-    async.each(refundsId, function(reverseId, next){
-      if(reverses[reverseId] === 0){
+    var transferIds = Object.keys(transfers);
+    var amount = metadata.amount;
+    sails.log.info("total money to transfer: $" + amount/100);
+    var refundingAmount;
+    async.each(transferIds, function(transferId, next){
+      var thisAmount = transfers[transferId];
+      sails.log.info("amount left in this transfer: $" + thisAmount/100);
+      if(thisAmount === 0){
         return next();
+      }else if(amount !== -1){
+        if(amount === 0){
+          return next();
+        }else if(thisAmount <= amount){
+          refundingAmount = thisAmount;
+        }else if(thisAmount > amount){
+          refundingAmount = amount;
+        }
+        amount -= refundingAmount;
+      }else{
+        refundingAmount = thisAmount;
       }
       _this.reverse({
-        id : reverseId,
-        amount : reverses[reverseId],
+        id : transferId,
+        amount : refundingAmount,
         metadata : metadata
       },function(err, refund){
         if(err){
           return next(err);
         }
+        transfers[transferId] -= refund.amount;
         next();
       });
     },function(err){
@@ -493,7 +533,8 @@ module.exports = {
   },
 
   reverse : function(attr, cb){
-    sails.log.info("reversing transfer: " + (typeof attr.amount === 'undefined' || "fully"));
+    var _this = this;
+    sails.log.info("reversing transfer: $" + attr.amount/100);
     stripe.transfers.createReversal(
       attr.id,
       {
@@ -505,7 +546,12 @@ module.exports = {
         if(err){
           return cb(err);
         }
-        cb(null, reversal);
+        _this.handlePoint(reversal, attr.metadata.userId, false, function(err, user){
+          if(err){
+            return cb(err);
+          }
+          cb(null,reversal);
+        });
       }
     );
   },
