@@ -1828,7 +1828,7 @@ module.exports = {
         return res.badRequest(req.__('order-refund-fail'));
       }
       var metadata = {
-        userId :  order.customer.id,
+        userId :  order.customer ? order.customer.id : null,
         reverse_transfer : true,
         refund_application_fee : true
       };
