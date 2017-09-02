@@ -56,6 +56,7 @@ var moment = require("moment");
 //-42 : stripe awaiting payment
 //-43 : order status error, can not confirm
 //-44 : order dynamic price not match
+//-45 : all stripe error type
 //-98 : result not found
 
 
@@ -561,7 +562,7 @@ module.exports = {
                   email : process.env.ADMIN_EMAIL
                 }, function(err, customer){
                   if(err){
-                    return next(err);
+                    return next({ code : -45, responseText : err.message });
                   }
                   req.body.customerId = customer.id;
                   req.body.discount = 0;
@@ -598,7 +599,7 @@ module.exports = {
                     }
                   }, function(err, source){
                     if(err){
-                      return res.badRequest(err);
+                      return res.badRequest({ code : -45, responseText : err.message });
                     }
                     if(source==="no-charge"){
                       $this.updateDishDynamicPrice(m, order.orders, null, m.dishes, function(err, d){
@@ -648,7 +649,7 @@ module.exports = {
                         if(err2){
                           return res.badRequest(err2);
                         }
-                        return res.badRequest(err);
+                        return res.badRequest({ code : -39, responseText : err.message });
                       });
                     }else{
                       $this.updateDishDynamicPrice(m, order.orders, null, m.dishes, function(err, d){
@@ -744,7 +745,7 @@ module.exports = {
         id : sourceId
       }, function(err, source){
         if(err){
-          return res.badRequest(err);
+          return res.badRequest({ code : -45, responseText : err.message });
         }
         if(source.status !== "pending"){
           return res.badRequest({ code : -39, responseText : req.__('ali-payment-failure')});
@@ -827,7 +828,7 @@ module.exports = {
                 }
               },function(err, charge, transfer){
                 if(err){
-                  return next(err);
+                  return next({ code : -39, responseText : err.message });
                 }
                 if(charge.status !== "succeeded") {
                   return next({ responseText : req.__('order-adjust-stripe-error',charge.status), code : -37});
@@ -1173,7 +1174,7 @@ module.exports = {
                 }
               },function(err, c, t) {
                 if (err) {
-                  return next(err);
+                  return next({ code : -39, responseText : err.message });
                 }
                 charge = c;
                 transfer = t;
@@ -1393,7 +1394,7 @@ module.exports = {
         id : sourceId
       }, function(err, source){
         if(err){
-          return res.badRequest(err);
+          return res.badRequest({ code : -45, responseText : err.message });
         }
         if(source.status !== "pending"){
           return res.badRequest({ code : -39, responseText : req.__('ali-payment-failure')});
