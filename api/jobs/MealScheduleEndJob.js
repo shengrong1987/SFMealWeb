@@ -272,7 +272,7 @@ module.exports = function(agenda) {
         }
         meal.hostEmail = meal.chef.email;
 
-        Order.find({ meal : mealId, status : "schedule"}).exec(function(err, orders){
+        Order.find({ meal : mealId, status : ["schedule","pending-payment"]}).exec(function(err, orders){
           if(err){
             return done();
           }
@@ -281,25 +281,45 @@ module.exports = function(agenda) {
             notification.notificationCenter("Meal","mealScheduleEnd",meal,true);
             return done();
           }
-          var total = 0;
-          orders.forEach(function(order){
-            total += order.subtotal;
-          });
-          if(orders.length < meal.minimalOrder || total < meal.minimalTotal){
-            notification.notificationCenter("Meal","cancel",meal,true,false,null);
-            _this.cancelOrders(mealId, done);
-          }else{
-            if(meal.supportDynamicPrice){
-              _this.adjustOrders(orders, meal.dishes, function(err){
-                if(err){
-                  return done();
-                }
-                _this.updateOrders(meal, done);
-              });
-            }else{
-              _this.updateOrders(meal, done);
+          async.each(orders, function(order, next){
+            if(order.status !== "pending-payment"){
+              return next();
             }
-          }
+            stripe.getSource(order.sourceId, function(err, source){
+              if(err){
+                return next(err);
+              }
+              if(source.status === "consumed"){
+                order.status = "schedule";
+                order.save(next);
+              }else{
+                Order.destroy(order.id).exec(next);
+              }
+            });
+          }, function(err){
+            if(err){
+              return done(err);
+            }
+            var total = 0;
+            orders.forEach(function(order){
+              total += order.subtotal;
+            });
+            if(orders.length < meal.minimalOrder || total < meal.minimalTotal){
+              notification.notificationCenter("Meal","cancel",meal,true,false,null);
+              _this.cancelOrders(mealId, done);
+            }else{
+              if(meal.supportDynamicPrice){
+                _this.adjustOrders(orders, meal.dishes, function(err){
+                  if(err){
+                    return done();
+                  }
+                  _this.updateOrders(meal, done);
+                });
+              }else{
+                _this.updateOrders(meal, done);
+              }
+            }
+          });
         });
       })
     }

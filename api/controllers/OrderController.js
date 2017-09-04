@@ -747,15 +747,21 @@ module.exports = {
         if(err){
           return res.badRequest({ code : -45, responseText : err.message });
         }
-        if(source.status !== "pending"){
-          return res.badRequest({ code : -39, responseText : req.__('ali-payment-failure')});
+        if(source.status === "consumed"){
+          Order.update(orderId, { status : "schedule"}).exec(function(err, order){
+            if(err){
+              return res.badRequest(err);
+            }
+            res.ok({});
+          });
+        }else{
+          Order.destroy(orderId).exec(function(err, order){
+            if(err){
+              return res.badRequest(err);
+            }
+            return res.ok({});
+          })
         }
-        Order.destroy(orderId).exec(function(err, order){
-          if(err){
-            return res.badRequest(err);
-          }
-          return res.ok({});
-        })
       });
     });
   },
@@ -1024,7 +1030,7 @@ module.exports = {
                 return next();
               }
               var metadata = {
-                userId : order.customer.id,
+                userId : order.customer ? order.customer.id : null,
                 paymentMethod : order.paymentMethod,
                 reverse_transfer : true,
                 refund_application_fee : true

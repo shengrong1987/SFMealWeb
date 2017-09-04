@@ -1528,6 +1528,20 @@ describe('MealController', function() {
         })
     });
 
+    it('should update a meal to not support dynamic price dishes', function(done){
+      var now = new Date();
+      agent
+        .put('/meal/' + mealId)
+        .send({
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          status : "on",
+          supportDynamicPrice : false
+        })
+        .expect(200)
+        .end(done)
+    });
+
 
   });
 

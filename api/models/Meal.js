@@ -280,16 +280,22 @@ module.exports = {
       if(!isVerify){
         return cb({ code : -8, responseText : req.__('meal-unverify-dish')});
       }
+      if(dynamicDishes.length > 0){
+        sails.log.info("dynamic dish: " + dynamicDishes[0].id);
+      }
 
       if(supportDynamicPrice){
-        Meal.find({ status : 'on', supportDynamicPrice : true }).populate("dishes",{ id : dynamicDishes }).exec(function(err, meals){
+        Meal.find({ status : 'on', supportDynamicPrice : true }).populate("dishes").exec(function(err, meals){
           if(err){
             return cb(err);
           }
-          var hasDish = meals.some(function(meal){
-            return meal.dishes.length !== 0;
+          // sails.log.info("meal has dishes with dynamic price : "  + meals.dishes.length);
+          var hasDynamicDish = meals.some(function(meal){
+            return meal.dishes.some(function(dish){
+              return !!dish.isDynamic;
+            })
           });
-          if(hasDish){
+          if(hasDynamicDish){
             return cb({ code : -18, responseText : req.__('meal-invalid-dynamic-dish')});
           }
           cb();

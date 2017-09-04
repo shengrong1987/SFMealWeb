@@ -2256,7 +2256,6 @@ describe('OrderController', function() {
         })
     });
 
-    var mealProvideFrom;
     it('should get meal with dynamic price', function (done) {
       agent
         .get('/meal/' + mealId)
@@ -2273,7 +2272,6 @@ describe('OrderController', function() {
           meal.leftQty[dish1.id].should.be.equal(dish1LeftQty);
           dish1.dynamicPrice.should.be.equal(price1 - parseInt(orderNumber / priceAlterRate1));
           dynamicPrice1 = dish1.dynamicPrice;
-          mealProvideFrom = meal.provideFromTime;
           done();
         })
     });
@@ -2372,31 +2370,6 @@ describe('OrderController', function() {
           done();
         })
     });
-
-    it('should login as host', function (done) {
-      agent
-        .post('/auth/login?type=local')
-        .send({email : hostEmail, password: password})
-        .expect(302)
-        .expect("Location","/auth/done")
-        .end(done)
-    });
-
-    it('should update the meals provideTillTime to 2 minute later and see meal schedule end job', function(done){
-      var now = moment()._d;
-      var twoMinuteLater = moment().add('2','minutes')._d;
-      mealProvideFrom = moment(mealProvideFrom).subtract('30','minutes')._d;
-      agent
-        .put('/meal/' + mealId)
-        .send({
-          status : 'on',
-          provideFromTime : mealProvideFrom,
-          provideTillTime : twoMinuteLater,
-          minimalOrder : 5
-        })
-        .expect(200)
-        .end(done)
-    })
   });
 
   describe('order a meal with Alipay', function(){
@@ -2412,6 +2385,7 @@ describe('OrderController', function() {
     var price5;
     var orderId;
     var dishId5;
+    var mealProvideFrom;
 
     it('should get meals', function (done) {
       agent
@@ -2435,6 +2409,7 @@ describe('OrderController', function() {
           price2 = meal.dishes[1].price;
           price3 = meal.dishes[2].price;
           price4 = meal.dishes[3].price;
+          mealProvideFrom = meal.provideFromTime;
           done();
         })
     });
@@ -2515,6 +2490,31 @@ describe('OrderController', function() {
           res.body.code.should.be.equal(-39);
           done();
         })
+    })
+
+    it('should login as host', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : hostEmail, password: password})
+        .expect(302)
+        .expect("Location","/auth/done")
+        .end(done)
+    });
+
+    it('should update the meals provideTillTime to 2 minute later and see meal schedule end job', function(done){
+      var now = moment()._d;
+      var twoMinuteLater = moment().add('2','minutes')._d;
+      mealProvideFrom = moment(mealProvideFrom).subtract('30','minutes')._d;
+      agent
+        .put('/meal/' + mealId)
+        .send({
+          status : 'on',
+          provideFromTime : mealProvideFrom,
+          provideTillTime : twoMinuteLater,
+          minimalOrder : 5
+        })
+        .expect(200)
+        .end(done)
     })
   })
 });

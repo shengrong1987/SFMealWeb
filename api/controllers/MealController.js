@@ -806,14 +806,17 @@ module.exports = {
         return cb(err);
       }
       if(params.supportDynamicPrice){
-        Meal.find({ status : 'on', supportDynamicPrice : true }).populate("dishes",{ id : dynamicDishes }).exec(function(err, meals){
+        Meal.find({ status : 'on', supportDynamicPrice : true }).populate("dishes").exec(function(err, meals){
           if(err){
             return cb(err);
           }
-          var hasDish = meals.some(function(meal){
-            return meal.dishes.length !== 0;
+          // sails.log.info("meal has dishes with dynamic price : "  + meals.dishes.length);
+          var hasDynamicDish = meals.some(function(meal){
+            return meal.dishes.some(function(dish){
+              return !!dish.isDynamic;
+            })
           });
-          if(hasDish){
+          if(hasDynamicDish){
             return cb({ code : -18, responseText : req.__('meal-invalid-dynamic-dish')});
           }
           cb();
