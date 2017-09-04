@@ -68,6 +68,9 @@
   };
 
   utility.initAutoComplete = function(){
+    if(typeof google === 'undefined'){
+      return;
+    }
     utility.getAutoComplete();
   };
 

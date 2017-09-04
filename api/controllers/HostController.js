@@ -13,6 +13,7 @@ var stripe = require("../services/stripe.js");
 var async = require('async');
 var fs = require("fs");
 var notification = require('../services/notification');
+var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUtil.js');
 
 module.exports = {
   me : function(req, res){
@@ -70,7 +71,7 @@ module.exports = {
   },
 
   search : function(req, res){
-    Host.find(req.query).exec(function (err, hosts) {
+    Host.find({ where : req.query, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req)}).exec(function (err, hosts) {
       if(err){
         return res.badRequest(err);
       }
@@ -345,7 +346,7 @@ module.exports = {
       if(!host){
         return res.notFound();
       }
-      Review.find({host : hostId}).exec(function(err, reviews){
+      Review.find({ where : { host : hostId }, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req) }).exec(function(err, reviews){
         if(err){
           return res.badRequest(err);
         }
@@ -514,7 +515,7 @@ module.exports = {
 
   findReview : function(req, res){
     var hostId = req.params.id;
-    Review.find({ host : hostId}).exec(function(err, reviews){
+    Review.find({ where : { host : hostId}, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req)}).exec(function(err, reviews){
       if(err){
         return res.badRequest(err);
       }
@@ -524,7 +525,7 @@ module.exports = {
 
   findMeal : function(req, res){
     var hostId = req.params.id;
-    Meal.find({ chef : hostId}).exec(function(err, meals){
+    Meal.find({ where : { chef : hostId}, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req)}).exec(function(err, meals){
       if(err){
         return res.badRequest(err);
       }
@@ -534,7 +535,7 @@ module.exports = {
 
   findDish : function(req, res){
     var hostId = req.params.id;
-    Dish.find({ chef : hostId}).exec(function(err, dishes){
+    Dish.find({ where : { chef : hostId}, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req) }).exec(function(err, dishes){
       if(err){
         return res.badRequest(err);
       }

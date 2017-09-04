@@ -12,6 +12,7 @@ var notification = require("../services/notification");
 var geocode = require("../services/geocode.js");
 var util = require('../services/util');
 var moment = require("moment");
+var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUtil.js');
 
 //-1 : quantity not enough
 //-2 : dish not valid
@@ -1768,7 +1769,7 @@ module.exports = {
   },
 
   search : function(req, res){
-    Order.find(req.query).populate('customer').populate('meal').populate('host').exec(function(err, orders){
+    Order.find({ where : req.query, skip : actionUtil.parseSkip(req), limit : actionUtil.parseLimit(req) }).populate('customer').populate('meal').populate('host').exec(function(err, orders){
       if(err){
         return res.badRequest(err);
       }

@@ -9,8 +9,6 @@
 var ObjectID = require('mongodb').ObjectID;
 module.exports = {
   find : function(req, res){
-    var skip = req.query.skip;
-    delete req.query.skip;
     Jobs.jobs(req.query,function(err, jobs){
       if(err){
         return res.badRequest(err);

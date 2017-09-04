@@ -951,7 +951,7 @@ var CheckListView = Backbone.View.extend({
 var Meal = Backbone.Model.extend({
   urlRoot : "/meal",
   url : function(){
-    if(this.type == "coupon"){
+    if(this.type === "coupon"){
       return this.urlRoot + "/" + this.get("id") + "/coupon/" + this.get("code");
     }else if(this.get("id")){
       if(this.action){

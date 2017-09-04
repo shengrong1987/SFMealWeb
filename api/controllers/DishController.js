@@ -8,6 +8,7 @@
  */
 
 var notification = require("../services/notification");
+var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUtil.js');
 module.exports = {
 	new_form : function(req, res){
     var user = req.session.user;
@@ -165,7 +166,7 @@ module.exports = {
 
   findReview : function(req, res){
     var dishId = req.params.id;
-    Review.find({ dish : dishId} ).exec(function(err, reviews){
+    Review.find({ where : { dish : dishId}, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req)} ).exec(function(err, reviews){
       if(err){
         return res.badRequest(err);
       }

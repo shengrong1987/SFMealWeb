@@ -1,7 +1,6 @@
 /**#
  * Created by shengrong on 11/16/15.
  */
-
 /*
   HelperMethods
   - geoLocate : "get user's location and set bound" @params: autocomplete obj
@@ -101,7 +100,7 @@ function toggleModal(event,cb){
 //Modal dismiss
 function dismissModal(event, cb){
   var modal = $("#myModal");
-  if(cb){
+  if(_.isFunction(cb)){
     modal.on('hidden.bs.modal',cb);
   }
   modal.modal('hide');
@@ -156,7 +155,7 @@ function search(target, isRegular){
 function createCookie(name, value, days) {
   var expires;
 
-  if (days) {
+  if (_.isNumber(days)) {
     var date = new Date();
     date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
     expires = "; expires=" + date.toGMTString();
@@ -245,7 +244,7 @@ function loadPreference(){
   -
  */
 function updateOrderWindow(fromCache, isTrigger){
-  if(isTrigger){
+  if(!!isTrigger){
     updateCollapseBtn(false);
   }
   $("#order").find(".item").each(function(){
@@ -327,12 +326,12 @@ function refreshPreference(id){
   if(number > 1){
     preferenceBtn.submenupicker('updateMenu', preferenceBtn);
   }
-  if(preferences){
+  if(_.isArray(preferences)){
     preferences.forEach(function(preference, index){
       var props = preference.property;
       if(props){
         var propInArray = props.split(",");
-        if(propInArray){
+        if(_.isArray(propInArray)){
           propInArray.forEach(function(prop){
             console.log("index is: " + index, "prop: " + prop);
             var i = parseInt(index) + 1;
@@ -351,7 +350,7 @@ function refreshPreference(id){
 }
 
 function loadCoupon(fromCache){
-  if(fromCache){
+  if(!!fromCache){
     var coupon = readCookie('coupon');
     if(coupon){
       coupon = JSON.parse(coupon);
@@ -366,7 +365,7 @@ function loadCoupon(fromCache){
 }
 
 function loadPoints(fromCache){
-  if(fromCache){
+  if(!!fromCache){
     var hasPoints = readCookie('points');
   }else{
     hasPoints = false;
@@ -379,7 +378,7 @@ function loadPoints(fromCache){
 function orderFood(id,number,initial){
 
   var dishItem = $("#meal-detail-container").find(".dish[data-id='" + id + "']");
-  if(initial){
+  if(!!initial){
     if(number > 0){
       $(this).amountInput('add',dishItem.find("[data-toggle='amount-input']"));
     }else if(number < 0){
@@ -414,7 +413,6 @@ function orderFood(id,number,initial){
     if(left<=0 && number > 0){
       localOrders[id].number -= number;
       alertView.show();
-      return;
     }
     left--;
     item.data("left-amount",left);
@@ -436,7 +434,7 @@ function orderFood(id,number,initial){
 
 function applyCoupon(isApply, amount, code){
   //set localVar and cookie
-  if(isApply){
+  if(!!isApply){
     localCoupon = localCoupon || {};
     localCoupon[code] = amount;
     createCookie('coupon',JSON.stringify(localCoupon),5);
@@ -449,7 +447,7 @@ function applyCoupon(isApply, amount, code){
 }
 
 function applyPoints(isApply, amount){
-  if(isApply){
+  if(!!isApply){
     localPoints = amount;
     createCookie('points',localPoints,5);
   }else{
@@ -541,9 +539,10 @@ function refreshCart(subtotal, numberOfItem){
 }
 
 function updateCollapseBtn(initialize){
-  var expandMenuBtn = $("#order").find("#expandMenuBtn");
-  var collapseMenuBtn = $("#order").find("#collapseMenuBtn");
-  if(initialize){
+  var orderEle = $("#order");
+  var expandMenuBtn = orderEle.find("#expandMenuBtn");
+  var collapseMenuBtn = orderEle.find("#collapseMenuBtn");
+  if(!!initialize){
     collapseMenuBtn.toggle();
   }else{
     collapseMenuBtn.toggle();

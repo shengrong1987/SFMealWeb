@@ -10,6 +10,7 @@ var moment = require("moment");
 var notification = require("../services/notification");
 var util = require("../services/util");
 var stripe = require("../services/stripe");
+var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUtil.js');
 /*
  error
  * -1 : geo service not available
@@ -53,7 +54,7 @@ module.exports = {
     var county = req.cookies['county'] || req.param('county') || "San Francisco County";
     var user = req.session.user;
     if(req.session.authenticated){
-      Meal.find({status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).sort('score DESC').limit(12).populate('dishes').populate('chef').exec(function(err,orders){
+      Meal.find({ where : {status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}, skip : actionUtil.parseSkip(req), limit : actionUtil.parseLimit(req)}).sort('score DESC').populate('dishes').populate('chef').exec(function(err,orders){
         if(err){
           return res.badRequest(err);
         }
@@ -72,7 +73,7 @@ module.exports = {
         });
       });
     }else{
-      Host.find({ passGuide : true, intro : { '!' : ''}}).populate("orders").populate("meals").exec(function(err, hosts){
+      Host.find({ where : { passGuide : true, intro : { '!' : ''}}, skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("orders").populate("meals").exec(function(err, hosts){
         if(err){
           return res.badRequest(err);
         }
@@ -148,7 +149,7 @@ module.exports = {
   searchAll : function(req, res){
     var keyword = req.query.keyword;
     delete req.query.keyword;
-    Meal.find(req.query).populate('dishes').exec(function(err,found){
+    Meal.find({ where : req.query, skip : actionUtil.parseSkip(req), limit : actionUtil.parseLimit(req)}).populate('dishes').exec(function(err,found){
       if(err){
         return res.badRequest(err);
       }
@@ -185,7 +186,7 @@ module.exports = {
     if(type){
       params.type = type;
     }
-    Meal.find(params).populate('dishes').populate('chef').exec(function(err,found){
+    Meal.find({ where : params, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req)}).populate('dishes').populate('chef').exec(function(err,found){
       if(err){
         return res.badRequest(err);
       }
@@ -285,7 +286,7 @@ module.exports = {
             }
             user[0].orders = user[0].orders.filter(function(order){
               return order.status === "schedule" || order.status === "preparing";
-            })
+            });
             u = user[0];
             cb();
           });
@@ -414,7 +415,7 @@ module.exports = {
   find : function(req, res){
     var county = req.cookies['county'] || req.param('county') || "San Francisco County";
     var now = new Date();
-    Meal.find({ status : 'on', provideFromTime : {'<' : now}, provideTillTime : {'>' : now}  }).populate('dishes').populate('chef').exec(function(err,found){
+    Meal.find( { where : { status : 'on', provideFromTime : {'<' : now}, provideTillTime : {'>' : now}  }, skip : actionUtil.parseSkip(req), limit : actionUtil.parseLimit(req)}).populate('dishes').populate('chef').exec(function(err,found){
       if(err){
         return res.badRequest(err);
       }
@@ -1026,7 +1027,7 @@ module.exports = {
 
   findReview : function(req, res){
     var mealId = req.params.id;
-    Review.find({ meal : mealId} ).exec(function(err, reviews){
+    Review.find({ where : { meal : mealId}, skip : actionUtil.parseSkip(req), limit : actionUtil.parseLimit(req) }).exec(function(err, reviews){
       if(err){
         return res.badRequest(err);
       }
@@ -1036,7 +1037,7 @@ module.exports = {
 
   findOrder : function(req, res){
     var mealId = req.params.id;
-    Order.find({ meal : mealId} ).exec(function(err, orders){
+    Order.find({ where : { meal : mealId}, skip : actionUtil.parseSkip(req), limit : actionUtil.parseLimit(req) } ).exec(function(err, orders){
       if(err){
         return res.badRequest(err);
       }

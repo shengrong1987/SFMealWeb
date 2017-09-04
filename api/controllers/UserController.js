@@ -18,6 +18,7 @@ var moment = require("moment");
 var async = require('async');
 var notification = require('../services/notification');
 var mailChimp = require("../services/mailchimp");
+var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUtil.js');
 
 module.exports = require('waterlock').actions.user({
   /* e.g.
@@ -129,13 +130,13 @@ module.exports = require('waterlock').actions.user({
   search : function(req, res){
     var email = req.query.email;
     delete req.query.email;
-    User.find(req.query).populate('auth').exec(function (err, users) {
+    User.find({ where : req.query, skip : actionUtil.parseSkip(req), limit : actionUtil.parseLimit(req) }).populate('auth').exec(function (err, users) {
       if(err){
         return res.badRequest(err);
       }
       if(email){
         users = users.filter(function(user){
-          return user.auth ? user.auth.email == email : false;
+          return user.auth ? user.auth.email === email : false;
         });
       }
       return res.ok(users);
