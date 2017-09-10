@@ -684,6 +684,11 @@ function enterHostInfo(target){
 }
 
 function updateScroll(){
+  if($(document).scrollTop() > 150) {
+    $(".nav-sticky").addClass("nav-stick-top");
+  }else{
+    $(".nav-sticky").removeClass("nav-stick-top");
+  }
   var $footer = $('.footer');
   if($footer.length===0){
     return;

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= __('welcome')%></title>
+
+  <!-- Viewport mobile tag for sensible mobile support -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+  <!--
+      Stylesheets and Preprocessors
+      ==============================
+
+      You can always bring in CSS files manually with `<link>` tags, or asynchronously
+      using a solution like AMD (RequireJS).  Or, if you like, you can take advantage
+      of Sails' conventional asset pipeline (boilerplate Gruntfile).
+
+      By default, stylesheets from your `assets/styles` folder are included
+      here automatically (between STYLES and STYLES END). Both CSS (.css) and LESS (.less)
+      are supported. In production, your styles will be minified and concatenated into
+      a single file.
+
+      To customize any part of the built-in behavior, just edit `tasks/pipeline.js`.
+      For example, here are a few things you could do:
+
+          + Change the order of your CSS files
+          + Import stylesheets from other directories
+          + Use a different or additional preprocessor, like SASS, SCSS or Stylus
+  -->
+
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <!--STYLES-->
+  <link rel="stylesheet" href="/styles/bootstrap-dialog.min.css">
+  <link rel="stylesheet" href="/styles/css/bootstrap-switch.css">
+  <link rel="stylesheet" href="/styles/css/simple-sidebar.css">
+  <link rel="stylesheet" href="/styles/css/toastr.min.css">
+  <link rel="stylesheet" href="/styles/importer.css">
+  <!--STYLES END-->
+
+  <!--SCRIPTS-->
+  <script src="/js/dependencies/sails.io.js"></script>
+  <script src="/js/dependencies/jquery/jquery-2.1.4.min.js"></script>
+  <script src="/js/bootstrap/bootstrap.js"></script>
+  <script src="/js/dependencies/mixitup/jquery.mixitup.min.js"></script>
+  <script src="/js/dependencies/jquery.i18n.properties.js"></script>
+  <script src="/js/dependencies/jquery.mixitup-pagination.min.js"></script>
+  <script src="/js/dependencies/jquery.toaster.js"></script>
+  <script src="/js/dependencies/lodash.core.js"></script>
+  <script src="/js/dependencies/moment.js"></script>
+  <script src="/js/dependencies/underscore-min.js"></script>
+  <script src="/js/utils/backbone-min.js"></script>
+  <script src="/js/utils/echo.js"></script>
+  <script src="/js/utils/jquery.mask.js"></script>
+  <script src="/js/utils/jweixin-1.0.0.js"></script>
+  <script src="/js/utils/validator.min.js"></script>
+  <script src="/js/COMP.js"></script>
+  <script src="/js/GUI.js"></script>
+  <script src="/js/Installation.js"></script>
+  <script src="/js/assan.custom.js"></script>
+  <script src="/js/bootstrap/bootstrap-datetimepicker.js"></script>
+  <script src="/js/bootstrap/bootstrap-dialog.min.js"></script>
+  <script src="/js/bootstrap/bootstrap-formhelpers-min.js"></script>
+  <script src="/js/bootstrap/bootstrap-submenu.js"></script>
+  <script src="/js/bootstrap/bootstrap-switch.js"></script>
+  <script src="/js/bootstrap/ekko-lightbox.js"></script>
+  <script src="/js/bootstrap/jasny-bootstrap.js"></script>
+  <script src="/js/bootstrap/jssocials.js"></script>
+  <script src="/js/const.js"></script>
+  <script src="/js/model.js"></script>
+  <script src="/js/utility.js"></script>
+  <!--SCRIPTS END-->
+  <!--TEMPLATES-->
+  <script type="text/javascript" src="/jst.js"></script>
+  <!--TEMPLATES END-->
+  <!--<script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/lodash@4.17.4/lodash.min.js"></script>-->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-90950313-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Overexposure - Slider Revolution</title>
+  <meta name="description" content="Slider Revolution Example" />
+  <meta name="keywords" content="fullscreen image, grid layout, flexbox grid, transition" />
+  <meta name="author" content="ThemePunch" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- LOAD JQUERY LIBRARY -->
+  <!--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js"></script>-->
+
+  <!-- LOADING FONTS AND ICONS -->
+  <link href="http://fonts.googleapis.com/css?family=Oswald:400" rel="stylesheet" property="stylesheet" type="text/css" media="all">
+
+  <link rel="stylesheet" type="text/css" href="/revolution/resource/fonts/pe-icon-7-stroke/css/pe-icon-7-stroke.css">
+  <link rel="stylesheet" type="text/css" href="/revolution/resource/fonts/font-awesome/css/font-awesome.css">
+
+  <!-- REVOLUTION STYLE SHEETS -->
+  <link rel="stylesheet" type="text/css" href="/revolution/resource/css/settings.css">
+  <!-- REVOLUTION LAYERS STYLES -->
+
+
+  <link rel="stylesheet" type="text/css" href="/revolution/resource/css/layers.css">
+
+  <!-- REVOLUTION NAVIGATION STYLES -->
+  <link rel="stylesheet" type="text/css" href="/revolution/resource/css/navigation.css">
+
+  <!-- REVOLUTION JS FILES -->
+  <script type="text/javascript" src="/revolution/resource/js/jquery.themepunch.tools.min.js"></script>
+  <script type="text/javascript" src="/revolution/resource/js/jquery.themepunch.revolution.min.js"></script>
+
+  <!-- PARTICLES ADD-ON FILES -->
+  <!--<link rel='stylesheet' href='../../revolution-addons/particles/css/revolution.addon.particles.css?ver=1.0.3' type='text/css' media='all' />-->
+  <!--<script type='text/javascript' src='../../revolution-addons/particles/js/revolution.addon.particles.min.js?ver=1.0.3'></script>-->
+
+  <!-- SLIDER REVOLUTION 5.0 EXTENSIONS  (Load Extensions only on Local File Systems !  The following part can be removed on Server for On Demand Loading) -->
+  <script type="text/javascript" src="/revolution/resource/js/extensions/revolution.extension.actions.min.js"></script>
+  <script type="text/javascript" src="/revolution/resource/js/extensions/revolution.extension.carousel.min.js"></script>
+  <script type="text/javascript" src="/revolution/resource/js/extensions/revolution.extension.kenburn.min.js"></script>
+  <script type="text/javascript" src="/revolution/resource/js/extensions/revolution.extension.layeranimation.min.js"></script>
+  <script type="text/javascript" src="/revolution/resource/js/extensions/revolution.extension.migration.min.js"></script>
+  <script type="text/javascript" src="/revolution/resource/js/extensions/revolution.extension.navigation.min.js"></script>
+  <script type="text/javascript" src="/revolution/resource/js/extensions/revolution.extension.parallax.min.js"></script>
+  <script type="text/javascript" src="/revolution/resource/js/extensions/revolution.extension.slideanims.min.js"></script>
+  <script type="text/javascript" src="/revolution/resource/js/extensions/revolution.extension.video.min.js"></script>
+  <script type="text/javascript">function setREVStartSize(e){
+      try{ var i=jQuery(window).width(),t=9999,r=0,n=0,l=0,f=0,s=0,h=0;
+        if(e.responsiveLevels&&(jQuery.each(e.responsiveLevels,function(e,f){f>i&&(t=r=f,l=e),i>f&&f>r&&(r=f,n=e)}),t>r&&(l=n)),f=e.gridheight[l]||e.gridheight[0]||e.gridheight,s=e.gridwidth[l]||e.gridwidth[0]||e.gridwidth,h=i/s,h=h>1?1:h,f=Math.round(h*f),"fullscreen"==e.sliderLayout){var u=(e.c.width(),jQuery(window).height());if(void 0!=e.fullScreenOffsetContainer){var c=e.fullScreenOffsetContainer.split(",");if (c) jQuery.each(c,function(e,i){u=jQuery(i).length>0?u-jQuery(i).outerHeight(!0):u}),e.fullScreenOffset.split("%").length>1&&void 0!=e.fullScreenOffset&&e.fullScreenOffset.length>0?u-=jQuery(window).height()*parseInt(e.fullScreenOffset,0)/100:void 0!=e.fullScreenOffset&&e.fullScreenOffset.length>0&&(u-=parseInt(e.fullScreenOffset,0))}f=u}else void 0!=e.minHeight&&f<e.minHeight&&(f=e.minHeight);e.c.closest(".rev_slider_wrapper").css({height:f})
+      }catch(d){console.log("Failure at Presize of Slider:"+d)}
+    };</script>
+</head>
+
+<body>
+
+<%- partial ('home-header.ejs') %>
+<%- body %>
+<%- partial ('footer.ejs') %>
+
+<div class="modal fade" id="myModal" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content"></div>
+  </div>
+</div>
+
+<div class="modal-loading"><!-- Place at bottom of page --></div>
+<div id="placeServiceHelper"></div>
+
+
+
+<!--
+    Client-side Templates
+    ========================
+
+    HTML templates are important prerequisites of modern, rich client applications.
+    To work their magic, frameworks like Backbone, Angular, Ember, and Knockout require
+    that you load these templates client-side.
+
+    By default, your Gruntfile is configured to automatically load and precompile
+    client-side JST templates in your `assets/templates` folder, then
+    include them here automatically (between TEMPLATES and TEMPLATES END).
+
+    To customize this behavior to fit your needs, just edit `tasks/pipeline.js`.
+    For example, here are a few things you could do:
+
+        + Import templates from other directories
+        + Use a different template engine (handlebars, jade, dust, etc.)
+        + Internationalize your client-side templates using a server-side
+          stringfile before they're served.
+-->
+
+
+
+
+<!--
+
+  Client-side Javascript
+  ========================
+
+  You can always bring in JS files manually with `script` tags, or asynchronously
+  on the client using a solution like AMD (RequireJS).  Or, if you like, you can
+  take advantage of Sails' conventional asset pipeline (boilerplate Gruntfile).
+
+  By default, files in your `assets/js` folder are included here
+  automatically (between SCRIPTS and SCRIPTS END).  Both JavaScript (.js) and
+  CoffeeScript (.coffee) are supported. In production, your scripts will be minified
+  and concatenated into a single file.
+
+  To customize any part of the built-in behavior, just edit `tasks/pipeline.js`.
+  For example, here are a few things you could do:
+
+      + Change the order of your scripts
+      + Import scripts from other directories
+      + Use a different preprocessor, like TypeScript
+
+-->
+
+
+</body>
+</html>

@@ -22,7 +22,7 @@ module.exports.bootstrap = function(cb) {
         if(err){
           return next(err);
         }
-        if(jobs.length != 0){
+        if(jobs.length !== 0){
           return next();
         }
         Jobs.schedule('next tuesday at noon', 'SchedulerJob', function(err, job) {

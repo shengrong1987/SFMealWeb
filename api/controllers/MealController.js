@@ -105,7 +105,7 @@ module.exports = {
         if(req.wantsJSON){
           return res.ok({user : user, hosts : publicHosts, locale : req.getLocale()});
         }
-        return res.view('home',{user : user, hosts : publicHosts, locale : req.getLocale()});
+        return res.view('home',{user : user, hosts : publicHosts, locale : req.getLocale(), layout : 'index'});
       });
     }
   },

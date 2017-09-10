@@ -1,0 +1,88 @@
+<nav id="myUserBar" class="mynavbar navbar navbar-transparent navbar-light bg-faded nav-sticky" data-host="<%= req.session.user ? (req.session.user.host ? (req.session.user.host.id ? req.session.user.host.id : req.session.user.host) : null) : null%>" data-user="<%= req.session.user ? req.session.user.id : null%>">
+  <div>
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavBar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+
+      <div class="dropdown navbar-btn nav-item" id="citySelector">
+        <a class="btn btn-outline dropdown-toggle nav-link" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="San Francisco County">
+          <span><%= __('location-san-francisco') %></span>
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+          <li><a href="javascript:void(0);" value="San Francisco County"><%= __('location-san-francisco') %></a></li>
+          <li class="disabled" data-toogle="tooltip" title="<%= __('area-not-open')%>" data-toggle="tooltip"><a href="javascript:void(0);" value="San Mateo County"><%= __('location-san-mateo-county') %></a></li>
+          <li class="disabled" data-toogle="tooltip" title="<%= __('area-not-open')%>" data-toggle="tooltip"><a href="javascript:void(0);" value="Santa Clara County"><%= __('location-santa-clara-county') %></a></li>
+          <!--<li><a href="#" value="Los Angeles County"><%= __('location-los-angeles-country') %></a></li>-->
+          <!--<li><a href="#" value="New York County"><%= __('location-new-york-county') %></a></li>-->
+          <li data-toogle="tooltip" data-toggle="tooltip"><a href="javascript:void(0);" value="Sacramento County"><%= __('location-sacramento-county') %></a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="collapse navbar-collapse" id="myNavBar">
+      <ul class="nav navbar-nav" style="margin-left: 20px;">
+        <li class="nav-item"><a class="nav-link" href="https://www.facebook.com/SFMeal/"><i class="fa fa-facebook-f fa-lg"></i></a></li>
+        <li class="nav-item"><a class="nav-link" href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
+        <li class="nav-item"><a class="nav-link" href="https://www.instagram.com/sfmeal/"><i class="fa fa-instagram fa-lg"></i></a></li>
+        <li class="nav-item"><a class="nav-link" href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
+        <li class="nav-item"><a class="nav-link" href="https://www.pinterest.com/sfmeal/"><i class="fa fa-pinterest-p fa-lg"></i></a></li>
+        <li class="nav-item"><a class="nav-link" href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a>   </li>
+        <li class="nav-item"><a class="nav-link" href="https://twitter.com/sfmeal"><i class="fa fa-twitter fa-lg"></i></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <% if (req.session.user && !req.session.user.host) { %>
+          <li class="nav-item"><button id="applyToHostBtn" class="btn btn-outline-dark navbar-btn round verticel-align text-white" style="background-color: transparent;margin-right: 20px;" title="<%= __('pay-attention') %>" data-content="<%= __('login-before-apply-chef') %>" type="button"><i class="icon icon-chef text-white" style="font-size: large;"></i><span style="position:relative;top:-3px;font-size: medium;"><%= __('i-cook') %></span></button></li>
+          <li class="nav-item"><a class="nav-link" href="javascript:void(0);" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
+        <% }%>
+        <li class="nav-item"><a class="nav-link" href="/"><i class="fa fa-th-large  "></i> <%= __('index') %></a></li>
+        <%
+          if(req.session.user){ %>
+          <li class="nav-item"><a class="nav-link" href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
+          <li class="nav-item"><a class="nav-link" href="/user/me#mycollect"><i class="fa fa-heart"></i> <%= __('favourite') %></a></li>
+          <li class="nav-item"><a class="nav-link" href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
+          <li class="nav-item"><a class="nav-link" id="msgBtn" data-toggle="tooltip" data-html="true" data-placement="bottom" href="javascript:void(0)"><i class="fa fa-envelope-o"></i> <%= __('notification') %> <span class="badge">New</span></a></li>
+          <li class="nav-item">
+            <a id="userActionBtn" data-badge="0" href='/user/me' class="text-center dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <img class="extra-small round_thumb" style="display:inline-block;" src=<%= req.session.user.picture || "/images/profile_man.png"%>>
+              Hi, <%= req.session.user.firstname || (req.session.user.host ? __('chef') : __('visitor')) %>
+              <span class="badge"></span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li class="nav-item"><a class="nav-link" href="/user/me"><strong><%= __('nav-bar-order') %></strong><span class="badge pull-right"></span></a></li>
+              <li class="nav-item"><a class="nav-link" href="/user/me#myinfo"><strong><%= __('nav-bar-info') %></strong><span class="badge pull-right"></span></a></li>
+              <li class="nav-item"><a class="nav-link" href="/user/me#myaddress"><strong><%= __('nav-bar-address') %></strong><span class="badge pull-right"></span></a></li>
+              <li class="nav-item"><a class="nav-link" href="/pocket/me"><strong><%= __('nav-bar-pocket') %></strong><span class="badge pull-right"></span></a></li>
+              <li class="nav-item"><a class="nav-link" href="/user/me#myreview"><strong><%= __('nav-bar-review') %></strong><span class="badge pull-right"></span></a></li>
+              <li class="nav-item"><a class="nav-link" href="/help"><strong><%= __('nav-bar-help') %></strong></a></li>
+              <li role="separator" class="divider"></li>
+              <li class="nav-item"><a class="nav-link" href="/auth/logout" class="text-grey"><strong><%= __('nav-bar-log-out') %></strong></a></li>
+            </ul>
+          </li>
+          <%if(req.session.user.host){ %>
+          <li class="nav-item">
+            <div id="hostActionBtn" data-badge="0" class="navbar-btn">
+              <a href="/host/me" class="btn btn-green vertical-align"><i class="fa icon-chef fa-2x" style="padding-top: 3px;"></i>&nbsp;<strong><%= __('nav-bar-kitchen') %></strong>&nbsp;&nbsp;<span class="badge"></span></a>
+            </div>
+          </li>
+        <%}}else{%>
+          <li class="nav-item"><a class="nav-link" href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
+          <li class="nav-item"><a class="nav-link" href="/help"><i class="fa fa-glass"></i> <%= __('nav-bar-help') %></a></li>
+          <li class="nav-item"><a class="nav-link" href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
+          <li class="nav-item"><a class="nav-link" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fa fa-user"></i> <%= __('nav-bar-register') %></a></li>
+          <li class="nav-item"><a class="nav-link" href="javascript:void(0)" class="seperator-compact"><i class="icon-dot text-red"></i></a> </li>
+          <li class="nav-item"><a class="nav-link" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fa fa-sign-in"></i> <%= __('nav-bar-login') %></a></li>
+        <%}%>
+      </ul>
+    </div>
+
+  </div>
+</nav>
+
+<script>
+  var userBarView = new UserBarView({el : $("#myUserBar"), model : new Host()})
+</script>

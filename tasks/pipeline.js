@@ -16,7 +16,8 @@ var tmpPath = '.tmp/public/';
 // (if you're using LESS with the built-in default config, you'll want
 //  to change `assets/styles/importer.less` instead.)
 var cssFilesToInject = [
-  'styles/**/*.css'
+  'styles/**/*.css',
+  '!styles/revolution/**.css'
 ];
 
 
@@ -42,7 +43,8 @@ var jsFilesToInject = [
 
   // Use the "exclude" operator to ignore files
   // '!js/ignore/these/files/*.js'
-  '!js/test/**/*.js'
+  '!js/test/**/*.js',
+  '!/revolution/**/*.js'
 ];
 
 
