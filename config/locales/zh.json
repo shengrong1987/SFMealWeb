@@ -807,5 +807,6 @@
   "ali-payment-failure" : "支付宝支付失败了，请关闭此窗口并确认支付宝操作无误。",
   "ali-payment-cancel" : "支付宝支付取消了，请关闭此窗口并重新下订单。",
   "ali-payment-awaiting" : "等待付款中，请前往支付宝页面完成支付。",
-  "pay" : "付款"
+  "pay" : "付款",
+  "learn-more" : "了解更多"
 }

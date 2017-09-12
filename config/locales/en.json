@@ -685,8 +685,8 @@
   "cancellationPolicy": "The cancellation and refund policy",
   "valid": "Verified",
   "pending": " Submitted and verifying, ",
-  "landing-title-1-1": "Taste of Home",
-  "landing-title-1-2": "Start Here",
+  "landing-title-1-1" : "家的味道",
+  "landing-title-1-2" : "从这里开始",
   "landing-slide-1-1" : "其实你想吃的不是食物",
   "landing-slide-1-2" : "是老家转角小摊的画面，是让你起床的味蕾记忆",
   "landing-slide-1-3" : "是一种能让你睹物思人，为梦想而奋斗的回忆。",
@@ -696,10 +696,10 @@
   "landing-slide-3-1" : "创造一场让客人惊呼的小吃派对？",
   "landing-slide-3-2" : "我们有深夜食堂的美味，有天天排队的网红美食，更多的是街头巷尾属于每个人的舌尖上的中国。",
   "landing-slide-3-3" : "是什么让你们漂洋过海来相聚的？",
-  "landing-page-1-1" : "无论如何打鸡血，卫生是我们考虑的第一要素。",
+  "landing-page-1-1" : "家是最卫生的",
   "landing-page-1-2" : "我们使用县卫生局通过的商业厨房准备食物，厨师进驻必须通过卫生局审批。",
   "landing-page-1-3" : "每位厨房工作人员都必须持有食品安全操作证书和至少拥有一位食品经理在场。",
-  "landing-page-2-1" : "还在团购生鲜？现在可以团购私房菜啦！",
+  "landing-page-2-1" : "在家吃饭最实惠",
   "landing-page-2-2" : "精选的单品可以团购拼单购买，拼得多省得多，人人有份，街头美食价格也必须接地气。",
   "landing-page-2-3" : "拉上亲朋好友一起边省边享受美食。",
   "landing-page-3-1" : "家的感觉最亲切",
@@ -806,5 +806,6 @@
   "ali-payment-failure" : "Alipay payment failed, please close this window and verify your payment process.",
   "ali-payment-cancel" : "Alipay payment canceled, please close this window and take your order again.",
   "ali-payment-awaiting" : "Alipay payment is pending, please go to Alipay to finish the payment.",
-  "pay" : "Pay"
+  "pay" : "Pay",
+  "learn-more" : "Learn More"
 }
