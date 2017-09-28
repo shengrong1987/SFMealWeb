@@ -13,7 +13,10 @@ module.exports = function(req, res, next) {
   var hostId = req.session.user.host.id ? req.session.user.host.id : req.session.user.host;
   var meal = req.param('parentid') || req.param('id') || req.body.meal
   Meal.findOne(meal).populate("chef").exec(function(err,m){
-    if(hostId && hostId == m.chef.id){
+    if(!m){
+      return res.notFound();
+    }
+    if(hostId && hostId === m.chef.id){
       return next();
     }
     return res.forbidden("You are not owner of the meal");

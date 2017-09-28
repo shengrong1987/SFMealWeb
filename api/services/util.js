@@ -38,6 +38,12 @@ module.exports = {
     var mDate = moment(date);
     return mDate.format('MMM');
   },
+  getMonthFromDate : function(date){
+    return moment(date).format("M");
+  },
+  getDayOfMonth : function(date){
+    return moment(date).format("D");
+  },
   getDateFromDate : function(date){
     var mDate = moment(date);
     return mDate.date();
@@ -51,8 +57,7 @@ module.exports = {
     return mDate.date();
   },
   getDateFromDaysAfterNow : function(date, day){
-    var mDate = date.add(day, 'days').hour(0).minute(0).second(0).millisecond(0);
-    return mDate;
+    return date.add(day, 'days').hour(0).minute(0).second(0).millisecond(0);
   },
   monthDesc : function(value){
     var month = "";

@@ -1,5 +1,7 @@
 {
-  "welcome": "Full moon home-style meals\r\nfor a home-sick you.",
+  "welcome": "Full moon home-style meals,for a home-sick you.",
+  "welcome-one" : "Full moon home-style meals",
+  "welcome-two" : "for a home-sick you",
   "welcome-title": "Welcome! Chef.",
   "welcome-context": "We are so thrilled knowing that you are one of us, let's share some home food.",
   "congrat-context": "Congratulations, your host application and dish verification is passed! ",
@@ -317,8 +319,12 @@
   "add-new-pickup": "New pickup method",
   "remove-pickup": "Remove pickup method",
   "meals-dishes": "Enter quantities from selected dishes(!IMPORTANT!): ",
-  "as-main-dishes": "As signatured dish",
+  "as-main-dishes": "As signature dish",
+  "main-dish-tip" : "Signature dish will display in host profile page.",
+  "as-fire-dishes" : "As hot dish",
+  "fire-dish-tip" : "Hot dishes's price decrease as order amount increase, fit for couple popular dishes to attract volume.",
   "as-cover": "As cover(Limited to one)。",
+  "cover-dish-tip" : "Cover dish will display as default image in menu page.",
   "add-to-meal": "Click to include this dish",
   "stock": "In stock",
   "how-much-for-one": "Hoe much per order？",
@@ -807,5 +813,10 @@
   "ali-payment-cancel" : "Alipay payment canceled, please close this window and take your order again.",
   "ali-payment-awaiting" : "Alipay payment is pending, please go to Alipay to finish the payment.",
   "pay" : "Pay",
-  "learn-more" : "Learn More"
+  "learn-more" : "Learn More",
+  "is-dynamic" : "Is dynamic price on?",
+  "dish-dynamic-price-success" : "Group price on! -$%s",
+  "dish-dynamic-price-pending" : "Need %s more order，-$%s",
+  "enter-meal" : "Welcome home，click above to see more dishes.",
+  "month-and-date" : "%s.%s"
 }

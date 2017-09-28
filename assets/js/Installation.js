@@ -62,6 +62,9 @@ function setupLanguage(){
         }else{
           $(this).text(jQuery.i18n.prop($(this).data("key")));
         }
+        if($(this).data("title")){
+          $(this).attr("title", jQuery.i18n.prop($(this).data("title")));
+        }
         if($(this).data("error")){
           $(this).data("error", jQuery.i18n.prop($(this).data("key")));
         }

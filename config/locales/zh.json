@@ -1,5 +1,7 @@
 {
-  "welcome": "满月私房菜\n\n喂想家的你",
+  "welcome": "满月私房菜,喂想家的你",
+  "welcome-one" : "满月私房菜",
+  "welcome-two" : "喂想家的你",
   "welcome-title" : "欢迎! 厨师",
   "welcome-context" : "我们很兴奋得知您想加入我们，一起分享私房菜！",
   "congrat-context" : "恭喜您，您的厨师申请和菜式已经通过审核。",
@@ -321,7 +323,11 @@
   "remove-pickup" : "移除取餐地点",
   "meals-dishes" : "从已选择的菜式中输入菜式供应量: ",
   "as-main-dishes" : "为主打",
+  "main-dish-tip" : "主打款式在厨师主页显示，适合你的招牌菜。",
+  "as-fire-dishes" : "为爆款",
+  "fire-dish-tip" : "爆款买的越多价格越低，适合设一两款做热卖推广。",
   "as-cover" : "为封面(限一款)。",
+  "cover-dish-tip" : "封面款式会作为默认菜式显示在菜单上，适合放招牌菜或爆款。",
   "add-to-meal" : "点击添加想要提供的菜式和份量",
   "stock" : "供应量",
   "how-much-for-one" : "一份卖多少钱？",
@@ -808,5 +814,10 @@
   "ali-payment-cancel" : "支付宝支付取消了，请关闭此窗口并重新下订单。",
   "ali-payment-awaiting" : "等待付款中，请前往支付宝页面完成支付。",
   "pay" : "付款",
-  "learn-more" : "了解更多"
+  "learn-more" : "了解更多",
+  "is-dynamic" : "是否开启爆款价格?",
+  "dish-dynamic-price-success" : "成功爆款, -$%s",
+  "dish-dynamic-price-pending" : "还差%s单爆款，-$%s",
+  "enter-meal" : "欢迎回家，点击图片查看更多菜式哦。",
+  "month-and-date" : "%s月%s号"
 }

@@ -57,24 +57,38 @@
                     </div>
                     <div class="col-sm-10">
                       <div>
-                        <label><%= __('meals-dishes')%>，<i class="fa fa-star text-yellow"></i> <%= __('as-main-dishes')%>，<i class="fa fa-camera text-yellow"></i> <%= __('as-cover')%>     <br/><%= __('stock')%>:</label>
+                        <label>
+                          <%= __('meals-dishes')%>
+                          <i class="fa fa-star text-yellow" data-toggle="tooltip" title=<%= __('main-dish-tip')%>></i><%= __('as-main-dishes')%>,
+                          <i class="fa fa-fire text-yellow" data-toggle="tooltip" title=<%= __('fire-dish-tip')%>></i><%= __('as-fire-dishes')%>,
+                          <i class="fa fa-camera text-yellow" data-toggle="tooltip" title="<%= __('cover-dish-tip')%>"></i> <%= __('as-cover')%>
+                          <br/><%= __('stock')%>:</label>
                       </div>
                       <ul id="dishSelected" class="border-lightgrey handle-list" data-error="<%= __('need-one-dish')%>">
                         <%
                         var dishes = meal.dishes;
+                        var dynamicDishes = meal.dynamicDishes;
                         var cover = meal.cover;
                         var features = meal.features;
                         var total = meal.totalQty;
                         dishes.forEach(function(dish){
                           var hasCover = false;
                           var hasFeatures = false;
+                          var hasDynamicDish = dynamicDishes.some(function(d){
+                              return d.id === dish.id;
+                          });
                           var quantity = total[dish.id] ? total[dish.id] : 1;
                           if(dish.id == cover){ hasCover = true;}
-                          if(features.indexOf(dish.id)>-1){ hasFeatures = true;}
+                          if(features.indexOf(dish.id)>-1){ hasFeatures = true; }
                         %>
-                        <li class="row" data-toggle="manipulate-item" data-id="<%= dish.id%>" data-cover="<%= hasCover%>" data-feature="<%= hasFeatures%>">
+                        <li class="row" data-toggle="manipulate-item" data-meal-id="<%= meal.id || ''%>" data-id="<%= dish.id || ''%>" data-cover="<%= hasCover%>" data-feature="<%= hasFeatures%>" data-fire="<%= hasDynamicDish%>">
                           <div class="col-xs-6">
-                            &nbsp;<i class="manipulate-button fa fa-star <%= (features && features.indexOf(dish.id)!=-1)?'text-yellow':'text-grey'%> cursor-pointer" data-type="feature"></i>&nbsp;<i class="manipulate-button fa fa-camera <%= (cover && cover==dish.id)?'text-yellow' : 'text-grey'%>  cursor-pointer" data-type="cover"></i><label name="title"><%= dish.title%></label>
+                            &nbsp;
+                            <i class="manipulate-button fa fa-star <%= (features && features.indexOf(dish.id)!=-1)?'text-yellow':'text-grey'%> cursor-pointer" data-type="feature"></i>
+                            <% if(dish.isDynamicPriceOn){%><i class="manipulate-button fa fa-fire <%= hasDynamicDish ?'text-yellow' : 'text-grey'%>  cursor-pointer" data-type="fire"></i>
+                            <%}%>
+                            <i class="manipulate-button fa fa-camera <%= (cover && cover==dish.id)?'text-yellow' : 'text-grey'%>  cursor-pointer" data-type="cover"></i>
+                            <label name="title"><%= dish.title%></label>
                           </div>
                           <div class="col-xs-1">
                             <i class="fa fa-close cursor-pointer select" data-id="<%= dish.id%>" data-type="close" style="margin-left:10px;"></i>
@@ -321,14 +335,14 @@
                     <div class="row box-compact">
                       <div class="col-sm-4">
                         <div class="input-group" name="1">
-                          <input id="min-order" class="form-control normal-number-input" type="number" min="0" max="999" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.minimalOrder %>">
+                          <input id="min-order" class="form-control normal-number-input" type="number" min="0" max="999" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.minimalOrder || 1 %>">
                           <div class="input-group-addon"><%= __('fen')%></div>
                         </div>
                       </div>
                       <div class="col-sm-1 vertical-align" style="height: 35px;"><label class="middle"><%= __('or')%></label></div>
                       <div class="col-sm-4">
                         <div class="input-group" name="2">
-                          <input id="min-total" class="form-control normal-number-input" type="number" min="0" max="9999" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.minimalTotal %>">
+                          <input id="min-total" class="form-control normal-number-input" type="number" min="0" max="9999" data-error="<%= __('need-minimal-requirement')%>" value="<%= meal.minimalTotal || 1 %>">
                           <div class="input-group-addon"><%= __('dollar')%></div>
                         </div>
                       </div>
@@ -468,13 +482,18 @@
               <div class="help-block with-errors"></div>
             </div>
 
+            <div class="form-group" style="margin-top:40px">
+              <label style="margin-right:15px;">6.<%= __('is-dynamic')%></label>
+              <input type="checkbox" data-toggle="switch-button" id="isSupportDynamicPrice" class="regular-checkbox" <%= !!meal.isSupportDynamicPrice ? "checked=''" : ""%>>
+            </div>
+
             <div class="form-group" style="margin-top: 40px;">
-              <label>6.<%= __('name-your-dish')%></label>
+              <label>7.<%= __('name-your-dish')%></label>
               <button class="btn btn-default" data-toggle="input-toggle" data-displaystyle="inline-block" title="<%= __('toggle-language')%>" data-target="#title-container"><i class="fa fa-refresh"></i> </button>
               <div class="row">
                 <div class="col-xs-12" id="title-container">
-                  <input id="meal_title" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="7" placeholder="<%= __('full-name')%>" data-error="<%= __('need-name')%>" required value="<%= meal.title%>">
-                  <input id="meal_title_en" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="30" placeholder="Meal title" data-error="<%= __('need-name')%>" value="<%= meal.title_en || ''%>">
+                  <input id="meal_title" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="7" placeholder="<%= __('full-name')%>" data-required-error="<%= __('need-name')%>" required value="<%= meal.title%>">
+                  <input id="meal_title_en" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="30" placeholder="Meal title" data-required-error="<%= __('need-name')%>" value="<%= meal.title_en || ''%>">
                   <small> <%= __('Ex-meal-title')%></small>
                 </div>
               </div>
@@ -482,7 +501,7 @@
             </div>
 
             <div class="form-group text-center submit">
-              <button name="publish" type="button" class="btn btn-green btn-lg round" style="margin-right: 20px;"><%= __('save-and-on')%></button>
+              <button name="publish" type="submit" class="btn btn-green btn-lg round" style="margin-right: 20px;"><%= __('save-and-on')%></button>
               <button name="save" type="button" class="btn btn-disable btn-lg round text-grey"><%= __('save-and-off')%></button>
               <div class="alert alert-danger" data-toggle="alert" style="margin-top: 20px;"></div>
               <div class="alert alert-success" data-toggle="alert" style="margin-top: 20px;"></div>

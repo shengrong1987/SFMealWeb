@@ -177,7 +177,8 @@ module.exports = function(agenda) {
       });
     },
 
-    adjustOrders : function(orders, dishes, cb){
+    adjustOrders : function(orders, meal, cb){
+      var dishes = meal.dishes;
       var _this = this;
       async.each(orders, function(order, next2){
         var currentOrders = order.orders;
@@ -192,9 +193,13 @@ module.exports = function(agenda) {
             return next();
           }
           var number = currentOrders[dishId].number;
-          var paidDishPrice = currentOrders[dishId].price;
-          var currentPrice = dish.dynamicPrice;
+          var paidDishPrice = parseFloat(currentOrders[dishId].price);
+          var myOrdered = currentOrders[dishId].number;
+          var otherOrdered = parseInt(meal.totalQty[dishId]) - parseInt(meal.leftQty[dishId]);
+          var totalQty = myOrdered + otherOrdered;
+          var currentPrice = parseFloat(dish.getPrice(totalQty, meal));
           currentOrders[dishId].price = currentPrice;
+          sails.log.info("viewing price difference...price you paid: $" + paidDishPrice + ", price now: $" + currentPrice);
           var difference = (currentPrice - paidDishPrice) * number;
           if(difference !== 0){
             Order.findOne(order.id).populate("meal").populate("host").exec(function (err, order) {
@@ -266,7 +271,7 @@ module.exports = function(agenda) {
       var mealId = job.attrs.data.mealId;
       var _this = helperMethod;
 
-      Meal.findOne(mealId).populate("chef").populate("dishes").exec(function(err, meal){
+      Meal.findOne(mealId).populate("chef").populate("dishes").populate("dynamicDishes").exec(function(err, meal){
         if(err || !meal){
           return done();
         }
@@ -306,17 +311,35 @@ module.exports = function(agenda) {
             });
             if(orders.length < meal.minimalOrder || total < meal.minimalTotal){
               notification.notificationCenter("Meal","cancel",meal,true,false,null);
-              _this.cancelOrders(mealId, done);
+              _this.cancelOrders(mealId, function(err){
+                if(err){
+                  return done(err);
+                }
+                meal.leftQty = meal.totalQty;
+                meal.save(done);
+              });
             }else{
-              if(meal.supportDynamicPrice){
-                _this.adjustOrders(orders, meal.dishes, function(err){
+              if(meal.isSupportDynamicPrice){
+                _this.adjustOrders(orders, meal, function(err){
                   if(err){
-                    return done();
+                    return done(err);
                   }
-                  _this.updateOrders(meal, done);
+                  _this.updateOrders(meal, function(err){
+                    if(err){
+                      return done(err);
+                    }
+                    meal.leftQty = meal.totalQty;
+                    meal.save(done);
+                  });
                 });
               }else{
-                _this.updateOrders(meal, done);
+                _this.updateOrders(meal, function(err){
+                  if(err){
+                    return done(err);
+                  }
+                  meal.leftQty = meal.totalQty;
+                  meal.save(done);
+                });
               }
             }
           });

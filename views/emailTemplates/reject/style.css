@@ -5020,8 +5020,8 @@ fieldset[disabled] .navbar-default .btn-link:focus {
 }
 .navbar-inverse .navbar-nav > li > a:hover,
 .navbar-inverse .navbar-nav > li > a:focus {
-  color: #ffffff;
-  background-color: transparent;
+  color: #ffffff !important;
+  background-color: transparent !important;
 }
 .navbar-inverse .navbar-nav > .active > a,
 .navbar-inverse .navbar-nav > .active > a:hover,
@@ -8301,12 +8301,19 @@ hovereffect p {
 .license-icon-remote {
   background: url("https://www.sfmeal.com/image/SFMeal_email_icon0.jpg") no-repeat center / 70% auto;
 }
+.logo-slogan {
+  background-image: url(../images/sfmeal_logo_slogan.png);
+  display: block;
+  height: 150px;
+  background-size: 120px;
+  background-position: center 20px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
 .logo {
   background-image: url(../images/sfmeal_logo.png);
   display: block;
   position: relative;
-  left: 50px;
-  top: 20px;
   width: 225px;
   height: 60px;
   background-size: 225px 60px;
@@ -8367,6 +8374,9 @@ hovereffect p {
 }
 .font-small {
   font-size: 16px;
+}
+.font-medium {
+  font-size: 24px;
 }
 /*color*/
 .blue {
@@ -9307,7 +9317,6 @@ fieldset[disabled] .btn-red.active {
 }
 .meal .photo {
   width: 100%;
-  min-height: 200px;
   cursor: pointer;
 }
 .meal .desc {
@@ -9331,11 +9340,6 @@ fieldset[disabled] .btn-red.active {
 .category-cell {
   margin: 10px -20px 10px -20px;
   padding: 5px 0 5px 0;
-}
-.meal-box.meal .desc {
-  top: 35%;
-  line-height: 50px;
-  width: 40%;
 }
 .meal-box.meal .fav {
   right: 40px;
@@ -9530,7 +9534,24 @@ fieldset[disabled] .btn-red.active {
   position: absolute;
   top: 0;
   right: 0;
-  border-radius: 6px;
+  overflow: hidden;
+  padding: 0 15px 0 15px;
+  display: inline-block;
+}
+.box-float-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  padding: 0 15px 0 15px;
+  display: inline-block;
+}
+.box-float-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   overflow: hidden;
   padding: 0 15px 0 15px;
   display: inline-block;
@@ -9986,13 +10007,20 @@ fieldset[disabled] .btn-red.active {
     top: 50px;
     line-height: 80px;
   }
-  .meal-box.meal .desc {
-    top: 20%;
-    line-height: 80px;
-    width: 50%;
+  .pure-banner {
+    height: 40px;
   }
   .pure-banner .banner-text {
     position: relative;
+  }
+  .pure-banner .logo-slogan {
+    background-image: url(../images/sfmeal_logo_slogan.png);
+    display: block;
+    height: 55px;
+    background-size: 50px;
+    background-position: center 10px;
+    background-repeat: no-repeat;
+    cursor: pointer;
   }
   .mynavbar #myNavBar .navbar-nav {
     margin-left: 0 !important;
@@ -10020,13 +10048,6 @@ fieldset[disabled] .btn-red.active {
     width: 100%;
     min-height: 120px;
   }
-  .compact-banner .logo {
-    top: 20px;
-    left: 10%;
-  }
-  /*
-Assan main style file
-*/
 }
 @media (min-width: 992px) {
   .navbar-light.navbar-transparent .navbar-brand {
@@ -10042,9 +10063,6 @@ Assan main style file
   }
   .navbar-nav {
     margin-right: -15px;
-  }
-  .navbar-nav {
-    margin-right: 65px;
   }
   .navbar.navbar-transparent {
     position: absolute;

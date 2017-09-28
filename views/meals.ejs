@@ -1,164 +1,99 @@
-<div class="container default-container text-center relative" style="margin-top:-20px;background-color: #f2f2f2;">
+<div class="container text-center relative" style="margin-top:-20px;">
 
-  <div class="normal-banner">
-    <div class="img-wrapper row">
-      <img src="/images/home-cover-1.jpg" class="relative middle">
-    </div>
-
-    <div class="absolute logo-container">
-      <div class="relative text-left">
-        <a href="/" class="logo"></a>
-      </div>
-
-      <div class="relative text-left search-container" style="top: 20px;">
-        <h4 class="text-white"><strong><%= __('searching-word')%></strong></h4>
-        <div class="btn-group search-btn-group">
-          <input name="keyword" type="text" class="btn round keyword light input" style="max-width: 150px;" placeholder="<%= __('searching-tips')%>">
-          <input name="zipcode" type="number" class="btn btn-default zipCode" placeholder="<%= __('zipcode')%>" value="<%= user?(user.zip?user.zip:''):''%>">
-          <button class="btn btn-warning round orange text-white searchBtn" onclick="javascript:search(this)">
-            <i class="fa fa-search"></i>
-            <%= __('search')%>
-          </button>
+  <div class="row">
+    <div class="pure-banner red">
+      <div class="middle banner-text vertical-align">
+        <div class="col-lg-3"></div>
+        <div class="col-xs-4 col-lg-2">
+          <img src="images/welcome-1.png" style="width: 100%;margin-left: 40px;">
         </div>
+        <div class="col-xs-4 col-lg-2">
+          <a href="/" class="logo-slogan"></a>
+        </div>
+        <div class="col-xs-4 col-lg-2">
+          <img src="images/welcome-2.png" style="width: 100%;margin-left: -80px;">
+        </div>
+        <div class="col-lg-3"></div>
       </div>
+
+      <!--<div class="absolute logo-container">-->
+
+      <!--<div class="relative text-left search-container" style="top: 20px;">-->
+      <!--<h4 class="text-white"><strong><%= __('searching-word')%></strong></h4>-->
+      <!--<div class="btn-group search-btn-group">-->
+      <!--<input name="keyword" type="text" class="btn round keyword light input" style="max-width: 150px;" placeholder="<%= __('searching-tips')%>">-->
+      <!--<input name="zipcode" type="number" class="btn btn-default zipCode" placeholder="<%= __('zipcode')%>" value="<%= user?(user.zip?user.zip:''):''%>">-->
+      <!--<button class="btn btn-warning round orange text-white searchBtn" onclick="javascript:search(this)">-->
+      <!--<i class="fa fa-search"></i>-->
+      <!--<%= __('search')%>-->
+      <!--</button>-->
+      <!--</div>-->
+      <!--</div>-->
+      <!--</div>-->
     </div>
   </div>
 
   <h2></h2>
 
   <div class="container-fluid">
-    <div class="row middle">
-    </div>
+    <div class="row">
 
-    <%
-      var numberOfOrder = meals.filter(function(meal){
-        return meal.type == "order";
-      }).length;
-      var numberOfPreorder = meals.filter(function(meal){
-        return meal.type == "preorder";
-      }).length;
-    %>
-    <% if (typeof search != 'undefined' && search ){ %>
-      <h4><%= __('search-result', (typeof keyword !== 'undefined' ? keyword : ''), (zipcode ? zipcode + __('nearby') : ""), numberOfOrder,numberOfPreorder)%></h4>
-    <% } %>
-    <div class="row middle" style="margin-bottom: 20px;margin-top: 20px;">
-      <div class="btn-set" data-toggle="btn-set">
-        <button class="btn btn-disable btn-lg round active filter" data-filter="all" style="width: 100px;line-height: 15px;"><%= __('all')%></button>
-        <button class="btn btn-disable btn-lg round filter" data-filter=".order" style="width: 100px;line-height: 15px;"><%= __('meal-type-order')%></button>
-        <button class="btn btn-disable btn-lg round filter" data-filter=".preorder" style="width: 100px;line-height: 15px;"><%= __('meal-type-preorder')%></button>
-      </div>
-      <h2></h2>
-
-      <div class="btn-set" data-toggle="btn-set">
-        <button class="btn btn-outline filter" data-filter=".appetizer"><%= __('appetizer')%></button>
-        <button class="btn btn-outline filter" data-filter=".entree"><%= __('main')%></button>
-        <button class="btn btn-outline sort" data-sort="distance-order:asc"><%= __('sort-as-distance')%></button>
-        <button class="btn btn-outline sort" data-sort="price-order:asc"><%= __('sort-as-hot')%> <i class="fa fa-question-circle"></i></button>
-      </div>
-    </div>
-
-    <div id="meal-container" class="row text-center">
-
-      <%
-      var monthDic = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-      var mealInAreas = {};
-      for(var i=0; i< meals.length; i++) {
-        var meal = meals[i];
-        var cover = meal.cover;
-        if (!cover) {
-          var mainDish = meal.dishes.filter(function (dish) {
-            return dish.id == Object.keys(meal.leftQty)[0];
-          })[0];
-        } else {
-          var mainDish = meal.dishes.filter(function (dish) {
-            return dish.id == cover;
-          })[0];
-        }
-        if (!mainDish) {break;}
-        meal.mainDish = mainDish;
-        if (typeof anchor !== 'undefined' && anchor) {
-          var distance = meal.chef.getDistance(anchor.lat, anchor.long);
-        } else if (user) {
-          var distance = meal.chef.getDistance(user.lat, user.long);
-        }
-        if(meal.pickups){
-          meal.pickups.forEach(function(pickup){
-            if(pickup.county == county){
-              pickup.area =  pickup.area || '';
-              if (!mealInAreas.hasOwnProperty(pickup.area)) {
-                mealInAreas[pickup.area] = [meal];
-              } else if(!mealInAreas[pickup.area].some(function(m){return m.id == meal.id})){
-                mealInAreas[pickup.area].push(meal);
-              }
-            }
-          })
-        }else{
-          mealInAreas[''] = meal;
-        }
-      }
-
-      var areasPower = Object.keys(mealInAreas).sort(function(k1,k2){
-        if(k1 == ''){
-          return -1;
-        }
-        return mealInAreas[k1].length < mealInAreas[k2].length;
-      });
-
-      for(var j=0; j < areasPower.length; j++) {
-        var areaName = areasPower[j];
-      %>
-
-      <div class="row">
-        <% if(areaName){%>
-        <div class="vertical-align">
-          <div class="col-sm-5"><div class="divider"></div></div>
-          <div class="col-sm-2 col-xs-12"><h3 style="margin:10px 0;"><%= areaName%></h3></div>
-          <div class="col-sm-5"><div class="divider"></div></div>
-        </div>
-
-      <%
-        }
-        var mealsInArea = mealInAreas[areaName];%>
-        <%
-        for(var k=0; k < mealsInArea.length; k++){
-          var meal = mealsInArea[k];
-      %>
-
-      <div class="meal-box meal col-md-4 col-lg-3 col-xs-12 mix appetizer item <%= meal.type %>" data-distance-order=<%= distance %> data-price-order=<%= meal.mainDish.price.toFixed(2)%>>
-        <div class="box-grid white" style="overflow: hidden;">
-          <div class="relative item-image">
-          <i class="fa fa-heart fa-2x fav text-white <% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
-                text-red
-                <%}})%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>"></i>
-            <img class="photo" src= <%= meal.coverString %> data-meal=<%= meal.id %> onclick="javascript:location.href='/meal/' + $(this).data('meal')">
-            <% if(meal.type == 'preorder'){ %>
-              <h1 class="desc absolute text-white middle text-shadow font-elegant"><strong><%= meal.finishDate(true) %></strong></h1>
-            <%}%>
-          </div>
-          <div class="col-md-7 basic-info">
-            <div class="col-xs-12">
-              <h3 class="text-red text-left">$<%= meal.mainDish.price.toFixed(2) %><br>
-                <small><strong class="text-black"><%= meal.mainDish.title %></strong> <span>( <%= meal.mainDish.quantity || '1' + __('fen')%>)</span></small>
-              </h3>
-            </div>
-          </div>
-          <div class="col-md-5">
-            <h3><small><%= __('left')%><%= meal.leftQty[meal.mainDish.id] + __('fen')%><br><%=  __('self-pickup') + (meal.isDelivery ? ("/" + __('delivery')) : '')%></small></h3>
-          </div>
-          <div class="divider"></div>
-          <div class="row vertical-align chef-cell">
-            <div class="col-sm-3">
-              <img class="round_thumb size-small" onclick="location.href='/host/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/profile_man.png" %>>
-            </div>
-            <div class="col-sm-9">
-              <h4 class="text-left text-dark"><%= meal.chef.shopNameI18n(locale) %><br><small><%= meal.chef.introI18n(locale) %></small></h4>
-            </div>
-          </div>
-        </div>
-      </div>
+      <% if (typeof search != 'undefined' && search ){ %>
+      <h4><%= __('search-result', (typeof keyword !== 'undefined' ? keyword : ''), (zipcode ? zipcode + __('nearby') : ""), meals.summary.orderCount,meals.summarypreOrderCount)%></h4>
       <% } %>
+
+      <div id="meal-container" class="text-center">
+
+        <div class="box">
+        <% var dateList = Object.keys(meals.meals); dateList.forEach(function(dateKey){var mealObj = meals.meals[dateKey]; var actualMeals = mealObj.meals; if(dateKey === "orders"){ %>
+
+        <% }else{ %>
+          <div class="row">
+            <div class="col-sm-1 col-lg-3"></div>
+            <div class="col-sm-2 col-lg-1"><div class="divider red"></div></div>
+            <div class="col-sm-6 col-lg-4 col-xs-12" style="line-height: 46px;"><label class="text-red font-medium"><%= __(mealObj.dayOfWeek)%>，<%= __('month-and-date',mealObj.month,mealObj.date)%></label></div>
+            <div class="col-sm-2 col-lg-1"><div class="divider red"></div></div>
+            <div class="col-sm-1 col-lg-3"></div>
+          </div>
+
+          <div class="row">
+            <% actualMeals.forEach(function(meal){var dish = meal.dishes.filter(function(d){ return d.id === meal.cover })[0]; %>
+            <div class="box-compact meal-box meal col-md-4 col-lg-3 col-xs-12 mix appetizer item <%= meal.type %>">
+              <div class="box-grid white relative" style="overflow: hidden;">
+                <div class="relative item-image">
+                  <i class="fa fa-heart fa-2x fav text-white <% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
+                  text-red
+                  <%}})%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>"></i>
+                  <img class="photo" src= <%= meal.coverString %> data-meal=<%= meal.id %> onclick="javascript:location.href='/meal/' + $(this).data('meal')">
+                </div>
+                <% if(meal.isSupportDynamicPrice && dish.isDynamicPriceOn && meal.dynamicDishes.some(function(d){
+                    return d.id === dish.id;
+                  })) {
+                  var orderAmount = parseInt(meal.totalQty[dish.id])-parseInt(meal.leftQty[dish.id]);
+                  var newPrice = dish.getPrice(orderAmount, meal);
+                if(newPrice !== dish.price){
+                %>
+                <div class="box-float-top red"><h3 class="text-white" style="margin-top: 10px;"><%= __('dish-dynamic-price-success', (dish.price - newPrice).toFixed(2))%></h3></div>
+                <%}else{ var amountNeed = dish.qtyRate - orderAmount;%>
+                <div class="box-float-top red"><h3 class="text-white" style="margin-top: 10px;"><%= __('dish-dynamic-price-pending', amountNeed, (dish.price - dish.getPrice(dish.qtyRate, meal)).toFixed(2))%></h3></div>
+                <%}}%>
+                <div class="box-float-bottom red"><h3 class="text-white" style="margin-top: 10px;"><%= dish.title%></h3></div>
+              </div>
+              <div class="row">
+                <div class="col-sm-3 xs-hide">
+                  <img class="round_thumb size-small" onclick="location.href='/host/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/profile_man.png" %>>
+                </div>
+                <div class="col-sm-9 col-xs-12">
+                  <h5 class="text-left text-dark"><%= meal.title %><br><small><%= __('enter-meal') %></small></h5>
+                </div>
+              </div>
+            </div>
+            <%});%>
+          </div>
+
+        <%}}); %>
+
         </div>
-      <% } %>
     </div>
   </div>
 
@@ -166,4 +101,5 @@
     <div class="pager-list"></div>
   </nav>
 
+  </div>
 </div>

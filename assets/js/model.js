@@ -214,19 +214,23 @@ var UserBarView = Backbone.View.extend({
       io.socket.get("/user/" + userId + "/meals");
       io.socket.get("/host/" + hostId + "/meals");
       io.socket.on("order", function(result){
-        $this.handleNotification(result.verb, result.data.action, result.id, "order");
-        if(result.data.host && result.data.host.id == hostId){
-          $this.handleBadge(true, "order");
-        }else{
-          $this.handleBadge(false, "order");
+        if(result.data){
+          $this.handleNotification(result.verb, result.data.action, result.id, "order");
+          if(result.data.host && result.data.host.id === hostId){
+            $this.handleBadge(true, "order");
+          }else{
+            $this.handleBadge(false, "order");
+          }
         }
       });
       io.socket.on("meal", function(result){
-        $this.handleNotification(result.verb, result.data.action, result.id, "meal");
-        if(result.data.host && result.data.host.id == hostId){
-          $this.handleBadge(true, "meal");
-        }else{
-          $this.handleBadge(false, "meal");
+        if(result.data){
+          $this.handleNotification(result.verb, result.data.action, result.id, "meal");
+          if(result.data.host && result.data.host.id === hostId){
+            $this.handleBadge(true, "meal");
+          }else{
+            $this.handleBadge(false, "meal");
+          }
         }
       });
     }else if(userId){
@@ -260,7 +264,7 @@ var UserBarView = Backbone.View.extend({
   switchCounty : function(e){
     e.preventDefault();
     var currentCountyValue = readCookie('county');
-    if(!$(e.currentTarget).attr("value") || currentCountyValue == $(e.currentTarget).attr("value")){
+    if(!$(e.currentTarget).attr("value") || currentCountyValue === $(e.currentTarget).attr("value")){
       return;
     }
     createCookie("county",$(e.currentTarget).attr("value"),30);
@@ -275,11 +279,11 @@ var UserBarView = Backbone.View.extend({
     var msg = "unknown notification";
     switch(verb){
       case "updated":
-        if(model == "order"){
+        if(model === "order"){
           msg = jQuery.i18n.prop('orderUpdatedNotification',id, jQuery.i18n.prop(action));
-        }else if(model == "meal"){
+        }else if(model === "meal"){
           msg = jQuery.i18n.prop('mealUpdatedNotification',id, jQuery.i18n.prop(action));
-        }else if(model == "user"){
+        }else if(model === "user"){
           msg = jQuery.i18n.prop('userUpdatedNotification',id, jQuery.i18n.prop(action));
         }
         break;
@@ -292,7 +296,7 @@ var UserBarView = Backbone.View.extend({
     }
     var msgBtn = this.$el.find("#msgBtn");
     msgBtn.find(".badge").show();
-    if(msgBtn.attr("data-original-title") != ""){
+    if(msgBtn.attr("data-original-title") !== ""){
       var newMsg = msgBtn.attr('data-original-title') + "<br/><br/>" + msg;
       msgBtn.attr('data-original-title', newMsg)
         .tooltip('show');
@@ -1225,7 +1229,7 @@ var MealSelectionView = Backbone.View.extend({
 var MealView = Backbone.View.extend({
   isActivate : true,
   events : {
-    "click button[name='publish']" : "on",
+    "submit form" : "on",
     "click button[name='save']" : "off",
     "click #addNewPickupBtn" : "addNewPickup",
     "click #removeNewPickupBtn" : "removeNewPickup",
@@ -1237,7 +1241,8 @@ var MealView = Backbone.View.extend({
     "change #shippingTypeOpt" : "changeTypeOfShippingFee",
     "change .method select" : "changeMethod",
     "click #orderTypeBtn" : "switchMealType",
-    "click #preorderTypeBtn" : 'switchMealType'
+    "click #preorderTypeBtn" : 'switchMealType',
+    "change #dishSelected [data-toggle='manipulate-item']" : "dishOperationHandler"
   },
   initialize : function(){
     var form = this.$el.find("form");
@@ -1254,6 +1259,13 @@ var MealView = Backbone.View.extend({
     dishesAlert.hide();
     this.dishAlert = dishesAlert;
 
+  },
+  dishOperationHandler : function(e){
+    var dishItem = $(e.currentTarget);
+    var isFireOn = dishItem.data("fire");
+    if(isFireOn){
+      this.$el.find("#isSupportDynamicPrice").bootstrapSwitch('state',true);
+    }
   },
   switchMealType : function(e){
     var targetHref = $(e.currentTarget).data('href');
@@ -1411,26 +1423,30 @@ var MealView = Backbone.View.extend({
     if(dishesItems.length === 0){
       this.dishAlert.html(form.find("#dishSelected").data("error"));
       this.dishAlert.show();
+      jumpTo("dish-selector");
       return;
     }
 
     var dishes = "";
     var totalQty = {};
-    var cover = "";
+    var cover,features,dynamicDishes = "";
     var index = 0;
-    var features = "";
     dishesItems.each(function(){
       var dishItem = $(this);
       var id = dishItem.data("id");
       var hasCover = !!dishItem.data().cover;
       var hasFeature = !!dishItem.data().feature;
+      var isFire = !!dishItem.data().fire;
       if(hasCover){
         cover = id;
-      }if(hasFeature){
-        if(features!==""){
-          features += ",";
-        }
+      }
+      if(hasFeature){
+        if(features!==""){features += ",";}
         features += id;
+      }
+      if(isFire){
+        if(dynamicDishes!==""){dynamicDishes += ",";}
+        dynamicDishes += id;
       }
       totalQty[id] = dishItem.find(".amount-input input").val();
       if(dishes!==""){
@@ -1453,6 +1469,7 @@ var MealView = Backbone.View.extend({
       if(!deliveryFee || !deliveryRange){
         this.formAlert.show();
         this.formAlert.html(jQuery.i18n.prop("deliveryOptionError"));
+        jumpTo("deliverySettingView");
         return;
       }
     }
@@ -1505,27 +1522,32 @@ var MealView = Backbone.View.extend({
           pickupValid = false;
           $this.scheduleAlert.show();
           $this.scheduleAlert.html(jQuery.i18n.prop('pickupLocationEmptyError'));
+          jumpTo("preorder");
           return;
         }
         if(!pickupFromTime || !pickupTillTime){
           pickupValid = false;
           $this.scheduleAlert.show();
           $this.scheduleAlert.html(jQuery.i18n.prop('pickupTimeEmptyError'));
+          jumpTo("preorder");
           return;
         }else if(pickupFromTime.isSame(pickupTillTime)){
           pickupValid = false;
           $this.scheduleAlert.show();
           $this.scheduleAlert.html(jQuery.i18n.prop('provideTimeError'));
+          jumpTo("preorder");
           return;
         }else if(pickupFromTime.isAfter(pickupTillTime)){
           pickupValid = false;
           $this.scheduleAlert.show();
           $this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeInvalidError'));
+          jumpTo("preorder");
           return;
         }else if(moment.duration(pickupTillTime.diff(pickupFromTime)).asMinutes() < 30){
           pickupValid = false;
           $this.scheduleAlert.show();
           $this.scheduleAlert.html(jQuery.i18n.prop('pickupTimeError'));
+          jumpTo("preorder");
           return;
         }
         pickupObj.pickupFromTime = pickupFromTime._d;
@@ -1542,20 +1564,24 @@ var MealView = Backbone.View.extend({
       });
 
       if(!pickupValid){
+        jumpTo("preorder");
         return;
       }
 
       if(!startBookingDate || !endBookingDate){
         this.scheduleAlert.show();
         this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeError'));
+        jumpTo("preorder");
         return;
       }else if(startBookingDate.isSame(endBookingDate)){
         this.scheduleAlert.show();
         this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeSameError'));
+        jumpTo("preorder");
         return;
       }else if(moment.duration(endBookingDate.diff(startBookingDate)).asMinutes() < 60){
         this.scheduleAlert.show();
         this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeTooShortError'));
+        jumpTo("preorder");
         return;
       }
 
@@ -1570,18 +1596,22 @@ var MealView = Backbone.View.extend({
       if(!startBookingDate || !endBookingDate){
         this.scheduleAlert.show();
         this.scheduleAlert.html(jQuery.i18n.prop('provideTimeNotError'));
+        jumpTo("order");
         return
       }else if(startBookingDate.isSame(endBookingDate)){
         this.scheduleAlert.show();
         this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeSameError'));
+        jumpTo("order");
         return;
       }else if(startBookingDate.isAfter(endBookingDate)){
         this.scheduleAlert.show();
         this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeInvalidError'));
+        jumpTo("order");
         return;
       }else if(moment.duration(endBookingDate.diff(startBookingDate)).asMinutes() < 60){
         this.scheduleAlert.show();
         this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeTooShortError'));
+        jumpTo("order");
         return;
       }
     }
@@ -1589,12 +1619,21 @@ var MealView = Backbone.View.extend({
     var min_order = form.find("#min-order").val();
     var min_total = form.find("#min-total").val();
 
+    if(!min_order && !min_total){
+      form.find(".order-require .alert").show();
+      form.find(".order-require .alert").html(form.find("#min-order").data("error"));
+      jumpTo("min-order");
+      return;
+    }
+
+    var isSupportDynamicPrice = form.find("#isSupportDynamicPrice").prop("checked");
     var supportPartyOrder = form.find("#supportParty").prop("checked");
     if(supportPartyOrder){
       var minimal = form.find("#cateringMinimal").val();
       if(!minimal){
         form.find(".order-require .alert").show();
         form.find(".order-require .alert").html(form.find("#min-order").data("error"));
+        jumpTo("cateringMinimal");
         return;
       }
       var partyRequirement = {
@@ -1606,9 +1645,15 @@ var MealView = Backbone.View.extend({
     var title = form.find("#meal_title").val();
     var title_en = form.find("#meal_title_en").val();
 
+    if(!title && !title_en){
+      jumpTo("meal_title");
+      return;
+    }
+
     if(mealId){
       this.model.set({id : mealId});
       dishes = undefined;
+      dynamicDishes = undefined;
     }
 
     this.successAlert.show();
@@ -1629,6 +1674,7 @@ var MealView = Backbone.View.extend({
       minimalTotal : min_total,
       cover : cover,
       features : features,
+      dynamicDishes : dynamicDishes,
       isDelivery : isDelivery,
       isDeliveryBySystem : isDeliveryBySystem,
       delivery_fee : deliveryFee,
@@ -1636,7 +1682,8 @@ var MealView = Backbone.View.extend({
       isShipping : isShipping,
       shippingPolicy : shippingPolicy,
       supportPartyOrder : supportPartyOrder,
-      partyRequirement : partyRequirement
+      partyRequirement : partyRequirement,
+      isSupportDynamicPrice : isSupportDynamicPrice
     });
     $this = this;
     this.model.save({},{
@@ -1960,6 +2007,7 @@ var DishView = Backbone.View.extend({
     var desc = form.find("#descriptionInput").val();
     var descEn = form.find("#descriptionInput-en").val();
     var instagram = form.find("#instagramInput").val();
+    var isDynamicPriceOn = form.find("#isDynamicPriceOn").prop("checked");
     var preference = {};
     form.find(".variation .currentVar .option").each(function(){
       var properties = [];
@@ -2015,7 +2063,8 @@ var DishView = Backbone.View.extend({
             description : desc,
             "description-en" : descEn,
             video : instagram,
-            preference : preference
+            preference : preference,
+            isDynamicPriceOn : isDynamicPriceOn
           });
 
           $this.model.save({},{

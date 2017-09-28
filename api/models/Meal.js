@@ -108,8 +108,15 @@ module.exports = {
       collection : 'Review',
       via : 'meal'
     },
+    dynamicDishes : {
+      collection : "Dish",
+      via : 'dynamicMeals',
+      dominant : true
+    },
     dishes : {
-      collection : 'Dish'
+      collection : 'Dish',
+      via : 'meals',
+      dominant : true
     },
     cover : {
       type : 'string',
@@ -159,7 +166,7 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
-    supportDynamicPrice : {
+    isSupportDynamicPrice : {
       type : 'boolean',
       defaultsTo : false
     },
@@ -249,15 +256,12 @@ module.exports = {
             if(pickupFromTime >= pickupTillTime){
               console.log("pickup time not valid");
               valid = false;
-              return;
             }else if(moment.duration(moment(pickupTillTime).diff(moment(pickupFromTime))).asMinutes() < 30){
               console.log("pickup time too short");
               valid = false;
-              return;
             }else if(pickupFromTime <= provideTillTime && params.type === "preorder"){
               console.log("pickup time too early");
               valid = false;
-              return;
             }
           }
         });
@@ -265,44 +269,19 @@ module.exports = {
       return valid;
     },
 
-    dishIsValid : function(supportDynamicPrice, req, cb){
+    dishIsValid : function(req, cb){
       if(this.dishes.length === 0){
         return cb({ code : -11, responseText : req.__('meal-dishes-empty')});
       }
-      var dynamicDishes = [];
-      var isVerify = this.dishes.every(function(dish){
-        if(dish.isDynamic){
-          dynamicDishes.push(dish);
-        }
+      var dishes = this.dishes;
+      var isVerify = dishes.every(function(dish){
         return dish.isVerified;
       });
 
       if(!isVerify){
         return cb({ code : -8, responseText : req.__('meal-unverify-dish')});
       }
-      if(dynamicDishes.length > 0){
-        sails.log.info("dynamic dish: " + dynamicDishes[0].id);
-      }
-
-      if(supportDynamicPrice){
-        Meal.find({ status : 'on', supportDynamicPrice : true }).populate("dishes").exec(function(err, meals){
-          if(err){
-            return cb(err);
-          }
-          // sails.log.info("meal has dishes with dynamic price : "  + meals.dishes.length);
-          var hasDynamicDish = meals.some(function(meal){
-            return meal.dishes.some(function(dish){
-              return !!dish.isDynamic;
-            })
-          });
-          if(hasDynamicDish){
-            return cb({ code : -18, responseText : req.__('meal-invalid-dynamic-dish')});
-          }
-          cb();
-        });
-      }else{
-        cb();
-      }
+      cb();
     },
 
     getTaxRate : function(){

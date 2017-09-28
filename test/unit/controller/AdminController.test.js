@@ -195,7 +195,7 @@ describe('AdminController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(8);
+          res.body.should.have.length(5);
           scheduledOrderId = res.body[0].id;
           redeemPoints = res.body[0].redeemPoints;
           done();

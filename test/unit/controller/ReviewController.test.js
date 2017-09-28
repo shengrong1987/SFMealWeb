@@ -64,7 +64,7 @@ describe('ReviewController', function() {
             if(res.body.length === 0){
               return done(Error("error getting any meal"));
             }
-            var meal = res.body.meals[0];
+            var meal = res.body.meals.meals.orders.meals[0];
             mealId = meal.id;
             dishId1 = meal.dishes[0].id;
             dishId2 = meal.dishes[1].id;
@@ -109,14 +109,14 @@ describe('ReviewController', function() {
     it('should order the meal', function (done) {
       var dishObj = {};
       dishObj[dishId1] = { number : 1, preference : [{ property : '', extra : 0}], price : price1};
-      dishObj[dishId2] = { number : 1, preference : [{ property : '', extra : 0}], price : price2};
+      dishObj[dishId2] = { number : 0, preference : [{ property : '', extra : 0}], price : price2};
       dishObj[dishId3] = { number : 1, preference : [{ property : '', extra : 0}], price : price3};
       dishObj[dishId4] = { number : 1, preference : [{ property : '', extra : 0}], price : price4};
       agent
         .post('/order')
         .send({
           orders : dishObj,
-          subtotal : price1 + price2 + price3 + price4,
+          subtotal : price1 + price3 + price4,
           contactInfo : { name : "sheng", address : address, phone : phone },
           paymentInfo : { method : 'online'},
           method : "pickup",
@@ -165,7 +165,7 @@ describe('ReviewController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.property('reviewing_orders').with.length(4);
+          res.body.should.have.property('reviewing_orders').with.length(3);
           done();
         })
     });

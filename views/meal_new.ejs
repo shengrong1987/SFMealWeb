@@ -49,7 +49,11 @@
                     </div>
                     <div class="col-sm-10">
                       <div>
-                        <label><%= __('meals-dishes')%>，<i class="fa fa-star-o text-yellow"></i> <%= __('as-main-dishes')%>, <i class="fa fa-camera text-yellow"></i> <%= __('as-cover')%></label>
+                        <%= __('meals-dishes')%>
+                        <i class="fa fa-star text-yellow" data-toggle="tooltip" title=<%= __('main-dish-tip')%>></i><%= __('as-main-dishes')%>,
+                        <i class="fa fa-fire text-yellow" data-toggle="tooltip" title=<%= __('fire-dish-tip')%>></i><%= __('as-fire-dishes')%>,
+                        <i class="fa fa-camera text-yellow" data-toggle="tooltip" title="<%= __('cover-dish-tip')%>"></i> <%= __('as-cover')%>
+                        <br/><%= __('stock')%>:</label>
                       </div>
                       <ul id="dishSelected" class="border-lightgrey handle-list" data-error="<%= __('need-one-dish')%>"></ul>
                       <div class="alert alert-danger" data-toggle="alert"></div>
@@ -222,14 +226,14 @@
                   <div class="row box-compact">
                     <div class="col-sm-4">
                       <div class="input-group">
-                        <input id="min-order" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="999" data-error="<%= __('need-minimal-requirement')%>">
+                        <input id="min-order" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="999" value=1 data-error="<%= __('need-minimal-requirement')%>">
                         <div class="input-group-addon"><%= __('fen')%></div>
                       </div>
                     </div>
                     <div class="col-sm-1 vertical-align" style="height: 35px;"><label class="middle"><%= __('or')%></label></div>
                     <div class="col-sm-4">
                       <div class="input-group">
-                        <input id="min-total" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="9999" data-error="<%= __('need-minimal-requirement')%>">
+                        <input id="min-total" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="9999" value=1 data-error="<%= __('need-minimal-requirement')%>">
                         <div class="input-group-addon"><%= __('dollar')%></div>
                       </div>
                     </div>
@@ -368,12 +372,17 @@
               <div class="help-block with-errors"></div>
             </div>
 
+            <div class="form-group" style="margin-top:40px">
+              <label style="margin-right:15px;">6.<%= __('is-dynamic')%></label>
+              <input type="checkbox" data-toggle="switch-button" id="isSupportDynamicPrice" class="regular-checkbox">
+            </div>
+
             <div class="form-group row" style="margin-top: 30px;">
               <div class="row">
                 <div class="col-xs-12">
-                  <label style="display: block;" for="">6.<%= __('name-your-meal')%></label><button class="btn btn-default" data-toggle="input-toggle" data-displaystyle="inline-block" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i> </button>
-                  <input id="meal_title" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="7" placeholder="<%= __('full-name')%>" data-error="<%= __('need-name')%>" required>
-                  <input id="meal_title_en" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="30" placeholder="Meal title" data-error="<%= __('need-name')%>">
+                  <label style="display: block;" for="">7.<%= __('name-your-meal')%></label><button class="btn btn-default" data-toggle="input-toggle" data-displaystyle="inline-block" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i> </button>
+                  <input id="meal_title" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="7" placeholder="<%= __('full-name')%>" data-required-error="<%= __('need-name')%>" required>
+                  <input id="meal_title_en" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="30" placeholder="Meal title" data-required-error="<%= __('need-name')%>">
                   <small>  <%= __('Ex-meal-title')%></small>
                   <div class="help-block with-errors"></div>
                 </div>
@@ -381,7 +390,7 @@
             </div>
 
             <div class="form-group text-center submit">
-              <button name="publish" type="button" class="btn btn-green btn-lg round" style="margin-right: 20px;"><%= __('save-and-on')%></button>
+              <button name="publish" type="submit" class="btn btn-green btn-lg round" style="margin-right: 20px;"><%= __('save-and-on')%></button>
               <button name="save" type="button" class="btn btn-disable btn-lg round text-grey"><%= __('save-and-off')%></button>
               <div class="alert alert-danger" data-toggle="alert" style="margin-top: 20px;"></div>
               <div class="alert alert-success" data-toggle="alert" style="margin-top: 20px;"></div>

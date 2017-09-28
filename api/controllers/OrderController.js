@@ -110,7 +110,6 @@ module.exports = {
 
     async.each(Object.keys(orders), function(dishId, next){
       var qty = parseInt(orders[dishId].number);
-      var price = parseInt(orders[dishId].price);
       var properties = $this.getProperties(orders[dishId].preference);
       var lastQty = lastOrders ? parseInt(lastOrders[dishId].number) : 0;
       if(qty > 0 || lastQty > 0){
@@ -143,27 +142,20 @@ module.exports = {
             })){
               return next2({ responseText : req.__('order-preference-not-exist'), code : -20});
             }
-            //check price match
-            if(dish.dynamicPrice !== price && meal.supportDynamicPrice){
-              var priceDiff = (parseInt(price) - parseInt(dish.dynamicPrice)) * qty;
-              sails.log.info("order price not match, update to current price, diff: " + priceDiff);
-              subtotal -= priceDiff;
-              sails.log.info("subtotal is: " + subtotal);
-              req.body.subtotal = subtotal;
-              orders[dishId].price = dish.dynamicPrice;
-            }
             var diff = qty - lastQty;
-            sails.log.info("dish id: " + dishId, " meal id:" + meal.id);
-            sails.log.info("order qty: " + qty, " last qty: " + lastQty);
-            sails.log.info("order number: " + diff, " leftQty: " + meal.leftQty[dishId]);
-            if(!isPartyMode && diff > meal.leftQty[dishId]){
+            sails.log.info("order qty for the dish: " + dish.id + " is: " + diff, "dish's left qty: " + meal.leftQty[dish.id]);
+            if(!isPartyMode && diff > meal.leftQty[dish.id]){
               return next2({responseText : req.__('order-dish-not-enough',dishId, qty), code : -1});
             }
-            if(meal.supportDynamicPrice){
-              actual_subtotal += (qty * (dish.dynamicPrice) + extra);
-            }else{
-              actual_subtotal += (qty * (dish.price) + extra);
+            var orderedQty = parseInt(meal.totalQty[dishId]) - parseInt(meal.leftQty[dishId]);
+            var totalQty = orderedQty + qty;
+            var price = dish.getPrice(totalQty, meal);
+            var listPrice = parseInt(orders[dishId].price);
+            if(price !== listPrice){
+              sails.log.info("listing price updated from " + listPrice + " to " + price);
+              orders[dishId].price = price;
             }
+            actual_subtotal += (qty * price + extra);
           }
           next2();
         }, function(err){
@@ -184,7 +176,8 @@ module.exports = {
 
       if(actual_subtotal !== subtotal) {
         sails.log.debug("subtotal supposed to be " + actual_subtotal + ", but get " + subtotal)
-        return cb({responseText : req.__('order-total-not-match'), code : -3});
+        req.body.subtotal = actual_subtotal;
+        // return cb({responseText : req.__('order-total-not-match'), code : -3});
       }
       return cb(null);
     });
@@ -439,7 +432,7 @@ module.exports = {
       req.body.guestEmail = email;
     }
 
-    Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,m) {
+    Meal.findOne(mealId).populate("dishes").populate("dynamicDishes").populate("chef").exec(function(err,m) {
       if (err) {
         return res.badRequest(err);
       }
@@ -603,12 +596,10 @@ module.exports = {
                       return res.badRequest({ code : -45, responseText : err.message });
                     }
                     if(source==="no-charge"){
-                      $this.updateDishDynamicPrice(m, order.orders, null, m.dishes, function(err, d){
-                        if(err){
-                          return res.badRequest(err);
-                        }
-                        $this.afterSuccessCharge(order, orders, m, null, null, req, res);
-                      });
+                      if(err){
+                        return res.badRequest(err);
+                      }
+                      $this.afterSuccessCharge(order, orders, m, null, null, req, res);
                     }else{
                       order.status = "pending-payment";
                       order.sourceId = source.id;
@@ -653,12 +644,10 @@ module.exports = {
                         return res.badRequest({ code : -39, responseText : err.message });
                       });
                     }else{
-                      $this.updateDishDynamicPrice(m, order.orders, null, m.dishes, function(err, d){
-                        if(err){
-                          return res.badRequest(err);
-                        }
-                        $this.afterSuccessCharge(order, orders, m, charge, transfer, req, res);
-                      });
+                      if(err){
+                        return res.badRequest(err);
+                      }
+                      $this.afterSuccessCharge(order, orders, m, charge, transfer, req, res);
                     }
                   });
                 }
@@ -788,162 +777,161 @@ module.exports = {
       if(order.coupon){
         return res.badRequest({ code : -18, responseText : req.__('adjust-with-coupon-error')});
       }
-      order.meal.dishes = order.dishes;
-      order.service_fee = order.meal.serviceFee;
-      $this.validate_meal(order.meal, params.orders, order.orders, subtotal, req, function(err){
+      Meal.findOne(order.meal.id).populate("dishes").populate("dynamicDishes").exec(function(err, meal){
         if(err){
-          sails.log.error(err.responseText);
           return res.badRequest(err);
         }
-        var isSendToHost = true;
-        if(hostId === order.host.id){
-          isSendToHost = false;
-        }
-        if(order.status === "schedule"){
-          //host cannot adjust the order at schedule
-          //can update without permission of host or adjust by host
-          var netDiff = parseFloat(subtotal - order.subtotal);
-          var tax = $this.getTax(netDiff, order.host.county, order.meal.isTaxIncluded);
-          netDiff *= 100;
-          var adjustAmount = netDiff + tax;
+        order.service_fee = order.meal.serviceFee;
+        $this.validate_meal(meal, params.orders, order.orders, subtotal, req, function(err){
+          if(err){
+            sails.log.error(err.responseText);
+            return res.badRequest(err);
+          }
+          var isSendToHost = true;
+          if(hostId === order.host.id){
+            isSendToHost = false;
+          }
+          if(order.status === "schedule"){
+            //host cannot adjust the order at schedule
+            //can update without permission of host or adjust by host
+            var netDiff = parseFloat(subtotal - order.subtotal);
+            var tax = $this.getTax(netDiff, order.host.county, order.meal.isTaxIncluded);
+            netDiff *= 100;
+            var adjustAmount = netDiff + tax;
 
-          sails.log.info("adjusting amount: " + netDiff);
-          sails.log.info("original tax amount: " + order.tax);
-          sails.log.info("tax adjusting amount: " + tax);
+            sails.log.info("adjusting amount: " + netDiff);
+            sails.log.info("original tax amount: " + order.tax);
+            sails.log.info("tax adjusting amount: " + tax);
 
-          async.auto({
-            chargeCustomer : function(next){
-              if(netDiff <= 0){
-                return next();
-              }
-              stripe.charge({
-                isInitial : false,
-                paymentMethod : order.paymentMethod,
-                amount : netDiff,
-                email : email,
-                customerId : order.customer.customerId,
-                destination : order.host.accountId,
-                meal : order.meal,
-                tax : tax,
-                metadata : {
-                  mealId : order.meal.id,
-                  hostId : order.host.id,
-                  orderId : order.id,
-                  userId : order.customer.id,
-                  deliveryFee : order.delivery_fee * 100,
-                  tax : order.tax + tax
+            async.auto({
+              chargeCustomer : function(next){
+                if(netDiff <= 0){
+                  return next();
                 }
-              },function(err, charge, transfer){
-                if(err){
-                  return next({ code : -39, responseText : err.message });
-                }
-                if(charge.status !== "succeeded") {
-                  return next({ responseText : req.__('order-adjust-stripe-error',charge.status), code : -37});
-                }
-                if(order.paymentMethod === "cash"){
-                  order.charges['cash'] = order.charges['cash'] || 0;
-                  order.charges['cash'] += charge.amount;
-                  order.application_fees['cash'] += charge.application_fee;
-                  if(transfer){
-                    order.feeCharges[transfer.id] = transfer.amount;
+                stripe.charge({
+                  isInitial : false,
+                  paymentMethod : order.paymentMethod,
+                  amount : netDiff,
+                  email : email,
+                  customerId : order.customer.customerId,
+                  destination : order.host.accountId,
+                  meal : order.meal,
+                  tax : tax,
+                  metadata : {
+                    mealId : order.meal.id,
+                    hostId : order.host.id,
+                    orderId : order.id,
+                    userId : order.customer.id,
+                    deliveryFee : order.delivery_fee * 100,
+                    tax : order.tax + tax
                   }
-                }else{
-                  order.charges[charge.id] = charge.amount;
-                  if(transfer){
-                    order.transfer[transfer.id] = transfer.amount;
+                },function(err, charge, transfer){
+                  if(err){
+                    return next({ code : -39, responseText : err.message });
                   }
-                }
-                next();
-              });
-            },
-            refundCustomer : function(next){
-              if(netDiff >= 0){
-                return next();
-              }
-
-              sails.log.info("original tax amount: " + order.tax);
-              sails.log.info("tax refund amount: " + tax);
-              sails.log.info("refunding amount plus tax: " + netDiff);
-              async.auto({
-                refundOrders : function(next2) {
-                  if (order.paymentMethod === "cash") {
-                    return next2();
+                  if(charge.status !== "succeeded") {
+                    return next({ responseText : req.__('order-adjust-stripe-error',charge.status), code : -37});
                   }
-                  var metadata = {
-                    userId: order.customer.id,
-                    paymentMethod: order.paymentMethod,
-                    reverse_transfer : true,
-                    refund_application_fee : true,
-                    amount : Math.abs(adjustAmount)
-                  };
-                  Object.keys(order.charges).forEach(function(chargeId){
-                    sails.log.info("charge: " + chargeId, " with amount: " + order.charges[chargeId]);
-                  });
-                  stripe.batchRefund(order.charges, order.transfer, metadata, function (err) {
-                    if (err) {
-                      return next2(err);
+                  if(order.paymentMethod === "cash"){
+                    order.charges['cash'] = order.charges['cash'] || 0;
+                    order.charges['cash'] += charge.amount;
+                    order.application_fees['cash'] += charge.application_fee;
+                    if(transfer){
+                      order.feeCharges[transfer.id] = transfer.amount;
                     }
-                    next2();
-                  });
-                },
-                refundFeeForCashOrder: function (next2) {
-                  if (order.paymentMethod !== "cash") {
-                    return next2();
-                  }
-                  var refundedFee = Math.abs(netDiff * order.meal.commission);
-                  var metadata = {
-                    userName: order.customerName,
-                    userPhone: order.customerPhone,
-                    paymentMethod: order.paymentMethod,
-                    reverse_transfer : false,
-                    refund_application_fee : false,
-                    amount : refundedFee
-                  };
-                  stripe.batchRefund(order.feeCharges, null, metadata, function (err) {
-                    if (err) {
-                      return next2(err);
+                  }else{
+                    order.charges[charge.id] = charge.amount;
+                    if(transfer){
+                      order.transfer[transfer.id] = transfer.amount;
                     }
-                    order.application_fees['cash'] -= refundedFee;
-                    order.charges['cash'] -= netDiff;
-                    next2();
-                  })
+                  }
+                  next();
+                });
+              },
+              refundCustomer : function(next){
+                if(netDiff >= 0){
+                  return next();
                 }
-              }, function(err){
+
+                sails.log.info("original tax amount: " + order.tax);
+                sails.log.info("tax refund amount: " + tax);
+                sails.log.info("refunding amount plus tax: " + netDiff);
+                async.auto({
+                  refundOrders : function(next2) {
+                    if (order.paymentMethod === "cash") {
+                      return next2();
+                    }
+                    var metadata = {
+                      userId: order.customer.id,
+                      paymentMethod: order.paymentMethod,
+                      reverse_transfer : true,
+                      refund_application_fee : true,
+                      amount : Math.abs(adjustAmount)
+                    };
+                    Object.keys(order.charges).forEach(function(chargeId){
+                      sails.log.info("charge: " + chargeId, " with amount: " + order.charges[chargeId]);
+                    });
+                    stripe.batchRefund(order.charges, order.transfer, metadata, function (err) {
+                      if (err) {
+                        return next2(err);
+                      }
+                      next2();
+                    });
+                  },
+                  refundFeeForCashOrder: function (next2) {
+                    if (order.paymentMethod !== "cash") {
+                      return next2();
+                    }
+                    var refundedFee = Math.abs(netDiff * order.meal.commission);
+                    var metadata = {
+                      userName: order.customerName,
+                      userPhone: order.customerPhone,
+                      paymentMethod: order.paymentMethod,
+                      reverse_transfer : false,
+                      refund_application_fee : false,
+                      amount : refundedFee
+                    };
+                    stripe.batchRefund(order.feeCharges, null, metadata, function (err) {
+                      if (err) {
+                        return next2(err);
+                      }
+                      order.application_fees['cash'] -= refundedFee;
+                      order.charges['cash'] -= netDiff;
+                      next2();
+                    })
+                  }
+                }, function(err){
                   if(err){
                     return next(err);
                   }
                   next(err);
-              });
-            },
-            adjustOrder : ['chargeCustomer', 'refundCustomer', function(next){
-              $this.updateMealLeftQty(order, order.meal, order.orders, params.orders, function(err, m){
+                });
+              },
+              adjustOrder : ['chargeCustomer', 'refundCustomer', function(next){
+                $this.updateMealLeftQty(order, order.meal, order.orders, params.orders, function(err, m){
+                  if(err){
+                    return next(err);
+                  }
+                  order.leftQty = m.leftQty;
+                  order.last_orders = order.orders;
+                  order.adjusting_orders = order.orders;
+                  order.adjusting_subtotal = order.subtotal;
+                  order.orders = params.orders;
+                  order.subtotal = params.subtotal;
+                  order.tax += tax;
+                  order.meal = m.id;
+                  next();
+                });
+              }]
+            }, function(err){
+              if(err){
+                return res.badRequest(err);
+              }
+              order.save(function(err,result){
                 if(err){
                   return next(err);
                 }
-                order.leftQty = m.leftQty;
-                order.last_orders = order.orders;
-                order.adjusting_orders = order.orders;
-                order.adjusting_subtotal = order.subtotal;
-                order.orders = params.orders;
-                order.subtotal = params.subtotal;
-                order.tax += tax;
-                order.meal = m.id;
-                next();
-              });
-            }]
-          }, function(err){
-            if(err){
-              return res.badRequest(err);
-            }
-            order.save(function(err,result){
-              if(err){
-                return next(err);
-              }
-              Meal.findOne(order.meal).populate("dishes").exec(function(err, meal){
-                if(err){
-                  return res.badRequest(err);
-                }
-                $this.updateDishDynamicPrice(meal, order.orders, order.last_orders, meal.dishes, function(err, d){
+                Meal.findOne(order.meal).populate("dishes").exec(function(err, meal){
                   if(err){
                     return res.badRequest(err);
                   }
@@ -953,31 +941,31 @@ module.exports = {
                   }
                   return res.ok({responseText : req.__('order-adjust-ok', adjustAmount) });
                 });
-              });
-            })
+              })
 
-          });
-        }else if(order.status === "preparing"){
-          order.lastStatus = order.status;
-          order.status = "adjust";
-          order.isSendToHost = isSendToHost;
-          order.adjusting_orders = params.orders;
-          order.adjusting_subtotal = params.subtotal;
-          order.service_fee = order.meal.serviceFee;
-          order.meal = order.meal.id;
-          order.save(function(err,result){
-            if(err){
-              return res.badRequest(err);
-            }
-            notification.notificationCenter("Order", "adjusting", result, isSendToHost, false, req);
-            if(isSendToHost){
-              return res.ok({responseText : req.__('order-adjust-request-user')});
-            }else{
-              return res.ok({responseText : req.__('order-adjust-request-host')});
-            }
-          });
-        }
-      })
+            });
+          }else if(order.status === "preparing"){
+            order.lastStatus = order.status;
+            order.status = "adjust";
+            order.isSendToHost = isSendToHost;
+            order.adjusting_orders = params.orders;
+            order.adjusting_subtotal = params.subtotal;
+            order.service_fee = order.meal.serviceFee;
+            order.meal = order.meal.id;
+            order.save(function(err,result){
+              if(err){
+                return res.badRequest(err);
+              }
+              notification.notificationCenter("Order", "adjusting", result, isSendToHost, false, req);
+              if(isSendToHost){
+                return res.ok({responseText : req.__('order-adjust-request-user')});
+              }else{
+                return res.ok({responseText : req.__('order-adjust-request-host')});
+              }
+            });
+          }
+        })
+      });
     });
   },
 
@@ -1081,20 +1069,15 @@ module.exports = {
                   if(err){
                     return res.badRequest(err);
                   }
-                  $this.updateDishDynamicPrice(meal, order.orders, order.last_orders, meal.dishes, function(err, d){
+                  notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
+                  $this.cancelOrderJob(result.id, function(err){
                     if(err){
                       return res.badRequest(err);
                     }
-                    notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
-                    $this.cancelOrderJob(result.id, function(err){
-                      if(err){
-                        return res.badRequest(err);
-                      }
-                      if(req.wantsJSON && process.env.NODE_ENV === "development"){
-                        return res.ok(result);
-                      }
-                      return res.ok({responseText : req.__('order-cancel-ok'), tax : order.tax, paymentMethod : order.paymentMethod, charges : order.charges, feeCharges : order.feeCharges, application_fees : order.application_fees});
-                    });
+                    if(req.wantsJSON && process.env.NODE_ENV === "development"){
+                      return res.ok(result);
+                    }
+                    return res.ok({responseText : req.__('order-cancel-ok'), tax : order.tax, paymentMethod : order.paymentMethod, charges : order.charges, feeCharges : order.feeCharges, application_fees : order.application_fees});
                   });
                 });
               })
@@ -1277,20 +1260,15 @@ module.exports = {
                   if(err){
                     return res.badRequest(err);
                   }
-                  $this.updateDishDynamicPrice(meal, order.orders, order.last_orders, meal.dishes, function(err, d){
-                    if(err){
-                      return res.badRequest(err);
-                    }
-                    notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);
-                    if(req.wantsJSON && process.env.NODE_ENV === "development"){
-                      return res.ok(result);
-                    }
-                    if(result.isSendToHost){
-                      return res.ok({responseText : req.__('order-confirm-user')});
-                    }else{
-                      return res.ok({responseText : req.__('order-confirm-host')});
-                    }
-                  });
+                  notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);
+                  if(req.wantsJSON && process.env.NODE_ENV === "development"){
+                    return res.ok(result);
+                  }
+                  if(result.isSendToHost){
+                    return res.ok({responseText : req.__('order-confirm-user')});
+                  }else{
+                    return res.ok({responseText : req.__('order-confirm-host')});
+                  }
                 });
               })
             });
@@ -1359,20 +1337,15 @@ module.exports = {
                   if(err){
                     return res.badRequest(err);
                   }
-                  $this.updateDishDynamicPrice(meal, order.orders, order.last_orders, meal.dishes, function(err, d){
+                  notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);
+                  if(req.wantsJSON && process.env.NODE_ENV === "development"){
+                    return res.ok(result);
+                  }
+                  $this.cancelOrderJob(result.id, function(err){
                     if(err){
                       return res.badRequest(err);
                     }
-                    notification.notificationCenter("Order", "confirm", result, !result.isSendToHost, false, req);
-                    if(req.wantsJSON && process.env.NODE_ENV === "development"){
-                      return res.ok(result);
-                    }
-                    $this.cancelOrderJob(result.id, function(err){
-                      if(err){
-                        return res.badRequest(err);
-                      }
-                      return res.ok({responseText : req.__('order-confirm-cancel')});
-                    });
+                    return res.ok({responseText : req.__('order-confirm-cancel')});
                   });
                 });
               })
@@ -1633,12 +1606,7 @@ module.exports = {
                 if(err){
                   return res.badRequest(err);
                 }
-                _this.updateDishDynamicPrice(order.meal, order.orders, null, dishes, function(err, d){
-                  if(err){
-                    return res.badRequest(err);
-                  }
-                  _this.afterSuccessCharge(order, order.orders, order.meal, charge, transfer, req, res);
-                });
+                _this.afterSuccessCharge(order, order.orders, order.meal, charge, transfer, req, res);
               });
             }else{
               res.badRequest({ code : -99, responseText : req.__('order-unknown-error')})
@@ -1698,39 +1666,6 @@ module.exports = {
         return cb(err);
       }
       cb(err,result);
-    });
-  },
-
-  updateDishDynamicPrice : function(meal, orders, lastOrders, dishes, cb){
-    if(!meal.supportDynamicPrice){
-      return cb();
-    }
-    async.each(Object.keys(orders), function(dishId, next){
-      if(orders[dishId].number === 0){
-        return next();
-      }
-      var dish;
-      dishes.forEach(function(d){
-        if(d.id === dishId){ dish = d; }
-      });
-      if(!dish || !dish.isDynamic){
-        return next();
-      }
-      var orderedNumber = parseInt(meal.totalQty[dishId]) - parseInt(meal.leftQty[dishId]);
-      var totalOrderedNo = parseInt(orders[dishId].number) + orderedNumber;
-      var priceBeforeUpdate = dish.dynamicPrice;
-      dish.updatePrice(totalOrderedNo);
-      var priceAfterUpdate = dish.dynamicPrice;
-      if(priceAfterUpdate === priceBeforeUpdate){
-        return next(null, dish);
-      }
-      sails.log.info("updating dishes number:" + totalOrderedNo + " with dynamic price: " + dish.dynamicPrice);
-      dish.save(next);
-    }, function(err){
-      if(err){
-        return cb(err);
-      }
-      cb();
     });
   },
 
@@ -1806,17 +1741,12 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            $this.updateDishDynamicPrice(meal, order.orders, emptyOrders, meal.dishes, function(err, d){
+            notification.notificationCenter("Order", "cancel", result, false, true, req);
+            $this.cancelOrderJob(result.id, function(err){
               if(err){
                 return res.badRequest(err);
               }
-              notification.notificationCenter("Order", "cancel", result, false, true, req);
-              $this.cancelOrderJob(result.id, function(err){
-                if(err){
-                  return res.badRequest(err);
-                }
-                return res.ok(order);
-              });
+              return res.ok(order);
             });
           });
         })

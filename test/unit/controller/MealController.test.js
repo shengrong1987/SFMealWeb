@@ -249,7 +249,7 @@ describe('MealController', function() {
       var preference = {
         "spicy" : ["mild", "very-spicy"],
         "meat" : ["white", "brown"]
-      }
+      };
       agent
           .post('/meal')
           .send({
@@ -648,7 +648,9 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.property('meals').with.length(0);
+          res.body.meals.should.have.property("meals");
+          res.body.meals.meals.should.not.have.property("orders");
+          res.body.meals.summary.preOrderCount.should.be.equal(0);
           done();
         })
     });
@@ -676,7 +678,7 @@ describe('MealController', function() {
           .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err,res){
-            if(res.body.meals.length !== 0){
+            if(res.body.meals.summary.orderCount !== 0 || res.body.meals.summary.preOrderCount !==0){
               return done(Error("error searching for meal"));
             }
             done();
@@ -1067,7 +1069,8 @@ describe('MealController', function() {
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
-          res.body.should.have.property('meals').with.length(0);
+          res.body.meals.summary.orderCount.should.be.equal(0);
+          res.body.meals.summary.preOrderCount.should.be.equal(0);
           done();
         })
     })
@@ -1148,9 +1151,7 @@ describe('MealController', function() {
             .expect('Content-Type', /json/)
             .expect(200)
             .end(function(err,res){
-              if(res.body.meals.length !== 1){
-                return done(Error("meal should be not active yet"));
-              }
+              res.body.meals.summary.orderCount.should.be.equal(1);
               done();
             })
         })
@@ -1190,7 +1191,7 @@ describe('MealController', function() {
             .expect('Content-Type', /json/)
             .expect(200)
             .end(function(err,res){
-              res.body.meals.should.have.length(1);
+              res.body.meals.summary.orderCount.should.be.equal(1);
               done();
             })
         })
@@ -1211,9 +1212,7 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          if(res.body.city != "San Francisco"){
-            return done(Error("error geocoding or updating address"));
-          }
+          res.body.city.should.be.equal("San Francisco");
           done();
         })
     });
@@ -1254,9 +1253,11 @@ describe('MealController', function() {
           .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err,res){
-            if(res.body.meals.length !== 2){
-              return done(Error("error searching for meal"));
-            }
+            res.body.meals.summary.orderCount.should.be.equal(1);
+            res.body.meals.summary.preOrderCount.should.be.equal(1);
+            res.body.meals.should.have.property("meals");
+            res.body.meals.meals.should.have.property("orders");
+            Object.keys(res.body.meals.meals).should.have.length(2);
             done();
           })
     })
@@ -1268,7 +1269,11 @@ describe('MealController', function() {
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
-          res.body.meals.should.have.length(2);
+          res.body.meals.summary.orderCount.should.be.equal(1);
+          res.body.meals.summary.preOrderCount.should.be.equal(1);
+          res.body.meals.should.have.property("meals");
+          res.body.meals.meals.should.have.property("orders");
+          Object.keys(res.body.meals.meals).should.have.length(2);
           res.body.should.have.property('anchor');
           done();
         })
@@ -1288,7 +1293,11 @@ describe('MealController', function() {
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
-          res.body.meals.should.have.length(1);
+          res.body.meals.summary.orderCount.should.be.equal(1);
+          res.body.meals.summary.preOrderCount.should.be.equal(0);
+          res.body.meals.should.have.property("meals");
+          res.body.meals.meals.should.have.property("orders");
+          res.body.meals.meals["orders"].meals.should.have.length(1);
           done();
         })
     })
@@ -1341,7 +1350,7 @@ describe('MealController', function() {
           provideFromTime: new Date(now.getTime() + 1000 * 60 * 11),
           provideTillTime: new Date(now.getTime() + 1000 * 2 * 3600),
           leftQty: leftQty,
-          totalQty: totalQty,
+          totalQty: leftQty,
           county : 'San Mateo County',
           title : "私房面馆",
           type : "order",
@@ -1356,7 +1365,7 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          if(res.body.chef != hostId){
+          if(res.body.chef !== hostId){
             return done(Error("error creating meal"));
           }
           res.body.county.should.be.equal('San Francisco County');
@@ -1447,10 +1456,7 @@ describe('MealController', function() {
             console.log(err);
             return done(err);
           }
-          if(res.body.meals.length === 0){
-            return done(Error("error getting any meal"));
-          }
-          var meal = res.body.meals[1];
+          var meal = res.body.meals.meals[Object.keys(res.body.meals.meals)[1]].meals[0];
           mealId = meal.id;
           dishId1 = meal.dishes[0].id;
           done();
@@ -1466,10 +1472,7 @@ describe('MealController', function() {
             console.log(err);
             return done(err);
           }
-          if(res.body.meals.length === 0){
-            return done(Error("error getting any meal"));
-          }
-          var meal = res.body.meals[0];
+          var meal = res.body.meals.meals.orders.meals[0];
           anotherMealId = meal.id;
           done();
         })
@@ -1488,7 +1491,7 @@ describe('MealController', function() {
       agent
         .put('/dish/' + dishId1)
         .send({
-          isDynamic : true
+          isDynamicPriceOn : true
         })
         .expect(200)
         .end(done)
@@ -1502,47 +1505,11 @@ describe('MealController', function() {
           provideFromTime: now,
           provideTillTime: new Date(now.getTime() + 1000 * 3600),
           status : "on",
-          supportDynamicPrice : true
+          isSupportDynamicPrice : true
         })
         .expect(200)
         .end(done)
     });
-
-    it('should not update another meal to support dynamic price dishes with the same dynamic price dish', function(done){
-      var now = new Date();
-      agent
-        .put('/meal/' + anotherMealId)
-        .send({
-          provideFromTime: now,
-          provideTillTime: new Date(now.getTime() + 1000 * 3600),
-          status : "on",
-          supportDynamicPrice : true
-        })
-        .expect(400)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          res.body.code.should.be.equal(-18);
-          done();
-        })
-    });
-
-    it('should update a meal to not support dynamic price dishes', function(done){
-      var now = new Date();
-      agent
-        .put('/meal/' + mealId)
-        .send({
-          provideFromTime: now,
-          provideTillTime: new Date(now.getTime() + 1000 * 3600),
-          status : "on",
-          supportDynamicPrice : false
-        })
-        .expect(200)
-        .end(done)
-    });
-
-
   });
 
 });

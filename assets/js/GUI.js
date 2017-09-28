@@ -10,6 +10,7 @@
   - toggleModal : "open/close modal"
   - dismissModal : "close modal"
   - reloadUrl : "reload url and tag"
+  - jumpTo : "scroll page to element with specific id"
   - search : "on user search handler"
   - createCookie : "create new cookie by name"
   - readCookie : "get cookie by name"
@@ -118,6 +119,30 @@ function reloadUrl(url, tag){
     location.reload();
   }
   return false;
+}
+
+function getPosition(element){
+  var e = document.getElementById(element);
+  var left = 0;
+  var top = 0;
+
+  do{
+    left += e.offsetLeft;
+    top += e.offsetTop;
+  }while(e = e.offsetParent);
+
+  return [left, top];
+}
+
+function jumpTo(id){
+  // var coordinate = getPosition(id);
+  if(!$("#" + id).length){
+    return;
+  }
+  $("html,body").animate({
+    scrollTop : $("#" + id).offset().top
+  },1000)
+  // window.scrollTo(coordinate[0],coordinate[1]);
 }
 
 //on user search action - redirect
@@ -254,16 +279,17 @@ function updateOrderWindow(fromCache, isTrigger){
       if(localDish){
         localDish = JSON.parse(localDish);
       }else{
-        localDish = {number : 0, preference : [], price : $(this).find(".price").attr("price")};
+        localDish = {number : 0, preference : [], price : $(this).find(".price").attr("value")};
       }
       localOrders[dishId] = localDish;
-      $(this).data("left-amount",$(this).data("left-amount") - localOrders[dishId].number);
+      $(this).data("left-amount", $(this).attr("data-left-amount"));
+      // $(this).data("left-amount",$(this).data("left-amount") - localOrders[dishId].number);
       updateMenuView(dishId, isTrigger);
     }else{
       localOrders[dishId] = {
         number : parseInt($(this).find(".amount").data("value")),
         preference : $(this).data("preference"),
-        price : $(this).find(".price").attr("price")
+        price : $(this).find(".price").attr("value")
       };
     }
   });
@@ -280,21 +306,35 @@ function updateMenuView(id, triggerExpand){
   var item = $("#order").find(".item[data-id=" + id + "]");
   var left = item.data("left-amount");
   item.find(".amount").html(number);
-  var price = item.find(".price");
+  var priceItem = item.find(".price");
   var preference = localOrders[id].preference;
+  var oldPrice = priceItem.attr("old-value");
+  var price = priceItem.attr("value");
   if(preference && preference.length){
     var extra = preference.reduce(function(total, next){
       return total + next.extra;
     }, 0);
-    price.data("extra", extra);
+    priceItem.data("extra", extra);
     if(extra > 0){
-      price.html("$" + price.attr('value') + " ($" + extra + ")");
+      if(oldPrice){
+        priceItem.html("$" + price + " <s>$" + oldPrice + "</s>" + " ($" + extra + ")");
+      }else{
+        priceItem.html("$" + price + " ($" + extra + ")");
+      }
     }else{
-      price.html("$" + price.attr('value'));
+      if(oldPrice){
+        priceItem.html("$" + price + " <s>$" + oldPrice + "</s>");
+      }else{
+        priceItem.html("$" + price);
+      }
     }
   }else{
-    price.data("extra", 0);
-    price.html("$" + price.attr('value'));
+    priceItem.data("extra", 0);
+    if(oldPrice){
+      priceItem.html("$" + price + " <s>$" + oldPrice + "</s>" + " ($" + extra + ")");
+    }else{
+      priceItem.html("$" + price + " ($" + extra + ")");
+    }
   }
   var dishItem = $("#meal-detail-container").find(".dish[data-id='" + id + "']");
   if(number > 0){
@@ -413,6 +453,7 @@ function orderFood(id,number,initial){
     if(left<=0 && number > 0){
       localOrders[id].number -= number;
       alertView.show();
+      return;
     }
     left--;
     item.data("left-amount",left);

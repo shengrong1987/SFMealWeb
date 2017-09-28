@@ -8,7 +8,7 @@
     <div class="absolute logo-container">
 
       <div class="col-lg-3 col-sm-4 col-xs-12 relative text-left">
-        <a href="/" class="logo"></a>
+        <a href="/" class="logo-slogan"></a>
       </div>
 
       <div class="relative text-left col-lg-9 col-sm-8 col-xs-12 content">
@@ -183,17 +183,30 @@
           <div class="row">
             <div class="col-xs-12">
               <div class="round-container dish" data-id=<%= dish.id %>>
-                <% dish.photos.forEach(function(photo, index){if(photo.v){%>
-                <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image" style="display: <%= index==0?'block':'none'%>">
-                  <img src="/images/blank.gif" data-echo="<%= index==0?photo.v:''%>" style="width:100%;">
-                </a>
-                <%}});%>
-                <% if(dish.video){%>
-                <a href="<%= dish.video%>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-type="instagram" class="absolute" style="position: absolute; top:10px; left: 20px;">
-                  <i class="fa fa-play fa-2x text-red"></i>
-                </a>
-                <%}%>
-                <div class="box-float-top-right red"><h3 class="text-white" style="margin-top: 10px;">$<%= dish.price.toFixed(2) %></h3></div>
+                <div class="relative">
+                  <% dish.photos.forEach(function(photo, index){if(photo.v){%>
+                  <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image" style="display: <%= index==0?'block':'none'%>">
+                    <img src="/images/blank.gif" data-echo="<%= index==0?photo.v:''%>" style="width:100%;">
+                  </a>
+                  <%}});%>
+                  <% if(dish.video){%>
+                  <a href="<%= dish.video%>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-type="instagram" class="absolute" style="position: absolute; top:10px; left: 20px;">
+                    <i class="fa fa-play fa-2x text-red"></i>
+                  </a>
+                  <%}%>
+                  <div class="box-float-top-right red"><h3 class="text-white" style="margin-top: 10px;">$<%= dish.price.toFixed(2) %></h3></div>
+                  <% if(meal.isSupportDynamicPrice && dish.isDynamicPriceOn && meal.dynamicDishes.some(function(d){
+                      return d.id === dish.id;
+                    })) {
+                      var orderAmount = parseInt(meal.totalQty[dish.id])-parseInt(meal.leftQty[dish.id]);
+                      var newPrice = dish.getPrice(orderAmount, meal);
+                      if(newPrice !== dish.price){
+                  %>
+                  <div class="box-float-bottom red"><h3 class="text-white" style="margin-top: 10px;"><%= __('dish-dynamic-price-success', (dish.price - newPrice).toFixed(2))%></h3></div>
+                  <%}else{ var amountNeed = dish.qtyRate - orderAmount;%>
+                  <div class="box-float-bottom red"><h3 class="text-white" style="margin-top: 10px;"><%= __('dish-dynamic-price-pending', amountNeed, (dish.price - dish.getPrice(dish.qtyRate, meal)).toFixed(2))%></h3></div>
+                  <%}}%>
+                </div>
                 <div class="row dish-operator">
                   <div class="col-sm-8">
                     <div>
@@ -281,10 +294,10 @@
 
               <h1></h1>
 
-              <ul class="nav nav-tabs" data-toggle="tabs">
-                <li class="active"><a href="#review<%= i%>" data-toggle="tab" class="text-red"><%= __('user-review')%></a></li>
-                <!--<li><a href="#host<%= i%>" data-toggle="tab" class="text-red"><%= __('host-review')%></a></li>-->
-              </ul>
+              <!--<ul class="nav nav-tabs" data-toggle="tabs">-->
+                <!--<li class="active"><a href="#review<%= i%>" data-toggle="tab" class="text-red"><%= __('user-review')%></a></li>-->
+                <!--&lt;!&ndash;<li><a href="#host<%= i%>" data-toggle="tab" class="text-red"><%= __('host-review')%></a></li>&ndash;&gt;-->
+              <!--</ul>-->
 
               <div class="tab-content">
                 <div id="review<%= i%>" class="tab-pane active">
@@ -367,7 +380,14 @@
             %>
             <tr class="item" data-id=<%= dish.id %> data-left-amount=<%= meal.isPartyMode === true ? "100" : meal.leftQty[dish.id] %>>
               <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span> </td>
-              <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
+              <%
+                var quantity = parseInt(meal.totalQty[dish.id])-parseInt(meal.leftQty[dish.id]);
+                var newPrice = dish.getPrice(quantity, meal);
+                if(dish.isDynamicPriceOn && meal.isSupportDynamicPrice && newPrice !== dish.price){ %>
+                  <td class="price" value=<%= newPrice %> old-value=<%= dish.price || ''%> data-extra=0>$<%= newPrice %> <s>$<%= dish.price%></s></td>
+              <%}else{%>
+                <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
+              <%}%>
               <td>
                 <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">-</button>
                 <span class="amount" style="padding: 5px;">  0  </span>

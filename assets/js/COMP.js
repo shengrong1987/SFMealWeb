@@ -420,18 +420,53 @@
 
   ManipulateItem.prototype.operate = function(button){
     var element = this.$element;
+    var mealId = element.data("meal-id");
+    var dishId = element.data("id");
+    var postType;
     if(button.hasClass("text-grey")){
       if(button.data().type === "cover"){
         ManipulateItem.reset();
+      }else if(button.data().type === "fire"){
+        if(mealId && dishId){
+          postType = "POST";
+          $.ajax({
+            url : "/dish/"+dishId+"/dynamicMeals/" + mealId,
+            type : postType,
+            success : function(){
+              makeAToast(jQuery.i18n.prop('saveSuccess'),'success');
+            },
+            error : function(){
+              makeAToast(jQuery.i18n.prop('error'),'error');
+            }
+          })
+        }
       }
       button.removeClass("text-grey");
       button.addClass("text-yellow");
       element.data(button.data().type,true);
     }else{
+      if(button.data().type === "fire"){
+        if(mealId && dishId){
+          postType = "DELETE";
+          $.ajax({
+            url : "/dish/"+dishId+"/dynamicMeals/" + mealId,
+            type : postType,
+            success : function(){
+              makeAToast(jQuery.i18n.prop('saveSuccess'),'success');
+            },
+            error : function(){
+              makeAToast(jQuery.i18n.prop('error'),'error');
+            }
+          })
+        }
+      }else if(button.data().type === "cover"){
+        return;
+      }
       button.removeClass("text-yellow");
       button.addClass("text-grey");
       element.data(button.data().type,false);
     }
+    element.trigger("change");
   };
 
   function Plugin(option,root){
@@ -740,7 +775,7 @@
       if(!data){
         root.data('bs.switch-box',(data = new SwitchBox(root, options)));
       }
-      if(typeof option == 'string'){
+      if(typeof option === 'string'){
         data[option]($(this));
       }
     });
@@ -962,7 +997,7 @@
     this.options = options;
     this.element.find("#dishList li").on('click', selectHandler)
     this.element.find("#dishSelected li [data-type='close']").on('click', selectHandler);
-  }
+  };
 
   $.fn.dishSelector              = Plugin
   $.fn.dishSelector.Constructor  = DishSelector
@@ -983,7 +1018,7 @@
       node.addClass('select');
       $this.render(node.data('id'));
     }
-  }
+  };
 
   DishSelector.prototype.remove = function(node){
     this.options.isAppend = false;
@@ -1001,16 +1036,31 @@
       node.removeClass('select');
       $this.render(node.data('id'));
     }
-  }
+  };
 
   DishSelector.prototype.render = function(dishId){
     var isAppend = this.options.isAppend;
     var content = this.options.content;
     var selectedDishContainer = this.element.find("#dishSelected");
+    var isCover = selectedDishContainer.children().length === 0;
     var selectingDishContainer = this.element.find("#dishList");
-    var mealId = this.options.mealid;
+    var mealId = this.options.mealid || '';
+    var isCoverClass = isCover ? "text-yellow" : "text-grey";
     if(isAppend){
-      var li = '<li class="row" data-toggle="manipulate-item" data-id="' + dishId + '"> <div class="col-xs-6">&nbsp;<i class="manipulate-button fa fa-star text-grey cursor-pointer" data-type="feature"></i>&nbsp;<i class="manipulate-button fa fa-camera text-grey cursor-pointer" data-type="cover"></i><label name="title">' + content + '</label></div><div class="col-xs-1"><i class="fa fa-close cursor-pointer select" data-id="' + dishId + '" data-type="close" style="margin-left:10px;"></i></div> <div class="col-xs-4 vertical-align" style="height:52px;padding-top: -10px;"> <div class="input-group amount-input" data-toggle="amount-input"> <div class="input-group-addon minus">-</div> <input class="form-control" type="number" placeholder="1" value="1" style="min-width: 75px;"> <div class="input-group-addon add">+</div> </div> </div><div class="col-xs-3"></div> </li>';
+      var li = '<li class="row" data-toggle="manipulate-item" data-meal-id="' + mealId + '" data-id="' + dishId + '" data-cover=' + isCover + '>' +
+      '<div class="col-xs-6">&nbsp;&nbsp;' +
+        '<i data-type="feature" class="manipulate-button fa fa-star text-grey cursor-pointer"></i>&nbsp;' +
+        '<i data-type="fire" class="manipulate-button fa fa-fire text-grey cursor-pointer"></i>&nbsp;' +
+        '<i data-type="cover" class="manipulate-button fa fa-camera cursor-pointer ' + isCoverClass + '"></i>&nbsp;' +
+        '<label name="title">' + content + '</label>' +
+        '</div>' +
+        '<div class="col-xs-1"><i class="fa fa-close cursor-pointer select" data-id="' + dishId + '" data-type="close" style="margin-left:10px;"></i></div>' +
+        '<div class="col-xs-4 vertical-align" style="height:52px;padding-top: -10px;"> ' +
+        '<div class="input-group amount-input" data-toggle="amount-input"> ' +
+        '<div class="input-group-addon minus">-</div> ' +
+        '<input class="form-control" type="number" placeholder="1" value="1" style="min-width: 75px;">' +
+        '<div class="input-group-addon add">+</div> </div> </div><div class="col-xs-3"></div>' +
+        ' </li>';
       $.when(selectedDishContainer.append(li)).done(function(){
         selectedDishContainer.find("[data-type='close']").on('click', selectHandler);
         reloadComp(dishId);
@@ -1019,7 +1069,7 @@
       selectingDishContainer.find("li[data-id='" + dishId + "']").removeClass("select");
       selectedDishContainer.find("li[data-id='" + dishId +  "']").remove();
     }
-  }
+  };
 
   DishSelector.prototype.remote = function(dishId, cb){
     var isAppend = this.options.isAppend;
@@ -1040,18 +1090,18 @@
         cb(false);
       }
     })
-  }
+  };
 
   function Plugin(option, root){
-    var hasRoot = typeof root != 'undefined';
+    var hasRoot = typeof root !== 'undefined';
     return this.each(function(){
       if(!hasRoot) root = $(this);
-      var options = $.extend({}, DishSelector.DEFAULTS, root.data(), typeof option == 'object' && option);
+      var options = $.extend({}, DishSelector.DEFAULTS, root.data(), typeof option === 'object' && option);
       var data = root.data('bs.dish-selector');
       if(!data){
         root.data('bs.dish-selector',(data = new DishSelector(root, options)));
       }
-      if(typeof option == 'string'){
+      if(typeof option === 'string'){
         data[option]($(this));
       }
     });

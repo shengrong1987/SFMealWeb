@@ -23,17 +23,18 @@ module.exports = {
       type : 'float',
       required : true
     },
-    dynamicPrice : {
-      type : 'float'
-    },
     minimalPrice : {
       type : 'float'
     },
-    priceAlterRate : {
+    qtyRate : {
+      type : 'integer',
+      defaultsTo : 10
+    },
+    priceRate : {
       type : 'integer',
       defaultsTo : 5
     },
-    isDynamic : {
+    isDynamicPriceOn : {
       type : 'boolean',
       defaultsTo : false
     },
@@ -89,6 +90,14 @@ module.exports = {
     chef : {
       model : 'Host'
     },
+    meals : {
+      collection : "Meal",
+      via : "dishes"
+    },
+    dynamicMeals : {
+      collection : "Meal",
+      via : "dynamicDishes"
+    },
     type : {
       type : 'string',
       enum : ['appetizer','entree','dessert'],
@@ -98,13 +107,17 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
-    updatePrice : function(number){
-      var p = Math.ceil(this.price - parseInt(number / this.priceAlterRate));
-      sails.log.info("origin price: " + this.price, "discount: " + parseInt(number / this.priceAlterRate), "minimal price: " + this.minimalPrice);
-      if(p < this.minimalPrice){
-        p = this.minimalPrice;
+    getPrice : function(orderQty, meal){
+      var _this = this;
+      if(!meal.isSupportDynamicPrice || !this.isDynamicPriceOn || !meal.dynamicDishes.some(function(dish){
+          return dish.id === _this.id;
+        })){
+        return this.price;
       }
-      this.dynamicPrice = p;
+      var price = Math.ceil(this.price - parseInt(orderQty / this.qtyRate) * this.priceRate);
+      price = Math.max(price, parseFloat(this.minimalPrice));
+      sails.log.info("original price: " + this.price + ", new price: " + price + " order total: " + orderQty);
+      return price;
     },
     isFeature : function(){
       return this.score >= 4.8 || this.numberOfReviews > 5;
@@ -113,7 +126,7 @@ module.exports = {
 
   beforeCreate : function(values, cb){
     values.isVerified = false;
-    values.minimalPrice = Math.ceil(values.price * 2/3);
+    values.minimalPrice = parseFloat(Math.ceil(values.price * 2/3));
     values.dynamicPrice = values.price;
     cb();
   }
