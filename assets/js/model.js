@@ -1423,7 +1423,7 @@ var MealView = Backbone.View.extend({
     if(dishesItems.length === 0){
       this.dishAlert.html(form.find("#dishSelected").data("error"));
       this.dishAlert.show();
-      jumpTo("dish-selector");
+      jumpTo("dishList");
       return;
     }
 

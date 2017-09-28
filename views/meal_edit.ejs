@@ -30,7 +30,7 @@
           <form class="form-horizontal" data-meal-id="<%= meal.id%>" data-id="<%= meal.userId%>" data-host-id="<%= meal.chef.id%>" data-err-container=".submit" data-toggle="validator">
 
             <div class="form-group">
-              <div data-toggle="dish-selector" data-mealid="<%= meal.id%>" data-isremote="true" class="row">
+              <div id="dish-selector" data-toggle="dish-selector" data-mealid="<%= meal.id%>" data-isremote="true" class="row">
                 <div class="col-md-5">
                   <label for="dishList">1.</span><%= __('add-to-meal')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
                   <ul id="dishList" class="border-lightgrey selectable-list">
