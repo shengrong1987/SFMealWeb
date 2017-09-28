@@ -69,6 +69,7 @@
 
   utility.initAutoComplete = function(){
     if(typeof google === 'undefined'){
+      utility.initGoogleMapService();
       return;
     }
     utility.getAutoComplete();
@@ -99,7 +100,8 @@
       ".location input",
       ".delivery-center input",
       "#paymentInfoView input[name='street']",
-      "#contactInfoView input[name='street']"
+      "#contactInfoView input[name='street']",
+      "input[name='street']"
     ];
     if(!utility.autoCompletePlaceService){
       utility.autoCompletePlaceService = new google.maps.places.AutocompleteService();
