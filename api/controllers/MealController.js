@@ -188,7 +188,7 @@ module.exports = {
     if(type){
       params.type = type;
     }
-    Meal.find({ where : params, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req)}).populate('dishes').populate('chef').exec(function(err,found){
+    Meal.find({ where : params, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req)}).populate('dishes').populate("dynamicDishes").populate('chef').exec(function(err,found){
       if(err){
         return res.badRequest(err);
       }
