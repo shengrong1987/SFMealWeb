@@ -30,13 +30,13 @@ module.exports = function(agenda) {
       sails.log.info("Meal check executed");
       var now = new Date();
 
-      Meal.find({status : 'on', isScheduled : false}).exec(function(err, meals){
+      Meal.find({ status : 'on', isScheduled : false }).exec(function(err, meals){
         if(err || !meals){
           return done();
         }
         //schedule an end job for each meals
         async.each(meals, function(meal, cb){
-          if(meal.type == "preorder" && meal.provideFromTime < now && meal.provideTillTime > now){
+          if(meal.type === "preorder" && meal.provideFromTime < now && meal.provideTillTime > now){
             meal.isScheduled = true;
             meal.save(function(err, result){
               if(err){
@@ -46,7 +46,7 @@ module.exports = function(agenda) {
               Jobs.schedule(meal.provideTillTime, 'MealScheduleEndJob', { mealId : meal.id });
               cb();
             });
-          }else if(meal.type == "order"){
+          }else if(meal.type === "order"){
             var tenMinutesBeforeProvideFromTime = new Date(util.minutesBefore(meal.provideFromTime,10));
             if(tenMinutesBeforeProvideFromTime > now){
               meal.isScheduled = true;

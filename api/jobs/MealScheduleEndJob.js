@@ -60,28 +60,37 @@ module.exports = function(agenda) {
       });
     },
 
-    updateOrders : function(meal, done){
+    updateOrders : function(meal, cb){
       //update all orders to preparing
       Order.update({ meal : meal.id, status : "schedule"}, {status : "preparing"}).exec(function(err, orders){
         if(err){
-          return done();
+          return cb(err);
         }
-        async.each(orders, function(order, cb){
+        async.each(orders, function(order, next){
+          if(!order.customer){
+            return next();
+          }
           User.findOne(order.customer).exec(function(err, user){
             if(err){
-              return cb(err);
+              return next(err);
             }
             order.customer = user;
-            cb();
+            next();
           });
         },function(err){
           if(err){
-            return done();
+            return cb(err);
           }
-          meal.orders = orders;
-          notification.notificationCenter("Meal","mealScheduleEnd",meal,true);
-          console.log("sending guest list to host");
-          done();
+          meal.leftQty = meal.totalQty;
+          meal.save(function(err, m){
+            if(err){
+              return cb(err);
+            }
+            m.orders = orders;
+            notification.notificationCenter("Meal","mealScheduleEnd",m,true);
+            console.log("sending guest list to host");
+            cb();
+          });
         });
       });
     },
@@ -109,8 +118,8 @@ module.exports = function(agenda) {
         method: order.method,
         tax: tax,
         metadata: {
-          mealId: order.meal,
-          hostId: order.host,
+          mealId: order.meal.id,
+          hostId: order.host.id,
           orderId: order.id,
           userId: order.customer,
           deliveryFee: 0,
@@ -120,6 +129,7 @@ module.exports = function(agenda) {
         if (err) {
           return cb(err);
         }
+        sails.log.info("charge amount: " + charge.amount );
         cb();
       });
     },
@@ -152,7 +162,7 @@ module.exports = function(agenda) {
           if(order.paymentMethod !== "cash"){
             return next();
           }
-          var refundedFee = Math.abs(amount * order.meal.commission) * 100;
+          var refundedFee = Math.floor(Math.abs(amount * order.meal.commission * 100));
           var metadata = {
             userName: order.customerName,
             userPhone: order.customerPhone,
@@ -189,18 +199,16 @@ module.exports = function(agenda) {
               dish = d;
             }
           });
-          if(!dish || currentOrders[dishId].number === 0 || !dish.isDynamic){
+          if(!dish || currentOrders[dishId].number === 0 || !dish.isDynamicPriceOn){
             return next();
           }
           var number = currentOrders[dishId].number;
           var paidDishPrice = parseFloat(currentOrders[dishId].price);
-          var myOrdered = currentOrders[dishId].number;
-          var otherOrdered = parseInt(meal.totalQty[dishId]) - parseInt(meal.leftQty[dishId]);
-          var totalQty = myOrdered + otherOrdered;
+          var totalQty = parseInt(meal.totalQty[dishId]) - parseInt(meal.leftQty[dishId]);
           var currentPrice = parseFloat(dish.getPrice(totalQty, meal));
           currentOrders[dishId].price = currentPrice;
-          sails.log.info("viewing price difference...price you paid: $" + paidDishPrice + ", price now: $" + currentPrice);
           var difference = (currentPrice - paidDishPrice) * number;
+          sails.log.info("price you paid: $" + paidDishPrice + ", price now: $" + currentPrice, " order amount: " + number, " difference: " + difference);
           if(difference !== 0){
             Order.findOne(order.id).populate("meal").populate("host").exec(function (err, order) {
               if (err) {
@@ -213,7 +221,6 @@ module.exports = function(agenda) {
                   if(err){
                     return next(err);
                   }
-                  sails.log.info("charged extra amount: " + difference);
                   order.save(next);
                 });
               }else{
@@ -221,7 +228,6 @@ module.exports = function(agenda) {
                   if(err){
                     return next(err);
                   }
-                  sails.log.info("refunded amount: " + difference);
                   order.save(next);
                 });
               }
@@ -324,22 +330,10 @@ module.exports = function(agenda) {
                   if(err){
                     return done(err);
                   }
-                  _this.updateOrders(meal, function(err){
-                    if(err){
-                      return done(err);
-                    }
-                    meal.leftQty = meal.totalQty;
-                    meal.save(done);
-                  });
+                  _this.updateOrders(meal, done);
                 });
               }else{
-                _this.updateOrders(meal, function(err){
-                  if(err){
-                    return done(err);
-                  }
-                  meal.leftQty = meal.totalQty;
-                  meal.save(done);
-                });
+                _this.updateOrders(meal,done);
               }
             }
           });

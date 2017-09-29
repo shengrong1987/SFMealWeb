@@ -23,9 +23,6 @@ module.exports = {
       type : 'float',
       required : true
     },
-    minimalPrice : {
-      type : 'float'
-    },
     qtyRate : {
       type : 'integer',
       defaultsTo : 10
@@ -107,6 +104,9 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
+    minimalPrice : function(){
+      return Math.round(this.price * 2 / 3);
+    },
     getPrice : function(orderQty, meal){
       var _this = this;
       if(!meal.isSupportDynamicPrice || !this.isDynamicPriceOn || !meal.dynamicDishes.some(function(dish){
@@ -115,20 +115,13 @@ module.exports = {
         return this.price;
       }
       var price = Math.ceil(this.price - parseInt(orderQty / this.qtyRate) * this.priceRate);
-      price = Math.max(price, parseFloat(this.minimalPrice));
+      price = Math.max(price, parseFloat(this.minimalPrice()));
       sails.log.info("original price: " + this.price + ", new price: " + price + " order total: " + orderQty);
       return price;
     },
     isFeature : function(){
       return this.score >= 4.8 || this.numberOfReviews > 5;
     }
-  },
-
-  beforeCreate : function(values, cb){
-    values.isVerified = false;
-    values.minimalPrice = parseFloat(Math.ceil(values.price * 2/3));
-    values.dynamicPrice = values.price;
-    cb();
   }
 };
 

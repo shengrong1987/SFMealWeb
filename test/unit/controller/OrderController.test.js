@@ -2113,13 +2113,13 @@ describe('OrderController', function() {
           dishId3 = meal.dishes[2].id;
           dishId4 = meal.dishes[3].id;
           price1 = meal.dishes[0].price;
-          minimalPrice1 = meal.dishes[0].minimalPrice;
+          minimalPrice1 = Math.round(price1 * 2 / 3);
           qtyRate1 = meal.dishes[0].qtyRate;
           priceRate1 = meal.dishes[0].priceRate;
           price2 = meal.dishes[1].price;
           price3 = meal.dishes[2].price;
           price4 = meal.dishes[3].price;
-          minimalPrice4 = meal.dishes[3].minimalPrice;
+          minimalPrice4 = Math.round(price4 * 2 /3);
           qtyRate4 = meal.dishes[3].qtyRate;
           priceRate4 = meal.dishes[3].priceRate;
           dish1OrderNumber = parseInt(meal.totalQty[dishId1]) - parseInt(meal.leftQty[dishId1]);
@@ -2149,7 +2149,7 @@ describe('OrderController', function() {
         .send({
           totalQty : totalQty,
           provideFromTime: now,
-          provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          provideTillTime: new Date(now.getTime() + 1000 * 60 * 30),
           status : "on",
           isSupportDynamicPrice : true
         })
@@ -2432,7 +2432,7 @@ describe('OrderController', function() {
           res.body.code.should.be.equal(-38);
           done();
         })
-    })
+    });
 
     it('should response to alipay callback waiting payment by default', function(done){
       agent
@@ -2445,7 +2445,7 @@ describe('OrderController', function() {
           res.body.code.should.be.equal(-39);
           done();
         })
-    })
+    });
 
     it('should login as host', function (done) {
       agent
@@ -2456,16 +2456,16 @@ describe('OrderController', function() {
         .end(done)
     });
 
-    it('should update the meals provideTillTime to 2 minute later and see meal schedule end job', function(done){
+    it('should update the meals provideTillTime to 3 minute later and see meal schedule end job', function(done){
       var now = moment()._d;
-      var twoMinuteLater = moment().add('2','minutes')._d;
+      var threeMinutesLater = moment().add('3','minutes')._d;
       mealProvideFrom = moment(mealProvideFrom).subtract('30','minutes')._d;
       agent
         .put('/meal/' + mealId)
         .send({
           status : 'on',
           provideFromTime : mealProvideFrom,
-          provideTillTime : twoMinuteLater,
+          provideTillTime : threeMinutesLater,
           minimalOrder : 5
         })
         .expect(200)

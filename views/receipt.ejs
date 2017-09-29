@@ -35,7 +35,9 @@
         <td style="vertical-align: middle;"><%= amount%><%= __('fen')%></td>
         <td style="vertical-align: middle;text-align: right;">
           $<%= (amount * (price ? price : dish.price)).toFixed(2)%>
-          <% if(extra){%>
+          <% if(price){ %>
+          <s>$<%= (amount * dish.price).toFixed(2)%></s>
+          <% }if(extra){%>
           (+$<%= extra.toFixed(2)%>)<br/>
           <% }%>
         </td>

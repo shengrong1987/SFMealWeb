@@ -282,8 +282,11 @@ function updateOrderWindow(fromCache, isTrigger){
         localDish = {number : 0, preference : [], price : $(this).find(".price").attr("value")};
       }
       localOrders[dishId] = localDish;
-      $(this).data("left-amount", $(this).attr("data-left-amount"));
-      // $(this).data("left-amount",$(this).data("left-amount") - localOrders[dishId].number);
+      var left = parseInt($(this).attr("data-left-amount") - parseInt(localOrders[dishId].number));
+      var dishItem = $("#meal-detail-container").find(".dish[data-id='" + dishId + "']");
+      dishItem.find(".dish-number").val(localOrders[dishId].number);
+      $(this).amountInput('update',dishItem.find("[data-toggle='amount-input']"));
+      $(this).data("left-amount", left);
       updateMenuView(dishId, isTrigger);
     }else{
       localOrders[dishId] = {
@@ -331,9 +334,9 @@ function updateMenuView(id, triggerExpand){
   }else{
     priceItem.data("extra", 0);
     if(oldPrice){
-      priceItem.html("$" + price + " <s>$" + oldPrice + "</s>" + " ($" + extra + ")");
+      priceItem.html("$" + price + " <s>$" + oldPrice + "</s>");
     }else{
-      priceItem.html("$" + price + " ($" + extra + ")");
+      priceItem.html("$" + price);
     }
   }
   var dishItem = $("#meal-detail-container").find(".dish[data-id='" + id + "']");

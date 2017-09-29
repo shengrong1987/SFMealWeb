@@ -415,10 +415,10 @@ module.exports = {
     var _this = this;
     var chargeIds = Object.keys(charges);
     var amount = metadata.amount || -1;
-    sails.log.info("total money to refund: " + amount/100);
+    sails.log.info("amount refund: " + amount);
     async.each(chargeIds, function(chargeId, next){
       var thisAmount = charges[chargeId];
-      sails.log.info("refund amount in this charge: " + chargeId, " is: " + thisAmount);
+      sails.log.info("amount in transaction: " + chargeId, " is: " + thisAmount);
       var refundAmount;
       if(thisAmount === 0){
         return next();
@@ -464,7 +464,6 @@ module.exports = {
       return cb(null, { amount : attr.amount });
     }
     var $this = this;
-    sails.log.debug("refunding customer : $" + attr.amount/100 );
     stripe.refunds.create({
       charge : attr.id,
       amount : attr.amount,

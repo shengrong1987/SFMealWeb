@@ -1657,7 +1657,7 @@ module.exports = {
     }
     var leftQty = meal.leftQty;
     Object.keys(lastOrder).forEach(function(dishId){
-      leftQty[dishId] += parseInt(lastOrder[dishId].number - order[dishId].number);
+      leftQty[dishId] = parseInt(parseInt(lastOrder[dishId].number) - parseInt(order[dishId].number)) + parseInt(leftQty[dishId]);
       sails.log.info("updating dish " + dishId + " to quantity of " + leftQty[dishId]);
     });
     meal.leftQty = leftQty;

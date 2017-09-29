@@ -386,7 +386,7 @@
                 if(dish.isDynamicPriceOn && meal.isSupportDynamicPrice && newPrice !== dish.price){ %>
                   <td class="price" value=<%= newPrice %> old-value=<%= dish.price || ''%> data-extra=0>$<%= newPrice %> <s>$<%= dish.price%></s></td>
               <%}else{%>
-                <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
+                <td class="price" value=<%= dish.price %> old-value='' data-extra=0>$<%= dish.price %></td>
               <%}%>
               <td>
                 <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">-</button>
