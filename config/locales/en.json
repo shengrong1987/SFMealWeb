@@ -818,5 +818,7 @@
   "dish-dynamic-price-success" : "Group price on! -$%s",
   "dish-dynamic-price-pending" : "Need %s more order，-$%s",
   "enter-meal" : "Welcome home，click above to see more dishes.",
-  "month-and-date" : "%s.%s"
+  "month-and-date" : "%s.%s",
+  "find-route" : "Navigate me to pickup",
+  "user-benefit" : "Whenever registered user takes order with credit card, he earns 10% cash credit."
 }
