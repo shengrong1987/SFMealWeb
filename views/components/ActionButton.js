@@ -197,7 +197,7 @@ var ActionButton = createReactClass({
         }else if(action === "clean"){
           if(this.props.data['data']){
             postData = {
-              nextRunAt : { value : null}
+              nextRunAt : { value : null }
             };
           }
         }
