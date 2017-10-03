@@ -129,6 +129,9 @@ module.exports = function(agenda) {
         if (err) {
           return cb(err);
         }
+        if(order.paymentMethod === "cash"){
+          order.charges['cash'] += charge.amount;
+        }
         sails.log.info("charge amount: " + charge.amount );
         cb();
       });
@@ -173,6 +176,7 @@ module.exports = function(agenda) {
           };
           stripe.batchRefund(order.feeCharges, null, metadata, function(err){
             if(err){
+              sails.log.error(err);
               return next(err);
             }
             order.charges['cash'] -= refundAmount;

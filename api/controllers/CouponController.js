@@ -20,7 +20,7 @@ module.exports = {
       }
       var couponIsValid = true;
       couponIsValid = !user.coupons.some(function(coupon){
-        return coupon.code == couponCode;
+        return coupon.code === couponCode;
       })
       if(!couponIsValid){
         return res.badRequest({ code : -1, responseText : req.__('coupon-already-redeem-error')});
@@ -29,7 +29,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        if(!coupons || coupons.length == 0){
+        if(!coupons || coupons.length === 0){
           return res.badRequest({ code : -2, responseText : req.__('coupon-invalid-error')});
         }
         var coupon = coupons[0];

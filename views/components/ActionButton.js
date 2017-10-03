@@ -128,18 +128,14 @@ var ActionButton = createReactClass({
   _doAction : function(event){
     var _this = this;
     return function(event){
-      var target = event.currentTarget.dataset;
-      var action = target["action"];
-      var id = target["id"];
-      var model = target["model"];
+      var target = event.currentTarget;
+      var dataset = target.dataset;
+      var action = dataset["action"];
+      var id = dataset["id"];
+      var model = dataset["model"];
       var isShowDetail = action === "view" ? true : _this.props.detail;
-      var dynamicData = _this._getData(target, action);
-      if(dynamicData === false){
-        return;
-      }
       var data = {};
-      Object.assign(data, dynamicData);
-      var postData = _this.getPostData(_this.props.model, action);
+      var postData = _this.getPostData(_this.props.model, action, $(target));
       if(postData){
         _this._openModal(postData, true, _this.props.data['name'], id, action, isShowDetail);
       }else{
@@ -148,7 +144,7 @@ var ActionButton = createReactClass({
     }(event);
   },
 
-  getPostData  : function(model, action){
+  getPostData  : function(model, action, target){
     var postData;
     switch(model){
       case "User":
@@ -230,6 +226,31 @@ var ActionButton = createReactClass({
           };
         }
         break;
+        case "Email":
+          if(action === "create"){
+            postData = {
+              model : target.closest('tr').find("input[name='model']").val(),
+              action : target.closest('tr').find("input[name='action']").val(),
+              metadata : target.closest('tr').find("input[name='metaData']").val()
+            }
+          }
+        break;
+        case "Coupon":
+          if(action === "create"){
+            var expire = new Date(target.closest('tr').find("input[name='expire']").val() * 1000);
+            if(moment(expire).isBefore(moment(new Date()))){
+              ActionCreators.badRequest("expiration date should be in the future");
+              return false;
+            }
+            postData = {
+              type : target.closest('tr').find("input[name='type']").val(),
+              amount : target.closest('tr').find("input[name='amount']").val(),
+              description : target.closest('tr').find("input[name='description']").val(),
+              code : target.closest('tr').find("input[name='code']").val(),
+              expire : expire
+            }
+          }
+          break;
     }
     return postData;
   },

@@ -36,6 +36,7 @@
         <td><%= contact%></td>
         <td><%= deliverylocation%></td>
         <td><%= amountowe%></td>
+        <td><%= comment%></td>
       </tr>
       </thead>
       <tbody>
@@ -54,7 +55,6 @@
               dishes.forEach(function(d){
                 if(d.id == dishId){
                   dish = d;
-                  return;
                 }
               })
           %>
@@ -73,6 +73,7 @@
         <td><%= order.customerPhone%></td>
         <td><%= order.contactInfo.address%></td>
         <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
+        <td><%= order.pickupInfo.comment || ''%></td>
       </tr>
       <%}})%>
       </tbody>
@@ -91,6 +92,7 @@
         <td><%= contact%></td>
         <td><%= deliverylocation%></td>
         <td><%= amountowe%></td>
+        <td><%= comment%></td>
       </tr>
       </thead>
       <tbody>
@@ -125,6 +127,7 @@
         <td><%= order.customerPhone%></td>
         <td>N/A</td>
         <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
+        <td><%= order.pickupInfo.comment || ''%></td>
       </tr>
       <%}})%>
       </tbody>

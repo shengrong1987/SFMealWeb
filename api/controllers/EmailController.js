@@ -10,6 +10,11 @@ var notification = require('../services/notification');
 module.exports = {
   create : function(req, res){
     var $this = this;
+    var metaData = req.body.metadata;
+    if(metaData){
+      metaData = JSON.parse(metaData);
+      req.body.metaData = metaData;
+    }
     Email.create(req.body).exec(function(err, email){
       if(err){
         return res.badRequest(err);
