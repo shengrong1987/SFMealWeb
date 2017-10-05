@@ -24,12 +24,10 @@ module.exports = {
       required : true
     },
     qtyRate : {
-      type : 'integer',
-      defaultsTo : 10
+      type : 'integer'
     },
     priceRate : {
-      type : 'integer',
-      defaultsTo : 5
+      type : 'integer'
     },
     isDynamicPriceOn : {
       type : 'boolean',
@@ -104,8 +102,8 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
-    minimalPrice : function(){
-      return Math.round(this.price * 2 / 3);
+    minimalPrice : {
+      type : 'float'
     },
     getPrice : function(orderQty, meal){
       var _this = this;
@@ -115,7 +113,7 @@ module.exports = {
         return this.price;
       }
       var price = Math.ceil(this.price - parseInt(orderQty / this.qtyRate) * this.priceRate);
-      price = Math.max(price, parseFloat(this.minimalPrice()));
+      price = Math.max(price, parseFloat(this.minimalPrice));
       sails.log.info("original price: " + this.price + ", new price: " + price + " order total: " + orderQty);
       return price;
     },

@@ -69,7 +69,7 @@
                 <% if(meal.isSupportDynamicPrice && dish.isDynamicPriceOn && meal.dynamicDishes.some(function(d){
                     return d.id === dish.id;
                   })) {
-                  var orderAmount = parseInt(meal.totalQty[dish.id])-parseInt(meal.leftQty[dish.id]);
+                  var orderAmount = meal.getDynamicDishesTotalOrder(0);
                   var newPrice = dish.getPrice(orderAmount, meal);
                 if(newPrice !== dish.price){
                 %>

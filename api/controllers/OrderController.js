@@ -64,215 +64,6 @@ var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUt
 module.exports = {
 
   /*
-  Check if meal is valid
-   */
-  validate_meal : function(meal, orders, lastOrders, subtotal, req, cb) {
-    var now = new Date();
-    var params = req.body;
-    if(!orders || !subtotal){
-      return cb({ responseText : req.__('order-empty'), code : -9});
-    }
-    if(meal.status === "off" || (now < meal.provideFromTime || now > meal.provideTillTime)){
-      return cb({ responseText : req.__('meal-not-active'), code : -10});
-    }
-
-    if(!meal.dateIsValid()) {
-      return cb({ responseText : req.__('order-invalid-meal'), code : -4});
-    }
-
-    var isPartyMode = req.body.isPartyMode;
-
-    if(isPartyMode){
-      var partyRequire = meal.partyRequirement;
-      if(!partyRequire){
-        return cb({ responseText : req.__('order-lack-of-party-requirement'), code : -32});
-      }
-      var minimal = partyRequire["minimal"];
-      if(subtotal < minimal){
-        return cb({ responseText : req.__('order-amount-not-qualify-party', minimal), code : -33});
-      }
-      var customDate = req.body.customInfo.time;
-      now = moment();
-      sails.log.info("now: " + now.format() + ", delivery date: " + moment(customDate).format());
-      var ms = moment(customDate).diff(now);
-      var d = moment.duration(ms);
-      sails.log.info("hours in advanced: " + d.asHours());
-      if(d.asHours() < 24){
-        return cb({ responseText : req.__('order-party-time-invalid'), code : -34});
-      }
-    }
-
-    sails.log.debug("meal looks good so far, checking order items...");
-
-    var actual_subtotal = 0;
-    var validDish = false;
-    var $this = this;
-
-    async.each(Object.keys(orders), function(dishId, next){
-      var qty = parseInt(orders[dishId].number);
-      var properties = $this.getProperties(orders[dishId].preference);
-      var lastQty = lastOrders ? parseInt(lastOrders[dishId].number) : 0;
-      if(qty > 0 || lastQty > 0){
-        async.each(meal.dishes, function(dish, next2){
-          if(dish.id === dishId){
-            if(!dish.isVerified){
-              return next2({responseText : req.__('order-invalid-dish',dishId), code : -2});
-            }
-            var extra = 0;
-            //check property exist
-            if(!properties.every(function(property){
-                if(property && dish.preference) {
-                  var hasPreference = Object.keys(dish.preference).some(function(preference){
-                    var pros = dish.preference[preference];
-                    var hasPros = pros.some(function(p){
-                      if(p.property === property){
-                        extra += parseInt(p.extra);
-                        return true;
-                      }
-                      return false;
-                    });
-                    sails.log.info("dish has property: " + property + " : " + hasPros);
-                    return hasPros;
-                  });
-                  sails.log.info("dish has preference: " + property + " : " + hasPreference);
-                  return hasPreference;
-                }else{
-                  return true;
-                }
-            })){
-              return next2({ responseText : req.__('order-preference-not-exist'), code : -20});
-            }
-            var diff = qty - lastQty;
-            sails.log.info("order qty for the dish: " + dish.id + " is: " + diff, "dish's left qty: " + meal.leftQty[dish.id]);
-            if(!isPartyMode && diff > meal.leftQty[dish.id]){
-              return next2({responseText : req.__('order-dish-not-enough',dishId, qty), code : -1});
-            }
-            var orderedQty = parseInt(meal.totalQty[dishId]) - parseInt(meal.leftQty[dishId]);
-            var totalQty = orderedQty + qty;
-            var price = dish.getPrice(totalQty, meal);
-            var listPrice = parseInt(orders[dishId].price);
-            if(price !== listPrice){
-              sails.log.info("listing price updated from " + listPrice + " to " + price);
-              orders[dishId].price = price;
-            }
-            actual_subtotal += (qty * price + extra);
-          }
-          next2();
-        }, function(err){
-          if(err){
-            return next(err);
-          }
-          next();
-        });
-      }else{
-        next();
-      }
-    }, function(err){
-      if(err){
-        return cb(err);
-      }
-
-      sails.log.debug("dish is valid and enough, checking total price...");
-
-      if(actual_subtotal !== subtotal) {
-        sails.log.debug("subtotal supposed to be " + actual_subtotal + ", but get " + subtotal)
-        req.body.subtotal = actual_subtotal;
-        // return cb({responseText : req.__('order-total-not-match'), code : -3});
-      }
-      return cb(null);
-    });
-  },
-
-  /*
-  check if parameters are valid
-   */
-  validateOption : function(params, meal, req, cb){
-    var method = params.method;
-    if(method === "pickup"){
-      if(params.isPartyMode){
-        return cb({ code : -36, responseText : req.__('order-catering-must-delivery')});
-      }
-      cb();
-    }else if(method === "delivery"){
-      var contactInfo = params.contactInfo;
-      if(!contactInfo.address){
-        return cb({responseText: req.__('order-incomplete-address'), code: -29});
-      }
-      var full_address = contactInfo.address;
-      if(!meal.isDelivery && !params.isPartyMode) {
-        return cb({responseText: req.__('order-invalid-method'), code: -11});
-      }
-      var range = params.isPartyMode ? meal.delivery_range * stripe.PARTY_ORDER_RANGE_MULTIPLIER : meal.delivery_range;
-      var pickupOption = params.pickupOption;
-      if(!pickupOption){
-        return cb({responseText : req.__('order-pickup-option-empty-error'), code : -20});
-      }else if(pickupOption > meal.pickups.length+1){
-        return cb({responseText : req.__('order-pickup-option-error'), code : -7});
-      }
-      var pickupInfo;
-      meal.pickups.forEach(function(pickup){
-        if(pickup.index === pickupOption){
-          pickupInfo = pickup;
-        }
-      });
-      if(!pickupInfo){
-        return cb({responseText : req.__('order-pickup-option-invalid-error'), code : -22});
-      }
-      sails.log.info("pickup method: " + pickupInfo.method);
-      if(!pickupInfo.phone){
-        return cb({responseText : req.__('order-pickup-option-invalid-error'), code : -28});
-      }
-      if(pickupInfo.method !== method){
-        return cb({responseText : req.__('order-pickup-method-not-match-error'), code : -21});
-      }
-      if(params.isPartyMode){
-        var customInfo = req.body.customInfo;
-        if(!customInfo){
-          return cb({ responseText : req.__('order-party-lack-of-info'), code : -35});
-        }
-        pickupInfo.pickupFromTime = customInfo.time;
-        pickupInfo.pickupTillTime = customInfo.time;
-        pickupInfo.comment = customInfo.comment;
-        pickupInfo.isDateCustomized = true;
-      }
-      geocode.distance(full_address, pickupInfo.deliveryCenter, function(err, distance){
-        if(err){
-          sails.log.error("verified distance err " + err);
-          return cb(err);
-        }
-        sails.log.debug("distance:" + distance, range);
-        if(distance > range){
-          if(!params.isPartyMode){
-            sails.log.error("distance verification failed");
-            return cb({responseText : req.__('order-invalid-address'), code : -6});
-          }else{
-            params.delivery_fee = (distance - range) * stripe.MILEAGE_FEE;
-            sails.log.info("charged distance: " + (distance - range) + " in a total of: " + params.delivery_fee);
-          }
-        }else if(params.isPartyMode){
-          params.delivery_fee = 0;
-        }
-        cb();
-      })
-    }else{
-      var subtotal = parseFloat(params.subtotal);
-      if(!meal.isShipping){
-        sails.log.error("meal doesn't support shipping");
-        return cb({responseText : req.__('meal-no-shipping'), code : -12});
-      }
-      if(!meal.shippingPolicy || !meal.shippingPolicy.freeAmount){
-        sails.log.error("meal's shipping setup is not correct");
-        return cb({responseText : req.__('meal-shipping-policy-invalid'), code : -13});
-      }
-      if(subtotal < parseFloat(meal.shippingPolicy.freeAmount)){
-        sails.log.error("order's amount do not reach free shipping policy");
-        return cb({responseText : req.__('order-not-qualify-shipping'), code : -14});
-      }
-      return cb();
-    }
-  },
-
-  /*
   Build pick-up info
    */
   buildDeliveryData : function(params, meal){
@@ -310,92 +101,6 @@ module.exports = {
     }
     sails.log.info("building pickup data");
     return params;
-  },
-
-  verifyCoupon : function(req, code, user, meal, cb){
-    if(!code){
-      return cb();
-    }
-    Coupon.findOne({ code : code}).exec(function(err, coupon){
-      if(err){
-        return cb(err);
-      }
-      if(!coupon){
-        return cb({ code : -16, responseText : req.__('coupon-invalid-error')})
-      }
-      if(coupon.expires_at < new Date()){
-        return res.badRequest({ code : -17, responseText : req.__('coupon-expire-error')});
-      }
-      var couponIsRedeemed = false;
-      couponIsRedeemed = user.coupons.some(function(coupon){
-        return coupon.code === code;
-      });
-      if(couponIsRedeemed){
-        return cb({code : -15, responseText : req.__('coupon-already-redeem-error')});
-      }
-      var amount = 0;
-      switch(coupon.type){
-        case "fix":
-          amount = coupon.amount;
-          break;
-        case "freeShipping":
-          amount = meal.delivery_fee;
-          break;
-      }
-      coupon.amount = amount;
-      cb(null, coupon);
-    })
-  },
-
-  redeemCoupon : function(req, code, total, coupon, user, discount, cb){
-    if(!code){
-      return cb(null, discount);
-    }
-    var diff = total - coupon.amount;
-    if(diff < 0){ coupon.amount += diff; }
-    user.coupons.add(coupon.id);
-    user.save(function(err, u){
-      if(err){
-        return cb(err);
-      }
-      req.body.discountAmount = coupon.amount;
-      sails.log.info("redeeming coupon amount:" + coupon.amount + " & order total: " + total);
-      cb(null, coupon.amount);
-    });
-  },
-
-  applyPoints : function(req, res){
-    var userId = req.session.user.id;
-    User.findOne(userId).exec(function(err, user){
-      if(err){
-        return res.badRequest(err);
-      }
-      res.ok({ points : user.points});
-    })
-  },
-
-  redeemPoints : function(req, points, user, total, cb){
-    if(!points){
-      return cb(null, 0);
-    }
-    //verify how many points need to be redeemed
-    if(points > total * 10){
-      return cb({ code : -24, responseText : req.__('order-points-exceed')});
-    }
-    user.points = user.points || 0;
-    //verify if user have enough points
-    if(points > user.points){
-      return cb({ code : -25, responseText : req.__('order-points-insufficient')});
-    }
-    //apply points
-    user.points -= points;
-    user.save(function(err, user){
-      if(err){
-        return cb(err);
-      }
-      req.body.redeemPoints = parseInt(points);
-      cb(null, points/10);
-    });
   },
 
   /*
@@ -1486,10 +1191,16 @@ module.exports = {
       if(!order){
         return res.notFound();
       }
-      notification.transitLocaleTimeZone(order);
-      order.download = false;
-      var dateString = moment().format("ddd, hA");;
-      res.view('receipt', order);
+      Meal.findOne(order.meal.id).populate("dynamicDishes").exec(function(err, meal){
+        if(err){
+          return res.badRequest(err);
+        }
+        order.meal = meal;
+        notification.transitLocaleTimeZone(order);
+        order.download = false;
+        var dateString = moment().format("ddd, hA");
+        res.view('receipt', order);
+      })
     })
   },
 
@@ -1813,6 +1524,299 @@ module.exports = {
           return res.ok(order);
         });
       });
+    });
+  },
+
+  /*
+   Check if meal is valid
+   */
+  validate_meal : function(meal, orders, lastOrders, subtotal, req, cb) {
+    var now = new Date();
+    var params = req.body;
+    if(!orders || !subtotal){
+      return cb({ responseText : req.__('order-empty'), code : -9});
+    }
+    if(meal.status === "off" || (now < meal.provideFromTime || now > meal.provideTillTime)){
+      return cb({ responseText : req.__('meal-not-active'), code : -10});
+    }
+    if(!meal.dateIsValid()) {
+      return cb({ responseText : req.__('order-invalid-meal'), code : -4});
+    }
+
+    var isPartyMode = req.body.isPartyMode;
+
+    if(isPartyMode){
+      var partyRequire = meal.partyRequirement;
+      if(!partyRequire){
+        return cb({ responseText : req.__('order-lack-of-party-requirement'), code : -32});
+      }
+      var minimal = partyRequire["minimal"];
+      if(subtotal < minimal){
+        return cb({ responseText : req.__('order-amount-not-qualify-party', minimal), code : -33});
+      }
+      var customDate = req.body.customInfo.time;
+      now = moment();
+      sails.log.info("now: " + now.format() + ", delivery date: " + moment(customDate).format());
+      var ms = moment(customDate).diff(now);
+      var d = moment.duration(ms);
+      sails.log.info("hours in advanced: " + d.asHours());
+      if(d.asHours() < 24){
+        return cb({ responseText : req.__('order-party-time-invalid'), code : -34});
+      }
+    }
+
+    sails.log.debug("meal looks good so far, checking order items...");
+
+    var actual_subtotal = 0;
+    var validDish = false;
+    var $this = this;
+
+    async.each(Object.keys(orders), function(dishId, next){
+      var qty = parseInt(orders[dishId].number);
+      var properties = $this.getProperties(orders[dishId].preference);
+      var lastQty = lastOrders ? parseInt(lastOrders[dishId].number) : 0;
+      if(qty > 0 || lastQty > 0){
+        async.each(meal.dishes, function(dish, next2){
+          if(dish.id === dishId){
+            if(!dish.isVerified){
+              return next2({responseText : req.__('order-invalid-dish',dishId), code : -2});
+            }
+            var extra = 0;
+            //check property exist
+            if(!properties.every(function(property){
+                if(property && dish.preference) {
+                  var hasPreference = Object.keys(dish.preference).some(function(preference){
+                    var pros = dish.preference[preference];
+                    var hasPros = pros.some(function(p){
+                      if(p.property === property){
+                        extra += parseInt(p.extra);
+                        return true;
+                      }
+                      return false;
+                    });
+                    sails.log.info("dish has property: " + property + " : " + hasPros);
+                    return hasPros;
+                  });
+                  sails.log.info("dish has preference: " + property + " : " + hasPreference);
+                  return hasPreference;
+                }else{
+                  return true;
+                }
+              })){
+              return next2({ responseText : req.__('order-preference-not-exist'), code : -20});
+            }
+            var diff = qty - lastQty;
+            sails.log.info("order qty for the dish: " + dish.id + " is: " + diff, "dish's left qty: " + meal.leftQty[dish.id]);
+            if(!isPartyMode && diff > meal.leftQty[dish.id]){
+              return next2({responseText : req.__('order-dish-not-enough',dishId, qty), code : -1});
+            }
+            var totalQty = meal.getDynamicDishesTotalOrder(qty);
+            var price = dish.getPrice(totalQty, meal);
+            var listPrice = parseInt(orders[dishId].price);
+            if(price !== listPrice){
+              sails.log.info("listing price updated from " + listPrice + " to " + price);
+              orders[dishId].price = price;
+            }
+            actual_subtotal += (qty * price + extra);
+          }
+          next2();
+        }, function(err){
+          if(err){
+            return next(err);
+          }
+          next();
+        });
+      }else{
+        next();
+      }
+    }, function(err){
+      if(err){
+        return cb(err);
+      }
+
+      sails.log.debug("dish is valid and enough, checking total price...");
+
+      if(actual_subtotal !== subtotal) {
+        sails.log.debug("subtotal supposed to be " + actual_subtotal + ", but get " + subtotal)
+        req.body.subtotal = actual_subtotal;
+        // return cb({responseText : req.__('order-total-not-match'), code : -3});
+      }
+      return cb(null);
+    });
+  },
+
+  /*
+   check if parameters are valid
+   */
+  validateOption : function(params, meal, req, cb){
+    var method = params.method;
+    if(method === "pickup"){
+      if(params.isPartyMode){
+        return cb({ code : -36, responseText : req.__('order-catering-must-delivery')});
+      }
+      cb();
+    }else if(method === "delivery"){
+      var contactInfo = params.contactInfo;
+      if(!contactInfo.address){
+        return cb({responseText: req.__('order-incomplete-address'), code: -29});
+      }
+      var full_address = contactInfo.address;
+      if(!meal.isDelivery && !params.isPartyMode) {
+        return cb({responseText: req.__('order-invalid-method'), code: -11});
+      }
+      var range = params.isPartyMode ? meal.delivery_range * stripe.PARTY_ORDER_RANGE_MULTIPLIER : meal.delivery_range;
+      var pickupOption = params.pickupOption;
+      if(!pickupOption){
+        return cb({responseText : req.__('order-pickup-option-empty-error'), code : -20});
+      }else if(pickupOption > meal.pickups.length+1){
+        return cb({responseText : req.__('order-pickup-option-error'), code : -7});
+      }
+      var pickupInfo;
+      meal.pickups.forEach(function(pickup){
+        if(pickup.index === pickupOption){
+          pickupInfo = pickup;
+        }
+      });
+      if(!pickupInfo){
+        return cb({responseText : req.__('order-pickup-option-invalid-error'), code : -22});
+      }
+      sails.log.info("pickup method: " + pickupInfo.method);
+      if(!pickupInfo.phone){
+        return cb({responseText : req.__('order-pickup-option-invalid-error'), code : -28});
+      }
+      if(pickupInfo.method !== method){
+        return cb({responseText : req.__('order-pickup-method-not-match-error'), code : -21});
+      }
+      if(params.isPartyMode){
+        var customInfo = req.body.customInfo;
+        if(!customInfo){
+          return cb({ responseText : req.__('order-party-lack-of-info'), code : -35});
+        }
+        pickupInfo.pickupFromTime = customInfo.time;
+        pickupInfo.pickupTillTime = customInfo.time;
+        pickupInfo.comment = customInfo.comment;
+        pickupInfo.isDateCustomized = true;
+      }
+      geocode.distance(full_address, pickupInfo.deliveryCenter, function(err, distance){
+        if(err){
+          sails.log.error("verified distance err " + err);
+          return cb(err);
+        }
+        sails.log.debug("distance:" + distance, range);
+        if(distance > range){
+          if(!params.isPartyMode){
+            sails.log.error("distance verification failed");
+            return cb({responseText : req.__('order-invalid-address'), code : -6});
+          }else{
+            params.delivery_fee = (distance - range) * stripe.MILEAGE_FEE;
+            sails.log.info("charged distance: " + (distance - range) + " in a total of: " + params.delivery_fee);
+          }
+        }else if(params.isPartyMode){
+          params.delivery_fee = 0;
+        }
+        cb();
+      })
+    }else{
+      var subtotal = parseFloat(params.subtotal);
+      if(!meal.isShipping){
+        sails.log.error("meal doesn't support shipping");
+        return cb({responseText : req.__('meal-no-shipping'), code : -12});
+      }
+      if(!meal.shippingPolicy || !meal.shippingPolicy.freeAmount){
+        sails.log.error("meal's shipping setup is not correct");
+        return cb({responseText : req.__('meal-shipping-policy-invalid'), code : -13});
+      }
+      if(subtotal < parseFloat(meal.shippingPolicy.freeAmount)){
+        sails.log.error("order's amount do not reach free shipping policy");
+        return cb({responseText : req.__('order-not-qualify-shipping'), code : -14});
+      }
+      return cb();
+    }
+  },
+
+  verifyCoupon : function(req, code, user, meal, cb){
+    if(!code){
+      return cb();
+    }
+    Coupon.findOne({ code : code}).exec(function(err, coupon){
+      if(err){
+        return cb(err);
+      }
+      if(!coupon){
+        return cb({ code : -16, responseText : req.__('coupon-invalid-error')})
+      }
+      if(coupon.expires_at < new Date()){
+        return res.badRequest({ code : -17, responseText : req.__('coupon-expire-error')});
+      }
+      var couponIsRedeemed = false;
+      couponIsRedeemed = user.coupons.some(function(coupon){
+        return coupon.code === code;
+      });
+      if(couponIsRedeemed){
+        return cb({code : -15, responseText : req.__('coupon-already-redeem-error')});
+      }
+      var amount = 0;
+      switch(coupon.type){
+        case "fix":
+          amount = coupon.amount;
+          break;
+        case "freeShipping":
+          amount = meal.delivery_fee;
+          break;
+      }
+      coupon.amount = amount;
+      cb(null, coupon);
+    })
+  },
+
+  redeemCoupon : function(req, code, total, coupon, user, discount, cb){
+    if(!code){
+      return cb(null, discount);
+    }
+    var diff = total - coupon.amount;
+    if(diff < 0){ coupon.amount += diff; }
+    user.coupons.add(coupon.id);
+    user.save(function(err, u){
+      if(err){
+        return cb(err);
+      }
+      req.body.discountAmount = coupon.amount;
+      sails.log.info("redeeming coupon amount:" + coupon.amount + " & order total: " + total);
+      cb(null, coupon.amount);
+    });
+  },
+
+  applyPoints : function(req, res){
+    var userId = req.session.user.id;
+    User.findOne(userId).exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok({ points : user.points});
+    })
+  },
+
+  redeemPoints : function(req, points, user, total, cb){
+    if(!points){
+      return cb(null, 0);
+    }
+    //verify how many points need to be redeemed
+    if(points > total * 10){
+      return cb({ code : -24, responseText : req.__('order-points-exceed')});
+    }
+    user.points = user.points || 0;
+    //verify if user have enough points
+    if(points > user.points){
+      return cb({ code : -25, responseText : req.__('order-points-insufficient')});
+    }
+    //apply points
+    user.points -= points;
+    user.save(function(err, user){
+      if(err){
+        return cb(err);
+      }
+      req.body.redeemPoints = parseInt(points);
+      cb(null, points/10);
     });
   }
 };

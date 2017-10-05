@@ -500,6 +500,7 @@
   "meal-query-invalid" : "Meal查询网址不对",
   "meal-lack-of-party-requirement" : "Meal支持团餐模式但缺少团餐要求",
   "meal-invalid-dynamic-dish" : "Meal的拼单菜式已经在另一个拼单Meal里了",
+  "dish-update-dynamic-insufficient-info" : "缺少价格信息，无法更新爆款菜式。",
   "host-like-once-error" : "你已经给这个厨师点过赞了",
   "host-like-himself-error" : "不可以自己给自己点赞／关注",
   "host-bank-ok" : "您的银行账号已成功输入",
@@ -821,5 +822,12 @@
   "enter-meal" : "欢迎回家，点击图片查看更多菜式哦。",
   "month-and-date" : "%s月%s号",
   "find-route" : "导航去取餐点",
-  "user-benefit" : "注册用户使用线上支付方式付款，每次都能返还10%的现金积分。"
+  "user-benefit" : "注册用户使用线上支付方式付款，每次都能返还10%的现金积分。",
+  "notStart" : "未开始",
+  "meal-expire-tips" : "Meal已经结束，请选择其他菜单。",
+  "meal-not-start-tips" : "Meal还未开始，请稍后再来。",
+  "expire" : "已结束",
+  "priceRate" : "减价金额",
+  "qtyRate" : "减价订单量",
+  "minimalPrice" : "最低价"
 }

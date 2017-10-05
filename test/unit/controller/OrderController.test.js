@@ -2079,15 +2079,15 @@ describe('OrderController', function() {
     var dishId3;
     var dishId4;
     var price1;
-    var minimalPrice1;
-    var qtyRate1;
-    var priceRate1;
+    var minimalPrice1 = 3;
+    var qtyRate1 = 10;
+    var priceRate1 = 1;
     var price2;
     var price3;
     var price4;
-    var minimalPrice4;
-    var qtyRate4;
-    var priceRate4;
+    var minimalPrice4 = 6;
+    var qtyRate4 = 10;
+    var priceRate4 = 2;
     var price5;
     var orderId;
     var dishId5;
@@ -2095,7 +2095,9 @@ describe('OrderController', function() {
     var adminEmail = 'admin@sfmeal.com';
     var hostEmail = 'aimbebe.r@gmail.com';
     var password = '12345678';
-    var dish1OrderNumber,dish4OrderNumber;
+    var dynamicDishOrderNumber;
+    var dish1OrderNumber;
+    var dish4OrderNumber;
 
     it('should get meals', function (done) {
       agent
@@ -2113,15 +2115,11 @@ describe('OrderController', function() {
           dishId3 = meal.dishes[2].id;
           dishId4 = meal.dishes[3].id;
           price1 = meal.dishes[0].price;
-          minimalPrice1 = Math.round(price1 * 2 / 3);
-          qtyRate1 = meal.dishes[0].qtyRate;
-          priceRate1 = meal.dishes[0].priceRate;
           price2 = meal.dishes[1].price;
           price3 = meal.dishes[2].price;
           price4 = meal.dishes[3].price;
-          minimalPrice4 = Math.round(price4 * 2 /3);
-          qtyRate4 = meal.dishes[3].qtyRate;
-          priceRate4 = meal.dishes[3].priceRate;
+          dynamicDishOrderNumber = parseInt(meal.totalQty[dishId1]) - parseInt(meal.leftQty[dishId1]);
+          dynamicDishOrderNumber += parseInt(meal.totalQty[dishId4]) - parseInt(meal.leftQty[dishId4]);
           dish1OrderNumber = parseInt(meal.totalQty[dishId1]) - parseInt(meal.leftQty[dishId1]);
           dish4OrderNumber = parseInt(meal.totalQty[dishId4]) - parseInt(meal.leftQty[dishId4]);
           done();
@@ -2165,12 +2163,33 @@ describe('OrderController', function() {
         })
     });
 
-    it('should be able to enable dynamic price on a dish', function(done){
+    it('should not be able to enable dynamic price on a dish without price info', function(done){
       agent
         .put('/dish/' + dishId1)
         .set('Accept', 'application/json')
         .send({
           isDynamicPriceOn : true
+        })
+        .expect('Content-Type', /json/)
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-3);
+          done();
+        })
+    });
+
+    it('should be able to enable dynamic price on a dish', function(done){
+      agent
+        .put('/dish/' + dishId1)
+        .set('Accept', 'application/json')
+        .send({
+          isDynamicPriceOn : true,
+          qtyRate : qtyRate1,
+          priceRate : priceRate1,
+          minimalPrice : minimalPrice1
         })
         .expect('Content-Type', /json/)
         .expect(200)
@@ -2179,6 +2198,7 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body.isDynamicPriceOn.should.be.true();
+          res.body.qtyRate.should.be.equal(qtyRate1);
           done();
         })
     });
@@ -2195,7 +2215,10 @@ describe('OrderController', function() {
         .put('/dish/' + dishId4)
         .set('Accept', 'application/json')
         .send({
-          isDynamicPriceOn : true
+          isDynamicPriceOn : true,
+          qtyRate : qtyRate4,
+          priceRate : priceRate4,
+          minimalPrice : minimalPrice4
         })
         .expect('Content-Type', /json/)
         .expect(200)
@@ -2247,9 +2270,9 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          dish1OrderNumber += 10;
+          dynamicDishOrderNumber += 10;
           var meal = res.body;
-          newPrice1 = price1 - parseInt(dish1OrderNumber / qtyRate1) * priceRate1;
+          newPrice1 = price1 - parseInt(dynamicDishOrderNumber / qtyRate1) * priceRate1;
           newPrice1 = Math.max(minimalPrice1, newPrice1);
           res.body.orders[dishId1].price.should.be.equal(newPrice1);
           res.body.subtotal.should.be.equal(newPrice1 * 10);
@@ -2258,18 +2281,17 @@ describe('OrderController', function() {
         })
     });
 
-
     it('should order a meal with outdated dynamic price', function(done){
       var dishObj = {};
       dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : 10 };
       dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
       dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
-      dishObj[dishId4] = { number : 9 , preference : [{ property : '', extra : 0}], price : price4 };
+      dishObj[dishId4] = { number : 7 , preference : [{ property : '', extra : 0}], price : price4 };
       agent
         .post('/order')
         .send({
           orders : dishObj,
-          subtotal : 10 + 9 * price4,
+          subtotal : 10 + 8 * price4,
           pickupOption : 1,
           method : "pickup",
           mealId : mealId,
@@ -2281,10 +2303,10 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          dish4OrderNumber += 9;
-          price4 = price4 - (dish4OrderNumber / qtyRate4) * priceRate4;
+          dynamicDishOrderNumber += 8;
+          price4 = price4 - (dynamicDishOrderNumber / qtyRate4) * priceRate4;
           price4 = Math.max(price4, minimalPrice4);
-          res.body.subtotal.should.be.equal(newPrice1+price4*9);
+          res.body.subtotal.should.be.equal(newPrice1+price4*7);
           done();
         })
     });
@@ -2320,8 +2342,8 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          dish4OrderNumber += 2;
-          var newPrice4 = price4 - (dish4OrderNumber / qtyRate4) * priceRate4;
+          dynamicDishOrderNumber += 2;
+          var newPrice4 = price4 - (dynamicDishOrderNumber / qtyRate4) * priceRate4;
           newPrice4 = Math.max(newPrice4, minimalPrice4);
           res.body.orders[dishId4].price.should.be.equal(newPrice4);
           res.body.subtotal.should.be.equal(newPrice4 * 2);

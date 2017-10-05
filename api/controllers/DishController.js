@@ -5,6 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  * @error       :: -1 dish can not be deleted on active meal
  *                 -2 dish can not be updated on active meal
+ *                 -3 insufficient info for dynamic dish
  */
 
 var notification = require("../services/notification");
@@ -85,6 +86,10 @@ module.exports = {
             });
           })){
           return res.badRequest({ code : -2, responseText : req.__("meal-active-update-dish")});
+        }
+        sails.log.info(req.body.minimalPrice, req.body.qtyRate, req.body.priceRate);
+        if(req.body.isDynamicPriceOn && (!req.body.minimalPrice || !req.body.qtyRate || !req.body.priceRate)){
+          return res.badRequest({ code : -3, responseText : req.__("dish-update-dynamic-insufficient-info")});
         }
         Dish.update(dishId, req.body).exec(function(err, dish){
           if(err){

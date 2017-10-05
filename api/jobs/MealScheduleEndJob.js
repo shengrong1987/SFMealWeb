@@ -7,6 +7,7 @@ var stripe = require('../services/stripe');
 module.exports = function(agenda) {
 
   var helperMethod = {
+
     cancelOrders : function(mealId, done){
       Order.find({ meal : mealId, status : "schedule"}).populate("dishes").populate("meal").populate("host").populate("customer").exec(function(err, orders){
         if(err){
@@ -208,7 +209,7 @@ module.exports = function(agenda) {
           }
           var number = currentOrders[dishId].number;
           var paidDishPrice = parseFloat(currentOrders[dishId].price);
-          var totalQty = parseInt(meal.totalQty[dishId]) - parseInt(meal.leftQty[dishId]);
+          var totalQty = meal.getDynamicDishesTotalOrder(number);
           var currentPrice = parseFloat(dish.getPrice(totalQty, meal));
           currentOrders[dishId].price = currentPrice;
           var difference = (currentPrice - paidDishPrice) * number;

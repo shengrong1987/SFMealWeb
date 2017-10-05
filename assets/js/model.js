@@ -1718,16 +1718,30 @@ var DishView = Backbone.View.extend({
     "click .customVar .continue" : "addCustomVariation",
     "click .customProperty .continue" : "addCustomerProperty",
     "click .customVar .reset" : "resetCustomVariation",
-    "click .customProperty .reset" : "resetCustomProperty"
+    "click .customProperty .reset" : "resetCustomProperty",
+    "switchChange.bootstrapSwitch #isDynamicPriceOn" : "switchDynamicDish"
   },
   initialize : function(){
     var form = this.$el.find("form");
     var formAlert = form.find(form.data("err-container") + " .alert.alert-danger");
+    formAlert.hide();
+    this.formAlert = formAlert;
     var progressAlert = form.find(form.data("err-container") + " .alert.alert-success");
     progressAlert.hide();
-    formAlert.hide();
     this.progressAlert = progressAlert;
-    this.formAlert = formAlert;
+    var dynamicPriceAlert = form.find("#dynamicDishSettingView").parent().find(".alert.alert-danger");
+    dynamicPriceAlert.hide();
+    this.dynamicPriceAlert = dynamicPriceAlert;
+  },
+  switchDynamicDish : function(e){
+    var target = $(e.currentTarget);
+    this.$el.find("#dynamicDishSettingView").removeClass("hide");
+    var isDynamicPriceOn = target.prop("checked");
+    if(isDynamicPriceOn){
+      this.$el.find("#dynamicDishSettingView").show();
+    }else{
+      this.$el.find("#dynamicDishSettingView").hide();
+    }
   },
   addCustomerProperty : function(e){
     e.preventDefault();
@@ -1762,9 +1776,8 @@ var DishView = Backbone.View.extend({
     e.preventDefault();
     var target = $(e.currentTarget);
     target.closest('.option').find(".property").next().find("li").each(function(){
-      if($(this).find("a").attr('value') == "custom"){
+      if($(this).find("a").attr('value') === "custom"){
         $(this).removeClass('disabled');
-        return;
       }
     });
     target.closest('.customProperty').remove();
@@ -1773,9 +1786,8 @@ var DishView = Backbone.View.extend({
     e.preventDefault();
     this.$el.find(".customVar").empty();
     $("#dishVariationInput").next().find("li").each(function(){
-      if($(this).find("a").attr('value') == "custom"){
+      if($(this).find("a").attr('value') === "custom"){
         $(this).removeClass('disabled');
-        return;
       }
     });
   },
@@ -1785,12 +1797,11 @@ var DishView = Backbone.View.extend({
     var variationText = $(e.currentTarget).text();
     console.log("add new variation : " + variation);
     $(e.currentTarget).next().find("li").each(function(){
-      if($(this).find("a").attr('value') == variation){
+      if($(this).find("a").attr('value') === variation){
         $(this).addClass('disabled');
-        return;
       }
     });
-    if(variation == "custom"){
+    if(variation === "custom"){
       var $this = this;
       this.addCustomInput();
     }else{
@@ -1808,9 +1819,8 @@ var DishView = Backbone.View.extend({
     var extra = target.closest(".option").find("[name='extra']").val();
     console.log("add new property : " + property + "within variation :" + variation);
     $(e.currentTarget).next().find("li").each(function(){
-      if($(this).find("a").attr('value') == property){
+      if($(this).find("a").attr('value') === property){
         $(this).addClass('disabled');
-        return;
       }
     });
     if(property === "custom"){
@@ -1853,7 +1863,7 @@ var DishView = Backbone.View.extend({
       "icy" : ['noIce', 'halfIce', 'regularIce', 'extraIce'],
       "ingredient" : [],
       "wellness" : ['rare','mediumRare','medium','mediumWell', 'wellDone']
-    }
+    };
     var container = this.$el.find(".variation .currentVar");
     var section = '<div class="row option" data-value="' + variation + '"> <div class="col-xs-3">'
       + '<h3>' + text + '</h3>'
@@ -1881,9 +1891,8 @@ var DishView = Backbone.View.extend({
     property = property.toString();
     console.log("removing property : " + property);
     target.find(".property").next().find("li").each(function(){
-      if((property=="custom" && $(this).find("a").attr('value') == property) || $(this).find("a").text() == property.trim()){
+      if((property==="custom" && $(this).find("a").attr('value') === property) || $(this).find("a").text() === property.trim()){
         $(this).removeClass('disabled');
-        return;
       }
     });
     $(e.currentTarget).closest(".customProperty").remove();
@@ -1892,9 +1901,8 @@ var DishView = Backbone.View.extend({
     var variation = $(e.currentTarget).data("value");
     console.log("remove new variation : " + variation);
     $("#dishVariationInput").next().find("li").each(function(){
-      if($(this).find("a").attr('value') == variation){
+      if($(this).find("a").attr('value') === variation){
         $(this).removeClass('disabled');
-        return;
       }
     });
     //remove option section
@@ -2008,6 +2016,14 @@ var DishView = Backbone.View.extend({
     var descEn = form.find("#descriptionInput-en").val();
     var instagram = form.find("#instagramInput").val();
     var isDynamicPriceOn = form.find("#isDynamicPriceOn").prop("checked");
+    var priceRate = form.find("#priceRateInput").val();
+    var qtyRate = form.find("#qtyRateInput").val();
+    var minimalPrice = form.find("#minimalPriceInput").val();
+    if(isDynamicPriceOn && (!priceRate || !qtyRate || !minimalPrice)){
+      this.dynamicPriceAlert.show();
+      this.dynamicPriceAlert.html(jQuery.i18n.prop("dynamic-price-incomplete"));
+      return;
+    }
     var preference = {};
     form.find(".variation .currentVar .option").each(function(){
       var properties = [];
@@ -2064,7 +2080,10 @@ var DishView = Backbone.View.extend({
             "description-en" : descEn,
             video : instagram,
             preference : preference,
-            isDynamicPriceOn : isDynamicPriceOn
+            isDynamicPriceOn : isDynamicPriceOn,
+            priceRate : priceRate,
+            qtyRate : qtyRate,
+            minimalPrice : minimalPrice
           });
 
           $this.model.save({},{

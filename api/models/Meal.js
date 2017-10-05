@@ -236,7 +236,7 @@ module.exports = {
     },
 
     dateIsValid : function(params){
-      var params = this;
+      params = this;
       var provideFromTime = params.provideFromTime;
       var provideTillTime = params.provideTillTime;
       var now = new Date();
@@ -309,6 +309,24 @@ module.exports = {
 
     getDateFromDaysAfterNow : function(day){
       return util.getDateFromDaysAfterNow(moment(),day);
+    },
+
+    getDynamicDishesTotalOrder : function(newOrderQty) {
+      var total = 0;
+      var _this = this;
+      _this.dynamicDishes.forEach(function (dish) {
+        total += parseInt(_this.totalQty[dish.id]) - parseInt(_this.leftQty[dish.id]);
+      });
+      total += newOrderQty;
+      return total;
+    },
+    isExpire : function(){
+      var now = moment();
+      return this.status === "on" && moment(this.provideTillTime).isBefore(now);
+    },
+    isNotStart : function(){
+      var now = moment();
+      return this.status === "on" && moment(this.provideFromTime).isAfter(now);
     }
   },
 

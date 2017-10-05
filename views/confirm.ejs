@@ -556,8 +556,7 @@
             <tr class="success item" data-id=<%= dish.id %> data-left-amount=<%= meal.isPartyMode === true ? "100" : meal.leftQty[dish.id] %>>
               <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span> </td>
               <%
-                var quantity = parseInt(meal.totalQty[dish.id])-parseInt(meal.leftQty[dish.id]);
-                var newPrice = dish.getPrice(quantity, meal);
+                var newPrice = dish.getPrice(meal.getDynamicDishesTotalOrder(0), meal);
               if(dish.isDynamicPriceOn && meal.isSupportDynamicPrice && newPrice !== dish.price){ %>
               <td class="price" value=<%= newPrice %> old-value=<%= dish.price || ''%> data-extra=0>$<%= newPrice %> <s>$<%= dish.price%></s></td>
               <%}else{%>

@@ -294,6 +294,8 @@ var ActionButton = createReactClass({
           status = rowData['status'];
         }
         actions.push("update");
+        actions.push("adjust");
+        actions.push("updatePickup");
         break;
         case "Host":
           if(rowData.hasOwnProperty('license')){

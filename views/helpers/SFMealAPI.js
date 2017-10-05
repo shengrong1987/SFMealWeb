@@ -140,16 +140,14 @@ module.exports = {
   },
 
   getOrders : function(criteria, value, skip){
-    if(criteria == "hostId" && value){
+    if(criteria === "hostId" && value){
       var url = "/host/" + value + "/orders?skip=" + skip;
-    }else if(criteria == "userId" && value) {
-      var url = "/user/" + value + "/orders?skip=" + skip;
-    }else if(criteria == "mealId" && value) {
-      var url = "/order/search?skip=" + skip + "&meal=" + value;
+    }else if(criteria === "userId" && value) {
+      url = "/user/" + value + "/orders?skip=" + skip;
     }else if(value) {
-      var url = "/order/search?skip=" + skip + "&" + criteria + "=" + value;
+      url = "/order/search?skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      var url = "/order?skip=" + skip;
+      url = "/order?skip=" + skip;
     }
     $.ajax({
       url: url,

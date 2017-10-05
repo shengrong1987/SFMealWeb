@@ -215,6 +215,21 @@
             <div class="form-group">
               <label for="instagramInput">9.<%= __('is-dynamic') %></label><br/>
               <input class="form-control" type="checkbox" data-toggle="switch-button" id="isDynamicPriceOn" <%= !!dish.isDynamicPriceOn?"checked='checked'":""%>>
+              <div id="dynamicDishSettingView" class="form-group form-inline <%= !!dish.isDynamicPriceOn?"":"hide"%>" style="margin-top:20px;">
+                <div class="input-group">
+                  <div class="input-group-addon"><%= __('priceRate')%>:$</div>
+                  <input type="number" class="form-control" id="priceRateInput" value="<%= dish.priceRate || ''%>">
+                </div>
+                <div class="input-group">
+                  <div class="input-group-addon"><%= __('qtyRate')%></div>
+                  <input type="number" class="form-control" id="qtyRateInput" value="<%= dish.qtyRate || ''%>">
+                </div>
+                <div class="input-group">
+                  <div class="input-group-addon"><%= __('minimalPrice')%>:$</div>
+                  <input type="number" class="form-control" id="minimalPriceInput" value="<%= dish.minimalPrice || ''%>">
+                </div>
+              </div>
+              <div class="alert alert-danger"></div>
             </div>
 
             <div class="form-group text-center submit">

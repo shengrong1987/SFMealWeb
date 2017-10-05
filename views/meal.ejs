@@ -43,7 +43,7 @@
             <div id="meal-detail-intro" class="col-xs-12 col-sm-6">
               <div class="row">
                 <div class="col-xs-7 text-left">
-                  <h2 style="display: inline-block;"><%= meal.titleI18n(locale) %><small class="text-orange"><% if(meal.type=='order'){ __('order') }else if(meal.type=='preorder'){ __('preorder') } %> <%= meal.isFull()? __('full'): "" %></small></h2>
+                  <h2 style="display: inline-block;"><%= meal.titleI18n(locale) %><small class="text-orange"><% if(meal.type=='order'){ __('order') }else if(meal.type=='preorder'){ __('preorder') } %> <%= meal.isFull()? __('full'): "" %><%= meal.isExpire()?("(" + __('expire') + ")"):""%><%= meal.isNotStart()?( "(" + __('notStart') + ")"):""%></small></h2>
                   <% if(meal.isPartyMode){%>
                   <img class="pop-icon" src="/images/group-icon-<%= locale%>.png">
                   <%}%>
@@ -198,8 +198,8 @@
                   <% if(meal.isSupportDynamicPrice && dish.isDynamicPriceOn && meal.dynamicDishes.some(function(d){
                       return d.id === dish.id;
                     })) {
-                      var orderAmount = parseInt(meal.totalQty[dish.id])-parseInt(meal.leftQty[dish.id]);
-                      var newPrice = dish.getPrice(orderAmount, meal);
+                      var orderAmount = meal.getDynamicDishesTotalOrder(0);
+                      newPrice = dish.getPrice(orderAmount, meal);
                       if(newPrice !== dish.price){
                   %>
                   <div class="box-float-bottom red"><h3 class="text-white" style="margin-top: 10px;"><%= __('dish-dynamic-price-success', (dish.price - newPrice).toFixed(2))%></h3></div>
@@ -362,86 +362,95 @@
           <div class="alert alert-danger" role="alert">
             <%= __('dish-out-tips')%>
           </div>
+          <%}else if(meal.isExpire()){%>
+          <div class="alert alert-danger" role="alert">
+            <%= __('meal-expire-tips')%>
+          </div>
+          <%}else if(meal.isNotStart()){%>
+          <div class="alert alert-danger" role="alert">
+            <%= __('meal-not-start-tips')%>
+          </div>
           <%}%>
-          <table id="order" class="table tableBodyScroll" data-err-container="#order-alert">
-            <thead>
-            <tr>
-              <th><%= __('name')%><i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" data-placement="buttom" title="<%= __('order-list-tip')%>"></i></th>
-              <td><%= __('price')%></td>
-              <td><%= __('quantity')%></td>
-            </tr>
-            </thead>
+          <div class="<%= (meal.isFull() || meal.isExpire() || meal.isNotStart()) ? 'hide' : ''%>">
+            <table id="order" class="table tableBodyScroll" data-err-container="#order-alert">
+              <thead>
+              <tr>
+                <th><%= __('name')%><i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" data-placement="buttom" title="<%= __('order-list-tip')%>"></i></th>
+                <td><%= __('price')%></td>
+                <td><%= __('quantity')%></td>
+              </tr>
+              </thead>
 
-            <tbody id="toOrderList" class="scroll">
-            <%
+              <tbody id="toOrderList" class="scroll">
+              <%
               dishes = meal.dishes;
               for(i=0; i < dishes.length; i++){
                 dish = dishes[i];
-            %>
-            <tr class="item" data-id=<%= dish.id %> data-left-amount=<%= meal.isPartyMode === true ? "100" : meal.leftQty[dish.id] %>>
-              <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span> </td>
-              <%
-                var quantity = parseInt(meal.totalQty[dish.id])-parseInt(meal.leftQty[dish.id]);
-                var newPrice = dish.getPrice(quantity, meal);
+              %>
+              <tr class="item" data-id=<%= dish.id %> data-left-amount=<%= meal.isPartyMode === true ? "100" : meal.leftQty[dish.id] %>>
+                <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span> </td>
+                <%
+                  var newPrice = dish.getPrice(meal.getDynamicDishesTotalOrder(0), meal);
                 if(dish.isDynamicPriceOn && meal.isSupportDynamicPrice && newPrice !== dish.price){ %>
-                  <td class="price" value=<%= newPrice %> old-value=<%= dish.price || ''%> data-extra=0>$<%= newPrice %> <s>$<%= dish.price%></s></td>
-              <%}else{%>
+                <td class="price" value=<%= newPrice %> old-value=<%= dish.price || ''%> data-extra=0>$<%= newPrice %> <s>$<%= dish.price%></s></td>
+                <%}else{%>
                 <td class="price" value=<%= dish.price %> old-value='' data-extra=0>$<%= dish.price %></td>
+                <%}%>
+                <td>
+                  <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">-</button>
+                  <span class="amount" style="padding: 5px;">  0  </span>
+                  <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',1,true)">+</button>
+                </td>
+              </tr>
+              <% }%>
+              <tr>
+                <th class="text-center">
+                  <button class="btn btn-green" id="expandMenuBtn" onclick="updateOrderWindow(true, true)"><%= __('order-more')%></button>
+                  <button class="btn btn-green" id="collapseMenuBtn" onclick="updateOrderWindow(true, true)"><%= __('order-less')%></button>
+                </th>
+              </tr>
+              </tbody>
+              <tbody>
+              <tr></tr>
+              <tr>
+                <th class="text-right"><%= __('meal-fee')%><span class="subtotal">$0.00</span></th>
+              </tr>
+              <tr class="border-less">
+                <th class="text-right"><%= __('tax')%>:<span class="tax" data-value="0" data-taxrate="<%= meal.getTaxRate()%>"> $0.00</span></th>
+              </tr>
+              <tr>
+                <th class="text-right"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('tip-service-fee')%>"></i> <%= __('service-fee')%>:<span class="service-fee" data-value="0"> $<%= meal.serviceFee%></span></th>
+              </tr>
+              <tr></tr>
+              <% if(user){%>
+              <tr>
+                <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('coupon')%>"></i> <%= __('coupon')%>:</th>
+                <th><input class="coupon-code form-control" style="margin:0 5px 0 5px;width: 80px;" maxlength="7" data-code="" data-value=""></input></th>
+                <th class="text-right">
+                  <button id="applyCouponBtn" class="btn btn-green"><%= __('apply-code')%></button>
+                  <button id="disApplyCouponBtn" class="btn btn-default btn-outline" onclick="javascript:applyCoupon(false);"><%= __('disapply-code')%></button>
+                </th>
+              </tr>
+              <tr>
+                <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i> <%= __('points')%>:</th>
+                <th><input class="points form-control" style="margin:0 5px 0 5px;width: 80px;" readonly value="<%= user?(user.points || 0):-1%>"></input></th>
+                <th class="text-right">
+                  <button id="applyPointsBtn" class="btn btn-green"><%= __('apply-code')%></button>
+                  <button id="disApplyPointsBtn" class="btn btn-default btn-outline" onclick="javascript:applyPoints(false);"><%= __('disapply-code')%></button>
+                </th>
+              </tr>
+              <tr></tr>
               <%}%>
-              <td>
-                <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">-</button>
-                <span class="amount" style="padding: 5px;">  0  </span>
-                <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',1,true)">+</button>
-              </td>
-            </tr>
-            <% }%>
-            <tr>
-              <th class="text-center">
-                <button class="btn btn-green" id="expandMenuBtn" onclick="updateOrderWindow(true, true)"><%= __('order-more')%></button>
-                <button class="btn btn-green" id="collapseMenuBtn" onclick="updateOrderWindow(true, true)"><%= __('order-less')%></button>
-              </th>
-            </tr>
-            </tbody>
-            <tbody>
-            <tr></tr>
-            <tr>
-              <th class="text-right"><%= __('meal-fee')%><span class="subtotal">$0.00</span></th>
-            </tr>
-            <tr class="border-less">
-              <th class="text-right"><%= __('tax')%>:<span class="tax" data-value="0" data-taxrate="<%= meal.getTaxRate()%>"> $0.00</span></th>
-            </tr>
-            <tr>
-            <th class="text-right"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('tip-service-fee')%>"></i> <%= __('service-fee')%>:<span class="service-fee" data-value="0"> $<%= meal.serviceFee%></span></th>
-            </tr>
-            <tr></tr>
-            <% if(user){%>
-            <tr>
-              <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('coupon')%>"></i> <%= __('coupon')%>:</th>
-              <th><input class="coupon-code form-control" style="margin:0 5px 0 5px;width: 80px;" maxlength="7" data-code="" data-value=""></input></th>
-              <th class="text-right">
-                <button id="applyCouponBtn" class="btn btn-green"><%= __('apply-code')%></button>
-                <button id="disApplyCouponBtn" class="btn btn-default btn-outline" onclick="javascript:applyCoupon(false);"><%= __('disapply-code')%></button>
-              </th>
-            </tr>
-            <tr>
-              <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i> <%= __('points')%>:</th>
-              <th><input class="points form-control" style="margin:0 5px 0 5px;width: 80px;" readonly value="<%= user?(user.points || 0):-1%>"></input></th>
-              <th class="text-right">
-                <button id="applyPointsBtn" class="btn btn-green"><%= __('apply-code')%></button>
-                <button id="disApplyPointsBtn" class="btn btn-default btn-outline" onclick="javascript:applyPoints(false);"><%= __('disapply-code')%></button>
-              </th>
-            </tr>
-            <tr></tr>
-            <%}%>
-            <tr>
-              <th class="text-right"><%= __('total')%><span class="total"></span></th>
-            </tr>
-            </tbody>
-          </table>
+              <tr>
+                <th class="text-right"><%= __('total')%><span class="total"></span></th>
+              </tr>
+              </tbody>
+            </table>
 
-          <div class="row">
-            <div class="col-xs-12">
-              <button type="button" data-id="<%= meal.id%>" class="btn btn-red" onclick="javascript:location.href='/meal/' + $(this).data('id') + '/confirm' + '<%= meal.isPartyMode === true ? '?party=true' : ''%>'"><%= __('checkout')%></button>
+            <div class="row">
+              <div class="col-xs-12">
+                <button type="button" data-id="<%= meal.id%>" class="btn btn-red" onclick="javascript:location.href='/meal/' + $(this).data('id') + '/confirm' + '<%= meal.isPartyMode === true ? '?party=true' : ''%>'"><%= __('checkout')%></button>
+              </div>
             </div>
           </div>
 

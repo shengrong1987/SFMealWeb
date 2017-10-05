@@ -497,6 +497,7 @@
   "meal-query-invalid" : "Meal query is invalid",
   "meal-lack-of-party-requirement" : "Meal support catering but lack of requirement",
   "meal-invalid-dynamic-dish" : "The Meal has a price-dynamic dish that exist in another open meal that support dynamic price",
+  "dish-update-dynamic-insufficient-info" : "Need more info to turn on dynamic price.",
   "host-like-once-error" : "You can only like the same chef once",
   "host-like-himself-error" : "You can not like/follow yourself",
   "host-bank-ok": "Your bank account has been successfully created",
@@ -820,5 +821,12 @@
   "enter-meal" : "Welcome home，click above to see more dishes.",
   "month-and-date" : "%s.%s",
   "find-route" : "Navigate me to pickup",
-  "user-benefit" : "Whenever registered user takes order with credit card, he earns 10% cash credit."
+  "user-benefit" : "Whenever registered user takes order with credit card, he earns 10% cash credit.",
+  "notStart" : "Not Start",
+  "meal-expire-tips" : "Meal is done for booking, please try other meals.",
+  "meal-not-start-tips" : "Meal has not started, please come later.",
+  "expire" : "Expire",
+  "priceRate" : "Price reduce amount",
+  "qtyRate" : "Price reduce order amount",
+  "minimalPrice" : "Minimal price"
 }
