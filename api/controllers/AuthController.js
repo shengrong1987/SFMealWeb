@@ -138,8 +138,12 @@ module.exports = require('waterlock').waterlocked({
       if(err){
         return res.badRequest(err);
       }
-      sails.log.info("wechat access token:" + response.body);
-      var body = JSON.parse(response.body);
+      try{
+        sails.log.info("wechat access token:" + response.body);
+        var body = JSON.parse(response.body);
+      }catch(err){
+        return res.badRequest(err);
+      }
       var ticketUrl = "https://api.wechat.com/cgi-bin/ticket/getticket?access_token=" + body.access_token + "&type=jsapi";
       request.get({
         url : ticketUrl
