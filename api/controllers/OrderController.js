@@ -1357,7 +1357,7 @@ module.exports = {
   getProperties : function(preferences){
     var properties = [];
     if(!preferences){
-      return "";
+      return [];
     }
     preferences.forEach(function(preference){
       var props = preference.property.split(",");

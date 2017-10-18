@@ -136,11 +136,9 @@ var ActionDialog = createReactClass({
     Object.keys(keyValues).forEach(function(key){
       if(action === "adjustAdmin"){
         if(key !== "subtotal"){
-          orders[key] = keyValues[key];
+          orders[key] = JSON.parse(keyValues[key]);
           delete keyValues[key];
         }
-      }else if(action === "addDish"){
-        keyValues["id"]
       }else if(key === "street" || key === "zip" ||  key === "city" || key === "state" || key === "county"){
         addressObj = addressObj || {};
         addressObj[key] = keyValues[key];
