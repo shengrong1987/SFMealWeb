@@ -80,7 +80,7 @@
                             var dishOrdered = order.orders[key];
                             var price = parseFloat(dishOrdered.price);
                             var number = dishOrdered.number;
-                            var preference = dishOrdered.preference;
+                            var preference = dishOrdered.preference || [];
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -194,7 +194,7 @@
                           var dishOrdered = order.orders[key];
                           var price = parseFloat(dishOrdered.price);
                           var number = dishOrdered.number;
-                          var preference = dishOrdered.preference;
+                          var preference = dishOrdered.preference || [];
                           if(!preference.length){preference = [preference];}
                           var extra = preference.reduce(function(total,next){
                             return total + parseInt(next.extra);
@@ -289,7 +289,7 @@
                             var dishOrdered = order.orders[key];
                             var price = parseFloat(dishOrdered.price);
                             var number = dishOrdered.number;
-                            var preference = dishOrdered.preference;
+                            var preference = dishOrdered.preference || [];
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -364,7 +364,7 @@
                           var dishOrdered = order.orders[key];
                           var price = parseFloat(dishOrdered.price);
                           var number = dishOrdered.number;
-                          var preference = dishOrdered.preference;
+                          var preference = dishOrdered.preference || [];
                           if(!preference.length){preference = [preference];}
                           var extra = preference.reduce(function(total,next){
                             return total + parseInt(next.extra);
@@ -440,7 +440,7 @@
                             var dishOrdered = order.orders[key];
                             var price = parseFloat(dishOrdered.price);
                             var number = dishOrdered.number;
-                            var preference = dishOrdered.preference;
+                            var preference = dishOrdered.preference || [];
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -517,7 +517,7 @@
                             var dishOrdered = order.orders[key];
                             var price = parseFloat(dishOrdered.price);
                             var number = dishOrdered.number;
-                            var preference = dishOrdered.preference;
+                            var preference = dishOrdered.preference || [];
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -606,7 +606,7 @@
                             var dishOrdered = order.orders[key];
                             var price = parseFloat(dishOrdered.price);
                             var number = dishOrdered.number;
-                            var preference = dishOrdered.preference;
+                            var preference = dishOrdered.preference || [];
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -719,7 +719,7 @@
                           var dishOrdered = order.orders[key];
                           var price = parseFloat(dishOrdered.price);
                           var number = dishOrdered.number;
-                          var preference = dishOrdered.preference;
+                          var preference = dishOrdered.preference || [];
                           if(!preference.length){preference = [preference];}
                           var extra = preference.reduce(function(total,next){
                             return total + parseInt(next.extra);
@@ -815,7 +815,7 @@
                             var dishOrdered = order.orders[key];
                             var price = parseFloat(dishOrdered.price);
                             var number = dishOrdered.number;
-                            var preference = dishOrdered.preference;
+                            var preference = dishOrdered.preference || [];
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -892,7 +892,7 @@
                             var dishOrdered = order.orders[key];
                             var price = parseFloat(dishOrdered.price);
                             var number = dishOrdered.number;
-                            var preference = dishOrdered.preference;
+                            var preference = dishOrdered.preference || [];
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -968,7 +968,7 @@
                             var dishOrdered = order.orders[key];
                             var price = parseFloat(dishOrdered.price);
                             var number = dishOrdered.number;
-                            var preference = dishOrdered.preference;
+                            var preference = dishOrdered.preference || [];
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
@@ -1047,7 +1047,7 @@
                             var dishOrdered = order.orders[key];
                             var price = parseFloat(dishOrdered.price);
                             var number = dishOrdered.number;
-                            var preference = dishOrdered.preference;
+                            var preference = dishOrdered.preference || [];
                             if(!preference.length){preference = [preference];}
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
