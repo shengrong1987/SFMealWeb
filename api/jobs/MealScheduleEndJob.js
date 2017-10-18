@@ -19,7 +19,7 @@ module.exports = function(agenda) {
             stripe.refund({
               id : chargeId,
               metadata : {
-                userId : order.customer.id
+                userId : order.customer ? order.customer.id : null
               }
             },function(err, refund){
               if(err){

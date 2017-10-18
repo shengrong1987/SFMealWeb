@@ -313,13 +313,25 @@ module.exports = {
     });
   },
 
-  command : function(model, id, action, detail, data){
+  command : function(model, id, action, detail, data, subModel, subId){
     var httpMethod = "POST";
     if(action === "create"){
       var url = '/' + model.toLowerCase();
     }else if(action === 'view'){
       url = '/' + model.toLowerCase() + '/' + id;
       httpMethod = "GET";
+    }else if(action === "delete"){
+      url = "/" + model.toLowerCase() + '/' + id;
+      httpMethod = "DELETE";
+      if(subId && subModel){
+        url += "/" + subModel + "/" + subId;
+      }
+    }else if(action === "add"){
+      url = "/" + model.toLowerCase() + '/' + id;
+      httpMethod = "POST";
+      if(subId && subModel){
+        url += "/" + subModel + "/" + subId;
+      }
     }else{
       url = '/' + model.toLowerCase() + '/' + id + '/' + action;
     }

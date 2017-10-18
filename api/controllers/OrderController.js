@@ -58,6 +58,7 @@ var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUt
 //-43 : order status error, can not confirm
 //-44 : order dynamic price not match
 //-45 : all stripe error type
+//-46 : this order is an express order, can not confirm
 //-98 : result not found
 
 
@@ -152,7 +153,7 @@ module.exports = {
           if(req.body.isPartyMode){
             m.dishes = dishes;
           }
-          $this.validate_meal(m, orders, undefined, parseFloat(req.body.subtotal), req , function(err){
+          $this.validate_meal(m, orders, undefined, parseFloat(req.body.subtotal), req ,null, function(err){
             if(err){
               return res.badRequest(err);
             }
@@ -486,190 +487,200 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        order.service_fee = order.meal.serviceFee;
-        $this.validate_meal(meal, params.orders, order.orders, subtotal, req, function(err){
-          if(err){
-            sails.log.error(err.responseText);
+        Dish.find({ chef : meal.chef, isVerified : true}).exec(function(err, dishes) {
+          if (err) {
             return res.badRequest(err);
           }
-          var isSendToHost = true;
-          if(hostId === order.host.id){
-            isSendToHost = false;
+          if (!!order.isPartyMode) {
+            meal.dishes = dishes;
           }
-          if(order.status === "schedule"){
-            //host cannot adjust the order at schedule
-            //can update without permission of host or adjust by host
-            var netDiff = parseFloat(subtotal - order.subtotal);
-            var tax = $this.getTax(netDiff, order.host.county, order.meal.isTaxIncluded);
-            netDiff *= 100;
-            var adjustAmount = netDiff + tax;
+          order.service_fee = order.meal.serviceFee;
+          $this.validate_meal(meal, params.orders, order.orders, subtotal, req, order, function(err){
+            if(err){
+              sails.log.error(err.responseText);
+              return res.badRequest(err);
+            }
+            var isSendToHost = true;
+            if(hostId === order.host.id){
+              isSendToHost = false;
+            }
+            if(order.status === "schedule"){
+              //host cannot adjust the order at schedule
+              //can update without permission of host or adjust by host
+              var netDiff = parseFloat(subtotal - order.subtotal);
+              var tax = $this.getTax(netDiff, order.host.county, order.meal.isTaxIncluded);
+              netDiff *= 100;
+              var adjustAmount = netDiff + tax;
 
-            sails.log.info("adjusting amount: " + netDiff);
-            sails.log.info("original tax amount: " + order.tax);
-            sails.log.info("tax adjusting amount: " + tax);
+              sails.log.info("adjusting amount: " + netDiff);
+              sails.log.info("original tax amount: " + order.tax);
+              sails.log.info("tax adjusting amount: " + tax);
 
-            async.auto({
-              chargeCustomer : function(next){
-                if(netDiff <= 0){
-                  return next();
-                }
-                stripe.charge({
-                  isInitial : false,
-                  paymentMethod : order.paymentMethod,
-                  amount : netDiff,
-                  email : email,
-                  customerId : order.customer.customerId,
-                  destination : order.host.accountId,
-                  meal : order.meal,
-                  tax : tax,
-                  metadata : {
-                    mealId : order.meal.id,
-                    hostId : order.host.id,
-                    orderId : order.id,
-                    userId : order.customer.id,
-                    deliveryFee : order.delivery_fee * 100,
-                    tax : order.tax + tax
+              async.auto({
+                chargeCustomer : function(next){
+                  if(netDiff <= 0){
+                    return next();
                   }
-                },function(err, charge, transfer){
-                  if(err){
-                    return next({ code : -39, responseText : err.message });
-                  }
-                  if(charge.status !== "succeeded") {
-                    return next({ responseText : req.__('order-adjust-stripe-error',charge.status), code : -37});
-                  }
-                  if(order.paymentMethod === "cash"){
-                    order.charges['cash'] = order.charges['cash'] || 0;
-                    order.charges['cash'] += charge.amount;
-                    order.application_fees['cash'] += charge.application_fee;
-                    if(transfer){
-                      order.feeCharges[transfer.id] = transfer.amount;
+                  stripe.charge({
+                    isInitial : false,
+                    paymentMethod : order.paymentMethod,
+                    amount : netDiff,
+                    email : email,
+                    customerId : !!order.customer ? order.customer.customerId : null,
+                    destination : order.host.accountId,
+                    meal : order.meal,
+                    tax : tax,
+                    metadata : {
+                      mealId : order.meal.id,
+                      hostId : order.host.id,
+                      orderId : order.id,
+                      userId : !!order.customer ? order.customer.id : null,
+                      deliveryFee : order.delivery_fee * 100,
+                      tax : order.tax + tax
                     }
-                  }else{
-                    order.charges[charge.id] = charge.amount;
-                    if(transfer){
-                      order.transfer[transfer.id] = transfer.amount;
+                  },function(err, charge, transfer){
+                    if(err){
+                      return next({ code : -39, responseText : err.message });
                     }
-                  }
-                  next();
-                });
-              },
-              refundCustomer : function(next){
-                if(netDiff >= 0){
-                  return next();
-                }
-
-                sails.log.info("original tax amount: " + order.tax);
-                sails.log.info("tax refund amount: " + tax);
-                sails.log.info("refunding amount plus tax: " + netDiff);
-                async.auto({
-                  refundOrders : function(next2) {
-                    if (order.paymentMethod === "cash") {
-                      return next2();
+                    if(charge.status !== "succeeded") {
+                      return next({ responseText : req.__('order-adjust-stripe-error',charge.status), code : -37});
                     }
-                    var metadata = {
-                      userId: order.customer.id,
-                      paymentMethod: order.paymentMethod,
-                      reverse_transfer : true,
-                      refund_application_fee : true,
-                      amount : Math.abs(adjustAmount)
-                    };
-                    Object.keys(order.charges).forEach(function(chargeId){
-                      sails.log.info("charge: " + chargeId, " with amount: " + order.charges[chargeId]);
-                    });
-                    stripe.batchRefund(order.charges, order.transfer, metadata, function (err) {
-                      if (err) {
-                        return next2(err);
+                    if(order.paymentMethod === "cash"){
+                      order.charges['cash'] = order.charges['cash'] || 0;
+                      order.charges['cash'] += charge.amount;
+                      order.application_fees['cash'] += charge.application_fee;
+                      if(transfer){
+                        order.feeCharges[transfer.id] = transfer.amount;
                       }
-                      next2();
-                    });
-                  },
-                  refundFeeForCashOrder: function (next2) {
-                    if (order.paymentMethod !== "cash") {
-                      return next2();
-                    }
-                    var refundedFee = Math.abs(netDiff * order.meal.commission);
-                    var metadata = {
-                      userName: order.customerName,
-                      userPhone: order.customerPhone,
-                      paymentMethod: order.paymentMethod,
-                      reverse_transfer : false,
-                      refund_application_fee : false,
-                      amount : refundedFee
-                    };
-                    stripe.batchRefund(order.feeCharges, null, metadata, function (err) {
-                      if (err) {
-                        return next2(err);
+                    }else{
+                      order.charges[charge.id] = charge.amount;
+                      if(transfer){
+                        order.transfer[transfer.id] = transfer.amount;
                       }
-                      order.application_fees['cash'] -= refundedFee;
-                      order.charges['cash'] -= netDiff;
-                      next2();
-                    })
+                    }
+                    next();
+                  });
+                },
+                refundCustomer : function(next){
+                  if(netDiff >= 0){
+                    return next();
                   }
-                }, function(err){
+
+                  sails.log.info("original tax amount: " + order.tax);
+                  sails.log.info("tax refund amount: " + tax);
+                  sails.log.info("refunding amount plus tax: " + netDiff);
+                  async.auto({
+                    refundOrders : function(next2) {
+                      if (order.paymentMethod === "cash") {
+                        return next2();
+                      }
+                      var metadata = {
+                        userId: !!order.customer ? order.customer.id : null,
+                        paymentMethod: order.paymentMethod,
+                        reverse_transfer : true,
+                        refund_application_fee : true,
+                        amount : Math.abs(adjustAmount)
+                      };
+                      Object.keys(order.charges).forEach(function(chargeId){
+                        sails.log.info("charge: " + chargeId, " with amount: " + order.charges[chargeId]);
+                      });
+                      stripe.batchRefund(order.charges, order.transfer, metadata, function (err) {
+                        if (err) {
+                          return next2(err);
+                        }
+                        next2();
+                      });
+                    },
+                    refundFeeForCashOrder: function (next2) {
+                      if (order.paymentMethod !== "cash") {
+                        return next2();
+                      }
+                      var refundedFee = Math.abs(netDiff * order.meal.commission);
+                      var metadata = {
+                        userName: order.customerName,
+                        userPhone: order.customerPhone,
+                        paymentMethod: order.paymentMethod,
+                        reverse_transfer : false,
+                        refund_application_fee : false,
+                        amount : refundedFee
+                      };
+                      stripe.batchRefund(order.feeCharges, null, metadata, function (err) {
+                        if (err) {
+                          return next2(err);
+                        }
+                        order.application_fees['cash'] -= refundedFee;
+                        order.charges['cash'] -= netDiff;
+                        next2();
+                      })
+                    }
+                  }, function(err){
+                    if(err){
+                      return next(err);
+                    }
+                    next(err);
+                  });
+                },
+                adjustOrder : ['chargeCustomer', 'refundCustomer', function(next){
+                  $this.updateMealLeftQty(order, order.meal, order.orders, params.orders, function(err, m){
+                    if(err){
+                      return next(err);
+                    }
+                    order.leftQty = m.leftQty;
+                    order.last_orders = order.orders;
+                    order.adjusting_orders = order.orders;
+                    order.adjusting_subtotal = order.subtotal;
+                    order.orders = params.orders;
+                    order.subtotal = params.subtotal;
+                    order.tax += tax;
+                    order.meal = m.id;
+                    next();
+                  });
+                }]
+              }, function(err){
+                if(err){
+                  return res.badRequest(err);
+                }
+                order.save(function(err,result){
                   if(err){
                     return next(err);
                   }
-                  next(err);
-                });
-              },
-              adjustOrder : ['chargeCustomer', 'refundCustomer', function(next){
-                $this.updateMealLeftQty(order, order.meal, order.orders, params.orders, function(err, m){
-                  if(err){
-                    return next(err);
-                  }
-                  order.leftQty = m.leftQty;
-                  order.last_orders = order.orders;
-                  order.adjusting_orders = order.orders;
-                  order.adjusting_subtotal = order.subtotal;
-                  order.orders = params.orders;
-                  order.subtotal = params.subtotal;
-                  order.tax += tax;
-                  order.meal = m.id;
-                  next();
-                });
-              }]
-            }, function(err){
-              if(err){
-                return res.badRequest(err);
-              }
+                  Meal.findOne(order.meal).populate("dishes").exec(function(err, meal){
+                    if(err){
+                      return res.badRequest(err);
+                    }
+                    notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
+                    if(req.wantsJSON && process.env.NODE_ENV === "development"){
+                      return res.ok(order);
+                    }
+                    return res.ok({responseText : req.__('order-adjust-ok', adjustAmount) });
+                  });
+                })
+
+              });
+            }else if(order.status === "preparing"){
+              order.lastStatus = order.status;
+              order.status = "adjust";
+              order.isSendToHost = isSendToHost;
+              order.adjusting_orders = params.orders;
+              order.adjusting_subtotal = params.subtotal;
+              order.service_fee = order.meal.serviceFee;
+              order.meal = order.meal.id;
               order.save(function(err,result){
                 if(err){
-                  return next(err);
+                  return res.badRequest(err);
                 }
-                Meal.findOne(order.meal).populate("dishes").exec(function(err, meal){
-                  if(err){
-                    return res.badRequest(err);
-                  }
-                  notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
-                  if(req.wantsJSON && process.env.NODE_ENV === "development"){
-                    return res.ok(order);
-                  }
-                  return res.ok({responseText : req.__('order-adjust-ok', adjustAmount) });
-                });
-              })
-
-            });
-          }else if(order.status === "preparing"){
-            order.lastStatus = order.status;
-            order.status = "adjust";
-            order.isSendToHost = isSendToHost;
-            order.adjusting_orders = params.orders;
-            order.adjusting_subtotal = params.subtotal;
-            order.service_fee = order.meal.serviceFee;
-            order.meal = order.meal.id;
-            order.save(function(err,result){
-              if(err){
-                return res.badRequest(err);
-              }
-              notification.notificationCenter("Order", "adjusting", result, isSendToHost, false, req);
-              if(isSendToHost){
-                return res.ok({responseText : req.__('order-adjust-request-user')});
-              }else{
-                return res.ok({responseText : req.__('order-adjust-request-host')});
-              }
-            });
-          }
-        })
+                notification.notificationCenter("Order", "adjusting", result, isSendToHost, false, req);
+                if(isSendToHost){
+                  return res.ok({responseText : req.__('order-adjust-request-user')});
+                }else{
+                  return res.ok({responseText : req.__('order-adjust-request-host')});
+                }
+              });
+            }else{
+              return res.badRequest({ code : -43, responseText : req.__('order-manipulate-wrong-status')})
+            }
+          })
+        });
       });
     });
   },
@@ -724,7 +735,7 @@ module.exports = {
                 return next();
               }
               var metadata = {
-                userId : order.customer ? order.customer.id : null,
+                userId : !!order.customer ? order.customer.id : null,
                 paymentMethod : order.paymentMethod,
                 reverse_transfer : true,
                 refund_application_fee : true
@@ -828,7 +839,10 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      var customerId = order.customer.id;
+      var customerId = !!order.customer ? order.customer.id : null;
+      if(!customerId){
+        return res.badRequest({ code : -47, responseText : req.__('order-confirm-express-error')});
+      }
       User.findOne(customerId).populate('payment').exec(function (err, user) {
         if (err) {
           return res.badRequest(err);
@@ -1057,7 +1071,7 @@ module.exports = {
             });
           });
         }else{
-          return res.badRequest({ code : -43, responseText : req.__('order-confirm-wrong-status') });
+          return res.badRequest({ code : -43, responseText : req.__('order-manipulate-wrong-status') });
         }
       })
     });
@@ -1415,7 +1429,7 @@ module.exports = {
   },
 
   search : function(req, res){
-    Order.find({ where : req.query, skip : actionUtil.parseSkip(req), limit : actionUtil.parseLimit(req) }).populate('customer').populate('meal').populate('host').exec(function(err, orders){
+    Order.find({ where : req.query, skip : actionUtil.parseSkip(req), limit : actionUtil.parseLimit(req) }).populate("dishes").populate('customer').populate('meal').populate('host').exec(function(err, orders){
       if(err){
         return res.badRequest(err);
       }
@@ -1467,7 +1481,6 @@ module.exports = {
 
   refund : function(req, res){
     var orderId = req.params.id;
-    var userId = req.session.user.id;
     Order.findOne(orderId).populate("meal").populate("host").populate('customer').exec(function(err,order) {
       if (err) {
         return res.badRequest(err)
@@ -1527,10 +1540,198 @@ module.exports = {
     });
   },
 
+  adjustAdmin : function(req, res){
+    var orderId = req.params.id;
+    var params = req.body;
+    var $this = this;
+    Order.findOne(orderId).populate("meal").populate("dishes").populate("host").populate("customer").populate('coupon').exec(function(err,order){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(order.coupon){
+        return res.badRequest({ code : -18, responseText : req.__('adjust-with-coupon-error')});
+      }
+      if(order.status !== "schedule" && order.status !== "preparing"){
+        return res.badRequest({ code : -43, responseText : req.__('order-manipulate-wrong-status')});
+      }
+      Meal.findOne(order.meal.id).populate("dishes").populate("dynamicDishes").exec(function(err, meal){
+        if(err){
+          return res.badRequest(err);
+        }
+        order.service_fee = order.meal.serviceFee;
+        Dish.find({ chef : meal.chef, isVerified : true}).exec(function(err, dishes) {
+          if (err) {
+            return res.badRequest(err);
+          }
+          if(!!order.isPartyMode) {
+            meal.dishes = dishes;
+          }
+          $this.validate_meal(meal, params.orders, order.orders, params.subtotal, req, order, function(err){
+            if(err){
+              sails.log.error(err.responseText);
+              return res.badRequest(err);
+            }
+            var isSendToHost = true;
+            var netDiff = parseFloat(params.subtotal - order.subtotal);
+            var tax = $this.getTax(netDiff, order.host.county, order.meal.isTaxIncluded);
+            netDiff *= 100;
+            var adjustAmount = netDiff + tax;
+
+            sails.log.info("adjusting amount: " + netDiff);
+            sails.log.info("original tax amount: " + order.tax);
+            sails.log.info("tax adjusting amount: " + tax);
+
+            async.auto({
+              chargeCustomer : function(next){
+                if(netDiff <= 0){
+                  return next();
+                }
+                stripe.charge({
+                  isInitial : false,
+                  paymentMethod : order.paymentMethod,
+                  amount : netDiff,
+                  email : order.guestEmail,
+                  customerId : !!order.customer ? order.customer.customerId : null,
+                  destination : order.host.accountId,
+                  meal : order.meal,
+                  tax : tax,
+                  metadata : {
+                    mealId : order.meal.id,
+                    hostId : order.host.id,
+                    orderId : order.id,
+                    userId : !!order.customer ? order.customer.id : null,
+                    deliveryFee : order.delivery_fee * 100,
+                    tax : order.tax + tax
+                  }
+                },function(err, charge, transfer){
+                  if(err){
+                    return next({ code : -39, responseText : err.message });
+                  }
+                  if(charge.status !== "succeeded") {
+                    return next({ responseText : req.__('order-adjust-stripe-error',charge.status), code : -37});
+                  }
+                  if(order.paymentMethod === "cash"){
+                    order.charges['cash'] = order.charges['cash'] || 0;
+                    order.charges['cash'] += charge.amount;
+                    order.application_fees['cash'] += charge.application_fee;
+                    if(transfer){
+                      order.feeCharges[transfer.id] = transfer.amount;
+                    }
+                  }else{
+                    order.charges[charge.id] = charge.amount;
+                    if(transfer){
+                      order.transfer[transfer.id] = transfer.amount;
+                    }
+                  }
+                  next();
+                });
+              },
+              refundCustomer : function(next){
+                if(netDiff >= 0){
+                  return next();
+                }
+
+                sails.log.info("original tax amount: " + order.tax);
+                sails.log.info("tax refund amount: " + tax);
+                sails.log.info("refunding amount plus tax: " + netDiff);
+                async.auto({
+                  refundOrders : function(next2) {
+                    if (order.paymentMethod === "cash") {
+                      return next2();
+                    }
+                    var metadata = {
+                      userId: !!order.customer ? order.customer.id : null,
+                      paymentMethod: order.paymentMethod,
+                      reverse_transfer : true,
+                      refund_application_fee : true,
+                      amount : Math.abs(adjustAmount)
+                    };
+                    Object.keys(order.charges).forEach(function(chargeId){
+                      sails.log.info("charge: " + chargeId, " with amount: " + order.charges[chargeId]);
+                    });
+                    stripe.batchRefund(order.charges, order.transfer, metadata, function (err) {
+                      if (err) {
+                        return next2(err);
+                      }
+                      next2();
+                    });
+                  },
+                  refundFeeForCashOrder: function (next2) {
+                    if (order.paymentMethod !== "cash") {
+                      return next2();
+                    }
+                    var refundedFee = Math.abs(netDiff * order.meal.commission);
+                    var metadata = {
+                      userName: order.customerName,
+                      userPhone: order.customerPhone,
+                      paymentMethod: order.paymentMethod,
+                      reverse_transfer : false,
+                      refund_application_fee : false,
+                      amount : refundedFee
+                    };
+                    stripe.batchRefund(order.feeCharges, null, metadata, function (err) {
+                      if (err) {
+                        return next2(err);
+                      }
+                      order.application_fees['cash'] -= refundedFee;
+                      order.charges['cash'] -= netDiff;
+                      next2();
+                    })
+                  }
+                }, function(err){
+                  if(err){
+                    return next(err);
+                  }
+                  next(err);
+                });
+              },
+              adjustOrder : ['chargeCustomer', 'refundCustomer', function(next){
+                $this.updateMealLeftQty(order, order.meal, order.orders, params.orders, function(err, m){
+                  if(err){
+                    return next(err);
+                  }
+                  order.leftQty = m.leftQty;
+                  order.last_orders = order.orders;
+                  order.adjusting_orders = order.orders;
+                  order.adjusting_subtotal = order.subtotal;
+                  order.orders = params.orders;
+                  order.subtotal = params.subtotal;
+                  order.tax += tax;
+                  order.meal = m.id;
+                  next();
+                });
+              }]
+            }, function(err){
+              if(err){
+                return res.badRequest(err);
+              }
+              order.save(function(err,result){
+                if(err){
+                  return next(err);
+                }
+                Meal.findOne(order.meal).populate("dishes").exec(function(err, meal){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  notification.notificationCenter("Order", "adjust", result, isSendToHost, false, req);
+                  if(req.wantsJSON && process.env.NODE_ENV === "development"){
+                    return res.ok(order);
+                  }
+                  return res.ok({responseText : req.__('order-adjust-ok', adjustAmount) });
+                });
+              })
+
+            });
+          })
+        });
+      });
+    });
+  },
+
   /*
    Check if meal is valid
    */
-  validate_meal : function(meal, orders, lastOrders, subtotal, req, cb) {
+  validate_meal : function(meal, orders, lastOrders, subtotal, req, order, cb) {
     var now = new Date();
     var params = req.body;
     if(!orders || !subtotal){
@@ -1542,10 +1743,11 @@ module.exports = {
     if(!meal.dateIsValid()) {
       return cb({ responseText : req.__('order-invalid-meal'), code : -4});
     }
+    var orderInfo = order || req.body;
 
-    var isPartyMode = req.body.isPartyMode;
+    var isPartyMode = orderInfo.isPartyMode;
 
-    if(isPartyMode){
+    if(!!isPartyMode){
       var partyRequire = meal.partyRequirement;
       if(!partyRequire){
         return cb({ responseText : req.__('order-lack-of-party-requirement'), code : -32});
@@ -1554,7 +1756,7 @@ module.exports = {
       if(subtotal < minimal){
         return cb({ responseText : req.__('order-amount-not-qualify-party', minimal), code : -33});
       }
-      var customDate = req.body.customInfo.time;
+      var customDate = orderInfo.customInfo.time;
       now = moment();
       sails.log.info("now: " + now.format() + ", delivery date: " + moment(customDate).format());
       var ms = moment(customDate).diff(now);

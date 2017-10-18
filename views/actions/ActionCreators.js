@@ -80,6 +80,13 @@ var ActionsCreators = {
     });
   },
 
+  createView : function(records){
+    AppDispatcher.handleServerAction({
+      type : ActionTypes.CREATE_VIEW,
+      content : records
+    })
+  },
+
   getTransaction : function(records){
     AppDispatcher.handleServerAction({
       type: ActionTypes.GET_TRANSACTION,

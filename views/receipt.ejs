@@ -6,9 +6,7 @@
     <div class="divider" style="margin-bottom: 10px;"></div>
     <p><%= __('order-number')%>:<%= id%></p>
     <table class="table table-email">
-      <%
-      var tempSubtotal = 0;
-      Object.keys(orders).forEach(function(dishId){
+      <% Object.keys(orders).forEach(function(dishId){
         var orderedDish = orders[dishId];
         var amount = parseInt(orderedDish.number);
         var preference = orderedDish.preference;
@@ -26,8 +24,7 @@
           var dish = dishes.filter(function(dish){
             return dish.id === dishId;
           })[0];
-          var price = dish.getPrice(meal.getDynamicDishesTotalOrder(0), meal);
-          tempSubtotal += parseInt(amount * price + extra);
+          var price = parseInt(orderedDish.price);
       %>
       <tr>
         <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 100px;"></td>
@@ -35,7 +32,7 @@
         <td style="vertical-align: middle;"><%= amount%><%= __('fen')%></td>
         <td style="vertical-align: middle;text-align: right;">
           $<%= (amount * price).toFixed(2)%>
-          <% if(price != dish.price){ %>
+          <% if(price !== dish.price){ %>
           <s>$<%= (amount * dish.price).toFixed(2)%></s>
           <% }if(extra){%>
           (+$<%= extra.toFixed(2)%>)<br/>
@@ -47,7 +44,7 @@
         <td class="xs-hide"></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= __('dingdan')%>: $<%= tempSubtotal.toFixed(2)%></td>
+        <td style="text-align: right;"><%= __('dingdan')%>: $<%= subtotal.toFixed(2)%></td>
       </tr>
       <tr class="border-less">
         <td class="xs-hide"></td>
@@ -59,7 +56,7 @@
         <td class="xs-hide"></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= __('tax')%>: $<%= (tempSubtotal * getTaxRate()).toFixed(2)%></td>
+        <td style="text-align: right;"><%= __('tax')%>: $<%= (subtotal * getTaxRate()).toFixed(2)%></td>
       </tr>
       <tr class="border-less">
         <td class="xs-hide"></td>
@@ -71,7 +68,7 @@
         <td class="xs-hide"></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= __('total')%> $<%= (tempSubtotal * (1 + getTaxRate()) + delivery_fee + (meal?meal.serviceFee:0)).toFixed(2)%></td>
+        <td style="text-align: right;"><%= __('total')%> $<%= (subtotal * (1 + getTaxRate()) + delivery_fee + (meal?meal.serviceFee:0)).toFixed(2)%></td>
       </tr>
       <tr>
         <td><%= __('payment-method')%>: <%= __(paymentInfo.method)%></td>

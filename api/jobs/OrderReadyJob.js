@@ -38,6 +38,7 @@ module.exports = function(agenda) {
           if(err){
             return done(err);
           }
+          sails.log.info("sending order ready reminder to guests");
           notification.notificationCenter("Order", "ready", result, false, false, null);
           done();
         });

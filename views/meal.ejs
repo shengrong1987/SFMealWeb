@@ -469,7 +469,7 @@
               }else if(orders && orders.length > 0){
                   var index = 1;
                   orders.forEach(function(order){%>
-                    <tr><td><%= index%>. <%= order.contactInfo.name || __('user')%>
+                    <tr><td><%= index%>. <%= order.customerName || __('user')%>
                     <%
                       Object.keys(order.orders).forEach(function(dishId){
                       meal.dishes.forEach(function(dish){

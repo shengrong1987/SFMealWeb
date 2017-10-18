@@ -24,13 +24,15 @@ var ActionButton = createReactClass({
 
   propTypes: {
     actions: PropTypes.array,
-    detail : PropTypes.bool
+    detail : PropTypes.bool,
+    data : PropTypes.object
   },
 
   getDefaultProps: function () {
     return {
       actions : [],
-      detail : false
+      detail : false,
+      data : {}
     };
   },
 
@@ -121,8 +123,8 @@ var ActionButton = createReactClass({
     return data;
   },
 
-  _openModal : function(postData, isOpen, title, id, action, isShowDetail){
-    this.setState({ postData : postData, isOpen : isOpen, title : title, id: id, action : action, isShowDetail : isShowDetail});
+  _openModal : function(postData, isOpen, title, id, action, isShowDetail, additionalData){
+    this.setState({ postData : postData, isOpen : isOpen, title : title, id: id, action : action, isShowDetail : isShowDetail, additionalData : additionalData});
   },
 
   _doAction : function(event){
@@ -136,17 +138,58 @@ var ActionButton = createReactClass({
       var isShowDetail = action === "view" ? true : _this.props.detail;
       var data = {};
       var postData = _this.getPostData(_this.props.model, action, $(target));
+      var additionalData = _this.getAdditionalData(_this.props.model, action);
       if(postData){
-        _this._openModal(postData, true, _this.props.data['name'], id, action, isShowDetail);
+        _this._openModal(postData, true, _this.props.data['name'], id, action, isShowDetail, additionalData);
       }else{
         SFMealAPI.command(model, id, action, isShowDetail, data);
       }
     }(event);
   },
 
+  getAdditionalData : function(model, action){
+    var additionalData;
+    switch(model){
+      case "Order":
+        if(action === "adjustAdmin"){
+          additionalData = {
+            dishes : { value : this.props.data["dishes"], type : 'array'}
+          }
+        }
+        break;
+      default:
+    }
+    return additionalData;
+  },
+
   getPostData  : function(model, action, target){
     var postData;
+    var _this = this;
     switch(model){
+      case "Order":
+        if(action === "update"){
+          postData = {
+            delivery_fee : { value : this.props.data["delivery_fee"], type : "float"},
+            shipping_fee : { value : this.props.data["shipping_fee"], type : "float"},
+            subtotal : { value : this.props.data["subtotal"], type : "float"},
+            customerPhone : { value : this.props.data["customerPhone"], type : "string"},
+            customerName : { value : this.props.data["customerName"], type : "string"},
+            guestEmail : { value : this.props.data["guestEmail"], type : "string"},
+            msg : { value : this.props.data["msg"], type : "string"}
+          };
+        }else if(action === "adjustAdmin"){
+          var dishes = this.props.data["dishes"];
+          Object.keys(this.props.data["orders"]).forEach(function(dishId){
+            postData = postData || {};
+            var dish = dishes.filter(function(d){
+              return d.id === dishId;
+            })[0];
+            var dishOrderObj = _this.props.data["orders"][dishId];
+            postData[dish.id] = { value : JSON.stringify(dishOrderObj), type : "json", title : dish.title };
+          })
+          postData["subtotal"] = { value : _this.props.data["subtotal"], type : "float" }
+        }
+        break;
       case "User":
         if(action === "update"){
           postData = {
@@ -185,16 +228,12 @@ var ActionButton = createReactClass({
         if(action === "run"){
           if(this.props.data['data']){
             Object.keys(this.props.data['data']).forEach(function(key){
+              postData = postData || {};
               postData[key] = {
-                value : this.props.data['data'][key]
+                value : _this.props.data['data'][key],
+                type : "string"
               }
             });
-          }
-        }else if(action === "clean"){
-          if(this.props.data['data']){
-            postData = {
-              nextRunAt : { value : null }
-            };
           }
         }
         break;
@@ -224,14 +263,24 @@ var ActionButton = createReactClass({
             description : { value : this.props.data['description']},
             status : { value : this.props.data['status']}
           };
+        }else if(action === "removeDish"){
+          var dishes = this.props.data["dishes"];
+          dishes.forEach(function(dish){
+            postData = postData || {};
+            postData[dish.id] = { value : dish.title, type : "string", submodel : "dishes", action : "delete"};
+          })
+        }else if(action === "addDish"){
+          postData = {
+            fillValue : { value : "请输入dish id", action : "add", submodel: "dishes"}
+          }
         }
         break;
         case "Email":
           if(action === "create"){
             postData = {
-              model : target.closest('tr').find("input[name='model']").val(),
-              action : target.closest('tr').find("input[name='action']").val(),
-              metadata : target.closest('tr').find("input[name='metaData']").val()
+              model : { value : target.closest('tr').find("input[name='model']").val()},
+              action : { value : target.closest('tr').find("input[name='action']").val()},
+              metadata : { value : target.closest('tr').find("input[name='metaData']").val()}
             }
           }
         break;
@@ -243,11 +292,11 @@ var ActionButton = createReactClass({
               return false;
             }
             postData = {
-              type : target.closest('tr').find("input[name='type']").val(),
-              amount : target.closest('tr').find("input[name='amount']").val(),
-              description : target.closest('tr').find("input[name='description']").val(),
-              code : target.closest('tr').find("input[name='code']").val(),
-              expire : expire
+              type : { value : target.closest('tr').find("input[name='type']").val()},
+              amount : { value : target.closest('tr').find("input[name='amount']").val(), type : 'integer'},
+              description : { value : target.closest('tr').find("input[name='description']").val()},
+              code : { value : target.closest('tr').find("input[name='code']").val()},
+              expire : { value : expire, type : 'Date'}
             }
           }
           break;
@@ -280,7 +329,7 @@ var ActionButton = createReactClass({
         if(rowData.hasOwnProperty('status')){
           actions.push(rowData['status'] === "on" ? "off" : "on");
         }
-        actions.push("update","order","review");
+        actions.push("update","order","review","removeDish","addDish");
         break;
       case "Order":
         if(rowData.hasOwnProperty('status')){
@@ -294,7 +343,7 @@ var ActionButton = createReactClass({
           status = rowData['status'];
         }
         actions.push("update");
-        actions.push("adjust");
+        actions.push("adjustAdmin");
         actions.push("updatePickup");
         break;
         case "Host":
@@ -320,7 +369,10 @@ var ActionButton = createReactClass({
           actions.push("update",'review','meal','dish');
           break;
         case "Job":
-          actions.push("run","delete");
+          actions.push("run");
+          if(!rowData["nextRunAt"]){
+            actions.push("delete");
+          }
           break;
         case "Checklist":
           actions = actions.concat(['verifyPhoto','unVerifyPhoto']);

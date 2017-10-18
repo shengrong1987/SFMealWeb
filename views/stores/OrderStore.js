@@ -14,10 +14,15 @@ var CHANGE_EVENT = 'change';
 
 var _orders = [];
 var _showDetail = false;
+var _contentView = "";
 
 var OrderStore = _.assign({}, EventEmitter.prototype, {
   getAllOrders: function () {
     return _orders;
+  },
+
+  getContentView : function(){
+    return _contentView;
   },
 
   isShowDetail : function(){

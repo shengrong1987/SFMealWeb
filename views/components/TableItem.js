@@ -60,7 +60,7 @@ var TableItem = createReactClass({
         rowContent = rowContent ? "true" : "false";
       }else if(typeof rowContent === 'object'){
         rowContent = Object.keys(rowContent).map(function(key,i){
-          return <p key={i}>{key} : {JSON.stringify(rowContent[key])}</p>;
+          return (<div className="form-group"><label>{key}</label><input className="form-control" readOnly type="text" key={i} value={JSON.stringify(rowContent[key])}></input></div>);
         });
       }else if(this._isDate(rowContent)){
         if(col === 'nextRunAt' && new Date(rowContent).getTime() <= new Date().getTime()){
@@ -70,7 +70,11 @@ var TableItem = createReactClass({
         }
       }
     }
-    return rowContent;
+    if(col !== "command"){
+      return <div className="scrollText">{rowContent}</div>;
+    }else{
+      return rowContent;
+    }
   },
 
   render: function() {

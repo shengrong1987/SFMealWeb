@@ -154,7 +154,7 @@ module.exports = require('waterlock').actions.user({
           if (err) {
             return cb(err);
           }
-          if(params.isReceivedEmail && !user.receivedEmail && process.env.NODE_ENV == "production"){
+          if(params.isReceivedEmail && !user.receivedEmail && process.env.NODE_ENV === "production"){
             mailChimp.addMemberToList({ email : user.auth.email, firstname : user.firstname, lastname: user.lastname, language : req.getLocale()}, "subscriber");
             user.receivedEmail = true;
           }
@@ -170,11 +170,11 @@ module.exports = require('waterlock').actions.user({
         async.each(addresses, function(addObj, next){
           sails.log.debug(addObj);
           if(addObj.delete){
-            if(user.address.length == 1){
+            if(user.address.length === 1){
               return next(req.__('user-only-address'));
             }
             var deletingAdd = user.address.filter(function(one){
-              return one.id == addObj.id;
+              return one.id === addObj.id;
             })[0];
             user.address.splice(user.address.indexOf(deletingAdd),1);
             if(deletingAdd.isDefault){
@@ -192,7 +192,7 @@ module.exports = require('waterlock').actions.user({
               return next(req.__('meal-error-address'));
             }
             sails.log.debug("geocoded result: " + result);
-            if(result.length==0){
+            if(result.length===0){
               return next(req.__('meal-error-address2'));
             }
             if(addObj.isDefault){

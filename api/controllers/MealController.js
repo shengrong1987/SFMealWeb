@@ -631,19 +631,21 @@ module.exports = {
   add : function(req, res){
     var mealId = req.param('parentid');
     var dishId = req.param('id');
+    var email = req.session.user.auth.email;
+    var isAdmin = email === "admin@sfmeal.com" ? true : false;
     Meal.findOne(mealId).populate('dishes').exec(function(err, meal){
       if(err){
         return res.badRequest(err);
       }
-      if(meal.status === 'on'){
+      if(!isAdmin && meal.status === 'on'){
         return res.badRequest({responseText : req.__('meal-active-update-dish'), code : -10});
       }
       meal.dishes.add(dishId);
       if(!meal.leftQty.hasOwnProperty(dishId)){
-        meal.leftQty[dishId] = 1;
+        meal.leftQty[dishId] = 10;
       }
       if(!meal.totalQty.hasOwnProperty(dishId)){
-        meal.totalQty[dishId] = 1;
+        meal.totalQty[dishId] = 10;
       }
       meal.save(function(err, result){
         if(err){

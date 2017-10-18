@@ -155,13 +155,15 @@ var Table = createReactClass({
     }
 
     return (
-        <table className="table table-striped table-bordered table-hover">
-          <tbody><tr><td colSpan={header.length}>{this.state.headData}</td></tr></tbody>
-          <TableHeader cols={header}/>
-          <tbody>
-            {tableRows}
-          </tbody>
-        </table>
+        <div>
+          <table className="table table-striped table-bordered table-hover">
+            <tbody><tr><td colSpan={header.length}>{this.state.headData}</td></tr></tbody>
+            <TableHeader cols={header}/>
+            <tbody>
+              {tableRows}
+            </tbody>
+          </table>
+        </div>
     );
   }
 });

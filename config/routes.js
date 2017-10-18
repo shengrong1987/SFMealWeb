@@ -70,6 +70,7 @@ module.exports.routes = {
   '/dish/:id/review' : 'DishController.findReview',
   '/dish/:id/update' : 'DishController.update',
   '/order/:id/adjust-form' : 'OrderController.adjust_order_form',
+  '/order/:id/adjustAdmin' : 'OrderController.adjustAdmin',
   '/order/:id/adjust' : 'OrderController.adjust',
   '/order/:id/cancel' : 'OrderController.cancel',
   '/order/:id/confirm' : 'OrderController.confirm',

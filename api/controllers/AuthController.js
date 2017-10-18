@@ -26,6 +26,7 @@ module.exports = require('waterlock').waterlocked({
    * -9 : fail to decrease totalQty because of the dish has been ordered
    * -10 : fail to add/remove dish on active meal
    * -11 : dish can not be empty
+   * -12 : wechat signature no response
   */
   register: function(req, res) {
     var params = req.params.all(),
@@ -137,27 +138,36 @@ module.exports = require('waterlock').waterlocked({
       if(err){
         return res.badRequest(err);
       }
+      sails.log.info("wechat access token:" + response.body);
       var body = JSON.parse(response.body);
       var ticketUrl = "https://api.wechat.com/cgi-bin/ticket/getticket?access_token=" + body.access_token + "&type=jsapi";
       request.get({
         url : ticketUrl
-      }, function(err, response){
-        if(err){
+      }, function(err, response) {
+        if (err) {
           return res.badRequest(err);
         }
-        body = JSON.parse(response.body);
+        if (!response.body) {
+          return res.badRequest({code: -12, responseText: "wechat signature no response"});
+        }
+        try {
+          sails.log.info("wechat ticket:" + response.body);
+          body = JSON.parse(response.body);
+        } catch (err) {
+          return res.badRequest(err);
+        }
         var ticket = body.ticket;
         var nonceStr = wechatNonceStr;
-        var timestamp = parseInt(new Date().getTime()/1000);
+        var timestamp = parseInt(new Date().getTime() / 1000);
         var preSignatureStr = "jsapi_ticket=" + ticket + "&noncestr=" + nonceStr + "&timestamp=" + timestamp + "&url=" + originalUrl;
         var sha1 = crypto.createHash('sha1'),
           signature = sha1.update(preSignatureStr).digest('hex');
         return res.ok({
-          appid : wechatAppId,
-          timestamp : timestamp,
-          nonceStr : nonceStr,
-          signature : signature,
-          url : originalUrl
+          appid: wechatAppId,
+          timestamp: timestamp,
+          nonceStr: nonceStr,
+          signature: signature,
+          url: originalUrl
         });
       })
     })

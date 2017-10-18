@@ -139,6 +139,9 @@ module.exports = {
     if(attr.metadata.application_fee === 0){
       return cb(null, { id : 'cash', status : 'succeeded', amount : attr.metadata.total, application_fee : attr.metadata.application_fee}, { amount : 0, application_fee : 0});
     }
+    if(attr.metadata.application_fee < 50){
+      attr.metadata.application_fee = 50;
+    }
     stripe.charges.create({
       amount : attr.metadata.application_fee,
       currency : 'usd',
@@ -474,6 +477,7 @@ module.exports = {
       if(err){
         return cb(err);
       }
+      sails.log.info("user id:" + attr.metadata.userId);
       if(!attr.metadata.userId){
         return cb(null, refund);
       }

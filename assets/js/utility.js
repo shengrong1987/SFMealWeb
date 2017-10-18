@@ -282,18 +282,18 @@
   }
 
   utility.formattedHour = function(date){
-    var mDate = moment(new Date(date).toISOString());
-    return mDate.local().format("LT");
+    var mDate = moment.tz(date, "America/Los_Angeles");
+    return mDate.format("LT");
   }
 
   utility.formattedDate = function(date){
-    var mDate = moment(new Date(date).toISOString());
-    return mDate.local().format("ddd, l, LT");
+    var mDate = moment.tz(date, "America/Los_Angeles");
+    return mDate.format("ddd, l, LT");
   }
 
   utility.formattedDay = function(date){
-    var mDate = moment(new Date(date).toISOString());
-    return mDate.local().format("l");
+    var mDate = moment.tz(date, "America/Los_Angeles");
+    return mDate.format("l");
   }
 
   utility.monthDesc = function(value){
@@ -301,5 +301,6 @@
   }
 
   global.utility = utility;
+  moment.tz.add('America/Los_Angeles|PST PDT|80 70|0101|1Lzm0 1zb0 Op0');
 
 })(this);

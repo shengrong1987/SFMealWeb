@@ -3,7 +3,7 @@
  */
 var notification = require('../services/notification');
 module.exports = function(agenda) {
-  var job = {
+  return {
 
     // job name (optional) if not set,
     // Job name will be the file name or subfolder.filename (without .js)
@@ -27,15 +27,21 @@ module.exports = function(agenda) {
     // execute job
     run: function(job, done) {
       var orderId = job.attrs.data.orderId;
-      Order.findOne(orderId).populate('host').populate('dishes').populate("customer").exec(function(err, order){
+      Order.findOne(orderId).populate("meal").populate('host').populate('dishes').populate("customer").exec(function(err, order){
         if(err || !order){
           return done();
         }
-        console.log("sending arrive reminder email to guest");
-        notification.notificationCenter("Order","reminder", order, false, false, null);
-        done();
+        order.status = "ready";
+        order.service_fee = order.meal.serviceFee;
+        order.save(function(err, o){
+          if(err){
+            return done(err);
+          }
+          sails.log.info("sending arrive reminder email to guest");
+          notification.notificationCenter("Order","reminder", o, false, false, null);
+          done();
+        })
       })
-    },
+    }
   };
-  return job;
 }
