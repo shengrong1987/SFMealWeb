@@ -151,7 +151,7 @@ module.exports = {
       if(err){
         return cb(err);
       }
-      return cb(null, { id : 'cash', status : 'succeeded', amount : attr.metadata.total, application_fee : attr.metadata.application_fee}, charge);
+      return cb(null, { id : charge.id, status : charge.status, amount : attr.metadata.total, application_fee : charge.amount}, null);
     });
   },
 
@@ -614,6 +614,41 @@ module.exports = {
         }
         cb(null,customer);
     })
+  },
+
+  retrieveConnectAccounts : function(attr, cb){
+    stripe.accounts.list(
+      { limit: attr.limit },
+      function(err, accounts) {
+        if(err){
+          return cb(err);
+        }
+        cb(null, accounts);
+      }
+    );
+  },
+
+  retrieveConnectAccount : function(attr, cb){
+    stripe.accounts.retrieve(
+      attr.id,
+      function(err, account) {
+        if(err){
+          return cb(err);
+        }
+        cb(null, account);
+      });
+  },
+
+  rejectAccount : function(attr, cb){
+    stripe.accounts.reject(
+      attr.id,
+      {reason: attr.msg},
+      function(err, account) {
+        if(err){
+          return cb(err);
+        }
+        cb(null, account);
+    });
   },
 
   deleteCard : function(attr, cb){

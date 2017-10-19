@@ -90,6 +90,8 @@ module.exports.routes = {
   '/job/:id/delete' : 'JobController.deleteJob',
   '/job/clean' : 'JobController.cleanJobs',
   '/review/:id/private' : 'ReviewController.private',
+  '/account/:id/reject' : 'AccountController.reject',
+  '/account/:id/charge' : 'AccountController.charge',
   '/checklist/:id/verify' : 'ChecklistController.verify',
   '/checklist/:id/unVerify' : 'ChecklistController.unVerify',
   '/coupon/:id/delete' : 'CouponController.delete',

@@ -300,6 +300,20 @@ var ActionButton = createReactClass({
             }
           }
           break;
+        case "Account":
+          if(action === "charge"){
+            postData = {
+              mealId : { value : ''},
+              orderId : { value : ''},
+              msg : { value : 'reason for charge'},
+              applicationFee : { value : 0, type : 'integer'}
+            }
+          }else if(action === "reject"){
+            postData = {
+              msg : { value : "fraud"}
+            }
+          }
+          break;
     }
     return postData;
   },
@@ -392,6 +406,9 @@ var ActionButton = createReactClass({
           if(rowData['isPublic']){
             actions.push('private');
           }
+          break;
+        case "Account":
+          actions.push("charge","reject");
           break;
     }
     if(!this.props.detail){

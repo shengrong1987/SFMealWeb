@@ -386,11 +386,10 @@ module.exports = {
 
       if(order.paymentMethod === "cash"){
         order.charges['cash'] = order.charges['cash'] || 0;
+        order.application_fees['cash'] = order.application_fees['cash'] || 0;
         order.charges['cash'] += charge.amount;
-        order.application_fees['cash'] = charge.application_fee;
-        if(transfer){
-          order.feeCharges[transfer.id] = transfer.amount;
-        }
+        order.application_fees['cash'] += charge.application_fee;
+        order.feeCharges[charge.id] = charge.application_fee;
       }else{
         if(charge){
           order.charges[charge.id] = charge.amount;
@@ -547,11 +546,10 @@ module.exports = {
                     }
                     if(order.paymentMethod === "cash"){
                       order.charges['cash'] = order.charges['cash'] || 0;
+                      order.application_fees['cash'] = order.application_fees['cash'] || 0;
                       order.charges['cash'] += charge.amount;
                       order.application_fees['cash'] += charge.application_fee;
-                      if(transfer){
-                        order.feeCharges[transfer.id] = transfer.amount;
-                      }
+                      order.feeCharges[charge.id] = charge.application_fee;
                     }else{
                       order.charges[charge.id] = charge.amount;
                       if(transfer){
@@ -857,7 +855,6 @@ module.exports = {
           var tax = $this.getTax(netDiff, order.host.county, order.meal.isTaxIncluded);
           netDiff *= 100;
           var adjustAmount = netDiff + tax;
-          var charge, transfer;
           async.auto({
             chargeCustomer : function(next){
               if(netDiff <= 0){
@@ -881,12 +878,25 @@ module.exports = {
                   deliveryFee : order.delivery_fee * 100,
                   tax : tax
                 }
-              },function(err, c, t) {
+              },function(err, charge, transfer) {
                 if (err) {
                   return next({ code : -39, responseText : err.message });
                 }
-                charge = c;
-                transfer = t;
+                if(order.paymentMethod === "cash"){
+                  order.charges['cash'] = order.charges['cash'] || 0;
+                  order.application_fees['cash'] = order.application_fees['cash'] || 0;
+                  order.charges['cash'] += charge.amount;
+                  order.application_fees['cash'] += charge.application_fee;
+                  order.feeCharges[charge.id] = charge.application_fee;
+                }else{
+                  if(charge){
+                    order.charges[charge.id] = charge.amount;
+                    order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
+                  }
+                  if(transfer){
+                    order.transfer[transfer.id] = transfer.amount;
+                  }
+                }
                 next();
               });
             },
@@ -1612,11 +1622,10 @@ module.exports = {
                   }
                   if(order.paymentMethod === "cash"){
                     order.charges['cash'] = order.charges['cash'] || 0;
+                    order.application_fees['cash'] = order.application_fees['cash'] || 0;
                     order.charges['cash'] += charge.amount;
                     order.application_fees['cash'] += charge.application_fee;
-                    if(transfer){
-                      order.feeCharges[transfer.id] = transfer.amount;
-                    }
+                    order.feeCharges[charge.id] = charge.application_fee;
                   }else{
                     order.charges[charge.id] = charge.amount;
                     if(transfer){

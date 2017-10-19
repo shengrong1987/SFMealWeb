@@ -164,6 +164,10 @@ module.exports.policies = {
 
   EmailController : {
     'create' : 'isAdmin'
+  },
+
+  AccountController : {
+    '*' : 'isAdmin'
   }
 
   /***************************************************************************

@@ -218,15 +218,15 @@
               <div id="dynamicDishSettingView" class="form-group form-inline <%= !!dish.isDynamicPriceOn?"":"hide"%>" style="margin-top:20px;">
                 <div class="input-group">
                   <div class="input-group-addon"><%= __('priceRate')%>:$</div>
-                  <input type="number" class="form-control" id="priceRateInput" value="<%= dish.priceRate || ''%>">
+                  <input type="number" class="form-control" id="priceRateInput" value="<%= dish.priceRate || 0%>">
                 </div>
                 <div class="input-group">
                   <div class="input-group-addon"><%= __('qtyRate')%></div>
-                  <input type="number" class="form-control" id="qtyRateInput" value="<%= dish.qtyRate || ''%>">
+                  <input type="number" class="form-control" id="qtyRateInput" value="<%= dish.qtyRate || 0%>">
                 </div>
                 <div class="input-group">
                   <div class="input-group-addon"><%= __('minimalPrice')%>:$</div>
-                  <input type="number" class="form-control" id="minimalPriceInput" value="<%= dish.minimalPrice || ''%>">
+                  <input type="number" class="form-control" id="minimalPriceInput" value="<%= dish.minimalPrice || 0%>">
                 </div>
               </div>
               <div class="alert alert-danger"></div>

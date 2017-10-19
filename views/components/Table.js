@@ -18,6 +18,7 @@ var React = require('react'),
   CouponStore = require('../stores/CouponStore'),
   EmailStore = require('../stores/EmailStore'),
   ReviewStore = require('../stores/ReviewStore'),
+  AccountStore = require('../stores/AccountStore'),
   TableItem = require('./TableItem');
 
 var Table = createReactClass({
@@ -74,6 +75,9 @@ var Table = createReactClass({
       case "Review":
         return {data : ReviewStore.getAllReviews(), detail : ReviewStore.isShowDetail()};
         break;
+      case "Account":
+        return {data : AccountStore.getAllAccounts(), detail : AccountStore.isShowDetail()};
+        break;
     }
   },
 
@@ -97,6 +101,7 @@ var Table = createReactClass({
     CouponStore.addChangeListener(this._onChange);
     EmailStore.addChangeListener(this._onChange);
     ReviewStore.addChangeListener(this._onChange);
+    AccountStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount: function () {
@@ -111,6 +116,7 @@ var Table = createReactClass({
     CouponStore.removeChangeListener(this._onChange);
     EmailStore.removeChangeListener(this._onChange);
     ReviewStore.removeChangeListener(this._onChange);
+    AccountStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function () {

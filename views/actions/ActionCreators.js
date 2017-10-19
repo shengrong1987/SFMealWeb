@@ -160,6 +160,20 @@ var ActionsCreators = {
     });
   },
 
+  getAccount: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_ACCOUNT,
+      records: records
+    });
+  },
+
+  getAccounts: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_ACCOUNTS,
+      records: records
+    });
+  },
+
   switchTab : function(tab){
     AppDispatcher.handleViewAction({
       type : ActionTypes.TAB_CHANGE,

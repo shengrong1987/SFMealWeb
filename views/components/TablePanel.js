@@ -99,6 +99,11 @@ var TablePanel = createReactClass({
         details = {id : 'Review ID', title : 'title', price : 'price', score : 'score', review : 'review', isPublic : "isPublic", dish : 'dish', meal : 'meal', username : 'username',  command : 'Command' };
         criterias = ['id', 'score', "dishId", "mealId", "hostId", "userId"];
         break;
+      case "Account":
+        headers = {id : 'Account ID', 'legal_entity.business_name' : 'business_name', email : 'email', 'legal_entity.verification' : 'verification', 'legal_entity.personal_id_number_provided' : 'id_provided', 'legal_entity.ssn_last_4_provided' : 'ssn_provided',  command : 'Command' };
+        details = {id : 'Review ID', 'legal_entity.business_name' : 'business_name', email : 'email', 'legal_entity.verification' : 'verification', 'legal_entity.personal_id_number_provided' : 'id_provided', 'legal_entity.ssn_last_4_provided' : 'ssn_provided', 'legal_entity.address' : 'address', charges_enabled : 'charges_enabled', payouts_enabled : 'payouts_enabled', verification : 'verification', command : 'Command' };
+        criterias = ['id', 'email', 'business_name'];
+        break;
     }
 
     return (

@@ -113,7 +113,7 @@ describe('PocketController', function() {
             return done(err);
           }
           should.exist(res.body.pocket.transactions);
-          res.body.pocket.transactions.should.have.length(9, 'user transactions number not match');
+          res.body.pocket.transactions.should.have.length(10, 'user transactions number not match');
           done()
         })
     })

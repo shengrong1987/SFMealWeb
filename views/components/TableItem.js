@@ -32,6 +32,24 @@ var TableItem = createReactClass({
     };
   },
 
+  getContent : function(rowContent){
+    var _this = this;
+    if(this._isImage(rowContent)){
+      rowContent = <img src={rowContent} width="100"/>
+    }else if(Array.isArray(rowContent)){
+      rowContent = rowContent.map(function(ele){
+        return _this.getContent(ele);
+      });
+    }else if(typeof rowContent === "boolean"){
+      rowContent = !!rowContent;
+    }else if(typeof rowContent === "object"){
+      rowContent = JSON.stringify(rowContent);
+    }else if(this._isDate(rowContent)){
+      rowContent = new Date(rowContent).toLocaleString();
+    }
+    return rowContent;
+  },
+
   _renderRow : function(rowContent, col, rowData, isCreate){
     var _this = this;
     if(isCreate){
@@ -50,17 +68,16 @@ var TableItem = createReactClass({
         rowContent = <img src={rowContent} width="100"/>
       }else if(Array.isArray(rowContent)){
         rowContent = rowContent.map(function(ele){
-          for(var key in ele){
-            if(_this._isImage(ele[key])){
-              return <img src={ele[key]} width="100"/>
-            }
-          }
+          return _this.getContent(ele);
         });
       }else if(typeof rowContent === "boolean"){
-        rowContent = rowContent ? "true" : "false";
+        rowContent = !!rowContent;
       }else if(typeof rowContent === 'object'){
         rowContent = Object.keys(rowContent).map(function(key,i){
-          return (<div className="form-group"><label>{key}</label><input className="form-control" readOnly type="text" key={i} value={JSON.stringify(rowContent[key])}></input></div>);
+          return (<div className="form-group">
+            <label>{key}</label>
+            <input className="form-control" readOnly type="text" key={i} value={_this.getContent(rowContent[key])}></input>
+          </div>);
         });
       }else if(this._isDate(rowContent)){
         if(col === 'nextRunAt' && new Date(rowContent).getTime() <= new Date().getTime()){

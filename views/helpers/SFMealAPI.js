@@ -313,6 +313,35 @@ module.exports = {
     });
   },
 
+  getAccount : function(id){
+    $.ajax({
+      url: '/account/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getAccount(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getAccounts : function(criteria, value, skip){
+   if(value) {
+      var url = "/account?skip=" + skip + "&" + criteria + "=" + value;
+    }else{
+      url = "/account?skip=" + skip;
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json'
+    }).done(function (data) {
+      ActionCreators.getAccounts(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
   command : function(model, id, action, detail, data, subModel, subId){
     var httpMethod = "POST";
     if(action === "create"){
@@ -418,6 +447,13 @@ module.exports = {
               ActionCreators.getReviews(data);
             }
             break;
+          case "Account":
+            if(detail){
+              ActionCreators.getAccount(data);
+            }else{
+              ActionCreators.getAccounts(data);
+            }
+            break;
         }
       }
     }).fail(function(jqXHR, textStatus){
@@ -516,6 +552,13 @@ module.exports = {
           this.getReview(content);
         }else{
           this.getReviews(criteria, content, skip);
+        }
+        break;
+      case "Account":
+        if(criteria === "id" && content){
+          this.getAccount(content);
+        }else{
+          this.getAccounts(criteria, content, skip);
         }
         break;
     }
