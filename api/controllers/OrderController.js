@@ -1746,16 +1746,15 @@ module.exports = {
     if(!orders || !subtotal){
       return cb({ responseText : req.__('order-empty'), code : -9});
     }
-    if(meal.status === "off" || (now < meal.provideFromTime || now > meal.provideTillTime)){
+    if(!order && (meal.status === "off" || (now < meal.provideFromTime || now > meal.provideTillTime))){
       return cb({ responseText : req.__('meal-not-active'), code : -10});
     }
     if(!meal.dateIsValid()) {
       return cb({ responseText : req.__('order-invalid-meal'), code : -4});
     }
+
     var orderInfo = order || req.body;
-
     var isPartyMode = orderInfo.isPartyMode;
-
     if(!!isPartyMode){
       var partyRequire = meal.partyRequirement;
       if(!partyRequire){
