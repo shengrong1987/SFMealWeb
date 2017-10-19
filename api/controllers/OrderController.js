@@ -1749,7 +1749,7 @@ module.exports = {
     if(!order && (meal.status === "off" || (now < meal.provideFromTime || now > meal.provideTillTime))){
       return cb({ responseText : req.__('meal-not-active'), code : -10});
     }
-    if(!meal.dateIsValid()) {
+    if(!order && !meal.dateIsValid()) {
       return cb({ responseText : req.__('order-invalid-meal'), code : -4});
     }
 
