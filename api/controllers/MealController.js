@@ -659,7 +659,7 @@ module.exports = {
   remove : function(req, res){
     var mealId = req.param('parentid');
     var dishId = req.param('id');
-    Meal.findOne(mealId).populate('dishes').exec(function(err, meal){
+    Meal.findOne(mealId).populate('dishes').populate("dynamicDishes").exec(function(err, meal){
       if(err){
         return res.badRequest(err);
       }
@@ -677,6 +677,7 @@ module.exports = {
       if(meal.totalQty.hasOwnProperty(dishId)){
         delete meal.totalQty[dishId];
       }
+      meal.dynamicDishes.remove(dishId);
       meal.dishes.remove(dishId);
       meal.save(function(err, result){
         if(err){

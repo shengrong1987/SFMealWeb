@@ -188,6 +188,26 @@ var ActionButton = createReactClass({
             postData[dish.id] = { value : JSON.stringify(dishOrderObj), type : "json", title : dish.title };
           })
           postData["subtotal"] = { value : _this.props.data["subtotal"], type : "float" }
+        }else if(action === "updatePickupInfo"){
+          postData = {
+            pickupOption : { value : this.props.data["pickupInfo"]["index"], type : 'integer'},
+            pickupFromTime : { value : this.props.data["pickupInfo"]["pickupFromTime"], type : 'date', readonly : true},
+            pickupTillTime : { value : this.props.data["pickupInfo"]["pickupTillTime"], type : 'date', readonly : true},
+            location : { value : this.props.data["pickupInfo"]["location"], readonly : true},
+            method : { value : this.props.data["pickupInfo"]["method"], readonly : true },
+            phone : { value : this.props.data["pickupInfo"]["phone"], readonly : true },
+            publicLocation : { value : this.props.data["pickupInfo"]["publicLocation"], readonly : true },
+            instruction : { value : this.props.data["pickupInfo"]["instruction"], readonly : true },
+            deliveryCenter : { value : this.props.data["pickupInfo"]["deliveryCenter"], readonly : true },
+            area : { value : this.props.data["pickupInfo"]["area"], readonly : true},
+            county : { value : this.props.data["pickupInfo"]["county"], readonly : true},
+            pickups : { value : this.props.data["meal"]["pickups"], type : 'json', readonly : true },
+            address : { value : this.props.data["contactInfo"]["address"]},
+            mealId : { value : this.props.data["meal"]["id"], readonly : true},
+            chef : { value : this.props.data["host"]["id"], readonly : true},
+            isPartyMode : { value : this.props.data["isPartyMode"], readonly : true},
+            customInfo : { value : this.props.data["customInfo"], type : 'json'}
+          }
         }
         break;
       case "User":
@@ -358,7 +378,7 @@ var ActionButton = createReactClass({
         }
         actions.push("update");
         actions.push("adjustAdmin");
-        actions.push("updatePickup");
+        actions.push("updatePickupInfo");
         break;
         case "Host":
           if(rowData.hasOwnProperty('license')){

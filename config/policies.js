@@ -114,7 +114,8 @@ module.exports.policies = {
     'downloadReceipt' : true,
     'process' : true,
     'verifyOrder' : true,
-    'adjustAdmin' : 'isAdmin'
+    'adjustAdmin' : 'isAdmin',
+    'updatePickupInfo' : 'isAdmin'
   },
 
   DishController : {

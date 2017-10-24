@@ -59,6 +59,7 @@ var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUt
 //-44 : order dynamic price not match
 //-45 : all stripe error type
 //-46 : this order is an express order, can not confirm
+//-47 : incomplete order pickup information
 //-98 : result not found
 
 
@@ -784,7 +785,7 @@ module.exports = {
                     return res.badRequest(err);
                   }
                   notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
-                  $this.cancelOrderJob(result.id, function(err){
+                  $this.cancelOrderJob(result.id,'', function(err){
                     if(err){
                       return res.badRequest(err);
                     }
@@ -1070,7 +1071,7 @@ module.exports = {
                   if(req.wantsJSON && process.env.NODE_ENV === "development"){
                     return res.ok(result);
                   }
-                  $this.cancelOrderJob(result.id, function(err){
+                  $this.cancelOrderJob(result.id,'', function(err){
                     if(err){
                       return res.badRequest(err);
                     }
@@ -1404,8 +1405,15 @@ module.exports = {
     });
   },
 
-  cancelOrderJob : function(orderId, cb){
-    Jobs.cancel({ 'data.orderId' : orderId }, function(err, numberRemoved){
+  cancelOrderJob : function(orderId, name, cb){
+    var query = {};
+    if(orderId){
+      query['data.orderId'] = orderId;
+    }
+    if(name){
+      query['name'] = name;
+    }
+    Jobs.cancel(query, function(err, numberRemoved){
       if(err){
         sails.log.error(err);
         return cb(err);
@@ -1427,6 +1435,59 @@ module.exports = {
   Admin API
   @update, @search, @abort, @refund
   */
+
+  updatePickupInfo : function(req, res){
+    var orderId = req.params["id"];
+    req.body.pickupOption = parseInt(req.body.pickupOption);
+    var address = req.body.address;
+    var method = req.body.method;
+    var mealId = req.body.mealId;
+    var _this = this;
+    if(!mealId || !method){
+      return res.badRequest({ code : -47, responseText : req.__('order-incomplete-pickup-update')});
+    }
+    if((method === "delivery" || req.body.isPartyMode) && !address){
+      return res.badRequest({ code : -47, responseText : req.__('order-incomplete-pickup-update')});
+    }
+    Order.findOne(orderId).populate("meal").populate("host").exec(function(err, order){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(order.status !== "schedule" && order.status !== "preparing"){
+        return res.badRequest({ code : -43, responseText : req.__('order-manipulate-wrong-status')});
+      }
+      req.body.contactInfo = { address : address };
+      if(req.body.customInfo){
+        req.body.customInfo = JSON.parse(req.body.customInfo);
+      }
+      Meal.findOne(mealId).populate("chef").exec(function(err, meal){
+        if(err){
+          return res.badRequest(err);
+        }
+        _this.validateOption(req.body, meal, req, function(err){
+          if(err){
+            return res.badRequest(err);
+          }
+          req.body = _this.buildDeliveryData(req.body, meal);
+
+          _this.cancelOrderJob(orderId, '', function(err){
+            if(err){
+              return res.badRequest(err);
+            }
+            req.body.isScheduled = false;
+            Order.update(order.id, req.body).exec(function(err, result){
+              if(err){
+                return res.badRequest(err);
+              }
+              result.meal = meal;
+              result.host = order.host;
+              res.ok(result);
+            });
+          });
+        });
+      })
+    });
+  },
 
   update : function(req, res){
     var orderId = req.params.id;
@@ -1477,7 +1538,7 @@ module.exports = {
               return res.badRequest(err);
             }
             notification.notificationCenter("Order", "cancel", result, false, true, req);
-            $this.cancelOrderJob(result.id, function(err){
+            $this.cancelOrderJob(result.id,'', function(err){
               if(err){
                 return res.badRequest(err);
               }
@@ -1861,10 +1922,10 @@ module.exports = {
   validateOption : function(params, meal, req, cb){
     var method = params.method;
     if(method === "pickup"){
-      if(params.isPartyMode){
-        return cb({ code : -36, responseText : req.__('order-catering-must-delivery')});
+      if(!!params.isPartyMode){
+        return cb({ code : -36, responseText : req.__('party-order-need-delivery')})
       }
-      cb();
+      return cb();
     }else if(method === "delivery"){
       var contactInfo = params.contactInfo;
       if(!contactInfo.address){
