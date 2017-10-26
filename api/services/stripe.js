@@ -261,7 +261,9 @@ module.exports = {
       if(err){
         return cb(err);
       }
+
       if(attr.metadata.discount !== 0){
+        attr.metadata.discount = parseInt(attr.metadata.discount);
         _this.retrieveApplicationFee(charge.application_fee, function(err, fee){
           if(err){
             return cb(err);
@@ -346,7 +348,7 @@ module.exports = {
     //declare all fees
     var delivery_application_fee = (attr.method && attr.method === "delivery" && meal.isDeliveryBySystem) ? SYSTEM_DELIVERY_FEE : 0;
     var delivery_fee = attr.deliveryFee || 0;
-    var discount = attr.discount || 0;
+    var discount = parseInt(attr.discount) || 0;
     var tax = attr.tax;
 
     sails.log.info("delivery application fee is: " + delivery_application_fee);
