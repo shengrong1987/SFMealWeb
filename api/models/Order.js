@@ -140,9 +140,12 @@ module.exports = {
     getTaxRate : function(){
       if(this.meal && this.meal.isTaxIncluded){
         return 0;
+      }else if(!this.meal){
+        return this.tax;
       }
       return util.getTaxRate(this.host.county);
     },
+
     discountAmount : {
       type : 'float',
       defaultsTo : 0
@@ -156,6 +159,10 @@ module.exports = {
       defaultsTo : 0
     },
     tax : {
+      type : 'float',
+      defaultsTo : 0
+    },
+    serviceFee : {
       type : 'float',
       defaultsTo : 0
     },
