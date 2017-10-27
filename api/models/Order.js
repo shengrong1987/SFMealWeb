@@ -162,7 +162,7 @@ module.exports = {
       type : 'float',
       defaultsTo : 0
     },
-    serviceFee : {
+    service_fee : {
       type : 'float',
       defaultsTo : 0
     },
