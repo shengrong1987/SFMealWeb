@@ -33,6 +33,10 @@ module.exports = {
       collection: 'Dish',
       required: true
     },
+    dynamicDishes: {
+      collection: 'Dish',
+      required: true
+    },
     orders: {
       type: 'json',
       required: true

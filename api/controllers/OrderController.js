@@ -169,10 +169,12 @@ module.exports = {
             req.body.host = m.chef.id;
             req.body.type = m.type;
             req.body.dishes = m.dishes;
+            req.body.dynamicDishes = m.dynamicDishes;
             req.body.meal = m.id;
             req.body.hostEmail = m.chef.email;
             req.body.phone = m.chef.phone;
             req.body.tax = $this.getTax(req.body.subtotal, m.chef.county, m.isTaxIncluded);
+            req.body.serviceFee = m.serviceFee;
             states.m = m;
 
             async.auto({
@@ -1216,16 +1218,9 @@ module.exports = {
       if(!order){
         return res.notFound();
       }
-      Meal.findOne(order.meal.id).populate("dynamicDishes").exec(function(err, meal){
-        if(err){
-          return res.badRequest(err);
-        }
-        order.meal = meal;
-        notification.transitLocaleTimeZone(order);
-        order.download = false;
-        var dateString = moment().format("ddd, hA");
-        res.view('receipt', order);
-      })
+      notification.transitLocaleTimeZone(order);
+      order.download = false;
+      res.view('receipt', order);
     })
   },
 
