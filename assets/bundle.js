@@ -67191,28 +67191,18 @@ var ActionButton = createReactClass({
               return d.id === dishId;
             })[0];
             var dishOrderObj = _this.props.data["orders"][dishId];
-            postData[dish.id] = { value : JSON.stringify(dishOrderObj), type : "json", title : dish.title };
+            postData[dish.id] = { value : dishOrderObj, type : "json", title : dish.title };
           })
           postData["subtotal"] = { value : _this.props.data["subtotal"], type : "float" }
         }else if(action === "updatePickupInfo"){
           postData = {
-            pickupOption : { value : this.props.data["pickupInfo"]["index"], type : 'integer'},
-            pickupFromTime : { value : this.props.data["pickupInfo"]["pickupFromTime"], type : 'date', readonly : true},
-            pickupTillTime : { value : this.props.data["pickupInfo"]["pickupTillTime"], type : 'date', readonly : true},
-            location : { value : this.props.data["pickupInfo"]["location"], readonly : true},
-            method : { value : this.props.data["pickupInfo"]["method"], readonly : true },
-            phone : { value : this.props.data["pickupInfo"]["phone"], readonly : true },
-            publicLocation : { value : this.props.data["pickupInfo"]["publicLocation"], readonly : true },
-            instruction : { value : this.props.data["pickupInfo"]["instruction"], readonly : true },
-            deliveryCenter : { value : this.props.data["pickupInfo"]["deliveryCenter"], readonly : true },
-            area : { value : this.props.data["pickupInfo"]["area"], readonly : true},
-            county : { value : this.props.data["pickupInfo"]["county"], readonly : true},
-            pickups : { value : this.props.data["meal"]["pickups"], type : 'json', readonly : true },
+            pickupOption : { value : this.props.data["pickupInfo"]["index"], type : 'select', options : this.props.data["meal"]["pickups"]},
             address : { value : this.props.data["contactInfo"]["address"]},
+            customInfo : { value : this.props.data["customInfo"], type : 'json'},
             mealId : { value : this.props.data["meal"]["id"], readonly : true},
             chef : { value : this.props.data["host"]["id"], readonly : true},
             isPartyMode : { value : this.props.data["isPartyMode"], readonly : true},
-            customInfo : { value : this.props.data["customInfo"], type : 'json'}
+            method : { value : this.props.data["method"], readonly : true}
           }
         }
         break;
@@ -67221,7 +67211,8 @@ var ActionButton = createReactClass({
           postData = {
             firstname : { value : this.props.data['firstname']},
             lastname : { value : this.props.data['lastname']},
-            phone : { value : this.props.data['phone']}
+            phone : { value : this.props.data['phone']},
+            points : { value : this.props.data['points']}
           };
         }else if(action === "deactivate"){
           postData = { msg : { value : ""}};
@@ -67545,14 +67536,14 @@ var ActionDialog = createReactClass({
 
   componentWillReceiveProps : function(nextPro){
     if(nextPro.isOpen && !this.state.modalVisible){
-      this.setState({modalVisible: true, msgData : '', data : null});
+      this.setState({modalVisible: true, msgData : '', data : nextPro.data});
     }else if(!nextPro.isOpen && this.state.modalVisible){
-      this.setState({modalVisible: false, data : null});
+      this.setState({modalVisible: false, msgData : '', data : null});
     }
   },
 
   _onClose : function() {
-    this.setState({modalVisible: false, data : null});
+    this.setState({modalVisible: false, data : null, msgData : ''});
   },
 
   getDefaultProps: function () {
@@ -67576,35 +67567,13 @@ var ActionDialog = createReactClass({
     }
     var action = this.props.action;
     var fieldName = target.attr("name");
-    if(action === "updatePickupInfo" && fieldName === "pickupOption"){
-      this.refreshData(target, action, fieldName);
+    var data = this.state.data;
+    if(data[fieldName].type === "json"){
+      data[fieldName].value = JSON.parse(value);
     }else{
-      var data = this.state.data || this.props.data;
-      if(data[fieldName].type === "json"){
-        data[fieldName].value = JSON.parse(value);
-      }else{
-        data[fieldName].value = value;
-      }
-      this.setState(data);
+      data[fieldName].value = value;
     }
-  },
-
-  refreshData : function(target){
-    var pickupOption = parseInt(target.val())-1;
-    var pickups = this.props.data["pickups"].value;
-    if(pickupOption === 0 || pickupOption >= pickups.length){
-      return ActionCreators.badRequest("invalid pickup option");
-    }
-    var pickupInfo = pickups[pickupOption];
-    var postData = this.props.data;
-    Object.keys(pickupInfo).forEach(function(key){
-      if(key === "index"){
-        postData["pickupOption"].value = parseInt(pickupInfo["index"]);
-      }else if(postData.hasOwnProperty(key)){
-        postData[key].value = pickupInfo[key];
-      }
-    });
-    this.setState({ modalVisible : true, data : postData })
+    this.setState(data);
   },
 
   _onAction : function(e){
@@ -67655,17 +67624,6 @@ var ActionDialog = createReactClass({
           orders[key] = JSON.parse(keyValues[key]);
           delete keyValues[key];
         }
-      }else if(action === "updatePickupInfo"){
-        delete keyValues["pickups"];
-        delete keyValues["pickupFromTime"];
-        delete keyValues["pickupTillTime"];
-        delete keyValues["location"];
-        delete keyValues["phone"];
-        delete keyValues["publicLocation"];
-        delete keyValues["instruction"];
-        delete keyValues["deliveryCenter"];
-        delete keyValues["area"];
-        delete keyValues["pickups"];
       }else if(key === "street" || key === "zip" ||  key === "city" || key === "state" || key === "county"){
         addressObj = addressObj || {};
         addressObj[key] = keyValues[key];
@@ -67710,20 +67668,51 @@ var ActionDialog = createReactClass({
     var submodel = valueObj['submodel'];
     var readonly = !!valueObj['readonly'];
     var title = valueObj["title"] ? valueObj["title"] : key;
+    var inputFormControl = this.getInputFromType(valueObj, key, defaultValue);
     return (
       React.createElement(FormGroup, null, 
         React.createElement(Col, {componentClass: ControlLabel, sm: 2}, " ", title, " "), 
         React.createElement(Col, {sm: 10}, 
-          React.createElement(FormControl, {name: key, type: type, value: value||defaultValue, readOnly: readonly?'readonly':'', onChange: this._inputOnChange}), 
+          inputFormControl, 
           React.createElement(Button, {bsStyle: "primary", style: action?{display:"inline-block"}:{display:"none"}, "data-id": key, "data-action": action, "data-submodel": submodel, onClick: this._onAction}, action)
         )
       )
     )
   },
 
+  getInputFromType : function(valueObj,key, defaultValue){
+    var value = valueObj['value'];
+    var readonly = !!valueObj['readonly'];
+    var inputControl;
+    var action = this.props.action;
+    var _this = this;
+    switch(valueObj.type){
+      case "select":
+        if(!valueObj.options){
+          return React.createElement("select", {value: value, name: key});
+        }
+        var optionsView = valueObj.options.map(function(option){
+          if(action === "updatePickupInfo"){
+            if(!!_this.state.data.isPartyMode.value && option.method === "delivery" && !!option.isDateCustomized){
+              return React.createElement("option", {value: option.index}, option.deliveryCenter)
+            }else if(!option.isDateCustomized){
+              return React.createElement("option", {value: option.index}, (option.location||option.deliveryCenter) + ":(" + option.method + ")" + new Date(option.pickupFromTime).toLocaleString() + " to " + new Date(option.pickupTillTime).toLocaleString())
+            }
+          }else{
+            return React.createElement("option", {value: option.index}, option.value)
+          }
+        });
+        inputControl = (React.createElement("select", {name: key, value: value, onChange: this._inputOnChange}, optionsView))
+        break;
+      default:
+        inputControl = React.createElement(FormControl, {name: key, type: valueObj["type"], value: value||defaultValue, readOnly: readonly?'readonly':'', onChange: this._inputOnChange});
+    }
+    return inputControl;
+  },
+
   render: function() {
     var _this = this;
-    var data = this.state.data || this.props.data;
+    var data = this.state.data;
     if(!data){
       return (React.createElement("div", null));
     }
@@ -67751,6 +67740,8 @@ var ActionDialog = createReactClass({
         copyValue.type = 'text';
         copyValue.value = JSON.stringify(copyValue.value);
         return _this.getInputView(i, key, copyValue, defaultValue);
+      }else if(valueObj.type === "select"){
+        return _this.getInputView(i, key, valueObj, 1);
       }else{
         valueObj.type = 'text';
         defaultValue = '';
@@ -68313,13 +68304,13 @@ var TableItem = createReactClass({
     };
   },
 
-  getContent : function(rowContent){
+  getContent : function(rowContent, key){
     var _this = this;
     if(this._isImage(rowContent)){
-      rowContent = React.createElement("img", {src: rowContent, width: "100"})
+      rowContent = React.createElement("img", {key: key, src: rowContent, width: "100"})
     }else if(Array.isArray(rowContent)){
-      rowContent = rowContent.map(function(ele){
-        return _this.getContent(ele);
+      rowContent = rowContent.map(function(ele, j){
+        return _this.getContent(ele, j);
       });
     }else if(typeof rowContent === "boolean"){
       rowContent = !!rowContent;
@@ -68348,16 +68339,16 @@ var TableItem = createReactClass({
       }else if(this._isImage(rowContent)){
         rowContent = React.createElement("img", {src: rowContent, width: "100"})
       }else if(Array.isArray(rowContent)){
-        rowContent = rowContent.map(function(ele){
-          return _this.getContent(ele);
+        rowContent = rowContent.map(function(ele, i){
+          return _this.getContent(ele, i);
         });
       }else if(typeof rowContent === "boolean"){
         rowContent = !!rowContent;
       }else if(typeof rowContent === 'object'){
         rowContent = Object.keys(rowContent).map(function(key,i){
-          return (React.createElement("div", {className: "form-group"}, 
+          return (React.createElement("div", {key: i, className: "form-group"}, 
             React.createElement("label", null, key), 
-            React.createElement("input", {className: "form-control", readOnly: true, type: "text", key: i, value: _this.getContent(rowContent[key])})
+            React.createElement("input", {className: "form-control", readOnly: true, type: "text", value: _this.getContent(rowContent[key])})
           ));
         });
       }else if(this._isDate(rowContent)){

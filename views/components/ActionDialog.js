@@ -64,14 +64,14 @@ var ActionDialog = createReactClass({
 
   componentWillReceiveProps : function(nextPro){
     if(nextPro.isOpen && !this.state.modalVisible){
-      this.setState({modalVisible: true, msgData : '', data : null});
+      this.setState({modalVisible: true, msgData : '', data : nextPro.data});
     }else if(!nextPro.isOpen && this.state.modalVisible){
-      this.setState({modalVisible: false, data : null});
+      this.setState({modalVisible: false, msgData : '', data : null});
     }
   },
 
   _onClose : function() {
-    this.setState({modalVisible: false, data : null});
+    this.setState({modalVisible: false, data : null, msgData : ''});
   },
 
   getDefaultProps: function () {
@@ -95,35 +95,13 @@ var ActionDialog = createReactClass({
     }
     var action = this.props.action;
     var fieldName = target.attr("name");
-    if(action === "updatePickupInfo" && fieldName === "pickupOption"){
-      this.refreshData(target, action, fieldName);
+    var data = this.state.data;
+    if(data[fieldName].type === "json"){
+      data[fieldName].value = JSON.parse(value);
     }else{
-      var data = this.state.data || this.props.data;
-      if(data[fieldName].type === "json"){
-        data[fieldName].value = JSON.parse(value);
-      }else{
-        data[fieldName].value = value;
-      }
-      this.setState(data);
+      data[fieldName].value = value;
     }
-  },
-
-  refreshData : function(target){
-    var pickupOption = parseInt(target.val())-1;
-    var pickups = this.props.data["pickups"].value;
-    if(pickupOption === 0 || pickupOption >= pickups.length){
-      return ActionCreators.badRequest("invalid pickup option");
-    }
-    var pickupInfo = pickups[pickupOption];
-    var postData = this.props.data;
-    Object.keys(pickupInfo).forEach(function(key){
-      if(key === "index"){
-        postData["pickupOption"].value = parseInt(pickupInfo["index"]);
-      }else if(postData.hasOwnProperty(key)){
-        postData[key].value = pickupInfo[key];
-      }
-    });
-    this.setState({ modalVisible : true, data : postData })
+    this.setState(data);
   },
 
   _onAction : function(e){
@@ -174,17 +152,6 @@ var ActionDialog = createReactClass({
           orders[key] = JSON.parse(keyValues[key]);
           delete keyValues[key];
         }
-      }else if(action === "updatePickupInfo"){
-        delete keyValues["pickups"];
-        delete keyValues["pickupFromTime"];
-        delete keyValues["pickupTillTime"];
-        delete keyValues["location"];
-        delete keyValues["phone"];
-        delete keyValues["publicLocation"];
-        delete keyValues["instruction"];
-        delete keyValues["deliveryCenter"];
-        delete keyValues["area"];
-        delete keyValues["pickups"];
       }else if(key === "street" || key === "zip" ||  key === "city" || key === "state" || key === "county"){
         addressObj = addressObj || {};
         addressObj[key] = keyValues[key];
@@ -229,20 +196,51 @@ var ActionDialog = createReactClass({
     var submodel = valueObj['submodel'];
     var readonly = !!valueObj['readonly'];
     var title = valueObj["title"] ? valueObj["title"] : key;
+    var inputFormControl = this.getInputFromType(valueObj, key, defaultValue);
     return (
       <FormGroup>
         <Col componentClass={ControlLabel} sm={2}> {title} </Col>
         <Col sm={10}>
-          <FormControl name={key} type={type} value={value||defaultValue} readOnly={readonly?'readonly':''} onChange={this._inputOnChange}/>
+          {inputFormControl}
           <Button bsStyle="primary" style={action?{display:"inline-block"}:{display:"none"}} data-id={key} data-action={action} data-submodel={submodel} onClick={this._onAction}>{action}</Button>
         </Col>
       </FormGroup>
     )
   },
 
+  getInputFromType : function(valueObj,key, defaultValue){
+    var value = valueObj['value'];
+    var readonly = !!valueObj['readonly'];
+    var inputControl;
+    var action = this.props.action;
+    var _this = this;
+    switch(valueObj.type){
+      case "select":
+        if(!valueObj.options){
+          return <select value={value} name={key}></select>;
+        }
+        var optionsView = valueObj.options.map(function(option){
+          if(action === "updatePickupInfo"){
+            if(!!_this.state.data.isPartyMode.value && option.method === "delivery" && !!option.isDateCustomized){
+              return <option value={option.index}>{option.deliveryCenter}</option>
+            }else if(!option.isDateCustomized){
+              return <option value={option.index}>{(option.location||option.deliveryCenter) + ":(" + option.method + ")" + new Date(option.pickupFromTime).toLocaleString() + " to " + new Date(option.pickupTillTime).toLocaleString()}</option>
+            }
+          }else{
+            return <option value={option.index}>{option.value}</option>
+          }
+        });
+        inputControl = (<select name={key} value={value} onChange={this._inputOnChange}>{optionsView}</select>)
+        break;
+      default:
+        inputControl = <FormControl name={key} type={valueObj["type"]} value={value||defaultValue} readOnly={readonly?'readonly':''} onChange={this._inputOnChange}/>;
+    }
+    return inputControl;
+  },
+
   render: function() {
     var _this = this;
-    var data = this.state.data || this.props.data;
+    var data = this.state.data;
     if(!data){
       return (<div></div>);
     }
@@ -270,6 +268,8 @@ var ActionDialog = createReactClass({
         copyValue.type = 'text';
         copyValue.value = JSON.stringify(copyValue.value);
         return _this.getInputView(i, key, copyValue, defaultValue);
+      }else if(valueObj.type === "select"){
+        return _this.getInputView(i, key, valueObj, 1);
       }else{
         valueObj.type = 'text';
         defaultValue = '';

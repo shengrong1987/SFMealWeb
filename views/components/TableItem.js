@@ -32,13 +32,13 @@ var TableItem = createReactClass({
     };
   },
 
-  getContent : function(rowContent){
+  getContent : function(rowContent, key){
     var _this = this;
     if(this._isImage(rowContent)){
-      rowContent = <img src={rowContent} width="100"/>
+      rowContent = <img key={key} src={rowContent} width="100"/>
     }else if(Array.isArray(rowContent)){
-      rowContent = rowContent.map(function(ele){
-        return _this.getContent(ele);
+      rowContent = rowContent.map(function(ele, j){
+        return _this.getContent(ele, j);
       });
     }else if(typeof rowContent === "boolean"){
       rowContent = !!rowContent;
@@ -67,16 +67,16 @@ var TableItem = createReactClass({
       }else if(this._isImage(rowContent)){
         rowContent = <img src={rowContent} width="100"/>
       }else if(Array.isArray(rowContent)){
-        rowContent = rowContent.map(function(ele){
-          return _this.getContent(ele);
+        rowContent = rowContent.map(function(ele, i){
+          return _this.getContent(ele, i);
         });
       }else if(typeof rowContent === "boolean"){
         rowContent = !!rowContent;
       }else if(typeof rowContent === 'object'){
         rowContent = Object.keys(rowContent).map(function(key,i){
-          return (<div className="form-group">
+          return (<div key={i} className="form-group">
             <label>{key}</label>
-            <input className="form-control" readOnly type="text" key={i} value={_this.getContent(rowContent[key])}></input>
+            <input className="form-control" readOnly type="text" value={_this.getContent(rowContent[key])}></input>
           </div>);
         });
       }else if(this._isDate(rowContent)){
