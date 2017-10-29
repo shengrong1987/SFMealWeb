@@ -873,7 +873,8 @@
         stepping : 30,
         showTodayButton : true,
         defaultDate : mDate,
-        minDate : minDate
+        minDate : minDate,
+        timeZone : ''
       });
     })
   });

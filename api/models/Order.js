@@ -34,8 +34,7 @@ module.exports = {
       required: true
     },
     dynamicDishes: {
-      collection: 'Dish',
-      required: true
+      collection: 'Dish'
     },
     orders: {
       type: 'json',
