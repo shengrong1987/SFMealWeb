@@ -433,7 +433,11 @@ var ActionButton = createReactClass({
     var buttons = actionData.actions.map(function(action, i){
       return (
         <li key={i}>
-          <a className="btn btn-info" data-model={this.props.model} data-id={this.props.data['id']||this.props.data['_id']} data-action={action} onClick={this._doAction}>{action}</a>
+          <a className="btn btn-info"
+            data-model={this.props.model}
+            data-id={this.props.data['id']||this.props.data['_id']}
+            data-action={action}
+            onClick={this._doAction}>{action}</a>
         </li>
       )
     }, this);

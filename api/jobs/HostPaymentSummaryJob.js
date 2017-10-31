@@ -112,7 +112,7 @@ module.exports = function(agenda) {
                         var dateObj = showDates[i];
                         date = dateObj.date;
                         var dateInfos = date.split(" ");
-                        if(dateInfos.length > 1 && dateInfos[0] === charge.month && dateInfos[1] === charge.day){
+                        if(dateInfos.length > 1 && dateInfos[0] === charge.month && parseInt(dateInfos[1]) === charge.day){
                           orderTotalPayment += charge.income - charge.application_fee;
                           dateObj.income += charge.income;
                           dateObj.fee += charge.application_fee;
