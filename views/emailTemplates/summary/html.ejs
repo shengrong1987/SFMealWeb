@@ -52,7 +52,7 @@
         <td><%= datasets.number%></td>
         <td>$<%= (datasets.income / 100).toFixed(2)%></td>
         <td>$<%= (datasets.fee / 100).toFixed(2)%></td>
-        <td>$<%= ((datasets.income - datasets.fee) / 100).toFixed(2)%></td>
+        <td>$<%= (datasets.payment / 100).toFixed(2)%></td>
       </tr>
       <%}%>
 

@@ -67439,7 +67439,11 @@ var ActionButton = createReactClass({
     var buttons = actionData.actions.map(function(action, i){
       return (
         React.createElement("li", {key: i}, 
-          React.createElement("a", {className: "btn btn-info", "data-model": this.props.model, "data-id": this.props.data['id']||this.props.data['_id'], "data-action": action, onClick: this._doAction}, action)
+          React.createElement("a", {className: "btn btn-info", 
+            "data-model": this.props.model, 
+            "data-id": this.props.data['id']||this.props.data['_id'], 
+            "data-action": action, 
+            onClick: this._doAction}, action)
         )
       )
     }, this);

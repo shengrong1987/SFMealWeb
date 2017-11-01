@@ -111,11 +111,17 @@ module.exports = function(agenda) {
                       for(var i=0; i < 7; i++){
                         var dateObj = showDates[i];
                         date = dateObj.date;
+                        dateObj.payment = dateObj.payment || 0;
                         var dateInfos = date.split(" ");
                         if(dateInfos.length > 1 && dateInfos[0] === charge.month && parseInt(dateInfos[1]) === charge.day){
                           orderTotalPayment += charge.income - charge.application_fee;
                           dateObj.income += charge.income;
                           dateObj.fee += charge.application_fee;
+                          if(order.paymentMethod === "cash"){
+                            dateObj.payment -= charge.application_fee;
+                          }else{
+                            dateObj.payment += charge.income - charge.application_fee;
+                          }
                           dateObj.number++;
                           paidInPeriod = true;
                         }
