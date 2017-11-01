@@ -131,7 +131,16 @@ module.exports = function(agenda) {
           return cb(err);
         }
         if(order.paymentMethod === "cash"){
+          order.charges['cash'] = order.charges['cash'] || 0;
+          order.application_fees['cash'] = order.application_fees['cash'] || 0;
           order.charges['cash'] += charge.amount;
+          order.application_fees['cash'] += charge.application_fee;
+          order.feeCharges[charge.id] = charge.application_fee;
+        }else{
+          order.charges[charge.id] = charge.amount;
+          if(transfer){
+            order.transfer[transfer.id] = transfer.amount;
+          }
         }
         sails.log.info("charge amount: " + charge.amount );
         cb();
@@ -180,6 +189,7 @@ module.exports = function(agenda) {
               sails.log.error(err);
               return next(err);
             }
+            order.application_fees['cash'] -= refundedFee;
             order.charges['cash'] -= refundAmount;
             next();
           });

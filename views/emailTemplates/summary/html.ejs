@@ -70,7 +70,7 @@
 
       <tr class="active">
         <td colspan="4"><strong>Last Balance</strong></td>
-        <td><strong>$<%= (host.totalBalance.amount - host.orderTotalPayment - host.otherPayments / 100).toFixed(2)%></strong></td>
+        <td><strong>$<%= ((parseInt(host.totalBalance.amount) - parseInt(host.orderTotalPayment) - parseInt(host.otherPayments)) / 100).toFixed(2)%></strong></td>
       </tr>
 
       <tr class="active">
