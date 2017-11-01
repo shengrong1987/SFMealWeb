@@ -58,9 +58,21 @@
 
       <tr>
         <td colspan="3"></td>
-        <td>Other:</td>
-        <td>$<%= ((host.totalBalance.amount - host.orderTotalPayment) / 100).toFixed(2)%></td>
+        <td>Payment:</td>
+        <td>$<%= (host.orderTotalPayment / 100).toFixed(2)%></td>
       </tr>
+
+      <tr>
+        <td colspan="3"></td>
+        <td>Compensation:</td>
+        <td>$<%= (host.otherPayments / 100).toFixed(2)%></td>
+      </tr>
+
+      <tr class="active">
+        <td colspan="4"><strong>Last Balance</strong></td>
+        <td><strong>$<%= (host.totalBalance.amount - host.orderTotalPayment - host.otherPayments / 100).toFixed(2)%></strong></td>
+      </tr>
+
       <tr class="active">
         <td colspan="4"><strong>Total Payout</strong></td>
         <td><strong>$<%= (host.totalBalance.amount / 100).toFixed(2)%></strong></td>

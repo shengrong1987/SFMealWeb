@@ -77,64 +77,87 @@ module.exports = function(agenda) {
             });
             var transactions = [];
             var orderTotalPayment = 0;
+            var otherPayments = 0;
             async.each(host.orders, function (order, next2) {
               var charges = order.charges;
               var transfer = order.transfer;
-              async.each(Object.keys(charges), function (chargeId, next3) {
-                stripe.retrieveCharge(chargeId, function (err, charge) {
-                  if (err) {
-                    return next3(err);
+              async.auto({
+                retrieveCharges : function(nxt){
+                  if(!charges){
+                    return nxt();
                   }
-                  Host.findOne(host.id).exec(function (err, host) {
-                    if (err) {
-                      return next3(err);
-                    }
-                    stripe.retrieveApplicationFee(charge.application_fee, function(err, fee){
-                      if(err){
-                        return next(err);
+                  async.each(Object.keys(charges), function (chargeId, next3) {
+                    stripe.retrieveCharge(chargeId, function (err, charge) {
+                      if (err) {
+                        return next3(err);
                       }
-                      if(chargeId === "cash"){
-                        var date = moment(new Date(order.createdAt).getTime());
-                        charge.income = order.charges['cash'];
-                        charge.application_fee = order.application_fees['cash'];
-                      }else {
-                        date = moment(charge.created * 1000);
-                        charge.application_fee = fee.amount - fee.amount_refunded;
-                        charge.income = (charge.amount - charge.amount_refunded);
-                      }
-
-                      charge.month = moment.months()[date.month()];
-                      charge.day = date.date();
-                      charge.type = "payment";
-                      charge.host = host;
-                      var paidInPeriod = false;
-                      for(var i=0; i < 7; i++){
-                        var dateObj = showDates[i];
-                        date = dateObj.date;
-                        dateObj.payment = dateObj.payment || 0;
-                        var dateInfos = date.split(" ");
-                        if(dateInfos.length > 1 && dateInfos[0] === charge.month && parseInt(dateInfos[1]) === charge.day){
-                          orderTotalPayment += charge.income - charge.application_fee;
-                          dateObj.income += charge.income;
-                          dateObj.fee += charge.application_fee;
-                          if(order.paymentMethod === "cash"){
-                            dateObj.payment -= charge.application_fee;
-                          }else{
-                            dateObj.payment += charge.income - charge.application_fee;
-                          }
-                          dateObj.number++;
-                          paidInPeriod = true;
+                      Host.findOne(host.id).exec(function (err, host) {
+                        if (err) {
+                          return next3(err);
                         }
-                      }
-                      if(paidInPeriod){
-                        transactions.push(charge);
-                      }
-                      next3();
+                        stripe.retrieveApplicationFee(charge.application_fee, function(err, fee){
+                          if(err){
+                            return next(err);
+                          }
+                          if(chargeId === "cash"){
+                            var date = moment(new Date(order.createdAt).getTime());
+                            charge.income = order.charges['cash'];
+                            charge.application_fee = order.application_fees['cash'];
+                          }else {
+                            date = moment(charge.created * 1000);
+                            charge.application_fee = fee.amount - fee.amount_refunded;
+                            charge.income = (charge.amount - charge.amount_refunded);
+                          }
+
+                          charge.month = moment.months()[date.month()];
+                          charge.day = date.date();
+                          charge.type = "payment";
+                          charge.host = host;
+                          var paidInPeriod = false;
+                          for(var i=0; i < 7; i++){
+                            var dateObj = showDates[i];
+                            date = dateObj.date;
+                            dateObj.payment = dateObj.payment || 0;
+                            var dateInfos = date.split(" ");
+                            if(dateInfos.length > 1 && dateInfos[0] === charge.month && parseInt(dateInfos[1]) === charge.day){
+                              dateObj.income += charge.income;
+                              dateObj.fee += charge.application_fee;
+                              if(order.paymentMethod === "cash"){
+                                dateObj.payment -= charge.application_fee;
+                                orderTotalPayment -= charge.application_fee;
+                              }else{
+                                dateObj.payment += charge.income - charge.application_fee;
+                                orderTotalPayment += charge.income - charge.application_fee;
+                              }
+                              dateObj.number++;
+                              paidInPeriod = true;
+                            }
+                          }
+                          if(paidInPeriod){
+                            transactions.push(charge);
+                          }
+                          next3();
+                        });
+                      })
                     });
-                  })
-                });
-              }, function (err) {
-                if (err) {
+                  }, function(err){
+                    if(err){
+                      return nxt(err);
+                    }
+                    nxt();
+                  });
+                },
+                retrieveTransactions : function(nxt){
+                  if(!transfer){
+                    return nxt();
+                  }
+                  Object.keys(transfer).forEach(function(key){
+                    otherPayments += transfer[key];
+                  });
+                  nxt();
+                }
+              }, function(err){
+                if(err){
                   return next2(err);
                 }
                 order.isPaid = true;
@@ -157,6 +180,7 @@ module.exports = function(agenda) {
               host.numberOfMeal = meals.length;
               host.totalBalance = totalBalance;
               host.orderTotalPayment = orderTotalPayment;
+              host.otherPayments = otherPayments;
               host.transactions = transactions;
               host.showDates = showDates;
               notification.sendEmail("Host", "summary", {host: host, hostEmail: host.email, isSendToHost: true});
