@@ -346,7 +346,7 @@ module.exports = {
     var serviceFee = isInitial ? SERVICE_FEE : 0;
 
     //declare all fees
-    var delivery_application_fee = (attr.method && attr.method === "delivery" && meal.isDeliveryBySystem) ? SYSTEM_DELIVERY_FEE : 0;
+    var delivery_application_fee = (!attr.isPartyMode && attr.method && attr.method === "delivery" && meal.isDeliveryBySystem) ? SYSTEM_DELIVERY_FEE : 0;
     var delivery_fee = attr.deliveryFee || 0;
     var discount = parseInt(attr.discount) || 0;
     var tax = attr.tax;

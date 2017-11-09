@@ -336,6 +336,7 @@ module.exports = {
                     meal : states.m,
                     method : method,
                     tax : req.body.tax,
+                    isPartyMode : order.isPartyMode,
                     metadata : {
                       mealId : states.m.id,
                       hostId : states.m.chef.id,
@@ -532,6 +533,7 @@ module.exports = {
                     destination : order.host.accountId,
                     meal : order.meal,
                     tax : tax,
+                    isPartyMode : order.isPartyMode,
                     metadata : {
                       mealId : order.meal.id,
                       hostId : order.host.id,
@@ -873,6 +875,7 @@ module.exports = {
                 destination : order.host.accountId,
                 meal : order.meal,
                 tax : tax,
+                isPartyMode : order.isPartyMode,
                 metadata : {
                   mealId : order.meal.id,
                   hostId : order.host.id,
@@ -1326,7 +1329,8 @@ module.exports = {
             paymentMethod : source.type,
             meal : order.meal,
             destination : order.host.accountId,
-            metadata : source.metadata
+            metadata : source.metadata,
+            isPartyMode : order.isPartyMode
           };
           stripe.charge(attr, function(err, charge, transfer){
             if(err){
@@ -1661,6 +1665,7 @@ module.exports = {
                   destination : order.host.accountId,
                   meal : order.meal,
                   tax : tax,
+                  isPartyMode : order.isPartyMode,
                   metadata : {
                     mealId : order.meal.id,
                     hostId : order.host.id,
