@@ -67139,7 +67139,7 @@ var ActionButton = createReactClass({
       var target = event.currentTarget;
       var dataset = target.dataset;
       var action = dataset["action"];
-      var id = dataset["id"];
+      var id = dataset['alt'] || dataset["id"];
       var model = dataset["model"];
       var isShowDetail = action === "view" ? true : _this.props.detail;
       var data = {};
@@ -67443,6 +67443,7 @@ var ActionButton = createReactClass({
             "data-model": this.props.model, 
             "data-id": this.props.data['id']||this.props.data['_id'], 
             "data-action": action, 
+            "data-alt": this.props.data['name']||'', 
             onClick: this._doAction}, action)
         )
       )
@@ -67494,7 +67495,7 @@ var React = require('react'),
   DropdownButton = require('react-bootstrap').DropdownButton,
   FormControl = require('react-bootstrap').FormControl,
   MenuItem = require('react-bootstrap').MenuItem,
-  SFMealAPI = require('../helpers/SFMealAPI'),
+  SFMealAPI =  require('../helpers/SFMealAPI'),
   ActionCreators = require('../actions/ActionCreators'),
   SearchStore = require('../stores/SearchStore'),
   _ = require('lodash');

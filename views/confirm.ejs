@@ -321,7 +321,8 @@
 
                   <% if(!user || Object.keys(user).length == 0){%>
                   <div class="col-xs-12">
-                    <a class="text-orange cursor-pointer" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html"><u><%= __('login-tips')%></u></a>
+                    <a class="text-orange cursor-pointer" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html"><u><%= __('signup-tips')%></u></a>
+                    <a class="text-orange cursor-pointer" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" title="<%= __('login-tips')%>%>"><u><%= __('nav-bar-login')%></u></a>
                   </div>
                   <%}else{%>
                   <div class="col-xs-12">
@@ -619,7 +620,7 @@
             <% if(user.id){%>
             <tr>
               <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('coupon')%>"></i> <%= __('coupon')%>:</th>
-              <th><input class="coupon-code form-control" style="margin:0 5px 0 5px;width: 80px;" maxlength="7" data-code="" data-value=""></input></th>
+              <th><input class="coupon-code form-control" style="margin:0 5px 0 5px;width: 80px;" maxlength="7" data-code="" data-value="" value="<%= user.firstOrder ? 'Happy' : ''%>"></input></th>
               <th class="text-right">
                 <button id="applyCouponBtn" class="btn btn-success"><%= __('apply-code')%></button>
                 <button id="disApplyCouponBtn" class="btn btn-danger" onclick="javascript:applyCoupon(false);"><%= __('disapply-code')%></button>

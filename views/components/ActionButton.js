@@ -133,7 +133,7 @@ var ActionButton = createReactClass({
       var target = event.currentTarget;
       var dataset = target.dataset;
       var action = dataset["action"];
-      var id = dataset["id"];
+      var id = dataset['alt'] || dataset["id"];
       var model = dataset["model"];
       var isShowDetail = action === "view" ? true : _this.props.detail;
       var data = {};
@@ -437,6 +437,7 @@ var ActionButton = createReactClass({
             data-model={this.props.model}
             data-id={this.props.data['id']||this.props.data['_id']}
             data-action={action}
+            data-alt={this.props.data['name']||''}
             onClick={this._doAction}>{action}</a>
         </li>
       )

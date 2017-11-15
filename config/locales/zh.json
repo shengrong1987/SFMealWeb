@@ -786,6 +786,7 @@
   "enter-new-contact" : "添加新的联系方式",
   "login-tips" : "如果您之前已注册过，请点击登录获取收餐人信息",
   "login-tips-payment" : "如果您之前已注册过，请点击登录获取银行卡信息",
+  "signup-tips" : "还没注册？现在注册立享新用户$10元优惠和积分",
   "enter-phone" : "请输入手机号",
   "enter-name" : "请输入名字",
   "enter-time" : "请输入送餐时间",

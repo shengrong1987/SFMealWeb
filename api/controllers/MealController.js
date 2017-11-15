@@ -284,14 +284,18 @@ module.exports = {
           if(!req.session.authenticated){
             return cb();
           }
-          User.find(u.id).populate("payment").populate("orders").exec(function(err,user){
+          User.findOne(u.id).populate("payment").populate("orders").exec(function(err,user){
             if(err){
               return cb(err);
             }
-            user[0].orders = user[0].orders.filter(function(order){
+            user.firstOrder = true;
+            user.firstOrder = user.orders.every(function(order){
+              return order.status === "cancel";
+            });
+            user.orders = user.orders.filter(function(order){
               return order.status === "schedule" || order.status === "preparing";
             });
-            u = user[0];
+            u = user;
             cb();
           });
         }

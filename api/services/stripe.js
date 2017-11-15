@@ -142,16 +142,47 @@ module.exports = {
     if(attr.metadata.application_fee < 50){
       attr.metadata.application_fee = 50;
     }
-    stripe.charges.create({
-      amount : attr.metadata.application_fee,
-      currency : 'usd',
-      source : attr.destination,
-      metadata : attr.metadata
-    }, function(err, charge){
+    var charge, transfer = null;
+    async.auto({
+      chargeApplicationFee : function(next){
+        stripe.charges.create({
+          amount : attr.metadata.application_fee,
+          currency : 'usd',
+          source : attr.destination,
+          metadata : attr.metadata
+        }, function(err, c){
+          if(err){
+            return next(err);
+          }
+          charge = c;
+          next();
+        });
+      },
+      transferDiscount : function(next){
+        if(attr.metadata.discount === 0){
+          return next();
+        }
+        stripe.transfers.create(
+          {
+            amount: attr.metadata.discount,
+            currency: 'usd',
+            destination: attr.destination,
+            metadata : attr.metadata
+          }, function(err, t){
+            if(err){
+              return next(err);
+            }
+            transfer = t;
+            sails.log.info("discount transferred as extra: " + t.amount);
+            next();
+          }
+        );
+      }
+    }, function(err){
       if(err){
         return cb(err);
       }
-      return cb(null, { id : charge.id, status : charge.status, amount : attr.metadata.total, application_fee : charge.amount}, null);
+      cb(null, { id : charge.id, status : charge.status, amount : attr.metadata.total, application_fee : charge.amount}, transfer);
     });
   },
 

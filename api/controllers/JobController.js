@@ -29,20 +29,13 @@ module.exports = {
   },
 
   run : function(req, res){
-    var id = req.params.id;
-    var ObjectId = require('mongodb').ObjectId;
-    Jobs.jobs({ _id : new ObjectId(id) }, function(err, jobs){
+    var name = req.params.name;
+    Jobs.now(name, req.body, function(err, job){
       if(err){
         return res.badRequest(err);
       }
-      var job = jobs[0];
-      Jobs.now(job.attrs.name, req.body, function(err, job){
-        if(err){
-          return res.badRequest(err);
-        }
-        return res.ok(job);
-      });
-    })
+      return res.ok(job);
+    });
   },
 
   deleteJob : function(req, res){

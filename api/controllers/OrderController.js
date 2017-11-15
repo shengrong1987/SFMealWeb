@@ -209,9 +209,9 @@ module.exports = {
                     return next({ code : -23, responseText : req.__('order-duplicate-discount')});
                   }
 
-                  if((code || pointsRedeem) && paymentInfo.method === 'cash'){
-                    return next({ code : -26, responseText : req.__('order-cash-no-discount')});
-                  }
+                  // if((code || pointsRedeem) && paymentInfo.method === 'cash'){
+                  //   return next({ code : -26, responseText : req.__('order-cash-no-discount')});
+                  // }
 
                   //validate Coupon
                   $this.verifyCoupon(req, code, found, m, function(err, coupon){
@@ -399,9 +399,9 @@ module.exports = {
           order.charges[charge.id] = charge.amount;
           order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
         }
-        if(transfer){
-          order.transfer[transfer.id] = transfer.amount;
-        }
+      }
+      if(transfer){
+        order.transfer[transfer.id] = transfer.amount;
       }
       order.meal = order.meal.id;
       order.save(function(err, o){
@@ -1400,7 +1400,7 @@ module.exports = {
       if(err){
         return cb(err);
       }
-      cb(err,result);
+      cb(null ,result);
     });
   },
 
@@ -1689,9 +1689,9 @@ module.exports = {
                     order.feeCharges[charge.id] = charge.application_fee;
                   }else{
                     order.charges[charge.id] = charge.amount;
-                    if(transfer){
-                      order.transfer[transfer.id] = transfer.amount;
-                    }
+                  }
+                  if(transfer){
+                    order.transfer[transfer.id] = transfer.amount;
                   }
                   next();
                 });

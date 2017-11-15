@@ -45,7 +45,7 @@ module.exports = function(agenda) {
             if(err){
               return next(err);
             }
-            if(meals.length == 0){
+            if(meals.length === 0){
               return next();
             }
             var params = {
