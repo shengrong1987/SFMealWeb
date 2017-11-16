@@ -282,17 +282,17 @@
   }
 
   utility.formattedHour = function(date){
-    var mDate = moment.tz(date, "America/Los_Angeles");
+    var mDate = moment(date).local();
     return mDate.format("LT");
   }
 
   utility.formattedDate = function(date){
-    var mDate = moment.tz(date, "America/Los_Angeles");
+    var mDate = moment(date).local();
     return mDate.format("ddd, l, LT");
   }
 
   utility.formattedDay = function(date){
-    var mDate = moment.tz(date, "America/Los_Angeles");
+    var mDate = moment(date).local();
     return mDate.format("l");
   }
 
