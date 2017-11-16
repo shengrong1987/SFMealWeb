@@ -439,27 +439,29 @@ var notification = {
   },
 
   transitLocaleTimeZone : function(params){
-    moment.tz.add('America/Los_Angeles|PST PDT|80 70|0101|1Lzm0 1zb0 Op0');
+    // moment.tz.add('America/Los_Angeles|PST PDT|80 70|0101|1Lzm0 1zb0 Op0');
     if(params.pickupInfo){
-      params.pickupInfo.pickupFromTime = moment.tz(params.pickupInfo.pickupFromTime, "America/Los_Angeles").format('ddd, L, LT');
-      params.pickupInfo.pickupTillTime = moment.tz(params.pickupInfo.pickupTillTime, "America/Los_Angeles").format('ddd, L, LT');
+      // params.pickupInfo.pickupFromTime = moment.tz(params.pickupInfo.pickupFromTime, "America/Los_Angeles").format('ddd, L, LT');
+      // params.pickupInfo.pickupTillTime = moment.tz(params.pickupInfo.pickupTillTime, "America/Los_Angeles").format('ddd, L, LT');
+      params.pickupInfo.pickupFromTime = moment(params.pickupInfo.pickupFromTime).local().format('ddd, L, LT');
+      params.pickupInfo.pickupTillTime = moment(params.pickupInfo.pickupTillTime).local().format('ddd, L, LT');
     }
     if(params.eta){
-      params.eta = moment.tz(params.eta,"America/Los_Angeles").format('ddd, L, LT');
+      params.eta = moment(params.eta).local().format('ddd, L, LT');
     }
     if(params.meal){
-      params.meal.provideFromTime = moment.tz(params.meal.provideFromTime, "America/Los_Angeles").format('ddd, L, LT');
-      params.meal.provideTillTime = moment.tz(params.meal.provideTillTime, "America/Los_Angeles").format('ddd, L, LT');
+      params.meal.provideFromTime = moment(params.meal.provideFromTime).local().format('ddd, L, LT');
+      params.meal.provideTillTime = moment(params.meal.provideTillTime).local().format('ddd, L, LT');
     }
     if(params.pickups){
       params.pickups.forEach(function(pickup){
-        pickup.pickupFromTime = moment.tz(pickup.pickupFromTime, "America/Los_Angeles").format('ddd, L, LT');
-        pickup.pickupTillTime = moment.tz(pickup.pickupTillTime, "America/Los_Angeles").format('ddd, L, LT');
+        pickup.pickupFromTime = moment(pickup.pickupFromTime).local().format('ddd, L, LT');
+        pickup.pickupTillTime = moment(pickup.pickupTillTime).local().format('ddd, L, LT');
       });
     }
     if(params.createdAt && params.updatedAt){
-      params.createdAt = moment.tz(params.createdAt, "America/Los_Angeles").format('L, LT');
-      params.updatedAt = moment.tz(params.updatedAt, "America/Los_Angeles").format('L, LT');
+      params.createdAt = moment(params.createdAt).local().format('L, LT');
+      params.updatedAt = moment(params.updatedAt).local().format('L, LT');
     }
   }
 }
