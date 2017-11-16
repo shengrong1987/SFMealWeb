@@ -831,5 +831,15 @@
   "expire" : "已结束",
   "priceRate" : "减价金额",
   "qtyRate" : "减价订单量",
-  "minimalPrice" : "最低价"
+  "minimalPrice" : "最低价",
+  "how-to-order" : "点餐流程",
+  "how-to-pickup" : "取餐流程",
+  "register-login" : "注册/登录流程",
+  "how-to-enter-info" : "填写个人信息",
+  "how-to-select-dish" : "选取菜式",
+  "how-to-manage-order" : "查看订单",
+  "how-to-contact-driver" : "联系司机",
+  "how-to-apply-chef" : "如何申请厨师",
+  "how-to-get-discount" : "注册以及获取$10首次订单折扣",
+  "how-to-save-to-screen" : "如何添加订餐网页到屏幕"
 }

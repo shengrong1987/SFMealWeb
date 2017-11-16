@@ -288,6 +288,9 @@ module.exports = {
             if(err){
               return cb(err);
             }
+            if(!user){
+              return cb({ code : -99, responseText : "can not find user"});
+            }
             user.firstOrder = true;
             user.firstOrder = user.orders.every(function(order){
               return order.status === "cancel";

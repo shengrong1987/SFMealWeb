@@ -830,5 +830,15 @@
   "expire" : "Expire",
   "priceRate" : "Price reduce amount",
   "qtyRate" : "Price reduce order amount",
-  "minimalPrice" : "Minimal price"
+  "minimalPrice" : "Minimal price",
+  "how-to-order" : "How to order?",
+  "how-to-pickup" : "How to pick up order?",
+  "register-login" : "How to Register/Login",
+  "how-to-enter-info" : "Update Information",
+  "how-to-select-dish" : "Select Dishes",
+  "how-to-manage-order" : "Manage Orders",
+  "how-to-contact-driver" : "Contact Drivers",
+  "how-to-apply-chef" : "How to apply for chef?",
+  "how-to-get-discount" : "How to register and get $10 off your first order?",
+  "how-to-save-to-screen" : "How to save website to screen?"
 }
