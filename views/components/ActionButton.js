@@ -179,12 +179,9 @@ var ActionButton = createReactClass({
           };
         }else if(action === "adjustAdmin"){
           var dishes = this.props.data["dishes"];
-          Object.keys(this.props.data["orders"]).forEach(function(dishId){
+          dishes.forEach(function(dish){
             postData = postData || {};
-            var dish = dishes.filter(function(d){
-              return d.id === dishId;
-            })[0];
-            var dishOrderObj = _this.props.data["orders"][dishId];
+            var dishOrderObj = _this.props.data["orders"][dish.id] || { number : 0, preference : [], price : dish.price};
             postData[dish.id] = { value : dishOrderObj, type : "json", title : dish.title };
           })
           postData["subtotal"] = { value : _this.props.data["subtotal"], type : "float" }

@@ -639,7 +639,7 @@ module.exports = {
     var mealId = req.param('parentid');
     var dishId = req.param('id');
     var email = req.session.user.auth.email;
-    var isAdmin = email === "admin@sfmeal.com" ? true : false;
+    var isAdmin = email === "admin@sfmeal.com";
     Meal.findOne(mealId).populate('dishes').exec(function(err, meal){
       if(err){
         return res.badRequest(err);
@@ -658,7 +658,26 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        return res.ok({});
+        Order.find({ $and : [{$or:[{status : "schedule"},{status : "preparing"}]},{meal:mealId}]}).populate("dynamicDishes").populate("dishes").exec(function(err, orders){
+          if(err){
+            return res.badRequest(err);
+          }
+          async.each(orders, function(order, next){
+            order.dishes.add(dishId);
+            order.dynamicDishes.add(dishId);
+            order.save(function(err, o){
+              if(err){
+                return next(err);
+              }
+              next();
+            });
+          }, function(err){
+            if(err){
+              return res.badRequest(err);
+            }
+            res.ok({});
+          })
+        })
       });
     });
   },
@@ -690,7 +709,21 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        return res.ok({});
+        Order.find({ $and : [{$or:[{status : "schedule"},{status : "preparing"}]},{meal:mealId}]}).populate("dynamicDishes").populate("dishes").exec(function(err, orders){
+          if(err){
+            return res.badRequest(err);
+          }
+          async.each(orders, function(order, next){
+            order.dishes.remove(dishId);
+            order.dynamicDishes.remove(dishId);
+            order.save(next);
+          }, function(err){
+            if(err){
+              return res.badRequest(err);
+            }
+            res.ok({});
+          })
+        })
       });
     });
   },

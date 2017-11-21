@@ -483,9 +483,9 @@ module.exports = {
       if(err){
         return res.badRequest(err)
       }
-      if(order.coupon){
-        return res.badRequest({ code : -18, responseText : req.__('adjust-with-coupon-error')});
-      }
+      // if(order.coupon){
+      //   return res.badRequest({ code : -18, responseText : req.__('adjust-with-coupon-error')});
+      // }
       Meal.findOne(order.meal.id).populate("dishes").populate("dynamicDishes").exec(function(err, meal){
         if(err){
           return res.badRequest(err);
@@ -1618,9 +1618,9 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(order.coupon){
-        return res.badRequest({ code : -18, responseText : req.__('adjust-with-coupon-error')});
-      }
+      // if(order.coupon){
+      //   return res.badRequest({ code : -18, responseText : req.__('adjust-with-coupon-error')});
+      // }
       if(order.status !== "schedule" && order.status !== "preparing"){
         return res.badRequest({ code : -43, responseText : req.__('order-manipulate-wrong-status')});
       }
