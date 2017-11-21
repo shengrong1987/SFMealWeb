@@ -36,25 +36,25 @@ module.exports = {
   },
   getMonthNameFromDate : function(date){
     var mDate = moment(date);
-    return mDate.format('MMM');
+    return mDate.local().format('MMM');
   },
   getMonthFromDate : function(date){
-    return moment(date).format("M");
+    return moment(date).local().format("M");
   },
   getDayOfMonth : function(date){
-    return moment(date).format("D");
+    return moment(date).local().format("D");
   },
   getDateFromDate : function(date){
     var mDate = moment(date);
-    return mDate.date();
+    return mDate.local().date();
   },
   getWeekFromDate : function(date){
     var mDate = moment(date);
-    return mDate.format('ddd');
+    return mDate.local().format('ddd');
   },
   getDaysAfterDate : function(date, day){
     var mDate = date.add(day, 'days');
-    return mDate.date();
+    return mDate.local().date();
   },
   getDateFromDaysAfterNow : function(date, day){
     return date.add(day, 'days').hour(0).minute(0).second(0).millisecond(0);
@@ -103,15 +103,15 @@ module.exports = {
   },
   oneHourBefore : function(date){
     var mDate = moment(date).subtract(1, 'hour');
-    return mDate._d;
+    return mDate.local()._d;
   },
   oneDayBefore : function(date){
     var mDate = moment(date).subtract(1, 'day');
-    return mDate._d;
+    return mDate.local()._d;
   },
   minutesBefore : function(date, minutes){
     var mDate = moment(date).subtract(minutes, 'minute');
-    return mDate._d;
+    return mDate.local()._d;
   },
   getTaxRate : function(county){
     var tax = 0.08;

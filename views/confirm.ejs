@@ -103,8 +103,8 @@
                               <span class="pickupInstruction" data-value="<%= pickup.instruction%>"><strong><%= __('pickup-instruction') %></strong>:&nbsp; <%= pickup.instruction || ''%></span>
                               <div class="vertical-align" style="margin-top:15px;">
                                 <div class="pickup-date" style="width: 70px;">
-                                  <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%> <%= meal.getDateFromDate(meal.pickups[0].pickupFromTime)%></span>
-                                  <span class="col-xs-12"><%= __(meal.getWeekFromDate(meal.pickups[0].pickupFromTime))%></span>
+                                  <span class="col-xs-12"><%= meal.getMonthName(pickup.pickupFromTime)%> <%= meal.getDateFromDate(pickup.pickupFromTime)%></span>
+                                  <span class="col-xs-12"><%= __(meal.getWeekFromDate(pickup.pickupFromTime))%></span>
                                 </div>
                                 <%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>
                               </div>
