@@ -82,7 +82,7 @@
   };
 
   Pagination.DEFAULTS = {
-    npp : 5,
+    npp : 10,
     index : 1
   };
 

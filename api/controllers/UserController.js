@@ -274,12 +274,12 @@ module.exports = require('waterlock').actions.user({
 
   me : function(req, res){
     var userId = req.session.user.id;
-    User.findOne(userId).populate("host").populate("orders").populate('auth').populate("collects").exec(function(err,found){
+    User.findOne(userId).populate("host").populate("orders",{ sort: 'createdAt DESC' }).populate('auth').populate("collects").exec(function(err,found){
       if(err){
         return res.badRequest(err);
       }
       found.featureDishes = [];
-      if(found.orders.length == 0 && found.collects.length == 0) {
+      if(found.orders.length === 0 && found.collects.length === 0) {
         found.locale = req.getLocale();
         found.save(function(err, result){
           if(err){

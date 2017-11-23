@@ -23,7 +23,7 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      Host.findOne(hostId).populate("dishes").populate("meals").populate('orders').exec(function(err,host){
+      Host.findOne(hostId).populate("dishes",{ sort: 'createdAt DESC' }).populate("meals",{ sort: 'createdAt DESC' }).populate('orders',{ sort: 'createdAt DESC' }).exec(function(err,host){
         if(err){
           return res.badRequest(err);
         }
@@ -160,7 +160,7 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          var host = host[0];
+          host = host[0];
           var addressObj = {};
           if(host.city){
             addressObj["city"] = host.city;

@@ -50,6 +50,9 @@ module.exports = function findOneRecord (req, res) {
     if(req.wantsJSON && sails.config.environment === 'development'){
      res.ok(matchingRecord);
     }else if(Model.adapter.identity === "user"){
+      if(req.wantsJSON){
+        return res.ok(matchingRecord);
+      }
       res.view('user',{user : matchingRecord});
     }else if(Model.adapter.identity === "payment"){
       res.view('payment',{payment: matchingRecord,layout:false});

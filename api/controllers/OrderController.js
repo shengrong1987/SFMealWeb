@@ -1499,6 +1499,14 @@ module.exports = {
   },
 
   search : function(req, res){
+    if(req.query.hasOwnProperty('contactInfo.name')){
+      var name = req.query["contactInfo.name"];
+      req.query.or = [
+        { "contactInfo.name" : name},
+        { "customerName" : name}
+      ];
+      delete req.query["contactInfo.name"];
+    }
     Order.find({ where : req.query, skip : actionUtil.parseSkip(req), limit : actionUtil.parseLimit(req) }).populate("dishes").populate('customer').populate('meal').populate('host').exec(function(err, orders){
       if(err){
         return res.badRequest(err);

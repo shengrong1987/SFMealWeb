@@ -190,6 +190,7 @@ var ActionButton = createReactClass({
             pickupOption : { value : this.props.data["pickupInfo"]["index"], type : 'select', options : this.props.data["meal"]["pickups"]},
             address : { value : this.props.data["contactInfo"]["address"]},
             customInfo : { value : this.props.data["customInfo"], type : 'json'},
+            comment : { value : this.props.data["pickupInfo"]["comment"], type : 'string'},
             mealId : { value : this.props.data["meal"]["id"], readonly : true},
             chef : { value : this.props.data["host"]["id"], readonly : true},
             isPartyMode : { value : this.props.data["isPartyMode"], readonly : true},

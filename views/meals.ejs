@@ -64,7 +64,7 @@
                   <i class="fa fa-heart fa-2x fav text-white <% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
                   text-red
                   <%}})%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>"></i>
-                  <img class="photo" src= <%= meal.coverString %> data-meal=<%= meal.id %> onclick="javascript:location.href='/meal/' + $(this).data('meal')">
+                  <img class="photo" src= <%= meal.coverString %> data-meal=<%= meal.id %> onclick="javascript:location.href='/meal/' + $(this).data('meal') + '<%= meal.supportPartyOrder ? "?party=true" : ""%>'">
                 </div>
                 <% if(meal.isSupportDynamicPrice && dish.isDynamicPriceOn && meal.dynamicDishes.some(function(d){
                     return d.id === dish.id;
