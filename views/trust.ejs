@@ -1,32 +1,39 @@
 <div class="container container-elegant text-center relative" style="margin-top:-20px;">
 
   <div class="row">
-    <div class="normal-banner" style="height:200px;overflow:hidden;">
-        <div class="img-wrapper">
-          <img src="/images/home-cover-1.jpg" class="relative middle">
+    <div class="pure-banner red">
+      <div class="middle banner-text vertical-align">
+        <div class="col-lg-3"></div>
+        <div class="col-xs-4 col-lg-2">
+          <img src="/images/welcome-1.png" style="width: 100%;margin-left: 40px;">
         </div>
+        <div class="col-xs-4 col-lg-2">
+          <a href="/" class="logo-slogan"></a>
+        </div>
+        <div class="col-xs-4 col-lg-2">
+          <img src="/images/welcome-2.png" style="width: 100%;margin-left: -80px;">
+        </div>
+        <div class="col-lg-3"></div>
+      </div>
+      <div class="absolute logo-container">
 
-        <div class="absolute logo-container">
-          <div class="relative text-left">
-            <a href="/" class="logo"></a>
-          </div>
-
-          <div class="relative text-left search-container" style="top: 20px;">
-            <h4 class="text-white"><strong><%= __('searching-word')%></strong></h4>
-            <div class="btn-group">
-              <input name="keyword" type="text" class="btn round light input" style="max-width: 150px;" placeholder="<%= __('searching-tips')%>">
-              <input name="zipcode" type="number" class="btn btn-default zipCode" placeholder="<%= __('zipcode')%>" style="width: 100px;display: inline;">
-              <button class="btn btn-warning round orange text-white searchBtn" onclick="javascript:search(this)">
-                <i class="fa fa-search"></i>
-                <%= __('search')%>
-              </button>
-            </div>
+        <div class="relative text-left search-container">
+          <!--<h4 class="text-white"><strong>今天吃什么好呢?</strong></h4>-->
+          <div class="btn-group search-btn-group">
+            <input name="keyword" type="text" class="btn round keyword light input" style="max-width: 150px;" placeholder="输入牛扒看看">
+            <input name="zipcode" type="number" class="btn btn-default zipCode" placeholder="邮编" value="">
+            <button class="btn btn-warning round orange text-white searchBtn" onclick="javascript:search(this)">
+              <i class="fa fa-search"></i>
+              搜索
+            </button>
           </div>
         </div>
       </div>
+    </div>
   </div>
 
   <div>
+    <h1 style="margin-top: 50px;"></h1>
     <div class="row">
       <h1>用美食传递家的亲切和温暖。</h1>
     </div>

@@ -7,6 +7,7 @@ var assert = require('assert'),
     request = require("supertest-as-promised");
 var agent;
 var moment = require('moment');
+const DELIVERY_FEE = 0;
 
 before(function(done){
   agent = request.agent(sails.hooks.http.app);
@@ -223,7 +224,7 @@ describe('MealController', function() {
         })
     })
 
-    it('should create a order type meal ', function (done) {
+    it('should create an order type meal ', function (done) {
       var now = new Date();
       var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
       for(var i=1; i<=4; i++){
@@ -465,7 +466,7 @@ describe('MealController', function() {
             return done(Error("error creating meal"));
           }
           sysDeliveryMealId = res.body.id;
-          res.body.delivery_fee.should.be.equal(3.99);
+          res.body.delivery_fee.should.be.equal(DELIVERY_FEE);
           res.body.county.should.be.equal("San Francisco County");
           done();
         })
@@ -1274,7 +1275,6 @@ describe('MealController', function() {
           res.body.meals.should.have.property("meals");
           res.body.meals.meals.should.have.property("orders");
           Object.keys(res.body.meals.meals).should.have.length(2);
-          res.body.should.have.property('anchor');
           done();
         })
     })
@@ -1352,7 +1352,7 @@ describe('MealController', function() {
           leftQty: leftQty,
           totalQty: leftQty,
           county : 'San Mateo County',
-          title : "私房面馆",
+          title : "私房面馆-即点2",
           type : "order",
           dishes : dishes,
           cover : dish1,

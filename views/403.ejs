@@ -49,8 +49,8 @@
           <%
             var errorMsg = __('authorizedError');
             if(data){
-              if(data.error){
-                errorMsg = data.error;
+              if(data.responseText){
+                errorMsg = data.responseText;
               }else{
                 errorMsg = data;
               }

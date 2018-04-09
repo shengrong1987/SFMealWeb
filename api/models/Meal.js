@@ -440,7 +440,7 @@ module.exports = {
             "county" : host.county,
             "area" : '',
             "index" : 2
-          }
+          };
           if(values.isDelivery){
             values.pickups = [pickupOption, deliveryOption];
           }else{

@@ -33,7 +33,8 @@ module.exports = function(grunt) {
         { 'views/emailTemplates/licenseUpdated/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/welcome/style.css' : 'assets/styles/importer.less' },
         { 'views/emailTemplates/congrat/style.css' : 'assets/styles/importer.less' },
-        { 'views/emailTemplates/chefSelect/style.css' : 'assets/styles/importer.less' }
+        { 'views/emailTemplates/chefSelect/style.css' : 'assets/styles/importer.less' },
+        { 'views/emailTemplates/verification/style.css' : 'assets/styles/importer.less' }
       ]
 		}
 	});

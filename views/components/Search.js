@@ -63,6 +63,10 @@ var Search = createReactClass({
     SFMealAPI.createForm(this.props.model);
   },
 
+  _onClean : function(){
+    SFMealAPI.clean(this.props.model);
+  },
+
   render: function () {
     var divStyle = {
       width : '100%'
@@ -85,6 +89,9 @@ var Search = createReactClass({
             </div>
             <div>
               <button className="btn btn-info" onClick={this._onCreate} style={buttonStyle}>Create</button>
+            </div>
+            <div>
+              <button className="btn btn-info" onClick={this._onClean} style={buttonStyle}>Clean</button>
             </div>
           </div>
         </div>

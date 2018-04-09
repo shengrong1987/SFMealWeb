@@ -742,6 +742,17 @@ var User = Backbone.Model.extend({
   urlRoot : "/user",
   validate : function(attrs, options){
 
+  },
+  url : function(){
+    if(this.get("id")){
+      if(this.action){
+        return this.urlRoot + "/" + this.get("id") + "/" + this.action;
+      }else{
+        return this.urlRoot + "/" + this.get("id");
+      }
+    }else{
+      return this.urlRoot;
+    }
   }
 });
 
@@ -2231,7 +2242,8 @@ var BankView = Backbone.View.extend({
 var UserProfileView = Backbone.View.extend({
   events : {
     "submit form" : "saveProfile",
-    "click .color-block" : "chooseColor"
+    "click .color-block" : "chooseColor",
+    "click #sendEmailVerificationBtn" : "sendEmail"
   },
   initialize : function(){
     var alertView = this.$el.find(".form-alert");
@@ -2267,6 +2279,7 @@ var UserProfileView = Backbone.View.extend({
         $(this).attr('selected', true);
       }
     });
+    this.model.set("id", this.$el.data("id"))
   },
   chooseColor : function(e){
     var target = $(e.currentTarget);
@@ -2274,6 +2287,20 @@ var UserProfileView = Backbone.View.extend({
     target.addClass("active");
     var color = target.data("color");
     target.parent().data("color",color);
+  },
+  sendEmail : function(e){
+    e.preventDefault();
+    this.model.action = "sendEmailVerification";
+    var $this = this;
+    this.model.save({}, {
+      success : function(){
+        BootstrapDialog.alert(jQuery.i18n.prop('emailVerificationSent'));
+      },error : function(err, model){
+        $this.sucessView.hide();
+        $this.alertView.html(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+        $this.alertView.show();
+      }
+    })
   },
   saveProfile : function(e){
     e.preventDefault();
@@ -3561,7 +3588,7 @@ function imageHandler(modual,file,progressBar,cb,error,index,name,isDelete){
 
 function deleteImage(filename,modual,cb,error){
   $.ajax({
-    url : '/user/me/delete',
+    url : '/user/me/deleteFile',
     data : {
       name : filename,
       modual : modual

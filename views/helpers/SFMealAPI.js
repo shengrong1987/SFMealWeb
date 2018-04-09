@@ -342,6 +342,57 @@ module.exports = {
     });
   },
 
+  clean : function(model){
+    var isValid;
+    switch(model){
+      case "User":
+        isValid = true;
+        break;
+    }
+    if(!isValid) {
+      return ActionCreators.badRequest("Can not clean items on " + model);
+    }
+    $.ajax({
+      url: "/" + model.toLowerCase() + "/clean",
+      type: "GET"
+    }).done(function (data) {
+      switch(model) {
+        case "User":
+          ActionCreators.getUsers(data);
+          break;
+        case "Host":
+          ActionCreators.getHosts(data);
+          break;
+        case "Meal":
+          ActionCreators.getMeals(data);
+          break;
+        case "Dish":
+          ActionCreators.getDishes(data);
+          break;
+        case "Order":
+          ActionCreators.getOrders(data);
+          break;
+        case "Checklist":
+          ActionCreators.getCheckLists(data);
+          break;
+        case "Coupon":
+          ActionCreators.getCoupons(data);
+          break;
+        case "Job":
+          ActionCreators.getJobs(data);
+          break;
+        case "Review":
+          ActionCreators.getReviews(data);
+          break;
+        case "Account":
+          ActionCreators.getAccounts(data);
+          break;
+      }
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.badRequest(jqXHR.responseText);
+    });
+  },
+
   command : function(model, id, action, detail, data, subModel, subId){
     var httpMethod = "POST";
     if(action === "create"){

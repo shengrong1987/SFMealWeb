@@ -15,7 +15,7 @@ var s3 = {
     };
     return s3Policy;
   }
-}
+};
 
 module.exports = s3;
 

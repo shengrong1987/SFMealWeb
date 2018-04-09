@@ -340,6 +340,7 @@ var ActionButton = createReactClass({
             actions.push("activate");
           }
         }
+        actions.push("delete");
         actions.push("update");
         break;
       case "Dish":

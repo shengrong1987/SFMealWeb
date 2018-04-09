@@ -13,7 +13,11 @@ module.exports = function(req, res, next) {
   var hostId = req.session.user.host.id ? req.session.user.host.id : req.session.user.host;
   var dishId = req.param('parentid') || req.param('id') || req.body.dish;
   Dish.findOne(dishId).populate("chef").exec(function(err,dish){
-    if(hostId && hostId == dish.chef.id){
+    if(!dish){
+      sails.log.debug("dish id:" + dishId + " not found");
+      return res.forbidden("You are not permitted to perform this action.");
+    }
+    if(hostId && hostId === dish.chef.id){
       return next();
     }
     return res.forbidden("You are not permitted to perform this action.");

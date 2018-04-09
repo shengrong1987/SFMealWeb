@@ -28,10 +28,10 @@ module.exports = {
     wechatToken : {
       type : 'string'
     },
-    firstName: {
+    firstname: {
       type : 'string'
     },
-    lastName: {
+    lastname: {
       type: 'string'
     },
     gender: {

@@ -11,6 +11,8 @@ var notification = require("../services/notification");
 var util = require("../services/util");
 var stripe = require("../services/stripe");
 var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUtil.js');
+var async = require('async');
+const DELIVERY_FEE = 0;
 /*
  error
  * -1 : geo service not available
@@ -30,6 +32,7 @@ var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUt
  * -15 : meal support delivery but no delivery option was provided
  * -16 : meal query is invalid
  * -17 : meal lack of party requirement
+ * -18 : meal lack county information, unable to perform search
  */
 
 module.exports = {
@@ -111,42 +114,6 @@ module.exports = {
     }
   },
 
-	// current : function(req, res){
-  //   var county;
-  //   var now = new Date();
-  //   if(req.session.user && req.session.user.county){
-  //     county = req.session.user.county;
-  //   }else{
-  //     county = "San Francisco";
-  //   }
-  //
-  //   Meal.find({status : "on",provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).exec(function(err, found){
-  //     if(err){
-  //       res.badRequest(err);
-  //     }else{
-  //       found = found.filter(function(meal){
-  //         return meal.county.split("+").indexOf(county) != -1;
-  //       })
-  //       res.view("meals",{meals : found, county : county});
-  //     }
-  //   });
-  // },
-  //
-  // county : function(req, res){
-  //   var county = req.param('county');
-  //   var now = new Date();
-  //   Meal.find({status : "on", provideFromTime : {'<' : now}, provideTillTime : {'>' : now}}).exec(function(err, found){
-  //     if(err){
-  //       res.badRequest(err);
-  //     }else{
-  //       found = found.filter(function(meal){
-  //         return meal.county.split("+").indexOf(county) != -1;
-  //       })
-  //       res.view("meals",{meals : found, county : county});
-  //     }
-  //   });
-  // },
-
   searchAll : function(req, res){
     var keyword = req.query.keyword;
     delete req.query.keyword;
@@ -175,15 +142,17 @@ module.exports = {
 
   search : function(req, res){
     var _this = this;
-    var keyword = req.param('keyword');
-    var zipcode = req.param('zipcode');
-    var county = req.cookies['county'] || req.param('county') || "San Francisco County";
+    var query = req.query;
+    var keyword = query['keyword'];
+    var zipcode = query['zip'];
+    var method = query['method'];
+    var county = req.cookies['county'] || query['county']|| "San Francisco County";
     var type = req.param('type');
     var now = new Date();
     var params = {
       status : 'on',
-      provideFromTime : {'<' : now},
-      provideTillTime : {'>' : now}
+      provideFromTime : {'<' : now },
+      provideTillTime : {'>' : now }
     };
     if(type){
       params.type = type;
@@ -193,63 +162,71 @@ module.exports = {
         return res.badRequest(err);
       }
 
-      found = found.filter(function(meal){
-        return meal.county.split("+").indexOf(county) !== -1;
-      });
-
-      if(typeof zipcode !== 'undefined' && zipcode && zipcode !== 'undefined' && typeof county !== 'undefined' && county && county !== 'undefined'){
-        GeoCoder.geocode(zipcode, function(err, result){
-          if (err) {
-            return res.badRequest({ code : -1, responseText : req.__('meal-error-address')});
-          }  else {
-            if(result.length===0){
-              return res.badRequest({ code : -2, responseText : req.__('meal-error-address2')});
-            }
-            var location = { lat : result[0].latitude, long : result[0].longitude };
-            if(keyword){
-              found = found.filter(function(meal){
-                var dishes = meal.dishes;
-                var valid = false;
-                for(var i=0; i < dishes.length; i++){
-                  var dish = dishes[i];
-                  if(meal.title.indexOf(keyword) !== -1 || dish.title.indexOf(keyword) !== -1 || dish.description.indexOf(keyword) !== -1 || dish.type.indexOf(keyword) !== -1){
-                    valid = true;
-                    break;
-                  }
-                }
-                return valid;
-              });
-            }
-            found = _this.composeMealWithDate(found);
-            if(req.wantsJSON) {
-              res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, anchor : location, county : county});
-            }else{
-              res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, anchor : location, county : county });
-            }
+      async.auto({
+        matchCounty : function(next){
+          if(!county){
+            return next();
           }
-        });
-      }else{
-        if(keyword){
+          found = found.filter(function(meal){
+            return meal.county.split("+").indexOf(county) !== -1;
+          });
+          next();
+        },
+        matchZipCode : function(next){
+          if(!zipcode){
+            return next();
+          }
+          //find which county the zip belongs to, exclude it if it does not match the meal's county
+          GeoCoder.geocode(zipcode, function(err, result){
+            if(err){
+              return next({ code : -1, responseText : req.__('meal-error-address')})
+            }else if(result.length===0){
+              return next({ code : -2, responseText : req.__('meal-error-address2')})
+            }
+            found = found.filter(function(meal){
+              return meal.county.split("+").indexOf(result[0].administrativeLevels.level2long) !== -1;
+            });
+            next();
+          })
+        },
+        matchMethod : function(next){
+          if(!method){
+            return next();
+          }
+          found = found.filter(function(meal){
+            return meal.pickups.some(function(pickup){
+              return pickup.method === method;
+            });
+          });
+          next();
+        },
+        matchKeyword : function(next){
+          if(!keyword){
+            return next();
+          }
           found = found.filter(function(meal){
             var dishes = meal.dishes;
-            var valid = false;
             for(var i=0; i < dishes.length; i++){
               var dish = dishes[i];
               if(meal.title.indexOf(keyword) !== -1 || dish.title.indexOf(keyword) !== -1 || dish.description.indexOf(keyword) !== -1 || dish.type.indexOf(keyword) !== -1){
-                valid = true;
-                break;
+                return true;
               }
             }
-            return valid;
+            return false;
           });
+          next();
+        }
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
         }
         found = _this.composeMealWithDate(found);
         if(req.wantsJSON) {
-          res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : null, anchor : null, county : county});
+          res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, county : county});
         }else{
-          res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : null, anchor : null, county : county });
+          res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, county : county });
         }
-      }
+      });
     });
   },
 
@@ -731,7 +708,7 @@ module.exports = {
   updateDelivery : function(params, host, req, cb){
 
     if(params.isDeliveryBySystem){
-      params.delivery_fee = "3.99";
+      params.delivery_fee = DELIVERY_FEE;
     }
 
     if(params.isDelivery && params.type === "preorder" && (!params.pickups || (params.pickups && !JSON.parse(params.pickups).some(function(pickup){
@@ -783,7 +760,7 @@ module.exports = {
       if(counties.length !== 0){
         params.county = counties.join("+");
       }
-      sails.log.info("counties are: " + counties.join("+"))
+      sails.log.info("counties are: " + counties.join("+"));
       cb(null, params);
     });
   },

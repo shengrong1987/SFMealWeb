@@ -175,32 +175,32 @@ describe('OrderController', function() {
         })
     });
 
-    it('should order the meal with pickup but get lack of name error', function (done) {
-      var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
-      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}], price : price2 };
-      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
-      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
-      agent
-        .post('/order')
-        .send({
-          orders : dishObj,
-          subtotal : price1 * 1 + price2 * 2,
-          contactInfo : { phone : phone },
-          paymentInfo : { method : 'online'},
-          method : "pickup",
-          mealId : mealId,
-          pickupOption : 1
-        })
-        .expect(400)
-        .end(function(err,res){
-          if(err){
-            return done(err);
-          }
-          res.body.code.should.be.equal(-31);
-          done();
-        })
-    });
+    // it('should order the meal with pickup but get lack of name error', function (done) {
+    //   var dishObj = {};
+    //   dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
+    //   dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}], price : price2 };
+    //   dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+    //   dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
+    //   agent
+    //     .post('/order')
+    //     .send({
+    //       orders : dishObj,
+    //       subtotal : price1 * 1 + price2 * 2,
+    //       contactInfo : { phone : phone },
+    //       paymentInfo : { method : 'online'},
+    //       method : "pickup",
+    //       mealId : mealId,
+    //       pickupOption : 1
+    //     })
+    //     .expect(400)
+    //     .end(function(err,res){
+    //       if(err){
+    //         return done(err);
+    //       }
+    //       res.body.code.should.be.equal(-31);
+    //       done();
+    //     })
+    // });
 
     it('should order the meal with pickup but get lack of phone error', function (done) {
       var dishObj = {};
@@ -597,7 +597,7 @@ describe('OrderController', function() {
         .expect(200)
         .end(done)
     });
-  //
+
     it('should order the meal again', function (done) {
       var dishObj = {};
       dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
@@ -1250,6 +1250,25 @@ describe('OrderController', function() {
         .end(done)
     });
 
+
+    var userId;
+
+    it('should get user id', function(done){
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          userId = res.body.id;
+          done();
+        })
+
+    });
+
     it('should get a meal', function (done) {
       agent
         .get('/meal')
@@ -1272,6 +1291,86 @@ describe('OrderController', function() {
           dish1LeftQty = meal.leftQty[dishId1];
           done();
         })
+    });
+
+    it('should not be able to order a meal with coupon because email unverified', function(done){
+      var dishObj = {};
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 1,
+          pickupOption : 1,
+          contactInfo : { name : "sheng", address : address, phone : phone },
+          paymentInfo : { method : 'online'},
+          method : "pickup",
+          mealId : mealId,
+          couponCode : "XMAS"
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-48);
+          done();
+        })
+    });
+
+    it('logout user account', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    })
+
+    it('login as admin', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({
+          email : adminEmail,
+          password : password
+        })
+        .expect(302)
+        .end(done)
+    })
+
+    it('should verify users email', function(done){
+      agent
+        .put('/user/' + userId)
+        .send({
+          emailVerified : true
+        })
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.emailVerified.should.be.true();
+          done();
+        })
+    });
+
+    it('logout user account', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    })
+
+    it('login as user', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({
+          email : guestEmail,
+          password : password
+        })
+        .expect(302)
+        .end(done)
     })
 
     it('should be able to order a meal with coupon', function(done){

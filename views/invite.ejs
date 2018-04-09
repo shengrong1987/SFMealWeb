@@ -1,0 +1,10 @@
+<div class="container-fluid default-container text-center" style="margin-top:-20px;">
+  <h3>Hi <%= user ? user.firstname : __('user')%>, 邀请朋友加入SFMeal，一起获得10元现金券吧！</h3>
+  <% if(user){ %>
+    <p>你的邀请链接：<a href="http://localhost:1337/join?code=<%= user.referralCode%>">localhost:1337/join?code=<%= user.referralCode%></a></p>
+  <%}else{%>
+    <p>请登录查看你的邀请链接</p>
+  <%}%>
+</div>
+
+<script></script>

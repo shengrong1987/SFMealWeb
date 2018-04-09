@@ -67346,6 +67346,7 @@ var ActionButton = createReactClass({
             actions.push("activate");
           }
         }
+        actions.push("delete");
         actions.push("update");
         break;
       case "Dish":
@@ -67930,6 +67931,10 @@ var Search = createReactClass({
     SFMealAPI.createForm(this.props.model);
   },
 
+  _onClean : function(){
+    SFMealAPI.clean(this.props.model);
+  },
+
   render: function () {
     var divStyle = {
       width : '100%'
@@ -67952,6 +67957,9 @@ var Search = createReactClass({
             ), 
             React.createElement("div", null, 
               React.createElement("button", {className: "btn btn-info", onClick: this._onCreate, style: buttonStyle}, "Create")
+            ), 
+            React.createElement("div", null, 
+              React.createElement("button", {className: "btn btn-info", onClick: this._onClean, style: buttonStyle}, "Clean")
             )
           )
         ), 
@@ -68211,7 +68219,7 @@ var Table = createReactClass({
 
     return (
         React.createElement("div", null, 
-          React.createElement("table", {className: "table table-striped table-bordered table-hover"}, 
+          React.createElement("table", {className: "table table-striped table-bordered table-hover table-sm table-responsive"}, 
             React.createElement("tbody", null, React.createElement("tr", null, React.createElement("td", {colSpan: header.length}, this.state.headData))), 
             React.createElement(TableHeader, {cols: header}), 
             React.createElement("tbody", null, 
@@ -68961,6 +68969,57 @@ module.exports = {
       ActionCreators.getAccounts(data);
     }).fail(function(jqXHR, textStatus){
       ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  clean : function(model){
+    var isValid;
+    switch(model){
+      case "User":
+        isValid = true;
+        break;
+    }
+    if(!isValid) {
+      return ActionCreators.badRequest("Can not clean items on " + model);
+    }
+    $.ajax({
+      url: "/" + model.toLowerCase() + "/clean",
+      type: "GET"
+    }).done(function (data) {
+      switch(model) {
+        case "User":
+          ActionCreators.getUsers(data);
+          break;
+        case "Host":
+          ActionCreators.getHosts(data);
+          break;
+        case "Meal":
+          ActionCreators.getMeals(data);
+          break;
+        case "Dish":
+          ActionCreators.getDishes(data);
+          break;
+        case "Order":
+          ActionCreators.getOrders(data);
+          break;
+        case "Checklist":
+          ActionCreators.getCheckLists(data);
+          break;
+        case "Coupon":
+          ActionCreators.getCoupons(data);
+          break;
+        case "Job":
+          ActionCreators.getJobs(data);
+          break;
+        case "Review":
+          ActionCreators.getReviews(data);
+          break;
+        case "Account":
+          ActionCreators.getAccounts(data);
+          break;
+      }
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.badRequest(jqXHR.responseText);
     });
   },
 

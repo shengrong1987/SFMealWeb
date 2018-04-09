@@ -178,6 +178,23 @@ var notification = {
     }
   },
 
+  generateToken : function(){
+    var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var token = '';
+    for (var i = 16; i > 0; --i) {
+      token += chars[Math.round(Math.random() * (chars.length - 1))];
+    }
+
+    // create expiration date
+    var expires = new Date();
+    expires.setHours(expires.getHours() + 2);
+
+    return {
+      token : token,
+      expires : expires
+    }
+  },
+
   sendEmail : function(model, action, params, req){
 
     var basicInfo = this.inquireBasicInfo(params.isSendToHost, params.isSendToAdmin, params);
@@ -206,7 +223,7 @@ var notification = {
     }
     sails.hooks.email.send(template, params,{
       to : basicInfo.recipientEmail,
-      subject : "SFMeal.com"
+      subject : "SFMeal support"
     },function(err){
       console.log(basicInfo.recipientEmail, err || "It worked!");
     })
@@ -318,8 +335,8 @@ var notification = {
       info.recipientEmail = "admin@sfmeal.com";
       info.recipientName = "SFMeal.com";
     }else{
-      info.recipientEmail = params.guestEmail;
-      info.recipientName = params.customerName || ( params.customer ? params.customer.firstname : '') || '';
+      info.recipientEmail = params.guestEmail || params.email;
+      info.recipientName = params.customerName || ( params.customer ? params.customer.firstname : '') || params.firstname || '';
     }
     return info;
   },
@@ -422,6 +439,9 @@ var notification = {
       switch (action){
         case "licenseUpdated":
           i18ns = i18ns.concat(['open-admin']);
+          break;
+        case "verification":
+          i18ns = i18ns.concat(['email-verification','email-verification-instruction','email-verification-unknown','email-verification-link-expire','verify-email']);
           break;
       }
     }

@@ -452,13 +452,13 @@ input:focus{
 /*logo*/
 
 .logo-container{
-  top:0;
   left:0;
   right:0;
 }
 
 .search-container{
   text-align: center;
+  bottom: 20px;
 }
 
 .pickup-map{
@@ -594,18 +594,18 @@ input:focus{
 /*color*/
 @blue : #3fa9f5;
 @dark-blue : #3f80f5;
-@red : #ff4001;
+@red : #d60e0e;
 @white : white;
-@orange : #ff931e;
+@orange : #ff7601;
 @grey : #999999;
 @light-grey : #eee;
 @medium-grey : #999999;
-@dark-grey : #4b4b4b;
+@dark-grey : #4d4049;
 @black : black;
-@green : #22b571;
+@green : #63B446;
 @pink : #ff7bac;
-@purple : #662e91;
-@yellow : #ffd65a;
+@purple : #151f45;
+@yellow : #dcb97d;
 @background-grey : #f2f2f2;
 
 .blue{
@@ -1186,93 +1186,46 @@ label {
   }
 }
 
-/*bootstrap button extension*/
-.btn-green {
-  .text-white;
-  .green;
-  border-color: #cccccc;
-}
-.btn-green:focus,
-.btn-green.focus {
-  .text-white;
-  background-color: #96e2c0 !important;
-  border-color: #8c8c8c;
-}
-.btn-green:hover {
-  .text-white;
-  background-color: #96e2c0 !important;
-  border-color: #adadad;
-}
-.btn-green:active,
-.btn-green.active,
-.open > .dropdown-toggle.btn-green {
-  .text-white;
-  background-color: #96e2c0 !important;
-  border-color: #adadad;
-}
-.btn-green:active:hover,
-.btn-green.active:hover,
-.open > .dropdown-toggle.btn-green:hover,
-.btn-green:active:focus,
-.btn-green.active:focus,
-.open > .dropdown-toggle.btn-green:focus,
-.btn-green:active.focus,
-.btn-green.active.focus,
-.open > .dropdown-toggle.btn-green.focus {
-  .text-white;
-  background-color: #96e2c0 !important;
-  border-color: #8c8c8c;
-}
-.btn-green:active,
-.btn-green.active,
-.open > .dropdown-toggle.btn-green {
-  background-image: none;
-}
-.btn-green .badge {
-  .text-white;
-  background-color: #333333;
+.btn-grey-green{
+  .btn-grey(@green);
 }
 
-.btn-red {
-  .text-white;
-  .red;
-  border-color: #d43f3a;
+.btn-grey-red{
+  .btn-grey(@red);
 }
-.btn-red:focus,
-.btn-red.focus {
-  .text-white;
-  background-color: #ffa489 !important;
-  border-color: #761c19;
+
+.btn-grey-blue{
+  .btn-grey(@blue);
 }
-.btn-red:hover {
+
+/*bootstrap button extension*/
+.btn-grey(@hover-color) {
   .text-white;
-  background-color: #ffa489 !important;
-  border-color: #ac2925;
-}
-.btn-red:active,
-.btn-red.active,
-.open > .dropdown-toggle.btn-red {
-  .text-white;
-  background-color: #ffa489 !important;
-  border-color: #ac2925;
-}
-.btn-red:active:hover,
-.btn-red.active:hover,
-.open > .dropdown-toggle.btn-red:hover,
-.btn-red:active:focus,
-.btn-red.active:focus,
-.open > .dropdown-toggle.btn-red:focus,
-.btn-red:active.focus,
-.btn-red.active.focus,
-.open > .dropdown-toggle.btn-red.focus {
-  .text-white;
-  background-color: #ffa489 !important;
-  border-color: #761c19;
-}
-.btn-red:active,
-.btn-red.active,
-.open > .dropdown-toggle.btn-red {
-  background-image: none;
+  .grey;
+  border-color: #cccccc;
+  &:focus,&.focus{
+    .text-white;
+    background-color: @hover-color !important;
+  }
+  &:hover{
+    .text-white;
+    background-color: @hover-color !important;
+  }
+  &:active,&.active,&.open > .dropdown-toggle.btn-grey{
+    .text-white;
+    background-color: @hover-color !important;
+  }
+  &:active:hover,&.active:hover,&.open > .dropdown-toggle.btn-grey,&.btn-grey:active:focus,&.btn-grey.active:focus,&.open > .dropdown-toggle.btn-grey:focus,&:active.focus,&.active.focus,&.open > .dropdown-toggle.btn-grey.focus{
+    .text-white;
+    background-color: @hover-color !important;
+  }
+  &:active,&.active,&.open > .dropdown-toggle.btn-grey{
+    background-image: none;
+  }
+  &.badge{
+    .text-white;
+    background-color: @grey;
+  }
 }
 
 fieldset[disabled] .btn-red.active {
@@ -1491,7 +1444,7 @@ fieldset[disabled] .btn-red.active {
 }
 
 .mynavbar{
-  background-color: #333333;
+  background-color: @purple;
   border-radius: 0;
   border-color: initial;
   z-index: 100;
@@ -1518,7 +1471,7 @@ fieldset[disabled] .btn-red.active {
 }
 
 .footer{
-  background-color: #333333;
+  background-color: @purple;
 }
 
 .email-footer{
@@ -1631,8 +1584,11 @@ fieldset[disabled] .btn-red.active {
 }
 
 .pure-banner{
-  height: 100px;
   width: 100%;
+  .banner-text{
+    position: relative;
+    padding:20px;
+  }
 }
 
 
@@ -2573,10 +2529,6 @@ fieldset[disabled] .btn-red.active {
   }
 
   .pure-banner{
-    .banner-text{
-      position: relative;
-    }
-    height : 40px;
     .logo-slogan{
       background-image : url(../images/sfmeal_logo_slogan.png);
       display: block;

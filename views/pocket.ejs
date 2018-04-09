@@ -45,7 +45,7 @@
                       <span class="fa fa-calendar"></span>
                     </span>
                   </div>
-                  <div id="durationBtn" data-target="#transaction_container" class="btn btn-info do col-xs-12 col-sm-6 col-md-2" style="float:left;"><%= __('filter')%></div>
+                  <div id="durationBtn" data-target="#transaction_container" class="btn btn-blue do col-xs-12 col-sm-6 col-md-2" style="float:left;"><%= __('filter')%></div>
                 </div>
                 <div class="alert alert-warning" data-toggle="alert"><%= __('need-from-or-to-time')%></div>
               </div>
@@ -67,10 +67,10 @@
             <div class="row">
               <div class="col-xs-12">
                 <div class="btn-set">
-                  <button class="btn btn-info filter" type="button" data-filter="all">All</button>
-                  <button class="btn btn-info filter" type="button" data-filter=".comp"><%= __('type-compensation')%></button>
-                  <button class="btn btn-info filter" type="button" data-filter=".payment"><%= __('type-payment')%></button>
-                  <button class="btn btn-info filter" type="button" data-filter=".charge"><%= __('type-charge')%></button>
+                  <button class="btn btn-grey-blue filter" type="button" data-filter="all">All</button>
+                  <button class="btn btn-grey-blue filter" type="button" data-filter=".comp"><%= __('type-compensation')%></button>
+                  <button class="btn btn-grey-blue filter" type="button" data-filter=".payment"><%= __('type-payment')%></button>
+                  <button class="btn btn-grey-blue filter" type="button" data-filter=".charge"><%= __('type-charge')%></button>
                   <!--<button class="btn btn-info filter" type="button" data-filter=".fee"><%= __('type-fee')%></button>-->
                 </div>
               </div>
@@ -84,7 +84,7 @@
               </div>
             </div>
 
-            <div id="transaction_container" class="container">
+            <div id="transaction_container" class="box-simple">
 
               <%
               user.pocket.transactions = user.pocket.transactions || [];
@@ -93,7 +93,7 @@
                 if(tranObj.orderStatus !== "cancel" && (tranObj.status === "paid" || tranObj.status === "succeeded" || tranObj.status === "cash")){
                   if(tranObj.type === "type-compensation" && !tranObj.reversed){
               %>
-              <div class="background-color mix comp" style="border-radius: 5px;display: block !important;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
+              <div class="mix comp" style="border-radius: 5px;display: block !important;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
                   <div class="col-xs-4"><%= __(tranObj.type) %>(<%= __(tranObj.paymentMethod || '')%>) <label><%= tranObj.metadata.orderId.slice(-4)%></label> <i class="fa fa-question-circle white cursor-pointer" data-toggle="tooltip" title=<%= __('order-last-4')%>></i></div>
@@ -102,7 +102,7 @@
                 </div>
               </div>
               <%}else if(tranObj.type === 'type-payment'){var refund = tranObj.amount_refunded;%>
-              <div class="background-color mix payment" style="border-radius: 5px;display: block !important;;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
+              <div class="mix payment" style="border-radius: 5px;display: block !important;;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
                   <div class="col-xs-4"><%= __(tranObj.type) %>(<%= __(tranObj.paymentMethod || '')%>) <label><%= tranObj.metadata.orderId.slice(-4)%></label> <i class="fa fa-question-circle white cursor-pointer" data-toggle="tooltip" title=<%= __('order-last-4')%>></i></div>
@@ -111,7 +111,7 @@
                 </div>
               </div>
               <%}else if(tranObj.type === 'type-charge'){var refund = tranObj.amount_refunded;%>
-              <div class="background-color mix charge" style="border-radius: 5px;display: block !important;;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
+              <div class="mix charge" style="border-radius: 5px;display: block !important;;" data-created="<%= tranObj.created%>" data-title="<%= tranObj.host.shopName%>">
                 <div class="row vertical-align" style="padding:5px;">
                   <div class="col-xs-2"><%= tranObj.month%><br/><%= tranObj.day%></div>
                   <div class="col-xs-4"><%= __(tranObj.type) %>(<%= __(tranObj.paymentMethod || '')%>) <label><%= tranObj.metadata.orderId.slice(-4)%></label> <i class="fa fa-question-circle white cursor-pointer" data-toggle="tooltip" title=<%= __('order-last-4')%>></i></div>

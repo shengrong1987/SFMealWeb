@@ -51,10 +51,15 @@ module.exports.policies = {
     'me' : ['sessionAuth'],
     'contactForm' : 'sessionAuth',
     'search' : 'isAdmin',
-    'deleteObject' : 'or(sessionAuth,isAdmin)',
-    'update' : 'or(and(sessionAuth, sessionSelf, isNotFields("status","pocket","host","customerId")),isAdmin)',
+    'deleteUserFile' : 'or(sessionAuth,isAdmin)',
+    'update' : 'or(and(sessionAuth, sessionSelf, isNotFields("status","pocket","host","customerId","referralBonus","points","emailVerified")),isAdmin)',
+    'verify' : true,
+    'sendEmailVerification' : 'or(sessionAuth,isAdmin)',
     'activate' : 'isAdmin',
-    'deactivate' : 'isAdmin'
+    'deactivate' : 'isAdmin',
+    'clean' : 'isAdmin',
+    'invite' : true,
+    'join' : true
   },
 
   JobController : {

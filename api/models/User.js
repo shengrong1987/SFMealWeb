@@ -91,9 +91,6 @@ module.exports = {
       type : 'string',
       regex : /^\d{5}(?:[-\s]\d{4})?$/
     },
-    birthday : {
-      type : 'date'
-    },
     receivedEmail : {
       type : 'boolean',
       defaultsTo : true
@@ -145,6 +142,40 @@ module.exports = {
       type : 'integer',
       at1000Max : true,
       defaultsTo : 0
+    },
+    emailVerified : {
+      type : 'boolean',
+      defaultsTo : false
+    },
+    referralBonus : {
+      type : 'boolean',
+      defaultsTo : false
+    },
+    referralCode : {
+      type : 'string'
+    },
+    generateCode : function(params, cb){
+      if(this.referralCode) {
+        if((params.firstname && params.firstname !== this.firstname) || (params.lastname && params.lastname !== this.lastname)) {
+          var code = this.referralCode;
+          var parts = code.split(".");
+          var newCode = (params.firstname || this.firstname) + "." + (params.lastname || this.lastname) + "." + parts[2];
+          sails.log.info("code updated: " + code);
+          cb(null, newCode);
+        }else{
+          cb(null, this.referralCode);
+        }
+      }else{
+        var _this = this;
+        User.count().exec(function(err, number){
+          if(err){
+            return cb(err);
+          }
+          var code = (params.firstname || _this.firstname) + "." + (params.lastname || _this.lastname) + "." + number;
+          sails.log.info("code created: " + code);
+          cb(null, code);
+        })
+      }
     }
   }),
 
@@ -153,36 +184,47 @@ module.exports = {
       if(err){
         return cb(err);
       }
-      var params = {
-        firstname: auth.firstname || ( auth.name ? auth.name.split(' ')[0] : auth.username) ,
-        lastname: auth.lastname || ( auth.name ? auth.name.split(' ')[1] : ''),
-        gender: auth.gender,
-        hometown: auth.hometown ? auth.hometown.name : "San Francisco, California",
-        desc : user.desc.replace('%s', auth.hometown ? auth.hometown.name : "San Francisco, California"),
-        picture: auth.picture ? auth.picture.data.url : '',
-        city: auth.location ? ( auth.location.name ? auth.location.name.split(",")[0] : '') : 'San Francisco',
-        state: auth.location ? ( auth.location.name ? auth.location.name.split(",")[1] : '') : 'California'
-      }
-      User.update(user.id, params).exec(function(err, user){
+      User.count().exec(function(err, number){
         if(err){
           return cb(err);
         }
-        Auth.native(function(err, collection){
+        var firstName = auth.firstname || ( auth.name ? auth.name.split(' ')[0] : auth.username) || 'guest';
+        var lastName = auth.lastname || ( auth.name ? auth.name.split(' ')[1] : '') || 'guest';
+        var referralCode = firstName + "." + lastName + "." + number;
+        sails.log.info("code created: " + referralCode);
+        var params = {
+          firstname: firstName,
+          lastname: lastName,
+          gender: auth.gender,
+          hometown: auth.hometown ? auth.hometown.name : "San Francisco, California",
+          email : auth.email,
+          desc : user.desc.replace('%s', auth.hometown ? auth.hometown.name : "San Francisco, California"),
+          picture: auth.picture ? auth.picture.data.url : '',
+          city: auth.location ? ( auth.location.name ? auth.location.name.split(",")[0] : '') : 'San Francisco',
+          state: auth.location ? ( auth.location.name ? auth.location.name.split(",")[1] : '') : 'California',
+          referralCode : referralCode
+        }
+        User.update(user.id, params).exec(function(err, user){
           if(err){
             return cb(err);
           }
-          var objectId = ObjectID = require('mongodb').ObjectID;
-          collection.updateOne({_id : objectId(auth.id)}, { $unset : {
-            firstname : "",
-            lastname : "",
-            gender : "",
-            username : "",
-            name : "",
-            location : "",
-            hometown : "",
-            picture : ""
-          }}, cb);
-        });
+          Auth.native(function(err, collection){
+            if(err){
+              return cb(err);
+            }
+            var objectId = ObjectID = require('mongodb').ObjectID;
+            collection.updateOne({_id : objectId(auth.id)}, { $unset : {
+              firstname : "",
+              lastname : "",
+              gender : "",
+              username : "",
+              name : "",
+              location : "",
+              hometown : "",
+              picture : ""
+            }}, cb);
+          });
+        })
       })
     })
   }

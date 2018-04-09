@@ -31,25 +31,25 @@ module.exports = {
     }
   },
   formattedDate : function(date){
-    var mDate = moment(date);
+    var mDate = moment(new Date(date).toISOString());
     return mDate.local().format("MMM D ddd");
   },
   getMonthNameFromDate : function(date){
-    var mDate = moment(date);
+    var mDate = moment(new Date(date).toISOString());
     return mDate.local().format('MMM');
   },
   getMonthFromDate : function(date){
-    return moment(date).local().format("M");
+    return moment(new Date(date).toISOString()).local().format("M");
   },
   getDayOfMonth : function(date){
-    return moment(date).local().format("D");
+    return moment(new Date(date).toISOString()).local().format("D");
   },
   getDateFromDate : function(date){
-    var mDate = moment(date);
+    var mDate = moment(new Date(date).toISOString());
     return mDate.local().date();
   },
   getWeekFromDate : function(date){
-    var mDate = moment(date);
+    var mDate = moment(new Date(date).toISOString());
     return mDate.local().format('ddd');
   },
   getDaysAfterDate : function(date, day){

@@ -7,6 +7,9 @@
  *
  * @docs        :: http://waterlock.ninja/documentation
  * @error       :: -1, already is a host
+ *              :: -2, can not find user
+ *              :: -3, token expire
+ *              :: -4, referral code not found
  */
 
 var AWS = require('aws-sdk');
@@ -92,10 +95,13 @@ module.exports = require('waterlock').actions.user({
             }
             if(user.birthday){
               params.legal_entity.dob = {
-                day : user.birthday.getDay(),
+                day : user.birthday.getDate(),
                 month : user.birthday.getMonth() + 1,
                 year : user.birthday.getFullYear()
-              }
+              };
+              var birthdayDate = new Date(user.birthday);
+              var birthday = birthdayDate.getMonth()+1+"/"+birthdayDate.getDate();
+              mailChimp.updateMember({ email : user.email, birthday : birthday }, "member");
             }
             stripe.createManagedAccount(params,function(err,account){
               if(err){
@@ -144,132 +150,135 @@ module.exports = require('waterlock').actions.user({
   },
 
   update : function(req, res) {
-
     var params = req.body;
     var userId = req.params.id;
-
-    async.auto({
-      handleSubscription : function(cb){
-        User.findOne(userId).populate("auth").exec(function(err, user) {
-          if (err) {
-            return cb(err);
-          }
+    User.findOne(userId).populate("auth").exec(function(err, user) {
+      if (err) {
+        return cb(err);
+      }
+      async.auto({
+        handleSubscription : function(cb){
           if(params.isReceivedEmail && !user.receivedEmail && process.env.NODE_ENV === "production"){
             mailChimp.addMemberToList({ email : user.auth.email, firstname : user.firstname, lastname: user.lastname, language : req.getLocale()}, "subscriber");
-            user.receivedEmail = true;
+            params.receivedEmail = true;
           }
-          cb(null, user);
-        });
-      },
-      handleAddress : ['handleSubscription', function(cb, result){
-        var user = result.handleSubscription;
-        if(!params.address){
-          return cb(null, user);
-        }
-        var addresses = params.address;
-        async.each(addresses, function(addObj, next){
-          sails.log.debug(addObj);
-          if(addObj.delete){
-            if(user.address.length === 1){
-              return next(req.__('user-only-address'));
-            }
-            var deletingAdd = user.address.filter(function(one){
-              return one.id === addObj.id;
-            })[0];
-            user.address.splice(user.address.indexOf(deletingAdd),1);
-            if(deletingAdd.isDefault){
-              user.address[0].isDefault = true;
-            }
-            return next();
+          cb();
+        },
+        handleAddress : function(cb){
+          if(!params.address){
+            return cb();
           }
-          var actualAddress = addObj.street + " " + addObj.city;
-          if(addObj.isDefault){
-            user.phone = addObj.phone;
-          }
-          require('../services/geocode').geocode(actualAddress, function (err, result) {
-            if (err) {
-              sails.log.debug(err);
-              return next(req.__('meal-error-address'));
+          var addresses = params.address;
+          var updatingAddress = user.address || [];
+          async.each(addresses, function(addObj, next){
+            if(addObj.delete){
+              if(updatingAddress.length === 1){
+                return next(req.__('user-only-address'));
+              }
+              var deletingAdd = updatingAddress.filter(function(one){
+                return one.id === addObj.id;
+              })[0];
+              updatingAddress.splice(updatingAddress.indexOf(deletingAdd),1);
+              if(deletingAdd.isDefault){
+                updatingAddress[0].isDefault = true;
+              }
+              return next();
             }
-            sails.log.debug("geocoded result: " + result);
-            if(result.length===0){
-              return next(req.__('meal-error-address2'));
-            }
+            var actualAddress = addObj.street + " " + addObj.city;
             if(addObj.isDefault){
-              user.address.forEach(function (one) {
-                one.isDefault = false;
-              });
-              var administration = result[0].administrativeLevels;
-              user.county = administration.level2long;
-              user.city = result[0].city;
-              user.full_address = result[0].formattedAddress;
-              user.lat = result[0].latitude;
-              user.long = result[0].longitude;
-              user.zip = result[0].zipcode;
+              params.phone = addObj.phone;
             }
+            require('../services/geocode').geocode(actualAddress, function (err, result) {
+              if (err) {
+                sails.log.debug(err);
+                return next(req.__('meal-error-address'));
+              }
+              sails.log.debug("geocoded result: " + result);
+              if(result.length===0){
+                return next(req.__('meal-error-address2'));
+              }
+              if(addObj.isDefault){
+                updatingAddress.forEach(function (one) {
+                  one.isDefault = false;
+                });
+                sails.log.info("default address: " + actualAddress);
+                var administration = result[0].administrativeLevels;
+                params.county = administration.level2long;
+                params.city = result[0].city;
+                params.full_address = result[0].formattedAddress;
+                params.lat = result[0].latitude;
+                params.long = result[0].longitude;
+                params.zip = result[0].zipcode;
+              }
 
-            addObj.street = result[0].streetNumber + " " + result[0].streetName;
-            addObj.city = result[0].city;
-            addObj.zip = result[0].zipcode;
+              addObj.street = result[0].streetNumber + " " + result[0].streetName;
+              addObj.city = result[0].city;
+              addObj.zip = result[0].zipcode;
 
-            if(addObj.id && addObj.id != 'undefined'){
-              user.address.forEach(function(add, index){
-                if(add.id == addObj.id){
-                  user.address[index] = addObj;
-                }
-              });
-            }else{
-              var id = new Date().getTime();
-              addObj.id = id;
-              user.address.push(addObj);
-            }
-            return next();
-          });
-        },function(err){
-          if(err){
-            return cb(err);
-          }
-          delete params.address;
-          sails.log.debug(user.address[0].isDefault);
-          sails.log.debug("address updated");
-          cb(null, user);
-        });
-      }],
-      updateUser : ['handleAddress',function(cb, results){
-
-        results.handleAddress.save(function(err, u){
-          if(err){
-            return cb(err);
-          }
-          var auth = req.session.user.auth;
-          User.update({id: userId}, params).exec(function (err, user) {
-            if (err) {
+              if(addObj.id && addObj.id !== 'undefined'){
+                updatingAddress.forEach(function(add, index){
+                  if(add.id === addObj.id){
+                    updatingAddress[index] = addObj;
+                  }
+                });
+              }else{
+                addObj.id = new Date().getTime();
+                updatingAddress.push(addObj);
+              }
+              return next();
+            });
+          },function(err){
+            if(err){
               return cb(err);
             }
-            if(user[0].host && user[0].phone){
-              var hostId = user[0].host.id || user[0].host;
-              Host.update(hostId, {phone : user[0].phone}).exec(function(err, host){
-                if(err){
-                  return cb(err);
-                }
-                user[0].auth = auth;
-                cb(null, user[0]);
-              })
-            }else{
-              user[0].auth = auth;
-              cb(null, user[0]);
-            }
+            params.address = updatingAddress;
+            cb();
           });
-        })
-
-      }]}, function(err, results){
+        },
+        handleReferralCode : function (cb) {
+          user.generateCode(params, function(err, code){
+            if(err){
+              return cb(err);
+            }
+            params.referralCode = code;
+            sails.log.info("code is: " + code);
+            cb();
+          })
+        },
+        updateBirthday : function(cb){
+          if(!params.birthday) {
+            return cb();
+          }
+          var birthdayDate = new Date(params.birthday);
+          var birthday = birthdayDate.getMonth()+1+"/"+birthdayDate.getDate();
+          mailChimp.updateMember({ email : user.auth.email, birthday : birthday }, "member");
+          cb();
+        }}, function(err){
         if(err){
           return res.badRequest(err);
         }
-        sails.log.info("updating user county: " + results.updateUser.county);
-        req.session.user = results.updateUser;
-        return res.ok(results.updateUser);
+        User.update({id: userId}, params).exec(function (err, user) {
+          if (err) {
+            return cb(err);
+          }
+          if(user[0].host && user[0].phone){
+            var hostId = user[0].host.id || user[0].host;
+            Host.update(hostId, {phone : user[0].phone}).exec(function(err, host){
+              if(err){
+                return cb(err);
+              }
+              user[0].auth = req.session.user.auth;
+              req.session.user = user[0];
+              return res.ok(user[0]);
+            })
+          }else{
+            user[0].auth = req.session.user.auth;
+            req.session.user = user[0];
+            return res.ok(user[0]);
+          }
+        });
       })
+    });
   },
 
   me : function(req, res){
@@ -304,14 +313,14 @@ module.exports = require('waterlock').actions.user({
               order.dishes = result.dishes;
               order.host = result.host;
               order.meal = result.meal;
-              if(order.status == "review"){
+              if(order.status === "review"){
                 Object.keys(order.orders).forEach(function(dishId){
                   if(order.orders[dishId]>0){
                     order.dishes.forEach(function(dish){
-                      if(dish.id == dishId){
+                      if(dish.id === dishId){
                         if(dish.isFeature()){
                           dish.meal = order.meal;
-                          if(found.featureDishes.indexOf(dishId) == -1){
+                          if(found.featureDishes.indexOf(dishId) === -1){
                             found.featureDishes.push(dish);
                           }
                         }
@@ -362,6 +371,47 @@ module.exports = require('waterlock').actions.user({
     });
   },
 
+  sendEmailVerification : function(req, res){
+    var userId = req.params.id;
+    var verifyToken = notification.generateToken();
+    User.update(userId, { verifyToken : verifyToken}).exec(function(err, users){
+      if(err){
+        return res.badRequest(err);
+      }
+      var user = users[0];
+      var host = process.env.NODE_ENV === 'production' ? 'https://sfmeal.com' : 'localhost:1337';
+      user.verificationUrl = host + "/user/verify/" + verifyToken.token;
+      notification.sendEmail("User","verification",user,req);
+      res.ok(user);
+    })
+  },
+
+  verify : function(req, res){
+    var token = req.params.token;
+    User.findOne({ "verifyToken.token" : token}).exec(function(err, user){
+      if(err){
+        return res.forbidden(err);
+      }
+      if(!user){
+        return res.notFound({ code : -2, responseText : "can not find user"});
+      }
+      if(user.emailVerified){
+        return res.redirect("/user/me#myinfo");
+      }
+      var expire = new Date(user.verifyToken.expires);
+      if(expire.getTime() < new Date().getTime()){
+        return res.forbidden({ code : -3, responseText : req.__('email-verification-link-expire')});
+      }
+      user.emailVerified = true;
+      user.save(function(err,u){
+        if(err){
+          return res.forbidden(err);
+        }
+        res.redirect("/user/me#myinfo");
+      });
+    });
+  },
+
   activate : function(req, res){
     var userId = req.params.id;
     var msg = req.body.msg;
@@ -382,6 +432,39 @@ module.exports = require('waterlock').actions.user({
       }
       res.ok(user);
     })
+  },
+
+  invite : function(req, res){
+    if(!req.session.authenticated){
+      return res.view('invite', { user : null});
+    }
+    var userId = req.session.user.id;
+    User.findOne(userId).exec(function(err, user){
+      if(err){
+        return res.forbidden(err);
+      }
+      res.view('invite', { user : user });
+    })
+  },
+
+  join : function(req, res){
+    var code = req.query.code;
+    if(req.session.authenticated && req.session.user.referralCode !== code){
+      return res.redirect('invite');
+    }
+    User.find({ referralCode : code }).exec(function(err, users){
+      if(err){
+        return res.notFound(err);
+      }
+      if(!users || !users.length){
+        return res.notFound({ responseText: req.__('referralCode-not-found')});
+      }
+      req.session.referralCode = code;
+      if(req.wantsJSON){
+        return res.ok({ referrer : users[0]});
+      }
+      res.view('join', { referrer : users[0]});
+    });
   },
 
   // getSignedUrl : function(req, res){
@@ -447,7 +530,7 @@ module.exports = require('waterlock').actions.user({
     res.ok({url : encodeURI(url), policy : policy, signature : signature, key : encodeURI(filename), credential : encodeURI(credential), date : date, AWSAccessKeyId : s3.id});
   },
 
-  deleteObject : function(req,res) {
+  deleteUserFile : function(req,res) {
     var s3 = new AWS.S3({Bucket : sails.config.aws.bucket});
     var bucket = sails.config.aws.bucket;
     var userId = req.session.user.id;
@@ -483,5 +566,119 @@ module.exports = require('waterlock').actions.user({
         });
       }
     });
+  },
+
+  deleteUser : function(req, res){
+    var s3 = new AWS.S3({ Bucket : sails.config.aws.bucket});
+    var bucket = sails.config.aws.bucket;
+    var userId = req.params.id;
+    async.auto({
+      deleteUserResource : function(next){
+        s3.headObject({
+          Key : "users/" + userId,
+          Bucket : bucket
+        }, function(err, metadata){
+          if(err && err.code === "NotFound"){
+            return next();
+          }
+          s3.deleteObject({
+            Key : "users/" + userId,
+            Bucket : bucket
+          }, function(err, data){
+            if(err){
+              sails.log.error(err);
+              return next(err);
+            }
+            next();
+          })
+        });
+      },
+      deleteUserDB : function(next){
+        User.destroy(userId).exec(function(err, users){
+          if(err){
+            return next(err);
+          }
+          if(!users || users.length === 0){
+            return next({ code : -2, responseText : "can not find user"});
+          }
+          var auth = users[0].auth;
+          Auth.destroy(auth).exec(next);
+        });
+      }
+    }, function(err){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok();
+    });
+  },
+
+  clean : function(req, res){
+    var s3 = new AWS.S3({ Bucket : sails.config.aws.bucket});
+    var bucket = sails.config.aws.bucket;
+    s3.listObjects({
+      Prefix : "users/",
+      Delimiter : '/',
+      Bucket : bucket
+    }, function(err, objects){
+      if(err){
+        return res.badRequest(err);
+      }
+      var deleteObjects = [];
+      async.each(objects.CommonPrefixes, function(object, next){
+        if(!object || !object.Prefix){
+          return next();
+        }
+        var userId = object.Prefix.match(/\w{24}/)[0];
+        User.count(userId).exec(function(err, number){
+          if(err){
+            sails.log.error(err);
+            return next();
+          }
+          if(number === 0){
+            deleteObjects.push({ Key : object.Prefix });
+            sails.log.info("user id: " + userId + " does not exist, deleting : " + object.Prefix);
+            s3.listObjects({
+              Prefix : object.Prefix,
+              Delimiter : '/',
+              Bucket : bucket
+            }, function(err, userObjects){
+              if(err){
+                return next(err);
+              }
+              async.each(userObjects.Contents, function(userObj, next2){
+                if(!userObj){
+                  return next2();
+                }
+                sails.log.info("user id: " + userId + " does not exist, deleting : " + userObj.Key);
+                deleteObjects.push({ Key : userObj.Key});
+                next2();
+              }, function(err){
+                if(err){
+                  return next(err)
+                }
+                next();
+              })
+            });
+          }else{
+            next();
+          }
+        })
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        s3.deleteObjects({
+          Delete : { Objects : deleteObjects },
+          Bucket : bucket
+        }, function(err, data){
+          if(err){
+            sails.log.error(err);
+            return res.badRequest(err);
+          }
+          res.ok({});
+        })
+      })
+    })
   }
 });

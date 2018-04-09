@@ -60,6 +60,7 @@ var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUt
 //-45 : all stripe error type
 //-46 : this order is an express order, can not confirm
 //-47 : incomplete order pickup information
+//-48 : unverify email
 //-98 : result not found
 
 
@@ -483,9 +484,9 @@ module.exports = {
       if(err){
         return res.badRequest(err)
       }
-      // if(order.coupon){
-      //   return res.badRequest({ code : -18, responseText : req.__('adjust-with-coupon-error')});
-      // }
+      if(order.coupon){
+        return res.badRequest({ code : -18, responseText : req.__('adjust-with-coupon-error')});
+      }
       Meal.findOne(order.meal.id).populate("dishes").populate("dynamicDishes").exec(function(err, meal){
         if(err){
           return res.badRequest(err);
@@ -2025,7 +2026,10 @@ module.exports = {
         return cb({ code : -16, responseText : req.__('coupon-invalid-error')})
       }
       if(coupon.expires_at < new Date()){
-        return res.badRequest({ code : -17, responseText : req.__('coupon-expire-error')});
+        return cb({ code : -17, responseText : req.__('coupon-expire-error')});
+      }
+      if(user.emailVerified===false){
+        return cb({ code : -48, responseText : req.__('coupon-unverified-email')})
       }
       var couponIsRedeemed = false;
       couponIsRedeemed = user.coupons.some(function(coupon){

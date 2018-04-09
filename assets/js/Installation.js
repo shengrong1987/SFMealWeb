@@ -25,6 +25,7 @@ function setup(){
   setupSwitchButton();
   setupEchoBox();
   setupGlobalLoading();
+  setupCrumble();
 }
 
 function initData(){
@@ -293,6 +294,17 @@ function setupGlobalLoading(){
       $('body').removeClass("loading");
     }
   })
+}
+
+function setupCrumble(){
+  $('#tour').crumble();
+  // $("#cateringModeBtn").grumble({
+  //   text : "Hello",
+  //   angle : 315,
+  //   distance : 3,
+  //   showAfter : 100,
+  //   useRelativePositioning : true
+  // });
 }
 
 /*

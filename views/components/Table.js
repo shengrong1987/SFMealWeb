@@ -162,7 +162,7 @@ var Table = createReactClass({
 
     return (
         <div>
-          <table className="table table-striped table-bordered table-hover">
+          <table className="table table-striped table-bordered table-hover table-sm table-responsive">
             <tbody><tr><td colSpan={header.length}>{this.state.headData}</td></tr></tbody>
             <TableHeader cols={header}/>
             <tbody>

@@ -13,6 +13,7 @@ var wechatToken = sails.config.wechat.token;
 var wechatAppId = sails.config.wechat.appId;
 var wechatAppSecret = sails.config.wechat.secret;
 var wechatNonceStr = sails.config.wechat.nonceStr;
+var notification = require("../services/notification");
 var crypto = require('crypto');
 var request = require('request');
 
@@ -29,6 +30,7 @@ module.exports = require('waterlock').waterlocked({
    * -12 : wechat signature no response
   */
   register: function(req, res) {
+    var _this = this;
     var params = req.params.all(),
       def = waterlock.Auth.definition,
       criteria = { },
@@ -38,7 +40,7 @@ module.exports = require('waterlock').waterlocked({
     }
     var attr = {
       password: params.password
-    }
+    };
     attr[scopeKey] = params[scopeKey];
     criteria[scopeKey] = attr[scopeKey];
     waterlock.engine.findAuth(criteria, function(err, user) {
@@ -56,42 +58,120 @@ module.exports = require('waterlock').waterlocked({
             //in development mode, skipping subscription
           }
           delete params.password;
-          User.update(user.id, params).exec(function(err, u){
+          params.verifyToken = notification.generateToken();
+          user.generateCode(params, function(err, code){
             if(err){
               return res.badRequest(err);
             }
-            req.session.user = user;
-            req.session.authenticated = true;
-            return res.ok(user);
-          });
+            params.referralCode = code;
+            User.update(user.id, params).exec(function(err, u){
+              if(err){
+                return res.badRequest(err);
+              }
+              u[0].auth = user.auth;
+              req.session.user = u[0];
+              req.session.authenticated = true;
+              var host = process.env.NODE_ENV === 'production' ? 'https://sfmeal.com' : 'localhost:1337';
+              params.verificationUrl = host + "/user/verify/" + params.verifyToken.token;
+              notification.sendEmail("User","verification",params,req);
+              _this.checkReferralProgram(req, function(err, me){
+                if(err){
+                  return res.badRequest(err);
+                }
+                if(me){
+                  u[0].points = me.points;
+                  u[0].referralBonus = me.referralBonus;
+                }
+                return res.ok(u[0]);
+              })
+            });
+          })
         });
       }
     });
+  },
+
+  checkReferralProgram : function(req, cb){
+    var referralCode = req.session.referralCode;
+    var userId = req.session.user.id;
+    if(!referralCode){
+      return User.update({ id : userId }, { referralBonus : true }).exec(function(err, u){
+        if(err){
+          return cb(err);
+        }
+        cb(null, u[0]);
+      });
+    }
+    req.session.referralCode = null;
+    sails.log.info("matching code: " + referralCode);
+    User.findOne({ referralCode : referralCode }).exec(function(err, referrer){
+      if(err){
+        return cb(err);
+      }
+      if(!referrer){
+        return User.update({ id : userId }, { referralBonus : true }).exec(cb);
+      }
+      User.findOne(userId).exec(function(err, me){
+        if(err){
+          return cb(err);
+        }
+        if(me.referralBonus){
+          return cb();
+        }
+        sails.log.info("adding points to referee");
+        me.points += 10;
+        me.referralBonus = true;
+        me.save(function(err, u){
+          if(err){
+            return cb(err);
+          }
+          sails.log.info("adding points to referrer");
+          referrer.points += 10;
+          referrer.save(function(err, r){
+            if(err){
+              return cb(err);
+            }
+            cb(null, me);
+          });
+        })
+      });
+    })
   },
 
   loginSuccess : function(req, res){
     console.log("login success...");
     var auth = req.session.user.auth;
     var county = req.session.user.county;
+
     sails.log.info("county: " + county);
     if(county && (!req.cookies['county'] || req.cookies['county'] === 'undefined')){
       res.cookie('county',county);
     }
-    if(auth.facebookId){
-      if(req.session.user.redirectUrl){
-        res.redirect(req.session.user.redirectUrl);
-      }else{
-        res.redirect('back');
+
+    this.checkReferralProgram(req, function(err, me){
+      if(err){
+        return res.badRequest(err);
       }
-    }else if(auth.googleEmail){
-      if(req.session.user.redirectUrl){
-        res.redirect(req.session.user.redirectUrl);
-      }else{
-        res.redirect('back');
+      if(me){
+        req.session.user.points = me.points;
+        req.session.user.referralBonus = me.referralBonus;
       }
-    }else{
-      res.ok(req.session.user);
-    }
+      if(auth.facebookId){
+        if(req.session.user.redirectUrl){
+          res.redirect(req.session.user.redirectUrl);
+        }else{
+          res.redirect('back');
+        }
+      }else if(auth.googleEmail){
+        if(req.session.user.redirectUrl){
+          res.redirect(req.session.user.redirectUrl);
+        }else{
+          res.redirect('back');
+        }
+      }else{
+        res.ok(req.session.user);
+      }
+    });
   },
 
   admin : function(req, res){

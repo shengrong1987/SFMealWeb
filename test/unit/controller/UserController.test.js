@@ -24,13 +24,14 @@ describe('UsersController', function() {
     it('should register admin account', function (done) {
       agent
         .post('/auth/register')
-        .send({email : adminEmail, password: password})
+        .send({email : adminEmail, password: password, firstname : "admin", lastname : "account"})
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
           res.body.should.have.property('auth');
           res.body.auth.should.have.property('email',adminEmail);
+          res.body.referralBonus.should.be.true();
           done();
         })
     })
@@ -211,13 +212,14 @@ describe('UsersController', function() {
     it('should register if account not exist', function (done) {
       agent
           .post('/auth/register')
-          .send({email : email, password: password})
+          .send({email : email, password: password, firstname : "test", lastname : "account"})
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err,res){
             res.body.should.have.property('auth');
             res.body.auth.should.have.property('email',email);
+            res.body.referralCode.should.be.equal("test.account.2");
             userId = res.body.id;
             done();
           })
@@ -242,7 +244,7 @@ describe('UsersController', function() {
         .expect('Location','/auth/done')
         .end(done)
     })
-
+  //
     it('should not login if password not correct', function (done) {
       agent
           .post('/auth/login?type=local')
@@ -481,7 +483,7 @@ describe('UsersController', function() {
 
     it('should get delete image url', function (done){
       agent
-        .post('/user/me/delete')
+        .post('/user/me/deleteFile')
         .send({
           filename : "test.jpg",
           module : "thumbnail"
@@ -504,6 +506,7 @@ describe('UsersController', function() {
             (true).should.be.equalOneOf(res.body.address[0].isDefault, res.body.address[1].isDefault, res.body.address[2].isDefault);
             res.body.city.should.be.equal("Elk Grove");
             res.body.phone.should.be.equal(defaultPhone);
+            res.body.referralCode.should.be.equal(firstname + "." + lastname + ".2");
             deletedAddresses = res.body.address;
             deletedAddresses = deletedAddresses.filter(function(address){
               if(address.isDefault){
@@ -563,6 +566,7 @@ describe('UsersController', function() {
           should(res.body.address[0]).which.is.a.Object();
           (newPhone).should.be.equalOneOf(res.body.address[0].phone, res.body.address[1].phone);
           res.body.phone.should.be.equal(defaultPhone);
+          res.body.referralCode.should.be.equal(firstname + "." + lastname + ".2");
           done();
         })
     })
@@ -581,6 +585,7 @@ describe('UsersController', function() {
           res.body.should.have.property("address").with.length(2);
           should(res.body.address[0]).which.is.a.Object();
           (true).should.be.equalOneOf(res.body.address[0].isDefault, res.body.address[1].isDefault);
+          res.body.referralCode.should.be.equal(firstname + "." + lastname + ".2");
           // res.body.city.should.be.equal("San Francisco");
           done();
         })
@@ -594,7 +599,7 @@ describe('UsersController', function() {
     it('should register instead if account not exist', function (done) {
       agent
           .post('/auth/register')
-          .send({email : anotherEmail, password: password})
+          .send({email : anotherEmail, password: password, firstname : "123", lastname : "la"})
           .expect(200)
           .end(function(err,res){
             res.body.should.have.property('auth');
@@ -653,6 +658,151 @@ describe('UsersController', function() {
       agent
         .get('/auth/wechat?signature=aerneQiK37rmpQgVuClSeOfXRxIbLycHSConuMHQTFA&nonce=wxfdb1d9c9775ec634&echostr=wxfdb1d9c9775ec634&timestamp=' + new Date().getTime())
         .expect(400, done)
+    })
+  });
+
+  describe('user registration with referral code', function(){
+
+    var email = "aimbebe.r@gmail.com";
+    var password = "12345678";
+    var referralCode = "";
+
+    it('should login if account exist', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
+    it('should get user info', function(done){
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          referralCode = res.body.referralCode;
+          done();
+        })
+    })
+
+    it('should log out user', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    });
+
+    it('should get referrer code', function(done){
+      agent
+        .get('/join?code=' + referralCode)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.referrer.referralCode.should.be.equal(referralCode);
+          done();
+        })
+    })
+
+    it('use referers code to sign up should give 10 points to both user', function(done){
+      agent
+        .post('/auth/register')
+        .send({
+          firstname: "referral",
+          lastname: "test",
+          email: "referraltest@gmail.com",
+          password: "12345678",
+          phone: "(123)123-4567",
+          birthday: null,
+          receivedEmail: false
+        })
+        .expect(200)
+        .end(function (err, res) {
+          if (err) {
+            return done(err);
+          }
+          res.body.points.should.be.equal(10);
+          done();
+        })
+    })
+
+    it('should login if account exist', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
+    it('referral should have 10 points', function(done){
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.points.should.be.equal(10);
+          done();
+        })
+    })
+
+    it('should log out user', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    });
+
+    it('should get referrer code', function(done){
+      agent
+        .get('/join?code=' + referralCode)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.referrer.referralCode.should.be.equal(referralCode);
+          done();
+        })
+    })
+
+    it('login again', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({email : "referraltest@gmail.com", password: "12345678"})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
+    it('should not gain points for existing user', function (done) {
+      agent
+        .get('/user/me')
+        .set('Accept','application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.points.should.be.equal(10);
+          done();
+        })
     })
   });
   //need manual test for facebook and google login

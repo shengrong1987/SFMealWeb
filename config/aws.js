@@ -13,5 +13,5 @@ module.exports.aws = {
   },
   host : 'https://sfmeal.s3.amazonaws.com/',
   acl : "public-read",
-  region : "us-east-1"
+  region : "us-west-1"
 }
