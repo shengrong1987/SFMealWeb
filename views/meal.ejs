@@ -492,7 +492,7 @@
 
 <ol id="tour" style="display: none;">
   <li data-target="#cateringModeBtn" data-angle="355">
-    <%= __('catering-option', meal.partyRequirement.minimal)%>
+    <%= __('catering-option', meal.partyRequirement ? meal.partyRequirement.minimal : 100)%>
   </li>
 </ol>
 

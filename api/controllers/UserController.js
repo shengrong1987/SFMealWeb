@@ -496,7 +496,7 @@ module.exports = require('waterlock').actions.user({
     expDate.setMinutes(expDate.getMinutes() + 5);
     expDate = expDate.toISOString();
     //var date = new Date().toISOString().replace(/-|\:|\./g, '');
-    var date = "20151229T000000Z";
+    var date = new Date();
     var credential = s3.id + "/" + date + "/" + s3.region + "/s3/aws4_request";
     var url = "https://" + bucket + ".s3.amazonaws.com/";
     var maxSize = this.getMaxSize(module);
