@@ -599,6 +599,7 @@
                 user.featureDishes.forEach(function(featureDish) {
                   user.orders.forEach(function(order){
                     if(order.status == "review"){
+                      if(!order.reviewing_orders){ return }
                       order.reviewing_orders.forEach(function(dish){
                         if(dish == featureDish.id){%>
                           <div id="rating<%= i%>" class="box-item">
@@ -688,6 +689,7 @@
               </div>
               <div id="meal-review-<%= j%>" class="background-color collapse" style="padding: 10px;border-top: solid 1px lightgrey;">
             <%
+                  if(!order.reviewing_orders){ return };
                   order.reviewing_orders.forEach(function(dishId){
                   order.dishes.forEach(function(dish){
                     if(dish.id == dishId){
