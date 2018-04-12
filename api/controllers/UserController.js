@@ -381,8 +381,13 @@ module.exports = require('waterlock').actions.user({
       var user = users[0];
       var host = process.env.NODE_ENV === 'production' ? 'https://sfmeal.com' : 'localhost:1337';
       user.verificationUrl = host + "/user/verify/" + verifyToken.token;
-      notification.sendEmail("User","verification",user,req);
-      res.ok(user);
+      User.findOne(userId).populate('auth').exec(function(err, u){
+        if(err){
+          return res.badRequest(err);
+        }
+        notification.sendEmail("User","verification",u,req);
+        res.ok(u);
+      })
     })
   },
 

@@ -5,7 +5,7 @@ var stripe = require('stripe')(sails.config.StripeKeys.secretKey);
 var async = require('async');
 
 const SERVICE_FEE = 0;
-const SYSTEM_DELIVERY_FEE = 399;
+const SYSTEM_DELIVERY_FEE = 0;
 const MILEAGE_FEE = 1.18;
 const PARTY_ORDER_RANGE_MULTIPLIER = 3;
 const SOURCE_FAIL = "failed";

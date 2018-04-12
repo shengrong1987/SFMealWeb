@@ -284,7 +284,7 @@
                   </div>
                 </div>
               </div>
-              <div id="deliverySettingView hide" class="row">
+              <div id="deliverySettingView" class="row hide">
                 <div class="col-xs-12">
                   <div class="vertical-align">
                     <input type="checkbox" data-toggle="switch-button" id="isDeliveryBySystem" class="regular-checkbox" checked='checked'>
@@ -298,13 +298,13 @@
                       <div class="col-sm-6">
                         <div class="input-group">
                           <div class="input-group-addon"><%= __('delivery-fee')%>: $</div>
-                          <input id="deliveryFeeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="5" value="5">
+                          <input id="deliveryFeeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="0" value="0">
                         </div>
                       </div>
                       <div class=col-sm-6>
                         <div class="input-group">
                           <div class="input-group-addon"><%= __('delivery-range')%>:</div>
-                          <input id="deliveryRangeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="5" value="5">
+                          <input id="deliveryRangeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="3" value="3">
                           <div class="input-group-addon"><%= __('miles')%></div>
                         </div>
                       </div>
@@ -390,7 +390,7 @@
             </div>
 
             <div class="form-group text-center submit">
-              <button name="publish" type="submit" class="btn btn-green btn-lg round" style="margin-right: 20px;"><%= __('save-and-on')%></button>
+              <button name="publish" type="submit" class="btn btn-grey-green btn-lg round active" style="margin-right: 20px;"><%= __('save-and-on')%></button>
               <button name="save" type="button" class="btn btn-disable btn-lg round text-grey"><%= __('save-and-off')%></button>
               <div class="alert alert-danger" data-toggle="alert" style="margin-top: 20px;"></div>
               <div class="alert alert-success" data-toggle="alert" style="margin-top: 20px;"></div>

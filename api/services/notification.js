@@ -335,7 +335,7 @@ var notification = {
       info.recipientEmail = "admin@sfmeal.com";
       info.recipientName = "SFMeal.com";
     }else{
-      info.recipientEmail = params.guestEmail || params.email;
+      info.recipientEmail = params.guestEmail || params.email || (params.auth ? params.auth.email : null);
       info.recipientName = params.customerName || ( params.customer ? params.customer.firstname : '') || params.firstname || '';
     }
     return info;

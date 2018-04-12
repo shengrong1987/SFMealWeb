@@ -874,7 +874,7 @@
         showTodayButton : true,
         defaultDate : mDate,
         minDate : minDate,
-        timeZone : ''
+        timeZone : 'America/Los_Angeles'
       });
     })
   });

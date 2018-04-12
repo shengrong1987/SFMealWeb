@@ -1369,7 +1369,7 @@ var MealView = Backbone.View.extend({
     e.preventDefault();
     var county = this.$el.find(".pickup_container").data("county");
     this.$el.find("#pickupAlert").hide();
-    var pickupView = '<div class="well form-group pickup"> ' +
+    var pickupView = '<div class="well form-group pickup autoCompleteTarget"> ' +
       '<div class="col-sm-4"> <label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> ' +
       '<div class="col-sm-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="from"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div>' +
       '<div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="end"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div>' +
@@ -1392,7 +1392,8 @@ var MealView = Backbone.View.extend({
         today : "fa fa-calendar-times-o"
       },
       stepping : 30,
-      showTodayButton : true
+      showTodayButton : true,
+      timeZone : 'America/Los_Angeles'
     });
     setupLanguage();
     setupInputMask();
@@ -2758,6 +2759,7 @@ var MealConfirmView = Backbone.View.extend({
       var location = $(this).data("center");
       var color = $(this).data("color");
       var area = $(this).data("area");
+      var time = $(this).data("time");
       utility.geocoding(location, function(err, center){
         if(err){
           makeAToast(err);
@@ -2791,7 +2793,7 @@ var MealConfirmView = Backbone.View.extend({
             icon: image
           });
           var deliveryInfo = new google.maps.InfoWindow({
-            content : "<h4><small><span data-toggle='i18n' data-key='deliveryRange'></span>:" + area + "</small></h4>"
+            content : "<h4><small><span data-toggle='i18n' data-key='deliveryRange'></span>:" + area + "<br/><span data-toggle='i18n' data-key='deliveryTime'></span>:" + time + "</small></h4>"
           })
           deliveryMarker.addListener('click', function(){
             deliveryInfo.open(map, deliveryMarker);
