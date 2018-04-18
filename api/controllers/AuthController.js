@@ -16,6 +16,7 @@ var wechatNonceStr = sails.config.wechat.nonceStr;
 var notification = require("../services/notification");
 var crypto = require('crypto');
 var request = require('request');
+var async = require('async');
 
 module.exports = require('waterlock').waterlocked({
   /* e.g.
@@ -28,6 +29,7 @@ module.exports = require('waterlock').waterlocked({
    * -10 : fail to add/remove dish on active meal
    * -11 : dish can not be empty
    * -12 : wechat signature no response
+   * -20 : wechat unionId not exist
   */
   register: function(req, res) {
     var _this = this;
@@ -71,7 +73,7 @@ module.exports = require('waterlock').waterlocked({
               u[0].auth = user.auth;
               req.session.user = u[0];
               req.session.authenticated = true;
-              var host = process.env.NODE_ENV === 'production' ? 'https://sfmeal.com' : 'localhost:1337';
+              var host = process.env.NODE_ENV === 'production' ? process.env.BASE_URL : 'localhost:1337';
               params.verificationUrl = host + "/user/verify/" + params.verifyToken.token;
               notification.sendEmail("User","verification",params,req);
               _this.checkReferralProgram(req, function(err, me){
@@ -88,6 +90,65 @@ module.exports = require('waterlock').waterlocked({
           })
         });
       }
+    });
+  },
+
+  registerWechat: function(attrs, req, res) {
+    var _this = this;
+    var isNewUser = false;
+    var unionId = attrs.unionid;
+    if(!unionId){
+      return res.badRequest({code : -20, responseText : req.__('user-unionid-needed')});
+    }
+    waterlock.engine.findAuth({ unionId : unionId }, function(err, user) {
+      if (!user) {
+        isNewUser = true;
+      }
+      waterlock.engine.findOrCreateAuth({ unionId : unionId }, attrs, function(err, user) {
+        if(err){
+          return res.badRequest(err);
+        }
+        async.auto({
+          newUser : function(next){
+            if(!isNewUser){
+              return next();
+            }
+            attrs.verifyToken = notification.generateToken();
+            user.generateCode(attrs, function(err, code) {
+              if (err) {
+                return next(err);
+              }
+              attrs.referralCode = code;
+              next();
+            });
+          }
+        }, function(err){
+          if(err){
+            return res.badRequest(err);
+          }
+          User.update(user.id, attrs).exec(function(err, u){
+            if(err){
+              return res.badRequest(err);
+            }
+            u[0].auth = user.auth;
+            req.session.user = u[0];
+            req.session.authenticated = true;
+            var host = process.env.NODE_ENV === 'production' ? process.env.BASE_URL : process.env.LOCAL_HOST;
+            attrs.verificationUrl = host + "/user/verify/" + attrs.verifyToken.token;
+            //notification.sendEmail("User","verification",attrs,req);
+            _this.checkReferralProgram(req, function(err, me){
+              if(err){
+                return res.badRequest(err);
+              }
+              if(me){
+                u[0].points = me.points;
+                u[0].referralBonus = me.referralBonus;
+              }
+              return res.ok(u[0]);
+            })
+          });
+        })
+      });
     });
   },
 
@@ -182,6 +243,42 @@ module.exports = require('waterlock').waterlocked({
 
   resetForm : function(req, res){
     return res.view("resetPassword");
+  },
+
+  wechatCode : function(req, res){
+    var code = req.query.code;
+    var state = req.query.state;
+    var errMsg = req.body.errmsg;
+    if(errMsg!=='ok'){
+      return res.badRequest(req.body);
+    }
+    this.exchangeToken(code, req, res);
+  },
+
+  exchangeToken : function(code, req, res){
+    var _this = this;
+    var accessTokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$APPID&secret=$SECRET&code=$CODE&grant_type=authorization_code";
+    accessTokenUrl = accessTokenUrl.replace('$APPID', process.env.WECHAT_APPID).replace('$SECRET',process.env.WECHAT_SECRET).replace('$CODE', code);
+    request.get({
+      url : accessTokenUrl
+    }, function(err, response){
+      if(err){
+        return res.badRequest(err);
+      }
+      var accessToken = response.body.access_token;
+      var refreshToken = response.body.refresh_token;
+      var openId = response.body.openid;
+      var userProfileUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$ACCESS_TOKEN&openid=$OPENID&lang=zh_CN";
+      userProfileUrl.replace('$ACCESS_TOKEN', accessToken).replace('$OPENID',openId);
+      request.get({
+        url : userProfileUrl
+      }, function(err, userRes){
+        if(err){
+          return res.badRequest(err);
+        }
+        _this.registerWechat(userRes.body, req, res);
+      });
+    });
   },
 
   wechat : function(req, res){

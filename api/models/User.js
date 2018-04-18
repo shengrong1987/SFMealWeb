@@ -188,20 +188,25 @@ module.exports = {
         if(err){
           return cb(err);
         }
-        var firstName = auth.firstname || ( auth.name ? auth.name.split(' ')[0] : auth.username) || 'guest';
+        var firstName = auth.firstname || ( auth.name ? auth.name.split(' ')[0] : auth.username) || auth.nickname || 'guest';
         var lastName = auth.lastname || ( auth.name ? auth.name.split(' ')[1] : '') || 'guest';
         var referralCode = firstName + "." + lastName + "." + number;
+        var hometown = auth.hometown ? auth.hometown.name : (auth.city ? (auth.city + ", " + auth.province) : 'San Francisco, California');
+        var city = auth.location ? ( auth.location.name ? auth.location.name.split(",")[0] : '') : ( auth.city || 'San Francisco');
+        var picture = auth.picture ? auth.picture.data.url : ( auth.headimgurl || '');
+        var state = auth.location ? ( auth.location.name ? auth.location.name.split(",")[1] : '') : ( auth.province || 'California');
+        var gender = auth.gender || auth.sex;
         sails.log.info("code created: " + referralCode);
         var params = {
           firstname: firstName,
           lastname: lastName,
-          gender: auth.gender,
-          hometown: auth.hometown ? auth.hometown.name : "San Francisco, California",
+          gender: gender,
+          hometown: hometown,
           email : auth.email,
-          desc : user.desc.replace('%s', auth.hometown ? auth.hometown.name : "San Francisco, California"),
-          picture: auth.picture ? auth.picture.data.url : '',
-          city: auth.location ? ( auth.location.name ? auth.location.name.split(",")[0] : '') : 'San Francisco',
-          state: auth.location ? ( auth.location.name ? auth.location.name.split(",")[1] : '') : 'California',
+          desc : user.desc.replace('%s', hometown),
+          picture: picture,
+          city: city,
+          state: state,
           referralCode : referralCode
         }
         User.update(user.id, params).exec(function(err, user){

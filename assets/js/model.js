@@ -255,6 +255,8 @@ var UserBarView = Backbone.View.extend({
         }
         $this.handleBadge(false, "user");
       })
+    }else{
+      wechatLogin();
     }
     this.getNotification();
   },
@@ -3772,4 +3774,16 @@ function uploadThumbnail(){
     errorAlert.html(err);
     errorAlert.show();
   },0,"thumbnail",isDelete);
+}
+
+function wechatLogin(){
+  var gm_ua = navigator.userAgent.toLowerCase();
+  if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger") {
+    var redirectUrl = '/auth/wechatCode';
+    var scope = "snsapi_userinfo";
+    var appId = WECHAT_APPID;
+    var wechatUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=STATE#wechat_redirect";
+    wechatUrl = wechatUrl.replace('$APPID', appId).replace('$REDIRECT_URL',redirectUrl).replace('$SCOPE',scope);
+    location.href = wechatUrl;
+  }
 }

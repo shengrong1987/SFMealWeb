@@ -28,6 +28,9 @@ module.exports = {
     wechatToken : {
       type : 'string'
     },
+    unionId : {
+      type : 'string'
+    },
     firstname: {
       type : 'string'
     },
