@@ -1038,7 +1038,7 @@ var MealSelectionView = Backbone.View.extend({
             icon: image
           });
           var deliveryInfo = new google.maps.InfoWindow({
-            content : "<h4><small><span data-toggle='i18n' data-key='deliveryRange'></span>:" + area || location + "</small></h4>"
+            content : "<h4><small><span data-toggle='i18n' data-key='deliveryRange'></span>:" + area + "<br/><span data-toggle='i18n' data-key='deliveryTime'></span>:" + time + "</small></h4>"
           })
           deliveryMarker.addListener('click', function(){
             deliveryInfo.open(map, deliveryMarker);
