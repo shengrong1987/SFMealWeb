@@ -248,9 +248,15 @@ module.exports = require('waterlock').waterlocked({
   wechatCode : function(req, res){
     var code = req.query.code;
     var state = req.query.state;
-    var errMsg = res.body.errmsg;
-    if(errMsg!=='ok'){
-      return res.badRequest(req.body);
+    try{
+      sails.log.info("wechat code res:" + res.body);
+      var body = JSON.parse(response.body);
+      var errMsg = body.errmsg;
+      if(errMsg!=='ok'){
+        return res.badRequest(req.body);
+      }
+    }catch(e){
+      sails.log.debug(e);
     }
     this.exchangeToken(code, req, res);
   },
