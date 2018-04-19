@@ -145,7 +145,7 @@ module.exports = require('waterlock').waterlocked({
                 u[0].referralBonus = me.referralBonus;
               }
               return res.ok(u[0]);
-            })
+          })
           });
         })
       });
@@ -248,7 +248,7 @@ module.exports = require('waterlock').waterlocked({
   wechatCode : function(req, res){
     var code = req.query.code;
     var state = req.query.state;
-    var errMsg = req.body.errmsg;
+    var errMsg = res.body.errmsg;
     if(errMsg!=='ok'){
       return res.badRequest(req.body);
     }

@@ -255,8 +255,6 @@ var UserBarView = Backbone.View.extend({
         }
         $this.handleBadge(false, "user");
       })
-    }else{
-      wechatLogin();
     }
     this.getNotification();
   },
