@@ -3779,7 +3779,7 @@ function uploadThumbnail(){
 function wechatLogin(){
   var gm_ua = navigator.userAgent.toLowerCase();
   if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger") {
-    var redirectUrl = '/auth/wechatCode';
+    var redirectUrl = BASE_URL + '/auth/wechatCode';
     var scope = "snsapi_userinfo";
     var appId = WECHAT_APPID;
     var wechatUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=STATE#wechat_redirect";
