@@ -258,7 +258,9 @@ module.exports = require('waterlock').waterlocked({
   exchangeToken : function(code, req, res){
     var _this = this;
     var accessTokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$APPID&secret=$SECRET&code=$CODE&grant_type=authorization_code";
-    accessTokenUrl = accessTokenUrl.replace('$APPID', process.env.WECHAT_APPID).replace('$SECRET',process.env.WECHAT_SECRET).replace('$CODE', code);
+    accessTokenUrl = accessTokenUrl.replace('$APPID', process.env.WECHAT_APPID);
+    accessTokenUrl = accessTokenUrl.replace('$SECRET',process.env.WECHAT_SECRET);
+    accessTokenUrl = accessTokenUrl.replace('$CODE', code);
     request.get({
       url : accessTokenUrl
     }, function(err, response){
@@ -269,7 +271,8 @@ module.exports = require('waterlock').waterlocked({
       var refreshToken = response.body.refresh_token;
       var openId = response.body.openid;
       var userProfileUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$ACCESS_TOKEN&openid=$OPENID&lang=zh_CN";
-      userProfileUrl.replace('$ACCESS_TOKEN', accessToken).replace('$OPENID',openId);
+      userProfileUrl = userProfileUrl.replace('$ACCESS_TOKEN', accessToken);
+      userProfileUrl = userProfileUrl.replace('$OPENID',openId);
       request.get({
         url : userProfileUrl
       }, function(err, userRes){

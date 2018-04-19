@@ -3783,7 +3783,9 @@ function wechatLogin(){
     var scope = "snsapi_userinfo";
     var appId = WECHAT_APPID;
     var wechatUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=STATE#wechat_redirect";
-    wechatUrl = wechatUrl.replace('$APPID', appId).replace('$REDIRECT_URL',redirectUrl).replace('$SCOPE',scope);
+    wechatUrl = wechatUrl.replace('$APPID', appId);
+    wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
+    wechatUrl = wechatUrl.replace('$SCOPE',scope);
     location.href = wechatUrl;
   }
 }
