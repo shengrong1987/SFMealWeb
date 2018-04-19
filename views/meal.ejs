@@ -34,7 +34,7 @@
 
   </div>
 
-  <div id="meal-detail-container" class="padding-clear" data-meal-prepareTime="<%= meal.prepareTime%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>" data-title="<%= meal.title%>" data-coverString="<%= meal.coverString%>" data-cover="<%= meal.cover%>">
+  <div id="meal-detail-container" class="padding-clear" data-meal-prepareTime="<%= meal.prepareTime%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>" data-title="<%= meal.title%>" data-coverString="<%= meal.coverString%>" data-cover="<%= meal.cover%>" data-user="<%= user || ''%>">
 
     <div class="row">
       <div class="col-md-8">
@@ -499,11 +499,14 @@
 <script>
   var mealSelectionView = new MealSelectionView({ el : $("#meal-detail-container"), model : new Meal()});
   var coverDishId = $("#meal-detail-container").data("cover");
+  var user = $("#meal-detail-container").data("user");
   var coverDish = $("#meal-detail-container").find(".dish a[data-gallery='" + coverDishId + "']");
   var dishTitle = coverDish.data("title");
   var desc = coverDish.data("footer");
   setupWechat($("#meal-detail-container").data("coverstring"),$("#meal-detail-container").data("title"), dishTitle + ":" + desc);
-  wechatLogin();
+  if(!user){
+    wechatLogin();
+  }
 //  $("#social-share").jsSocials({
 //    shareIn: "popup",
 //    text : "SFMeal.com",

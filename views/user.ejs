@@ -750,4 +750,8 @@
   var userProfileView = new UserProfileView( { el: $("#myinfo"), model : new User()})
   new ReviewView({ el : $("#myreview"), model : new Review()})
   var orderView = new OrderView({ el : $("#myorder"), model : new Order()});
+  var userId = $("#myinfo").data("id");
+  if(!userId){
+      wechatLogin();
+  }
 </script>

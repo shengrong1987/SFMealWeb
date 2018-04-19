@@ -718,7 +718,7 @@
           </div>
         </div>
 
-        <div id="myinfo" class="tab-pane middle">
+        <div id="myinfo" class="tab-pane middle" data-user="<%= user || ''%>">
           <div class="box box-shadow white">
             <form class="form-horizontal text-left" data-toggle="validator" data-id="<%= user.host.id%>" data-err-container="#formAlert">
 
@@ -965,4 +965,8 @@
   var hostProfileView = new HostProfileView( { el : $("#myinfo"), model : new Host()})
   var addressView = new AddressView({ el : $("#hostAddressView"), model : new Host()})
   var orderView = new OrderView({ el : $("#myorder"), model : new Order()});
+  var user = $("#myinfo").data("user");
+  if(!user){
+      wechatLogin();
+  }
 </script>
