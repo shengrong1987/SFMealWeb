@@ -195,7 +195,7 @@ module.exports = {
         var city = auth.location ? ( auth.location.name ? auth.location.name.split(",")[0] : '') : ( auth.city || 'San Francisco');
         var picture = auth.picture ? auth.picture.data.url : ( auth.headimgurl || '');
         var state = auth.location ? ( auth.location.name ? auth.location.name.split(",")[1] : '') : ( auth.province || 'California');
-        var gender = auth.gender || auth.sex;
+        var gender = auth.gender || (auth.sex === 1 ? "male" : "female");
         sails.log.info("code created: " + referralCode);
         var params = {
           firstname: firstName,

@@ -93,7 +93,7 @@ module.exports = require('waterlock').waterlocked({
     });
   },
 
-  registerWechat: function(attrs, req, res) {
+  registerWechat: function(attrs, state, req, res) {
     var _this = this;
     var isNewUser = false;
     var openid = attrs.openid;
@@ -144,7 +144,7 @@ module.exports = require('waterlock').waterlocked({
                 u[0].points = me.points;
                 u[0].referralBonus = me.referralBonus;
               }
-              return res.ok(u[0]);
+              return res.redirect(state);
           })
           });
         })
@@ -249,10 +249,11 @@ module.exports = require('waterlock').waterlocked({
     var code = req.query.code;
     var state = req.query.state;
     sails.log.info("wechat code:" + code);
-    this.exchangeToken(code, req, res);
+    sails.log.info("wechat state:" + state);
+    this.exchangeToken(code, state, req, res);
   },
 
-  exchangeToken : function(code, req, res){
+  exchangeToken : function(code, state, req, res){
     var _this = this;
     var accessTokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$APPID&secret=$SECRET&code=$CODE&grant_type=authorization_code";
     accessTokenUrl = accessTokenUrl.replace('$APPID', process.env.WECHAT_APPID);
@@ -287,7 +288,7 @@ module.exports = require('waterlock').waterlocked({
         }catch(e){
           return res.badRequest(e);
         }
-        _this.registerWechat(userData, req, res);
+        _this.registerWechat(userData, state, req, res);
       });
     });
   },

@@ -3780,10 +3780,12 @@ function wechatLogin(){
     var redirectUrl = BASE_URL + '/auth/wechatCode';
     var scope = "snsapi_userinfo";
     var appId = WECHAT_APPID;
+    var state = location.href;
     var wechatUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=STATE#wechat_redirect";
     wechatUrl = wechatUrl.replace('$APPID', appId);
     wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
     wechatUrl = wechatUrl.replace('$SCOPE',scope);
+    wechatUrl = wechatUrl.replace('$STATE',state);
     location.href = wechatUrl;
   }
 }
