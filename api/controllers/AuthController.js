@@ -96,15 +96,15 @@ module.exports = require('waterlock').waterlocked({
   registerWechat: function(attrs, req, res) {
     var _this = this;
     var isNewUser = false;
-    var unionId = attrs.unionid;
-    if(!unionId){
+    var openid = attrs.openid;
+    if(!openid){
       return res.badRequest({code : -20, responseText : req.__('user-unionid-needed')});
     }
-    waterlock.engine.findAuth({ unionId : unionId }, function(err, user) {
+    waterlock.engine.findAuth({ unionId : openid }, function(err, user) {
       if (!user) {
         isNewUser = true;
       }
-      waterlock.engine.findOrCreateAuth({ unionId : unionId }, attrs, function(err, user) {
+      waterlock.engine.findOrCreateAuth({ unionId : openid }, attrs, function(err, user) {
         if(err){
           return res.badRequest(err);
         }
@@ -248,16 +248,7 @@ module.exports = require('waterlock').waterlocked({
   wechatCode : function(req, res){
     var code = req.query.code;
     var state = req.query.state;
-    try{
-      sails.log.info("wechat code res:" + res.body);
-      var body = JSON.parse(response.body);
-      var errMsg = body.errmsg;
-      if(errMsg!=='ok'){
-        return res.badRequest(req.body);
-      }
-    }catch(e){
-      sails.log.debug(e);
-    }
+    sails.log.info("wechat code:" + code);
     this.exchangeToken(code, req, res);
   },
 
@@ -273,19 +264,30 @@ module.exports = require('waterlock').waterlocked({
       if(err){
         return res.badRequest(err);
       }
-      var accessToken = response.body.access_token;
-      var refreshToken = response.body.refresh_token;
-      var openId = response.body.openid;
+      try{
+        var body = JSON.parse(response.body);
+        var accessToken = body.access_token;
+        var refreshToken = body.refresh_token;
+        var openId = body.openid;
+      }catch(e){
+        return res.badRequest(e);
+      }
       var userProfileUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$ACCESS_TOKEN&openid=$OPENID&lang=zh_CN";
       userProfileUrl = userProfileUrl.replace('$ACCESS_TOKEN', accessToken);
       userProfileUrl = userProfileUrl.replace('$OPENID',openId);
+      sails.log.info("user profile url:" + userProfileUrl);
       request.get({
         url : userProfileUrl
       }, function(err, userRes){
         if(err){
           return res.badRequest(err);
         }
-        _this.registerWechat(userRes.body, req, res);
+        try{
+          var userData = JSON.parse(userRes.body);
+        }catch(e){
+          return res.badRequest(e);
+        }
+        _this.registerWechat(userData, req, res);
       });
     });
   },
