@@ -39,7 +39,8 @@ module.exports.policies = {
     'logout' : ['sessionAuth'],
     'admin' : 'isAdmin',
     'wechat' : true,
-    'wechatSignature' : true
+    'wechatSignature' : true,
+    'wechatCode' : true
   },
 
   UserController : {
