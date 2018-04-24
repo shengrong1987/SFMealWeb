@@ -10,7 +10,13 @@ files:
 #   owner: ec2-user
 #   group: ec2-user
 #
-#hooks:
-#  ApplicationStart:
-#    - location: scripts/start_server
-#      timeout: 300
+hooks:
+  BeforeInstall:
+    - location: bin/exportENV.sh
+      timeout: 300
+  AfterInstall:
+    - location: bin/install.sh
+      timeout : 10000
+  ApplicationStart:
+    - location: bin/node-app.sh start
+      timeout : 1000

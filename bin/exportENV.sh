@@ -19,5 +19,6 @@ tags_to_env () {
         echo $key="$value" >> /home/ec2-user/my-app/.env
     done
 }
+
 instance_tags=$(get_instance_tags)
 tags_to_env "$instance_tags"
