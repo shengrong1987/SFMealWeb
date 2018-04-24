@@ -140,7 +140,7 @@ module.exports = {
     },
     delivery_range : {
       type : 'float',
-      defaultsTo : 3.0,
+      defaultsTo : 4.0,
       decimal2 : true
     },
     delivery_center : {

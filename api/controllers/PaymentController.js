@@ -5,6 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  * @error       :: -1 payment card exist
  *              :: -2 can not delete only card
+ *              :: -3 need email to create payment method
  */
 var stripe = require("../services/stripe.js");
 var async = require('async');
@@ -30,7 +31,7 @@ module.exports = {
             card.brand = "AE";
             break;
           case "Diners Club":
-            card.brand = "DC"
+            card.brand = "DC";
             break;
         }
         res.view('payment', { id : payment.id, payment : card, layout : false });
@@ -41,6 +42,9 @@ module.exports = {
   create : function(req, res){
     var userId = req.session.user.id;
     var email = req.session.user.auth.email;
+    if(!email){
+      return res.badRequest({ code : -3, responseText : req.__('payment-lackof-email')})
+    }
     var params = req.body;
     var cardnumber = params.cardNumber;
 
@@ -60,7 +64,7 @@ module.exports = {
             }
             if(customer.sources && customer.sources.data && customer.sources.data.length > 0){
               var cardExisted = customer.sources.data.some(function(card){
-                return card.last4 == cardnumber.slice(-4);
+                return card.last4 === cardnumber.slice(-4);
               });
               if(cardExisted){
                 return next({ code : -1, responseText : req.__('payment-card-exist')});
@@ -216,7 +220,7 @@ module.exports = {
                 card.brand = "AE";
                 break;
               case "Diners Club":
-                card.brand = "DC"
+                card.brand = "DC";
                 break;
             }
             updatedParam.brand = card.brand;
@@ -225,7 +229,7 @@ module.exports = {
         },
         updateDefaultSource : function(cb){
           sails.log.info("is default card: " + isDefaultPayment);
-          if(!isDefaultPayment || isDefaultPayment == "false"){
+          if(!isDefaultPayment || isDefaultPayment === "false"){
             return cb();
           }
           stripe.updateDefaultSource({
@@ -252,7 +256,7 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          if(number == 1){
+          if(number === 1){
             updatedParam.isDefaultPayment = true;
           }
           Payment.update(paymentId, updatedParam).exec(function(err, payment){

@@ -136,13 +136,13 @@ module.exports = {
 
   getUserBalance : function(req, res){
     var _this = this;
-    if(req.session.user.auth.email !== "admin@sfmeal.com" && req.params.id){
+    if(req.session.user.auth.email && req.session.user.auth.email !== "admin@sfmeal.com" && req.params.id){
       return res.forbidden();
     }
     var isAdmin = req.session.user.auth.email === "admin@sfmeal.com";
     var userId = isAdmin ? req.params.id : req.session.user.id;
     User.findOne(userId).populate("orders").populate('pocket').populate('payment').exec(function(err, user) {
-      if (err) {
+      if(err){
         return res.badRequest(err);
       }
       _this.createOrGetPocket(user, null, false, function (err, pocket) {

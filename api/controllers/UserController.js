@@ -7,9 +7,10 @@
  *
  * @docs        :: http://waterlock.ninja/documentation
  * @error       :: -1, already is a host
- *              :: -2, can not find user
+ *              :: -2, user lack of phone
  *              :: -3, token expire
  *              :: -4, referral code not found
+ *              :: -5, user lack of email
  */
 
 var AWS = require('aws-sdk');
@@ -42,6 +43,9 @@ module.exports = require('waterlock').actions.user({
     var params = {};
     if(!phone && !user.phone){
       return res.badRequest({ code : -2, responseText : req.__('host-lack-of-phone')});
+    }
+    if(!email){
+      return res.badRequest({ code : -5, responseText : req.__('user-lack-of-email')});
     }
     phone = phone || user.phone;
     params.user = userId;
@@ -156,10 +160,17 @@ module.exports = require('waterlock').actions.user({
       if (err) {
         return cb(err);
       }
+      if(!user.auth.email && !params.email){
+        return res.badRequest({ code : -5, responseText : req.__('user-lack-of-email')});
+      }
+      if(params.email && user.auth.email){
+        return res.badRequest({ code : -6, responseText : req.__('user-email-can-not-change')});
+      }
+      var email = user.auth.email || params.email;
       async.auto({
         handleSubscription : function(cb){
           if(params.isReceivedEmail && !user.receivedEmail && process.env.NODE_ENV === "production"){
-            mailChimp.addMemberToList({ email : user.auth.email, firstname : user.firstname, lastname: user.lastname, language : req.getLocale()}, "subscriber");
+            mailChimp.addMemberToList({ email : email, firstname : user.firstname, lastname: user.lastname, language : req.getLocale()}, "subscriber");
             params.receivedEmail = true;
           }
           cb();
@@ -251,7 +262,7 @@ module.exports = require('waterlock').actions.user({
           }
           var birthdayDate = new Date(params.birthday);
           var birthday = birthdayDate.getMonth()+1+"/"+birthdayDate.getDate();
-          mailChimp.updateMember({ email : user.auth.email, birthday : birthday }, "member");
+          mailChimp.updateMember({ email : email, birthday : birthday }, "member");
           cb();
         }}, function(err){
         if(err){

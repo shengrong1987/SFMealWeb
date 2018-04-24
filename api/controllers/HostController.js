@@ -337,7 +337,9 @@ module.exports = {
     var hostId = req.params.id;
     var isAdmin = false;
     if(req.session.authenticated){
-      isAdmin = req.session.user.auth.email === 'admin@sfmeal.com';
+      if(req.session.user.auth.email){
+        isAdmin = req.session.user.auth.email === 'admin@sfmeal.com';
+      }
     }
     Host.findOne(hostId).populate("dishes").populate("meals").exec(function(err, host){
       if(err){

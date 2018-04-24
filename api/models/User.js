@@ -179,6 +179,14 @@ module.exports = {
     }
   }),
 
+  beforeUpdate : function(params, cb){
+    if(params.email){
+      Auth.update({ user : params.id}, { email : params.email}).exec(cb);
+    }else{
+      cb();
+    }
+  },
+
   afterCreate : function(user, cb){
     Auth.findOne(user.auth).exec(function(err, auth){
       if(err){

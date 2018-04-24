@@ -2323,6 +2323,7 @@ var UserProfileView = Backbone.View.extend({
     var bYear = parseInt(this.$el.find("#bYearInput").val());
     var birthDate = new Date(bYear,bMonth-1,bDay);
     var isReceiveEmail = this.$el.find("#receivedEmailCheckbox").is(":visible") && this.$el.find("#receivedEmailCheckbox")[0].checked;
+    var email = this.$el.find("#emailInput").val();
     this.model.clear();
     this.model.set({
       id : this.$el.data("id"),
@@ -2336,6 +2337,11 @@ var UserProfileView = Backbone.View.extend({
       birthday : birthDate,
       isReceivedEmail : isReceiveEmail
     });
+    if(email){
+      this.model.set({
+        email : email
+      })
+    }
     var $this = this;
     this.model.save({},{
       success : function(){
@@ -3781,7 +3787,7 @@ function wechatLogin(){
     var scope = "snsapi_userinfo";
     var appId = WECHAT_APPID;
     var state = location.href;
-    var wechatUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=STATE#wechat_redirect";
+    var wechatUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
     wechatUrl = wechatUrl.replace('$APPID', appId);
     wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
     wechatUrl = wechatUrl.replace('$SCOPE',scope);

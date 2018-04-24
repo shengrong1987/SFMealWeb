@@ -32,6 +32,7 @@ describe('Host register', function() {
         .end(done)
     })
 
+
     it('should become a host', function (done) {
       agent
         .get('/user/becomeHost?shopName=The Tea House&phone=(415)802-3853')
