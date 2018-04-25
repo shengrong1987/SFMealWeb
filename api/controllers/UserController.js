@@ -392,12 +392,12 @@ module.exports = require('waterlock').actions.user({
         return res.badRequest(err);
       }
       var user = users[0];
-      var host = process.env.NODE_ENV === 'production' ? process.env.BASE_URL : 'localhost:1337';
-      user.verificationUrl = host + "/user/verify/" + verifyToken.token;
+      var host = process.env.NODE_ENV === 'production' ? process.env.BASE_URL : 'localhost:1337';23
       User.findOne(userId).populate('auth').exec(function(err, u){
         if(err){
           return res.badRequest(err);
         }
+        u.verificationUrl = host + "/user/verify/" + verifyToken.token;
         notification.sendEmail("User","verification",u,req);
         res.ok(u);
       })
