@@ -166,11 +166,47 @@ var RegisterView = Backbone.View.extend({
     });
     this.model.save({},{
       success : function(){
-        if(location.href.indexOf('oauth2') !== -1){
-          location.href = '/';
+        if(email.indexOf('@gmail.com')!==-1){
+          var url = "https://mail.google.com";
+        }else if(email.indexOf('hotmail.com')!==-1){
+          url = "https://hotmail.com";
+        }else if(email.indexOf('@aol.com')!==-1){
+          url = "https://aol.com";
+        }else if(email.indexOf('@yahoo.com')!==-1){
+          url = "https://yahoo.com	";
+        }else if(email.indexOf('@outlook.com')!==-1){
+          url = "https://outlook.com";
+        }else if(email.indexOf('@icloud.com')!==-1){
+          url = "https://www.icloud.com/#mail";
+        }else if(email.indexOf('@qq.com')!==-1){
+          url = "https://mail.qq.com";
         }else{
-          location.reload();
+          url = '';
         }
+        var buttons = [];
+        if(url){
+          buttons = [{
+            label: jQuery.i18n.prop('newUserCheckEmailButton'),
+            action: function(dialog) {
+              window.open(url);
+            }
+          }]
+        }
+        buttons.push({
+          label: jQuery.i18n.prop('yes'),
+          action: function(dialog) {
+            if(location.href.indexOf('oauth2') !== -1){
+              location.href = '/';
+            }else{
+              location.reload();
+            }
+          }
+        });
+        BootstrapDialog.show({
+          title: jQuery.i18n.prop('newUserCheckEmailTitle'),
+          message: jQuery.i18n.prop('newUserCheckEmailContent'),
+          buttons: buttons
+        });
       },error : function(model,err){
         alertView.html(getMsgFromError(err));
         alertView.show();

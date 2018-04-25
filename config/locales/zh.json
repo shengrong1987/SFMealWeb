@@ -573,6 +573,7 @@
   "host-lack-of-phone" : "需要填写手机",
   "user-lack-of-email" : "需要补充邮箱资料",
   "user-email-can-not-change" : "用户邮箱不能被修改",
+  "user-email-exist" : "邮箱已存在，请以注册方式登陆账号并绑定微信登陆",
   "enter-website" : "进入网站",
   "our-mailing-address" : "我们的邮寄地址是",
   "footer-send-by" : "这封电邮是由SFMeal.com发送的.遇到问题? SFMeal客户服务邮箱:",

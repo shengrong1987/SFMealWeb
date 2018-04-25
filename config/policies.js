@@ -90,7 +90,7 @@ module.exports.policies = {
     'verifyLicense' : 'isAdmin',
     'me' : ['sessionAuth','isHost'],
     'apply' : ['sessionAuth'],
-    'findOne' : true,
+    'findOne' : 'isAdmin',
     'update' : 'or(isAdmin,and(sessionAuth, sessionSelf, isNotFields("user","accountId","bankId","long","lat","city","street","passGuide","pocket","commission")))',
     'like' : 'sessionAuth',
     'follow' : 'sessionAuth',
@@ -98,7 +98,8 @@ module.exports.policies = {
     'search' : 'isAdmin',
     'findReview' : 'isAdmin',
     'findMeal' : 'isAdmin',
-    'findDish' : 'isAdmin'
+    'findDish' : 'isAdmin',
+    'hostPage' : true
   },
 
   PaymentController : {

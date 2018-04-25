@@ -11,6 +11,7 @@
  *              :: -3, token expire
  *              :: -4, referral code not found
  *              :: -5, user lack of email
+ *              :: -6, user email already exist
  */
 
 var AWS = require('aws-sdk');
@@ -167,6 +168,7 @@ module.exports = require('waterlock').actions.user({
         return res.badRequest({ code : -6, responseText : req.__('user-email-can-not-change')});
       }
       var email = user.auth.email || params.email;
+
       async.auto({
         handleSubscription : function(cb){
           if(params.isReceivedEmail && !user.receivedEmail && process.env.NODE_ENV === "production"){
@@ -390,7 +392,7 @@ module.exports = require('waterlock').actions.user({
         return res.badRequest(err);
       }
       var user = users[0];
-      var host = process.env.NODE_ENV === 'production' ? 'https://sfmeal.com' : 'localhost:1337';
+      var host = process.env.NODE_ENV === 'production' ? process.env.BASE_URL : 'localhost:1337';
       user.verificationUrl = host + "/user/verify/" + verifyToken.token;
       User.findOne(userId).populate('auth').exec(function(err, u){
         if(err){

@@ -63,6 +63,7 @@ module.exports.routes = {
   '/host/:id/review' : "HostController.findReview",
   '/host/:id/meal' : "HostController.findMeal",
   '/host/:id/dish' : "HostController.findDish",
+  '/host/public/:id' : "HostController.hostPage",
   '/meal/:id/off' : 'MealController.off',
   '/meal/:id/on' : 'MealController.on',
   '/meal/:id/review' : 'MealController.findReview',

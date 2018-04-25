@@ -218,7 +218,7 @@ describe('Host register', function() {
 
     it('should get host public profile', function(done){
       agent
-        .get('/host/' + hostId)
+        .get('/host/public/' + hostId)
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
         .expect(200)

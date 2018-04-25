@@ -333,14 +333,8 @@ module.exports = {
     });
   },
 
-  findOne : function(req, res){
+  hostPage : function(req, res){
     var hostId = req.params.id;
-    var isAdmin = false;
-    if(req.session.authenticated){
-      if(req.session.user.auth.email){
-        isAdmin = req.session.user.auth.email === 'admin@sfmeal.com';
-      }
-    }
     Host.findOne(hostId).populate("dishes").populate("meals").exec(function(err, host){
       if(err){
         return res.badRequest(err);
@@ -352,27 +346,42 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        if(!isAdmin){
-          var publicHost = {};
-          publicHost.id = host.id;
-          publicHost.dishes = host.dishes;
-          publicHost.meals = host.meals;
-          publicHost.shopName = host.shopName;
-          publicHost.shopName_en = host.shopName_en;
-          publicHost.picture = host.picture;
-          publicHost.intro = host.intro;
-          publicHost.intro_en = host.intro_en;
-          publicHost.feature_dishes = host.feature_dishes;
-          publicHost.shortIntro = host.shortIntro();
-          publicHost.license = host.license;
-          publicHost.reviews = reviews;
-          publicHost.likes = host.likes;
-          publicHost.shopNameI18n = host.shopNameI18n;
-          publicHost.introI18n = host.introI18n;
-          if(req.wantsJSON){
-            return res.ok(publicHost);
-          }
-          return res.view("profile",{host : publicHost, user : req.session.user, locale : req.getLocale()});
+        var publicHost = {};
+        publicHost.id = host.id;
+        publicHost.dishes = host.dishes;
+        publicHost.meals = host.meals;
+        publicHost.shopName = host.shopName;
+        publicHost.shopName_en = host.shopName_en;
+        publicHost.picture = host.picture;
+        publicHost.intro = host.intro;
+        publicHost.intro_en = host.intro_en;
+        publicHost.feature_dishes = host.feature_dishes;
+        publicHost.shortIntro = host.shortIntro();
+        publicHost.license = host.license;
+        publicHost.reviews = reviews;
+        publicHost.likes = host.likes;
+        publicHost.shopNameI18n = host.shopNameI18n;
+        publicHost.introI18n = host.introI18n;
+        if(req.wantsJSON){
+          return res.ok(publicHost);
+        }
+        return res.view("profile",{host : publicHost, user : req.session.user, locale : req.getLocale()});
+      });
+    });
+  },
+
+  findOne : function(req, res){
+    var hostId = req.params.id;
+    Host.findOne(hostId).populate("dishes").populate("meals").exec(function(err, host){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(!host){
+        return res.notFound();
+      }
+      Review.find({ where : { host : hostId }, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req) }).exec(function(err, reviews){
+        if(err){
+          return res.badRequest(err);
         }
         host.reviews = reviews;
         return res.ok(host);

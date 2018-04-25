@@ -12,9 +12,13 @@ module.exports = function(req, res, next) {
   // or if this is the last policy, the controller
   if(req.session.authenticated){
     var email = req.session.user.auth.email;
-    if(email == "admin@sfmeal.com"){
-      sails.log.info("accessing admin api");
-      next();
+    var emailVerified = req.session.user.emailVerified;
+    if(email === "admin@sfmeal.com"){
+      if(process.env.NODE_ENV === "development" || (process.env.NODE_ENV === "production" && emailVerified)){
+        next();
+      }else{
+        return res.forbidden('You are not admin');
+      }
     }else{
       return res.forbidden('You are not admin');
     }

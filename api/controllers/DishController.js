@@ -48,7 +48,7 @@ module.exports = {
   update : function(req, res){
     var dishId = req.params.id;
     var hostId;
-    var isAdmin = req.session.user.auth.email === "admin@sfmeal.com";
+    var isAdmin = req.session.user.auth.email === "admin@sfmeal.com" && (req.session.user.emailVerified || process.env.NODE_ENV === "development");
     async.auto({
       findChef : function(next){
         if(!isAdmin){

@@ -851,7 +851,7 @@
     $('[data-toggle="dateTimePicker"]').each(function(){
       var dateString = $(this).data("date");
       var minDate;
-      if(typeof dateString != "undefined" && dateString != "undefined"){
+      if(typeof dateString !== "undefined" && dateString !== "undefined"){
         var date = new Date(dateString);
         var mDate = moment(date.toISOString());
         // if(mDate.isBefore(moment()) && $(this).data("min") == "now"){
@@ -873,8 +873,7 @@
         stepping : 30,
         showTodayButton : true,
         defaultDate : mDate,
-        minDate : minDate,
-        timeZone : 'America/Los_Angeles'
+        minDate : minDate
       });
     })
   });

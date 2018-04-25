@@ -297,7 +297,7 @@ module.exports = {
   off : function(req, res){
     var mealId = req.param("id");
     var user = req.session.user;
-    var isAdmin = user.auth.email === 'admin@sfmeal.com';
+    var isAdmin = user.auth.email === 'admin@sfmeal.com' && (user.emailVerified || process.env.NODE_ENV === "development");
     var hostId;
     var $this = this;
     Order.find({meal : mealId, status : { '!' : ['complete','review','cancel']}}).exec(function(err,orders){
@@ -354,7 +354,7 @@ module.exports = {
   on : function(req, res){
     var mealId = req.param("id");
     var user = req.session.user;
-    var isAdmin = user.auth.email === 'admin@sfmeal.com';
+    var isAdmin = user.auth.email === 'admin@sfmeal.com' && (user.emailVerified || process.env.NODE_ENV === "development");
     var $this = this;
 
     Meal.findOne(mealId).populate('dishes').exec(function(err, meal){
@@ -485,7 +485,7 @@ module.exports = {
 
   update : function(req, res){
     var mealId = req.param("id");
-    var isAdmin = req.session.user.auth.email === "admin@sfmeal.com";
+    var isAdmin = req.session.user.auth.email === "admin@sfmeal.com" && (req.session.user.emailVerified || process.env.NODE_ENV === "development");
     var user = req.session.user;
     var status = req.body.status;
     var $this = this;
@@ -616,7 +616,7 @@ module.exports = {
     var mealId = req.param('parentid');
     var dishId = req.param('id');
     var email = req.session.user.auth.email;
-    var isAdmin = email === "admin@sfmeal.com";
+    var isAdmin = email === "admin@sfmeal.com" && (req.session.user.emailVerified || process.env.NODE_ENV === "development");
     Meal.findOne(mealId).populate('dishes').exec(function(err, meal){
       if(err){
         return res.badRequest(err);

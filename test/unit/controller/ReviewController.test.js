@@ -279,7 +279,7 @@ describe('ReviewController', function() {
 
     it('should get host profile of correct number of reviews', function (done){
       agent
-        .get('/host/' + hostId)
+        .get('/host/public/' + hostId)
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
         .expect(200)

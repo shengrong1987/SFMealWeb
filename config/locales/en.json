@@ -569,6 +569,7 @@
   "host-lack-of-phone" : "You need to enter a phone number.",
   "user-lack-of-email" : "Email needed to become a host",
   "user-email-can-not-change" : "User's email can't be changed.",
+  "user-email-exist" : "The email already exist, please login first and connect Wechat with that account.",
   "enter-website": "Enter the website",
   "our-mailing-address" : "Our mailing address is",
   "footer-send-by": "This email was sent by SFMeal.com. If you have problems, please contact SFMeal Customer Service Email:",
