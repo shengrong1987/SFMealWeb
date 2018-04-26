@@ -426,7 +426,7 @@
                     <div><label>3. <%= __('email-verified')%> <i class="fa fa-check text-green"></i></label></div>
                     <% }else{%>
                     <div><label>3. <%= __('email-unverified')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i></label></div>
-                    <% if(!user.email){%>
+                    <% if(!user.auth.email){%>
                     <div class="form-group block">
                       <label class="sr-only" for="emailInput" data-toggle="i18n" data-key="email"></label>
                       <input type="email" class="form-control" id="emailInput" data-toggle="i18n" data-pattern-key="emailBadFormat" data-pattern-error="bad format" placeholder="邮箱 (Email)" required>

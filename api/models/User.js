@@ -196,6 +196,7 @@ module.exports = {
         if(err){
           return cb(err);
         }
+        var emailVerified = !!(auth.googleEmail || (auth.facebookId && auth.email)) ;
         var firstName = auth.firstname || ( auth.name ? auth.name.split(' ')[0] : auth.username) || auth.nickname || 'guest';
         var lastName = auth.lastname || ( auth.name ? auth.name.split(' ')[1] : '') || 'guest';
         var referralCode = firstName + "." + lastName + "." + number;
@@ -215,7 +216,8 @@ module.exports = {
           picture: picture,
           city: city,
           state: state,
-          referralCode : referralCode
+          referralCode : referralCode,
+          emailVerified : emailVerified
         }
         User.update(user.id, params).exec(function(err, user){
           if(err){
