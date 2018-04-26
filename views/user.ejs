@@ -664,7 +664,7 @@
                 <div class="col-md-5 col-xs-7">
                   <h2 class="text-left"><%= order.meal.title%>  <small class="text-orange"><%= order.meal.type=="order"?__('order'):__('preorder')%></small></h2>
                   <div class="row vertical-align text-left">
-                    <div class="col-xs-3 col-lg-1"><img class="round_thumb size-small cursor-pointer" onclick="location.href='/host/<%= order.host.id%>'" src="<%= order.host.picture || "/images/profile_man.png" %>"></div>
+                    <div class="col-xs-3 col-lg-1"><img class="round_thumb size-small cursor-pointer" onclick="location.href='/host/public/<%= order.host.id%>'" src="<%= order.host.picture || "/images/profile_man.png" %>"></div>
                     <div class="col-xs-9 col-lg-11">
                       <h4 class="text-left text-lightgrey" style="margin-top: 15px;margin-left:10px;"><%= order.host.shopName %></h4>
                     </div>
