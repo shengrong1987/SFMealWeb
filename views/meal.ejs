@@ -71,7 +71,7 @@
 
               <div class="row chef-cell vertical-align text-center">
                 <div class="col-md-2 col-xs-3">
-                  <img class="round_thumb size-small text-center cursor-pointer" onclick="javascript:location.href='/host/<%= meal.chef.id%>'" src="/images/blank.gif" data-echo=<%= meal.chef.picture || "/images/profile_man.png" %>>
+                  <img class="round_thumb size-small text-center cursor-pointer" onclick="javascript:location.href='/host/public/<%= meal.chef.id%>'" src="/images/blank.gif" data-echo=<%= meal.chef.picture || "/images/profile_man.png" %>>
                 </div>
                 <div class="col-md-10 col-xs-9">
                   <h4 class="text-left text-dark text-box" style="margin: 0 0 10px 10px;"><%= meal.chef.shopNameI18n(locale) %><br><small><%= meal.chef.shortIntro(locale) %></small></h4>

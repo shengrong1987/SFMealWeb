@@ -421,6 +421,7 @@ module.exports = require('waterlock').actions.user({
         return res.forbidden({ code : -3, responseText : req.__('email-verification-link-expire')});
       }
       user.emailVerified = true;
+      req.session.user.emailVerified = true;
       user.save(function(err,u){
         if(err){
           return res.forbidden(err);
