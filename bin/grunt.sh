@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-grunt prod
+/usr/bin/grunt prod
