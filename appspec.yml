@@ -18,7 +18,8 @@ hooks:
     - location: bin/install.sh
       timeout : 10000
   ApplicationStart:
-    - location: bin/node-app.sh start
+    - location: bin/service.sh
       timeout : 1000
   BeforeAllowTraffic:
-    - location: bin/
+    - location: bin/grunt.sh
+      timeout : 10000
