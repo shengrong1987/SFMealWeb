@@ -17,9 +17,3 @@ hooks:
   AfterInstall:
     - location: bin/install.sh
       timeout : 10000
-  ApplicationStart:
-    - location: bin/service.sh
-      timeout : 1000
-  BeforeAllowTraffic:
-    - location: bin/grunt.sh
-      timeout : 10000
