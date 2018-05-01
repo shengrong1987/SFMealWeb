@@ -35,7 +35,6 @@ module.exports.routes = {
   '/': 'MealController.feature',
   '/auth/resetForm' : "AuthController.resetForm",
   '/auth/done' : "AuthController.loginSuccess",
-  '/invite' : 'UserController.invite',
   '/join' : 'UserController.join',
   '/user/me' : 'UserController.me',
   '/user/me/contact' : 'UserController.contactForm',

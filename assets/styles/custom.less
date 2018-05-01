@@ -14,10 +14,12 @@ body{
   //font-style: normal;
   //font-family: Arial;
   min-height: 550px;
+  //position: relative;
 }
 
 #myUserBar{
   z-index: 101;
+  //margin-top: 20px;
 }
 
 .modal-backdrop{
@@ -603,10 +605,13 @@ input:focus{
 @dark-grey : #4d4049;
 @black : black;
 @green : #63B446;
+@wechat-green: #5bbc20;
 @pink : #ff7bac;
 @purple : #151f45;
 @yellow : #dcb97d;
 @background-grey : #f2f2f2;
+@refferal-yellow : #ffd833;
+@facebook-blue: #3b5998;
 
 .blue{
   background-color: @blue !important;
@@ -644,6 +649,10 @@ input:focus{
   background-color: @green !important;
 }
 
+.wechat-green{
+  background-color: @wechat-green !important;
+}
+
 .pink{
   background-color: @pink !important;
 }
@@ -658,6 +667,14 @@ input:focus{
 
 .yellow{
   background-color: @yellow !important;
+}
+
+.referral-yellow{
+  background-color: @refferal-yellow !important;
+}
+
+.facebook-blue{
+  background-color: @facebook-blue !important;
 }
 
 /*text-color*/
@@ -1198,6 +1215,14 @@ label {
   .btn-grey(@blue);
 }
 
+.btn-grey-wechat-green{
+  .btn-grey(@wechat-green);
+}
+
+.btn-grey-facebook-blue{
+  .btn-grey(@facebook-blue);
+}
+
 /*bootstrap button extension*/
 .btn-grey(@hover-color) {
   .text-white;
@@ -1600,6 +1625,10 @@ fieldset[disabled] .btn-red.active {
   right: 0;
   background: rgba(0, 0, 0, 0.7);
   transition: opacity 250ms;
+  z-index: 102;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
   /*/!*visibility: hidden;*!/*/
   /*opacity: 1;*/
 }

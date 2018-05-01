@@ -1582,8 +1582,8 @@ describe('OrderController', function() {
     var orderId;
     var phone = "(415)802-3853";
     var adminEmail = 'admin@sfmeal.com';
-    var password = '123456789';
-    var user5Email = "user5@sfmeal.com";
+    var password = '12345678';
+    var user5Email = "referraltest@gmail.com";
     var userId;
 
     it('should login a guest account', function (done) {
@@ -1705,6 +1705,63 @@ describe('OrderController', function() {
           res.body.customerPhone.should.be.equal(customerPhone);
           res.body.customerName.should.be.equal(customerName);
           orderId = res.body.id;
+          done();
+        })
+    });
+
+    it('should log out user', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    });
+
+    it('should login referrer account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : hostEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    });
+
+    it('should get points', function (done) {
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.points.should.be.equal(5);
+          done();
+        })
+    });
+
+    it('should log out user', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    });
+
+    it('should login user account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : user5Email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
           done();
         })
     });
@@ -2591,6 +2648,39 @@ describe('OrderController', function() {
         })
         .expect(200)
         .end(done)
+    })
+  })
+
+  describe('should order a meal and give referer points', function(){
+    it('should log out user', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    });
+
+    it('should login if account exist', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : "referraltest@gmail.com", password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
+    it('referral should have 5 points', function(done){
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.points.should.be.equal(5);
+          done();
+        })
     })
   })
 });

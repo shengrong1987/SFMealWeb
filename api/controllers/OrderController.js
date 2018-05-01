@@ -196,7 +196,7 @@ module.exports = {
                   if(!found.phone && !contactInfo.phone){
                     return next({ responseText : req.__('order-lack-contact'), code : -31});
                   }
-
+                  sails.log.info("user's name: " + found.firstname);
                   if(!found.firstname && !contactInfo.name){
                     return next({ responseText : req.__('order-lack-contact'), code : -31});
                   }
@@ -372,60 +372,66 @@ module.exports = {
 
   afterSuccessCharge : function(order, orders, m, charge, transfer, req, res){
     sails.log.info("charge succeed, gathering charging info for order");
-    this.updateMealLeftQty(order, m, this.clearOrder(order.orders), order.orders, function(err, meal){
+    var _this = this;
+    this.addReferrerPoints(order.customer, function(err, u){
       if(err){
         return res.badRequest(err);
       }
-      //build charges obj & application_fees obj
-      order.leftQty = meal.leftQty;
-      order.charges = {};
-      order.transfer = {};
-      order.feeCharges = {};
-      order.application_fees = {};
-
-      if(m.type === "order"){
-        order.status = "preparing";
-      }else{
-        order.status = "schedule";
-      }
-
-      if(order.paymentMethod === "cash"){
-        order.charges['cash'] = order.charges['cash'] || 0;
-        order.application_fees['cash'] = order.application_fees['cash'] || 0;
-        order.charges['cash'] += charge.amount;
-        order.application_fees['cash'] += charge.application_fee;
-        order.feeCharges[charge.id] = charge.application_fee;
-      }else{
-        if(charge){
-          order.charges[charge.id] = charge.amount;
-          order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
-        }
-      }
-      if(transfer){
-        order.transfer[transfer.id] = transfer.amount;
-      }
-      order.meal = order.meal.id;
-      order.save(function(err, o){
+      _this.updateMealLeftQty(order, m, _this.clearOrder(order.orders), order.orders, function(err, meal){
         if(err){
           return res.badRequest(err);
         }
-        o.chef = m.chef;
-        o.dishes = m.dishes;
-        o.service_fee = m.serviceFee;
-        notification.notificationCenter("Order", "new", o, true, false, req);
-        //test only
-        if(req.wantsJSON && process.env.NODE_ENV === "development"){
-          return res.ok(order);
-        }
-        if(order.paymentMethod === 'alipay' || order.paymentMethod === 'wechatpay'){
-          if(req.authenticated){
-            return res.redirect('/user/me#myorder');
-          }else{
-            return res.redirect('/order/' + order.id + "/receipt");
-          }
+        //build charges obj & application_fees obj
+        order.leftQty = meal.leftQty;
+        order.charges = {};
+        order.transfer = {};
+        order.feeCharges = {};
+        order.application_fees = {};
+
+        if(m.type === "order"){
+          order.status = "preparing";
         }else{
-          return res.ok({ id: order.id});
+          order.status = "schedule";
         }
+
+        if(order.paymentMethod === "cash"){
+          order.charges['cash'] = order.charges['cash'] || 0;
+          order.application_fees['cash'] = order.application_fees['cash'] || 0;
+          order.charges['cash'] += charge.amount;
+          order.application_fees['cash'] += charge.application_fee;
+          order.feeCharges[charge.id] = charge.application_fee;
+        }else{
+          if(charge){
+            order.charges[charge.id] = charge.amount;
+            order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
+          }
+        }
+        if(transfer){
+          order.transfer[transfer.id] = transfer.amount;
+        }
+        order.meal = order.meal.id;
+        order.save(function(err, o){
+          if(err){
+            return res.badRequest(err);
+          }
+          o.chef = m.chef;
+          o.dishes = m.dishes;
+          o.service_fee = m.serviceFee;
+          notification.notificationCenter("Order", "new", o, true, false, req);
+          //test only
+          if(req.wantsJSON && process.env.NODE_ENV === "development"){
+            return res.ok(order);
+          }
+          if(order.paymentMethod === 'alipay' || order.paymentMethod === 'wechatpay'){
+            if(req.authenticated){
+              return res.redirect('/user/me#myorder');
+            }else{
+              return res.redirect('/order/' + order.id + "/receipt");
+            }
+          }else{
+            return res.ok({ id: order.id});
+          }
+        });
       });
     });
   },
@@ -2101,6 +2107,39 @@ module.exports = {
       req.body.redeemPoints = parseInt(points);
       cb(null, points/10);
     });
+  },
+
+  addReferrerPoints : function(customer, cb){
+    if(!customer){
+      return cb();
+    }
+    var userId = customer.id || customer;
+    User.findOne(userId).exec(function(err, user){
+      if(err){
+        return cb(err);
+      }
+      if(!user.referrerCode){
+        return cb();
+      }
+      User.findOne({ referralCode : user.referrerCode }).exec(function(err, referrer){
+        if(err){
+          return cb(err);
+        }
+        if(!referrer){
+          return cb();
+        }
+        referrer.points += 5;
+        sails.log.info("adding points to referrer: " + referrer.email);
+        referrer.save(function(err, r){
+          if(err){
+            return cb(err);
+          }
+          user.referrerCode = null;
+          user.save(cb);
+        });
+      })
+    });
+
   }
 };
 

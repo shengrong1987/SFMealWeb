@@ -14,8 +14,8 @@ module.exports = function(grunt) {
 				'test/**/**/OrderController.test.js',
         'test/**/**/JobController.test.js',
         'test/**/**/AdminController.test.js',
-        'test/**/**/ReviewController.test.js'
-        // 'test/**/**/PocketController.test.js'
+        'test/**/**/ReviewController.test.js',
+        'test/**/**/PocketController.test.js'
 			]
 		},
     build : {

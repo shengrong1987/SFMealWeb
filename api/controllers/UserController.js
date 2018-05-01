@@ -453,37 +453,35 @@ module.exports = require('waterlock').actions.user({
     })
   },
 
-  invite : function(req, res){
-    if(!req.session.authenticated){
-      return res.view('invite', { user : null});
-    }
-    var userId = req.session.user.id;
-    User.findOne(userId).exec(function(err, user){
-      if(err){
-        return res.forbidden(err);
-      }
-      res.view('invite', { user : user });
-    })
-  },
-
   join : function(req, res){
     var code = req.query.code;
-    if(req.session.authenticated && req.session.user.referralCode !== code){
-      return res.redirect('invite');
+    var baseUrl = process.env.NODE_ENV === "development" ? process.env.LOCAL_HOST : process.env.BASE_URL;
+    if(req.session.authenticated){
+      var userId = req.session.user.id;
+      User.findOne(userId).exec(function(err, user){
+        if(err){
+          return res.forbidden(err);
+        }
+        if(!code){
+          return res.redirect('/join?code=' + user.referralCode);
+        }
+        return res.view('join', { user : user, baseUrl : baseUrl });
+      })
+    }else{
+      User.find({ referralCode : code }).exec(function(err, users){
+        if(err){
+          return res.notFound(err);
+        }
+        if(!users || !users.length){
+          return res.notFound({ responseText: req.__('referralCode-not-found')});
+        }
+        req.session.referralCode = code;
+        if(req.wantsJSON){
+          return res.ok({ referrer : users[0], user : null});
+        }
+        res.view('join', { referrer : users[0], user : null});
+      });
     }
-    User.find({ referralCode : code }).exec(function(err, users){
-      if(err){
-        return res.notFound(err);
-      }
-      if(!users || !users.length){
-        return res.notFound({ responseText: req.__('referralCode-not-found')});
-      }
-      req.session.referralCode = code;
-      if(req.wantsJSON){
-        return res.ok({ referrer : users[0]});
-      }
-      res.view('join', { referrer : users[0]});
-    });
   },
 
   // getSignedUrl : function(req, res){

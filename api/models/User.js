@@ -154,6 +154,9 @@ module.exports = {
     referralCode : {
       type : 'string'
     },
+    referrerCode : {
+      type : 'string'
+    },
     generateCode : function(params, cb){
       if(this.referralCode) {
         if((params.firstname && params.firstname !== this.firstname) || (params.lastname && params.lastname !== this.lastname)) {

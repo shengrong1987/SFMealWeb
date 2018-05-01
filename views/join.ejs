@@ -1,7 +1,67 @@
-<div class="container-fluid default-container text-center" style="margin-top:-20px;">
+<div class="container-fluid default-container text-center" style="margin-top:-20px;min-height: 100%;position: relative;">
+  <% if(user){ %>
+  <div style="height:30px;"><h4>邀请好友</h4></div>
+  <div class="referral-yellow row">
+    <image style="width: 100%;max-width: 363px;" class="middle" src="/images/referral@2x.png"></image>
+  </div>
+
+  <h3 style="padding-top: 10px;">送朋友5元积分<br/>朋友下单后，您会获得5元积分</h3>
+  <div class="divider" style="width: 30%;"></div>
+
+  <div style="margin-bottom: 50px;">
+    <div class="row">
+      <div class="col-lg-2 col-xl-3"></div>
+      <div class="col-xs-12 col-lg-8 col-xl-6 text-center">
+        <div class="row">
+          <div class="col-lg-3"></div>
+          <div class="col-xs-6 col-lg-3">
+            <button class="btn btn-grey-facebook-blue active" style="width: 100%;"><i class="fa fa-facebook-f fa-lg"></i></button>
+          </div>
+          <div class="col-xs-6 col-lg-3">
+            <button id="wechatBtn" class="btn btn-grey-wechat-green active" style="width: 100%;"><i class="fa fa-weixin fa-lg"></i></button>
+          </div>
+          <div class="col-lg-3"></div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-3"></div>
+          <div class="col-xs-12 col-lg-6" style="margin-top: 15px;">
+            <div class="row">
+              <div class="col-lg-9">
+                <input class="form-control" type="text" readonly value="<%= baseUrl + '/join?code=' + user.referralCode%>">
+              </div>
+              <div class="  col-lg-3">
+                <button class="btn btn-outline text-red border-red">复制</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3"></div>
+        </div>
+      </div>
+      <div class="col-lg-2 col-xl-3"></div>
+    </div>
+  </div>
+
+
+  <%}else{%>
   <h3>Hi <%= __('user')%>, 你的朋友 <%= referrer.firstname%> 邀请你加入SFMeal，立即加入来获得10元现金券！</h3>
-  <!--<div id="referralCode" class="hidden" data-code="<%= referrer.referralCode%>"></div>-->
+  <%}%>
 </div>
+
+<div id="wechatOverlay" class="overlay" style="display: none;">
+  <h1 style="position: absolute;top: 50px;right: 20px;" class="text-white">点击这里分享<i class="fa fa-arrow-up fa-lg"></i></h1>
+</div>
+
 <script>
-//  createCookie('referralCode', $("#referralCode").data("code"), 7);
+
+  $("#wechatBtn").click(function(){
+      $("#wechatOverlay").removeClass('hide');
+      $("#wechatOverlay").toggle();
+  })
+
+  $("#wechatOverlay").click(function(){
+    $("#wechatOverlay").toggle();
+  })
+
 </script>
+

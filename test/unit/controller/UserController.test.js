@@ -713,15 +713,12 @@ describe('UsersController', function() {
         })
     })
 
-    it('use referers code to sign up should give 10 points to both user', function(done){
+    it('use referers code to sign up should give 5 points to user', function(done){
       agent
         .post('/auth/register')
         .send({
-          firstname: "referral",
-          lastname: "test",
           email: "referraltest@gmail.com",
           password: "12345678",
-          phone: "(123)123-4567",
           birthday: null,
           receivedEmail: false
         })
@@ -730,7 +727,7 @@ describe('UsersController', function() {
           if (err) {
             return done(err);
           }
-          res.body.points.should.be.equal(10);
+          res.body.points.should.be.equal(5);
           done();
         })
     })
@@ -744,7 +741,7 @@ describe('UsersController', function() {
         .end(done)
     })
 
-    it('referral should have 10 points', function(done){
+    it('referral should have 0 points', function(done){
       agent
         .get('/user/me')
         .set('Accept', 'application/json')
@@ -754,7 +751,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.points.should.be.equal(10);
+          res.body.points.should.be.equal(0);
           done();
         })
     })
@@ -800,7 +797,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.points.should.be.equal(10);
+          res.body.points.should.be.equal(5);
           done();
         })
     })

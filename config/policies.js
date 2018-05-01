@@ -53,7 +53,7 @@ module.exports.policies = {
     'contactForm' : 'sessionAuth',
     'search' : 'isAdmin',
     'deleteUserFile' : 'or(sessionAuth,isAdmin)',
-    'update' : 'or(and(sessionAuth, sessionSelf, isNotFields("status","pocket","host","customerId","referralBonus","points","emailVerified")),isAdmin)',
+    'update' : 'or(and(sessionAuth, sessionSelf, isNotFields("status","pocket","host","customerId","referralBonus","referralCode","points","emailVerified")),isAdmin)',
     'verify' : true,
     'sendEmailVerification' : 'or(sessionAuth,isAdmin)',
     'activate' : 'isAdmin',

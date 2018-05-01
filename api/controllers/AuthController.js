@@ -136,16 +136,13 @@ module.exports = require('waterlock').waterlocked({
             var host = process.env.NODE_ENV === 'production' ? process.env.BASE_URL : process.env.LOCAL_HOST;
             attrs.verificationUrl = host + "/user/verify/" + attrs.verifyToken.token;
             //notification.sendEmail("User","verification",attrs,req);
+
             _this.checkReferralProgram(req, function(err, me){
               if(err){
                 return res.badRequest(err);
               }
-              if(me){
-                u[0].points = me.points;
-                u[0].referralBonus = me.referralBonus;
-              }
-              return res.redirect(state);
-          })
+              res.redirect(state);
+            })
           });
         })
       });
@@ -163,8 +160,8 @@ module.exports = require('waterlock').waterlocked({
         cb(null, u[0]);
       });
     }
-    req.session.referralCode = null;
     sails.log.info("matching code: " + referralCode);
+    req.session.referralCode = null;
     User.findOne({ referralCode : referralCode }).exec(function(err, referrer){
       if(err){
         return cb(err);
@@ -180,21 +177,10 @@ module.exports = require('waterlock').waterlocked({
           return cb();
         }
         sails.log.info("adding points to referee");
-        me.points += 10;
+        me.points += 5;
         me.referralBonus = true;
-        me.save(function(err, u){
-          if(err){
-            return cb(err);
-          }
-          sails.log.info("adding points to referrer");
-          referrer.points += 10;
-          referrer.save(function(err, r){
-            if(err){
-              return cb(err);
-            }
-            cb(null, me);
-          });
-        })
+        me.referrerCode = referralCode;
+        me.save(cb);
       });
     })
   },

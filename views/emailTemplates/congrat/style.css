@@ -8406,6 +8406,9 @@ hovereffect p {
 .green {
   background-color: #63b446 !important;
 }
+.wechat-green {
+  background-color: #5bbc20 !important;
+}
 .pink {
   background-color: #ff7bac !important;
 }
@@ -8417,6 +8420,12 @@ hovereffect p {
 }
 .yellow {
   background-color: #dcb97d !important;
+}
+.referral-yellow {
+  background-color: #ffd833 !important;
+}
+.facebook-blue {
+  background-color: #3b5998 !important;
 }
 /*text-color*/
 .text-white {
@@ -8979,6 +8988,88 @@ label {
   color: #ffffff !important;
   background-color: #999999;
 }
+.btn-grey-wechat-green {
+  color: #ffffff !important;
+  background-color: #999999 !important;
+  border-color: #cccccc;
+}
+.btn-grey-wechat-green:focus,
+.btn-grey-wechat-green.focus {
+  color: #ffffff !important;
+  background-color: #5bbc20 !important;
+}
+.btn-grey-wechat-green:hover {
+  color: #ffffff !important;
+  background-color: #5bbc20 !important;
+}
+.btn-grey-wechat-green:active,
+.btn-grey-wechat-green.active,
+.btn-grey-wechat-green.open > .dropdown-toggle.btn-grey {
+  color: #ffffff !important;
+  background-color: #5bbc20 !important;
+}
+.btn-grey-wechat-green:active:hover,
+.btn-grey-wechat-green.active:hover,
+.btn-grey-wechat-green.open > .dropdown-toggle.btn-grey,
+.btn-grey-wechat-green.btn-grey:active:focus,
+.btn-grey-wechat-green.btn-grey.active:focus,
+.btn-grey-wechat-green.open > .dropdown-toggle.btn-grey:focus,
+.btn-grey-wechat-green:active.focus,
+.btn-grey-wechat-green.active.focus,
+.btn-grey-wechat-green.open > .dropdown-toggle.btn-grey.focus {
+  color: #ffffff !important;
+  background-color: #5bbc20 !important;
+}
+.btn-grey-wechat-green:active,
+.btn-grey-wechat-green.active,
+.btn-grey-wechat-green.open > .dropdown-toggle.btn-grey {
+  background-image: none;
+}
+.btn-grey-wechat-green.badge {
+  color: #ffffff !important;
+  background-color: #999999;
+}
+.btn-grey-facebook-blue {
+  color: #ffffff !important;
+  background-color: #999999 !important;
+  border-color: #cccccc;
+}
+.btn-grey-facebook-blue:focus,
+.btn-grey-facebook-blue.focus {
+  color: #ffffff !important;
+  background-color: #3b5998 !important;
+}
+.btn-grey-facebook-blue:hover {
+  color: #ffffff !important;
+  background-color: #3b5998 !important;
+}
+.btn-grey-facebook-blue:active,
+.btn-grey-facebook-blue.active,
+.btn-grey-facebook-blue.open > .dropdown-toggle.btn-grey {
+  color: #ffffff !important;
+  background-color: #3b5998 !important;
+}
+.btn-grey-facebook-blue:active:hover,
+.btn-grey-facebook-blue.active:hover,
+.btn-grey-facebook-blue.open > .dropdown-toggle.btn-grey,
+.btn-grey-facebook-blue.btn-grey:active:focus,
+.btn-grey-facebook-blue.btn-grey.active:focus,
+.btn-grey-facebook-blue.open > .dropdown-toggle.btn-grey:focus,
+.btn-grey-facebook-blue:active.focus,
+.btn-grey-facebook-blue.active.focus,
+.btn-grey-facebook-blue.open > .dropdown-toggle.btn-grey.focus {
+  color: #ffffff !important;
+  background-color: #3b5998 !important;
+}
+.btn-grey-facebook-blue:active,
+.btn-grey-facebook-blue.active,
+.btn-grey-facebook-blue.open > .dropdown-toggle.btn-grey {
+  background-image: none;
+}
+.btn-grey-facebook-blue.badge {
+  color: #ffffff !important;
+  background-color: #999999;
+}
 /*bootstrap button extension*/
 fieldset[disabled] .btn-red.active {
   background-color: #ffa489 !important;
@@ -9284,6 +9375,10 @@ fieldset[disabled] .btn-red.active {
   right: 0;
   background: rgba(0, 0, 0, 0.7);
   transition: opacity 250ms;
+  z-index: 102;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
   /*/!*visibility: hidden;*!/*/
   /*opacity: 1;*/
 }
