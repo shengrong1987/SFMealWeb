@@ -43,17 +43,23 @@ function browserVersion(){
     safari = /safari/.test( userAgent ),
     ios = /iphone|ipod|ipad/.test( userAgent );
 
-  if( ios ) {
-    if ( !standalone && safari ) {
-      return 'browser';
-    } else if ( standalone && !safari ) {
-      return 'standalone';
-    } else if ( !standalone && !safari ) {
-      return 'uiwebview';
-    }
-  } else {
-    return 'not iOS';
+  if(userAgent.match(/MicroMessenger/i) && userAgent.match(/MicroMessenger/i)[0]==="micromessenger") {
+    return 'uiwebview';
+  }else{
+    return '';
   }
+
+  // if( ios ) {
+  //   if ( !standalone && safari ) {
+  //     return 'browser';
+  //   } else if ( standalone && !safari ) {
+  //     return 'standalone';
+  //   } else if ( !standalone && !safari ) {
+  //     return 'uiwebview';
+  //   }
+  // } else {
+  //   return 'not iOS';
+  // }
 }
 
 function makeAToast(msg, type){

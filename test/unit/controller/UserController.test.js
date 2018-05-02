@@ -713,7 +713,7 @@ describe('UsersController', function() {
         })
     })
 
-    it('use referers code to sign up should give 5 points to user', function(done){
+    it('use referers code to sign up should give 50 points to user', function(done){
       agent
         .post('/auth/register')
         .send({
@@ -727,7 +727,7 @@ describe('UsersController', function() {
           if (err) {
             return done(err);
           }
-          res.body.points.should.be.equal(5);
+          res.body.points.should.be.equal(50);
           done();
         })
     })
@@ -797,7 +797,7 @@ describe('UsersController', function() {
           if(err){
             return done(err);
           }
-          res.body.points.should.be.equal(5);
+          res.body.points.should.be.equal(50);
           done();
         })
     })

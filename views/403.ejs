@@ -78,6 +78,12 @@
               <span><img style="width: 30px;height: 30px;margin-right: 15px;display: inline;" src="/images/g-logo.png">Google <span data-toggle="i18n" data-key="login">帐号登陆</span></span>
             </button>
 
+            <!--<h4></h4>-->
+
+            <!--<button id="wechatBtn" class="popline btn btn-outline-light btn-lg outline round white text-orange" style="margin-left: 15px;">-->
+              <!--<span><i class="fa fa-wechat" style="padding-right:15px;"></i>微信<span data-toggle="i18n" data-key="login">帐号登陆</span></span>-->
+            <!--</button>-->
+
             <h2 data-toggle="i18n" data-key="emailLogin"></h2>
 
             <form class="text-center" data-toggle="validator" role="form">
@@ -121,6 +127,6 @@
   <script>
     setup();
     new LoginView({model : new Auth(), el: $("#loginView")});
-    if(browserVersion()=="uiwebview"){$("#GoogleBtn").hide();}
+    if(browserVersion()==="uiwebview"){$("#GoogleBtn").hide();}
   </script>
 </html>

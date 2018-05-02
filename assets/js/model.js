@@ -21,7 +21,8 @@ var LoginView = Backbone.View.extend({
     "click #FBBtn" : "FBLogin",
     "click #GoogleBtn" : "GoogleLogin",
     "click #sendEmailBtn" : "sendEmail",
-    "click #resetPasswordBtn" : "resetPassword"
+    "click #resetPasswordBtn" : "resetPassword",
+    "click #wechatBtn" : "gotoWechatLogin"
   },
   initialize : function(){
     var errorView = this.$el.find(".alert-danger");
@@ -122,6 +123,9 @@ var LoginView = Backbone.View.extend({
         $this.errorView.show();
       }
     })
+  },
+  gotoWechatLogin : function(e){
+    wechatLogin(true);
   }
 });
 
@@ -129,7 +133,8 @@ var RegisterView = Backbone.View.extend({
   events : {
     "submit form" : "register",
     "click #FBBtn" : "FBLogin",
-    "click #GoogleBtn" : "GoogleLogin"
+    "click #GoogleBtn" : "GoogleLogin",
+    "click #wechatBtn" : "gotoWechatLogin"
   },
   initialize : function(){
     var alertView = this.$el.find(".alert");
@@ -226,6 +231,9 @@ var RegisterView = Backbone.View.extend({
     this.model.method = "google";
     this.model.originUrl = location.href;
     location.href = this.model.url();
+  },
+  gotoWechatLogin : function () {
+    wechatLogin(true);
   }
 });
 
@@ -3816,7 +3824,8 @@ function uploadThumbnail(){
   },0,"thumbnail",isDelete);
 }
 
-function wechatLogin(){
+function wechatLogin(userInit){
+  return;
   var gm_ua = navigator.userAgent.toLowerCase();
   if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger") {
     var redirectUrl = BASE_URL + '/auth/wechatCode';
@@ -3824,6 +3833,17 @@ function wechatLogin(){
     var appId = WECHAT_APPID;
     var state = location.href;
     var wechatUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
+    wechatUrl = wechatUrl.replace('$APPID', appId);
+    wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
+    wechatUrl = wechatUrl.replace('$SCOPE',scope);
+    wechatUrl = wechatUrl.replace('$STATE',state);
+    location.href = wechatUrl;
+  }else if(userInit){
+    redirectUrl = encodeURIComponent(BASE_URL + '/auth/wechatCode');
+    scope = "snsapi_login";
+    appId = WECHAT_APPID;
+    state = encodeURIComponent(location.href);
+    wechatUrl = "https://open.weixin.qq.com/connect/qrconnect?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
     wechatUrl = wechatUrl.replace('$APPID', appId);
     wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
     wechatUrl = wechatUrl.replace('$SCOPE',scope);

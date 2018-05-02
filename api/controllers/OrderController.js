@@ -2134,7 +2134,7 @@ module.exports = {
         if(!referrer){
           return cb();
         }
-        referrer.points += 5;
+        referrer.points += 50;
         sails.log.info("adding points to referrer: " + referrer.email);
         referrer.save(function(err, r){
           if(err){

@@ -177,7 +177,7 @@ module.exports = require('waterlock').waterlocked({
           return cb();
         }
         sails.log.info("adding points to referee");
-        me.points += 5;
+        me.points += 50;
         me.referralBonus = true;
         me.referrerCode = referralCode;
         me.save(cb);

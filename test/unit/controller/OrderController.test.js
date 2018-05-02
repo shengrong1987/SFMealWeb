@@ -1860,7 +1860,7 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          res.body.points.should.be.equal(5);
+          res.body.points.should.be.equal(50);
           done();
         })
     });
@@ -2788,7 +2788,7 @@ describe('OrderController', function() {
         .end(done)
     })
 
-    it('referral should have 5 points', function(done){
+    it('referral should have 50 points', function(done){
       agent
         .get('/user/me')
         .set('Accept', 'application/json')
@@ -2798,7 +2798,7 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          res.body.points.should.be.equal(5);
+          res.body.points.should.be.equal(50);
           done();
         })
     })
