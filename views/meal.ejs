@@ -110,7 +110,7 @@
                         meal.pickups.forEach(function(pickup){ if(pickup.method === "pickup" && !meal.isPartyMode){ %>
                         <div class="row">
                           <div class="col-xs-12">
-                            <div class="option pickupOption" data-location="<%= pickup.publicLocation || pickup.location%>" data-color="<%= colors[count]%>">
+                            <div class="option pickupOption" data-location="<%= pickup.publicLocation || pickup.location%>" data-color="<%= colors[count]%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>">
                               <label>
                                 <i class="fa fa-hand-paper-o cursor-pointer text-<%= colors[count]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i>
                                 <span> <%= pickup.publicLocation || pickup.location%><% if(pickup.instruction){%>(<%= pickup.instruction%>)<%}%></span>
@@ -121,7 +121,7 @@
                         <%}else if(pickup.method === "delivery"){if(pickup.isDateCustomized && !meal.isPartyMode){return}%>
                         <div class="row">
                           <div class="col-xs-12">
-                            <div class="option deliveryOption" data-area="<%= pickup.area%>" data-location="<%= pickup.deliveryCenter%>" data-color="<%= colors[count]%>">
+                            <div class="option deliveryOption" data-area="<%= pickup.area%>" data-location="<%= pickup.deliveryCenter%>" data-color="<%= colors[count]%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>">
                               <label>
                                 <i class="fa fa-truck cursor-pointer text-<%= colors[count]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i>
                                 <span> <%= pickup.area || pickup.deliveryCenter%> <%= __('nearby')%></span>

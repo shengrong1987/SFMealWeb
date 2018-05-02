@@ -1041,6 +1041,7 @@ var MealSelectionView = Backbone.View.extend({
       var location = $(this).data("location");
       var color = $(this).data("color");
       var area = $(this).data("area");
+      var time = $(this).data("time");
       utility.geocoding(location, function(err, center){
         if(err){
           makeAToast(err, 'error');

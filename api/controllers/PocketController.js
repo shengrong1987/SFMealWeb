@@ -179,7 +179,7 @@ module.exports = {
             return res.badRequest(err);
           }
           pocket.transactions = transactions;
-          if(req.wantsJSON){
+          if(req.wantsJSON && process.env.NODE_ENV === "development"){
             return res.ok({pocket : pocket});
           }
           user.pocket = pocket;
@@ -377,7 +377,7 @@ module.exports = {
                 if(err){
                   return res.badRequest(err);
                 }
-                if(req.wantsJSON){
+                if(req.wantsJSON && process.env.NODE_ENV === "development"){
                   return res.ok({pocket : pocket});
                 }
 

@@ -59,7 +59,7 @@ module.exports = {
               });
               var u = user[0];
               u.host = host;
-              if(req.wantsJSON){
+              if(req.wantsJSON && process.env.NODE_ENV === "development"){
                 return res.ok(u);
               }
               return res.view('host',{user: u});
@@ -269,7 +269,7 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
-              if(req.wantsJSON){
+              if(req.wantsJSON && process.env.NODE_ENV === "development"){
                 return res.ok(user[0]);
               }
               return res.ok({});
@@ -301,7 +301,7 @@ module.exports = {
             return res.badRequest(err);
           }
           //for testing only
-          if(req.wantsJSON){
+          if(req.wantsJSON && process.env.NODE_ENV === "development"){
             return res.ok(bank_account);
           }
           res.ok(host);
@@ -362,7 +362,7 @@ module.exports = {
         publicHost.likes = host.likes;
         publicHost.shopNameI18n = host.shopNameI18n;
         publicHost.introI18n = host.introI18n;
-        if(req.wantsJSON){
+        if(req.wantsJSON && process.env.NODE_ENV === "development"){
           return res.ok(publicHost);
         }
         return res.view("profile",{host : publicHost, user : req.session.user, locale : req.getLocale()});
@@ -417,7 +417,7 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          if(req.wantsJSON){
+          if(req.wantsJSON && process.env.NODE_ENV === "development"){
             return res.ok(host);
           }
           return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, verification : host.verification, passGuide: host.passGuide, dishVerifying : host.dishVerifying });

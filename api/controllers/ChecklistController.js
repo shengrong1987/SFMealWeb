@@ -18,9 +18,9 @@ module.exports = {
   update : function(req, res){
     var id = req.params.id;
     var keys = Object.keys(req.body).forEach(function(key){
-      if(key != "id"){
+      if(key !== "id"){
         var checkListValue = JSON.parse(req.body[key]);
-        if(checkListValue.url && checkListValue.url != ""){
+        if(checkListValue.url && checkListValue.url !== ""){
           checkListValue.status = "pending";
         }else{
           checkListValue.status = "needed";

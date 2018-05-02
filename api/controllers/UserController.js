@@ -311,7 +311,7 @@ module.exports = require('waterlock').actions.user({
             if(err){
               console.log(err);
             }
-            if(req.wantsJSON){
+            if(req.wantsJSON && process.env.NODE_ENV === "development"){
               return res.ok(found);
             }
             return res.view('user', {user: found});
@@ -373,7 +373,7 @@ module.exports = require('waterlock').actions.user({
               if(err){
                 return res.badRequest(err);
               }
-              if(req.wantsJSON){
+              if(req.wantsJSON && process.env.NODE_ENV === "development"){
                 return res.ok(found);
               }
               return res.view('user',{user: found});
@@ -476,9 +476,9 @@ module.exports = require('waterlock').actions.user({
           return res.notFound({ responseText: req.__('referralCode-not-found')});
         }
         req.session.referralCode = code;
-        // if(req.wantsJSON){
-        //   return res.ok({ referrer : users[0], user : null});
-        // }
+        if(req.wantsJSON && process.env.NODE_ENV === "development"){
+          return res.ok({ referrer : users[0], user : null});
+        }
         res.view('join', { referrer : users[0], user : null});
       });
     }

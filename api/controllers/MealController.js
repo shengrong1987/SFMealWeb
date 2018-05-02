@@ -44,7 +44,7 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(req.wantsJSON){
+      if(req.wantsJSON && process.env.NODE_ENV === "development"){
         return res.ok({ dishes : host.dishes, host : host});
       }
       return res.view("meal_new",{dishes : host.dishes, host : host});
@@ -70,7 +70,7 @@ module.exports = {
             return res.badRequest(err);
           }
           meals = _this.composeMealWithDate(meals);
-          if(req.wantsJSON){
+          if(req.wantsJSON && process.env.NODE_ENV === "development"){
             return res.ok({meals : meals, user : u, county : county, locale : req.getLocale()});
           }
           return res.view('meals',{meals : meals, user : u, county : county, locale : req.getLocale()});
@@ -106,7 +106,7 @@ module.exports = {
             publicHosts.push(_host);
           }
         });
-        if(req.wantsJSON){
+        if(req.wantsJSON && process.env.NODE_ENV === "development"){
           return res.ok({user : user, hosts : publicHosts, locale : req.getLocale()});
         }
         return res.view('home',{user : user, hosts : publicHosts, locale : req.getLocale(), layout : 'index'});
@@ -221,7 +221,7 @@ module.exports = {
           return res.badRequest(err);
         }
         found = _this.composeMealWithDate(found);
-        if(req.wantsJSON) {
+        if(req.wantsJSON && process.env.NODE_ENV === "development") {
           res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, county : county});
         }else{
           res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, county : county });
@@ -283,7 +283,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        if(req.wantsJSON){
+        if(req.wantsJSON && process.env.NODE_ENV === "development"){
           return res.ok({meal : m, user : u, locale : req.getLocale()});
         }
         if(!req.session.authenticated){
@@ -393,7 +393,7 @@ module.exports = {
                 if(err){
                   return res.badRequest(err);
                 }
-                if(isAdmin || req.wantsJSON){
+                if(isAdmin || (req.wantsJSON && process.env.NODE_ENV === "development")){
                   return res.ok(meal);
                 }
                 return res.redirect("/host/me#mymeal");
@@ -418,7 +418,7 @@ module.exports = {
       });
       found = _this.composeMealWithDate(found);
       //test only
-      if(req.wantsJSON){
+      if(req.wantsJSON && process.env.NODE_ENV === "development"){
         return res.ok({meals : found});
       }
       return res.view("meals",{ meals : found, user : req.session.user, county : county});
@@ -1020,7 +1020,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        if(req.wantsJSON){
+        if(req.wantsJSON && process.env.NODE_ENV === "development"){
           return res.ok(meal);
         }
         if(isEditMode){

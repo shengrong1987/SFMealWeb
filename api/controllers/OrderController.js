@@ -1316,7 +1316,7 @@ module.exports = {
             if(err){
               return res.view('redirectPopup', { code : -99, responseText : err.responseText, mealId : order.meal.id} );
             }
-            if(req.wantsJSON){
+            if(req.wantsJSON && process.env.NODE_ENV === "development"){
               return res.badRequest({ code : -39, responseText : req.__('ali-payment-failure'), mealId : order.meal.id})
             }else{
               return res.view('redirectPopup', { code : -39, responseText : req.__('ali-payment-failure'), mealId : order.meal.id});
