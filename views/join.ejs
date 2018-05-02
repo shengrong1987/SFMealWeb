@@ -1,4 +1,4 @@
-<div class="container-fluid default-container text-center" style="margin-top:-20px;min-height: 100%;position: relative;">
+<div class="container-fluid default-container text-center" style="margin-top:-20px;min-height: 550px;position: relative;">
   <% if(user){ %>
   <div style="height:30px;"><h4>邀请好友</h4></div>
   <div class="referral-yellow row">
@@ -12,26 +12,17 @@
     <div class="row">
       <div class="col-lg-2 col-xl-3"></div>
       <div class="col-xs-12 col-lg-8 col-xl-6 text-center">
-        <div class="row">
-          <div class="col-lg-3"></div>
-          <div class="col-xs-6 col-lg-3">
-            <button class="btn btn-grey-facebook-blue active" style="width: 100%;"><i class="fa fa-facebook-f fa-lg"></i></button>
-          </div>
-          <div class="col-xs-6 col-lg-3">
-            <button id="wechatBtn" class="btn btn-grey-wechat-green active" style="width: 100%;"><i class="fa fa-weixin fa-lg"></i></button>
-          </div>
-          <div class="col-lg-3"></div>
-        </div>
+        <div class="social-share"></div>
 
         <div class="row">
           <div class="col-lg-3"></div>
           <div class="col-xs-12 col-lg-6" style="margin-top: 15px;">
             <div class="row">
               <div class="col-lg-9">
-                <input class="form-control" type="text" readonly value="<%= baseUrl + '/join?code=' + user.referralCode%>">
+                <input id="linkUrl" class="form-control" type="text" readonly value="<%= baseUrl + '/join?code=' + user.referralCode%>">
               </div>
-              <div class="  col-lg-3">
-                <button class="btn btn-outline text-red border-red">复制</button>
+              <div class="col-lg-3">
+                <button id="copyBtn" class="btn btn-outline text-red border-red" onclick="copyLink();" data-toggle="tooltip" title="<%= __('click-to-copy')%>" data-title-clicked="<%= __('copied')%>"><%= __('copy')%></button>
               </div>
             </div>
           </div>
@@ -48,10 +39,6 @@
   <%}%>
 </div>
 
-<div id="wechatOverlay" class="overlay" style="display: none;">
-  <h1 style="position: absolute;top: 50px;right: 20px;" class="text-white">点击这里分享<i class="fa fa-arrow-up fa-lg"></i></h1>
-</div>
-
 <script>
 
   $("#wechatBtn").click(function(){
@@ -62,6 +49,29 @@
   $("#wechatOverlay").click(function(){
     $("#wechatOverlay").toggle();
   })
+
+  $('.social-share').share({
+    title : "SFMeal私房菜平台，喂想家的你，加入即可领取5元现金券吧！"
+  });
+
+  function copyLink(){
+    var copyText = $("#linkUrl");
+
+    /* Select the text field */
+    copyText.select();
+
+    /* Copy the text inside the text field */
+    document.execCommand("Copy");
+
+    /* Alert the copied text */
+    $("#copyBtn").tooltip('hide')
+      .attr('data-original-title', $("#copyBtn").data("title-clicked"))
+      .tooltip('fixTitle')
+      .tooltip('show')
+      .focus();
+  }
+
+
 
 </script>
 

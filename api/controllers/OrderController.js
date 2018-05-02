@@ -2081,6 +2081,9 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
+      if(!user.emailVerified){
+        return res.badRequest({ code : -48, reponseText : req.__('coupon-unverified-email')});
+      }
       res.ok({ points : user.points});
     })
   },
@@ -2097,6 +2100,9 @@ module.exports = {
     //verify if user have enough points
     if(points > user.points){
       return cb({ code : -25, responseText : req.__('order-points-insufficient')});
+    }
+    if(!user.emailVerified){
+      return cb({ code : -48, reponseText : req.__('coupon-unverified-email')});
     }
     //apply points
     user.points -= points;

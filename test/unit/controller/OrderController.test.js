@@ -494,7 +494,7 @@ describe('OrderController', function() {
         })
     })
 
-    it('should not order the meal with points and coupon', function (done) {
+    it('should not order the meal with points and coupon at the same time', function (done) {
       var dishObj = {};
       dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
       dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
@@ -628,6 +628,74 @@ describe('OrderController', function() {
           done();
         })
     })
+
+    it('should not order the meal again with points', function (done) {
+      var dishObj = {};
+      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}], price : price1 };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
+      dishObj[dishId3] = { number : 1 , preference : [{ property : '', extra : 0}], price : price3 };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price3 * 1,
+          contactInfo : { name : "sheng", address : address, phone : phone },
+          paymentInfo : { method : 'online'},
+          method : "delivery",
+          pickupOption : 2,
+          mealId : mealId,
+          delivery_fee : 0,
+          points : 13
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-48);
+          done();
+        })
+    });
+
+    it('logout user account', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    })
+
+    it('should login as administrator', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : adminEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should verify user email', function (done) {
+      agent
+        .put('/user/' + guestId)
+        .send({emailVerified : true})
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.emailVerified.should.be.true();
+          done();
+        })
+    })
+
+    it('should login as guest', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect("Location","/auth/done")
+        .end(done)
+    });
   //
     it('should order the meal again with points', function (done) {
       var dishObj = {};
@@ -1292,6 +1360,58 @@ describe('OrderController', function() {
           done();
         })
     });
+
+    it('logout user account', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    })
+
+    it('login as admin', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({
+          email : adminEmail,
+          password : password
+        })
+        .expect(302)
+        .end(done)
+    })
+
+    it('should verify users email', function(done){
+      agent
+        .put('/user/' + userId)
+        .send({
+          emailVerified : false
+        })
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.emailVerified.should.be.false();
+          done();
+        })
+    });
+
+    it('logout user account', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    })
+
+    it('login as user', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({
+          email : guestEmail,
+          password : password
+        })
+        .expect(302)
+        .end(done)
+    })
 
     it('should not be able to order a meal with coupon because email unverified', function(done){
       var dishObj = {};

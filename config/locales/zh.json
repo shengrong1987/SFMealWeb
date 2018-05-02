@@ -859,5 +859,8 @@
   "email-verification-resend" : "重新发送验证邮件",
   "verify-email" : "验证邮箱",
   "chicken-dinner" : "今晚吃鸡，大吉大利",
-  "catering-option" : "点击这里切换团餐和普通餐。"
+  "catering-option" : "点击这里切换团餐和普通餐。",
+  "copy" : "复制",
+  "click-to-copy" : "点击复制",
+  "copied" : "已复制!"
 }

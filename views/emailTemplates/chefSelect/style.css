@@ -9170,6 +9170,10 @@ fieldset[disabled] .btn-red.active {
 .navbar .navbar-nav.footer-nav li a {
   display: inline !important;
 }
+.navbar-nav.navbar-center {
+  left: 50%;
+  transform: translatex(-50%);
+}
 .nav-email .navbar-nav.footer-nav {
   margin-bottom: 20px;
   min-height: 20px;
@@ -9842,9 +9846,6 @@ fieldset[disabled] .btn-red.active {
   .footer-container {
     width: 334px;
   }
-  .footer .nav {
-    padding-left: 25px;
-  }
   .footer .middle {
     width: 430px;
   }
@@ -10195,9 +10196,6 @@ fieldset[disabled] .btn-red.active {
     padding-right: .9rem;
     padding-left: .9rem;
   }
-  .navbar-nav {
-    margin-right: -15px;
-  }
   .navbar.navbar-transparent {
     position: absolute;
     width: 100%;
@@ -10386,85 +10384,6 @@ fieldset[disabled] .btn-red.active {
   .container {
     width: 100%;
   }
-}
-@font-face {
-  font-family: "BanglaMN";
-  src: url("/styles/fonts/BanglaMN.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: "sfmeal";
-  src: url("/styles/fonts/sfmeal.eot");
-  src: url("/styles/fonts/sfmeal.eot?#iefix") format("embedded-opentype"), url("/styles/fonts/sfmeal.woff") format("woff"), url("/styles/fonts/sfmeal.ttf") format("truetype"), url("/styles/fonts/sfmeal.svg#sfmeal") format("svg");
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: "sf-meal Bangla MN";
-  src: url("/styles/fonts/Bangla MN.ttf") format("truetype");
-  font-weight: lighter;
-  font-style: normal;
-}
-[data-icon]:before {
-  font-family: "sfmeal" !important;
-  content: attr(data-icon);
-  font-style: normal !important;
-  font-weight: normal !important;
-  font-variant: normal !important;
-  text-transform: none !important;
-  speak: none;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-[class^="icon-"]:before,
-[class*=" icon-"]:before {
-  font-family: "sfmeal" !important;
-  font-style: normal !important;
-  font-weight: normal !important;
-  font-variant: normal !important;
-  text-transform: none !important;
-  speak: none;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-.icon-fb:before {
-  content: "a";
-}
-.icon-insta:before {
-  content: "b";
-}
-.icon-pin:before {
-  content: "c";
-}
-.icon-tw:before {
-  content: "d";
-}
-.icon-dot:before {
-  content: "e";
-}
-.icon-more:before {
-  content: "f";
-}
-.icon-less:before {
-  content: "g";
-}
-.icon-chef:before {
-  content: "h";
-}
-.icon-like:before {
-  content: "i";
-}
-.icon-help:before {
-  content: "j";
-}
-.icon-star:before {
-  content: "k";
-}
-.icon-modify:before {
-  content: "l";
 }
 /*!
  *  Font Awesome 4.4.0 by @davegandy - http://fontawesome.io - @fontawesome
@@ -12491,6 +12410,227 @@ fieldset[disabled] .btn-red.active {
 }
 .fa-fonticons:before {
   content: "\f280";
+}
+@font-face {
+  font-family: "socialshare";
+  src: url('/styles/fonts/iconfont.eot');
+  src: url('/styles/fonts/iconfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */ url('/styles/fonts/iconfont.woff') format('woff'), /* chrome, firefox */ url('/styles/fonts/iconfont.ttf') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/ url('/styles/fonts/iconfont.svg#iconfont') format('svg');
+  
+  /* IE9*/
+  /* iOS 4.1- */
+}
+.social-share {
+  font-family: "socialshare" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke-width: 0.2px;
+  -moz-osx-font-smoothing: grayscale;
+}
+.social-share * {
+  font-family: "socialshare" !important;
+}
+.social-share .icon-tencent:before {
+  content: "\f07a";
+}
+.social-share .icon-qq:before {
+  content: "\f11a";
+}
+.social-share .icon-weibo:before {
+  content: "\f12a";
+}
+.social-share .icon-wechat:before {
+  content: "\f09a";
+}
+.social-share .icon-douban:before {
+  content: "\f10a";
+}
+.social-share .icon-heart:before {
+  content: "\f20a";
+}
+.social-share .icon-like:before {
+  content: "\f00a";
+}
+.social-share .icon-qzone:before {
+  content: "\f08a";
+}
+.social-share .icon-linkedin:before {
+  content: "\f01a";
+}
+.social-share .icon-diandian:before {
+  content: "\f05a";
+}
+.social-share .icon-facebook:before {
+  content: "\f03a";
+}
+.social-share .icon-google:before {
+  content: "\f04a";
+}
+.social-share .icon-twitter:before {
+  content: "\f06a";
+}
+.social-share a {
+  position: relative;
+  text-decoration: none;
+  margin: 4px;
+  display: inline-block;
+  outline: none;
+}
+.social-share .social-share-icon {
+  position: relative;
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
+  border-radius: 50%;
+  line-height: 32px;
+  border: 1px solid #666;
+  color: #666;
+  text-align: center;
+  vertical-align: middle;
+  transition: background 0.6s ease-out 0s;
+}
+.social-share .social-share-icon:hover {
+  background: #666;
+  color: #fff;
+}
+.social-share .icon-weibo {
+  color: #ff763b;
+  border-color: #ff763b;
+}
+.social-share .icon-weibo:hover {
+  background: #ff763b;
+}
+.social-share .icon-tencent {
+  color: #56b6e7;
+  border-color: #56b6e7;
+}
+.social-share .icon-tencent:hover {
+  background: #56b6e7;
+}
+.social-share .icon-qq {
+  color: #56b6e7;
+  border-color: #56b6e7;
+}
+.social-share .icon-qq:hover {
+  background: #56b6e7;
+}
+.social-share .icon-qzone {
+  color: #FDBE3D;
+  border-color: #FDBE3D;
+}
+.social-share .icon-qzone:hover {
+  background: #FDBE3D;
+}
+.social-share .icon-douban {
+  color: #33b045;
+  border-color: #33b045;
+}
+.social-share .icon-douban:hover {
+  background: #33b045;
+}
+.social-share .icon-linkedin {
+  color: #0077B5;
+  border-color: #0077B5;
+}
+.social-share .icon-linkedin:hover {
+  background: #0077B5;
+}
+.social-share .icon-facebook {
+  color: #44619D;
+  border-color: #44619D;
+}
+.social-share .icon-facebook:hover {
+  background: #44619D;
+}
+.social-share .icon-google {
+  color: #db4437;
+  border-color: #db4437;
+}
+.social-share .icon-google:hover {
+  background: #db4437;
+}
+.social-share .icon-twitter {
+  color: #55acee;
+  border-color: #55acee;
+}
+.social-share .icon-twitter:hover {
+  background: #55acee;
+}
+.social-share .icon-diandian {
+  color: #307DCA;
+  border-color: #307DCA;
+}
+.social-share .icon-diandian:hover {
+  background: #307DCA;
+}
+.social-share .icon-wechat {
+  position: relative;
+  color: #7bc549;
+  border-color: #7bc549;
+}
+.social-share .icon-wechat:hover {
+  background: #7bc549;
+}
+.social-share .icon-wechat .wechat-qrcode {
+  display: none;
+  border: 1px solid #eee;
+  position: absolute;
+  z-index: 9;
+  top: -205px;
+  left: -84px;
+  color: #666;
+  font-size: 12px;
+  text-align: center;
+  background-color: #fff;
+  box-shadow: 0 2px 10px #aaa;
+  transition: all 200ms;
+  -webkit-tansition: all 350ms;
+  -moz-transition: all 350ms;
+}
+.social-share .icon-wechat .wechat-qrcode.bottom {
+  top: 40px;
+  left: -84px;
+}
+.social-share .icon-wechat .wechat-qrcode.bottom:after {
+  display: none;
+}
+.social-share .icon-wechat .wechat-qrcode h4 {
+  font-weight: normal;
+  height: 26px;
+  line-height: 26px;
+  font-size: 12px;
+  background-color: #f3f3f3;
+  margin: 0;
+  padding: 0;
+  color: #777;
+}
+.social-share .icon-wechat .wechat-qrcode .qrcode {
+  padding: 10px;
+}
+.social-share .icon-wechat .wechat-qrcode .qrcode table {
+  margin: 0!important;
+}
+.social-share .icon-wechat .wechat-qrcode .help p {
+  font-weight: normal;
+  line-height: 16px;
+  padding: 0;
+  margin: 0;
+}
+.social-share .icon-wechat .wechat-qrcode:after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  margin-left: -6px;
+  bottom: -13px;
+  width: 0;
+  height: 0;
+  border-width: 8px 6px 6px 6px;
+  border-style: solid;
+  border-color: #ffffff transparent transparent transparent;
+}
+.social-share .icon-wechat:hover .wechat-qrcode {
+  display: block;
 }
 /*
 * CSS TOGGLE SWITCH
@@ -14719,236 +14859,6 @@ fieldset[disabled] .btn-red.active {
 }
 .input-group > .bfh-number-btn:hover {
   background-color: #cccccc;
-}
-.jssocials-shares {
-  margin: 0.2em 0;
-}
-.jssocials-shares * {
-  box-sizing: border-box;
-}
-.jssocials-share {
-  display: inline-block;
-  vertical-align: top;
-  margin: 0.3em;
-}
-.jssocials-share:first-child {
-  margin-left: 0;
-}
-.jssocials-share:last-child {
-  margin-right: 0;
-}
-.jssocials-share-logo {
-  width: 1em;
-  vertical-align: middle;
-  font-size: 1.5em;
-}
-img.jssocials-share-logo {
-  width: auto;
-  height: 1em;
-}
-.jssocials-share-link {
-  display: inline-block;
-  text-align: center;
-  text-decoration: none;
-  line-height: 1;
-}
-.jssocials-share-link.jssocials-share-link-count {
-  padding-top: .2em;
-}
-.jssocials-share-link.jssocials-share-link-count .jssocials-share-count {
-  display: block;
-  font-size: .6em;
-  margin: 0 -0.5em -0.8em -0.5em;
-}
-.jssocials-share-link.jssocials-share-no-count {
-  padding-top: .5em;
-}
-.jssocials-share-link.jssocials-share-no-count .jssocials-share-count {
-  height: 1em;
-}
-.jssocials-share-label {
-  padding-left: 0.3em;
-  vertical-align: middle;
-}
-.jssocials-share-count-box {
-  display: inline-block;
-  height: 1.5em;
-  padding: 0 0.3em;
-  vertical-align: middle;
-  cursor: default;
-}
-.jssocials-share-count-box.jssocials-share-no-count {
-  display: none;
-}
-.jssocials-share-count {
-  line-height: 1.5em;
-  vertical-align: middle;
-}
-.jssocials-share-twitter .jssocials-share-link {
-  color: #00aced;
-}
-.jssocials-share-twitter .jssocials-share-link .jssocials-share-label {
-  color: #00aced;
-}
-.jssocials-share-twitter .jssocials-share-link:hover,
-.jssocials-share-twitter .jssocials-share-link:focus,
-.jssocials-share-twitter .jssocials-share-link:active {
-  color: #0087ba;
-}
-.jssocials-share-twitter .jssocials-share-link:hover .jssocials-share-label,
-.jssocials-share-twitter .jssocials-share-link:focus .jssocials-share-label,
-.jssocials-share-twitter .jssocials-share-link:active .jssocials-share-label {
-  color: #0087ba;
-}
-.jssocials-share-facebook .jssocials-share-link {
-  color: #3b5998;
-}
-.jssocials-share-facebook .jssocials-share-link .jssocials-share-label {
-  color: #3b5998;
-}
-.jssocials-share-facebook .jssocials-share-link:hover,
-.jssocials-share-facebook .jssocials-share-link:focus,
-.jssocials-share-facebook .jssocials-share-link:active {
-  color: #2d4373;
-}
-.jssocials-share-facebook .jssocials-share-link:hover .jssocials-share-label,
-.jssocials-share-facebook .jssocials-share-link:focus .jssocials-share-label,
-.jssocials-share-facebook .jssocials-share-link:active .jssocials-share-label {
-  color: #2d4373;
-}
-.jssocials-share-googleplus .jssocials-share-link {
-  color: #dd4b39;
-}
-.jssocials-share-googleplus .jssocials-share-link .jssocials-share-label {
-  color: #dd4b39;
-}
-.jssocials-share-googleplus .jssocials-share-link:hover,
-.jssocials-share-googleplus .jssocials-share-link:focus,
-.jssocials-share-googleplus .jssocials-share-link:active {
-  color: #c23321;
-}
-.jssocials-share-googleplus .jssocials-share-link:hover .jssocials-share-label,
-.jssocials-share-googleplus .jssocials-share-link:focus .jssocials-share-label,
-.jssocials-share-googleplus .jssocials-share-link:active .jssocials-share-label {
-  color: #c23321;
-}
-.jssocials-share-linkedin .jssocials-share-link {
-  color: #007bb6;
-}
-.jssocials-share-linkedin .jssocials-share-link .jssocials-share-label {
-  color: #007bb6;
-}
-.jssocials-share-linkedin .jssocials-share-link:hover,
-.jssocials-share-linkedin .jssocials-share-link:focus,
-.jssocials-share-linkedin .jssocials-share-link:active {
-  color: #005983;
-}
-.jssocials-share-linkedin .jssocials-share-link:hover .jssocials-share-label,
-.jssocials-share-linkedin .jssocials-share-link:focus .jssocials-share-label,
-.jssocials-share-linkedin .jssocials-share-link:active .jssocials-share-label {
-  color: #005983;
-}
-.jssocials-share-pinterest .jssocials-share-link {
-  color: #cb2027;
-}
-.jssocials-share-pinterest .jssocials-share-link .jssocials-share-label {
-  color: #cb2027;
-}
-.jssocials-share-pinterest .jssocials-share-link:hover,
-.jssocials-share-pinterest .jssocials-share-link:focus,
-.jssocials-share-pinterest .jssocials-share-link:active {
-  color: #9f191f;
-}
-.jssocials-share-pinterest .jssocials-share-link:hover .jssocials-share-label,
-.jssocials-share-pinterest .jssocials-share-link:focus .jssocials-share-label,
-.jssocials-share-pinterest .jssocials-share-link:active .jssocials-share-label {
-  color: #9f191f;
-}
-.jssocials-share-email .jssocials-share-link {
-  color: #3490F3;
-}
-.jssocials-share-email .jssocials-share-link .jssocials-share-label {
-  color: #3490F3;
-}
-.jssocials-share-email .jssocials-share-link:hover,
-.jssocials-share-email .jssocials-share-link:focus,
-.jssocials-share-email .jssocials-share-link:active {
-  color: #0e76e6;
-}
-.jssocials-share-email .jssocials-share-link:hover .jssocials-share-label,
-.jssocials-share-email .jssocials-share-link:focus .jssocials-share-label,
-.jssocials-share-email .jssocials-share-link:active .jssocials-share-label {
-  color: #0e76e6;
-}
-.jssocials-share-whatsapp .jssocials-share-link {
-  color: #29a628;
-}
-.jssocials-share-whatsapp .jssocials-share-link .jssocials-share-label {
-  color: #29a628;
-}
-.jssocials-share-whatsapp .jssocials-share-link:hover,
-.jssocials-share-whatsapp .jssocials-share-link:focus,
-.jssocials-share-whatsapp .jssocials-share-link:active {
-  color: #1f7d1e;
-}
-.jssocials-share-whatsapp .jssocials-share-link:hover .jssocials-share-label,
-.jssocials-share-whatsapp .jssocials-share-link:focus .jssocials-share-label,
-.jssocials-share-whatsapp .jssocials-share-link:active .jssocials-share-label {
-  color: #1f7d1e;
-}
-.jssocials-share-line .jssocials-share-link {
-  color: #25af00;
-}
-.jssocials-share-line .jssocials-share-link .jssocials-share-label {
-  color: #25af00;
-}
-.jssocials-share-line .jssocials-share-link:hover,
-.jssocials-share-line .jssocials-share-link:focus,
-.jssocials-share-line .jssocials-share-link:active {
-  color: #1a7c00;
-}
-.jssocials-share-line .jssocials-share-link:hover .jssocials-share-label,
-.jssocials-share-line .jssocials-share-link:focus .jssocials-share-label,
-.jssocials-share-line .jssocials-share-link:active .jssocials-share-label {
-  color: #1a7c00;
-}
-.jssocials-share-stumbleupon .jssocials-share-link {
-  color: #eb4823;
-}
-.jssocials-share-stumbleupon .jssocials-share-link .jssocials-share-label {
-  color: #eb4823;
-}
-.jssocials-share-stumbleupon .jssocials-share-link:hover,
-.jssocials-share-stumbleupon .jssocials-share-link:focus,
-.jssocials-share-stumbleupon .jssocials-share-link:active {
-  color: #c93412;
-}
-.jssocials-share-stumbleupon .jssocials-share-link:hover .jssocials-share-label,
-.jssocials-share-stumbleupon .jssocials-share-link:focus .jssocials-share-label,
-.jssocials-share-stumbleupon .jssocials-share-link:active .jssocials-share-label {
-  color: #c93412;
-}
-.jssocials-share-link {
-  -webkit-transition: color 200ms ease-in-out;
-  transition: color 200ms ease-in-out;
-}
-.jssocials-share-link.jssocials-share-link-count .jssocials-share-count {
-  font-size: .5em;
-}
-.jssocials-share-label {
-  font-size: 0.8em;
-  color: #444;
-  -webkit-transition: color 200ms ease-in-out;
-  transition: color 200ms ease-in-out;
-}
-.jssocials-share-count-box {
-  margin-left: 0.3em;
-  border: 1px solid #efefef;
-  border-radius: 0.3em;
-}
-.jssocials-share-count-box .jssocials-share-count {
-  font-size: 0.8em;
-  color: #444;
 }
 /*!
  * Datetimepicker for Bootstrap 3

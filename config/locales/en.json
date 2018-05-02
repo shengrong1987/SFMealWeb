@@ -857,5 +857,8 @@
   "email-verification-resend" : "Resend verification email",
   "verify-email" : "Verify Email",
   "chicken-dinner" : "Winner Winner, Chicken Diner",
-  "catering-option" : "Click here to switch between catering and normal order."
+  "catering-option" : "Click here to switch between catering and normal order.",
+  "copy" : "Copy",
+  "click-to-copy" : "Copy to clipboard",
+  "copied" : "Copied!"
 }
