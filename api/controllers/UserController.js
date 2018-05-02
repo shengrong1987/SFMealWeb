@@ -476,9 +476,6 @@ module.exports = require('waterlock').actions.user({
           return res.notFound({ responseText: req.__('referralCode-not-found')});
         }
         req.session.referralCode = code;
-        if(req.wantsJSON){
-          return res.ok({ referrer : users[0], user : null});
-        }
         res.view('join', { referrer : users[0], user : null});
       });
     }
