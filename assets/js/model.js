@@ -1428,8 +1428,7 @@ var MealView = Backbone.View.extend({
         today : "fa fa-calendar-times-o"
       },
       stepping : 30,
-      showTodayButton : true,
-      timeZone : 'America/Los_Angeles'
+      showTodayButton : true
     });
     setupLanguage();
     setupInputMask();
