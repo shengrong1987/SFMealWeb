@@ -100,11 +100,11 @@ module.exports = require('waterlock').waterlocked({
     if(!openid){
       return res.badRequest({code : -20, responseText : req.__('user-unionid-needed')});
     }
-    waterlock.engine.findAuth({ unionId : openid }, function(err, user) {
+    waterlock.engine.findAuth({ openid : openid }, function(err, user) {
       if (!user) {
         isNewUser = true;
       }
-      waterlock.engine.findOrCreateAuth({ unionId : openid }, attrs, function(err, user) {
+      waterlock.engine.findOrCreateAuth({ openid : openid }, attrs, function(err, user) {
         if(err){
           return res.badRequest(err);
         }

@@ -3825,7 +3825,6 @@ function uploadThumbnail(){
 }
 
 function wechatLogin(userInit){
-  return;
   var gm_ua = navigator.userAgent.toLowerCase();
   if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger") {
     var redirectUrl = BASE_URL + '/auth/wechatCode';
