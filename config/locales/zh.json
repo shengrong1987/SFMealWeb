@@ -862,5 +862,6 @@
   "catering-option" : "点击这里切换团餐和普通餐。",
   "copy" : "复制",
   "click-to-copy" : "点击复制",
-  "copied" : "已复制!"
+  "copied" : "已复制!",
+  "driver-phone" : "司机电话"
 }

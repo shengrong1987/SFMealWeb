@@ -860,5 +860,6 @@
   "catering-option" : "Click here to switch between catering and normal order.",
   "copy" : "Copy",
   "click-to-copy" : "Copy to clipboard",
-  "copied" : "Copied!"
+  "copied" : "Copied!",
+  "driver-phone" : "Driver's phone"
 }

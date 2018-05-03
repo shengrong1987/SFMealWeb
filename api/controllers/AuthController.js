@@ -134,7 +134,7 @@ module.exports = require('waterlock').waterlocked({
             req.session.user = u[0];
             req.session.authenticated = true;
             var host = process.env.NODE_ENV === 'production' ? process.env.BASE_URL : process.env.LOCAL_HOST;
-            attrs.verificationUrl = host + "/user/verify/" + user.verifyToken.token;
+            attrs.verificationUrl = host + "/user/verify/" + u[0].verifyToken.token;
             //notification.sendEmail("User","verification",attrs,req);
             _this.checkReferralProgram(req, function(err, me){
               if(err){

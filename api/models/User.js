@@ -174,7 +174,7 @@ module.exports = {
           if(err){
             return cb(err);
           }
-          var code = (params.firstname || _this.firstname || params.nickname) + "." + (params.lastname || _this.lastname || 'guest') + "." + number;
+          var code = (params.firstname || _this.firstname || params.nickname || 'chi') + "." + (params.lastname || _this.lastname || 'huo') + "." + number;
           sails.log.info("code created: " + code);
           cb(null, code);
         })

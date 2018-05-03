@@ -463,7 +463,7 @@ module.exports = require('waterlock').actions.user({
           return res.forbidden(err);
         }
         if(!code){
-          return res.redirect('/join?code=' + user.referralCode);
+          return res.redirect('/join?code=' + encodeURIComponent(user.referralCode));
         }
         return res.view('join', { user : user, baseUrl : baseUrl });
       })
