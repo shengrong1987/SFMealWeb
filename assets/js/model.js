@@ -676,7 +676,7 @@ var PaymentView = Backbone.View.extend({
           var token = response['id'];
           var brandInput = form.find("input[name='brand']");
           var brand = response['card']['brand'];
-          if (brandInput.length == 0) {
+          if (brandInput.length === 0) {
             form.append("<input type='hidden' name='brand' value='" + brand + "' />");
           } else {
             brandInput.attr("value", brand);
@@ -734,7 +734,7 @@ var PaymentView = Backbone.View.extend({
     });
     this.model.save({}, {
       success: function () {
-        if(location.href.indexOf('/pocket/me') != -1){
+        if(location.href.indexOf('/pocket/me') !== -1){
           reloadUrl('/pocket/me','#mypayment');
         }else{
           location.reload();
@@ -753,8 +753,10 @@ var PaymentView = Backbone.View.extend({
     this.model.set({
       stripeToken: this.$el.find("input[name='stripeToken']").val(),
       cardNumber: this.$el.find("input[name='cardNumber']").val(),
-      isDefaultPayment: this.isSetToDefault
+      isDefaultPayment: this.isSetToDefault,
+      email : this.$el.find("#emailInput").val()
     });
+
     this.model.save({}, {
       success: function () {
         location.reload();

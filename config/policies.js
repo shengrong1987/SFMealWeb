@@ -40,7 +40,8 @@ module.exports.policies = {
     'admin' : 'isAdmin',
     'wechat' : true,
     'wechatSignature' : true,
-    'wechatCode' : true
+    'wechatCode' : true,
+    'update' : 'isAdmin'
   },
 
   UserController : {

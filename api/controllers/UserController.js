@@ -157,14 +157,12 @@ module.exports = require('waterlock').actions.user({
   update : function(req, res) {
     var params = req.body;
     var userId = req.params.id;
+    var isAdmin = (req.session.user.emailVerified || process.env.NODE_ENV === "development") && req.session.user.auth.email === "admin@sfmeal.com";
     User.findOne(userId).populate("auth").exec(function(err, user) {
       if (err) {
         return cb(err);
       }
-      if(!user.auth.email && !params.email){
-        return res.badRequest({ code : -5, responseText : req.__('user-lack-of-email')});
-      }
-      if(params.email && user.auth.email){
+      if(params.email && user.auth.email && !isAdmin){
         return res.badRequest({ code : -6, responseText : req.__('user-email-can-not-change')});
       }
       var email = user.auth.email || params.email;

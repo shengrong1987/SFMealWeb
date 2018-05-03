@@ -1,4 +1,4 @@
-<div class="green" style="padding: 25px;margin-top: -25px;">
+<div id="receiptView" class="green" style="padding: 25px;margin-top: -25px;" data-title="Hi <%= customerName%> ," data-desc="<%= __('new-order-receipt-detail', host.shopName)%>">
   <div class="box-email white relative middle text-left">
     <h4 class="text-green"><%= __('new-order-receipt-title')%></h4>
     <p>Hi <%= customerName%>,</p>
@@ -27,7 +27,7 @@
           var price = parseInt(orderedDish.price);
       %>
       <tr>
-        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 100px;"></td>
+        <td class="xs-hide"><img class="dishImg" src="<%= dish.photos[0].v%>" style="width: 100px;"></td>
         <td class="text-green" style="vertical-align: middle;"><%= dish.title%><%= title%></td>
         <td style="vertical-align: middle;"><%= amount%><%= __('fen')%></td>
         <td style="vertical-align: middle;text-align: right;">
@@ -104,3 +104,7 @@
   </div>
 
 </div>
+
+<script>
+  setupWechat($("#receiptView .dishImg:eq(0)").prop('src'),$("#receiptView").data("title"), $("#receiptView").data("desc"));
+</script>

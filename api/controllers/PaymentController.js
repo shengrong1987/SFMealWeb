@@ -41,11 +41,11 @@ module.exports = {
 
   create : function(req, res){
     var userId = req.session.user.id;
-    var email = req.session.user.auth.email;
+    var params = req.body;
+    var email = req.session.user.email || params.email;
     if(!email){
       return res.badRequest({ code : -3, responseText : req.__('payment-lackof-email')})
     }
-    var params = req.body;
     var cardnumber = params.cardNumber;
 
     User.findOne(userId).exec(function(err, user){
@@ -90,6 +90,7 @@ module.exports = {
             delete params.stripeToken;
             var card = customer.sources.data[0];
             user.customerId = customer.id;
+            user.email = email;
             params.customerId = customer.id;
             params.cardId = card.id;
             params.last4 = card.last4;
@@ -310,7 +311,7 @@ module.exports = {
   },
 
   newForm : function(req, res) {
-    res.view("payment",{layout:false});
+    res.view("payment",{ layout:false, user: req.session.user });
   }
 };
 

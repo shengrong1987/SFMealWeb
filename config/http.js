@@ -42,6 +42,7 @@ module.exports.http = {
       'poweredBy',
       '$custom',
       'router',
+      // 'setLanguage',
       'www',
       'favicon',
       '404',
@@ -56,12 +57,23 @@ module.exports.http = {
 
     removeSubDomain : require('subdomain')({ base : process.env.BASE_URL, removeWWW : true }),
 
+    setLanguage : function (req, res, next) {
+      var gm_ua = req.headers['user-agent'].toLowerCase();
+
+      sails.log.info("ddd:" + sails.hooks.i18n);
+
+      if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger") {
+        sails.hooks.i18n.setLocale('zh');
+      }
+      next();
+    },
+
     redirectToHttps: function (req, res, next) {
       var reqParam = req;
       if(reqParam.headers){
         sails.log.verbose("visiting host: " + reqParam.headers.host);
       }
-      if(process.env.NODE_ENV == 'production'){
+      if(process.env.NODE_ENV === 'production'){
         if((req.get('X-Forwarded-Proto') && req.get('X-Forwarded-Proto') !== 'https') && !req.isSocket) {
           res.redirect('https://' + req.get('Host') + req.url);
         }else{

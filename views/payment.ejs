@@ -112,7 +112,7 @@
 
                     var year = $(".card-expiry-year").attr("value");
                     $(".card-expiry-year option").each(function(){
-                      if($(this).attr("value")==year){
+                      if($(this).attr("value")===year){
                         $(this).attr("selected","selected");
                       }
                     });
@@ -129,6 +129,17 @@
                 <div class="help-block with-errors"></div>
               </div>
             </div>
+
+            <!-- Email -->
+            <% if(!user || !user.email){ %>
+            <div class="form-group">
+              <label class="col-sm-4 control-label" for="textinput"><%= __('email')%></label>
+              <div class="col-sm-6">
+                <input type="email" class="form-control" id="emailInput" data-pattern-error="bad format" placeholder="<%= __('email')%>" required>
+                <div class="help-block with-errors"></div>
+              </div>
+            </div>
+            <% }%>
 
             <div class="alert alert-danger" role="alert"></div>
 
