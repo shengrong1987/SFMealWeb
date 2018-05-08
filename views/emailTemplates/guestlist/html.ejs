@@ -39,44 +39,44 @@
         <td><%= comment%></td>
       </tr>
       </thead>
-      <tbody>
       <%}})%>
       <% orders.forEach(function(order){
-      if(order.method == 'delivery'){%>
-      <tr>
-        <td><%= order.customerName %></td>
-        <td><%= order.id%></td>
-        <td>
-          <% Object.keys(order.orders).forEach(function(dishId){
-            var amount = order.orders[dishId].number;
-            var preference = order.orders[dishId].preference;
-            if(amount > 0){
-              var dish;
-              dishes.forEach(function(d){
-                if(d.id == dishId){
-                  dish = d;
-                }
-              })
-          %>
-          <% if(preference && preference.length > 0){
-            var title = '';
-            preference.forEach(function(pref){
-              title += "(" + pref.property + ')';
-            });
-          %>
-          <%= dish.title%>(<%= amount%>)<%= title%>
-          <% }else{%>
-          <%= dish.title%>(<%= amount%>)
-          <% }%>
-          <%}});%>
-        </td>
-        <td><%= order.customerPhone%></td>
-        <td><%= order.contactInfo.address%></td>
-        <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
-        <td><%= order.pickupInfo.comment || ''%></td>
-      </tr>
-      <%}})%>
+      if(order.method === 'delivery'){%>
+      <tbody>
+        <tr>
+          <td><%= order.customerName %></td>
+          <td><%= order.id%></td>
+          <td>
+            <% Object.keys(order.orders).forEach(function(dishId){
+              var amount = order.orders[dishId].number;
+              var preference = order.orders[dishId].preference;
+              if(amount > 0){
+                var dish;
+                dishes.forEach(function(d){
+                  if(d.id == dishId){
+                    dish = d;
+                  }
+                })
+            %>
+            <% if(preference && preference.length > 0){
+              var title = '';
+              preference.forEach(function(pref){
+                title += "(" + pref.property + ')';
+              });
+            %>
+            <%= dish.title%>(<%= amount%>)<%= title%>
+            <% }else{%>
+            <%= dish.title%>(<%= amount%>)
+            <% }%>
+            <%}});%>
+          </td>
+          <td><%= order.customerPhone%></td>
+          <td><%= order.contactInfo.address%></td>
+          <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
+          <td><%= order.pickupInfo.comment || ''%></td>
+        </tr>
       </tbody>
+      <%}})%>
     </table>
     <%} pickups.forEach(function(pickup, index){if(pickup.method == "pickup"){%>
     <p>

@@ -910,13 +910,14 @@ module.exports = {
 
   report : function(req, res){
     var mealId = req.param("id");
+    var status = req.query.status || 'preparing';
     Meal.findOne(mealId).populate("chef").populate("dishes").exec(function(err, meal){
       if(err || !meal){
         return done();
       }
       meal.hostEmail = meal.chef.email;
 
-      Order.find({ meal : mealId, status : "preparing" }).exec(function(err, orders){
+      Order.find({ meal : mealId, status : status }).exec(function(err, orders){
         if(err){
           return done();
         }

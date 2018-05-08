@@ -11,7 +11,9 @@
     meal.pickups.forEach(function(pickup){ %>
 
     <% if(pickup.method === "delivery"){ if(!pickup.isDateCustomized){ %>
-      <p><%= __('delivery-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%></p>
+      <p><%= __('delivery-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%>
+        <button class="btn btn-info copyBtn" data-index="<%= pickup.index%>" data-title="<%= __('delivery-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%>"><%= __('copy')%></button>
+      </p>
     <%}else{
       return
     }%>
@@ -24,13 +26,14 @@
         <td><%= __('contact')%></td>
         <td><%= __('delivery-location')%></td>
         <td><%= __('amount-owe')%></td>
+        <td><%= __('comment')%></td>
       </tr>
       </thead>
       <tbody>
       <% meal.orders.forEach(function(order){
-        if(order.method === 'delivery'){
+        if(order.pickupOption === pickup.index){
           if(!pickup.isDateCustomized && !order.isPartyMode){ %>
-      <tr>
+      <tr data-option="<%= order.pickupOption%>">
         <td><%= order.customerName %></td>
         <td><%= order.id%></td>
         <td>
@@ -60,6 +63,7 @@
         <td><%= order.customerPhone%></td>
         <td><%= order.contactInfo.address%></td>
         <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
+        <td><%= order.pickupInfo.comment || ''%></td>
       </tr>
       <%}else{%>
 
@@ -71,6 +75,7 @@
     <p>
       <%= __('pickup-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/>
       <%= __('pickup-location')%>: <%= pickup.location%>
+      <button class="btn btn-info copyBtn" data-index="<%= pickup.index%>" data-title="<%= __('pickup-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/><%= __('pickup-location')%>: <%= pickup.location%>"><%= __('copy')%></button>
     </p>
     <table class="table table-bordered">
       <thead>
@@ -84,8 +89,9 @@
       </tr>
       </thead>
       <tbody>
-      <% meal.orders.forEach(function(order){if(order.pickupOption-1 == index){%>
-      <tr>
+      <% meal.orders.forEach(function(order){
+          if(order.pickupOption === pickup.index){%>
+      <tr data-option="<%= order.pickupOption%>">
         <td><%= order.customerName%></td>
         <td><%= order.id%></td>
         <td>
@@ -114,6 +120,7 @@
         <td><%= order.customerPhone%></td>
         <td>N/A</td>
         <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
+        <td><%= order.pickupInfo.comment || ''%></td>
       </tr>
       <%}})%>
       </tbody>
@@ -132,3 +139,45 @@
     </div>
   </div>
 </div>
+
+<script>
+  $(".copyBtn").click(function(){
+      var indexes = ["0","A","B","C","D","E","F","G","H","I","J","K","L","M","N"];
+      var pickupIndex = $(this).data("index");
+      var pickupTitle = $(this).data("title");
+      var pickupInfos = $("[data-option='" + pickupIndex + "']");
+      var text = pickupTitle;
+      var pickupIndexTitle = indexes[pickupIndex];
+      pickupInfos.each(function(index){
+          var infoRows = $(this).find("td");
+          if(infoRows.length){
+            var phone = infoRows[3].innerText.replace(/\D/g, "");
+            var content = "送餐序号:" + pickupIndexTitle + index + "; " + infoRows[0].innerText + " : " + infoRows[2].innerText + " ; " + infoRows[4].innerText + " ; （" + phone + "） ; 应收: " + infoRows[5].innerText;
+            text += "\n\n" + content + "\n";
+          }
+      });
+      copyToClipboard(text);
+  })
+
+  function copyToClipboard(text) {
+    if (window.clipboardData && window.clipboardData.setData) {
+      // IE specific code path to prevent textarea being shown while dialog is visible.
+      return clipboardData.setData("Text", text);
+
+    } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+      var textarea = document.createElement("textarea");
+      textarea.textContent = text;
+      textarea.style.position = "fixed";  // Prevent scrolling to bottom of page in MS Edge.
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        return document.execCommand("copy");  // Security exception may be thrown by some browsers.
+      } catch (ex) {
+        console.warn("Copy to clipboard failed.", ex);
+        return false;
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    }
+  }
+</script>

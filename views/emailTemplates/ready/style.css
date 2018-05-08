@@ -9472,6 +9472,28 @@ fieldset[disabled] .btn-red.active {
 .meal .fav:hover {
   color: #d60e0e !important;
 }
+.meal:hover .photo {
+  opacity: 0.3;
+}
+.meal:hover .hoverLayer {
+  opacity: 1;
+}
+.hoverLayer {
+  transition: .5s ease;
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  text-align: center;
+}
+.hoverLayer .text {
+  background-color: #63b446;
+  color: white;
+  font-size: 16px;
+  padding: 16px 32px;
+}
 .chef-cell {
   padding: 15px 0px 5px 0px;
   background-color: #eeeeee !important;
