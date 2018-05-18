@@ -252,7 +252,8 @@ describe('OrderController', function() {
             },
             paymentInfo : {
               method : 'online'
-            }
+            },
+            tip : 10
           })
           .expect(200)
           .end(function(err,res){
@@ -260,7 +261,7 @@ describe('OrderController', function() {
               return done(err);
             }
             // var tax = Math.round((price1 + price2 * 2 + (price4*2+2))*0.085*100);
-            var chargesTotal = Math.round(((price1 + price2 * 2 + (price4*2 + 2)) + SERVICE_FEE) * 100);
+            var chargesTotal = Math.round(((price1 + price2 * 2 + (price4*2 + 2)) + SERVICE_FEE + 10) * 100);
             userPoints += Math.floor(chargesTotal / 100);
             // res.body.tax.should.be.equal(tax);
             res.body.customerName.should.be.equal('sheng');
@@ -270,6 +271,7 @@ describe('OrderController', function() {
             res.body.charges[Object.keys(res.body.charges)[0]].should.be.equal(chargesTotal);
             dish1LeftQty = dish1LeftQty - 1;
             res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
+            parseFloat(res.body.tip).should.be.equal(10);
             orderId = res.body.id;
             done();
           })
@@ -764,6 +766,24 @@ describe('OrderController', function() {
         })
     });
 
+    it('should update host legal_entity', function(done){
+      var legalObj = {
+        personal_id_number : "123456789"
+      };
+      agent
+        .put('/host/' + hostId)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .field('legal_entity',JSON.stringify(legalObj))
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    });
+
     it('should not update any thing on meal with orders', function(done){
       var now = new Date();
       agent
@@ -1199,6 +1219,7 @@ describe('OrderController', function() {
       })
 
       var orderId;
+      var hostId;
       it('should order the meal with delivery with pickup option invalid error', function (done) {
         var dishObj = {};
         dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
@@ -1230,6 +1251,40 @@ describe('OrderController', function() {
           .expect(302)
           .expect('Location','/auth/done')
           .end(done)
+      });
+
+      it('should get host id', function (done) {
+        agent
+          .get('/host/me')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err,res){
+            if(err){
+              return done(err);
+            }
+            res.body.should.have.property('host');
+            hostId = res.body.host.id;
+            done();
+          })
+      });
+
+      it('should update host legal_entity', function(done){
+        var legalObj = {
+          personal_id_number : "123456789"
+        };
+        agent
+          .put('/host/' + hostId)
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .field('legal_entity',JSON.stringify(legalObj))
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            done();
+          })
       });
 
       it('should update the meal with support delivery', function(done){
@@ -2411,6 +2466,42 @@ describe('OrderController', function() {
         .end(done)
     });
 
+    var hostId;
+
+    it('should get host id', function (done) {
+      agent
+        .get('/host/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('host');
+          hostId = res.body.host.id;
+          done();
+        })
+    });
+
+    it('should update host legal_entity', function(done){
+      var legalObj = {
+        personal_id_number : "123456789"
+      };
+      agent
+        .put('/host/' + hostId)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .field('legal_entity',JSON.stringify(legalObj))
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    });
+
     it('should be able to update dish left qty on active meal', function(done){
       var totalQty = {};
       totalQty[dishId1] = 20;
@@ -2752,6 +2843,42 @@ describe('OrderController', function() {
         .expect(302)
         .expect("Location","/auth/done")
         .end(done)
+    });
+
+    var hostId;
+
+    it('should get host id', function (done) {
+      agent
+        .get('/host/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('host');
+          hostId = res.body.host.id;
+          done();
+        })
+    });
+
+    it('should update host legal_entity', function(done){
+      var legalObj = {
+        personal_id_number : "123456789"
+      };
+      agent
+        .put('/host/' + hostId)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .field('legal_entity',JSON.stringify(legalObj))
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
     });
 
     it('should update the meals provideTillTime to 3 minute later and see meal schedule end job', function(done){

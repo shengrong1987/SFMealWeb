@@ -154,6 +154,7 @@ module.exports = {
         if(err){
           return cb(err);
         }
+        sails.log.info("phone valid: " + !!host.phone + "& address valid: " + !!host.full_address + "&dishes valid: " + !!host.dishes.length + "&bank valid: " + !!host.bankId + "&verification valid: " + valid);
         if(host.phone && host.full_address && host.dishes.length > 0 && host.bankId && valid){
           host.passGuide = true;
         }else{

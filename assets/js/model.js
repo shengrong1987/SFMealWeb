@@ -3457,80 +3457,39 @@ var OrderView = Backbone.View.extend({
             var code = Object.keys(couponValue)[0];
           }
 
-          $this.model.clear();
-          $this.model.set({
-            orders: currentOrder,
-            subtotal: subtotal,
-            contactInfo: contactInfo,
-            paymentInfo : paymentInfo,
-            customInfo : customInfo,
-            pickupOption: pickupOption,
-            method: method,
-            mealId: mealId,
-            couponCode: code,
-            points: points,
-            isLogin : isLogin,
-            isPartyMode : partyMode
-          });
-
-          button.button('loading');
-          $this.model.save({}, {
-            success: function (model, result) {
-              button.button('reset');
-              if(paymentInfo.method === "alipay" || paymentInfo.method === "wechatpay"){
-                var source = result.source;
-                var redirectUrl = source.redirect.url;
-                var orderId = source.metadata.orderId;
-                var mealId = source.metadata.mealId;
-                BootstrapDialog.show({
-                  title: jQuery.i18n.prop('pendingPaymentTitle'),
-                  message : jQuery.i18n.prop('pendingPaymentContent'),
-                  buttons: [
-                    {
-                      label: jQuery.i18n.prop('confirmPayment'),
-                      action: function(dialog) {
-                        $.get(
-                          '/order/' + orderId + '/verifyOrder'
-                        ).done(function(){
-                          $this.clear();
-                          if(isLogin){
-                            reloadUrl("/user/me", "#myorder");
-                          }else{
-                            location.href = "/order/" + result.id + '/receipt';
-                          }
-                        }).fail(function(err){
-                          dialog.setMessage(err.responseJSON.responseText);
-                          dialog.setType(BootstrapDialog.TYPE_DANGER);
-                        })
-                      }
-                    },
-                    {
-                      label: jQuery.i18n.prop('cancelPayment'),
-                      action: function(dialog) {
-                        dialog.close();
-                      }
-                    }
-                  ]
-                });
-                location.href = redirectUrl;
-              }else{
-                $this.clear();
-                BootstrapDialog.alert(jQuery.i18n.prop('newOrderTakenSuccessfully',result.id), function () {
-                  if(isLogin){
-                    reloadUrl("/user/me", "#myorder");
-                  }else{
-                    location.href = "/order/" + result.id + '/receipt';
-                  }
-                });
+          BootstrapDialog.show({
+            title : jQuery.i18n.prop("tipTitle"),
+            message : "<h4>" + jQuery.i18n.prop('selectTip') + "</h4>" + "<form id='customTip' class='hide'><div class='input-group'><div class='input-group-addon'><span class='input-group-text'>$</span></div> <input name='tip' type='number' class='form-control' require></div></div>" +
+            "<button class='form-control btn btn-info' type='submit'>Confirm</button></form>",
+            buttons : [{
+                label : "15%",
+                title : subtotal * 0.15,
+                cssClass: 'btn-primary',
+                action : function(dialog){
+                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, method, mealId, code, points, isLogin, partyMode, subtotal * 0.15, $this, button);
+                }
+              }, {
+                label : jQuery.i18n.prop('customTip'),
+                title : jQuery.i18n.prop('customTip'),
+                cssClass: 'btn-primary',
+                action : function(dialog){
+                  $("#customTip").removeClass("hide").show();
+                  $("#customTip").submit(function(e){
+                    e.preventDefault();
+                    var tip = $(e.currentTarget).find("[name='tip']").val();
+                    $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, method, mealId, code, points, isLogin, partyMode, tip, $this, button);
+                  });
+                }
+              }, {
+                label : jQuery.i18n.prop('noTip'),
+                title : jQuery.i18n.prop('noTip'),
+                cssClass: 'btn-default',
+                action : function(dialog){
+                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, method, mealId, code, points, isLogin, partyMode, 0, $this, button);
+                }
               }
-            }, error: function (model, err) {
-              button.button('reset');
-              BootstrapDialog.show({
-                title: jQuery.i18n.prop('error'),
-                message: err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText
-              });
-            }
-          })
+            ]
+          });
         });
       });
     });
@@ -3595,6 +3554,84 @@ var OrderView = Backbone.View.extend({
         location.href = source.redirect.url;
       },error : function(model, err){
         BootstrapDialog.alert(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+      }
+    })
+  },
+  submitOrder : function(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, method, mealId, code, points, isLogin, partyMode, tip, $this, button){
+    console.log("order include tips: " + tip);
+    $this.model.clear();
+    $this.model.set({
+      orders: currentOrder,
+      subtotal: subtotal,
+      contactInfo: contactInfo,
+      paymentInfo : paymentInfo,
+      customInfo : customInfo,
+      pickupOption: pickupOption,
+      method: method,
+      mealId: mealId,
+      couponCode: code,
+      points: points,
+      isLogin : isLogin,
+      isPartyMode : partyMode,
+      tip : tip
+    });
+
+    button.button('loading');
+    $this.model.save({}, {
+      success: function (model, result) {
+        button.button('reset');
+        if(paymentInfo.method === "alipay" || paymentInfo.method === "wechatpay"){
+          var source = result.source;
+          var redirectUrl = source.redirect.url;
+          var orderId = source.metadata.orderId;
+          var mealId = source.metadata.mealId;
+          BootstrapDialog.show({
+            title: jQuery.i18n.prop('pendingPaymentTitle'),
+            message : jQuery.i18n.prop('pendingPaymentContent'),
+            buttons: [
+              {
+                label: jQuery.i18n.prop('confirmPayment'),
+                action: function(dialog) {
+                  $.get(
+                    '/order/' + orderId + '/verifyOrder'
+                  ).done(function(){
+                    $this.clear();
+                    if(isLogin){
+                      reloadUrl("/user/me", "#myorder");
+                    }else{
+                      location.href = "/order/" + result.id + '/receipt';
+                    }
+                  }).fail(function(err){
+                    dialog.setMessage(err.responseJSON.responseText);
+                    dialog.setType(BootstrapDialog.TYPE_DANGER);
+                  })
+                }
+              },
+              {
+                label: jQuery.i18n.prop('cancelPayment'),
+                action: function(dialog) {
+                  dialog.close();
+                }
+              }
+            ]
+          });
+          location.href = redirectUrl;
+        }else{
+          $this.clear();
+          BootstrapDialog.alert(jQuery.i18n.prop('newOrderTakenSuccessfully',result.id), function () {
+            if(isLogin){
+              reloadUrl("/user/me", "#myorder");
+            }else{
+              location.href = "/order/" + result.id + '/receipt';
+            }
+          });
+        }
+      }, error: function (model, err) {
+        button.button('reset');
+        BootstrapDialog.show({
+          title: jQuery.i18n.prop('error'),
+          message: err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText
+        });
       }
     })
   }

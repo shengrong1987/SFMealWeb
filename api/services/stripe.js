@@ -381,12 +381,14 @@ module.exports = {
     var delivery_fee = attr.deliveryFee || 0;
     var discount = parseInt(attr.discount) || 0;
     var tax = attr.tax;
+    var tip = attr.tip * 100;
 
     sails.log.info("delivery application fee is: " + delivery_application_fee);
     sails.log.info("delivery fee is: " + delivery_fee);
     sails.log.info("discount is: " + discount);
     sails.log.info("subtotal is: " + attr.amount);
     sails.log.info("tax is: " + tax);
+    sails.log.info("tip is: " + tip);
 
     //calculate application fee
     var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee;
@@ -394,7 +396,7 @@ module.exports = {
     sails.log.info("application fee is: " + application_fee);
 
     //calculate subtotal after tax
-    var subtotalAfterTax = attr.amount + tax;
+    var subtotalAfterTax = attr.amount + tax + tip;
 
     //calculate other fee
     var originalTotal = subtotalAfterTax + delivery_fee + serviceFee;
@@ -405,6 +407,7 @@ module.exports = {
     attr.metadata.total = originalTotal - discount;
     attr.metadata.application_fee = application_fee;
     attr.metadata.total = attr.metadata.total < 0 ? 0 : attr.metadata.total;
+    attr.metadata.tip = attr.tip;
 
     sails.log.info("charge total: " + attr.metadata.total);
   },

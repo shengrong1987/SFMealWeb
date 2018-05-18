@@ -288,24 +288,24 @@ describe('Host register', function() {
             new Date(res.body.birthday).should.which.is.a.Date();
             done();
           })
+    });
 
-      it('should get the updated managed account', function(done){
-        agent
-          .get("/apply")
-          .set('Accept', 'application/json')
-          .expect('Content-Type', /json/)
-          .expect(200)
-          .end(function(err, res){
-            if(err){
-              return done(err);
-            }
-            res.body.should.have.property('verification');
-            should('legal_entity.first_name').be.equalOneOf(res.body.verification);
-            should('legal_entity.last_name').be.equalOneOf(res.body.verification);
-            should('legal_entity.dob.month').be.equalOneOf(res.body.verification);
-            done();
-          });
-      });
+    it('should get the updated managed account', function(done){
+      agent
+        .get("/apply")
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('verification');
+          should('legal_entity.address.postal_code').be.equalOneOf(res.body.verification.fields_needed);
+          should('legal_entity.ssn_last_4').be.equalOneOf(res.body.verification.fields_needed);
+          should('legal_entity.address.city').be.equalOneOf(res.body.verification.fields_needed);
+          done();
+        });
     });
   });
     //need manual test for facebook and google login

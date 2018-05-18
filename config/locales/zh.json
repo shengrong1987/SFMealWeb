@@ -863,5 +863,7 @@
   "copy" : "复制",
   "click-to-copy" : "点击复制",
   "copied" : "已复制!",
-  "driver-phone" : "司机电话"
+  "driver-phone" : "司机电话",
+  "view-receipt" : "查看收据",
+  "tip" : "小费"
 }

@@ -176,6 +176,8 @@ module.exports = {
             req.body.phone = m.chef.phone;
             req.body.tax = $this.getTax(req.body.subtotal, m.chef.county, m.isTaxIncluded);
             req.body.serviceFee = m.serviceFee;
+            req.body.tip = req.body.tip|| 0;
+            req.body.tip = req.body.tip.toFixed(2);
             states.m = m;
 
             async.auto({
@@ -286,6 +288,7 @@ module.exports = {
                     type : order.paymentMethod,
                     isInitial : true,
                     amount : req.body.subtotal * 100,
+                    tip : req.body.tip,
                     deliveryFee : parseInt(req.body.delivery_fee * 100),
                     discount : req.body.discount * 100,
                     email : process.env.ADMIN_EMAIL,
@@ -329,6 +332,7 @@ module.exports = {
                     paymentMethod : order.paymentMethod,
                     isInitial : true,
                     amount : req.body.subtotal * 100,
+                    tip : req.body.tip,
                     deliveryFee : parseInt(req.body.delivery_fee * 100),
                     discount : req.body.discount * 100,
                     email : email,
@@ -485,6 +489,7 @@ module.exports = {
     var params = req.body;
     var subtotal = parseFloat(params.subtotal);
     var delivery_fee = parseFloat(params.delivery_fee);
+    var tip = (params.tip || 0).toFixed(2);
     var $this = this;
     Order.findOne(orderId).populate("meal").populate("dishes").populate("host").populate("customer").populate('coupon').exec(function(err,order){
       if(err){
@@ -540,6 +545,7 @@ module.exports = {
                     destination : order.host.accountId,
                     meal : order.meal,
                     tax : tax,
+                    tip : tip,
                     isPartyMode : order.isPartyMode,
                     metadata : {
                       mealId : order.meal.id,
@@ -844,6 +850,7 @@ module.exports = {
     var email = req.session.user.auth.email;
     var orderId = req.params.id;
     var params = req.body;
+    var tip = (req.body.tip || 0).toFixed(2);
     var $this = this;
     Order.findOne(orderId).populate("meal").populate("host").populate("customer").exec(function(err,order){
       if(err){
@@ -882,6 +889,7 @@ module.exports = {
                 destination : order.host.accountId,
                 meal : order.meal,
                 tax : tax,
+                tip : tip,
                 isPartyMode : order.isPartyMode,
                 metadata : {
                   mealId : order.meal.id,

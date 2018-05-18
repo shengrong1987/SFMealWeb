@@ -172,6 +172,75 @@ describe('AdminController', function() {
         })
     })
 
+    it('should log out user', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    });
+
+    var hostId;
+    var hostEmail = "aimbebe.r@gmail.com";
+
+    it('should login an account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : hostEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should get host id', function (done) {
+      agent
+        .get('/host/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('host');
+          hostId = res.body.host.id;
+          done();
+        })
+    });
+
+    it('should update host legal_entity', function(done){
+      var legalObj = {
+        personal_id_number : "123456789"
+      };
+      agent
+        .put('/host/' + hostId)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .field('legal_entity',JSON.stringify(legalObj))
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    });
+
+    it('should log out user', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    });
+
+    it('should login admin account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : admin, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
     it('should be able to turn a meal on', function (done) {
       agent
         .get(encodeURI('/meal/' + mealId + '/on'))

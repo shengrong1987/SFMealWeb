@@ -861,5 +861,7 @@
   "copy" : "Copy",
   "click-to-copy" : "Copy to clipboard",
   "copied" : "Copied!",
-  "driver-phone" : "Driver's phone"
+  "driver-phone" : "Driver's phone",
+  "view-receipt" : "View Receipt",
+  "tip" : "Tips"
 }

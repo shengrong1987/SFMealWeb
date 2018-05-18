@@ -74,11 +74,13 @@
                   <div class="hoverLayer">
                     <div class="text">
                       <% meal.dishes.forEach(function(_d, index){%>
-                        <% if(index >= 5){%>
+                        <% if(index === 4){%>
                         <p>...</p>
-                        <% return;}%>
+                        <% }else if(index > 4){%>
+
+                        <% }else{ %>
                         <p><%= _d.title %></p>
-                      <% });%>
+                        <% }});%>
                     </div>
                   </div>
                 </div>

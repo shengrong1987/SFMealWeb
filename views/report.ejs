@@ -86,6 +86,8 @@
         <td><%= __('contact')%></td>
         <td><%= __('delivery-location')%></td>
         <td><%= __('amount-owe')%></td>
+        <td><%= __('tip')%></td>
+        <td><%= __('comment')%></td>
       </tr>
       </thead>
       <tbody>
@@ -120,6 +122,7 @@
         <td><%= order.customerPhone%></td>
         <td>N/A</td>
         <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
+        <td><%= "$" + order.tip%></td>
         <td><%= order.pickupInfo.comment || ''%></td>
       </tr>
       <%}})%>
@@ -152,7 +155,7 @@
           var infoRows = $(this).find("td");
           if(infoRows.length){
             var phone = infoRows[3].innerText.replace(/\D/g, "");
-            var content = "送餐序号:" + pickupIndexTitle + index + "; " + infoRows[0].innerText + " : " + infoRows[2].innerText + " ; " + infoRows[4].innerText + " ; （" + phone + "） ; 应收: " + infoRows[5].innerText;
+            var content = "送餐序号:" + pickupIndexTitle + index + "; " + infoRows[0].innerText + " : " + infoRows[2].innerText + "(" + infoRows[6].innerText + ") ; " + infoRows[4].innerText + " ; （" + phone + "） ; 应收: " + infoRows[5].innerText;
             text += "\n\n" + content + "\n";
           }
       });

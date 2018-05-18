@@ -166,6 +166,7 @@
                           <%}else if(order.status == "complete"){%>
                           <a href="/host/<%= order.host.id%>"><%= __('see-review')%></a>
                           <%}%>
+                          <br/><a href="/order/<%= order.id%>/receipt" target="__blank"><%= __('view-receipt')%></a>
                         </td>
                       </tr>
                       <%}%>
@@ -303,6 +304,7 @@
                           <%}else if(order.status == "complete"){%>
                           <a href="/host/<%= order.host.id%>"><%= __('see-review')%></a>
                           <%}%>
+                          <br/><a href="/order/<%= order.id%>/receipt" target="__blank"><%= __('view-receipt')%></a>
                         </td>
                       </tr>
                       <%}}})})%>

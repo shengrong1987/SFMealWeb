@@ -15,7 +15,7 @@
     </div>
   </div>
 
-  <div id="hostProfileView" data-host="<%= host.id%>" class="default-container" style="padding: 30px 20px 30px 20px;" data-title="<%= host.shopNameI18n(locale)%>" data-desc="<%= host.introI18n(locale)%>">
+  <div id="hostProfileView" data-host="<%= host.id%>" class="default-container" style="padding: 30px 20px 30px 20px;" data-title="<%= host.shopNameI18n(locale)%>" data-desc="<%= host.introI18n(locale)%>" data-user="<%= user || ''%>">
 
     <div class="row">
       <div class="col-md-5">
@@ -200,5 +200,8 @@
   var desc = $("#hostProfileView").data("desc");
   new HostPageView({ el : $("#hostProfileView"), model : new Host()})
   setupWechat($("#hostProfileView .round_thumb").prop("src"), title , title + ":" + desc);
-  console.log($("#hostProfileView .round_thumb").prop("src"), title, desc);
+  var user = $("#hostProfileView").data("user");
+  if(!user){
+    wechatLogin();
+  }
 </script>

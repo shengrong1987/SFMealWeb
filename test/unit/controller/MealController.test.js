@@ -734,8 +734,6 @@ describe('MealController', function() {
         .expect('Content-Type', /json/)
         // .field('Content-Type', 'multipart/form-data')
         .field('legal_entity',JSON.stringify(legalObj))
-        .field('hasImage',"true")
-        .attach('image','/Users/shengrong/Documents/SFMeal/SFMealWeb/assets/images/dumplings.jpg')
         .expect(200)
         .end(function(err, res){
           if(err){
@@ -745,7 +743,7 @@ describe('MealController', function() {
         })
     });
 
-    it('should update host legal_entity', function(done){
+    it('should update host personal id number', function(done){
       var legalObj = {
         personal_id_number : "123456789"
       };
@@ -761,6 +759,25 @@ describe('MealController', function() {
           }
           done();
         })
+    });
+
+    it('should update host document', function(done){
+      this.timeout(10000);
+      setTimeout(function () {
+        agent
+          .put('/host/' + hostId)
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .field('hasImage',"true")
+          .attach('image','/Users/shengrong/Documents/SFMeal/SFMealWeb/assets/images/dumplings.jpg')
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            done();
+          })
+      }, 4000);
     });
 
     it('host should be passGuide', function(done){
