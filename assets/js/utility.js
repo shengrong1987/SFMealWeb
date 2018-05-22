@@ -282,17 +282,17 @@
   }
 
   utility.formattedHour = function(date){
-    var mDate = moment(date).local();
+    var mDate = moment(new Date(date).toISOString()).local();
     return mDate.format("LT");
   }
 
   utility.formattedDate = function(date){
-    var mDate = moment(date).local();
+    var mDate = moment(new Date(date).toISOString()).local();
     return mDate.format("ddd, l, LT");
   }
 
   utility.formattedDay = function(date){
-    var mDate = moment(date).local();
+    var mDate = moment(new Date(date).toISOString()).local();
     return mDate.format("l");
   }
 

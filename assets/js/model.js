@@ -2774,6 +2774,7 @@ var MealConfirmView = Backbone.View.extend({
     "change #deliveryTab .regular-radio" : "switchAddress",
     "change #method" : "switchMethod",
     "click #createNewContactBtn" : "createNewContact",
+    "click #addCommentBtn" : "toggleCommentView",
     "keydown" : "onKeyDown",
     "click #verifyAddressBtn" : "verifyAddress",
     "change #payment-cards" : "switchPaymentMethod",
@@ -2785,6 +2786,7 @@ var MealConfirmView = Backbone.View.extend({
     this.alertView.hide();
     this.isCoolDown = true;
     utility.initGoogleMapService();
+    this.$el.find("#commentView").removeClass('hide').hide();
   },
   enterBillingAddress : function(e){
     var isChecked = $(e.currentTarget).prop("checked");
@@ -2906,6 +2908,10 @@ var MealConfirmView = Backbone.View.extend({
     }else{
       toggleModal(e, addressView.enterAddressInfoFromOrder);
     }
+  },
+  toggleCommentView : function(e){
+    e.preventDefault();
+    this.$el.find("#commentView").toggle();
   },
   switchMethod : function(e){
     var isLogin = !!this.$el.data("user");
@@ -3318,7 +3324,7 @@ var OrderView = Backbone.View.extend({
   },
   getCustomizedInfo : function(partyMode, cb){
     if(!partyMode){
-      return cb({});
+      return cb({ comment : this.$el.find("#commentView [name='comment']").val()});
     }
     var customerInfo = {};
     var customDate = this.$el.find(".customDeliveryDate").data("DateTimePicker");
@@ -3329,6 +3335,7 @@ var OrderView = Backbone.View.extend({
       makeAToast(jQuery.i18n.prop('deliveryAddressEmptyError'));
       return cb(false);
     }
+    // var comment = this.$el.find("#commentView [name='comment']").val();
     customerInfo.time = customDate;
     customerInfo.comment = "comment";
     return cb(customerInfo);

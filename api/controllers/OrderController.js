@@ -98,6 +98,7 @@ module.exports = {
       });
 
     }
+    pickUpInfo.comment = params.customInfo.comment;
     params.pickupInfo = pickUpInfo;
     if(!pickUpInfo){
       sails.log.debug("pickup info not exist, check meal setting");
@@ -1238,6 +1239,7 @@ module.exports = {
       }
       notification.transitLocaleTimeZone(order);
       order.download = false;
+      order.tip = order.tip || 0;
       res.view('receipt', order);
     })
   },

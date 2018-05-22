@@ -144,7 +144,10 @@ module.exports = {
       }
       return util.getTaxRate(this.host.county);
     },
-
+    tip :{
+      type : 'float',
+      defaultsTo : 0
+    },
     discountAmount : {
       type : 'float',
       defaultsTo : 0

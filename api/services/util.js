@@ -16,14 +16,14 @@ module.exports = {
     return mMidnight._i;
   },
   formattedHour : function(date){
-    var mDate = moment(date);
+    var mDate = moment(new Date(date).toISOString());
     return mDate.local().format("LT");
   },
   hourOfDay : function(m){
     return m.hours();
   },
   getTimeOfDay : function(date){
-    var h = this.hourOfDay(moment(date));
+    var h = this.hourOfDay(moment(new Date(date).toISOString()));
     if(h < 12){
       return "am";
     }else{
@@ -102,15 +102,15 @@ module.exports = {
     return month;
   },
   oneHourBefore : function(date){
-    var mDate = moment(date).subtract(1, 'hour');
+    var mDate = moment(new Date(date).toISOString()).subtract(1, 'hour');
     return mDate.local()._d;
   },
   oneDayBefore : function(date){
-    var mDate = moment(date).subtract(1, 'day');
+    var mDate = moment(new Date(date).toISOString()).subtract(1, 'day');
     return mDate.local()._d;
   },
   minutesBefore : function(date, minutes){
-    var mDate = moment(date).subtract(minutes, 'minute');
+    var mDate = moment(new Date(date).toISOString()).subtract(minutes, 'minute');
     return mDate.local()._d;
   },
   getTaxRate : function(county){
