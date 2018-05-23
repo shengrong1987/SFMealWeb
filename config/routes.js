@@ -93,6 +93,7 @@ module.exports.routes = {
   '/order/:id/verifyOrder' : 'OrderController.verifyOrder',
   '/order/:id/update' : 'OrderController.update',
   '/order/:id/updatePickupInfo' : 'OrderController.updatePickupInfo',
+  '/order/week/:numberOfWeek' : 'OrderController.findOrdersOfWeek',
   '/job/:name/run' : 'JobController.run',
   '/job/:id/delete' : 'JobController.deleteJob',
   '/job/clean' : 'JobController.cleanJobs',

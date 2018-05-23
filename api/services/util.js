@@ -52,6 +52,10 @@ module.exports = {
     var mDate = moment(new Date(date).toISOString());
     return mDate.local().format('ddd');
   },
+  getWeekOfYear : function(date){
+    var mDate = moment(new Date(date).toISOString());
+    return mDate.local().isoWeek();
+  },
   getDaysAfterDate : function(date, day){
     var mDate = date.add(day, 'days');
     return mDate.local().date();

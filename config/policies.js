@@ -123,7 +123,8 @@ module.exports.policies = {
     'process' : true,
     'verifyOrder' : true,
     'adjustAdmin' : 'isAdmin',
-    'updatePickupInfo' : 'isAdmin'
+    'updatePickupInfo' : 'isAdmin',
+    'findOrdersOfWeek' : true
   },
 
   DishController : {

@@ -2155,7 +2155,98 @@ module.exports = {
         });
       })
     });
+  },
 
+  findOrdersOfWeek : function(req, res){
+    var weekWanted = req.params['numberOfWeek'];
+    Order.find({ status : { '!' : ['cancel','pending-payment']}}).exec(function(err, orders){
+      if(err){
+        return res.badRequest(err);
+      }
+      orders = orders.filter(function(order){
+        var numberOfWeek = util.getWeekOfYear(order.pickupInfo.pickupFromTime);
+        sails.log.info("number of week:" + numberOfWeek);
+        return numberOfWeek === parseInt(weekWanted);
+      });
+      orders.forEach(function(order){
+        order.startTime = moment(order.pickupInfo.pickupFromTime).local().format('ddd, L, LT');
+        order.endTime = moment(order.pickupInfo.pickupTillTime).local().format('ddd, L, LT');
+        order.createdAt = moment(order.createdAt).local().format('ddd, L , LT');
+        order.updatedAt = moment(order.updatedAt).local().format('ddd, L, LT');
+      });
+      async.each(orders, function(order, cb){
+        async.auto({
+          findMeal : function(next){
+             if(!order.meal){
+               return next();
+             }
+             Meal.findOne(order.meal).populate('dishes').populate('dynamicDishes').exec(function(err, meal){
+               if(err){
+                 return next(err);
+               }
+               order.mealTitle = meal.title;
+               Object.keys(order.orders).forEach(function(dishId){
+                 var dish = meal.dishes.filter(function(d){
+                   return d.id === dishId;
+                 })[0];
+                 if(!dish){
+                   return;
+                 }
+                 var dishTitle = dish.title;
+                 order[dishTitle] = order.orders[dishId].number;
+                 order[dishTitle + "备注"] = order.orders[dishId].preference.property;
+               });
+               next();
+             })
+          },
+          findHost : function(next){
+            if(!order.host){
+              return next();
+            }
+            Host.findOne(order.host).exec(function (err, host) {
+              if(err){
+                return next(err);
+              }
+              order.shopName = host.shopName;
+              next();
+            })
+          }
+        }, function(err){
+          if(err){
+            return cb(err);
+          }
+          order.deliveryCenter = order.pickupInfo.deliveryCenter;
+          order.charge = order.charges[Object.keys(order.charges)[0]];
+          order.application_fee = order.application_fees[Object.keys(order.application_fees)[0]];
+          order.pickupPhone = order.phone;
+          order.deliveryAddres = order.address;
+          delete order.customer;
+          delete order.meal;
+          delete order.host;
+          delete order.orders;
+          delete order.contactInfo;
+          delete order.pickupInfo;
+          delete order.eta;
+          delete order.isScheduled;
+          delete order.isSendToHost;
+          delete order.leftQty;
+          delete order.paymentInfo;
+          delete order.application_fees;
+          delete order.phone;
+          delete order.msg;
+          delete order.mealId;
+          delete order.pickupOption;
+          delete order.address;
+          delete order.charges;
+          cb();
+        });
+      },function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(orders);
+      });
+    });
   }
 };
 
