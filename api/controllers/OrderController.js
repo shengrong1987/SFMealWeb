@@ -2159,7 +2159,8 @@ module.exports = {
 
   findOrdersOfWeek : function(req, res){
     var weekWanted = req.params['numberOfWeek'];
-    Order.find({ status : { '!' : ['cancel','pending-payment']}}).exec(function(err, orders){
+    var status = req.query.status || { '!' : ['cancel','pending-payment']};
+    Order.find({ status : status }).exec(function(err, orders){
       if(err){
         return res.badRequest(err);
       }
@@ -2243,6 +2244,10 @@ module.exports = {
       },function(err){
         if(err){
           return res.badRequest(err);
+        }
+        var wantsReport = req.query.report;
+        if(wantsReport){
+          return res.view('weeklyReport', orders);
         }
         res.ok(orders);
       });
