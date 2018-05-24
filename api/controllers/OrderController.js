@@ -177,7 +177,7 @@ module.exports = {
             req.body.phone = m.chef.phone;
             req.body.tax = $this.getTax(req.body.subtotal, m.chef.county, m.isTaxIncluded);
             req.body.serviceFee = m.serviceFee;
-            req.body.tip = req.body.tip|| 0;
+            req.body.tip = parseFloat(req.body.tip)|| 0;
             req.body.tip = req.body.tip.toFixed(2);
             states.m = m;
 
@@ -2159,22 +2159,26 @@ module.exports = {
 
   findOrdersOfWeek : function(req, res){
     var weekWanted = req.params['numberOfWeek'];
+    var yearWanted = req.query.year;
     var status = req.query.status || { '!' : ['cancel','pending-payment']};
-    Order.find({ status : status }).exec(function(err, orders){
+    Order.find({ status : status }).populate('dishes').exec(function(err, orders){
       if(err){
         return res.badRequest(err);
       }
       orders = orders.filter(function(order){
         var numberOfWeek = util.getWeekOfYear(order.pickupInfo.pickupFromTime);
-        sails.log.info("number of week:" + numberOfWeek);
-        return numberOfWeek === parseInt(weekWanted);
+        var year = new Date(order.pickupInfo.pickupFromTime).getFullYear();
+        sails.log.info("number of week:" + numberOfWeek, "& year: " + year);
+        var isYearMatch = yearWanted ? (parseInt(yearWanted) === year) : true;
+        return numberOfWeek === parseInt(weekWanted) && isYearMatch;
       });
+      var dishIds = [];
       orders.forEach(function(order){
-        order.startTime = moment(order.pickupInfo.pickupFromTime).local().format('ddd, L, LT');
-        order.endTime = moment(order.pickupInfo.pickupTillTime).local().format('ddd, L, LT');
-        order.createdAt = moment(order.createdAt).local().format('ddd, L , LT');
-        order.updatedAt = moment(order.updatedAt).local().format('ddd, L, LT');
-      });
+        dishIds = dishIds.concat(Object.keys(order.orders));
+        dishIds = dishIds.filter(function(item, pos){
+          return dishIds.indexOf(item) === pos;
+        });
+      })
       async.each(orders, function(order, cb){
         async.auto({
           findMeal : function(next){
@@ -2185,19 +2189,28 @@ module.exports = {
                if(err){
                  return next(err);
                }
+               if(!meal){
+                 return next();
+               }
                order.mealTitle = meal.title;
-               Object.keys(order.orders).forEach(function(dishId){
-                 var dish = meal.dishes.filter(function(d){
-                   return d.id === dishId;
-                 })[0];
-                 if(!dish){
-                   return;
+               async.each(dishIds, function(dishId, next2){
+                 Dish.findOne(dishId).exec(function(err, d){
+                   if(err){
+                     return next2(err);
+                   }
+                   if(order.orders.hasOwnProperty(dishId)){
+                     order[d.title] = order.orders[dishId].number;
+                   }else{
+                     order[d.title] = 0;
+                   }
+                   next2();
+                 });
+               }, function(err){
+                 if(err){
+                   return next(err);
                  }
-                 var dishTitle = dish.title;
-                 order[dishTitle] = order.orders[dishId].number;
-                 order[dishTitle + "备注"] = order.orders[dishId].preference.property;
-               });
-               next();
+                 next();
+               })
              })
           },
           findHost : function(next){
@@ -2216,29 +2229,43 @@ module.exports = {
           if(err){
             return cb(err);
           }
-          order.deliveryCenter = order.pickupInfo.deliveryCenter;
-          order.charge = order.charges[Object.keys(order.charges)[0]];
-          order.application_fee = order.application_fees[Object.keys(order.application_fees)[0]];
-          order.pickupPhone = order.phone;
-          order.deliveryAddres = order.address;
-          delete order.customer;
-          delete order.meal;
-          delete order.host;
-          delete order.orders;
-          delete order.contactInfo;
-          delete order.pickupInfo;
-          delete order.eta;
-          delete order.isScheduled;
-          delete order.isSendToHost;
-          delete order.leftQty;
-          delete order.paymentInfo;
-          delete order.application_fees;
-          delete order.phone;
-          delete order.msg;
-          delete order.mealId;
-          delete order.pickupOption;
-          delete order.address;
-          delete order.charges;
+          var wantsReport = req.query.report;
+          if(!wantsReport){
+            order.deliveryCenter = order.pickupInfo.deliveryCenter;
+            order.charge = order.charges[Object.keys(order.charges)[0]];
+            order.application_fee = order.application_fees[Object.keys(order.application_fees)[0]];
+            order.pickupFromTime = order.pickupInfo.pickupFromTime;
+            order.pickupTillTime = order.pickupInfo.pickupTillTime;
+            order.pickupPhone = order.contactInfo.phone;
+            order.deliveryAddress = order.contactInfo.address;
+            order.instruction = order.customInfo.comment;
+            delete order.customer;
+            delete order.meal;
+            delete order.host;
+            delete order.orders;
+            delete order.contactInfo;
+            delete order.pickupInfo;
+            delete order.eta;
+            delete order.isScheduled;
+            delete order.isSendToHost;
+            delete order.leftQty;
+            delete order.paymentInfo;
+            delete order.application_fees;
+            delete order.phone;
+            delete order.msg;
+            delete order.mealId;
+            delete order.pickupOption;
+            delete order.address;
+            delete order.charges;
+            delete order.feeCharges;
+            delete order.customInfo;
+            order.dishes = []
+            order.dynamicDishes = [];
+            delete order.dishes;
+            delete order.dynamicDishes;
+          }else{
+            notification.transitLocaleTimeZone(order);
+          }
           cb();
         });
       },function(err){
@@ -2246,10 +2273,44 @@ module.exports = {
           return res.badRequest(err);
         }
         var wantsReport = req.query.report;
-        if(wantsReport){
-          return res.view('weeklyReport', orders);
+        var csv = req.query.csv;
+        if(!wantsReport){
+          if(csv){
+            var csvStr = util.ConvertToCSV(orders);
+            res.setHeader('Content-disposition', 'attachment; filename=orders.csv');
+            res.setHeader('Content-type', 'text/plain');
+            res.charset = 'UTF-8';
+            return res.end(csvStr);
+          }else{
+            return res.ok(orders);
+          }
         }
-        res.ok(orders);
+        var pickups,dishes;
+        orders.forEach(function(order){
+          if(!order.pickupInfo){
+            return;
+          }
+          if(!pickups){
+            pickups = [order.pickupInfo];
+            dishes = order.dishes;
+          }
+          var isOldPickupOption = pickups.some(function(pickupInfo){
+            return (pickupInfo.pickupFromTime === order.pickupInfo.pickupFromTime || pickupInfo.pickupTillTime === order.pickupInfo.pickupTillTime)
+              &&  pickupInfo.location === order.pickupInfo.location && pickupInfo.method === order.pickupInfo.method;
+          })
+          order.dishes.forEach(function(dish){
+            var hasDish = dishes.some(function(oldDish){
+              return oldDish.id === dish.id;
+            })
+            if(!hasDish){
+              dishes.push(dish);
+            }
+          })
+          if(!isOldPickupOption){
+            pickups.push(order.pickupInfo);
+          }
+        })
+        res.view('report', { meal : { orders : orders, pickups : pickups, dishes : dishes }});
       });
     });
   }

@@ -1,26 +1,31 @@
 <div class="green" style="padding: 25px;margin-top: -20px;">
   <div class="box-email white relative middle text-left">
 
-    <% if(meal.orders.length == 0){%>
-    <h3 class="text-green"><u><%= meal.chef ? meal.chef.shopName : __('weekly-orders')%></u> <small><%= __('guest-list-no-tips')%></small></h3>
+    <% if(orders.length == 0){%>
+    <h3 class="text-green"><u><%= __('weekly-orders')%></u> <small><%= __('guest-list-no-tips')%></small></h3>
     <%}else{%>
-    <h3 class="text-green"><u><%= meal.chef ? meal.chef.shopName : __('weekly-orders')%></u></h3>
+    <h3 class="text-green"><u><%= __('weekly-orders')%></u></h3>
     <%}%>
 
-    <% if(meal.orders.length != 0){
-    meal.pickups.forEach(function(pickup){ %>
+    <%
+      var pickups;
+      orders.forEach(function(order){
+        if(!pickups.length){
+            pickups = [order];
+        }
+        var isNewPickerOption = orders.every(function())
+      })
+    %>
 
-    <% if(pickup.method === "delivery"){ %>
-      <p><%= __('delivery-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%>
-        <button class="btn btn-info copyBtn" data-index="<%= pickup.index%>" data-title="<%= __('delivery-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%>"><%= __('copy')%></button>
-      </p>
-    <%}else{%>
-      <p>
-      <%= __('pickup-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/>
-      <%= __('pickup-location')%>: <%= pickup.location%>
-      <button class="btn btn-info copyBtn" data-index="<%= pickup.index%>" data-title="<%= __('pickup-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/><%= __('pickup-location')%>: <%= pickup.location%>"><%= __('copy')%></button>
-      </p>
-    <%}%>
+    <% if(pickers.length != 0){
+    orders.forEach(function(order){ %>
+
+    if(!order.isPartyMode){return;}
+
+    <p><%= __('delivery-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%>
+      <button class="btn btn-info copyBtn" data-index="<%= pickup.index%>" data-title="<%= __('delivery-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%>"><%= __('copy')%></button>
+    </p>
+
     <table class="table table-bordered">
       <thead>
       <tr>
@@ -35,7 +40,7 @@
       </thead>
       <tbody>
       <% meal.orders.forEach(function(order){
-        if(order.pickupInfo.pickupFromTime === pickup.pickupFromTime){
+        if(order.pickupOption === pickup.index){
           if(!pickup.isDateCustomized && !order.isPartyMode){ %>
       <tr data-option="<%= order.pickupOption%>">
         <td><%= order.customerName %></td>
@@ -74,7 +79,7 @@
       <%}}})%>
       </tbody>
     </table>
-    <%})}%>
+    <%}})%>
 
     <div class="divider"></div>
 

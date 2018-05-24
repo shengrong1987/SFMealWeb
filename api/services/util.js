@@ -134,6 +134,42 @@ module.exports = {
         break;
     }
     return tax;
+  },
+  ConvertToCSV : function(objArray) {
+    var array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
+    var str = '';
+    var line = '';
+
+    for (var index in array[0]) {
+      if (index === 'constructor'){
+        break;
+      }
+      if (line !== '') line += ';';
+
+      sails.log.info(index);
+
+      line += index;
+    }
+
+    str += line + '\r\n';
+
+    line = '';
+
+    for (var i = 0; i < array.length; i++) {
+      for (index in array[i]) {
+        if (index === 'constructor'){
+          break;
+        }
+        if (line !== '') line += ';'
+
+        line += array[i][index];
+        sails.log.info("value: " + array[i][index]);
+      }
+
+      str += line + '\r\n';
+      line = '';
+    }
+    return str;
   }
 };
 

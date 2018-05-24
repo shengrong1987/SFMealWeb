@@ -865,5 +865,6 @@
   "driver-phone" : "Driver's phone",
   "view-receipt" : "View Receipt",
   "tip" : "Tips",
-  "leave-comment" : "Memo"
+  "leave-comment" : "Memo",
+  "weekly-orders" : "Orders of the week"
 }
