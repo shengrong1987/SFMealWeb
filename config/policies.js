@@ -124,7 +124,7 @@ module.exports.policies = {
     'verifyOrder' : true,
     'adjustAdmin' : 'isAdmin',
     'updatePickupInfo' : 'isAdmin',
-    'findOrdersOfWeek' : true
+    'findOrdersOfWeek' : 'isAdmin'
   },
 
   DishController : {

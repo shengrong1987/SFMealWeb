@@ -13,7 +13,7 @@ module.exports = function(req, res, next) {
   if(req.session.authenticated){
     var email = req.session.user.auth.email;
     var emailVerified = req.session.user.emailVerified;
-    if(email === "admin@sfmeal.com" || email === "mikehe@me.com"){
+    if(email === "admin@sfmeal.com" || email === "youlizhouyi@hotmail.com"){
       if(process.env.NODE_ENV === "development" || (process.env.NODE_ENV === "production" && emailVerified)){
         next();
       }else{
