@@ -146,8 +146,6 @@ module.exports = {
       }
       if (line !== '') line += ';';
 
-      sails.log.info(index);
-
       line += index;
     }
 
@@ -156,11 +154,15 @@ module.exports = {
     line = '';
 
     for (var i = 0; i < array.length; i++) {
-      for (index in array[i]) {
+      for (index in array[0]) {
         if (index === 'constructor'){
           break;
         }
-        if (line !== '') line += ';'
+        if (line !== '') line += ';';
+
+        if(typeof array[i][index] === 'object'){
+          array[i][index] = JSON.stringify(array[i][index]);
+        }
 
         line += array[i][index];
         sails.log.info("value: " + array[i][index]);

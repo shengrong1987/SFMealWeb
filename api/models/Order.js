@@ -40,11 +40,16 @@ module.exports = {
       type: 'json',
       required: true
     },
+    last_orders : {
+      type : 'json',
+      defaultsTo : {}
+    },
     reviewing_orders : {
       type : 'json'
     },
     adjusting_orders : {
-      type : 'json'
+      type : 'json',
+      defaultsTo : {}
     },
     adjusting_subtotal : {
       type : 'float'

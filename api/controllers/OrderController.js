@@ -98,7 +98,9 @@ module.exports = {
       });
 
     }
-    pickUpInfo.comment = params.customInfo.comment;
+    var customComment = params.customInfo ? params.customInfo.comment : '';
+    var pickupComment = pickUpInfo.comment || pickUpInfo.instruction;
+    pickUpInfo.comment = customComment + pickupComment;
     params.pickupInfo = pickUpInfo;
     if(!pickUpInfo){
       sails.log.debug("pickup info not exist, check meal setting");
@@ -2229,6 +2231,7 @@ module.exports = {
           if(err){
             return cb(err);
           }
+          notification.transitLocaleTimeZone(order);
           var wantsReport = req.query.report;
           if(!wantsReport){
             order.deliveryCenter = order.pickupInfo.deliveryCenter;
@@ -2263,8 +2266,6 @@ module.exports = {
             order.dynamicDishes = [];
             delete order.dishes;
             delete order.dynamicDishes;
-          }else{
-            notification.transitLocaleTimeZone(order);
           }
           cb();
         });
