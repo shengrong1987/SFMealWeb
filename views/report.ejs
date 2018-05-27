@@ -35,7 +35,7 @@
       </thead>
       <tbody>
       <% meal.orders.forEach(function(order){
-        if(order.pickupInfo.pickupFromTime === pickup.pickupFromTime){
+        if(order.pickupInfo.pickupFromTime === pickup.pickupFromTime && order.pickupInfo.pickupTillTime === pickup.pickupTillTime && pickup.index === order.pickupOption){
           if(!pickup.isDateCustomized && !order.isPartyMode){ %>
       <tr data-option="<%= order.pickupOption%>">
         <td><%= order.customerName %></td>
