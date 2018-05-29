@@ -1674,8 +1674,8 @@ var MealView = Backbone.View.extend({
       }
     }
 
-    var min_order = form.find("#min-order").val();
-    var min_total = form.find("#min-total").val();
+    var min_order = form.find("#min-order").val() || 0;
+    var min_total = form.find("#min-total").val() || 0;
 
     if(!min_order && !min_total){
       form.find(".order-require .alert").show();

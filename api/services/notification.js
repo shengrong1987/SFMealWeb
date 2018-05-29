@@ -58,8 +58,8 @@ var notification = {
     var phone = params.isSendToHost ? (params.host ? params.host.phone : params.chef.phone) : params.customerPhone;
     var content = "";
     if(model === "Order"){
-      var userOrderUrl = params.isExpressCheckout ? "https://www.sfmeal.com/order/" + params.id + "/receipt" : "https://www.sfmeal.com/user/me#myorder";
-      var userReviewUrl = "https://www.sfmeal.com/user/me#myreview";
+      var userOrderUrl = params.isExpressCheckout ? process.env.BASE_URL + "/order/" + params.id + "/receipt" : process.env.BASE_URL + "/user/me#myorder";
+      var userReviewUrl = process.env.BASE_URL + "/user/me#myreview";
       switch(action){
         case "new":
           content = sails.__({

@@ -38,6 +38,9 @@ module.exports = function(agenda) {
           return done();
         }
         async.each(users, function(user,next){
+          if(!user.follow){
+            return next();
+          }
           var hostId = user.follow.id;
           var now = new Date();
           var nextMon = moment().day(7)._d;
