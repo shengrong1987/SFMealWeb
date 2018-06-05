@@ -114,32 +114,41 @@
         $(eles).toArray().forEach(function (ele) {
           autocomplete = new google["maps"]["places"].Autocomplete(ele, options);
           geolocate(autocomplete);
-          $(ele).off("blur");
-          $(ele).blur(function(e){
-            e.preventDefault();
-            var locationInput = $(this).val();
-            if(locationInput){
-              utility.autoCompletePlaceService.getQueryPredictions({ input : locationInput }, function(p, status){
-                if(status !== google.maps.places.PlacesServiceStatus.OK){
-                  alert(status);
-                  return;
-                }
-                if(p && p.length > 0){
-                  utility.getPlaceDetail(p[0].place_id, ele);
-                }else{
-                  console.log("zero results");
-                }
-              });
-            }
-          });
+          // $(ele).off("blur");
+          // $(ele).blur(function(e){
+          //   e.preventDefault();
+          //   var locationInput = $(this).val();
+          //   if(locationInput){
+          //     utility.autoCompletePlaceService.getQueryPredictions({ input : locationInput }, function(p, status){
+          //       if(status !== google.maps.places.PlacesServiceStatus.OK){
+          //         alert(status);
+          //         return;
+          //       }
+          //       if(p && p.length > 0){
+          //         utility.getPlaceDetail(p[0].place_id, ele);
+          //       }else{
+          //         console.log("zero results");
+          //       }
+          //     });
+          //   }
+          // });
           autocomplete.addListener('place_changed', function () {
             var place = this["getPlace"]();
-            if(!place["geometry"]) {
-              window.alert("No details available for input: '" + place.name + "'");
+            var location = $(ele).val();
+            if(!location){
               return;
             }
-            utility.clearField(utility.componentForm, ele);
-            utility.fillFromPlace(place.address_components, utility.componentForm, ele);
+            utility.autoCompletePlaceService.getQueryPredictions({ input : location }, function(p, status){
+              if(status !== google.maps.places.PlacesServiceStatus.OK){
+                alert(status);
+                return;
+              }
+              if(p && p.length > 0){
+                utility.getPlaceDetail(p[0].place_id, ele);
+              }else{
+                console.log("zero results");
+              }
+            });
           });
         });
       }

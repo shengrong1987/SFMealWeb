@@ -315,7 +315,8 @@ var UserBarView = Backbone.View.extend({
     if(location.href.indexOf('search') !== -1){
       search($(".search-container .searchBtn")[0], true);
     }else{
-      location.reload();
+      location.href = location.href.split("?")[0];
+      // location.reload();
     }
   },
   handleNotification : function(verb, action, id, model){
@@ -1439,7 +1440,8 @@ var MealView = Backbone.View.extend({
         today : "fa fa-calendar-times-o"
       },
       stepping : 30,
-      showTodayButton : true
+      showTodayButton : true,
+      date : new Date()
     });
     setupLanguage();
     setupInputMask();
@@ -1613,9 +1615,9 @@ var MealView = Backbone.View.extend({
         pickupObj.location = location;
         pickupObj.method = method;
         pickupObj.phone = phone;
-        pickupObj.publicLocation = publicLocation;
-        pickupObj.comment = pickupInstruction;
-        pickupObj.deliveryCenter = deliveryCenter;
+        pickupObj.publicLocation = publicLocation || '';
+        pickupObj.comment = pickupInstruction || '';
+        pickupObj.deliveryCenter = deliveryCenter || '';
         pickupObj.area = area;
         pickupObj.county = county;
         pickups.push(pickupObj);

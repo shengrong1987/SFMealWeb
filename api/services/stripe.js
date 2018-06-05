@@ -381,7 +381,7 @@ module.exports = {
     var delivery_fee = attr.deliveryFee || 0;
     var discount = parseInt(attr.discount) || 0;
     var tax = attr.tax;
-    var tip = attr.tip * 100;
+    var tip = (attr.tip || 0) * 100;
 
     sails.log.info("delivery application fee is: " + delivery_application_fee);
     sails.log.info("delivery fee is: " + delivery_fee);

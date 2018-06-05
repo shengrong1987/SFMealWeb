@@ -75,7 +75,7 @@ module.exports = {
     if(params.method === "shipping"){
       meal.pickups.forEach(function(pickupObj){
         if(pickupObj.method === "shipping"){
-          pickUpInfo = pickupObj;
+          pickUpInfo = Object.assign({}, pickupObj);
         }
       });
     }else{
@@ -93,14 +93,19 @@ module.exports = {
       }
       meal.pickups.forEach(function(pickup){
         if(pickup.index === params.pickupOption){
-          pickUpInfo = pickup;
+          pickUpInfo = Object.assign({}, pickup);
         }
       });
-
     }
-    var customComment = params.customInfo ? params.customInfo.comment : '';
-    var pickupComment = pickUpInfo.comment || pickUpInfo.instruction;
+    var customComment = params.customInfo ? (params.customInfo.comment) || '' : '';
+    var pickupComment = pickUpInfo.comment || pickUpInfo.instruction || '';
     pickUpInfo.comment = customComment + pickupComment;
+    if(params.isPartyMode){
+      pickUpInfo.pickupFromTime = params.customInfo.time;
+      pickUpInfo.pickupTillTime = params.customInfo.time;
+      pickUpInfo.comment = params.customInfo.comment;
+      pickUpInfo.isDateCustomized = true;
+    }
     params.pickupInfo = pickUpInfo;
     if(!pickUpInfo){
       sails.log.debug("pickup info not exist, check meal setting");
@@ -1972,7 +1977,7 @@ module.exports = {
       var pickupInfo;
       meal.pickups.forEach(function(pickup){
         if(pickup.index === pickupOption){
-          pickupInfo = pickup;
+          pickupInfo = Object.assign({}, pickup);
         }
       });
       if(!pickupInfo){
@@ -1990,10 +1995,6 @@ module.exports = {
         if(!customInfo){
           return cb({ responseText : req.__('order-party-lack-of-info'), code : -35});
         }
-        pickupInfo.pickupFromTime = customInfo.time;
-        pickupInfo.pickupTillTime = customInfo.time;
-        pickupInfo.comment = customInfo.comment;
-        pickupInfo.isDateCustomized = true;
       }
       geocode.distance(full_address, pickupInfo.deliveryCenter, function(err, distance){
         if(err){

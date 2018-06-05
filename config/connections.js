@@ -62,11 +62,11 @@ module.exports.connections = {
     port: 27017,
     user: process.env.NODE_ENV === 'production' ? process.env.MONGODB_USER : '',
     password: process.env.NODE_ENV === 'production' ? process.env.MONGODB_PWD : '',
-    database: process.env.NODE_ENV === 'production' ? 'sails' : 'test'
-  },
+  database: process.env.NODE_ENV === 'production' ? 'sails' : 'test'
+},
 
 
-  /***************************************************************************
+/***************************************************************************
   *                                                                          *
   * PostgreSQL is another officially supported relational database.          *
   * http://en.wikipedia.org/wiki/PostgreSQL                                  *
