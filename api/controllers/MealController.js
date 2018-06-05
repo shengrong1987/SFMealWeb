@@ -406,7 +406,7 @@ module.exports = {
   },
 
   find : function(req, res){
-    var county = req.cookies['county'] || req.param('county') || "San Francisco County";
+    var county = req.query['county'] || req.cookies['county'] || req.param('county') || "San Francisco County";
     var now = new Date();
     var _this = this;
     Meal.find( { where : { status : 'on', provideFromTime : {'<' : now}, provideTillTime : {'>' : now}  }, skip : actionUtil.parseSkip(req), limit : actionUtil.parseLimit(req)}).populate('dishes').populate("dynamicDishes").populate('chef').exec(function(err,found){
