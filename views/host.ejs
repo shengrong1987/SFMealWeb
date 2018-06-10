@@ -967,8 +967,4 @@
   var hostProfileView = new HostProfileView( { el : $("#myinfo"), model : new Host()})
   var addressView = new AddressView({ el : $("#hostAddressView"), model : new Host()})
   var orderView = new OrderView({ el : $("#myorder"), model : new Order()});
-  var user = $("#myinfo").data("user");
-  if(!user){
-      wechatLogin();
-  }
 </script>

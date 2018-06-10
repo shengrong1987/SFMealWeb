@@ -806,10 +806,14 @@ var User = Backbone.Model.extend({
 var AddressView = Backbone.View.extend({
   events : {
     "click .deleteBtn" : "deleteAddress",
-    "submit form" : "saveAddress"
+    "submit form" : "saveAddress",
+    "click #emailVerifyBtn" : "sendEmail"
   },
   initialize : function() {
-    var userId = this.$el.data("id");
+    this.alertView = this.$el.find("#orderAlertView");
+    this.alertView.removeClass("hide");
+    this.alertView.hide();
+    var userId = this.$el.data("user");
     this.model.set({id: userId});
     this.isCoolDown = true;
   },
@@ -928,6 +932,24 @@ var AddressView = Backbone.View.extend({
         submit_btn.button("reset");
       }
     });
+  },
+  sendEmail : function(e){
+    e.preventDefault();
+    var email = this.$el.find("#emailVerificationView input[name='email']").val();
+    if(!email){
+      makeAToast(jQuery.i18n.prop('emailEmptyError'));
+      return;
+    }
+    this.model.action = "sendEmailVerification";
+    var $this = this;
+    this.model.save({}, {
+      success : function(){
+        BootstrapDialog.alert(jQuery.i18n.prop('emailVerificationSent'));
+      },error : function(err, model){
+        $this.alertView.html(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+        $this.alertView.show();
+      }
+    })
   }
 });
 
@@ -1237,7 +1259,7 @@ var MealSelectionView = Backbone.View.extend({
       this.alertView.html(jQuery.i18n.prop('couponCodeEmpty'));
       return;
     }
-    var mealId = this.$el.find("[data-meal]").data("meal");
+    var mealId = this.$el.data("meal");
     this.model.set("id", mealId);
     this.model.set("code", code);
     this.model.type = "coupon";
@@ -1249,6 +1271,9 @@ var MealSelectionView = Backbone.View.extend({
       applyCoupon(true, discount, code);
     },
     error : function(model, err){
+      if(err['responseJSON'].code === -48){
+        jumpTo("emailVerificationView");
+      }
       $this.alertView.show();
       $this.alertView.html(getMsgFromError(err));
     }});
@@ -3098,6 +3123,9 @@ var MealConfirmView = Backbone.View.extend({
         applyCoupon(true, discount, code);
       },
       error: function (model, err) {
+        if(err['responseJSON'].code === -48){
+          jumpTo("emailVerificationView");
+        }
         $this.alertView.show();
         $this.alertView.html(getMsgFromError(err));
       }

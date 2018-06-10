@@ -34,7 +34,7 @@
 
   </div>
 
-  <div id="meal-detail-container" class="padding-clear" data-meal-prepareTime="<%= meal.prepareTime%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>" data-title="<%= meal.title%>" data-coverString="<%= meal.coverString%>" data-cover="<%= meal.cover%>" data-user="<%= user || ''%>">
+  <div id="meal-detail-container" class="padding-clear" data-meal="<%= meal.id%>" data-meal-prepareTime="<%= meal.prepareTime%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>" data-title="<%= meal.title%>" data-coverString="<%= meal.coverString%>" data-cover="<%= meal.cover%>" data-user="<%= user || ''%>">
 
     <div class="row">
       <div class="col-md-8">
@@ -424,15 +424,22 @@
                 <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('coupon')%>"></i> <%= __('coupon')%>:</th>
                 <th><input class="coupon-code form-control" style="margin:0 5px 0 5px;width: 80px;" maxlength="7" data-code="" data-value=""></input></th>
                 <th class="text-right">
-                  <button id="applyCouponBtn" class="btn btn-green"><%= __('apply-code')%></button>
+                  <button id="applyCouponBtn" class="btn btn-grey-green active"><%= __('apply-code')%></button>
                   <button id="disApplyCouponBtn" class="btn btn-default btn-outline" onclick="javascript:applyCoupon(false);"><%= __('disapply-code')%></button>
                 </th>
               </tr>
+              <% if(!user.email || !user.emailVerified){%>
+              <tr id="emailVerificationView">
+                <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i> <%= __('email')%></th>
+                <th><input class="form-control" name="email" style="width:170px;" type="email" value="<%= user.email || ''%>"></th>
+                <th class="text-right"><button id="emailVerifiedBtn" class="btn btn-grey-green active"><%= __('verify-email')%></button></th>
+              </tr>
+              <% }%>
               <tr>
                 <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i> <%= __('points')%>:</th>
                 <th><input class="points form-control" style="margin:0 5px 0 5px;width: 80px;" readonly value="<%= user?(user.points || 0):-1%>"></input></th>
                 <th class="text-right">
-                  <button id="applyPointsBtn" class="btn btn-green"><%= __('apply-code')%></button>
+                  <button id="applyPointsBtn" class="btn btn-grey-green"><%= __('apply-code')%></button>
                   <button id="disApplyPointsBtn" class="btn btn-default btn-outline" onclick="javascript:applyPoints(false);"><%= __('disapply-code')%></button>
                 </th>
               </tr>

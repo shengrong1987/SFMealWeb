@@ -12,13 +12,13 @@
 
     <% if(pickup.method === "delivery"){ %>
       <p><%= __('delivery-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%>
-        <button class="btn btn-info copyBtn" data-index="<%= pickup.index%>" data-title="<%= __('delivery-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%>"><%= __('copy')%></button>
+        <button class="btn btn-info copyBtn" data-method="<%= pickup.method%>" data-location="<%= pickup.location%>" data-index="<%= pickup.index%>" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" data-title="<%= __('delivery-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%>"><%= __('copy')%></button>
       </p>
     <%}else{%>
       <p>
       <%= __('pickup-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/>
       <%= __('pickup-location')%>: <%= pickup.location%>
-      <button class="btn btn-info copyBtn" data-index="<%= pickup.index%>" data-title="<%= __('pickup-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/><%= __('pickup-location')%>: <%= pickup.location%>"><%= __('copy')%></button>
+      <button class="btn btn-info copyBtn" data-method="<%= pickup.method%>" data-location="<%= pickup.location%>" data-index="<%= pickup.index%>" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" data-title="<%= __('pickup-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/><%= __('pickup-location')%>: <%= pickup.location%>"><%= __('copy')%></button>
       </p>
     <%}%>
     <table class="table table-bordered">
@@ -37,7 +37,7 @@
       <% meal.orders.forEach(function(order){
         if(order.pickupInfo.pickupFromTime === pickup.pickupFromTime && order.pickupInfo.pickupTillTime === pickup.pickupTillTime && pickup.method === order.pickupInfo.method && pickup.location === order.pickupInfo.location){
           if(!pickup.isDateCustomized && !order.isPartyMode){ %>
-      <tr data-option="<%= order.pickupOption%>">
+      <tr data-option="<%= order.pickupOption%>" data-method="<%= order.pickupInfo.method%>" data-location="<%= order.pickupInfo.location%>" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>">
         <td><%= order.customerName %></td>
         <td><%= order.id%></td>
         <td>
@@ -65,7 +65,7 @@
           <%}});%>
         </td>
         <td><%= order.customerPhone%></td>
-        <td><%= order.contactInfo.address%></td>
+        <td><%= order.contactInfo.address || '自取'%></td>
         <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
         <td><%= order.pickupInfo.comment || ''%></td>
       </tr>
@@ -94,8 +94,13 @@
       var indexes = ["0","A","B","C","D","E","F","G","H","I","J","K","L","M","N"];
       var pickupIndex = $(this).data("index");
       var pickupTitle = $(this).data("title");
-      var pickupInfos = $("[data-option='" + pickupIndex + "']");
-      var text = pickupTitle;
+      var pickupFromTime = $(this).data("from");
+      var pickupTillTime = $(this).data("to");
+      var method = $(this).data("method");
+      var location = $(this).data("location");
+//      var pickupInfos = $("[data-option='" + pickupIndex + "'][data-from='" + pickupFromTime + "'][data-to='" + pickupTillTime + "']");
+      var pickupInfos = $("[data-method='" + method + "'][data-location='" + location + "'][data-from='" + pickupFromTime + "'][data-to='" + pickupTillTime + "']");
+    var text = pickupTitle;
       var pickupIndexTitle = indexes[pickupIndex];
       pickupInfos.each(function(index){
           var infoRows = $(this).find("td");
@@ -105,6 +110,7 @@
             text += "\n\n" + content + "\n";
           }
       });
+      console.log(text);
       copyToClipboard(text);
   })
 
