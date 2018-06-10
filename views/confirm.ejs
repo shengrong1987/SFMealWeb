@@ -642,6 +642,13 @@
                 <button id="disApplyCouponBtn" class="btn btn-danger" onclick="javascript:applyCoupon(false);"><%= __('disapply-code')%></button>
               </th>
             </tr>
+            <% if(!user.email || !user.emailVerified){%>
+            <tr id="emailVerificationView">
+              <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i> <%= __('email')%></th>
+              <th><input class="form-control" name="email" style="width:170px;" type="email" value="<%= user.email || ''%>"></th>
+              <th class="text-right"><button id="emailVerifyBtn" class="btn btn-grey-green active"><%= __('verify-email')%></button></th>
+            </tr>
+            <% }%>
             <tr>
               <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i> <%= __('points')%>:</th>
               <th><input class="points form-control" style="margin:0 5px 0 5px;width: 80px;" readonly value="<%= user?(user.points || 0):-1%>"></input></th>

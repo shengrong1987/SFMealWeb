@@ -18,6 +18,9 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
+      if(!user.email || !user.emailVerified){
+        return res.badRequest({ code : -48, responseText : req.__('coupon-unverified-email')});
+      }
       var couponIsValid = true;
       couponIsValid = !user.coupons.some(function(coupon){
         return coupon.code === couponCode;
