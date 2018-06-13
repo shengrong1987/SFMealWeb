@@ -154,16 +154,117 @@
                   <div class="row text-left">
 
                     <div class="col-xs-12">
+                      <h4 class="text-left"><strong><%= __('choose-delivery-location') %></strong></h4>
+                    </div>
+
+                    <div class="col-xs-12">
+                      <div class="radio-box" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
+                        <%
+                        var addresses= user.address;
+                        if(addresses){
+                          var keys = Object.keys(addresses);
+                        keys.forEach(function(key){
+                          var addressObj = addresses[key];
+                          var address = addressObj.street + ", " + addressObj.city + ", CA " + addressObj.zip + ", +" + addressObj.phone;
+                        %>
+                        <label class="btn btn-default vertical-inline option contactOption">
+                          <input type="radio" id="delivery-1-<%= i%>" name="delivery-location-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="delivery-1-<%= i%>"></label>
+                          <span style="margin-left: 10px;"><%= address %></span>
+                        </label>
+                        <%i++;})}; %>
+                      </div>
+                    </div>
+
+                    <form class="col-xs-12 <%= user.id ? 'hide' : ''%>" id="contactInfoView" data-user="<%= user.id || null%>" data-toggle="validator" role="form">
+                      <div class="row deliveryInput <%= meal.isPartyMode ? '' : 'hide'%>">
+                        <div class="col-xs-12">
+                          <div class="form-group">
+                            <label><%= __('street')%> *</label>
+                            <input class="form-control" name="street">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row deliveryInput <%= meal.isPartyMode ? '' : 'hide'%>">
+                        <div class="col-xs-6">
+                          <div class="form-group">
+                            <label><%= __('city')%> *</label>
+                            <input class="form-control" name="city">
+                          </div>
+                        </div>
+                        <div class="col-xs-6">
+                          <div class="form-group">
+                            <label><%= __('state')%> *</label>
+                            <input class="form-control" name="state">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row deliveryInput <%= meal.isPartyMode ? '' : 'hide'%>">
+                        <div class="col-xs-6">
+                          <div class="form-group">
+                            <label><%= __('zipcode')%> *</label>
+                            <input class="form-control" name="zipcode">
+                          </div>
+                        </div>
+                        <div class="col-xs-6">
+                          <div class="form-group">
+                            <label>*</label>
+                            <button id="verifyAddressBtn" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Saving" class="btn btn-red form-control"><%= __('calculate-delivery')%></button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-xs-6">
+                          <div class="form-group">
+                            <label><%= __('enter-phone')%> *</label>
+                            <input class="form-control" name="phone" type="tel" minlength="13" data-error="<%= __('phone-bad-format')%>">
+                            <div class="help-block with-errors"></div>
+                          </div>
+                        </div>
+                        <div class="col-xs-6">
+                          <div class="form-group">
+                            <label><%= __('enter-name')%> *</label>
+                            <input class="form-control" name="name">
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+
+                    <% if(!user || Object.keys(user).length == 0){%>
+                    <div class="col-xs-12">
+                      <a class="text-orange cursor-pointer" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html"><u><%= __('signup-tips')%></u></a>
+                      <a class="text-orange cursor-pointer" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" title="<%= __('login-tips')%>%>"><u><%= __('nav-bar-login')%></u></a>
+                    </div>
+                    <%}else{%>
+                    <div class="col-xs-12">
+                      <div class="radio-box">
+                        <label class="btn btn-default vertical-inline option">
+                          <input type="radio" id="createNewContactBtn" data-id="<%= user.id%>" data-target="#myModal" data-href="/templates/user/address.html" class="regular-radio"><label for="createNewContactBtn"></label>
+                          <span style="margin-left: 10px;"><%=  __('enter-new-contact')%></span>
+                        </label>
+                      </div>
+                      <!--<u><a id="createNewContactBtn" class="text-orange cursor-pointer" toggle="modal" data-id="<%= user.id%>" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0)"><%= __('enter-new-contact')%></a></u>-->
+                    </div>
+                    <%}%>
+
+                    <div class="col-xs-12">
+                      <h3></h3>
+                    </div>
+
+                    <div class="col-xs-12">
                       <h4 class="text-left"><strong><%= __('choose-delivery-option') %></strong></h4>
                     </div>
 
                     <div class="col-xs-12">
-                      <div class="radio-box" id="deliveryMethod">
+                      <div class="radio-box row" id="deliveryMethod">
                         <%
                         colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
                         i= 0;j = 0;
                         if(meal.pickups){ meal.pickups.forEach(function(pickup){ if(pickup.method == 'delivery'){ if((pickup.isDateCustomized && !meal.isPartyMode) || (!pickup.isDateCustomized && meal.isPartyMode) ){return} %>
-                        <label class="btn btn-outline-light option deliveryOption" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-area="<%= pickup.area || '' %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
+                        <label class="btn btn-outline-light option deliveryOption col-xs-6" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-area="<%= pickup.area || '' %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
+                          <div class="s"></div>
                           <input type="radio" id="delivery-2-<%= i%>" data-index="<%= pickup.index%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>
                           <i class="fa fa-truck cursor-pointer text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i>
                           <span> <%= pickup.area || pickup.deliveryCenter%> <%= __('nearby')%></span>
@@ -205,32 +306,6 @@
                       </div>
                     </div>
                     <%}%>
-
-                    <div class="col-xs-12">
-                      <h3></h3>
-                    </div>
-
-                    <div class="col-xs-12">
-                      <h4 class="text-left"><strong><%= __('choose-delivery-location') %></strong></h4>
-                    </div>
-
-                    <div class="col-xs-12">
-                      <div class="radio-box" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
-                        <%
-                        var addresses= user.address;
-                        if(addresses){
-                          var keys = Object.keys(addresses);
-                        keys.forEach(function(key){
-                          var addressObj = addresses[key];
-                          var address = addressObj.street + ", " + addressObj.city + ", CA " + addressObj.zip + ", +" + addressObj.phone;
-                        %>
-                        <label class="btn btn-default vertical-inline option contactOption">
-                          <input type="radio" id="delivery-1-<%= i%>" name="delivery-location-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="delivery-1-<%= i%>"></label>
-                          <span style="margin-left: 10px;"><%= address %></span>
-                        </label>
-                        <%i++;})}; %>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
@@ -259,76 +334,6 @@
                       <h4 style="margin-left: 42px;"><a class="text-red" data-action="updateFromOrder" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" data-id="<%= user.id%>" href="javascript:void(0)"><%= __('new-location-phone') %></a></h4>
                     </div>
                   </div>
-                </div>
-
-                <div class="row text-left" style="margin-top: 20px;">
-                  <form class="col-xs-12 <%= user.id ? 'hide' : ''%>" id="contactInfoView" data-user="<%= user.id || null%>" data-toggle="validator" role="form">
-                    <div class="row deliveryInput <%= meal.isPartyMode ? '' : 'hide'%>">
-                      <div class="col-xs-12">
-                        <div class="form-group">
-                          <label><%= __('street')%> *</label>
-                          <input class="form-control" name="street">
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="row deliveryInput <%= meal.isPartyMode ? '' : 'hide'%>">
-                      <div class="col-xs-6">
-                        <div class="form-group">
-                          <label><%= __('city')%> *</label>
-                          <input class="form-control" name="city">
-                        </div>
-                      </div>
-                      <div class="col-xs-6">
-                        <div class="form-group">
-                          <label><%= __('state')%> *</label>
-                          <input class="form-control" name="state">
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="row deliveryInput <%= meal.isPartyMode ? '' : 'hide'%>">
-                      <div class="col-xs-6">
-                        <div class="form-group">
-                          <label><%= __('zipcode')%> *</label>
-                          <input class="form-control" name="zipcode">
-                        </div>
-                      </div>
-                      <div class="col-xs-6">
-                        <div class="form-group">
-                          <label>*</label>
-                          <button id="verifyAddressBtn" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Saving" class="btn btn-red form-control"><%= __('calculate-delivery')%></button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="row">
-                      <div class="col-xs-6">
-                        <div class="form-group">
-                          <label><%= __('enter-phone')%> *</label>
-                          <input class="form-control" name="phone" type="tel" minlength="13" data-error="<%= __('phone-bad-format')%>">
-                          <div class="help-block with-errors"></div>
-                        </div>
-                      </div>
-                      <div class="col-xs-6">
-                        <div class="form-group">
-                          <label><%= __('enter-name')%> *</label>
-                          <input class="form-control" name="name">
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-
-                  <% if(!user || Object.keys(user).length == 0){%>
-                  <div class="col-xs-12">
-                    <a class="text-orange cursor-pointer" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html"><u><%= __('signup-tips')%></u></a>
-                    <a class="text-orange cursor-pointer" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" title="<%= __('login-tips')%>%>"><u><%= __('nav-bar-login')%></u></a>
-                  </div>
-                  <%}else{%>
-                  <div class="col-xs-12">
-                    <u><a id="createNewContactBtn" class="text-orange cursor-pointer" toggle="modal" data-id="<%= user.id%>" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0)"><%= __('enter-new-contact')%></a></u>
-                  </div>
-                  <%}%>
                 </div>
 
                 <div class="row text-left">
