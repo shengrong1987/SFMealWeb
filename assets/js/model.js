@@ -3011,6 +3011,7 @@ var MealConfirmView = Backbone.View.extend({
       }
       makeAToast(jQuery.i18n.prop('addressValid'),'success');
     });
+    this.checkOptions(yourAddress);
   },
   switchPaymentMethod : function(e){
     var method = $(e.currentTarget).find("button.active").data("method");
@@ -3024,6 +3025,30 @@ var MealConfirmView = Backbone.View.extend({
         paymentExpressForm.show();
       }
     }
+  },
+  checkOptions : function(address){
+    var range = this.$el.data("range");
+    var deliveryOptions = this.$el.find("#deliveryTab .deliveryOption .regular-radio")
+    deliveryOptions.each(function(index){
+      var deliveryOption = $(this);
+      deliveryOption.parent().addClass('disabled');
+      deliveryOption.parent().find('.s').addClass('spinner');
+      var deliveryCenter = deliveryOption.parent().data('center');
+      setTimeout(function() {
+        utility.distance(deliveryCenter, address, function(err, distance) {
+          deliveryOption.parent().find('.s').removeClass('spinner');
+          if (err) {
+            makeAToast(err);
+            return;
+          }
+          if(distance > range){
+            deliveryOption.parent().addClass('disabled');
+          }else{
+            deliveryOption.parent().removeClass('disabled');
+          }
+        })
+      }, index*2000);
+    });
   },
   switchAddress : function(e, cb, yourAddress){
     var range = this.$el.data("range");
@@ -3051,16 +3076,20 @@ var MealConfirmView = Backbone.View.extend({
       return;
     }
 
+    if($(e.currentTarget).parent().hasClass('contactOption')){
+      this.checkOptions(yourAddress);
+    }
+
     var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
     if(!deliveryOption.length){
-      makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
+      // makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
       if(cb){
         return cb(false);
       }
       return;
     }
 
-    var cdTime = 3000;
+    var cdTime = 1800;
     if(this.isCoolDown){
       this.isCoolDown = false;
       var deliveryCenter = deliveryOption.parent().data('center');
@@ -3088,6 +3117,7 @@ var MealConfirmView = Backbone.View.extend({
           form.find(".delivery").data("value", 0);
           refreshMenu();
         }
+        deliveryOption.parent().removeClass('disabled');
         makeAToast(jQuery.i18n.prop('addressValid'),'success');
         if(cb){
           cb(true);
