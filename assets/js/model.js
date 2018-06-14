@@ -2946,6 +2946,7 @@ var MealConfirmView = Backbone.View.extend({
     this.$el.find(".deliveryInput").removeClass('hide');
     if(value === "delivery"){
       this.$el.find(".deliveryInput").show();
+      this.$el.find(".pickupInput").hide();
       if(isLogin){
         $('#contactInfoView').hide();
         this.switchAddress(e);
@@ -2954,6 +2955,7 @@ var MealConfirmView = Backbone.View.extend({
       }
     }else{
       this.$el.find(".deliveryInput").hide();
+      this.$el.find(".pickupInput").show();
       if(isLogin){
         $('#contactInfoView').hide();
       }else{
@@ -3076,7 +3078,7 @@ var MealConfirmView = Backbone.View.extend({
       return;
     }
 
-    if($(e.currentTarget).parent().hasClass('contactOption')){
+    if(e && $(e.currentTarget).parent().hasClass('contactOption')){
       this.checkOptions(yourAddress);
     }
 

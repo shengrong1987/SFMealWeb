@@ -284,32 +284,44 @@ module.exports = require('waterlock').waterlocked({
       timestamp = req.query.timestamp,
       nonce = req.query.nonce,
       echostr = req.query.echostr;
-    var body = req.body;
 
+    var buffer = [];
+    req.on('data', function(data){
+      buffer.push(data);
+    })
 
-    sails.log.info("signature: " + signature, "timestamp: " + timestamp, "nonce: " + nonce, 'echostr: ' + echostr );
-    sails.log.info("token:" + wechatToken);
+    req.on('end',function(){
+      if(buffer.length){
+        var msgXml = Buffer.concat(buffer).toString('utf-8');
+        require('xml2js').parseString(msgXml, {explicitArray : false}, function(err, result){
+          if(err){
+            sails.log.error(err);
+          }
+          sails.log.info(result);
+        })
+      }else{
+        sails.log.info("signature: " + signature, "timestamp: " + timestamp, "nonce: " + nonce, 'echostr: ' + echostr );
+        sails.log.info("token:" + wechatToken);
 
-    if(signature && timestamp && nonce){
-      var sha1 = crypto.createHash('sha1'),
-        sha1Str = sha1.update([wechatToken, timestamp, nonce].sort().join('')).digest('hex');
+        if(signature && timestamp && nonce){
+          var sha1 = crypto.createHash('sha1'),
+            sha1Str = sha1.update([wechatToken, timestamp, nonce].sort().join('')).digest('hex');
 
-      sails.log.info(sha1Str, signature);
+          sails.log.info(sha1Str, signature);
 
-      if (sha1Str === signature) {
-        res.set('Content-Type', 'text/plain');
-        sails.log.info('validation success');
-        return res.ok(echostr);
-      } else {
-        sails.log.info('validation error');
-        return res.badRequest({ responseText : "validation error"});
+          if (sha1Str === signature) {
+            res.set('Content-Type', 'text/plain');
+            sails.log.info('validation success');
+            return res.ok(echostr);
+          } else {
+            sails.log.info('validation error');
+            return res.badRequest({ responseText : "validation error"});
+          }
+        }else{
+          return res.forbidden();
+        }
       }
-    }else if(body){
-      nlp.receiveContent(body.MsgType, body.Content);
-      return res.ok("");
-    }else{
-      return res.forbidden();
-    }
+    })
   },
 
   wechatSignature : function(req, res){
