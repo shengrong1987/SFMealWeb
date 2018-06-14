@@ -11,6 +11,8 @@ var processor = {
     var _this = this;
     switch (type){
       case 'text':
+        content = new String(content.getBytes(),"ISO-8859-1");
+        sails.log.info(content);
         nlp.ner(content, _this.classifyWord);
       default:
         break;
@@ -21,7 +23,7 @@ var processor = {
     if(!results.length){
       return;
     }
-    var result = results[0];
+    var result = JSON.parse(results)[0];
     var words = result['word'];
     var entities = result['entity'];
     var tag = result['tag'];
