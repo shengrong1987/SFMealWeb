@@ -35,43 +35,40 @@
       </thead>
       <tbody>
       <% meal.orders.forEach(function(order){
-        if(order.pickupInfo.pickupFromTime === pickup.pickupFromTime && order.pickupInfo.pickupTillTime === pickup.pickupTillTime && pickup.method === order.pickupInfo.method && pickup.location === order.pickupInfo.location){
-          if(!pickup.isDateCustomized && !order.isPartyMode){ %>
-      <tr data-option="<%= order.pickupOption%>" data-method="<%= order.pickupInfo.method%>" data-location="<%= order.pickupInfo.location%>" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>">
-        <td><%= order.customerName %></td>
-        <td><%= order.id%></td>
-        <td>
-          <% Object.keys(order.orders).forEach(function(dishId){
-            var amount = order.orders[dishId].number;
-            var preference = order.orders[dishId].preference;
-            if(amount > 0){
-              var dish;
-              meal.dishes.forEach(function(d){
-                if(d.id == dishId){
-                  dish = d;
-                  return;
-                }
-              })%>
-          <% if(preference && preference.length > 0){
-            var title = '';
-            preference.forEach(function(pref){
-              title += "(" + pref.property + ')';
-            });
-          %>
-          <%= dish.title%>(<%= amount%>)<%= title%>
-          <% }else{%>
-          <%= dish.title%>(<%= amount%>)
-          <% }%>
-          <%}});%>
-        </td>
-        <td><%= order.customerPhone%></td>
-        <td><%= order.contactInfo.address || '自取'%></td>
-        <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
-        <td><%= order.pickupInfo.comment || ''%></td>
-      </tr>
-      <%}else{%>
-
-      <%}}})%>
+        if(order.isDateCustomized || (order.pickupInfo.pickupFromTime === pickup.pickupFromTime && order.pickupInfo.pickupTillTime === pickup.pickupTillTime && pickup.method === order.pickupInfo.method && pickup.location === order.pickupInfo.location)){%>
+          <tr data-option="<%= order.pickupOption%>" data-method="<%= order.pickupInfo.method%>" data-location="<%= order.pickupInfo.location%>" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>">
+            <td><%= order.customerName %></td>
+            <td><%= order.id%></td>
+            <td>
+              <% Object.keys(order.orders).forEach(function(dishId){
+                var amount = order.orders[dishId].number;
+                var preference = order.orders[dishId].preference;
+              if(amount > 0){
+                var dish;
+                meal.dishes.forEach(function(d){
+                  if(d.id == dishId){
+                    dish = d;
+                    return;
+                  }
+                })%>
+              <% if(preference && preference.length > 0){
+                var title = '';
+                preference.forEach(function(pref){
+                  title += "(" + pref.property + ')';
+                });
+              %>
+              <%= dish.title%>(<%= amount%>)<%= title%>
+              <% }else{%>
+              <%= dish.title%>(<%= amount%>)
+              <% }%>
+              <%}});%>
+            </td>
+            <td><%= order.customerPhone%></td>
+            <td><%= order.contactInfo.address || '自取'%></td>
+            <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
+            <td><%= order.pickupInfo.comment || ''%></td>
+          </tr>
+        <%}})%>
       </tbody>
     </table>
     <%})}%>
