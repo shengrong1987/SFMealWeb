@@ -185,7 +185,7 @@
                         if(meal.pickups){
                           colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
                           meal.pickups.forEach(function(pickup){ if(pickup.method == 'pickup' && !meal.isPartyMode){ %>
-                          <label class="btn btn-outline-light vertical-inline option pickupOption" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-color="<%= colors[i]%>" data-location="<%= pickup.publicLocation || pickup.location%>">
+                          <label class="btn btn-outline-light vertical-inline option pickupOption col-xs-12" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-color="<%= colors[i]%>" data-location="<%= pickup.publicLocation || pickup.location%>">
                             <input type="radio" id="pickup-1-<%= i%>" data-index="<%= pickup.index%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
                             <span class="content">
                               <i class="fa fa-hand-paper-o cursor-pointer text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i>
@@ -264,14 +264,14 @@
                         colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
                         i= 0;j = 0;
                         if(meal.pickups){ meal.pickups.forEach(function(pickup){ if(pickup.method == 'delivery'){ if((pickup.isDateCustomized && !meal.isPartyMode) || (!pickup.isDateCustomized && meal.isPartyMode) ){return} %>
-                        <label class="btn btn-outline-light option deliveryOption col-xs-6" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-area="<%= pickup.area || '' %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
+                        <label class="btn btn-outline-light option deliveryOption col-xs-12" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-area="<%= pickup.area || '' %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
                           <div class="s"></div>
                           <input type="radio" id="delivery-2-<%= i%>" data-index="<%= pickup.index%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>
                           <i class="fa fa-truck cursor-pointer text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i>
                           <span> <%= pickup.area || pickup.deliveryCenter%> <%= __('nearby')%></span>
                           <% if(!meal.isPartyMode){%>
                           <div class="vertical-align" style="margin-top:15px;">
-                            <div class="pickup-date" style="width: 70px;">
+                            <div class="pickup-date">
                               <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%> <%= meal.getDateFromDate(meal.pickups[0].pickupFromTime)%></span>
                               <span class="col-xs-12"><%= __(meal.getWeekFromDate(meal.pickups[0].pickupFromTime))%></span>
                             </div>
@@ -290,7 +290,7 @@
                     <div class="col-xs-12">
                       <div class="row">
                         <div class="col-xs-12 col-sm-4">
-                          <div class="pickup-date" style="width: 85px;">
+                          <div class="pickup-date">
                             <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%></span>
                             <span class="col-xs-12"> > <%= meal.getDaysAfterNow(1)%>  <i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" title="<%= __('party-pickup-date-tip')%>"></i></span>
                           </div>
@@ -339,12 +339,15 @@
 
                 <div class="row text-left">
                   <div class="col-xs-12">
-                    <u><a id="addCommentBtn" class="text-orange cursor-pointer" toggle="modal" data-id="<%= user.id%>"href="javascript:void(0)"><%= __('leave-comment')%></a></u>
+                    <label class="btn btn-default vertical-inline option" style="width: 100%;">
+                      <input id="addCommentBtn" type="radio" class="text-orange cursor-pointer regular-radio" toggle="modal" data-id="<%= user.id%>" href="javascript:void(0)"></input>
+                      <label for="addCommentBtn">
+                        <span><i class="fa fa-plus text-red"></i>  <%= __('leave-comment')%></span>
+                    </label>
                     <form id="commentView" class="hide" data-toggle="validator" role="form">
                       <div class="row">
                         <div class="col-xs-12">
                           <div class="form-group">
-                            <label><%= __('comment')%> *</label>
                             <input class="form-control" name="comment">
                           </div>
                         </div>
