@@ -34,7 +34,7 @@
 
   </div>
 
-  <div id="meal-detail-container" class="padding-clear" data-meal="<%= meal.id%>" data-meal-prepareTime="<%= meal.prepareTime%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>" data-title="<%= meal.title%>" data-coverString="<%= meal.coverString%>" data-cover="<%= meal.cover%>" data-user="<%= user || ''%>">
+  <div id="meal-detail-container" class="padding-clear" data-meal="<%= meal.id%>" data-meal-prepareTime="<%= meal.prepareTime%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>" data-title="<%= meal.title%>" data-coverString="<%= meal.coverString%>" data-cover="<%= meal.cover%>" data-user="<%= user ? user.id : ''%>">
 
     <div class="row">
       <div class="col-md-8">
@@ -428,11 +428,11 @@
                   <button id="disApplyCouponBtn" class="btn btn-default btn-outline" onclick="javascript:applyCoupon(false);"><%= __('disapply-code')%></button>
                 </th>
               </tr>
-              <% if(!user.email || !user.emailVerified){%>
+              <% if(user && !user.emailVerified){%>
               <tr id="emailVerificationView">
                 <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i> <%= __('email')%></th>
-                <th><input class="form-control" name="email" style="width:170px;" type="email" value="<%= user.email || ''%>"></th>
-                <th class="text-right"><button id="emailVerifiedBtn" class="btn btn-grey-green active"><%= __('verify-email')%></button></th>
+                <th><input class="form-control" name="email" style="width:150px;" type="email" value="<%= user.auth? user.auth.email : ''%>"></th>
+                <th class="text-right"><button id="emailVerifyBtn" class="btn btn-grey-green active"><%= __('verify-email')%></button></th>
               </tr>
               <% }%>
               <tr>
@@ -505,6 +505,7 @@
 
 <script>
   var mealSelectionView = new MealSelectionView({ el : $("#meal-detail-container"), model : new Meal()});
+  var addressView = new AddressView({ el : $("#meal-detail-container"), model : new User()})
   var coverDishId = $("#meal-detail-container").data("cover");
   var user = $("#meal-detail-container").data("user");
   var coverDish = $("#meal-detail-container").find(".dish a[data-gallery='" + coverDishId + "']");

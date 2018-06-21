@@ -1235,7 +1235,7 @@
           hosts.forEach(function(host){ index++; if(index <= 3){%>
           <div class="col-sm-4">
             <div class="box">
-              <img class="round_thumb" style="width: 100px;height:100px;" src="/images/blank.gif" data-echo="<%= host.picture || ''%>" onclick="javascript:location.href='/host/public<%= host.id%>'">
+              <img class="round_thumb" style="width: 100px;height:100px;" src="/images/blank.gif" data-echo="<%= host.picture || ''%>" onclick="javascript:location.href='/host/public/<%= host.id%>'">
               <p style="margin-top: 15px;"><%= host.shortIntro(locale) %></p>
               <div data-toggle="tooltip" data-placement="bottom" title="<%= host.score || 5.0%>">
                 <div class="rating" data-toggle="star-set" data-rate="<%= host.score || 5.0%>">
@@ -1246,7 +1246,7 @@
                   <i class="fa fa-star"></i>
                 </div>
               </div>
-              <a href="/host/<%= host.id%>"><%= __('view-dish')%></a>
+              <a href="/host/public/<%= host.id%>"><%= __('view-dish')%></a>
             </div>
           </div>
           <%}})}%>

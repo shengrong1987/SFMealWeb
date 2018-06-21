@@ -651,8 +651,9 @@ module.exports = {
                     }
                     order.leftQty = m.leftQty;
                     order.last_orders = order.orders;
-                    order.adjusting_orders = order.orders;
-                    order.adjusting_subtotal = order.subtotal;
+                    order.last_subtotal = order.subtotal;
+                    order.adjusting_orders = {};
+                    order.adjusting_subtotal = 0;
                     order.orders = params.orders;
                     order.subtotal = params.subtotal;
                     order.tax += tax;
@@ -694,6 +695,9 @@ module.exports = {
                   return res.badRequest(err);
                 }
                 notification.notificationCenter("Order", "adjusting", result, isSendToHost, false, req);
+                if(process.env.NODE_ENV === 'development' && req.wantsJSON){
+                  return res.ok(order);
+                }
                 if(isSendToHost){
                   return res.ok({responseText : req.__('order-adjust-request-user')});
                 }else{
@@ -995,9 +999,10 @@ module.exports = {
               }
               order.leftQty = m.leftQty;
               order.last_orders = order.orders;
+              order.last_subtotal = order.total;
               order.orders = adjusting_orders;
-              order.adjusting_orders = {};
               order.subtotal = adjusting_subtotal;
+              order.adjusting_orders = {};
               order.adjusting_subtotal = 0;
               var tmpLastStatus = order.status;
               order.status = order.lastStatus;
@@ -1794,8 +1799,9 @@ module.exports = {
                   }
                   order.leftQty = m.leftQty;
                   order.last_orders = order.orders;
-                  order.adjusting_orders = order.orders;
-                  order.adjusting_subtotal = order.subtotal;
+                  order.last_subtotal = order.subtotal;
+                  order.adjusting_orders = {};
+                  order.adjusting_subtotal = 0;
                   order.orders = params.orders;
                   order.subtotal = params.subtotal;
                   order.tax += tax;
