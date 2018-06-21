@@ -39,7 +39,7 @@
   </head>
   <body>
 
-    <div class="page" style="text-align: center;">
+    <div id="403View" class="page" style="text-align: center;" data-login="<%= login || ''%>">
 
       <div class="main" style="min-height: 500px;">
         <h3>
@@ -127,6 +127,11 @@
   <script>
     setup();
     new LoginView({model : new Auth(), el: $("#loginView")});
+    var isLogin = $("#403View").data('login');
+    console.log("user is login:" + isLogin);
+    if(!isLogin){
+        wechatLogin();
+    }
     if(browserVersion()==="uiwebview"){$("#GoogleBtn").hide();}
   </script>
 </html>

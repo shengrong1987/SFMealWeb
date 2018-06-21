@@ -16,13 +16,13 @@
   <div class="container box-email white relative middle text-center">
     <h2><%= yourfollowedchef%>"<%= host.shopName%>"<%= menuoftheweek%></h2>
     <p><%= hometaste1%></p>
-    <a class="btn btn-red btn-lg round" style="height: 40px;" href="https://www.sfmeal.com/meal"><%= seemore%></a>
+    <a class="btn btn-red btn-lg round" style="height: 40px;" href="http://www.sfmeal.com/meal"><%= seemore%></a>
     <div class="divider"></div>
     <table class="table-email middle" style="margin-top: 25px;">
       <% var i=0;var j=0; meals.forEach(function(meal){%>
       <% if(i%2==0){ j++;%><tr><%}%>
         <td style="max-width: 350px;padding: 10px;">
-          <a href="https://www.sfmeal.com/meal/<%= meal.id%>">
+          <a href="http://www.sfmeal.com/meal/<%= meal.id%>">
             <img src="<%= meal.coverString %>" class="cursor-pointer" style="width: 100%;">
             <p class="text-left" style="margin-top: 5px;font-size: medium;"><%= meal.title%></p>
           </a>
@@ -32,7 +32,7 @@
     </table>
     <div class="btn-group" style="margin-top: 25px;">
       <input name="keyword" type="text" class="btn btn-outline-light round input" style="max-width: 150px;height: 40px;" placeholder="<%= searchingtips%>">
-      <a class="btn btn-warning round orange text-white searchBtn" style="height: 40px;padding: 8px 15px 5px 5px;" href="https://sfmeal.com/meal">
+      <a class="btn btn-warning round orange text-white searchBtn" style="height: 40px;padding: 8px 15px 5px 5px;" href="http://sfmeal.com/meal">
         <i class="fa fa-search"></i>
         <%= search%>
       </a>
