@@ -151,6 +151,30 @@
                 <div id="pickupTab" class="tab-pane <%= meal.isPartyMode === true ? '' : 'active'%>">
                   <div class="row text-left">
                     <div class="col-xs-12">
+                      <div class="radio-box">
+                        <%
+                        var firstname = user.firstname;
+                        var addresses = user.address;
+                        if(addresses && addresses.length != 0){
+                          keys = Object.keys(addresses);
+                        for(var i=0; i < keys.length; i++){
+                          var key = keys[i];
+                          var addressObj = addresses[key];
+                          var phone = addressObj.phone;
+                        %>
+                        <label class="btn btn-default fixed-label vertical-align option contactOption">
+                          <input type="radio" id="pickup-2-<%= i%>" name="pickup-contact-set" data-color="red" data-index="<%= i%>" class="regular-radio" <%= phone == user.phone ? "checked=''" : ''%>><label for="pickup-2-<%= i%>"></label>
+                          <span style="margin-left: 10px;"><%= firstname + "+" + phone %></span>
+                        </label>
+                        <%}}else{phone = user.phone;if(phone){ %>
+                        <label class="btn btn-default fixed-label vertical-align option contactOption">
+                          <input type="radio" id="pickup-2-<%= i%>" name="pickup-contact-set" data-index="<%= i%>" class="regular-radio" checked=''><label for="pickup-2-<%= i%>"></label>
+                          <span style="margin-left: 10px;"><%= firstname + "+" + phone %></span>
+                        </label>
+                        <%}} %>
+                      </div>
+                    </div>
+                    <div class="col-xs-12">
                       <h4 class="text-left"><u><%= __('choose-pickup-location') %></u></h4>
                     </div>
                     <div class="col-xs-12">
@@ -183,31 +207,6 @@
                           </label>
                         <%}i++;j++;})}; %>
                       </div>
-                    </div>
-
-                    <div class="col-xs-12">
-                      <div class="radio-box">
-                        <%
-                        var firstname = user.firstname;
-                        var addresses = user.address;
-                        if(addresses && addresses.length != 0){
-                          keys = Object.keys(addresses);
-                          for(var i=0; i < keys.length; i++){
-                            var key = keys[i];
-                            var addressObj = addresses[key];
-                            var phone = addressObj.phone;
-                        %>
-                        <label class="btn btn-default fixed-label vertical-align option contactOption">
-                          <input type="radio" id="pickup-2-<%= i%>" name="pickup-contact-set" data-color="red" data-index="<%= i%>" class="regular-radio" <%= phone == user.phone ? "checked=''" : ''%>><label for="pickup-2-<%= i%>"></label>
-                          <span style="margin-left: 10px;"><%= firstname + "+" + phone %></span>
-                        </label>
-                        <%}}else{phone = user.phone;if(phone){ %>
-                        <label class="btn btn-default fixed-label vertical-align option contactOption">
-                          <input type="radio" id="pickup-2-<%= i%>" name="pickup-contact-set" data-index="<%= i%>" class="regular-radio" checked=''><label for="pickup-2-<%= i%>"></label>
-                          <span style="margin-left: 10px;"><%= firstname + "+" + phone %></span>
-                        </label>
-                        <%}} %>
-                        </div>
                     </div>
                   </div>
                 </div>
