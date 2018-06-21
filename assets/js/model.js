@@ -944,7 +944,16 @@ var AddressView = Backbone.View.extend({
     var $this = this;
     this.model.save({}, {
       success : function(){
-        BootstrapDialog.alert(jQuery.i18n.prop('emailVerificationSent'));
+        BootstrapDialog.show({
+          title : jQuery.i18n.prop('tip'),
+          message : jQuery.i18n.prop('emailVerificationSent'),
+          buttons : [{
+            label : jQuery.i18n.prop('emailVerificationComplete'),
+            action : function(dialog){
+              location.reload();
+            }
+          }]
+        });
       },error : function(err, model){
         $this.alertView.html(err.responseJSON ? err.responseJSON.responseText : err.responseText);
         $this.alertView.show();
@@ -2946,7 +2955,6 @@ var MealConfirmView = Backbone.View.extend({
     this.$el.find(".deliveryInput").removeClass('hide');
     if(value === "delivery"){
       this.$el.find(".deliveryInput").show();
-      this.$el.find(".pickupInput").hide();
       if(isLogin){
         $('#contactInfoView').hide();
         this.switchAddress(e);
@@ -2955,7 +2963,6 @@ var MealConfirmView = Backbone.View.extend({
       }
     }else{
       this.$el.find(".deliveryInput").hide();
-      this.$el.find(".pickupInput").show();
       if(isLogin){
         $('#contactInfoView').hide();
       }else{
@@ -3078,7 +3085,7 @@ var MealConfirmView = Backbone.View.extend({
       return;
     }
 
-    if(e && $(e.currentTarget).parent().hasClass('contactOption')){
+    if($(e.currentTarget).parent().hasClass('contactOption')){
       this.checkOptions(yourAddress);
     }
 
@@ -3119,7 +3126,7 @@ var MealConfirmView = Backbone.View.extend({
           form.find(".delivery").data("value", 0);
           refreshMenu();
         }
-        deliveryOption.parent().removeClass('disabled');
+        deliveryOption.parent().removeClass('disabled')
         makeAToast(jQuery.i18n.prop('addressValid'),'success');
         if(cb){
           cb(true);

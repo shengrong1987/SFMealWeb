@@ -882,6 +882,7 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
+          res.body.adjusting_orders[dishId3].number.should.be.equal(1);
           done();
         })
     })
@@ -913,8 +914,10 @@ describe('OrderController', function() {
           if(err){
             return done(err)
           }
-          // res.body.status.should.be.equal('preparing');
-          // res.body.lastStatus.should.be.equal('cancelling');
+          res.body.status.should.be.equal('preparing');
+          res.body.lastStatus.should.be.equal('adjust');
+          res.body.adjusting_orders[dishId3].number.should.be.equal(1);
+          res.body.orders[dishId3].number.should.be.equal(0);
           done();
         })
     });
@@ -1011,6 +1014,9 @@ describe('OrderController', function() {
         .expect(200)
         .end(function(err,res){
           res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
+          Object.keys(res.body.adjusting_orders).length.should.be.equal(0);
+          res.body.orders[dishId3].number.should.be.equal(1);
+          res.body.last_orders[dishId3].number.should.be.equal(0);
           done();
         })
     });
@@ -2279,7 +2285,7 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body.isPartyMode.should.be.true();
-          res.body.delivery_fee.should.be.above(30);
+          res.body.delivery_fee.should.be.above(25);
           new Date(res.body.pickupInfo.pickupFromTime).getTime().should.be.equal(deliveryDate.getTime());
           res.body.pickupInfo.deliveryCenter.should.be.equal("1974 Palou Ave, San Francisco, CA 94124, USA");
           res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);

@@ -31,7 +31,7 @@
             return total + parseInt(next.extra);
           }, 0);
         }
-        var lastPreference = adjusting_orders[dishId].preference;
+        var lastPreference = last_orders[dishId].preference;
         var lastTitle = '';
         if(lastPreference && lastPreference.length > 0) {
           lastPreference.forEach(function (pref) {
@@ -41,8 +41,8 @@
             return total + parseInt(next.extra);
           }, 0);
         }
-        var lastAmount = parseInt(orders[dishId].number);
-        var currentAmount = parseInt(adjusting_orders[dishId].number);
+        var lastAmount = parseInt(last_orders[dishId].number);
+        var currentAmount = parseInt(orders[dishId].number);
         if(lastAmount > 0 || currentAmount > 0){
           var dish;
           dishes.forEach(function(d){
@@ -85,10 +85,10 @@
         <td></td>
         <td></td>
         <td></td>
-        <%if(subtotal != adjusting_subtotal){%>
-        <td style="text-align: right;"><%= dingdan%>:<s>$<%= subtotal.toFixed(2)%></s> $<%= adjusting_subtotal.toFixed(2)%></td>
+        <%if(subtotal != last_subtotal){%>
+        <td style="text-align: right;"><%= dingdan%>:<s>$<%= subtotal.toFixed(2)%></s> $<%= last_subtotal.toFixed(2)%></td>
         <%}else{%>
-        <td style="text-align: right;"><%= dingdan%>:$<%= adjusting_subtotal.toFixed(2)%></td>
+        <td style="text-align: right;"><%= dingdan%>:$<%= last_subtotal.toFixed(2)%></td>
         <%}%>
       </tr>
       <tr class="border-less">
@@ -101,7 +101,7 @@
         <td></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= tax%>: $<%= (adjusting_subtotal * taxRate).toFixed(2)%></td>
+        <td style="text-align: right;"><%= tax%>: $<%= (last_subtotal * taxRate).toFixed(2)%></td>
       </tr>
       <tr class="border-less">
         <td></td>
@@ -113,7 +113,7 @@
         <td></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= total%> $<%= (adjusting_subtotal * (1 + taxRate) + delivery_fee + service_fee).toFixed(2)%></td>
+        <td style="text-align: right;"><%= total%> $<%= (last_subtotal * (1 + taxRate) + delivery_fee + service_fee).toFixed(2)%></td>
       </tr>
       <tr>
         <td><%= ordertime%>: <%= createdAt%></td>

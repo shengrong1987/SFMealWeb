@@ -254,14 +254,14 @@ module.exports = {
             m.delivery_range = m.delivery_range * stripe.PARTY_ORDER_RANGE_MULTIPLIER;
             m.delivery_fee = 0;
             m.dishes = dishes;
-            cb();
+            cb();[]
           })
         },
         getMeal : function(cb){
           if(!req.session.authenticated){
             return cb();
           }
-          User.findOne(u.id).populate("payment").populate("orders").exec(function(err,user){
+          User.findOne(u.id).populate('auth').populate("payment").populate("orders").exec(function(err,user){
             if(err){
               return cb(err);
             }
@@ -1008,7 +1008,7 @@ module.exports = {
               return cb();
             }
             var userId = req.session.user.id;
-            User.findOne(userId).populate("collects").exec(function(err,user){
+            User.findOne(userId).populate('auth').populate("collects").exec(function(err,user){
               if(err){
                 return cb(err);
               }
