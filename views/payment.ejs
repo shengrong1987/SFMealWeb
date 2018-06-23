@@ -131,7 +131,7 @@
             </div>
 
             <!-- Email -->
-            <% if(!user || !user.email){ %>
+            <% if(user && !user.emailVerified){ %>
             <div class="form-group">
               <label class="col-sm-4 control-label" for="textinput"><%= __('email')%></label>
               <div class="col-sm-6">

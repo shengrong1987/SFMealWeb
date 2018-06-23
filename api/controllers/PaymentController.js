@@ -34,7 +34,7 @@ module.exports = {
             card.brand = "DC";
             break;
         }
-        res.view('payment', { id : payment.id, payment : card, layout : false });
+        res.view('payment', { id : payment.id, payment : card, layout : false, user : req.session.user });
       });
     });
   },
