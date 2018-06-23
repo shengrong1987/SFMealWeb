@@ -3088,17 +3088,21 @@ var MealConfirmView = Backbone.View.extend({
       return;
     }
 
-    if($(e.currentTarget).parent().hasClass('contactOption')){
+    if(e && $(e.currentTarget).parent().hasClass('contactOption')){
       this.checkOptions(yourAddress);
     }
 
     var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
-    if(!deliveryOption.length){
+    if(!deliveryOption.length && !isPartyMode){
       // makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
       if(cb){
         return cb(false);
       }
       return;
+    }
+
+    if(isPartyMode){
+      deliveryOption = this.$el.find(".deliveryOption");
     }
 
     var cdTime = 1800;
