@@ -2303,7 +2303,7 @@ module.exports = {
             dishes = order.dishes;
           }
           var isOldPickupOption = pickups.some(function(pickupInfo){
-            return (pickupInfo.pickupFromTime === order.pickupInfo.pickupFromTime || pickupInfo.pickupTillTime === order.pickupInfo.pickupTillTime)
+            return (pickupInfo.pickupFromTime === order.pickupInfo.pickupFromTime && pickupInfo.pickupTillTime === order.pickupInfo.pickupTillTime)
               &&  pickupInfo.location === order.pickupInfo.location && pickupInfo.method === order.pickupInfo.method;
           })
           order.dishes.forEach(function(dish){

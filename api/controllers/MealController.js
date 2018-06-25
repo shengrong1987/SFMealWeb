@@ -739,7 +739,10 @@ module.exports = {
           }
         });
         if(params.supportPartyOrder){
+          var now = moment();
           var kitchenDelivery = {
+            pickupFromTime : now.toDate(),
+            pickupTillTime : now.add(7, 'days').toDate(),
             deliveryCenter : host.full_address,
             method : "delivery",
             area : host.city,
