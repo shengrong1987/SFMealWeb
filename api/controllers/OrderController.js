@@ -73,11 +73,13 @@ module.exports = {
     var dishes = meal.dishes;
     var pickUpInfo;
     if(params.method === "shipping"){
-      meal.pickups.forEach(function(pickupObj){
-        if(pickupObj.method === "shipping"){
-          pickUpInfo = Object.assign({}, pickupObj);
-        }
-      });
+      pickUpInfo = {
+        method : 'shipping',
+        phone : meal.chef.phone,
+        pickupFromTime : moment().add(1,'days').toDate(),
+        pickupTillTime : moment().add(2,'days').toDate()
+      };
+      params.delivery_fee = 0;
     }else{
       sails.log.info("method: " + params.method, " party mode: " + params.isPartyMode);
       if(params.method === "delivery" && params.isPartyMode !== true){

@@ -107,15 +107,15 @@ module.exports = {
   },
   oneHourBefore : function(date){
     var mDate = moment(new Date(date).toISOString()).subtract(1, 'hour');
-    return mDate.local()._d;
+    return mDate.local().toDate();
   },
   oneDayBefore : function(date){
     var mDate = moment(new Date(date).toISOString()).subtract(1, 'day');
-    return mDate.local()._d;
+    return mDate.local().toDate();
   },
   minutesBefore : function(date, minutes){
     var mDate = moment(new Date(date).toISOString()).subtract(minutes, 'minute');
-    return mDate.local()._d;
+    return mDate.local().toDate();
   },
   getTaxRate : function(county){
     var tax = 0.08;
