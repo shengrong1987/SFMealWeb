@@ -2810,6 +2810,7 @@ var MealConfirmView = Backbone.View.extend({
     "change #deliveryTab .regular-radio" : "switchAddress",
     "change #method" : "switchMethod",
     "click #createNewContactBtn" : "createNewContact",
+    "click #createNewContactBtn2" : "createNewContact",
     "click #addCommentBtn" : "toggleCommentView",
     "keydown" : "onKeyDown",
     "click #verifyAddressBtn" : "verifyAddress",
@@ -2954,9 +2955,21 @@ var MealConfirmView = Backbone.View.extend({
     var value = $(e.currentTarget).find(".active").attr("value");
     this.$el.find(".deliveryInput").removeClass('hide');
     this.$el.find(".pickupInput").removeClass('hide');
+    this.$el.find(".shippingInput").removeClass('hide');
     if(value === "delivery"){
       this.$el.find(".pickupInput").hide();
+      this.$el.find(".shippingInput").hide();
       this.$el.find(".deliveryInput").show();
+      if(isLogin){
+        $('#contactInfoView').hide();
+        this.switchAddress(e);
+      }else{
+        this.verifyAddress(e);
+      }
+    }else if(value === "shipping"){
+      this.$el.find(".pickupInput").hide();
+      this.$el.find(".deliveryInput").hide();
+      this.$el.find(".shippingInput").show();
       if(isLogin){
         $('#contactInfoView').hide();
         this.switchAddress(e);
@@ -2965,6 +2978,7 @@ var MealConfirmView = Backbone.View.extend({
       }
     }else{
       this.$el.find(".deliveryInput").hide();
+      this.$el.find(".shippingInput").hide();
       this.$el.find(".pickupInput").show();
       if(isLogin){
         $('#contactInfoView').hide();
@@ -3315,33 +3329,33 @@ var OrderView = Backbone.View.extend({
   getContactInfo : function(method, isLogin, cb){
     var contactObj = {};
     var contactView = isLogin ? this.$el.find("#" + method + "Tab" + " .contactOption .regular-radio:checked") : this.$el.find("#contactInfoView");
-    switch(method){
+    switch(method) {
       case "pickup":
-        if(!isLogin){
+        if (!isLogin) {
           var name = contactView.find("input[name='name']").val();
           var phone = contactView.find("input[name='phone']").val();
-          if(!name || !phone){
+          if (!name || !phone) {
             makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
             return cb(false);
           }
           contactObj.name = name;
           contactObj.phone = phone;
-        }else{
+        } else {
           var t = contactView.next().next().text();
-          if(t){
+          if (t) {
             name = t.split("+")[0];
             phone = t.split("+")[1];
-            if(!name || !phone){
+            if (!name || !phone) {
               makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
               return cb(false);
             }
             contactObj.name = name;
             contactObj.phone = phone;
-          }else{
+          } else {
             contactView = this.$el.find("#contactInfoView");
             name = contactView.find("input[name='name']").val();
             phone = contactView.find("input[name='phone']").val();
-            if(!name || !phone){
+            if (!name || !phone) {
               makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
               return cb(false);
             }
@@ -3352,13 +3366,55 @@ var OrderView = Backbone.View.extend({
         cb(contactObj);
         break;
       case "delivery":
-        if(!isLogin){
+        if (!isLogin) {
           name = contactView.find("input[name='name']").val();
           phone = contactView.find("input[name='phone']").val();
           var street = contactView.find("input[name='street']").val();
           var city = contactView.find("input[name='city']").val();
           var state = contactView.find("input[name='state']").val();
           var zipcode = contactView.find("input[name='zipcode']").val();
+          if (!street || !city || !state || !zipcode) {
+            makeAToast(jQuery.i18n.prop('addressIncomplete'));
+            return cb(false);
+          }
+          if (!name || !phone) {
+            makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
+            return cb(false);
+          }
+          contactObj.address = street + ", " + city + ", " + state + " " + zipcode;
+          contactObj.name = name;
+          contactObj.phone = phone;
+        } else {
+          var t = contactView.next().next().text();
+          if (t) {
+            var address = t.split("+")[0];
+            phone = t.split("+")[1];
+            if (!address || !phone) {
+              makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'));
+              return cb(false);
+            }
+            contactObj.address = address;
+            contactObj.phone = phone;
+          } else {
+            makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'));
+            return cb(false);
+          }
+        }
+        mealConfirmView.switchAddress(null, function (valid) {
+          if (!valid) {
+            return cb(false);
+          }
+          return cb(contactObj);
+        }, contactObj.address);
+        break;
+      case "shipping":
+        if(!isLogin){
+          name = contactView.find("input[name='name']").val();
+          phone = contactView.find("input[name='phone']").val();
+          street = contactView.find("input[name='street']").val();
+          city = contactView.find("input[name='city']").val();
+          state = contactView.find("input[name='state']").val();
+          zipcode = contactView.find("input[name='zipcode']").val();
           if(!street || !city || !state || !zipcode){
             makeAToast(jQuery.i18n.prop('addressIncomplete'));
             return cb(false);
@@ -3371,9 +3427,9 @@ var OrderView = Backbone.View.extend({
           contactObj.name = name;
           contactObj.phone = phone;
         }else{
-          var t = contactView.next().next().text();
+          t = contactView.next().next().text();
           if(t){
-            var address = t.split("+")[0];
+            address = t.split("+")[0];
             phone = t.split("+")[1];
             if(!address || !phone){
               makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'));
@@ -3386,14 +3442,9 @@ var OrderView = Backbone.View.extend({
             return cb(false);
           }
         }
-        mealConfirmView.switchAddress(null, function(valid) {
-          if (!valid) {
-            return cb(false);
-          }
-          return cb(contactObj);
-        }, contactObj.address);
+        return cb(contactObj);
         break;
-    }
+      }
   },
   getPickupOption : function(method){
     return parseInt(this.$el.find("#" + method + "Tab" + " .option .regular-radio:checked").data("index"));

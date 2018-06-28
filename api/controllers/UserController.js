@@ -270,7 +270,7 @@ module.exports = require('waterlock').actions.user({
         }
         User.update({id: userId}, params).exec(function (err, user) {
           if (err) {
-            return cb(err);
+            return res.badRequest(err);
           }
           if(user[0].host && user[0].phone){
             var hostId = user[0].host.id || user[0].host;
