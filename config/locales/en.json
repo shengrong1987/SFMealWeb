@@ -866,5 +866,6 @@
   "view-receipt" : "View Receipt",
   "tip" : "Tips",
   "leave-comment" : "Memo",
-  "weekly-orders" : "Orders of the week"
+  "weekly-orders" : "Orders of the week",
+  "track-order" : "Track order"
 }
