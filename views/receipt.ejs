@@ -97,8 +97,12 @@
       <!--<% if(!download){%>-->
       <!--<a href="/order/<%= id%>/receipt/download" class="btn btn-red"><%= __('save-receipt')%></a>-->
       <!--<%}%>-->
-      <a href="http://maps.apple.com/?q=<%= pickupInfo.method == 'pickup' ? pickupInfo.location : contactInfo.address%>" class="btn btn-red"><%= __('find-route')%></a>
-      <a class="btn btn-info" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)"> <%= __('nav-bar-register') %></a>
+      <% if(pickupInfo.method === "shipping"){%>
+      <a href="https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=<%= tracking || ''%>" class="btn btn-grey-red"><%= __('track-order')%></a>
+      <% }else{%>
+      <a href="http://maps.apple.com/?q=<%= pickupInfo.method == 'pickup' ? pickupInfo.location : contactInfo.address%>" class="btn btn-grey-red"><%= __('find-route')%></a>
+      <% }%>
+      <a class="btn btn-grey-blue" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)"> <%= __('nav-bar-register') %></a>
       <i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" title="<%= __('user-benefit')%>"></i>
     </div>
   </div>

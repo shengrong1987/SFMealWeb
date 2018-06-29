@@ -3107,7 +3107,8 @@ var MealConfirmView = Backbone.View.extend({
     }
 
     var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
-    if(!deliveryOption.length && !isPartyMode){
+    var deliveryCenter = deliveryOption.parent().data('center');
+    if(!deliveryOption.length || !deliveryCenter){
       // makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
       if(cb){
         return cb(false);
@@ -3115,14 +3116,9 @@ var MealConfirmView = Backbone.View.extend({
       return;
     }
 
-    if(isPartyMode){
-      deliveryOption = this.$el.find(".deliveryOption");
-    }
-
     var cdTime = 1800;
     if(this.isCoolDown){
       this.isCoolDown = false;
-      var deliveryCenter = deliveryOption.parent().data('center');
       utility.distance(deliveryCenter, yourAddress, function(err, distance){
         if(err){
           makeAToast(err);
