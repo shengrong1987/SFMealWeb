@@ -67052,80 +67052,6 @@ var ActionButton = createReactClass({
 
   _getData : function(target, action){
     var data = {};
-    // switch(action){
-    //   case "create":
-    //     switch(this.props.model){
-    //       case "Coupon":
-    //         var type = target.closest('tr').find("input[name='type']").val();
-    //         var amount = target.closest('tr').find("input[name='amount']").val();
-    //         var description = target.closest('tr').find("input[name='description']").val();
-    //         var code = target.closest('tr').find("input[name='code']").val();
-    //         var expires = new Date(parseInt(target.closest('tr').find("input[name='expires']").val() * 1000));
-    //         if(Object.prototype.toString.call(expires) === "[object Date]" ){
-    //           if(isNaN(expires.getTime())){
-    //             ActionCreators.badRequest("expire date is not valid");
-    //             return false;
-    //           }
-    //         }else{
-    //           ActionCreators.badRequest("expire date is not valid");
-    //           return false;
-    //         }
-    //         if(!type || !amount || !description || !code){
-    //           ActionCreators.badRequest("please fill in all values");
-    //           return false;
-    //         }
-    //         var data = {
-    //           type : type,
-    //           amount : amount,
-    //           description : description,
-    //           code : code,
-    //           expires : expires
-    //         };
-    //         break;
-    //       case "Email":
-    //         var modelType = target.closest('tr').find("input[name='model']").val();
-    //         var action = target.closest('tr').find("input[name='action']").val();
-    //         var metaData = target.closest('tr').find("input[name='metaData']").val();
-    //         if(!model || !action || !metaData){
-    //           ActionCreators.badRequest("please fill in all values");
-    //           return;
-    //         }
-    //         try{
-    //           JSON.parse(metaData)
-    //         }catch(e){
-    //           ActionCreators.badRequest("metaData must be a json string");
-    //           return;
-    //         }
-    //         var data = {
-    //           model : modelType,
-    //           action : action,
-    //           metaData : metaData
-    //         }
-    //         break;
-    //     }
-    //     break;
-    //   case "verifyPhoto":
-    //   case "unVerifyPhoto":
-    //     var key = target.find("~input[name='key']").val();
-    //     data.key = key;
-    //     break;
-    //   case "verifyLicense":
-    //     var month = target.find("~input[name='month']").val();
-    //     var day = target.find("~input[name='day']").val();
-    //     var year = target.find("~input[name='year']").val();
-    //     var date = new Date(year, month-1, day);
-    //     if(date.getTime() < new Date().getTime()){
-    //       ActionCreators.badRequest("expiration date should be in the future");
-    //       return false;
-    //     }
-    //     data.month = month;
-    //     data.day = day;
-    //     data.year = year;
-    //     break;
-    //   case "job":
-    //     data = target.data("job");
-    //     break;
-    // }
     return data;
   },
 
@@ -67201,6 +67127,10 @@ var ActionButton = createReactClass({
             chef : { value : this.props.data["host"]["id"], readonly : true},
             isPartyMode : { value : this.props.data["isPartyMode"], readonly : true},
             method : { value : this.props.data["method"], readonly : true}
+          }
+        }else if(action === "discount"){
+          postData = {
+            discount : { value : this.props.data['discount'], type : 'float'}
           }
         }
         break;
@@ -67364,10 +67294,10 @@ var ActionButton = createReactClass({
       case "Order":
         if(rowData.hasOwnProperty('status')){
           if(rowData['status'] !== 'complete' && rowData['status'] !== 'cancel'){
-            actions = actions.concat(['abort','refund']);
+            actions = actions.concat(['discount','abort','refund']);
           }else if(rowData.hasOwnProperty('charges')){
             if(rowData['charges'] && Object.keys(rowData['charges']).length > 0){
-              actions.push('refund');
+              actions.concat(['discount','refund']);
             }
           }
           status = rowData['status'];

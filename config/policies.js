@@ -118,6 +118,7 @@ module.exports.policies = {
     'abort' : 'isAdmin',
     'refund' : 'isAdmin',
     'update' : 'isAdmin',
+    'discount' : 'isAdmin',
     'receipt' : true,
     'downloadReceipt' : true,
     'process' : true,

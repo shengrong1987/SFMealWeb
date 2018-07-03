@@ -3460,7 +3460,7 @@ var OrderView = Backbone.View.extend({
     }
     // var comment = this.$el.find("#commentView [name='comment']").val();
     customerInfo.time = customDate;
-    customerInfo.comment = "comment";
+    customerInfo.comment = this.$el.find("#commentView [name='comment']").val();
     return cb(customerInfo);
   },
   getPaymentInfo : function(isLogin, cb){
