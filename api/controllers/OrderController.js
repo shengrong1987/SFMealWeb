@@ -61,6 +61,8 @@ var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUt
 //-46 : this order is an express order, can not confirm
 //-47 : incomplete order pickup information
 //-48 : unverify email
+//-49 : refund no charges found
+//-50 : discount amount missing
 //-98 : result not found
 
 
@@ -591,7 +593,6 @@ module.exports = {
                   if(netDiff >= 0){
                     return next();
                   }
-
                   sails.log.info("original tax amount: " + order.tax);
                   sails.log.info("tax refund amount: " + tax);
                   sails.log.info("refunding amount plus tax: " + netDiff);
@@ -1253,6 +1254,7 @@ module.exports = {
       }
       notification.transitLocaleTimeZone(order);
       order.download = false;
+      order.discount = order.discount || 0;
       order.tip = order.tip || 0;
       res.view('receipt', order);
     })
@@ -1595,7 +1597,7 @@ module.exports = {
         return res.badRequest(err)
       }
       if((!order.charges || order.charges.length === 0) && (!order.transfer || order.transfer.length === 0)){
-        return res.badRequest(req.__('order-refund-fail'));
+        return res.badRequest({ responseText : req.__('order-refund-fail'), code : -49});
       }
       var metadata = {
         userId :  order.customer ? order.customer.id : null,
@@ -1639,6 +1641,89 @@ module.exports = {
         }
         order.tax = 0;
         order.msg = "Order refunded by admin, please see email for detail, order id:" + order.id;
+        order.save(function (err, result) {
+          if (err) {
+            return res.badRequest(err);
+          }
+          return res.ok(order);
+        });
+      });
+    });
+  },
+
+  discount : function(req, res){
+    var orderId = req.params.id;
+    var discount = req.body.discount * 100;
+    if(!discount){
+      return res.badRequest({ responseText : req.__('order-discount-amount-needed'), code : -50});
+    }
+    Order.findOne(orderId).populate("meal").populate("host").populate('customer').exec(function(err, order) {
+      if (err) {
+        return res.badRequest(err)
+      }
+      if((!order.charges || order.charges.length === 0) && (!order.transfer || order.transfer.length === 0)){
+        return res.badRequest({ responseText : req.__('order-refund-fail'), code : -49});
+      }
+      var metadata = {
+        userId :  order.customer ? order.customer.id : null,
+        amount : discount
+      };
+      async.auto({
+        refundOrder : function(next){
+          if(order.paymentMethod === "cash"){
+            return next();
+          }
+          stripe.batchRefund(order.charges, order.transfer, metadata, function(err) {
+            if(err){
+              return next(err);
+            }
+            next();
+          });
+        },
+        refundApplicationFeeForCashOrder : function(next){
+          if(order.paymentMethod !== "cash"){
+            return next();
+          }
+          var refundedFee = discount * order.meal.service_fee;
+          metadata = {
+            userName: order.customerName,
+            userPhone: order.customerPhone,
+            reverse_transfer : false,
+            refund_application_fee : false,
+            amount : discount
+          };
+          stripe.batchRefund(order.feeCharges, null, metadata, function(err) {
+            if (err) {
+              return next(err);
+            }
+            order.charges['cash'] -= discount;
+            order.application_fees['cash'] -= refundedFee;
+            next();
+          });
+        },
+        transferDiscount : function(next){
+          metadata = {
+            destination : order.host.accountId,
+            amount : discount,
+            userId : order.customer.id
+          };
+          stripe.transfer({ metadata : metadata }, function(err, transfer){
+            if(err){
+              return next(err);
+            }
+            if(transfer){
+              order.transfer[transfer.id] = transfer.amount;
+            }
+            next();
+          })
+        }
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        order.tax = 0;
+        order.discount = discount;
+        order.msg = "Order discounted by admin, amount: " + order.discount + ", order id:" + order.id;
         order.save(function (err, result) {
           if (err) {
             return res.badRequest(err);

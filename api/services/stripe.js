@@ -262,10 +262,10 @@ module.exports = {
       if(err){
         return final(err);
       }
-      if(!attr.metadata.userId){
-        return final(null, charge);
+      if(!attr.metadata.userId || !charge){
+        return final(null, charge, transfer);
       }
-      _this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
+      _this.handlePoint(charge.amount, attr.metadata.userId, function(err, user){
         if(err){
           return final(err);
         }
@@ -313,8 +313,11 @@ module.exports = {
               if(err){
                 return cb(err);
               }
+              if(!charge || charge.amount===0 || attr.metadata.userId){
+                return cb(null, charge, transfer);
+              }
               sails.log.info("extra transfer created: " + transfer.amount);
-              _this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
+              _this.handlePoint(charge.amount, attr.metadata.userId, function(err, user){
                 if(err){
                   return cb(err);
                 }
@@ -324,10 +327,10 @@ module.exports = {
           );
         });
       }else{
-        if(!attr.metadata.userId){
+        if(!charge || charge.amount===0 || attr.metadata.userId){
           return cb(null, charge);
         }
-        _this.handlePoint(charge, attr.metadata.userId, true, function(err, user){
+        _this.handlePoint(charge.amount, attr.metadata.userId, function(err, user){
           if(err){
             return cb(err);
           }
@@ -424,8 +427,8 @@ module.exports = {
     }
   },
 
-  handlePoint : function(charge, userId, isCharge, cb){
-    if(!charge || charge.status !== "succeeded"){
+  handlePoint : function(amount, userId, cb){
+    if(!userId){
       return cb();
     }
     User.findOne(userId).exec(function(err, user){
@@ -433,18 +436,41 @@ module.exports = {
         return cb(err);
       }
       var points = user.points || 0;
-      var earnedPoints = Math.floor(charge.amount/100);
-      if(isCharge){
-        var newPoints = points + earnedPoints;
-      }else{
-        newPoints = points - earnedPoints;
-      }
+      var earnedPoints = Math.floor(amount/100);
+      var newPoints = points + earnedPoints;
       sails.log.info("user old points: " + points);
       sails.log.info("points difference: " + earnedPoints);
       sails.log.info("user total points: " + newPoints);
       user.points = newPoints;
       user.save(cb);
-    })
+    });
+  },
+
+  transfer : function(attr, cb){
+    var amount = attr.metadata.amount;
+    var _this = this;
+    stripe.transfers.create(
+      {
+        amount: amount,
+        currency: 'usd',
+        destination: attr.metadata.destination,
+        metadata : attr.metadata
+      }, function(err, transfer){
+        if(err){
+          return cb(err);
+        }
+        sails.log.info("extra transfer created: " + transfer.amount);
+        if(!transfer || transfer.amount===0 || attr.metadata.userId){
+          return cb(null, transfer);
+        }
+        _this.handlePoint(transfer.amount, attr.metadata.userId, function(err, user){
+          if(err){
+            return cb(err);
+          }
+          cb(null, transfer);
+        })
+      }
+    );
   },
 
   batchRefund : function(charges, transfers, metadata, cb){
@@ -514,10 +540,10 @@ module.exports = {
         return cb(err);
       }
       sails.log.info("user id:" + attr.metadata.userId);
-      if(!attr.metadata.userId){
+      if(!attr.metadata.userId || !refund || refund.amount === 0){
         return cb(null, refund);
       }
-      $this.handlePoint(refund, attr.metadata.userId, false, function(err, user){
+      $this.handlePoint(-refund.amount, attr.metadata.userId, function(err, user){
         if(err){
           return cb(err);
         }
@@ -585,7 +611,7 @@ module.exports = {
         if(err){
           return cb(err);
         }
-        _this.handlePoint(reversal, attr.metadata.userId, false, function(err, user){
+        _this.handlePoint(-reversal.amount, attr.metadata.userId, function(err, user){
           if(err){
             return cb(err);
           }

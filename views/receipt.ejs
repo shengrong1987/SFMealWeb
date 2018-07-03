@@ -44,7 +44,11 @@
         <td class="xs-hide"></td>
         <td></td>
         <td></td>
+        <% if(discount){%>
+        <td style="text-align: right;"><%= __('dingdan')%>: <s>$<%= subtotal.toFixed(2)%></s> -> $<%= (subtotal - discount/100).toFixed(2)%></td>
+        <% }else{%>
         <td style="text-align: right;"><%= __('dingdan')%>: $<%= subtotal.toFixed(2)%></td>
+        <% }%>
       </tr>
       <tr class="border-less">
         <td class="xs-hide"></td>
@@ -56,7 +60,7 @@
         <td class="xs-hide"></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= __('tax')%>: $<%= (subtotal * getTaxRate()).toFixed(2)%></td>
+        <td style="text-align: right;"><%= __('tax')%>: $<%= ((subtotal - discount/100) * getTaxRate()).toFixed(2)%></td>
       </tr>
       <tr class="border-less">
         <td class="xs-hide"></td>
@@ -68,7 +72,7 @@
         <td class="xs-hide"></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= __('total')%> $<%= (parseFloat(subtotal * (1 + getTaxRate())) + parseFloat(delivery_fee) + parseFloat(tip)).toFixed(2)%></td>
+        <td style="text-align: right;"><%= __('total')%> $<%= (parseFloat((subtotal - discount/100) * (1 + getTaxRate())) + parseFloat(delivery_fee) + parseFloat(tip)).toFixed(2)%></td>
       </tr>
       <tr>
         <td><%= __('payment-method')%>: <%= __(paymentInfo.method)%></td>
