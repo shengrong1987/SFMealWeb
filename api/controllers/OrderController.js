@@ -1705,7 +1705,7 @@ module.exports = {
           metadata = {
             destination : order.host.accountId,
             amount : discount,
-            userId : order.customer.id
+            userId : order.customer ? order.customer.id : ''
           };
           stripe.transfer({ metadata : metadata }, function(err, transfer){
             if(err){
