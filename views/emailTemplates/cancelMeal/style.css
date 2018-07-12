@@ -8275,34 +8275,34 @@ hovereffect p {
   display: block;
 }
 .fa-facebook-remote {
-  background: url("https://www.sfmeal.com/images/fa-facebook.png") no-repeat center / 70% auto;
+  background: url("http://www.sfmeal.com/images/fa-facebook.png") no-repeat center / 70% auto;
 }
 .fa-instagram-remote {
-  background: url("https://www.sfmeal.com/images/fa-instagram.png") no-repeat center / 70% auto;
+  background: url("http://www.sfmeal.com/images/fa-instagram.png") no-repeat center / 70% auto;
 }
 .fa-pinterest-remote {
-  background: url("https://www.sfmeal.com/images/fa-pinterest.png") no-repeat center / 70% auto;
+  background: url("http://www.sfmeal.com/images/fa-pinterest.png") no-repeat center / 70% auto;
 }
 .fa-twitter-remote {
-  background: url("https://www.sfmeal.com/images/fa-twitter.png") no-repeat center / 70% auto;
+  background: url("http://www.sfmeal.com/images/fa-twitter.png") no-repeat center / 70% auto;
 }
 .chef-icon-remote {
-  background: url("https://www.sfmeal.com/images/SFMeal_email_icon1.jpg") no-repeat center / 70% auto;
+  background: url("http://www.sfmeal.com/images/SFMeal_email_icon1.jpg") no-repeat center / 70% auto;
 }
 .camera-icon-remote {
-  background: url("https://www.sfmeal.com/images/SFMeal_email_icon2.jpg") no-repeat center / 70% auto;
+  background: url("http://www.sfmeal.com/images/SFMeal_email_icon2.jpg") no-repeat center / 70% auto;
 }
 .dish-icon-remote {
-  background: url("https://www.sfmeal.com/images/SFMeal_email_icon3.jpg") no-repeat center / 70% auto;
+  background: url("http://www.sfmeal.com/images/SFMeal_email_icon3.jpg") no-repeat center / 70% auto;
 }
 .meal-icon-remote {
-  background: url("https://www.sfmeal.com/images/SFMeal_email_icon4.jpg") no-repeat center / 70% auto;
+  background: url("http://www.sfmeal.com/images/SFMeal_email_icon4.jpg") no-repeat center / 70% auto;
 }
 .license-icon-remote {
-  background: url("https://www.sfmeal.com/image/SFMeal_email_icon0.jpg") no-repeat center / 70% auto;
+  background: url("http://www.sfmeal.com/image/SFMeal_email_icon0.jpg") no-repeat center / 70% auto;
 }
 .logo-slogan {
-  background-image: url(../images/sfmeal_logo_slogan.png);
+  background-image: url(../images/sfmeal_logo2.png);
   display: block;
   height: 150px;
   background-size: 120px;
@@ -8340,7 +8340,7 @@ hovereffect p {
 }
 .logo-remote {
   padding: 30px 150px 50px 150px;
-  background: url("https://www.sfmeal.com/images/sfmeal_logo.png") no-repeat center / 100% auto;
+  background: url("http://www.sfmeal.com/images/sfmeal_logo.png") no-repeat center / 100% auto;
   background-color: transparent;
 }
 .logo-sm {
@@ -10205,7 +10205,7 @@ fieldset[disabled] .btn-red.active {
     line-height: 80px;
   }
   .pure-banner .logo-slogan {
-    background-image: url(../images/sfmeal_logo_slogan.png);
+    background-image: url(../images/sfmeal_logo2.png);
     display: block;
     height: 55px;
     background-size: 50px;

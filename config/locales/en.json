@@ -412,6 +412,7 @@
   "no-order-tip": "You don't have any orders, browser around.",
   "browse": "Browse",
   "no-review-tip": "You don't have any pending reviews, want to order something first?",
+  "complete-review-tip" : "You have reviewed all order.",
   "order-action": "Order Now",
   "pocket-my-balance": "My current balance:",
   "pocket-detail": "Transaction History",

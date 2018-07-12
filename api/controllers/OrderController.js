@@ -2269,13 +2269,37 @@ module.exports = {
         return numberOfWeek === parseInt(weekWanted) && isYearMatch;
       });
       var dishIds = [];
+      var newOrders = [];
       orders.forEach(function(order){
+        newOrders.forEach(function(oldOrder){})
+        var isSamePickup = newOrders.some(function(oldOrder){
+          var _isSame = oldOrder.pickupInfo.pickupFromTime === order.pickupInfo.pickupFromTime && oldOrder.pickupInfo.pickupTillTime === order.pickupInfo.pickupTillTime
+            && oldOrder.pickupInfo.customerName === order.pickupInfo.customerName && oldOrder.pickupInfo.customerPhone === order.pickupInfo.customerPhone
+            && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address)
+            || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
+          if(_isSame){
+            Object.keys(order.orders).forEach(function(dishId){
+              oldOrder.orders[dishId] = order.orders[dishId];
+            })
+            oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
+            oldOrder.pickupInfo.comment += order.pickupInfo.comment;
+            if(oldOrder.paymentMethod === "cash"){
+              oldOrder.charges['cash'] += order.charges['cash'];
+            }
+          }
+          return _isSame;
+        })
+        if(!isSamePickup){
+          newOrders.push(order);
+        }
+      });
+      newOrders.forEach(function(order){
         dishIds = dishIds.concat(Object.keys(order.orders));
         dishIds = dishIds.filter(function(item, pos){
           return dishIds.indexOf(item) === pos;
         });
       })
-      async.each(orders, function(order, cb){
+      async.each(newOrders, function(order, cb){
         async.auto({
           findMeal : function(next){
              if(!order.meal){
@@ -2371,17 +2395,17 @@ module.exports = {
         var csv = req.query.csv;
         if(!wantsReport){
           if(csv){
-            var csvStr = util.ConvertToCSV(orders);
+            var csvStr = util.ConvertToCSV(newOrders);
             res.setHeader('Content-disposition', 'attachment; filename=orders.csv');
             res.setHeader('Content-type', 'text/plain');
             res.charset = 'UTF-8';
             return res.end(csvStr);
           }else{
-            return res.ok(orders);
+            return res.ok(newOrders);
           }
         }
-        var pickups,dishes;
-        orders.forEach(function(order){
+        var pickups,dishes = [];
+        newOrders.forEach(function(order){
           if(!order.pickupInfo){
             return;
           }
@@ -2408,7 +2432,7 @@ module.exports = {
         pickups.sort(function(a, b){
           return new Date(a.pickupFromTime).getTime() - new Date(b.pickupFromTime).getTime();
         })
-        res.view('report', { meal : { orders : orders, pickups : pickups, dishes : dishes }});
+        res.view('report', { meal : { orders : newOrders, pickups : pickups, dishes : dishes }});
       });
     });
   }
