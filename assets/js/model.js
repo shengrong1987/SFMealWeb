@@ -2612,7 +2612,7 @@ var ReviewView = Backbone.View.extend({
     "click .leaveReview" : "leaveReview"
   },
   initialize : function(){
-
+    this.$el.find('[data-toggle="star-set"]').starSet();
   },
   leaveReview : function(e){
     e.preventDefault();
@@ -2624,6 +2624,7 @@ var ReviewView = Backbone.View.extend({
     var dishId = ele.data("dish");
     var mealId = ele.data("meal");
     var hostId = ele.data("host");
+    var orderId = this.$el.data("order");
     var score;
     if(dishId){
       //single dish review
@@ -2638,14 +2639,15 @@ var ReviewView = Backbone.View.extend({
         reviewObj.dish = $(this).data("dish");
         reviewObj.score = $(this).find(".rating .text-yellow").length;
         reviewObj.content = $(this).find(".review").val();
-        if(reviewObj.score == 0){
+        if(reviewObj.score === 0){
           scoreNotRated = true;
         }
         reviews.push(reviewObj);
       });
-      if(reviews.length > 0){
-        reviews = JSON.stringify(reviews);
-      }
+    }
+    if(orderId){
+      this.model.set({ id : orderId });
+      this.model.action = "review";
     }
     var $this = this;
     if((!score || score === 0) && scoreNotRated){
@@ -3215,6 +3217,29 @@ var MealConfirmView = Backbone.View.extend({
     applyPoints(true, pointRedeem);
   }
 })
+
+var receiptView = Backbone.View.extend({
+  events : {
+    "click [data-action='review']" : "review"
+  },
+  review : function(e){
+    e.preventDefault();
+    var orderId = $(e.currentTarget).data("id");
+    var mealId = $(e.currentTarget).data("meal");
+    this.model.set({ id : orderId, reviews : [{content : "testing review", score : 5, dish : "5b3b0154c087f5789ee64f65"}]});
+    this.model.action = "review";
+    this.model.save({}, {
+      success : function(model, result){
+        BootstrapDialog.alert(result.responseText, function(){
+          reloadUrl("/meal/" + mealId, "");
+        });
+      },
+      error : function(model, err){
+        BootstrapDialog.alert(getMsgFromError(err));
+      }
+    })
+  }
+});
 
 var OrderView = Backbone.View.extend({
   events : {

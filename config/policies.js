@@ -125,7 +125,7 @@ module.exports.policies = {
     'verifyOrder' : true,
     'adjustAdmin' : 'isAdmin',
     'updatePickupInfo' : 'isAdmin',
-    'findOrdersOfWeek' : 'isAdmin'
+    'findOrdersOfWeek' : true
   },
 
   DishController : {
@@ -146,7 +146,9 @@ module.exports.policies = {
     'create' : ['sessionAuth', 'isGuestOfMeal'],
     'delete' : 'isAdmin',
     'update' : 'isAdmin',
-    'private' : 'isAdmin'
+    'private' : 'isAdmin',
+    'orderReview' : true,
+    'reviewPopup' : true
   },
 
   PocketController : {

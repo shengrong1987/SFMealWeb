@@ -415,6 +415,7 @@
   "no-order-tip" : "您尚未有任何订单，四处看看吧。",
   "browse" : "立即浏览",
   "no-review-tip" : "您尚未有任何待评价菜，需要点餐吗？",
+  "complete-review-tip" : "该订单的所有菜式已经评价完成了",
   "order-action" : "立即点餐",
   "pocket-my-balance":"我的钱包存款为",
   "pocket-detail" : "收支明细",

@@ -35,7 +35,8 @@
       </thead>
       <tbody>
       <% meal.orders.forEach(function(order){
-        if(order.isDateCustomized || (order.pickupInfo.pickupFromTime === pickup.pickupFromTime && order.pickupInfo.pickupTillTime === pickup.pickupTillTime && pickup.method === order.pickupInfo.method && pickup.location === order.pickupInfo.location)){%>
+        if(order.isDateCustomized
+        || (order.pickupInfo.pickupFromTime === pickup.pickupFromTime && order.pickupInfo.pickupTillTime === pickup.pickupTillTime && pickup.method === order.pickupInfo.method && pickup.location === order.pickupInfo.location)){%>
           <tr data-option="<%= order.pickupOption%>" data-method="<%= order.pickupInfo.method%>" data-location="<%= order.pickupInfo.location%>" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>">
             <td><%= order.customerName %></td>
             <td><%= order.id%></td>

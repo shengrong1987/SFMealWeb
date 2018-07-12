@@ -28,7 +28,7 @@
       %>
       <tr>
         <td class="xs-hide"><img class="dishImg" src="<%= dish.photos[0].v%>" style="width: 100px;"></td>
-        <td class="text-green" style="vertical-align: middle;"><%= dish.title%><%= title%></td>
+        <td class="text-green" style="vertical-align: middle;" data-dish-id="<%= dish.id%>"><%= dish.title%><%= title%></td>
         <td style="vertical-align: middle;"><%= amount%><%= __('fen')%></td>
         <td style="vertical-align: middle;text-align: right;">
           $<%= (amount * price).toFixed(2)%>
@@ -98,15 +98,13 @@
     </table>
     <div class="row text-center">
       <h4><small><%= __('order-receipt-help')%></small></h4>
-      <!--<% if(!download){%>-->
-      <!--<a href="/order/<%= id%>/receipt/download" class="btn btn-red"><%= __('save-receipt')%></a>-->
-      <!--<%}%>-->
       <% if(pickupInfo.method === "shipping"){%>
       <a href="https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=<%= tracking || ''%>" class="btn btn-grey-red"><%= __('track-order')%></a>
       <% }else{%>
-      <a href="http://maps.apple.com/?q=<%= pickupInfo.method == 'pickup' ? pickupInfo.location : contactInfo.address%>" class="btn btn-grey-red"><%= __('find-route')%></a>
+      <a href="http://maps.apple.com/?q=<%= pickupInfo.method == 'pickup' ? pickupInfo.location : contactInfo.address%>" class="btn btn-grey-red active"><%= __('find-route')%></a>
       <% }%>
-      <a class="btn btn-grey-blue" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)"> <%= __('nav-bar-register') %></a>
+      <button class="btn btn-grey-blue active" style="margin-right: 10px;" toggle="modal" data-target="#myModal" data-href="/review/<%= id%>" onclick="toggleModal(event)"><%= __('review')%></button>
+      <!--<a class="btn btn-grey-blue active" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)"> <%= __('nav-bar-register') %></a>-->
       <i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" title="<%= __('user-benefit')%>"></i>
     </div>
   </div>
@@ -115,4 +113,5 @@
 
 <script>
   setupWechat($("#receiptView .dishImg:eq(0)").prop('src'),$("#receiptView").data("title"), $("#receiptView").data("desc"));
+  new receiptView({ el : $("#receiptView"), model : new Order()});
 </script>
