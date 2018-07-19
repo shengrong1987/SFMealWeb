@@ -1867,8 +1867,8 @@ module.exports = {
                       if (err) {
                         return next2(err);
                       }
-                      order.application_fees['cash'] -= refundedFee;
-                      order.charges['cash'] -= netDiff;
+                      order.application_fees['cash'] += refundedFee;
+                      order.charges['cash'] += netDiff;
                       next2();
                     })
                   }
@@ -2273,16 +2273,14 @@ module.exports = {
       orders.forEach(function(order){
         newOrders.forEach(function(oldOrder){})
         var isSamePickup = newOrders.some(function(oldOrder){
-          var _isSame = oldOrder.pickupInfo.pickupFromTime === order.pickupInfo.pickupFromTime && oldOrder.pickupInfo.pickupTillTime === order.pickupInfo.pickupTillTime
-            && oldOrder.pickupInfo.customerName === order.pickupInfo.customerName && oldOrder.pickupInfo.customerPhone === order.pickupInfo.customerPhone
-            && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address)
-            || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
+          var _isSame = oldOrder.pickupInfo.pickupFromTime === order.pickupInfo.pickupFromTime && oldOrder.pickupInfo.pickupTillTime === order.pickupInfo.pickupTillTime && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
           if(_isSame){
             Object.keys(order.orders).forEach(function(dishId){
               oldOrder.orders[dishId] = order.orders[dishId];
             })
             oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
             oldOrder.pickupInfo.comment += order.pickupInfo.comment;
+            oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
             if(oldOrder.paymentMethod === "cash"){
               oldOrder.charges['cash'] += order.charges['cash'];
             }
