@@ -3476,7 +3476,7 @@ var OrderView = Backbone.View.extend({
       }
   },
   getPickupOption : function(method){
-    return parseInt(this.$el.find("#" + method + "Tab" + " .option .regular-radio:checked").data("index"));
+    return parseInt(this.$el.find("#" + method + "Tab" + " .option." + method +  "Option .regular-radio:checked").data("index"));
   },
   getCustomizedInfo : function(partyMode, cb){
     if(!partyMode){
