@@ -3005,14 +3005,17 @@ var MealConfirmView = Backbone.View.extend({
     var range = this.$el.data("range");
     var yourAddress = street + ", " + city + ", " + state + " " + zipcode;
     var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
-    if(!deliveryOption.length){
+    if(!deliveryOption.length && !isPartyMode){
       makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
       return false;
+    }else if(isPartyMode){
+      var deliveryCenter = this.$el.find('.deliveryOption').data('center');
+    }else{
+      deliveryCenter = deliveryOption.parent().data('center');
     }
     if(checkOnly){
       return yourAddress;
     }
-    var deliveryCenter = deliveryOption.parent().data('center');
     if(btn){
       btn.button('loading');
     }
