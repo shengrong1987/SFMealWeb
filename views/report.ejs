@@ -52,16 +52,18 @@
                     return;
                   }
                 })%>
-              <% if(preference && preference.length > 0){
+              <% if(dish && preference && preference.length > 0){
                 var title = '';
                 preference.forEach(function(pref){
                   title += "(" + pref.property + ')';
                 });
               %>
               <%= dish.title%>(<%= amount%>)<%= title%>
-              <% }else{%>
+              <% }else if(dish){%>
               <%= dish.title%>(<%= amount%>)
-              <% }%>
+              <% }else{%>
+              <%= __('dish-can-not-found-title')%>
+              <% } %>
               <%}});%>
             </td>
             <td><%= order.customerPhone%></td>

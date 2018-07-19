@@ -869,5 +869,6 @@
   "tip" : "Tips",
   "leave-comment" : "Memo",
   "weekly-orders" : "Orders of the week",
-  "track-order" : "Track order"
+  "track-order" : "Track order",
+  "dish-can-not-found-title" : "Dish removed"
 }

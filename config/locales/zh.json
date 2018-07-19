@@ -871,5 +871,6 @@
   "tip" : "小费",
   "leave-comment" : "备注",
   "weekly-orders" : "本周所有订单",
-  "track-order" : "查询快递"
+  "track-order" : "查询快递",
+  "dish-can-not-found-title" : "菜式被移除"
 }
