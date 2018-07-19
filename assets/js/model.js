@@ -3111,8 +3111,13 @@ var MealConfirmView = Backbone.View.extend({
       this.checkOptions(yourAddress);
     }
 
-    var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
-    var deliveryCenter = deliveryOption.parent().data('center');
+    if(!isPartyMode){
+      var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
+      var deliveryCenter = deliveryOption.parent().data('center');
+    }else{
+      deliveryOption = this.$el.find("#deliveryTab .deliveryOption");
+      deliveryCenter = deliveryOption.data('center');
+    }
     if(!deliveryOption.length || !deliveryCenter){
       // makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
       if(cb){
