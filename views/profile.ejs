@@ -1,21 +1,19 @@
-<div class="container text-center relative" style="margin-top:-20px;">
+<div class="default-container text-center relative" style="margin-top:-20px;">
 
-  <div class="row">
-    <div class="pure-banner vertical-align red">
-      <div style="width: 600px;" class="middle banner-text">
-        <div class="row vertical-align" style="margin-bottom: 5px;">
-          <div class="col-sm-3">
-            <a href="/" class="logo logo-sm"></a>
-          </div>
-          <div class="col-sm-9">
-            <h4 class="text-white"><strong><%= __('welcome')%></strong></h4>
-          </div>
+  <div class="pure-banner vertical-align red">
+    <div style="width: 600px;" class="middle banner-text">
+      <div class="row vertical-align" style="margin-bottom: 5px;">
+        <div class="col-sm-3">
+          <a href="/" class="logo logo-sm"></a>
+        </div>
+        <div class="col-sm-9">
+          <h4 class="text-white"><strong><%= __('welcome')%></strong></h4>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="hostProfileView" data-host="<%= host.id%>" class="default-container" style="padding: 30px 20px 30px 20px;" data-title="<%= host.shopNameI18n(locale)%>" data-desc="<%= host.introI18n(locale)%>" data-user="<%= user || ''%>">
+  <div id="hostProfileView" data-host="<%= host.id%>" class="box" data-title="<%= host.shopNameI18n(locale)%>" data-desc="<%= host.introI18n(locale)%>" data-user="<%= user || ''%>">
 
     <div class="row">
       <div class="col-md-5">
@@ -29,10 +27,10 @@
             <div class="col-xs-12">
               <h4 class="text-dark"><strong><%= host.shopNameI18n(locale) %></strong><br/><br/><small><%= host.introI18n(locale) %></small></h4>
               <p><% if(host.license && host.license.valid){%><i class="fa fa-certificate fa-2x text-yellow"></i><%= __('has-foodhandler-license')%> <%}%></p>
-              <p>
-                <button id="likeBtn" class="btn btn-red"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
-                <button id="followBtn" class="btn btn-green" data-followed="<%= (user && (user.follow && user.follow==host.id)) ? true : false%>"><%= (user && (user.follow && user.follow==host.id)) ? __('followed') : __('follow')%> <i class="fa <%= (user && (user.follow && user.follow==host.id)) ? 'fa-star' : 'fa-star-o'%>"></i></button>
-              </p>
+              <div>
+                <button id="likeBtn" style="width:45%;margin-right: 15px;" class="btn btn-grey-red btn-lg active"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
+                <button id="followBtn" style="width:45%;" class="btn btn-grey-green btn-lg active" data-followed="<%= (user && (user.follow && user.follow==host.id)) ? true : false%>"><%= (user && (user.follow && user.follow==host.id)) ? __('followed') : __('follow')%> <i class="fa <%= (user && (user.follow && user.follow==host.id)) ? 'fa-star' : 'fa-star-o'%>"></i></button>
+              </div>
               <div id="actionAlertView" class="alert alert-danger hide"></div>
             </div>
           </div>
@@ -82,11 +80,11 @@
       <div class="col-md-7">
         <div class="box white">
           <div class="row">
-            <div class="col-xs-12">
-              <h4 class="text-left text-red"><strong><%= __('my-story')%></strong></h4>
-              <div class="divider red none-margin" style="height: 8px;"></div>
-              <p style="margin-top: 10px;min-height: 50px;" class="text-left"><%= host.intro%></p>
-            </div>
+            <!--<div class="col-xs-12">-->
+              <!--<h4 class="text-left text-red"><strong><%= __('my-story')%></strong></h4>-->
+              <!--<div class="divider red none-margin" style="height: 8px;"></div>-->
+              <!--<p style="margin-top: 10px;min-height: 50px;" class="text-left"><%= host.intro%></p>-->
+            <!--</div>-->
             <div class="col-xs-12">
               <h4 class="text-left text-red"><%= __('my-dish')%></h4>
               <div class="divider red none-margin" style="height: 8px;"></div>
@@ -99,7 +97,7 @@
                   host.dishes.forEach(function(dish){
               if(dish.id == meal.cover){
               %>
-                <div class="feature-dish col-lg-4 col-md-6 col-xs-4" style="margin-top: 5px;">
+                <div class="feature-dish col-lg-4 col-md-6 col-xs-6" style="margin-top: 5px;">
                   <div class="white border-round" style="overflow: hidden;">
                     <div class="row">
                       <div class="col-xs-12">
@@ -127,7 +125,7 @@
                     host.dishes.forEach(function(dish){
                 if(dish.id == meal.cover){
                 %>
-                <div class="feature-dish col-lg-4 col-md-6 col-xs-4" style="margin-top: 5px;">
+                <div class="feature-dish col-lg-4 col-md-6 col-xs-6" style="margin-top: 5px;">
                   <div class="white border-round" style="overflow: hidden;">
                     <div class="row">
                       <div class="col-xs-12">
