@@ -228,7 +228,7 @@
 
                           <div class="form-group instruction pickup-item" style="display: <%= pickup.method == 'pickup' ? 'block' : 'none'%>">
                             <label><%= __('pickup-instruction')%></label>
-                            <input type="text" class="form-control" value="<%= pickup.instruction || '' %>">
+                            <input type="text" class="form-control" value="<%= pickup.comment || '' %>">
                           </div>
 
                           <div class="form-group area" data-county="<%= pickup.county || ''%>">

@@ -2357,6 +2357,8 @@ module.exports = {
             order.pickupTillTime = order.pickupInfo.pickupTillTime;
             order.pickupPhone = order.contactInfo.phone;
             order.deliveryAddress = order.contactInfo.address;
+            order.method = order.pickupInfo.method;
+            order.location = order.pickupInfo.location;
             order.instruction = order.customInfo.comment;
             delete order.customer;
             delete order.meal;
