@@ -990,7 +990,7 @@ module.exports = {
           if(!isPartyMode){
             return cb();
           }
-          Dish.find({ chef : meal.chef.id }).exec(function(err, dishes){
+          Dish.find({ chef : meal.chef.id, isVerified : true }).exec(function(err, dishes){
             if(err){
               return cb(err);
             }
