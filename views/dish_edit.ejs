@@ -1,33 +1,37 @@
 
-<div class="container-fluid text-center" style="margin-top:-20px;">
+<div>
   <div class="row">
-    <div class="pure-banner vertical-align green">
-      <div class="middle banner-text">
-        <div class="vertical-align" style="margin-bottom: 5px;">
-          <div class="col-sm-3 relative text-left">
-            <a href="/" class="logo logo-sm"></a>
+    <div class="pure-banner green">
+      <div class="middle banner-text py-3">
+        <div class="row vertical-align">
+          <div class="col-lg-2"></div>
+          <div class="col-5 col-lg-3">
+            <img src="/images/welcome-1.png" style="width: 100%;">
           </div>
-          <div class="col-sm-9">
-            <h4 class="text-white"><strong><%= __('welcome') %></strong></h4>
+          <div class="col-2 col-lg-2">
+            <a href="/" class="logo-slogan"></a>
           </div>
+          <div class="col-5 col-lg-3">
+            <img src="/images/welcome-2.png" style="width: 100%;">
+          </div>
+          <div class="col-lg-2"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="row">
+  <div>
+    <ul class="nav nav-tabs nav-fill bg-light pt-3">
+      <li class="nav-item"><a class="nav-link" href="/host/me#myorder"><%= __('host-nav-order') %></a></li>
+      <li class="nav-item"><a class="nav-link" href="/host/me#mymeal"><%= __('host-nav-meal') %></a></li>
+      <li class="nav-item"><a class="nav-link active" href="/host/me#mydish"><%= __('host-nav-dish') %></a></li>
+      <li class="nav-item"><a class="nav-link" href="/host/me#myinfo"><%= __('host-nav-info') %></a></li>
+    </ul>
 
-    <div class="default-container">
-      <ul class="nav nav-tab-green nav-justified" style="padding: 20px;">
-        <li><a href="/host/me#myorder"><h4><strong><%= __('host-nav-order') %></strong></h4></a></li>
-        <li><a href="/host/me#mymeal"><h4><strong><%= __('host-nav-meal') %></strong></h4></a></li>
-        <li class="active"><a href="/host/me#mydish"><h4><strong><%= __('host-nav-dish') %></strong></h4></a></li>
-        <li><a href="/host/me#myinfo"><h4><strong><%= __('host-nav-info') %></strong></h4></a></li>
-      </ul>
-
-      <div id="dishEditView" style="margin: auto;">
+    <div class="tab-content">
+      <div id="dishEditView" class="tab-pane active" style="margin: auto;">
         <div class="box box-shadow box-primary white text-left">
-          <h1></h1>
+
           <form data-id="<%= dish.userId%>" data-dish-id="<%= dish.id%>" data-err-container=".submit" data-toggle="validator">
             <div class="form-group">
               <label for="mealTitleInput">1.<%= __('dish-name') %></label><button class="btn btn-default" data-toggle="input-toggle" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i></button>
@@ -39,42 +43,42 @@
             <div class="form-group photo">
               <label style="display: block;" for="">2.<%= __('photos') %><span class="text-grey">(<%= __('photosTip')%>)</span></label>
               <%
-                var photos = dish.photos;
-                for(var i = 1; i <= 3; i++){
-                  var photo = photos[i-1];
-                  if(photo && photo.v != ""){
+              var photos = dish.photos;
+              for(var i = 1; i <= 3; i++){
+                var photo = photos[i-1];
+              if(photo && photo.v != ""){
               %>
-                <div class="fileinput fileinput-exists form-group" data-provides="fileinput" data-index="<%= i%>">
-                  <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
-                  </div>
-                  <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px;" data-src="<%= photo.v%>">
-                    <img src="<%= photo.v%>">
-                  </div>
-                  <div>
-                    <div class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
-                      <input id="photoInput-<%= i%>" class="form-control" type="file" data-strictImage=true name="image">
-                    </div>
-                    <a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput"><%= __('remove')%></a>
-                    <script>
-                      $(".fileinput").on("clear.bs.fileinput",function(){
-                        var index = $(this).data("index");
-                        $("#photoInput-" + index).data("isDelete",true);
-                      });
-                    </script>
-                  </div>
-                  <div class="help-block with-errors"></div>
+              <div class="fileinput fileinput-exists form-group" data-provides="fileinput" data-index="<%= i%>">
+                <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
                 </div>
+                <div class="fileinput-preview fileinput-exists thumbnail" style="width: 200px; height: 150px;" data-src="<%= photo.v%>">
+                  <img src="<%= photo.v%>">
+                </div>
+                <div>
+                  <div class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
+                    <input id="photoInput-<%= i%>" class="form-control" type="file" data-strictImage=true name="image">
+                  </div>
+                  <a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput"><%= __('remove')%></a>
+                  <script>
+                    $(".fileinput").on("clear.bs.fileinput",function(){
+                      var index = $(this).data("index");
+                      $("#photoInput-" + index).data("isDelete",true);
+                    });
+                  </script>
+                </div>
+                <div class="help-block with-errors"></div>
+              </div>
               <%}else{%>
-                <div class="fileinput fileinput-new" data-provides="fileinput">
-                  <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;"></div>
-                  <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px;"></div>
-                  <div>
-                    <div class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
-                      <input id="photoInput-<%= i%>" type="file" data-strictImage=true>
-                    </div>
-                    <a href="javascript:$(this).prev().find('input').data('delete',true);" class="btn btn-default fileinput-exists" data-dismiss="fileinput"><%= __('remove')%></a>
+              <div class="fileinput fileinput-new" data-provides="fileinput">
+                <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;"></div>
+                <div class="fileinput-preview fileinput-exists thumbnail" style="width: 200px; height: 150px;"></div>
+                <div>
+                  <div class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
+                    <input id="photoInput-<%= i%>" type="file" data-strictImage=true>
                   </div>
+                  <a href="javascript:$(this).prev().find('input').data('delete',true);" class="btn btn-default fileinput-exists" data-dismiss="fileinput"><%= __('remove')%></a>
                 </div>
+              </div>
               <%}}%>
               <div id="photoError" class="help-block with-errors text-red"></div>
               <div class="alert alert-info"><%= __('need-three-photos') %></div>
@@ -83,9 +87,13 @@
             <div class="form-group">
               <label for="priceInput">3.<%= __('how-much-for-one') %></label>
               <div class="input-group" style="width: 250px;">
-                <div class="input-group-addon">$</div>
+                <div class="input-group-prepend">
+                  <span class="input-group-text">$</span>
+                </div>
                 <input type="text" class="form-control" id="priceInput" placeholder="<%= __('dollar') %>" min="1" max="100" data-error="<%= __('price-incorrect') %>" required value="<%= dish.price%>">
-                <div class="input-group-addon">.00</div>
+                <div class="input-group-append">
+                  <span class="input-group-text">.00</span>
+                </div>
               </div>
               <div class="help-block with-errors"></div>
             </div>
@@ -102,21 +110,21 @@
               <div class="dropdown">
                 <button class="btn btn-default dropdown-toggle btn-outline" type="button" id="categoryInput" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" value="<%= dish.type%>" data-selected="true">
                   <% switch(dish.type){
-                    case "appetizer": %>
+                  case "appetizer": %>
                   <%= __('appetizer') %>
                   <%break;
-                    case "entree": %>
+                  case "entree": %>
                   <%= __('main') %>
                   <%break;
-                    case "dessert": %>
+                  case "dessert": %>
                   <%= __('dessert') %>
                   <%}%>
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                  <li class="active"><a href="javascript:void(0)" value="entree"><%= __('main') %></a></li>
-                  <li><a href="javascript:void(0)" value="appetizer"><%= __('appetizer') %></a></li>
-                  <li><a href="javascript:void(0)" value="dessert"><%= __('dessert') %></a></li>
+                  <a class="dropdown-item active" href="javascript:void(0)" value="entree"><%= __('main') %></a>
+                  <a class="dropdown-item" href="javascript:void(0)" value="appetizer"><%= __('appetizer') %></a>
+                  <a class="dropdown-item" href="javascript:void(0)" value="dessert"><%= __('dessert') %></a>
                 </ul>
               </div>
             </div>
@@ -139,50 +147,50 @@
                   <div class="col-xs-9">
                     <table class="table table-bordered">
                       <thead>
-                        <tr class="active">
-                          <td><%= __('property')%></td>
-                          <td><%= __('price')%></td>
-                          <td><%= __('action')%></td>
-                        </tr>
+                      <tr class="active">
+                        <td><%= __('property')%></td>
+                        <td><%= __('price')%></td>
+                        <td><%= __('action')%></td>
+                      </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>
-                            <div class="dropdown">
-                              <a class="btn btn-default btn-outline dropdown-toggle property" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="">
-                                <span data-toggle="i18n" data-key="addVariation"></span>
-                                <span class="caret"></span>
-                              </a>
-                              <ul class="dropdown-menu" aria-labelledby="dLabel">
-                                <%
-                                  var varSets = {
-                                    "spicy" : ['mild', 'littleSpicy','regularSpicy','verySpicy','insaneSpicy'],
-                                    "sweetness" : ['noSugar','halfSugar','regularSugar','extraSugar'],
-                                    "icy" : ['noIce', 'halfIce', 'regularIce', 'extraIce'],
-                                    "ingredient" : [],
-                                    "wellness" : ['rare','mediumRare','medium','mediumWell', 'wellDone']
-                                  }
-                                  if(varSets[variation] && varSets[variation].length > 0 ) { varSets[variation].forEach(function (option) { %>
-                                    <li><a href="javascript:void(0);" data-toggle="i18n" data-key="<%= option%>" value="<%= option%>"></a></li>
-                                <%});} %>
-                                <li class="disabled"><a><%= __('noOption')%></a></li>
-                                <li><a href="javascript:void(0);" value="custom"><%= __('customizedOption')%></a></li>
-                              </ul>
-                            </div>
-                          </td>
-                          <td>
-                            <input class="form-control" name="extra" type="number" value="0">
-                          </td>
-                          <td>
-                            <% props.forEach(function(property){ %>
-                              <tr class="customProperty">
-                                <td><%= property.property %><i class="fa fa-close reset cursor-pointer" data-value="<%= property.property%>" style="float: right;" href="javascript:void(0)"></i></td>
-                                <td class="extra" data-value="<%= property.extra%>">$<%= property.extra %></td>
-                                <td></td>
-                              </tr>
-                            <% });%>
-                          </td>
-                        </tr>
+                      <tr>
+                        <td>
+                          <div class="dropdown">
+                            <a class="btn btn-default btn-outline dropdown-toggle property" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="">
+                              <span data-toggle="i18n" data-key="addVariation"></span>
+                              <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dLabel">
+                              <%
+                                var varSets = {
+                                  "spicy" : ['mild', 'littleSpicy','regularSpicy','verySpicy','insaneSpicy'],
+                                  "sweetness" : ['noSugar','halfSugar','regularSugar','extraSugar'],
+                                  "icy" : ['noIce', 'halfIce', 'regularIce', 'extraIce'],
+                                  "ingredient" : [],
+                                  "wellness" : ['rare','mediumRare','medium','mediumWell', 'wellDone']
+                                }
+                              if(varSets[variation] && varSets[variation].length > 0 ) { varSets[variation].forEach(function (option) { %>
+                              <a class="dropdown-item" href="javascript:void(0);" data-toggle="i18n" data-key="<%= option%>" value="<%= option%>"></a>
+                              <%});} %>
+                              <a class="dropdown-item disabled"><%= __('noOption')%></a>
+                              <a class="dropdown-item" href="javascript:void(0);" value="custom"><%= __('customizedOption')%></a>
+                            </ul>
+                          </div>
+                        </td>
+                        <td>
+                          <input class="form-control" name="extra" type="number" value="0">
+                        </td>
+                        <td>
+                          <% props.forEach(function(property){ %>
+                      <tr class="customProperty">
+                        <td><%= property.property %><i class="fa fa-close reset cursor-pointer" data-value="<%= property.property%>" style="float: right;" href="javascript:void(0)"></i></td>
+                        <td class="extra" data-value="<%= property.extra%>">$<%= property.extra %></td>
+                        <td></td>
+                      </tr>
+                      <% });%>
+                      </td>
+                      </tr>
                       </tbody>
                     </table>
                   </div>
@@ -194,15 +202,15 @@
                   <span><%= __('add-variation')%></span>
                   <span class="caret"></span>
                 </a>
-                <ul class="dropdown-menu" aria-labelledby="dLabel">
-                  <li><a href="javascript:void(0);" value="spicy"><%= __('spicy') %></a></li>
-                  <li><a href="javascript:void(0);" value="sweetness"><%= __('sweetness') %></a></li>
-                  <li><a href="javascript:void(0);" value="icy"><%= __('icy') %></a></li>
-                  <li><a href="javascript:void(0);" value="ingredient"><%= __('ingredient') %></a></li>
-                  <li><a href="javascript:void(0);" value="wellness"><%= __('wellness') %></a></li>
-                  <li class="disabled"><a><%= __('cant-find-option')%></a></li>
-                  <li><a href="javascript:void(0);" value="custom"><%= __('add-custom-option')%></a></li>
-                </ul>
+                <div class="dropdown-menu" aria-labelledby="dLabel">
+                  <a class="dropdown-item" href="javascript:void(0);" value="spicy"><%= __('spicy') %></a>
+                  <a class="dropdown-item" href="javascript:void(0);" value="sweetness"><%= __('sweetness') %></a>
+                  <a class="dropdown-item" href="javascript:void(0);" value="icy"><%= __('icy') %></a>
+                  <a class="dropdown-item" href="javascript:void(0);" value="ingredient"><%= __('ingredient') %></a>
+                  <a class="dropdown-item" href="javascript:void(0);" value="wellness"><%= __('wellness') %></a>
+                  <a class="dropdown-item disabled"><%= __('cant-find-option')%></a></li>
+                  <a class="dropdown-item" href="javascript:void(0);" value="custom"><%= __('add-custom-option')%></a>
+                </div>
               </div>
               <div class="customVar"></div>
             </div>
@@ -215,18 +223,28 @@
             <div class="form-group">
               <label for="instagramInput">9.<%= __('is-dynamic') %></label><br/>
               <input class="form-control" type="checkbox" data-toggle="switch-button" id="isDynamicPriceOn" <%= !!dish.isDynamicPriceOn?"checked='checked'":""%>>
-              <div id="dynamicDishSettingView" class="form-group form-inline <%= !!dish.isDynamicPriceOn?"":"hide"%>" style="margin-top:20px;">
-                <div class="input-group">
-                  <div class="input-group-addon"><%= __('priceRate')%>:$</div>
-                  <input type="number" class="form-control" id="priceRateInput" value="<%= dish.priceRate || 0%>">
-                </div>
-                <div class="input-group">
-                  <div class="input-group-addon"><%= __('qtyRate')%></div>
-                  <input type="number" class="form-control" id="qtyRateInput" value="<%= dish.qtyRate || 0%>">
-                </div>
-                <div class="input-group">
-                  <div class="input-group-addon"><%= __('minimalPrice')%>:$</div>
-                  <input type="number" class="form-control" id="minimalPriceInput" value="<%= dish.minimalPrice || 0%>">
+              <div id="dynamicDishSettingView" class="form-group form-inline <%= !!dish.isDynamicPriceOn?"":"d-none"%>" style="margin-top:20px;">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="input-group my-2">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><%= __('priceRate')%>:$</span>
+                      </div>
+                      <input type="number" class="form-control" id="priceRateInput" value="<%= dish.priceRate || 0%>">
+                    </div>
+                    <div class="input-group my-2">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><%= __('qtyRate')%></span>
+                      </div>
+                      <input type="number" class="form-control" id="qtyRateInput" value="<%= dish.qtyRate || 0%>">
+                    </div>
+                    <div class="input-group my-2">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><%= __('minimalPrice')%>:$</span>
+                      </div>
+                      <input type="number" class="form-control" id="minimalPriceInput" value="<%= dish.minimalPrice || 0%>">
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="alert alert-danger"></div>
@@ -243,8 +261,8 @@
 
         </div>
       </div>
-
     </div>
+
   </div>
 </div>
 

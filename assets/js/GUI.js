@@ -1,6 +1,8 @@
 /**#
  * Created by shengrong on 11/16/15.
  */
+(function($, viewport, global){
+})(jQuery, ResponsiveBootstrapToolkit, window);
 /*
   HelperMethods
   - geoLocate : "get user's location and set bound" @params: autocomplete obj
@@ -16,6 +18,8 @@
   - readCookie : "get cookie by name"
   - eraseCookie : "remove a cookie by name"
   - loadStripeJS : "load Stripe js"
+  - isViewport : "xs,sm,md,lg,xl"
+
  */
 
 var googleAPILoaded;
@@ -80,26 +84,28 @@ function toggleModal(event,cb){
   var url = $(target).data('href');
   var modalId = $(target).data('target');
   var modal = $(modalId);
-  if(modal.hasClass('in')){
+  if(modal.hasClass('show')){
     modal.modal('hide');
     modal.removeData('bs.modal');
     modal.on('hidden.bs.modal',function(){
       modal.off('hidden.bs.modal');
-      modal.on('loaded.bs.modal',function(){
-        modal.off('loaded.bs.modal');
+      modal.on('shown.bs.modal',function(){
+        modal.off('shown.bs.modal');
         modal.modal('show');
         if(cb){cb(target);}
       });
-      modal.modal({remote: url});
+      $($(target).data("target")+' .modal-content').load($(target).data("href"));
+      modal.modal();
     });
   }else{
     modal.removeData('bs.modal');
-    modal.on('loaded.bs.modal',function(){
-      modal.off('loaded.bs.modal');
+    modal.on('shown.bs.modal',function(){
+      modal.off('shown.bs.modal');
       modal.modal('show');
       if(cb){cb(target);}
     });
-    modal.modal({remote: url});
+    $($(target).data("target")+' .modal-content').load($(target).data("href"));
+    modal.modal();
     modal.modal('show');
   }
 }
@@ -384,12 +390,13 @@ function refreshPreference(id){
           propInArray.forEach(function(prop){
             console.log("index is: " + index, "prop: " + prop);
             var i = parseInt(index) + 1;
-            var propertyLabel = preferenceBtn.next().find(".dropdown-submenu:nth-child(" + i + ") .variation a[value='" + prop + "']");
-            var extra = propertyLabel.data("extra");
-            var variationLabel = propertyLabel.closest(".dropdown-submenu.variation").find("a").first();
-            if(variationLabel.length){
-              variationLabel.attr("value", prop);
-              variationLabel.text(prop + " + $" + extra);
+            var pref = preferenceBtn.next().find("[data-layer='0']:nth-child(" + i + ")");
+            var prop = pref.find(".variation a[value='" + prop + "']");
+            var extra = prop.data("extra");
+            var variation = prop.closest("[data-layer='1'].variation").find("a").first();
+            if(variation.length){
+              variation.attr("value", prop);
+              variation.text(prop + " + $" + extra);
             }
           })
         }
@@ -633,7 +640,7 @@ var setupStepContainer = function(){
 };
 
 function resetDropdownMenu(target){
-  var resetLabel = target.next().find(".dropdown-submenu.variation > a");
+  var resetLabel = target.next().find("[data-layer='1'].variation > a");
   resetLabel.each(function(){
     $(this).text(jQuery.i18n.prop($(this).data('variation')));
     $(this).attr("value", $(this).data('variation'));
@@ -743,19 +750,49 @@ function updateScroll(){
   if($footer.length===0){
     return;
   }
-  var headerHeight = $('.compact-banner').height() + $("#myUserBar").height() - 3;
+  // var headerHeight = $('.compact-banner').height() + $("#myUserBar").height() - 3;
+  var headerHeight = 56 - 3;
   var footertotop = ($footer.position().top);
   var $floater = $('.floater');
   var fixedElementHeight = $floater.height();
   var scrollTop = $(document).scrollTop();
 
-  if (scrollTop + fixedElementHeight > footertotop) {
-  }else if (scrollTop > headerHeight){
-    $floater.removeClass("static-floater");
-    $floater.addClass("fix-floater");
-    $floater.css('top', -20);
+  if(location.pathname === "/"){
+    if(!isViewport('xs') && !isViewport('sm')){
+      if (scrollTop + fixedElementHeight > footertotop) {
+      }else if (scrollTop > headerHeight){
+        $floater.removeClass("static-floater");
+        $floater.addClass("fix-floater");
+        $floater.removeClass('navbar-transparent').removeClass('bg-faded').addClass('navbar-light').removeClass('navbar-dark').addClass('bg-light');
+        // $floater.css('top', -20);
+      }else{
+        $floater.removeClass("fix-floater");
+        $floater.addClass('navbar-transparent').addClass('bg-faded').removeClass('navbar-light').addClass('navbar-dark').removeClass('bg-light');
+        $floater.addClass("static-floater");
+      }
+    }
   }else{
-    $floater.removeClass("fix-floater");
-    $floater.addClass("static-floater");
+    if(isViewport('lg') || isViewport('xl')){
+      if (scrollTop + fixedElementHeight > footertotop) {
+      }else if (scrollTop > (headerHeight+150)){
+        $floater.removeClass("static-floater");
+        $floater.addClass("fix-floater");
+        $floater.removeClass('navbar-transparent').removeClass('bg-faded').addClass('navbar-light').removeClass('navbar-dark').addClass('bg-light');
+        // $floater.css('top', -20);
+      }else{
+        $floater.removeClass("fix-floater");
+        $floater.addClass('navbar-transparent').addClass('bg-faded').removeClass('navbar-light').addClass('navbar-dark').removeClass('bg-light');
+        $floater.addClass("static-floater");
+      }
+    }
   }
+}
+
+function isViewport( alias ) {
+  return $('.device-' + alias).css('display') !== 'none';
+}
+
+function removeHash () {
+  history.pushState("", document.title, window.location.pathname
+    + window.location.search);
 }

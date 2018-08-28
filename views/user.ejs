@@ -1,44 +1,47 @@
 
-<div class="container-fluid text-center" style="margin-top:-20px;">
-  <div class="row">
-    <div class="pure-banner vertical-align red">
-      <div class="middle banner-text">
-        <div class="vertical-align" style="margin-bottom: 5px;">
-          <div class="col-sm-3 cursor-pointer" onclick="location.href='/'">
-            <a href="/" class="logo"></a>
-          </div>
-          <div class="col-sm-9">
-
-          </div>
+<div>
+  <div class="pure-banner red">
+    <div class="middle banner-text py-3">
+      <div class="row vertical-align">
+        <div class="col-lg-2"></div>
+        <div class="col-5 col-lg-3">
+          <img src="/images/welcome-1.png" style="width: 100%;">
         </div>
+        <div class="col-2 col-lg-2">
+          <a href="/" class="logo-slogan"></a>
+        </div>
+        <div class="col-5 col-lg-3">
+          <img src="/images/welcome-2.png" style="width: 100%;">
+        </div>
+        <div class="col-lg-2"></div>
       </div>
     </div>
   </div>
 
   <div class="row">
 
-    <div class="default-container">
-      <ul class="nav nav-tab-cute nav-justified" style="padding: 20px;">
-        <li class="active"><a data-toggle="tab" href="#myorder"><h4><strong><%= __('nav-bar-order')%></strong></h4></a></li>
-        <li><a data-toggle="tab" role="tab" href="#mycollect"><h4><strong><%= __('user-nav-collect')%></strong></h4></a></li>
-        <li><a data-toggle="tab" role="tab" href="#myinfo"><h4><strong><%= __('user-nav-info')%></strong></h4></a></li>
-        <li><a data-toggle="tab" role="tab" href="#myaddress"><h4><strong><%= __('user-nav-address')%></strong></h4></a></li>
-        <li><a data-toggle="tab" role="tab" href="#myreview"><h4><strong><%= __('nav-bar-review')%></strong></h4></a></li>
+    <div class="col-12">
+      <ul class="nav nav-tabs nav-fill bg-light pt-3">
+        <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder"><%= __('nav-bar-order')%></a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#mycollect"><%= __('user-nav-collect')%></a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#myinfo"><%= __('user-nav-info')%></a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#myaddress"><%= __('user-nav-address')%></a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#myreview"><%= __('nav-bar-review')%></a></li>
       </ul>
 
-      <div class="tab-content" style="padding-top: 20px;padding-bottom: 60px;min-height: 500px;">
-        <div id="myorder" class="tab-pane middle active">
+      <div class="tab-content">
+        <div id="myorder" class="tab-pane middle active pb-4" style="min-height: 400px;">
           <div class="box box-shadow white">
             <% var orders = user.orders; if(orders.length == 0){%>
-            <h3><small><%= __('no-order-tip')%><br/><a href="/meal"><%= __('browse')%></a></small></h3>
+            <h4 class="text-center mt-2"><small><%= __('no-order-tip')%><br/><a href="/meal"><%= __('browse')%></a></small></h4>
             <div class="divider"></div>
             <%}else{%>
-            <ul class="nav nav-justified nav-tab-cute" style="padding: 20px;">
-              <li><a data-toggle="tab" href="#myorder-order"><h4><strong><%= __('my-order')%></strong></h4></a></li>
-              <li class="active"><a data-toggle="tab" href="#myorder-preorder"><h4><strong><%= __('my-preorder')%></strong></h4></a></li>
+            <ul class="nav nav-pills nav-justified p-3">
+              <li class="nav-item"><a class="nav-link" data-toggle="tab" data-href="#myorder-order"><h4><strong><%= __('order-nav-order')%></strong></h4></a></li>
+              <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder-preorder"><h4><strong><%= __('order-nav-preorder')%></strong></h4></a></li>
             </ul>
             <div class="tab-content">
-              <div id="myorder-order" class="tab-pane middle">
+              <div id="myorder-order" class="tab-pane middle pb-4">
                 <% var tabsData = [
                   { id : "order-preparing", title : "order-nav-preparing", status : "preparing", type : "order"},
                   { id : "order-holding", title : "order-nav-waiting", status : "holding", type : "order"},
@@ -47,18 +50,18 @@
                   { id : "order-reviewed", title : "order-nav-reviewed", status : "complete", type : "order"},
                   { id : "order-all", title : "order-nav-all", status : "all", type : "order"}
                 ];%>
-                <ul class="nav nav-tabs" style="margin-top: 20px;margin-bottom: 10px;">
+                <ul class="nav nav-tabs my-2">
                   <% tabsData.forEach(function(tabData, i){%>
-                  <li class="<%= i===0?'active':''%>"><a data-toggle="tab" href="#<%= tabData.id%>" class="btn-lg text-dark"><strong><%= __(tabData.title)%></strong></a></li>
+                  <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark <%= i===0?'active':''%>"><%= __(tabData.title)%></a></li>
                   <% });%>
                 </ul>
                 <div class="tab-content box-scroll">
                   <% tabsData.forEach(function(tabData, i){%>
-                  <div id="<%= tabData.id%>" class="tab-pane middle active">
-                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
+                  <div id="<%= tabData.id%>" class="tab-pane middle <%= i===0?'active':''%>">
+                    <table class="table table-bordered table-vertical-middle table-striped" style="width: 100%;">
                       <thead>
                       <tr>
-                        <td class="xs-hide"><%= __('photos')%></td>
+                        <td class="d-none d-md-table-cell"><%= __('photos')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -109,7 +112,7 @@
                                 index++;
                       %>
                       <tr>
-                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="d-none d-md-table-cell"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>
                           $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
@@ -167,8 +170,8 @@
                       <%}})%>
 
                     </table>
-                    <nav class="pull-right">
-                      <ul class="pagination pagination-sm" data-trigger="pagination" data-target="#<%= tabData.id%>"></ul>
+                    <nav>
+                      <ul class="pagination pagination-red pagination-sm" data-trigger="pagination" data-target="#<%= tabData.id%>"></ul>
                     </nav>
                   </div>
                   <% });%>
@@ -185,18 +188,18 @@
                   { id : "preorder-reviewed", title : "order-nav-reviewed", status : "complete", type : "preorder"},
                   { id : "preorder-all", title : "order-nav-all", status : "all", type : "preorder"}
                 ];%>
-                <ul class="nav nav-tabs" style="margin-top: 20px;margin-bottom: 10px;">
+                <ul class="nav nav-tabs my-2">
                   <% tabsData.forEach(function(tabData, i){%>
-                  <li class="<%= i===0?'active':''%>"><a data-toggle="tab" href="#<%= tabData.id%>" class="btn-lg text-dark"><strong><%= __(tabData.title)%></strong></a></li>
+                  <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link <%= i===0?'active':''%> text-dark"><%= __(tabData.title)%></a></li>
                   <% });%>
                 </ul>
                 <div class="tab-content">
                   <% tabsData.forEach(function(tabData, i){%>
                   <div id="<%= tabData.id%>" class="tab-pane middle <%= i===0?'active':''%>">
-                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
+                    <table class="table table-bordered table-vertical-middle table-striped" style="width: 100%;">
                       <thead class="item">
                       <tr>
-                        <td class="xs-hide"><%= __('photos')%></td>
+                        <td class="d-none d-md-table-cell"><%= __('photos')%></td>
                         <td><%= __('meal')%></td>
                         <td><%= __('price')%></td>
                         <td><%= __('quantity')%></td>
@@ -247,7 +250,7 @@
                         index++;
                       %>
                       <tr>
-                        <td class="xs-hide"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                        <td class="d-none d-md-table-cell"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
                         <td>
                           $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
@@ -303,8 +306,8 @@
                       </tbody>
                       <%}})%>
                     </table>
-                    <nav class="pull-right">
-                      <ul class="pagination pagination-sm" data-trigger="pagination" data-target="#<%= tabData.id%>"></ul>
+                    <nav>
+                      <ul class="pagination pagination-red pagination-sm" data-trigger="pagination" data-target="#<%= tabData.id%>"></ul>
                     </nav>
                   </div>
                   <% });%>
@@ -315,20 +318,20 @@
           </div>
         </div>
 
-        <div id="mycollect" class="tab-pane middle">
+        <div id="mycollect" class="tab-pane middle pb-4" style="min-height: 400px;">
           <div class="box box-shadow white">
             <%if(!user.collects || user.collects.length == 0){ %>
-            <h3><small><%= __('no-collect-tip')%><br/><a href="/meal"><%= __('browse')%></a></small></h3>
+            <h4 class="text-center mt-2"><small><%= __('no-collect-tip')%><br/><a href="/meal"><%= __('browse')%></a></small></h4>
             <%}user.collects.forEach(function(meal){
               var host = meal.chef;%>
             <div class="row vertical-align item">
-              <div class="col-xs-3">
-                <img src=<%= meal.coverString%> style="width: 100%;">
+              <div class="col-3">
+                <img class="w-100 border rounded" src=<%= meal.coverString%>>
               </div>
-              <div class="col-xs-4">
+              <div class="col-4">
                 <h2 class="text-left"><%= meal.title%>  <small class="text-orange"><%= meal.type==="order"?__('order'): __('preorder')%></small></h2>
                 <div class="row text-left">
-                  <div class="col-xs-12">
+                  <div class="col-12">
                     <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(2)%>">
                       <div class="rating" data-toggle="star-set" data-rate="<%= meal.score.toFixed(2)%>">
                         <i class="fa fa-star"></i>
@@ -343,13 +346,13 @@
                 </div>
 
                 <div class="row">
-                  <div class="col-xs-12">
+                  <div class="col-12">
                     <h3 class="text-left"><small><%= __('provide-time')%> <span class="text-red"><%= meal.provideDate()%></span></small></h3>
                   </div>
                 </div>
 
               </div>
-              <div class="col-xs-5">
+              <div class="col-5">
                 <div class="row vertical-align">
                   <div class="col-md-2">
                     <img src="<%= host.picture || '/images/profile_man.png'%>" class="round_thumb size-small text-center">
@@ -372,8 +375,8 @@
 
             <div class="divider"></div>
 
-            <nav class="pull-right">
-              <ul class="pagination pagination-sm" data-trigger="pagination" data-target="#mycollect">
+            <nav>
+              <ul class="pagination pagination-red pagination-sm" data-trigger="pagination" data-target="#mycollect">
                 <li class="active"><a href="javascript:void(0)">1</a></li><li>
               </ul>
             </nav>
@@ -381,7 +384,7 @@
           </div>
         </div>
         <!-- collect end -->
-        <div id="myinfo" class="tab-pane middle" data-id="<%= user.id %>">
+        <div id="myinfo" class="tab-pane middle pb-4" data-id="<%= user.id %>" style="min-height: 400px;">
           <div class="box box-shadow white">
             <form data-toggle="validator">
               <div class="row">
@@ -405,8 +408,8 @@
                         </script>
                       </div>
                       <h4><small><br/><br/><%= __('upload-instruction')%></small></h4>
-                      <div class="alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
-                      <div class="alert alert-info hide" role="alert" style="margin-top: 10px;"></div>
+                      <div class="alert alert-danger d-none mt-2" role="alert"></div>
+                      <div class="alert alert-info d-none mt-2" role="alert"></div>
                     </div>
                   </div>
 
@@ -414,9 +417,9 @@
                     <label>2. <%= __('user-name')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('name-instruction')%>"></i></label>
                     <div class="block">
                       <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon2"><%= __('firstname')%></span>
+                        <div class="input-group-prepend" id="basic-addon2"><span class="input-group-text"><%= __('firstname')%></span></div>
                         <input name="firstname" type="text" class="form-control" placeholder="<% if(!user.firstname){ __('firstname') } %>" value="<%= user.firstname?user.firstname : ""%>" aria-describedby="basic-addon2" required>
-                        <span class="input-group-addon" id="basic-addon1"><%= __('lastname')%></span>
+                        <div class="input-group-append" id="basic-addon1"><span class="input-group-text"><%= __('lastname')%></span></div>
                         <input name="lastname" type="text" class="form-control" placeholder="<% if(!user.lastname){ __('lastname') } %>" value="<%= user.lastname? user.lastname : ""%>" aria-describedby="basic-addon1" style="margin-right: 20px;" required>
                       </div>
                     </div>
@@ -513,12 +516,12 @@
               </div>
 
               <div class="row">
-                <div class="col-xs-12">
-                  <div class="alert form-alert alert-danger hide" role="alert" style="margin-top: 10px;"></div>
-                  <div class="alert alert-success hide" role="alert" style="margin-top: 10px;"></div>
+                <div class="col-12">
+                  <div class="alert form-alert alert-danger d-none" role="alert" style="margin-top: 10px;"></div>
+                  <div class="alert alert-success d-none" role="alert" style="margin-top: 10px;"></div>
                 </div>
 
-                <div class="col-xs-12">
+                <div class="col-12">
                   <button type="submit" class="btn btn-grey-red round active" style="width:80px;margin-right:10px;" ><%= __('save')%></button>
                 </div>
               </div>
@@ -527,10 +530,10 @@
         </div>
 
         <!-- info end -->
-        <div id="myaddress" class="tab-pane middle" data-user="<%= user.id %>">
+        <div id="myaddress" class="tab-pane middle pb-4" data-user="<%= user.id %>" style="min-height: 400px;">
           <div class="box box-shadow white text-left">
             <div class="row">
-              <div class="col-xs-12">
+              <div class="col-12">
                 <label>1.<%= __('delivery-location')%></label>
                 <div class="address_blocks">
                   <%
@@ -542,15 +545,15 @@
                   <div class="text-left box-grid">
                     <div class="address_block">
                       <div class="row vertical-align">
-                        <div class="col-xs-2 text-center">
+                        <div class="col-2 text-center">
                           <% if(address.isDefault){ %>
                           <label class="text-red default"><%= __('default')%></label>
                           <%}%>
                         </div>
-                        <div class="col-xs-6">
+                        <div class="col-6">
                           <label class="actual_address"><%= address.street%>, &nbsp;<%= address.city%> <%= address.zip%> <br/>+<%= address.phone%></label>
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-4">
                           <a class="text-red cursor-pointer" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>" data-address-id="<%= address.id%>" data-id="<%= user.id %>" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0);" onclick="toggleModal(this, addressView.enterAddressInfo)">&nbsp;&nbsp;<%= __('modify')%></a>
                           <a class="text-red cursor-pointer deleteBtn" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>" data-address-id="<%= address.id%>" data-id="<%= user.id %>" style="margin-left: 5px;" href="javascript:void(0)">&nbsp;<%= __('delete')%></a>
                         </div>
@@ -568,20 +571,20 @@
 
             <% if (typeof (user.host) != 'undefined'){ %>
               <div class="row">
-                <div class="col-xs-12">
+                <div class="col-12">
                   <h5 class="text-left" style="padding-top: 20px;"><strong>2.<%= __('host-address')%><br/><br/><%= __('host-current-address')%></strong></h5>
                 </div>
               </div>
               <div class="text-left box-grid">
                 <div class="address_block">
                   <div class="row vertical-align">
-                    <div class="col-xs-2 text-center">
+                    <div class="col-2 text-center">
                       <label class="text-green"><%= __('default')%></label>
                     </div>
-                    <div class="col-xs-6">
+                    <div class="col-6">
                       <label><%= user.host.full_address || __('need-kitchen-location') %><br/> +<%= user.phone || __('need-phone-number') %></label>
                     </div>
-                    <div class="col-xs-4">
+                    <div class="col-4">
                       <a class="text-green cursor-pointer" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street || ""%>" data-city="<%= user.host.city || ""%>" data-zip="<%= user.host.zip || ""%>" data-phone="<%=user.phone || ""%>" style="margin-left:10px;" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0)" onclick="toggleModal(this, addressView.enterAddressInfo)"><%= __('modify')%></a>
                     </div>
                   </div>
@@ -593,7 +596,7 @@
         </div>
         <!--my address end-->
 
-        <div id="myreview" class="tab-pane middle">
+        <div id="myreview" class="tab-pane middle pb-4" style="min-height: 400px;">
           <div class="box box-shadow white">
             <div data-toggle="switch-box">
               <%
@@ -602,7 +605,7 @@
                 }).length;
                 if((!user.featureDishes || user.featureDishes.length == 0) && ordersNeedReview == 0){
               %>
-              <h3><small><%= __('no-review-tip')%><br/><a href="/meal"><%= __('order-action')%></a></small></h3>
+              <h4 class="text-center mt-2"><small><%= __('no-review-tip')%><br/><a href="/meal"><%= __('order-action')%></a></small></h4>
               <%}else{
                 var i = 0;
                 user.featureDishes.forEach(function(featureDish) {
@@ -613,10 +616,10 @@
                         if(dish == featureDish.id){%>
                           <div id="rating<%= i%>" class="box-item">
                             <div class="row vertical-align">
-                              <div class="col-xs-4"><h3><%= featureDish.title%></h3></div>
-                              <div class="col-xs-6 text-left">
+                              <div class="col-4"><h3><%= featureDish.title%></h3></div>
+                              <div class="col-6 text-left">
                                 <div data-toggle="tooltip" data-placement="bottom">
-                                  <div class="rating" data-toggle="star-set">
+                                  <div class="rating border" data-toggle="star-set">
                                     <i class="fa fa-star fa-2x"></i>
                                     <i class="fa fa-star fa-2x"></i>
                                     <i class="fa fa-star fa-2x"></i>
@@ -625,21 +628,21 @@
                                   </div>
                                 </div>
                               </div>
-                              <div class="col-xs-2"><%= __('review-star')%></div>
+                              <div class="col-2"><%= __('review-star')%></div>
                             </div>
 
                             <div class="row" style="margin-top:20px;">
-                              <div class="col-xs-6">
+                              <div class="col-6">
                                 <img src="<%= featureDish.photos[0].v%>" style="width:100%;">
                               </div>
-                              <div class="col-xs-6">
+                              <div class="col-6">
                                 <textarea class="form-control review" placeholder="<%= __('review-placeholder')%>" style="height: 177px;"></textarea>
                               </div>
                             </div>
 
                             <div class="row">
-                              <div class="col-xs-12">
-                                <div id="feature-review-error-<%= i%>" class="alert alert-danger hide" style="margin-top:15px;"><%= __('review-warning')%></div>
+                              <div class="col-12">
+                                <div id="feature-review-error-<%= i%>" class="alert alert-danger d-none" style="margin-top:15px;"><%= __('review-warning')%></div>
                               </div>
                             </div>
 
@@ -658,40 +661,27 @@
               user.orders.forEach(function(order){
                 if(order.status == "review" && order.meal){
             %>
-            <div class="item border-round" id="i<%= j%>">
-              <div class="row" style="padding:10px;">
-                <div class="col-md-4 col-xs-5">
-                  <img src="<%= order.meal.coverString %>" style="width: 100%;">
+            <div class="item border rounded my-2 box-shadow" data-id="<%= order.id%>" id="i<%= j%>" style="overflow:hidden;">
+              <div class="row">
+                <div class="col-md-4 col-7">
+                  <img class="w-100" src="<%= order.meal.coverString %>">
                 </div>
-                <div class="col-md-5 col-xs-7">
-                  <h2 class="text-left"><%= order.meal.title%>  <small class="text-orange"><%= order.meal.type=="order"?__('order'):__('preorder')%></small></h2>
-                  <div class="row vertical-align text-left">
-                    <div class="col-xs-3 col-lg-1"><img class="round_thumb size-small cursor-pointer" onclick="location.href='/host/public/<%= order.host.id%>'" src="<%= order.host.picture || "/images/profile_man.png" %>"></div>
-                    <div class="col-xs-9 col-lg-11">
-                      <h4 class="text-left text-lightgrey" style="margin-top: 15px;margin-left:10px;"><%= order.host.shopName %></h4>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-xs-12">
-                      <h4 class="text-left text-lightgrey" style="margin-top: 15px;margin-left:10px;"><small><%= order.host.intro %></small></h4>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-xs-12">
-                      <h3 class="text-left none-margin"><small><span class="text-red"><%= __('transaction-complete')%></span></small></h3>
-                    </div>
-                  </div>
-
+                <div class="col-md-5 col-5 p-4">
+                  <h4 class="text-left">
+                    <%= order.meal.title%>
+                    <br/>
+                    <small class="text-orange"><%= order.meal.type=="order"?__('order'):__('preorder')%></small>
+                  </h4>
                 </div>
-                <div class="col-md-3">
-                  <div class="row">
-                    <div class="col-xs-12">
-                      <button class="btn btn-grey-red round active" style="width:100%;margin-top:20px;" data-toggle="collapse" data-parent="#i<%= j%>" href=".collapse"><%= __('review-action')%></button>
+                <div class="col-md-3 p-md-4 p-2 text-center">
+                  <div class="row d-none d-md-table-cell">
+                    <div class="col-12">
+                      <h5><small><%= __('total') %></small><span class="text-red"> $<%= (order.subtotal * ( 1 + order.getTaxRate()) + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)%></span></h5>
                     </div>
                   </div>
-                  <div class="row">
-                    <div class="col-xs-12">
-                      <h3><small><%= __('total') %></small><span class="text-red"> $<%= (order.subtotal * ( 1 + order.getTaxRate()) + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)%></span></h3>
+                  <div class="row text-center">
+                    <div class="col-12">
+                      <button class="btn btn-grey-red active w-50" style="max-width:250px;" data-toggle="collapse" data-parent="#i<%= j%>" href="#meal-review-<%= j%>"><%= __('review-action')%></button>
                     </div>
                   </div>
                 </div>
@@ -703,36 +693,41 @@
                   order.dishes.forEach(function(dish){
                     if(dish.id == dishId){
             %>
-                <div style="margin-top:10px;" class="dish-item" data-dish="<%= dish.id%>">
-                  <div class="row vertical-align">
-                    <div class="col-md-2 col-xs-3">
-                      <img src="<%= dish.photos[0].v%>" style="max-height:100px;">
+                <div class="dish-item" data-dish="<%= dish.id%>">
+                  <div class="d-flex justify-content-around vertical-align">
+                    <div class="d-none d-md-table-cell">
+                      <img class="rounded border" src="<%= dish.photos[0].v%>" style="max-height:100px;">
                     </div>
-                    <div class="col-md-6 col-xs-9">
-                      <h3 class="none-margin"><small class="text-black"><%= dish.title%>&nbsp&nbsp&nbsp&nbsp&nbsp$<%= dish.price%>&nbsp&nbsp&nbsp&nbsp&nbsp<%= order.orders[dish.id].number%><%= __('fen')%></small></h3>
+                    <div>
+                      <h5 class="none-margin">
+                        <%= dish.title%>
+                        <small>$<%= dish.price%></small>
+                      </h5>
                     </div>
-                    <div class="col-md-4 col-xs-12">
+                    <div>
                       <div data-toggle="tooltip" data-placement="bottom">
-                        <div class="rating" data-toggle="star-set">
-                          <i class="fa fa-star"></i>
-                          <i class="fa fa-star"></i>
-                          <i class="fa fa-star"></i>
-                          <i class="fa fa-star"></i>
-                          <i class="fa fa-star"></i>
+                        <div class="card white">
+                          <div class="rating" data-toggle="star-set">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div class="row" style="margin-top:10px;">
-                    <div class="col-xs-12">
+                    <div class="col-12">
                       <textarea class="form-control review" placeholder="<%= __('review-placeholder')%>" style="height:100px;"></textarea>
                     </div>
                   </div>
                 </div>
             <%}})})%>
                 <div class="row" style="margin-top:10px;">
-                  <div class="col-xs-12 text-right">
-                    <div id="meal-review-<%= j%>" class="alert alert-danger hide"><%= __('review-warning')%></div>
+                  <div class="col-12 text-right">
+                    <div id="meal-review-<%= j%>" class="alert alert-danger d-none"><%= __('review-warning')%></div>
                     <div class="btn btn-grey-red leaveReview active" data-target="#meal-review-<%= j%>" data-host="<%= order.host.id%>" data-meal="<%= order.meal.id%>" data-err-container="#meal-review-<%= j%>" style="margin-right:20px;"><%= __('submit')%></div>
                   </div>
                 </div>
@@ -742,8 +737,8 @@
             <!--item end-->
           </div>
 
-          <nav class="pull-right">
-            <ul class="pagination pagination-sm" data-trigger="pagination" data-target="#myreview">
+          <nav>
+            <ul class="pagination pagination-red pagination-sm" data-trigger="pagination" data-target="#myreview">
               <li class="active"><a href="javascript:void(0)">1</a></li><li>
             </ul>
           </nav>

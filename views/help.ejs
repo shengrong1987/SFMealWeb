@@ -1,175 +1,166 @@
-<div class="container-fluid default-container text-center relative" style="margin-top:-20px;background-color: #f2f2f2;">
+<div class="container-fluid default-container text-center relative p-3" style="background-color: #f2f2f2;">
 
-  <div id="wrapper">
-    <div id="sidebar-wrapper">
-      <ul class="sidebar-nav">
-        <li class="sidebar-brand">
-          <a class="sidenav-item text-black" href="#">
-            帮助中心
-          </a>
-        </li>
-        <li><a href="#menu-toggle" class="btn btn-default" data-toggle="menu-toggle"><%= __('help-menu-collapse')%></a></li>
-        <li><span class="divider"></span></li>
-        <li>
-          <a class="sidenav-item" href="#aboutUs"><%= __('about-us')%></a>
-        </li>
-        <li>
-          <a class="sidenav-item" href="#general">常规帮助</a>
-        </li>
-        <li>
-          <a class="sidenav-item" href="/terms#terms"><%= __('terms')%></a>
-        </li>
-        <li>
-          <a class="sidenav-item" href="#cancellationPolicy"><%= __('cancellationPolicy')%></a>
-        </li>
-        <li>
-          <a class="sidenav-item" href="#trust"><%= __('trust')%></a>
-        </li>
-      </ul>
+  <div class="row">
+
+    <div class="col-md-3">
+      <nav id="helpNav" class="navbar navbar-light bg-light text-center sticky-top">
+        <a class="navbar-brand" href="#help">帮助中心</a>
+        <nav class="nav nav-pills">
+          <a class="nav-link" href="#menu-toggle" class="btn btn-default" data-toggle="menu-toggle"><%= __('help-menu-collapse')%></a>
+          <div role="separator" class="divider"></div>
+          <a class="nav-link" href="#aboutUs"><%= __('about-us')%></a>
+          <a class="nav-link" href="#general"><%= __('general-help')%></a>
+          <a class="nav-link" href="#cancellationPolicy"><%= __('cancellationPolicy')%></a>
+          <a class="nav-link" href="#trust"><%= __('trust')%></a>
+          <a class="nav-link" href="/terms#terms"><%= __('terms')%></a>
+        </nav>
+      </nav>
     </div>
 
-    <div id="page-content-wrapper">
-      <div class="container-fluid well white">
-        <div class="row">
-          <div class="col-lg-12 text-left">
-
-            <div id="aboutUs">
-              <h2><%= __('about-us')%></h2>
-              <div class="divider"></div>
-              <p><%= __('about-us-context-1')%><br><br></p>
-            </div>
-
-            <div id="aboutSFMeal">
-              <h2><%= __('about-sfmeal')%></h2>
-              <div class="divider"></div>
-              <p><%= __('about-sfmeal-context-1')%><br><br></p>
-            </div>
-
-            <div id="aboutKitchen">
-              <h2><%= __('about-kitchen')%></h2>
-              <div class="divider"></div>
-              <p><%= __('about-kitchen-context-1')%><br><br></p>
-              <img src="/images/kitchen.jpg"/>
-            </div>
-
-            <div class="divider"></div>
-
-            <div id="general">
-              <h2>常规帮助</h2>
-              <a href="#menu-toggle" class="btn btn-default btn-outline" data-toggle="menu-toggle"><%= __('help-menu')%></a>
-              <div class="divider"></div>
-              <div id="order">
-                <p>1. <%= __('how-to-order')%></p>
-                <p>你可以通过邮箱或Facebook,Google+来注册成为吃货<a href="#register"> (如何注册?) </a>, 然后只需填写个人资料<a href="#updateUserInfo">  (如何填写?) </a>就可以开始选取或预定你喜欢吃的东西了。</p>
-                <p>点击进入选定好的菜单, 在对应的菜式中选取数量<a href="#takeOrder"> (如何选取?) </a>, 然后点击'去结账'按钮, 接着选择希望的取货方式(自取或送餐), '自取'选项可能会有多个自取时间和地点, '送餐'选项需要输入您的地址和联系电话。</p>
-                <p>初次下订单我们会要求你添加您的支付信息, 在选择取货方式下方添加您的信用卡信息。</p>
-                <p>查看您的订单数量和金额(加税)是否正确, 然后付款下单!</p>
-              </div>
-
-              <div class="divider"></div>
-              <div id="pickup">
-                <p>2. <%= __('how-to-pickup')%></p>
-                <p>您可以在登录后点击右上角个人头像 -> 吃货订单 查看您下的订单<a href="#checkOrder"> (查看订单?)。</a></p>
-                <p>订单准备好后您会收到通知(邮箱和短信), 选择送餐的吃货会收到您的订单已在路上的通知, 只需留意手机并等待美食就可以啦<a href="#contactChef"> (联系司机?)</a>。
-                <p>选择自取的吃货会在15分钟前收到即点订单的自取通知, 或1小时及1天前收到预定订单自取通知 (菜单类型?)。</p>
-                <p>您也可以在吃货订单中随时查看订单的取货时间,地点和联系电话。</p>
-              </div>
-
-              <div class="divider"></div>
-              <div id="register">
-                <p>3. <%= __('register-login')%></p>
-                <p>您可以在网页右上角点击"注册" -> "邮箱注册", 填写姓名、邮箱、密码、电话和生日, 请记住您的邮箱和密码以用于登录。</p>
-                <p>您也可以选择用Facebook或Google+进行登录, 注意无法使用相同的邮箱重复注册 (可能您社交账号的邮箱已经被注册了)。</p>
-                <p>点击网页右上角"登录"按钮, 输入您之前注册的邮箱和密码进行登录, 或者使用社交账号直接登录 (无需注册)。</p>
-              </div>
-
-              <div class="divider"></div>
-              <div id="updateUserInfo">
-                <p>4. <%= __('how-to-enter-info')%></p>
-                <p>您可以在登录后点击右上角个人头像 -> 修改个人资料 上传个人头像, 填写姓名、个人简介、手机(获取订单提醒),邮编和生日。</p>
-                <p>名字采用实名制, 只能输入英文字母, 中文则输入拼音字母。(我们绝不会公开展示您的全名!)</p>
-                <p>点击'保存'保存修改。</p>
-              </div>
-
-              <div class="divider"></div>
-              <div id="takeOrder">
-                <p>5. <%= __('how-to-select-dish')%></p>
-                <p>您可以在菜单页里菜式图片下进行点餐或取消点餐, 点击"点一份"增加一份, 点击"-"减少一份, 在结账窗口也可以查看和修改您的订单数量。</p>
-                <p>注意:如果该菜式已卖完, 则会在结账窗口提示已售罄, 您将无法增加该菜式的订单数量。</p>
-              </div>
-
-              <div class="divider"></div>
-              <div id="checkOrder">
-                <p>5. <%= __('how-to-manage-order')%></p>
-                <p>您可以在登陆后点击右上角个人头像 -> 吃货订单查看您的订单。订单分为两种, 你可以在订单栏中切换即点订单和预定订单。</p>
-                <p>在"所有订单"可以查看包括历史和正在进行中的订单, 你也可以根据订单的不同状态查看。</p>
-                <p><i>"待确认"</i>: 正在等待您或者厨师确认的订单(订单申请调整/取消中), 调整/取消订单是可以双向的。</p>
-                <p><i>"待煮"</i>: 还未截止预定的预定订单, 您可以直接调整/取消订单。</p>
-                <p><i>"烹饪中"</i>: 正在准备中的订单, 您可以申请调整/取消订单。</p>
-                <p><i>"等自取/送餐中"</i>: 已经准备好的订单, 您可以查看自取地址和厨师/联系人联系电话。</p>
-                <p><i>"待评价"</i>: 成功收货还未评价的订单, 您可以评价你点的菜式。</p>
-              </div>
-
-              <div class="divider"></div>
-              <div id="contactChef">
-                <p>6. <%= __('how-to-contact-driver')%></p>
-                <p>在吃货订单中找到您下的订单<a href="#checkOrder"> (查看订单?)</a></p>
-                <p>点击"交易操作"栏中的"联系厨师", 您会看到厨房名和联系电话。</p>
-              </div>
-
-              <div class="divider"></div>
-              <div id="applyAsChef">
-                <p>7. <%= __('how-to-apply-chef')%></p>
-                <p>登录<a href="#register"> (如何注册?) </a>后点击顶部"我做私房菜"按钮, 根据流程完成厨师申请。</p>
-                <p>请准备好您的ID证件, 手机号, 厨房地址, 收款银行, 社会安全号等资料(仅将用于联系用途以及收款账号的设立)。</p>
-                <p>申请过程中您将创建菜式和菜单以供我们审查, 请准备好真实, 同等份量的菜式图片和填写菜式名/价钱/份量。</p>
-              </div>
-
-              <div class="divider"></div>
-              <div id="get-discount">
-                <p>8. <%= __('how-to-get-discount')%></p>
-                <p><img src="/images/how-to-register.gif"></p>
-              </div>
-
-              <div class="divider"></div>
-              <div id="save-to-screen">
-                <p>9. <%= __('how-to-save-to-screen')%></p>
-                <p><img src="/images/how-to-save-to-screen.gif"></p>
-              </div>
-
-            </div>
-
-            <div class="divider"></div>
-
-            <div id="cancellationPolicy">
-              <h2><%= __('cancellationPolicy')%></h2>
-              <p>吃货可以在预定订单预定截止前取消订单，订单金额会100%退换给吃货。吃货和厨师可以在预定订单准备中以及即点订单准备中时申请取消，经对方确认后即可取消订单，金额将会100%退换给付款方。</p>
-              <p>如厨师设定的订单最低要求在预定截止时未达到，系统将自动取消所有订单，并100%退款给吃货和厨师。</p>
-            </div>
-
-            <div class="divider"></div>
-            <div id="trust">
-              <h2><%= __('chef-guide')%></h2>
-              <p>1. <%= __('chef-guide-title-1')%></p>
-              <p><%= __('chef-guide-context-1')%></p>
-              <div class="divider"></div>
-              <p>2. <%= __('chef-guide-title-2')%></p>
-              <p><%= __('chef-guide-context-2')%><a href="#fdl"> (如何获取?)</a></p>
-              <p><%= __('chef-guide-context-2-2')%></p>
-              <p><%= __('chef-guide-context-2-3')%></p>
-              <div class="divider"></div>
-              <p>3. <%= __('chef-guide-title-3')%></p>
-              <p><%= __('chef-guide-context-3')%></p>
-              <p><%= __('chef-guide-context-3-2')%></p>
-              <p><%= __('chef-guide-context-3-3')%></p>
-              <p><%= __('chef-guide-context-3-4')%> <a href="/trust"><%= __('trust')%></a>。</p>
-            </div>
-
-            <div class="divider"></div>
-          </div>
+    <div class="col-md-9" style="height: 700px;">
+      <div class="container-fluid well white p-md-5 p-4 text-left mh-100" style="overflow-y: scroll;" data-spy="scroll" data-target="#helpNav" data-offset="0">
+        <div id="aboutUs">
+          <h2><%= __('about-us')%></h2>
+          <div class="divider"></div>
+          <p><%= __('about-us-context-1')%><br><br></p>
         </div>
+
+        <div id="aboutSFMeal">
+          <h2><%= __('about-sfmeal')%></h2>
+          <div class="divider"></div>
+          <p><%= __('about-sfmeal-context-1')%><br><br></p>
+        </div>
+
+        <div id="aboutKitchen">
+          <h2><%= __('about-kitchen')%></h2>
+          <div class="divider"></div>
+          <p><%= __('about-kitchen-context-1')%><br><br></p>
+          <img class="mx-auto mw-100" src="/images/kitchen.jpg"/>
+        </div>
+
+        <div class="divider"></div>
+
+        <div id="general">
+          <h2>常规帮助</h2>
+          <a href="#menu-toggle" class="btn btn-default btn-outline" data-toggle="menu-toggle"><%= __('help-menu')%></a>
+          <div class="divider"></div>
+          <div id="order">
+            <p>1. <%= __('how-to-order')%></p>
+            <p>你可以通过邮箱或Facebook,Google+来注册成为吃货<a href="#register"> (如何注册?) </a>, 然后只需填写个人资料<a href="#updateUserInfo">  (如何填写?) </a>就可以开始选取或预定你喜欢吃的东西了。</p>
+            <p>点击进入选定好的菜单, 在对应的菜式中选取数量<a href="#takeOrder"> (如何选取?) </a>, 然后点击'去结账'按钮, 接着选择希望的取货方式(自取或送餐), '自取'选项可能会有多个自取时间和地点, '送餐'选项需要输入您的地址和联系电话。</p>
+            <p>初次下订单我们会要求你添加您的支付信息, 在选择取货方式下方添加您的信用卡信息。</p>
+            <p>查看您的订单数量和金额(加税)是否正确, 然后付款下单!</p>
+          </div>
+
+          <div class="divider"></div>
+          <div id="pickup">
+            <p>2. <%= __('how-to-pickup')%></p>
+            <p>您可以在登录后点击右上角个人头像 -> 吃货订单 查看您下的订单<a href="#checkOrder"> (查看订单?)。</a></p>
+            <p>订单准备好后您会收到通知(邮箱和短信), 选择送餐的吃货会收到您的订单已在路上的通知, 只需留意手机并等待美食就可以啦<a href="#contactChef"> (联系司机?)</a>。
+            <p>选择自取的吃货会在15分钟前收到即点订单的自取通知, 或1小时及1天前收到预定订单自取通知 (菜单类型?)。</p>
+            <p>您也可以在吃货订单中随时查看订单的取货时间,地点和联系电话。</p>
+          </div>
+
+          <div class="divider"></div>
+          <div id="register">
+            <p>3. <%= __('register-login')%></p>
+            <p>您可以在网页右上角点击"注册" -> "邮箱注册", 填写姓名、邮箱、密码、电话和生日, 请记住您的邮箱和密码以用于登录。</p>
+            <p>您也可以选择用Facebook或Google+进行登录, 注意无法使用相同的邮箱重复注册 (可能您社交账号的邮箱已经被注册了)。</p>
+            <p>点击网页右上角"登录"按钮, 输入您之前注册的邮箱和密码进行登录, 或者使用社交账号直接登录 (无需注册)。</p>
+          </div>
+
+          <div class="divider"></div>
+          <div id="updateUserInfo">
+            <p>4. <%= __('how-to-enter-info')%></p>
+            <p>您可以在登录后点击右上角个人头像 -> 修改个人资料 上传个人头像, 填写姓名、个人简介、手机(获取订单提醒),邮编和生日。</p>
+            <p>名字采用实名制, 只能输入英文字母, 中文则输入拼音字母。(我们绝不会公开展示您的全名!)</p>
+            <p>点击'保存'保存修改。</p>
+          </div>
+
+          <div class="divider"></div>
+          <div id="takeOrder">
+            <p>5. <%= __('how-to-select-dish')%></p>
+            <p>您可以在菜单页里菜式图片下进行点餐或取消点餐, 点击"点一份"增加一份, 点击"-"减少一份, 在结账窗口也可以查看和修改您的订单数量。</p>
+            <p>注意:如果该菜式已卖完, 则会在结账窗口提示已售罄, 您将无法增加该菜式的订单数量。</p>
+          </div>
+
+          <div class="divider"></div>
+          <div id="checkOrder">
+            <p>5. <%= __('how-to-manage-order')%></p>
+            <p>您可以在登陆后点击右上角个人头像 -> 吃货订单查看您的订单。订单分为两种, 你可以在订单栏中切换即点订单和预定订单。</p>
+            <p>在"所有订单"可以查看包括历史和正在进行中的订单, 你也可以根据订单的不同状态查看。</p>
+            <p><i>"待确认"</i>: 正在等待您或者厨师确认的订单(订单申请调整/取消中), 调整/取消订单是可以双向的。</p>
+            <p><i>"待煮"</i>: 还未截止预定的预定订单, 您可以直接调整/取消订单。</p>
+            <p><i>"烹饪中"</i>: 正在准备中的订单, 您可以申请调整/取消订单。</p>
+            <p><i>"等自取/送餐中"</i>: 已经准备好的订单, 您可以查看自取地址和厨师/联系人联系电话。</p>
+            <p><i>"待评价"</i>: 成功收货还未评价的订单, 您可以评价你点的菜式。</p>
+          </div>
+
+          <div class="divider"></div>
+          <div id="contactChef">
+            <p>6. <%= __('how-to-contact-driver')%></p>
+            <p>在吃货订单中找到您下的订单<a href="#checkOrder"> (查看订单?)</a></p>
+            <p>点击"交易操作"栏中的"联系厨师", 您会看到厨房名和联系电话。</p>
+          </div>
+
+          <div class="divider"></div>
+          <div id="applyAsChef">
+            <p>7. <%= __('how-to-apply-chef')%></p>
+            <p>登录<a href="#register"> (如何注册?) </a>后点击顶部"我做私房菜"按钮, 根据流程完成厨师申请。</p>
+            <p>请准备好您的ID证件, 手机号, 厨房地址, 收款银行, 社会安全号等资料(仅将用于联系用途以及收款账号的设立)。</p>
+            <p>申请过程中您将创建菜式和菜单以供我们审查, 请准备好真实, 同等份量的菜式图片和填写菜式名/价钱/份量。</p>
+          </div>
+
+          <div class="divider"></div>
+          <div id="get-discount">
+            <p>8. <%= __('how-to-get-discount')%></p>
+            <p><img src="/images/how-to-register.gif"></p>
+          </div>
+
+          <div class="divider"></div>
+          <div id="save-to-screen">
+            <p>9. <%= __('how-to-save-to-screen')%></p>
+            <p><img src="/images/how-to-save-to-screen.gif"></p>
+          </div>
+
+        </div>
+
+        <div class="divider"></div>
+
+        <div id="cancellationPolicy">
+          <h2><%= __('cancellationPolicy')%></h2>
+          <p>吃货可以在预定订单预定截止前取消订单，订单金额会100%退换给吃货。吃货和厨师可以在预定订单准备中以及即点订单准备中时申请取消，经对方确认后即可取消订单，金额将会100%退换给付款方。</p>
+          <p>如厨师设定的订单最低要求在预定截止时未达到，系统将自动取消所有订单，并100%退款给吃货和厨师。</p>
+          <h2> ... </h2>
+          <h2> .. </h2>
+          <h2> . </h2>
+          <h2> . </h2>
+          <h2> .. </h2>
+          <h2> ... </h2>
+        </div>
+
+        <div class="divider"></div>
+        <div id="trust">
+          <h2><%= __('trust')%></h2>
+          <p>1. <%= __('chef-guide-title-1')%></p>
+          <p><%= __('chef-guide-context-1')%></p>
+          <div class="divider"></div>
+          <p>2. <%= __('chef-guide-title-2')%></p>
+          <p><%= __('chef-guide-context-2')%><a href="#fdl"> (如何获取?)</a></p>
+          <p><%= __('chef-guide-context-2-2')%></p>
+          <p><%= __('chef-guide-context-2-3')%></p>
+          <div class="divider"></div>
+          <p>3. <%= __('chef-guide-title-3')%></p>
+          <p><%= __('chef-guide-context-3')%></p>
+          <p><%= __('chef-guide-context-3-2')%></p>
+          <p><%= __('chef-guide-context-3-3')%></p>
+          <p><%= __('chef-guide-context-3-4')%> <a href="/trust"><%= __('trust')%></a>。</p>
+        </div>
+
+        <div class="divider"></div>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -177,7 +168,13 @@
 
   $("[data-toggle='menu-toggle']").click(function(e) {
     e.preventDefault();
-    $("#wrapper").toggleClass("toggled");
+    var navContainer = $("#helpNav").parent();
+    navContainer.toggle();
+    if(navContainer.next().hasClass('col-md-9')){
+      navContainer.next().removeClass('col-md-9').addClass('col-md-12');
+    }else{
+      navContainer.next().addClass('col-md-9').removeClass('col-md-12');
+    }
   });
 
 </script>

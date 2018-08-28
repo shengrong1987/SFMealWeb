@@ -1,162 +1,144 @@
-<div class="container default-container text-center relative" style="margin-top:-20px;background-color: #f2f2f2;">
+<div class="default-container text-center relative">
 
-  <div class="compact-banner">
-    <div class="img-wrapper row">
+  <div class="compact-banner w-100 d-none d-md-block">
+    <div class="img-wrapper">
       <img src="/images/blank.gif" data-echo="/images/home-cover-1.jpg" class="relative middle">
     </div>
 
-    <div class="absolute logo-container">
-
-      <div class="col-lg-3 col-sm-4 col-xs-12 relative text-left">
-        <a href="/" class="logo-slogan"></a>
-      </div>
-
-      <div class="relative text-left col-lg-9 col-sm-8 col-xs-12 content">
-        <h4 class="text-white"><strong><%__('searching-word')%></strong></h4>
-        <!--<div class="btn-group">-->
-          <!--<input class="input btn btn-default round light text-grey" placeholder="<%= __('searching-tips')%>">-->
-          <!--<button class="btn btn-warning round orange text-white" onclick="javascript:search(this)">-->
-            <!--<i class="fa fa-search"></i>-->
-            <!--<%= __('search')%>-->
-          <!--</button>-->
-        <!--</div>-->
-        <!--<button class="btn btn-grey-red round active" onclick="location.href='/meal'"><%= __('see-menu')%></button>-->
+    <div class="absolute">
+      <div class="logo-container row">
+        <div class="col-lg-3 col-sm-4 col relative text-left">
+          <a href="/" class="logo-slogan"></a>
+        </div>
       </div>
     </div>
   </div>
 
-  <div id="shoppingCartView" class="btn btn-grey-red btn-info vertical-align active" style="position: fixed;bottom: 0;right: 0;z-index:90;width: 100%;height:50px;" onclick="javascript:location.href='#order'">
-    <div style="width:100%;height: 35px;line-height: 35px;">
-      <div class="col-xs-3"><span style="left: 10px;" class="total-preview relative" data-subtotal=""></span></div>
-      <div class="col-xs-6 middle"><span style="margin-right: 5px;text-align: center;"><%= __('check-out-fast-btn')%></span></div>
-      <div class="col-xs-3 text-right"><div style="right: 10px;" class="btn btn-outline-white order-preview relative" data-item=""></div></div>
+  <div id="shoppingCartView" class="red text-white p-2 w-100 align-middle d-block d-md-none" style="line-height:50px;position: fixed;bottom: 0;right: 0;z-index:90;" onclick="javascript:location.href='#order'">
+    <div class="row w-100">
+      <div class="col-3"><span style="left: 10px;" class="total-preview relative" data-subtotal=""></span></div>
+      <div class="col-6 middle text-center"><span class="mr-1"><%= __('check-out-fast-btn')%></span></div>
+      <div class="col-3 text-right"><div style="right: 10px;" class="btn btn-outline-white order-preview relative" data-item=""></div></div>
     </div>
-
   </div>
 
-  <div id="meal-detail-container" class="padding-clear" data-meal="<%= meal.id%>" data-meal-prepareTime="<%= meal.prepareTime%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>" data-title="<%= meal.title%>" data-coverString="<%= meal.coverString%>" data-cover="<%= meal.cover%>" data-user="<%= user ? user.id : ''%>">
+  <div id="meal-detail-container" class="padding-clear container" data-meal="<%= meal.id%>" data-meal-prepareTime="<%= meal.prepareTime%>" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-range="<%= meal.delivery_range%>" data-title="<%= meal.title%>" data-coverString="<%= meal.coverString%>" data-cover="<%= meal.cover%>" data-user="<%= user ? user.id : ''%>">
 
     <div class="row">
-      <div class="col-md-8">
+      <div class="col-md-12">
         <div class="box white">
-          <div class="row">
-            <div id="meal-detail-intro" class="col-xs-12 col-sm-6">
-              <div class="row">
-                <div class="col-xs-7 text-left">
-                  <h2 style="display: inline-block;"><%= meal.titleI18n(locale) %><small class="text-orange"><% if(meal.type=='order'){ __('order') }else if(meal.type=='preorder'){ __('preorder') } %> <%= meal.isFull()? __('full'): "" %><%= meal.isExpire()?("(" + __('expire') + ")"):""%><%= meal.isNotStart()?( "(" + __('notStart') + ")"):""%></small></h2>
-                </div>
-                <% if(meal.supportPartyOrder){%>
-                <h2 class="col-xs-5">
-                  <input id="cateringModeBtn" type="checkbox" data-on-text="<%= __('catering_on')%>" data-off-text="<%= __('catering_off')%>" data-meal="<%= meal.id%>" data-toggle="switch-button" <%= meal.isPartyMode ? "checked=checked" : ""%>>
-                </h2>
-                <%}%>
+          <div id="meal-title-view">
+            <div class="row mb-3">
+              <div class="col">
+                <img class="rounded-circle size-large cursor-pointer" src="<%= meal.chef.picture || ''%>" onclick="javascript:location.href='/host/public/<%= meal.chef.id%>';">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12 mx-auto mb-1">
+                <h2 class="d-inline"><%= meal.titleI18n(locale) %><small class="text-orange"><% if(meal.type=='order'){ __('order') }else if(meal.type=='preorder'){ __('preorder') } %> <%= meal.isFull()? __('full'): "" %><%= meal.isExpire()?("(" + __('expire') + ")"):""%><%= meal.isNotStart()?( "(" + __('notStart') + ")"):""%></small></h2>
               </div>
 
-              <div class="row vertical-align-base">
-                <div class="col-xs-12 text-left">
-                  <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(2)%>" style="display: inline;margin-top: 5px;">
-                    <div class="rating" data-toggle="star-set" data-rate="<%= meal.score.toFixed(2)%>">
-                      <i class="fa fa-star"></i>
-                      <i class="fa fa-star"></i>
-                      <i class="fa fa-star"></i>
-                      <i class="fa fa-star"></i>
-                      <i class="fa fa-star"></i>
-                    </div>
+              <div class="col-12 mx-auto">
+                <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(2)%>" style="display: inline;margin-top: 5px;">
+                  <div class="rating" data-toggle="star-set" data-rate="<%= meal.score.toFixed(2)%>">
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
                   </div>
-                  <small style="font-size: 20px;" class="text-lightgrey">(<%= meal.numberOfReviews %>)</small>
                 </div>
+                <small style="font-size: 20px;" class="text-lightgrey">(<%= meal.numberOfReviews %>)</small>
               </div>
+            </div>
 
-              <h3></h3>
+            <div class="divider"></div>
 
-              <div class="row chef-cell vertical-align text-center">
-                <div class="col-md-2 col-xs-3">
-                  <img class="round_thumb size-small text-center cursor-pointer" onclick="javascript:location.href='/host/public/<%= meal.chef.id%>'" src="/images/blank.gif" data-echo=<%= meal.chef.picture || "/images/profile_man.png" %>>
-                </div>
-                <div class="col-md-10 col-xs-9">
-                  <h4 class="text-left text-dark text-box" style="margin: 0 0 10px 10px;"><%= meal.chef.shopNameI18n(locale) %><br><small><%= meal.chef.shortIntro(locale) %></small></h4>
-                </div>
-              </div>
+            <div class="row">
 
-              <div class="row">
-                <div class="col-xs-12">
-                  <!--<h4 class="text-left"><small><%= __('book-time')%>: <span class="text-black"><strong><%= meal.provideDate()%></strong></span></small></h4>-->
+              <div class="col-12 col-md-6 text-left">
+                <div style="max-width: 100px;height: 120px;">
+                  <h4><small><%= __('pickup-date')%>:</small></h4>
                   <div class="row">
-                    <div class="col-xs-4">
-                      <h4><small><%= __('pickup-date')%>:</small></h4>
-                      <div class="pickup-date">
-                        <% if(meal.isPartyMode){%>
-                        <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%></span>
-                        <span class="col-xs-12"> > <%= meal.getDaysAfterNow(1)%>  <i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" title="<%= __('party-pickup-date-tip')%>"></i></span>
-                        <%}else{%>
-                        <span class="col-xs-12"><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%> <%= meal.getDateFromDate(meal.pickups[0].pickupFromTime)%></span>
-                        <span class="col-xs-12"><%= __(meal.getWeekFromDate(meal.pickups[0].pickupFromTime))%></span>
-                        <%}%>
-                      </div>
-                      <div class="pickup-map">
-                        <a data-toggle="collapse" data-parent="#meal-detail-container" href="#googlemapContainer" aria-expanded="false" aria-controls="googlemapContainer">
-                          <span><%= __('nav_me')%></span>
-                          <i class="fa fa-location-arrow"></i>
-                        </a>
-                      </div>
-
-                    </div>
-                    <div class="col-xs-8 text-left">
-                      <h4><small><%= __('pickup-location')%>:</small></h4>
-                      <div class="pickup-location">
-                        <%
-                        var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
-                        var count = 1;
-                        meal.pickups.forEach(function(pickup){ if(pickup.method === "pickup" && !meal.isPartyMode){ %>
-                        <div class="row">
-                          <div class="col-xs-12">
-                            <div class="option pickupOption" data-location="<%= pickup.publicLocation || pickup.location%>" data-color="<%= colors[count]%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>">
-                              <label>
-                                <i class="fa fa-hand-paper-o cursor-pointer text-<%= colors[count]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i>
-                                <span> <%= pickup.publicLocation || pickup.location%><% if(pickup.instruction){%>(<%= pickup.instruction%>)<%}%></span>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                        <%}else if(pickup.method === "delivery"){if(pickup.isDateCustomized && !meal.isPartyMode){return}%>
-                        <div class="row">
-                          <div class="col-xs-12">
-                            <div class="option deliveryOption" data-area="<%= pickup.area%>" data-location="<%= pickup.deliveryCenter%>" data-color="<%= colors[count]%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>">
-                              <label>
-                                <i class="fa fa-truck cursor-pointer text-<%= colors[count]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i>
-                                <span> <%= pickup.area || pickup.deliveryCenter%> <%= __('nearby')%></span>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                        <%}count++;})%>
-
+                    <div class="col">
+                      <div class="pretty-date mt-1">
+                        <p><%= meal.isPartyMode ? meal.getDaysAfterNow(1) : meal.getDateFromDate(meal.pickups[0].pickupFromTime)%> <span><%= meal.getMonthName(meal.pickups[0].pickupFromTime)%></span></p>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <!--<div class="row">-->
-                <!--<div class="col-xs-12 text-left">-->
-                  <!--<h4><small><i class="fa fa-exclamation-circle"></i> <%= meal.isPartyMode === true ? __('party-meal-pickup-tip', meal.partyRequirement.minimal) : __('pickup_detail_title')%></small></h4>-->
-                <!--</div>-->
-              <!--</div>-->
-            </div>
 
-            <div class="col-xs-12 col-sm-6">
-              <!--<div class="vertical-align">-->
-                <!--<h4><small><%= __('share-to-all')%></small></h4>-->
-                <!--<div id="social-share"></div>-->
-                <!--<i class="fa fa-heart fa-2x cursor-pointer" style="margin-left:10px;" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}else{%>false<%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>-->
-              <!--</div>-->
+              <div class="col-12 col-md-6 text-left">
+                <div class="mx-auto">
+                  <h4><small><%= __('pickup-location')%>:</small></h4>
+                  <div class="pickup-location">
+                    <%
+                    var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
+                    var count = 1;
+                    meal.pickups.forEach(function(pickup){ if(pickup.method === "pickup" && !meal.isPartyMode){ %>
+                    <div class="row">
+                      <div class="col">
+                        <div class="option pickupOption mt-1" data-location="<%= pickup.publicLocation || pickup.location%>" data-color="<%= colors[count]%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>">
+                          <label>
+                            <i class="fa fa-hand-paper-o cursor-pointer text-<%= colors[count]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i>
+                            <span> <%= pickup.publicLocation || pickup.location%><% if(pickup.instruction){%>(<%= pickup.instruction%>)<%}%></span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <%}else if(pickup.method === "delivery"){if(pickup.isDateCustomized && !meal.isPartyMode){return}%>
+                    <div class="row">
+                      <div class="col">
+                        <div class="option deliveryOption mt-1" data-area="<%= pickup.area%>" data-location="<%= pickup.deliveryCenter%>" data-color="<%= colors[count]%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>">
+                          <label>
+                            <i class="fa fa-truck cursor-pointer text-<%= colors[count]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i>
+                            <span> <%= pickup.area || pickup.deliveryCenter%> <%= __('nearby')%></span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <%}count++;})%>
 
-              <h4 class="text-left"><small><% __('pickup-location-after-order')%></small></h4>
+                    <div class="row">
+                      <div class="col">
+                        <div class="mt-1">
+                          <label>
+                            <i class="fa fa-map cursor-pointer text-blue"></i>
+                            <a data-toggle="collapse" role="button" data-parent="#meal-title-view" href="#googlemapContainer" aria-expanded="false" aria-controls="googlemapContainer"><%= __('show-map')%></a>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
 
-              <div id="googlemapContainer" class="collapse">
-                <div id="googlemap" data-target="#meal-detail-intro"></div>
+                  </div>
+                </div>
               </div>
 
+              <!--<% if(meal.supportPartyOrder){%>-->
+              <!--<h2 class="col-12 col-md-2">-->
+                <!--<input id="cateringModeBtn" type="checkbox" data-on-text="<%= __('catering_on')%>" data-off-text="<%= __('catering_off')%>" data-meal="<%= meal.id%>" data-toggle="switch-button" <%= meal.isPartyMode ? "checked=checked" : ""%>>-->
+              <!--</h2>-->
+              <!--<%}%>-->
+
             </div>
+
+            <div class="row mt-3">
+              <div id="googlemapContainer" class="w-100 collapse">
+                <div id="googlemap" style="height: 350px;"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="col-xs-12 col-sm-6">
+            <!--<div class="vertical-align">-->
+            <!--<h4><small><%= __('share-to-all')%></small></h4>-->
+            <!--<div id="social-share"></div>-->
+            <!--<i class="fa fa-heart fa-2x cursor-pointer" style="margin-left:10px;" data-select="<% if(user && user.collects){%><%= user.isCollect(meal.id)%><%}else{%>false<%}%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>" data-heart="true"></i>-->
+            <!--</div>-->
+
+            <h4 class="text-left"><small><% __('pickup-location-after-order')%></small></h4>
           </div>
 
           <%
@@ -169,21 +151,19 @@
             <div class="dark category-cell">
               <h4 class="text-white"><%= typeName[header] %></h4>
             </div>
-          <%
-            for(var i=0; i < dishes.length; i++){
-              var dish = dishes[i];
-              if(dish.type == header){
-          %>
-
-          <h2></h2>
 
           <div class="row">
-            <div class="col-xs-12">
+            <%
+            for(var i=0; i < dishes.length; i++){
+              var dish = dishes[i];
+            if(dish.type == header){
+            %>
+            <div class="col-12 col-lg-6">
               <div class="round-container dish" data-id=<%= dish.id %>>
                 <div class="relative">
                   <% dish.photos.forEach(function(photo, index){if(photo.v){%>
                   <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image" style="display: <%= index==0?'block':'none'%>">
-                    <img src="/images/blank.gif" data-echo="<%= index==0?photo.v:''%>" style="width:100%;">
+                    <img src="/images/blank.gif" data-echo="<%= index==0?photo.v:''%>" class="img-fluid">
                   </a>
                   <%}});%>
                   <% if(dish.video){%>
@@ -195,22 +175,25 @@
                   <% if(meal.isSupportDynamicPrice && dish.isDynamicPriceOn && meal.dynamicDishes.some(function(d){
                       return d.id === dish.id;
                     })) {
-                      var orderAmount = meal.getDynamicDishesTotalOrder(0);
-                      newPrice = dish.getPrice(orderAmount, meal);
-                      if(newPrice !== dish.price){
+                    var orderAmount = meal.getDynamicDishesTotalOrder(0);
+                    newPrice = dish.getPrice(orderAmount, meal);
+                  if(newPrice !== dish.price){
                   %>
                   <div class="box-float-bottom red"><h3 class="text-white" style="margin-top: 10px;"><%= __('dish-dynamic-price-success', (dish.price - newPrice).toFixed(2))%></h3></div>
                   <%}else{ var amountNeed = dish.qtyRate - orderAmount;%>
                   <div class="box-float-bottom red"><h3 class="text-white" style="margin-top: 10px;"><%= __('dish-dynamic-price-pending', amountNeed, (dish.price - dish.getPrice(dish.qtyRate, meal)).toFixed(2))%></h3></div>
                   <%}}%>
                 </div>
-                <div class="row dish-operator">
-                  <div class="col-sm-8">
-                    <div>
-                      <div class="col-sm-3">
+                <div class="row dish-operator text-center m-3">
+                  <div class="col-sm-6">
+                    <div class="row">
+                      <div class="col">
                         <h4 class="text-black"><%= dish.titleI18n(locale) %><span> ( <%= dish.quantity || '1' + __('fen') %> )</span></h4>
                       </div>
-                      <div class="col-sm-6">
+                    </div>
+
+                    <div class="row">
+                      <div class="col">
                         <div data-toggle="tooltip" data-placement="bottom" title="<%= dish.score.toFixed(2)%>" style="display: inline;margin-top: 5px;">
                           <div class="rating" data-toggle="star-set" data-rate="<%= dish.score.toFixed(2)%>">
                             <i class="fa fa-star"></i>
@@ -223,61 +206,69 @@
                         <small style="font-size: 20px;" class="text-lightgrey">(<%= dish.numberOfReviews %>)</small>
                       </div>
                     </div>
+
                     <div class="row">
                       <div class="col-sm-12">
-                        <h3 style="padding: 5px;" class="none-margin"><small><%= dish.descriptionI18n(locale) %></small></h3>
+                        <h5 class="none-margin p-1"><small><%= dish.descriptionI18n(locale) %></small></h5>
+                        <div class="divider d-md-none"></div>
                       </div>
                     </div>
                   </div>
 
-                  <div class="col-sm-4">
+                  <div class="col-sm-6 mb-3">
 
                     <div class="row">
-                      <div class="col-xs-12">
+                      <div class="col-12">
                         <h4><small class="left-amount"><%= __('left')%><span class="text-red" value=<%= meal.isPartyMode === true ? "100" : meal.leftQty[dish.id] %>><%= meal.isPartyMode === true ? 100 : meal.leftQty[dish.id] %></span><%= __('fen')%></small></h4>
                       </div>
                     </div>
 
                     <div class="row beforeOrder">
-                      <div class="col-xs-12">
+                      <div class="col-12">
                         <button class="btn btn-grey-red take-order btn-lg active <%= parseInt(meal.leftQty[dish.id])==0 ? 'disabled' : '' %>" onclick="javascript:orderFood('<%= dish.id %>',1, true)"><%= parseInt(meal.leftQty[dish.id]) == 0 ? __('check-out-sold-btn') : __('order-one')%></button>
                       </div>
                     </div>
 
                     <div class="row afterOrder">
-                      <div class="col-xs-12" style="margin-top:10px;">
-                        <div class="input-group input-group-lg amount-input round" data-toggle="amount-input" data-max="<%= meal.isPartyMode === true ? 100 : meal.leftQty[dish.id] %>" data-dish="<%= dish.id%>" style="width:150px;margin:auto;">
-                          <div class="input-group-addon minus" onclick="javascript:orderFood('<%= dish.id %>',-1)">-</div>
+                      <div class="col-12" style="margin-top:10px;">
+                        <div class="input-group input-group-lg amount-input round mx-auto" data-toggle="amount-input" data-max="<%= meal.isPartyMode === true ? 100 : meal.leftQty[dish.id] %>" data-dish="<%= dish.id%>">
+                          <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1)">
+                            <span class="input-group-text">-</span>
+                          </div>
                           <input class="form-control text-center dish-number" type="number" pattern="[0-9]*" inputmode="numeric" value="0" style="min-width: 75px;">
-                          <div class="input-group-addon add" onclick="javascript:orderFood('<%= dish.id %>',1)">+</div>
+                          <div class="input-group-append add" onclick="javascript:orderFood('<%= dish.id %>',1)">
+                            <span class="input-group-text">+</span>
+                          </div>
                         </div>
                       </div>
                     </div>
 
                     <div class="row afterOrder" style="margin-top: 10px;">
                       <% if(dish.preference && Object.keys(dish.preference).length){%>
-                      <div class="col-xs-12">
-                        <a class="btn btn-default btn-outline dropdown-toggle" data-dish=<%= dish.id%> style="width:160px;" type="button" data-toggle="dropdown" data-layer="0" data-submenu aria-haspopup="true" aria-expanded="true" value="">
-                          <span><%= __('addVariation')%></span>
-                          <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu text-center" aria-labelledby="dLabel">
-                          <li class="dropdown-submenu" data-layer="0">
-                            <a tabindex="0" data-toggle="dropdown" data-selected="true"><%= __('the')%>1<%= __('fen')%></a>
-                            <ul class="dropdown-menu">
-                              <% Object.keys(dish.preference).forEach(function(key){%>
-                              <li class="dropdown-submenu variation" data-layer="1">
-                                <a tabindex="0" data-toggle="dropdown" data-dish=<%= dish.id%> data-variation=<%= key%> data-selected="true"><%= __(key)%></a>
-                                <ul class="dropdown-menu">
-                                  <% var options = dish.preference[key]; options.forEach(function(option){%>
-                                  <li tabindex="0"><a value="<%= option.property%>" data-extra="<%= option.extra%>" href="javascript:void(0);"><%= option.property%> + $<%= option.extra%></a></li>
-                                  <%});%>
-                                </ul>
-                              </li>
-                              <%});%>
-                            </ul>
-                          </li>
-                        </ul>
+                      <div class="col-12">
+                        <div class="dropdown">
+                          <button class="btn btn-light btn-outline dropdown-toggle" data-dish="<%= dish.id%>" type="button" data-toggle="dropdown" data-layer="0" data-submenu aria-haspopup="true" aria-expanded="true" value="">
+                            <span><%= __('addVariation')%></span>
+                            <span class="caret"></span>
+                          </button>
+                          <div class="dropdown-menu text-center" aria-labelledby="dLabel">
+                            <div class="dropdown dropdown-submenu" data-layer="0">
+                              <a class="dropdown-toggle dropdown-item" tabindex="0" data-toggle="dropdown" data-selected="true"><%= __('the')%>1<%= __('fen')%></a>
+                              <div class="dropdown-menu">
+                                <% Object.keys(dish.preference).forEach(function(key){%>
+                                <div class="dropdown variation" data-layer="1">
+                                  <a class="dropdown-toggle dropdown-item dropdown-submenu" tabindex="0" data-toggle="dropdown" data-dish=<%= dish.id%> data-variation=<%= key%> data-selected="true"><%= __(key)%></a>
+                                  <div class="dropdown-menu">
+                                    <% var options = dish.preference[key]; options.forEach(function(option){%>
+                                    <a class="dropdown-item" tabindex="0"><span value="<%= option.property%>" data-extra="<%= option.extra%>" href="javascript:void(0);"><%= option.property%> +$<%= option.extra%></span></a>
+                                    <%});%>
+                                  </div>
+                                </div>
+                                <%});%>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       <% } %>
                     </div>
@@ -292,8 +283,8 @@
               <h1></h1>
 
               <!--<ul class="nav nav-tabs" data-toggle="tabs">-->
-                <!--<li class="active"><a href="#review<%= i%>" data-toggle="tab" class="text-red"><%= __('user-review')%></a></li>-->
-                <!--&lt;!&ndash;<li><a href="#host<%= i%>" data-toggle="tab" class="text-red"><%= __('host-review')%></a></li>&ndash;&gt;-->
+              <!--<li class="active"><a href="#review<%= i%>" data-toggle="tab" class="text-red"><%= __('user-review')%></a></li>-->
+              <!--&lt;!&ndash;<li><a href="#host<%= i%>" data-toggle="tab" class="text-red"><%= __('host-review')%></a></li>&ndash;&gt;-->
               <!--</ul>-->
 
               <div class="tab-content">
@@ -303,10 +294,10 @@
                     var number = 0;
                     var perPage = 3;
                     var curPage = 1;
-                    for(var j=0; j < reviews.length; j++){
-                      var review = reviews[j];
-                      if(review.dish == dish.id && review.isPublic){
-                        number++;
+                  for(var j=0; j < reviews.length; j++){
+                    var review = reviews[j];
+                  if(review.dish == dish.id && review.isPublic){
+                    number++;
                   %>
                   <div class="item">
                     <div class="row">
@@ -343,15 +334,14 @@
               </div>
 
             </div>
+            <%}}%>
           </div>
-          <%}}} %>
-
-      <h1></h1>
+          <%} %>
       </div>
     </div>
 
-      <div class="col-md-4">
-        <div class="box white floater static-floater">
+      <div class="relative" style="left:0;">
+        <div class="box white floater static-floater border">
           <div id="order-alert" class="alert alert-danger hide" role="alert">
             <%= __('dish-out-tips')%>
           </div>
@@ -452,7 +442,7 @@
             </table>
 
             <div class="row">
-              <div class="col-xs-12">
+              <div class="col">
                 <button type="button" data-id="<%= meal.id%>" class="btn btn-grey-red active" onclick="javascript:location.href='/meal/' + $(this).data('id') + '/confirm' + '<%= meal.isPartyMode === true ? '?party=true' : ''%>'"><%= __('checkout')%></button>
               </div>
             </div>

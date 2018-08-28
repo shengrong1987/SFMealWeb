@@ -96,12 +96,14 @@
         <td class="xs-hide"></td>
       </tr>
     </table>
-    <div class="row text-center">
+    <div class="text-center">
       <h4><small><%= __('order-receipt-help')%></small></h4>
+    </div>
+    <div class="d-flex justify-content-center vertical-align">
       <% if(pickupInfo.method === "shipping"){%>
-      <a href="https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=<%= tracking || ''%>" class="btn btn-grey-red"><%= __('track-order')%></a>
+      <a href="https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=<%= tracking || ''%>" class="btn btn-grey-red mr-1"><%= __('track-order')%></a>
       <% }else{%>
-      <a href="http://maps.apple.com/?q=<%= pickupInfo.method == 'pickup' ? pickupInfo.location : contactInfo.address%>" class="btn btn-grey-red active"><%= __('find-route')%></a>
+      <a href="http://maps.apple.com/?q=<%= pickupInfo.method == 'pickup' ? pickupInfo.location : contactInfo.address%>" class="btn btn-grey-red active mr-1"><%= __('find-route')%></a>
       <% }%>
       <button class="btn btn-grey-blue active" style="margin-right: 10px;" toggle="modal" data-target="#myModal" data-href="/review/<%= id%>" onclick="toggleModal(event)"><%= __('review')%></button>
       <!--<a class="btn btn-grey-blue active" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)"> <%= __('nav-bar-register') %></a>-->

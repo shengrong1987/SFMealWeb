@@ -1,4 +1,4 @@
-<div class="green" style="padding: 25px;margin-top: -20px;">
+<div class="green p-4" style="margin-top: -20px;">
   <div class="box-email white relative middle text-left">
 
     <% if(meal.orders.length == 0){%>
@@ -21,7 +21,7 @@
       <button class="btn btn-info copyBtn" data-method="<%= pickup.method%>" data-location="<%= pickup.location%>" data-index="<%= pickup.index%>" data-from="<%= pickup.pickupFromTime%>" data-to="<%= pickup.pickupTillTime%>" data-title="<%= __('pickup-time')%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/><%= __('pickup-location')%>: <%= pickup.location%>"><%= __('copy')%></button>
       </p>
     <%}%>
-    <table class="table table-bordered">
+    <table class="table table-bordered table-responsive-sm">
       <thead>
       <tr>
         <td><%= __('user')%></td>
@@ -39,7 +39,11 @@
         || (order.pickupInfo.pickupFromTime === pickup.pickupFromTime && order.pickupInfo.pickupTillTime === pickup.pickupTillTime && pickup.method === order.pickupInfo.method && pickup.location === order.pickupInfo.location)){%>
           <tr data-option="<%= order.pickupOption%>" data-method="<%= order.pickupInfo.method%>" data-location="<%= order.pickupInfo.location%>" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>">
             <td><%= order.customerName %></td>
-            <td><%= order.id%></td>
+            <td>
+              <% order.id.split(",").forEach(function(id){ %>
+              <span class="dbClick" data-trigger="dblclick" data-toggle="popupTooltip" data-popupText="copied" data-copy-text="<%= id%>"><%= id.slice(-4)%></span>
+              <% })%>
+            </td>
             <td>
               <% Object.keys(order.orders).forEach(function(dishId){
                 var amount = order.orders[dishId].number;
@@ -112,6 +116,11 @@
       });
       console.log(text);
       copyToClipboard(text);
+  })
+
+  $(".dbClick").dblclick(function(){
+      var copyText = $(this).data("copy-text");
+      copyToClipboard(copyText);
   })
 
   function copyToClipboard(text) {

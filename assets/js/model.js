@@ -26,12 +26,12 @@ var LoginView = Backbone.View.extend({
   },
   initialize : function(){
     var errorView = this.$el.find(".alert-danger");
-    errorView.removeClass("hide");
+    errorView.removeClass("d-none");
     errorView.hide();
     this.errorView = errorView;
 
     var successView = this.$el.find(".alert-success");
-    successView.removeClass("hide");
+    successView.removeClass("d-none");
     successView.hide();
     this.successView = successView;
 
@@ -138,7 +138,7 @@ var RegisterView = Backbone.View.extend({
   },
   initialize : function(){
     var alertView = this.$el.find(".alert");
-    alertView.removeClass("hide");
+    alertView.removeClass("d-none");
     alertView.hide();
     this.alertView = alertView;
   },
@@ -601,13 +601,12 @@ var ApplyView = Backbone.View.extend({
       return;
     }
     var btn = $(e.currentTarget);
-    btn.button('loading');
     this.model.url = "/user/becomeHost?shopName=" + shopName + '&phone=' + phone;
     this.model.fetch({
       success : function(){
         location.reload();
       },error : function(model,err){
-        btn.button('reset');
+        btn.html(btn.data('original-text'));
         BootstrapDialog.alert(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
       }
     });
@@ -626,7 +625,7 @@ var PaymentView = Backbone.View.extend({
   },
   initialize: function () {
     var alertView = this.$el.find(".alert");
-    alertView.removeClass("hide");
+    alertView.removeClass("d-none");
     alertView.hide();
     this.alertView = alertView;
 
@@ -644,7 +643,6 @@ var PaymentView = Backbone.View.extend({
     e.preventDefault();
 
     var btn = $(e.currentTarget).find('[type="submit"]');
-    btn.button("loading");
 
     if (!Stripe.card.validateCVC(this.$el.find("#cvv").val())) {
       this.$el.find("#cvv").next().html($("#cvv").data("error"));
@@ -669,7 +667,7 @@ var PaymentView = Backbone.View.extend({
         address_country: this.$el.find(".flagstrap").data('selected-country')
       }, function(status, response){
         if (response.error) {
-          btn.button('reset');
+          btn.html(btn.data('original-text'));
           $this.alertView.html(jQuery.i18n.prop(response.error.code));
           $this.alertView.show();
         } else {
@@ -811,7 +809,7 @@ var AddressView = Backbone.View.extend({
   },
   initialize : function() {
     this.alertView = this.$el.find("#orderAlertView");
-    this.alertView.removeClass("hide");
+    this.alertView.removeClass("d-none");
     this.alertView.hide();
     var userId = this.$el.data("user");
     this.model.set({id: userId});
@@ -841,7 +839,7 @@ var AddressView = Backbone.View.extend({
     address_form.attr("data-id",id);
     address_form.find(".user").show();
     address_form.find(".host").hide();
-    address_form.find("#new_title").removeClass("hide");
+    address_form.find("#new_title").removeClass("d-none");
     address_form.off("submit");
     address_form.on("submit", AddressView.prototype.saveAddress);
     address_form.find("button[name='cancel']").off("click");
@@ -863,9 +861,9 @@ var AddressView = Backbone.View.extend({
     address_form.attr("data-id",id);
     address_form.attr("data-address-id",address_id);
     if(street){
-      address_form.find("#exist_title").removeClass("hide");
+      address_form.find("#exist_title").removeClass("d-none");
     }else{
-      address_form.find("#new_title").removeClass("hide");
+      address_form.find("#new_title").removeClass("d-none");
     }
     var isHost = target.data("host");
     if(isHost){
@@ -889,9 +887,8 @@ var AddressView = Backbone.View.extend({
     if (submit_btn.hasClass('disabled') || !phone) {
       return;
     }
-    submit_btn.button("loading");
     var alert_block = address_form.find(".alert");
-    alert_block.removeClass("hide");
+    alert_block.removeClass("d-none");
     alert_block.hide();
     var id = address_form.data("id");
     var address_id = address_form.data("address-id");
@@ -929,7 +926,7 @@ var AddressView = Backbone.View.extend({
           alert_block.html(getMsgFromError(err));
         }
         alert_block.show();
-        submit_btn.button("reset");
+        submit_btn.html(submit_btn.data('original-text'));
       }
     });
   },
@@ -973,11 +970,11 @@ var CheckListView = Backbone.View.extend({
   },
   initialize : function(){
     var successView = this.$el.find(".alert-success");
-    successView.removeClass("hide");
+    successView.removeClass("d-none");
     successView.hide();
     this.successView = successView;
     var errorView = this.$el.find(".alert-danger");
-    errorView.removeClass("hide");
+    errorView.removeClass("d-none");
     errorView.hide();
     this.errorView = errorView;
   },
@@ -1068,7 +1065,7 @@ var MealSelectionView = Backbone.View.extend({
   },
   initialize : function(){
     this.alertView = this.$el.find("#orderAlertView");
-    this.alertView.removeClass("hide");
+    this.alertView.removeClass("d-none");
     this.alertView.hide();
     utility.initGoogleMapService();
   },
@@ -1325,11 +1322,11 @@ var MealView = Backbone.View.extend({
     "submit form" : "on",
     "click button[name='save']" : "off",
     "click #addNewPickupBtn" : "addNewPickup",
-    "click #removeNewPickupBtn" : "removeNewPickup",
+    "click .close" : "removePickup",
+    "switchChange.bootstrapSwitch #isShipping" : "toggleShipping",
     "switchChange.bootstrapSwitch #isDelivery" : "toggleDelivery",
     "switchChange.bootstrapSwitch #isDeliveryBySystem" : "toggleDelivery",
     "switchChange.bootstrapSwitch #supportParty" : "togglePartyOrder",
-    "click #isShipping" : "toggleShipping",
     "click #freeShippingOption" : "toggleFreeShippingOpt",
     "change #shippingTypeOpt" : "changeTypeOfShippingFee",
     "change .method select" : "changeMethod",
@@ -1386,7 +1383,7 @@ var MealView = Backbone.View.extend({
     var select = $(e.target);
     var container = select.closest('.pickup');
     var method = select.val();
-    container.find(".delivery-item").removeClass("hide");
+    container.find(".delivery-item").removeClass("d-none");
     if(method === "pickup"){
       container.find(".pickup-item").show();
       container.find(".delivery-item").hide();
@@ -1419,7 +1416,7 @@ var MealView = Backbone.View.extend({
   togglePartyOrder : function(e){
     var isSupportPartyOrder = this.$el.find("#supportParty").prop("checked");
     var partyRequirementView = this.$el.find("#partyRequirementView");
-    partyRequirementView.removeClass("hide");
+    partyRequirementView.removeClass("d-none");
     if(isSupportPartyOrder){
       partyRequirementView.show('1000');
     }else{
@@ -1433,9 +1430,9 @@ var MealView = Backbone.View.extend({
     var deliveryRangeInput = this.$el.find("#deliveryRangeInput");
 
     var deliverySettingView = this.$el.find("#deliverySettingView");
-    deliverySettingView.removeClass("hide");
+    deliverySettingView.removeClass("d-none");
     var settingButton = deliverySettingView.find(".setting");
-    settingButton.removeClass("hide");
+    settingButton.removeClass("d-none");
     if(isDelivery){
       deliverySettingView.show("1000");
       if(isDeliveryBySystem){
@@ -1451,17 +1448,22 @@ var MealView = Backbone.View.extend({
     e.preventDefault();
     var county = this.$el.find(".pickup_container").data("county");
     this.$el.find("#pickupAlert").hide();
-    var pickupView = '<div class="well form-group pickup autoCompleteTarget"> ' +
-      '<div class="col-sm-4"> <label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> </div> ' +
-      '<div class="col-sm-8 start-pickup"> <div class="form-group"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="from"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div> </div>' +
-      '<div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <span class="input-group-addon" data-toggle="i18n" data-key="end"></span> <input type="text" class="form-control" readonly="true"/> <span class="input-group-addon"> <span class="fa fa-calendar"></span> </span> </div></div>' +
+    var pickupView = '<div class="pickup autoCompleteTarget py-2"> ' +
+      '<div class="card"><div class="card-body"><h5 class="card-title text-right"><button type="button" class="close" aria-label="Close"> <span aria-hidden="true">&times;</span> </button></h5> ' +
+      '<label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> ' +
+      '<div class="row">' +
+      '<div class="col-12 col-sm-6"> <div class="form-group start-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <div class="input-group-prepend"><span class="input-group-text" data-toggle="i18n" data-key="from"></span></div> <input type="text" class="form-control" readonly="true"/> <div class="input-group-append"><span class="input-group-text"> <i class="fa fa-calendar"></i> </span></span> </div></div></div> </div>' +
+      '<div class="col-12 col-sm-6"> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <div class="input-group-prepend"><span class="input-group-text" data-toggle="i18n" data-key="end"></span></div> <input type="text" class="form-control" readonly="true"/> <div class="input-group-append"><span class="input-group-text"><i class="fa fa-calendar"></i></span> </div> </div></div></div>' +
+      '</div>' +
       '<div class="form-group location pickup-item"> <label data-toggle="i18n" data-key="pickupAddress"></label> <input type="text" class="form-control"> </div>' +
       '<div class="form-group delivery-center delivery-item" style="display: none;"> <label data-toggle="i18n" data-key="deliveryCenter"></label> <input type="text" class="form-control"></div>' +
       '<div class="form-group public-location pickup-item"> <label data-toggle="i18n" data-key="publicLocation"></label> <input type="text" class="form-control"> </div>' +
       '<div class="form-group instruction pickup-item"><label data-toggle="i18n" data-key="pickupInstruction"></label> <input type="text" class="form-control"> </div>' +
-      '<div class="form-group area" data-county="' + county + '"> <label data-toggle="i18n" data-key="area"></label> <input class="form-control" type="text" readonly="readonly" value=""> </div>' +
-      '<div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div>' +
-      '<div class="form-group phone"> <label data-toggle="i18n" data-key="telephone"></label> <input type="tel" class="form-control"> </div> </div> </div>';
+      '<div class="row">' +
+      '<div class="col-12 col-sm-6"><div class="form-group area" data-county="' + county + '"> <label data-toggle="i18n" data-key="area"></label> <input class="form-control" type="text" readonly="readonly" value=""> </div></div>' +
+      '<div class="col-12 col-sm-6"><div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control" style="height: 38px;"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div></div>' +
+      '</div>' +
+      '<div class="form-group phone"> <label data-toggle="i18n" data-key="telephone"></label> <input type="tel" class="form-control"> </div></div></div> </div> </div>';
     this.$el.find(".pickup_container").append(pickupView);
     this.$el.find("[data-toggle='dateTimePicker']").datetimepicker({
       icons:{
@@ -1481,15 +1483,16 @@ var MealView = Backbone.View.extend({
     setupInputMask();
     utility.initAutoComplete();
   },
-  removeNewPickup : function(e){
+  removePickup : function(e){
     e.preventDefault();
     this.$el.find("#pickupAlert").hide();
-    var pickupContainers = this.$el.find(".pickup_container .well");
+    var pickupContainers = this.$el.find(".pickup_container .pickup");
     if(pickupContainers.length === 1){
       this.$el.find("#pickupAlert").show();
       return;
     }
-    pickupContainers.last().remove();
+    var targetPickup = $(e.currentTarget).parents(".pickup");
+    targetPickup.remove();
   },
   on : function(e){
     e.preventDefault();
@@ -1829,7 +1832,7 @@ var DishView = Backbone.View.extend({
   },
   switchDynamicDish : function(e){
     var target = $(e.currentTarget);
-    this.$el.find("#dynamicDishSettingView").removeClass("hide");
+    this.$el.find("#dynamicDishSettingView").removeClass("d-none");
     var isDynamicPriceOn = target.prop("checked");
     if(isDynamicPriceOn){
       this.$el.find("#dynamicDishSettingView").show();
@@ -2249,7 +2252,7 @@ var BankView = Backbone.View.extend({
   initialize : function(){
     var form = this.$el.find("form");
     var alertForm = form.find(".alert");
-    alertForm.removeClass("hide");
+    alertForm.removeClass("d-none");
     alertForm.hide();
     this.alertForm = alertForm;
     loadStripeJS(function(err){
@@ -2330,12 +2333,12 @@ var UserProfileView = Backbone.View.extend({
   },
   initialize : function(){
     var alertView = this.$el.find(".form-alert");
-    alertView.removeClass("hide");
+    alertView.removeClass("d-none");
     alertView.hide();
     this.alertView = alertView;
 
     var successView = this.$el.find(".alert.alert-success");
-    successView.removeClass("hide");
+    successView.removeClass("d-none");
     successView.hide();
     this.sucessView = successView;
 
@@ -2449,16 +2452,26 @@ var MyMealView = Backbone.View.extend({
   },
   go : function(e){
     e.preventDefault();
-    var target = $(e.currentTarget)
+    var _this = this;
+    var target = $(e.currentTarget);
     var mealId = target.data("id");
     var action = target.data("action");
     this.model.set("id",mealId);
     this.model.action = action;
     this.model.fetch({
       success : function(){
-        reloadUrl('/host/me','#mymeal');
+        target.html(target.data('original-text'));
+        target.addClass("d-none");
+        if(action === "on"){
+          target.parent().find("[data-action='off']").removeClass("d-none");
+        }else if(action === "off"){
+          target.parent().find("[data-action='on']").removeClass("d-none");
+        }else{
+          reloadUrl('/host/me','#mymeal');
+        }
       },
       error : function(model, err){
+        target.html(target.data('original-text'));
         BootstrapDialog.alert(err.responseJSON ? err.responseJSON.responseText : err.responseText);
       }
     })
@@ -2472,11 +2485,11 @@ var HostProfileView = Backbone.View.extend({
   initialize : function(){
     var form = this.$el.find("form");
     var alertView = form.find(form.data("err-container")).find(".alert-danger");
-    alertView.removeClass("hide");
+    alertView.removeClass("d-none");
     alertView.hide();
     this.alertView = alertView;
     var successView = form.find(form.data("err-container")).find(".alert-success");
-    successView.removeClass("hide");
+    successView.removeClass("d-none");
     successView.hide();
     this.successView = successView;
   },
@@ -2535,7 +2548,7 @@ var HostPageView = Backbone.View.extend({
   },
   initialize : function(){
     var alertView = this.$el.find("#actionAlertView");
-    alertView.removeClass("hide");
+    alertView.removeClass("d-none");
     alertView.hide();
     this.alertView = alertView;
 
@@ -2619,7 +2632,7 @@ var ReviewView = Backbone.View.extend({
     var ele = $(e.target);
     var rating_container = $(ele.data("target"));
     var alertView = rating_container.find($(ele).data("err-container"));
-    alertView.removeClass("hide");
+    alertView.removeClass("d-none");
     alertView.hide();
     var dishId = ele.data("dish");
     var mealId = ele.data("meal");
@@ -2821,17 +2834,17 @@ var MealConfirmView = Backbone.View.extend({
   },
   initialize : function(){
     this.alertView = this.$el.find("#orderAlertView");
-    this.alertView.removeClass("hide");
-    this.alertView.hide();
+    this.alertView.removeClass("d-none").hide();
     this.isCoolDown = true;
     utility.initGoogleMapService();
-    this.$el.find("#commentView").removeClass('hide').hide();
+    this.$el.find("#commentView").removeClass('d-none').hide();
+    this.$el.find(".deliveryInput").removeClass('d-none').hide();
   },
   enterBillingAddress : function(e){
     var isChecked = $(e.currentTarget).prop("checked");
     if(isChecked){
       var contactInfoView = this.$el.find("#contactInfoView");
-      var paymentInfoView = this.$el.find("#paymentInfoView");
+      var paymentInfoView = this.$el.find("#cardPayment");
       var fieldsToCopy = ['input[name="street"]','input[name="city"]','input[name="state"]','input[name="zipcode"]'];
       fieldsToCopy.forEach(function(field){
         paymentInfoView.find(field).val(contactInfoView.find(field).val());
@@ -2943,7 +2956,7 @@ var MealConfirmView = Backbone.View.extend({
     e.preventDefault();
     var value = this.$el.find("#method button.active").attr("value");
     if(value === "pickup"){
-      $('#contactInfoView').removeClass('hide').show();
+      $('#contactInfoView').removeClass('d-none').show();
     }else{
       toggleModal(e, addressView.enterAddressInfoFromOrder);
     }
@@ -2955,9 +2968,9 @@ var MealConfirmView = Backbone.View.extend({
   switchMethod : function(e){
     var isLogin = !!this.$el.data("user");
     var value = $(e.currentTarget).find(".active").attr("value");
-    this.$el.find(".deliveryInput").removeClass('hide');
-    this.$el.find(".pickupInput").removeClass('hide');
-    this.$el.find(".shippingInput").removeClass('hide');
+    this.$el.find(".deliveryInput").removeClass('d-none');
+    this.$el.find(".pickupInput").removeClass('d-none');
+    this.$el.find(".shippingInput").removeClass('d-none');
     if(value === "delivery"){
       this.$el.find(".pickupInput").hide();
       this.$el.find(".shippingInput").hide();
@@ -3016,16 +3029,13 @@ var MealConfirmView = Backbone.View.extend({
     if(checkOnly){
       return yourAddress;
     }
-    if(btn){
-      btn.button('loading');
-    }
     utility.distance(deliveryCenter, yourAddress, function(err, distance) {
       if(err) {
         makeAToast(err, 'error');
         return;
       }
       if(btn){
-        btn.button('reset');
+        btn.html(btn.data('original-text'));
       }
       if(distance > range){
         if(!isPartyMode){
@@ -3047,7 +3057,8 @@ var MealConfirmView = Backbone.View.extend({
   switchPaymentMethod : function(e){
     var method = $(e.currentTarget).find("button.active").data("method");
     var userId = this.$el.data("user");
-    var paymentExpressForm = this.$el.find("#paymentInfoView");
+    var paymentExpressForm = this.$el.find("#cardPayment");
+    paymentExpressForm.removeClass('d-none');
     var isLogin = !!userId;
     if(!isLogin){
       if(method !== "online"){
@@ -3510,7 +3521,7 @@ var OrderView = Backbone.View.extend({
       cb(paymentInfo);
     }else{
       if(paymentMethod === "online"){
-        var paymentInfoView = this.$el.find("#paymentInfoView");
+        var paymentInfoView = this.$el.find("#cardPayment");
         var cardholder = paymentInfoView.find("input[name='card-holder']").val();
         var cardnumber = paymentInfoView.find("input[name='card-number']").val();
         var expMonth = paymentInfoView.find("select[name='month']").attr('value');
@@ -3636,7 +3647,7 @@ var OrderView = Backbone.View.extend({
                 title : jQuery.i18n.prop('customTip'),
                 cssClass: 'btn-primary',
                 action : function(dialog){
-                  $("#customTip").removeClass("hide").show();
+                  $("#customTip").removeClass("d-none").show();
                   $("#customTip").submit(function(e){
                     e.preventDefault();
                     var tip = $(e.currentTarget).find("[name='tip']").val();
@@ -3739,10 +3750,9 @@ var OrderView = Backbone.View.extend({
       tip : tip
     });
 
-    button.button('loading');
     $this.model.save({}, {
       success: function (model, result) {
-        button.button('reset');
+        button.html(button.data('original-text'));
         if(paymentInfo.method === "alipay" || paymentInfo.method === "wechatpay"){
           var source = result.source;
           var redirectUrl = source.redirect.url;

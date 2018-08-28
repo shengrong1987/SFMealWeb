@@ -1,407 +1,459 @@
 
-<div class="container-fluid text-center" style="margin-top:-20px;">
+<div>
   <div class="row">
-    <div class="pure-banner vertical-align green">
-      <div class="middle banner-text">
-        <div class="vertical-align" style="margin-bottom: 5px;">
-          <div class="col-sm-3">
-            <a href="/" class="logo logo-sm"></a>
+    <div class="pure-banner green">
+      <div class="middle banner-text py-3">
+        <div class="row vertical-align">
+          <div class="col-lg-2"></div>
+          <div class="col-5 col-lg-3">
+            <img src="/images/welcome-1.png" style="width: 100%;">
           </div>
-          <div class="col-sm-9">
-            <h4 class="text-white"><strong><%= __('welcome')%></strong></h4>
+          <div class="col-2 col-lg-2">
+            <a href="/" class="logo-slogan"></a>
           </div>
+          <div class="col-5 col-lg-3">
+            <img src="/images/welcome-2.png" style="width: 100%;">
+          </div>
+          <div class="col-lg-2"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="row">
+  <div>
+    <ul class="nav nav-tabs nav-fill bg-light pt-2">
+      <li class="nav-item"><a class="nav-link" href="/host/me#myorder"><%= __('host-nav-order')%></a></li>
+      <li class="nav-item"><a class="nav-link active" href="/host/me#mymeal"><%= __('host-nav-meal')%></a></li>
+      <li class="nav-item"><a class="nav-link" href="/host/me#mydish"><%= __('host-nav-dish')%></a></li>
+      <li class="nav-item"><a class="nav-link" href="/host/me#myinfo"><%= __('host-nav-info')%></a></li>
+    </ul>
 
-    <div class="default-container">
-      <ul class="nav nav-tab-green nav-justified" style="padding: 20px;">
-        <li><a href="/host/me#myorder"><h4><strong><%= __('host-nav-order')%></strong></h4></a></li>
-        <li class="active"><a href="/host/me#mymeal"><h4><strong><%= __('host-nav-meal')%></strong></h4></a></li>
-        <li><a href="/host/me#mydish"><h4><strong><%= __('host-nav-dish')%></strong></h4></a></li>
-        <li><a href="/host/me#myinfo"><h4><strong><%= __('host-nav-info')%></strong></h4></a></li>
-      </ul>
+    <div class="tab-content">
+      <div class="tab-pane active">
+        <div id="mealCreatingView">
+          <div class="box box-shadow box-primary white text-left">
+            <h4 class="text-green"><%= __('new-meal')%></h4>
+            <h1></h1>
+            <form class="form-horizontal" data-host-id="<%= host.id%>" data-err-container=".submit" data-toggle="validator">
 
-      <div id="mealCreatingView" class="middle box-compact">
-        <div class="box box-shadow box-primary white text-left">
-          <h4 class="text-green"><%= __('new-meal')%></h4>
-          <h1></h1>
-          <form class="form-horizontal" data-host-id="<%= host.id%>" data-err-container=".submit" data-toggle="validator">
-
-            <div class="form-group">
-              <div id="dish-selector" data-toggle="dish-selector" class="row" data-isRemote="false">
-                <div class="col-md-5">
-                  <label for="dishList">1.<%= __('add-to-meal')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                  <ul id="dishList" class="border-lightgrey selectable-list">
-                    <% dishes.forEach(function(dish){%>
+              <div class="form-group">
+                <div id="dish-selector" data-toggle="dish-selector" class="row" data-isRemote="false">
+                  <div class="col-md-5">
+                    <label for="dishList"><strong>1.<%= __('add-to-meal')%></strong><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                    <ul id="dishList" class="border-lightgrey selectable-list">
+                      <% dishes.forEach(function(dish){%>
                       <li data-id="<%= dish.id%>"><a name="title"><%= dish.title%><i class="fa fa-ticket"></i></a></li>
-                    <%});%>
-                  </ul>
-                </div>
+                      <%});%>
+                    </ul>
+                  </div>
 
-                <div class="col-md-7">
-                  <div class="row">
-                    <div class="col-sm-2 vertical-align" style="height: 120px;">
-                      <i class="fa fa-arrow-circle-o-right fa-4x"></i>
-                    </div>
-                    <div class="col-sm-10">
-                      <div>
-                        <%= __('meals-dishes')%>
-                        <i class="fa fa-star text-yellow" data-toggle="tooltip" title=<%= __('main-dish-tip')%>></i><%= __('as-main-dishes')%>,
-                        <i class="fa fa-fire text-yellow" data-toggle="tooltip" title=<%= __('fire-dish-tip')%>></i><%= __('as-fire-dishes')%>,
-                        <i class="fa fa-camera text-yellow" data-toggle="tooltip" title="<%= __('cover-dish-tip')%>"></i> <%= __('as-cover')%>
-                        <br/><%= __('stock')%>:</label>
+                  <div class="col-md-7">
+                    <div class="row">
+                      <div class="col-md-2 vertical-align" style="height: 120px;">
+                        <i class="fa fa-arrow-circle-o-right fa-4x"></i>
                       </div>
-                      <ul id="dishSelected" class="border-lightgrey handle-list" data-error="<%= __('need-one-dish')%>"></ul>
+                      <div class="col-md-10">
+                        <div>
+                          <%= __('meals-dishes')%>
+                          <i class="fa fa-star text-yellow" data-toggle="tooltip" title=<%= __('main-dish-tip')%>></i><%= __('as-main-dishes')%>,
+                          <i class="fa fa-fire text-yellow" data-toggle="tooltip" title=<%= __('fire-dish-tip')%>></i><%= __('as-fire-dishes')%>,
+                          <i class="fa fa-camera text-yellow" data-toggle="tooltip" title="<%= __('cover-dish-tip')%>"></i> <%= __('as-cover')%>
+                          <br/><%= __('stock')%>:</label>
+                        </div>
+                        <ul id="dishSelected" class="border-lightgrey handle-list" data-error="<%= __('need-one-dish')%>"></ul>
+                        <div class="alert alert-danger" data-toggle="alert"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label style="display: block;" for=""><strong>2.<%= __('meal-type-title')%></strong><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                <div class="row">
+                  <div class="col-12">
+                    <label id="orderTypeBtn" class="btn btn-default fixed-label vertical-align" data-href="#order" style="width: 120px;">
+                      <input type="radio" id="radio-order-now" name="radio-set-1" class="regular-radio" checked=""><label for="radio-order-now"></label><span style="margin-left: 10px;"><%= __('meal-type-order')%></span>
+                    </label>
+
+                    <label id="preorderTypeBtn" class="btn btn-default fixed-label vertical-align" data-href="#preorder" style="width: 120px;" onclick="javascript:$($(this).data('href')).parent().find('.tab-pane').hide();$($(this).data('href')).show();">
+                      <input type="radio" id="radio-preorder" name="radio-set-1" class="regular-radio"><label for="radio-preorder"></label><span style="margin-left: 10px;"><%= __('meal-type-preorder')%></span>
+                    </label>
+                  </div>
+                  <div class="col-12 tab-content">
+                    <div id="order" style="width: 90%;display: block;" class="tab-pane middle">
+                      <div class="mt-3">
+                        <label><%= __("provide-time")%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                        <div class="row">
+                          <div class="col-12 col-sm-6">
+                            <div class="form-group start-booking">
+                              <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= new Date()%>">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text">
+                                    <%= __('from')%>
+                                  </span>
+                                </div>
+                                <input type='text' class="form-control" readonly="true"/>
+                                <div class="input-group-append">
+                                <span class="input-group-text">
+                                  <i class="fa fa-calendar"></i>
+                                </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-12 col-sm-6">
+                            <div class="form-group end-booking">
+                              <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= new Date()%>">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text">
+                                    <%= __('end')%>
+                                  </span>
+                                </div>
+                                <input type='text' class="form-control" readonly="true"/>
+                                <div class="input-group-append">
+                                <span class="input-group-text">
+                                  <i class="fa fa-calendar"></i>
+                                </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                       <div class="alert alert-danger" data-toggle="alert"></div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            <div class="form-group">
-              <label style="display: block;" for="">2.<%= __('meal-type-title')%><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-              <div class="row">
-                <div class="col-xs-12">
-                  <label id="orderTypeBtn" class="btn btn-default fixed-label vertical-align" data-href="#order" style="width: 120px;">
-                    <input type="radio" id="radio-order-now" name="radio-set-1" class="regular-radio" checked=""><label for="radio-order-now"></label><span style="margin-left: 10px;"><%= __('meal-type-order')%></span>
-                  </label>
+                    <div id="preorder" class="tab-pane middle">
 
-                  <label id="preorderTypeBtn" class="btn btn-default fixed-label vertical-align" data-href="#preorder" style="width: 120px;" onclick="javascript:$($(this).data('href')).parent().find('.tab-pane').hide();$($(this).data('href')).show();">
-                    <input type="radio" id="radio-preorder" name="radio-set-1" class="regular-radio"><label for="radio-preorder"></label><span style="margin-left: 10px;"><%= __('meal-type-preorder')%></span>
-                  </label>
-                </div>
-                <div class="col-xs-12 tab-content">
-                  <div id="order" style="width: 90%;display: block;" class="tab-pane middle">
-                    <div class="form-group row" style="margin-top:20px;">
-                      <div class="col-sm-2 vertical-align" style="height: 30px;">
-                        <label><%= __("from-time")%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                      </div>
-                      <div class="col-sm-10 vertical-align start-booking" style="height: 40px;">
-                        <div class="form-group">
-                          <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= new Date()%>">
-                            <input type='text' class="form-control" readonly="true"/>
-                            <span class="input-group-addon">
-                                <span class="fa fa-calendar"></span>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="form-group row">
-                      <div class="col-sm-2 vertical-align" style="height: 30px;">
-                        <label><%= __('end-time')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                      </div>
-                      <div class="col-sm-10 vertical-align end-booking" style="height: 40px;">
-                        <div class="form-group">
-                          <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= new Date()%>">
-                            <input type='text' class="form-control" readonly="true"/>
-                            <span class="input-group-addon">
-                                <span class="fa fa-calendar"></span>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="alert alert-danger" data-toggle="alert"></div>
-                  </div>
-
-                  <div id="preorder" style="width: 90%;display: none;" class="tab-pane middle">
-                    <div class="well form-group" style="margin-top:20px;">
-                      <div class="col-sm-4">
+                      <div>
                         <label><%= __('provide-time')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                      </div>
-                      <div class="col-sm-8">
-                        <div class="form-group start-booking">
-                          <div class='input-group date' data-toggle="dateTimePicker">
-                            <span class="input-group-addon"><%= __('from')%></span>
-                            <input type='text' class="form-control" readonly="true"/>
-                            <span class="input-group-addon">
-                                <span class="fa fa-calendar"></span>
-                            </span>
-                          </div>
-                        </div>
-                        <div class="form-group end-booking">
-                          <div class='input-group date' data-toggle="dateTimePicker">
-                            <span class="input-group-addon"><%= __('end')%></span>
-                            <input type='text' class="form-control" readonly="true"/>
-                            <span class="input-group-addon">
-                                <span class="fa fa-calendar"></span>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="pickup_container" data-county="<%= host.county || ''%>">
-                      <div class="well form-group pickup">
-                        <div class="col-sm-4">
-                          <label><%= __('pickup-time')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                        </div>
-
-                        <div class="col-sm-8 start-pickup autoCompleteTarget">
-                          <div class="form-group">
-                            <div class='input-group date' data-toggle="dateTimePicker">
-                              <span class="input-group-addon"><%= __('from')%></span>
-                              <input type='text' class="form-control" readonly="true"/>
-                              <span class="input-group-addon">
-                                <span class="fa fa-calendar"></span>
-                              </span>
+                        <div class="row">
+                          <div class="col-12 col-sm-6">
+                            <div class="form-group start-booking">
+                              <div class='input-group date' data-toggle="dateTimePicker">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text"><%= __('from')%></span>
+                                </div>
+                                <input type='text' class="form-control" readonly="true"/>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="fa fa-calendar"></i>
+                                      </span>
+                                </div>
+                              </div>
                             </div>
                           </div>
-
-                          <div class="form-group end-pickup">
-                            <div class='input-group date' data-toggle="dateTimePicker">
-                              <span class="input-group-addon"><%= __('end')%></span>
-                              <input type='text' class="form-control" readonly="true"/>
-                              <span class="input-group-addon">
-                                  <span class="fa fa-calendar"></span>
-                              </span>
+                          <div class="col-12 col-sm-6">
+                            <div class="form-group end-booking">
+                              <div class='input-group date' data-toggle="dateTimePicker">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text"><%= __('end')%></span>
+                                </div>
+                                <input type='text' class="form-control" readonly="true"/>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <i class="fa fa-calendar"></i>
+                                      </span>
+                                </div>
+                              </div>
                             </div>
                           </div>
-
-                          <div class="form-group location pickup-item">
-                            <label><%= __('pickup-location')%></label>
-                            <input type="text" class="form-control">
-                          </div>
-
-                          <div class="form-group delivery-center delivery-item hide">
-                            <label><%= __('delivery-center')%></label>
-                            <input type="text" class="form-control">
-                          </div>
-
-                          <div class="form-group public-location pickup-item">
-                            <label><%= __('pickup-public-location')%></label>
-                            <input type="text" class="form-control">
-                          </div>
-
-                          <div class="form-group instruction pickup-item">
-                            <label><%= __('pickup-instruction')%></label>
-                            <input type="text" class="form-control">
-                          </div>
-
-                          <div class="form-group area" data-county="<%= host.county || ''%>">
-                            <label><%= __('area')%></label>
-                            <input class="form-control" type="text" readonly="readonly">
-                          </div>
-
-                          <div class="form-group method">
-                            <label><%= __('pickup-method')%></label>
-                            <select class="form-control">
-                              <option value="delivery"><%= __('delivery')%></option>
-                              <option value="pickup" selected="true"><%= __('self-pickup')%></option>
-                            </select>
-                          </div>
-
-                          <div class="form-group phone">
-                            <label><%= __('phone')%></label>
-                            <input type="tel" class="form-control" value="<%= host.user.phone || ''%>">
-                          </div>
-
                         </div>
                       </div>
+
+                      <div class="pickup_container" data-county="<%= host.county || ''%>">
+                        <div class="pickup autoCompleteTarget py-2">
+                          <div class="card">
+                            <div class="card-body">
+                              <h5 class="card-title text-right">
+                                <button type="button" class="close" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </h5>
+                              <label><%= __('pickup-time')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                              <div class="row">
+
+                                <div class="col-12 col-sm-6 start-pickup">
+                                  <div class="form-group">
+                                    <div class='input-group date' data-toggle="dateTimePicker">
+                                    <span class="input-group-prepend">
+                                      <span class="input-group-text"><%= __('from')%></span>
+                                    </span>
+                                      <input type='text' class="form-control" readonly="true"/>
+                                      <div class="input-group-append">
+                                      <span class="input-group-text">
+                                        <i class="fa fa-calendar"></i>
+                                      </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="col-12 col-sm-6">
+                                  <div class="form-group end-pickup">
+                                    <div class='input-group date' data-toggle="dateTimePicker">
+                                      <div class="input-group-prepend">
+                                        <span class="input-group-text"><%= __('end')%></span>
+                                      </div>
+                                      <input type='text' class="form-control" readonly="true"/>
+                                      <div class="input-group-append">
+                                        <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                              </div>
+
+                              <div class="form-group location pickup-item">
+                                <label><%= __('pickup-location')%></label>
+                                <input type="text" class="form-control">
+                              </div>
+
+                              <div class="form-group delivery-center delivery-item d-none">
+                                <label><%= __('delivery-center')%></label>
+                                <input type="text" class="form-control">
+                              </div>
+
+                              <div class="form-group public-location pickup-item">
+                                <label><%= __('pickup-public-location')%></label>
+                                <input type="text" class="form-control">
+                              </div>
+
+                              <div class="form-group instruction pickup-item">
+                                <label><%= __('pickup-instruction')%></label>
+                                <input type="text" class="form-control">
+                              </div>
+
+                              <div class="row">
+                                <div class="col-12 col-sm-6">
+                                  <div class="form-group area" data-county="<%= host.county || ''%>">
+                                    <label><%= __('area')%></label>
+                                    <input class="form-control" type="text" readonly="readonly">
+                                  </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                  <div class="form-group method">
+                                    <label><%= __('pickup-method')%></label>
+                                    <select class="form-control" style="height: 38px;">
+                                      <option value="delivery"><%= __('delivery')%></option>
+                                      <option value="pickup" selected="true"><%= __('self-pickup')%></option>
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="form-group phone">
+                                <label><%= __('phone')%></label>
+                                <input type="tel" class="form-control" value="<%= host.user.phone || ''%>">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div id="pickupAlert" class="alert alert-danger" data-toggle="alert"><%= __('need-one-pickup-location')%></div>
+                      <button id="addNewPickupBtn" class="btn btn-info pull-right"><%= __('add-new-pickup')%></button>
                     </div>
-
-                    <div id="pickupAlert" class="alert alert-danger" data-toggle="alert"><%= __('need-one-pickup-location')%></div>
-
-                    <button id="addNewPickupBtn" class="btn btn-info pull-right"><%= __('add-new-pickup')%></button>
-                    <button id="removeNewPickupBtn" class="btn btn-danger pull-right" style="margin-right:10px;"><%= __('remove-pickup')%></button>
-
                   </div>
+                </div>
+                <div id="scheduleAlert" class="alert alert-danger" data-toggle="alert" style="margin-top:10px;"></div>
+              </div>
+
+              <div class="form-group">
+                <div class="row">
+                  <div class="col-12">
+                    <label><strong>3.<%= __('meal-minimal-requirement-title')%> </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                  </div>
+                  <div class="col-12 order-require" data-toggle="exclusive-input">
+                    <div class="row box-compact">
+                      <div class="col-sm-4">
+                        <div class="input-group">
+                          <input id="min-order" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="999" value=1 data-error="<%= __('need-minimal-requirement')%>">
+                          <div class="input-group-append">
+                            <span class="input-group-text"><%= __('fen')%></span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm-1 vertical-align" style="height: 35px;"><label class="middle"><%= __('or')%></label></div>
+                      <div class="col-sm-4">
+                        <div class="input-group">
+                          <input id="min-total" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="9999" value=1 data-error="<%= __('need-minimal-requirement')%>">
+                          <div class="input-group-append">
+                            <span class="input-group-text"><%= __('dollar')%></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="alert alert-danger" data-toggle="alert"></div>
                 </div>
               </div>
-              <div id="scheduleAlert" class="alert alert-danger" data-toggle="alert" style="margin-top:10px;"></div>
-            </div>
 
-            <div class="form-group order-require">
-              <div class="row">
-                <div class="col-xs-12">
-                  <label>3.<%= __('meal-minimal-requirement-title')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                </div>
-                <div class="col-xs-12" data-toggle="exclusive-input">
-                  <div class="row box-compact">
-                    <div class="col-sm-4">
-                      <div class="input-group">
-                        <input id="min-order" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="999" value=1 data-error="<%= __('need-minimal-requirement')%>">
-                        <div class="input-group-addon"><%= __('fen')%></div>
-                      </div>
-                    </div>
-                    <div class="col-sm-1 vertical-align" style="height: 35px;"><label class="middle"><%= __('or')%></label></div>
-                    <div class="col-sm-4">
-                      <div class="input-group">
-                        <input id="min-total" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="9999" value=1 data-error="<%= __('need-minimal-requirement')%>">
-                        <div class="input-group-addon"><%= __('dollar')%></div>
-                      </div>
+              <div class="form-group">
+                <div class="row">
+                  <div class="col-12">
+                    <label><strong>4.<%= __('delivery-option')%></strong><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                  </div>
+                  <div class="col-12">
+                    <div class="py-2 vertical-align">
+                      <input type="checkbox" data-toggle="switch-button" id="isDelivery" class="regular-checkbox" checked="checked">
+                      <label for="isDelivery"></label>
+                      <span style="margin-left: 10px;"><%= __('delivery-available')%></span>
                     </div>
                   </div>
                 </div>
-                <div class="col-xs-12">
-                  <div class="row">
-                    <div class="col-xs-12 col-md-4">
-                      <input type="checkbox" data-toggle="switch-button" id="supportParty">
-                      <label for="supportParty"></label>
-                      <span style="margin-left: 10px;"><%= __('support-party')%></span>
-                      <i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" title="<%= __('party-order-tip')%>"></i>
+                <div id="deliverySettingView" class="row">
+                  <div class="col-12">
+                    <div class="vertical-align">
+                      <input type="checkbox" data-toggle="switch-button" id="isDeliveryBySystem" class="regular-checkbox" checked='checked'>
+                      <label for="isDeliveryBySystem"></label>
+                      <span style="margin-left: 10px;"><%= __('delivery-by-system')%></span>
                     </div>
-                    <div class="col-xs-12 col-md-6 hide" id="partyRequirementView">
-                      <div class="row vertical-align">
-                        <div class="col-xs-6">
+                  </div>
+                  <div class="col-sm-12 col-md-10 col-lg-8">
+                    <div class="setting d-none mt-4">
+                      <div class="row">
+                        <div class="col-sm-6">
                           <div class="input-group">
-                            <input id="cateringMinimal" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="9999" data-error="<%= __('need-minimal-requirement')%>">
-                            <div class="input-group-addon"><%= __('dollar')%></div>
+                            <div class="input-group-prepend">
+                              <span class="input-group-text"><%= __('delivery-fee')%>: $</span>
+                            </div>
+                            <input id="deliveryFeeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="0" value="0">
                           </div>
                         </div>
-                        <div class="col-xs-6">
-                          <label><%= __('party-minimal-requirement')%></label>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-                </div>
-                <div class="col-xs-12">
-                  <div class="box-compact">
-                    <div class="alert alert-danger" data-toggle="alert"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <div class="row">
-                <div class="col-xs-12">
-                  <label>4.<%= __('delivery-option')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                </div>
-                <div class="col-xs-12">
-                  <div class="box-compact vertical-align">
-                    <input type="checkbox" data-toggle="switch-button" id="isDelivery" class="regular-checkbox" checked="checked">
-                    <label for="isDelivery"></label>
-                    <span style="margin-left: 10px;"><%= __('delivery-available')%></span>
-                  </div>
-                </div>
-              </div>
-              <div id="deliverySettingView" class="row hide">
-                <div class="col-xs-12">
-                  <div class="vertical-align">
-                    <input type="checkbox" data-toggle="switch-button" id="isDeliveryBySystem" class="regular-checkbox" checked='checked'>
-                    <label for="isDeliveryBySystem"></label>
-                    <span style="margin-left: 10px;"><%= __('delivery-by-system')%></span>
-                  </div>
-                </div>
-                <div class="col-sm-12 col-md-10 col-lg-8">
-                  <div class="well setting hide" style="margin-top:45px;">
-                    <div class="row">
-                      <div class="col-sm-6">
-                        <div class="input-group">
-                          <div class="input-group-addon"><%= __('delivery-fee')%>: $</div>
-                          <input id="deliveryFeeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="0" value="0">
-                        </div>
-                      </div>
-                      <div class=col-sm-6>
-                        <div class="input-group">
-                          <div class="input-group-addon"><%= __('delivery-range')%>:</div>
-                          <input id="deliveryRangeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="3" value="3">
-                          <div class="input-group-addon"><%= __('miles')%></div>
+                        <div class=col-sm-6>
+                          <div class="input-group">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text"><%= __('delivery-range')%>:</span>
+                            </div>
+                            <input id="deliveryRangeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="3" value="3">
+                            <div class="input-group-append">
+                              <span class="input-group-text"><%= __('miles')%></span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
+                  <div class="help-block with-errors"></div>
                 </div>
-                <div class="help-block with-errors"></div>
-              </div>
-            </div>
 
-            <div class="form-group" style="margin-top: 40px;">
-              <div class="row">
-                <div class="col-xs-12">
-                  <label>5.<%= __('shipping-option')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
-                </div>
-                <div class="col-xs-12">
-                  <div class="box-compact vertical-align">
-                    <input type="checkbox" id="isShipping" class="regular-checkbox" >
-                    <label for="isShipping"></label>
-                    <span style="margin-left: 10px;"><%= __('shipping-available')%></span>
+                <div class="row my-3">
+                  <div class="col-12 col-md-4">
+                    <input type="checkbox" data-toggle="switch-button" id="supportParty">
+                    <label for="supportParty"></label>
+                    <span class="ml-2"><%= __('support-party')%></span>
+                    <i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" title="<%= __('party-order-tip')%>"></i>
+                  </div>
+                  <div class="col-12 col-md-6 d-none" id="partyRequirementView">
+                    <div class="row vertical-align">
+                      <div class="col-6">
+                        <div class="input-group">
+                          <input id="cateringMinimal" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="9999" data-error="<%= __('need-minimal-requirement')%>">
+                          <div class="input-group-append">
+                            <span class="input-group-text"><%= __('dollar')%></span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <label><%= __('party-minimal-requirement')%></label>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               </div>
 
-              <!--<div class="row">-->
+              <div class="form-group mt-4">
+                <div class="row">
+                  <div class="col-12">
+                    <label><strong>5.<%= __('shipping-option')%></strong> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
+                  </div>
+                  <div class="col-12">
+                    <div class="my-2 vertical-align">
+                      <input type="checkbox" id="isShipping" class="regular-checkbox" >
+                      <label for="isShipping"></label>
+                      <span style="margin-left: 10px;"><%= __('shipping-available')%></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!--<div class="row">-->
                 <!--<div class="col-sm-12 col-md-10 col-lg-8">-->
-                  <!--<div class="col-sm-6">-->
-                    <!--<div class="form-inline">-->
-                      <!--<label><%= __('shipping-type')%>:</label>-->
-                      <!--<select id="shippingTypeOpt" class="form-control" style="min-width: 250px;">-->
-                        <!--<option value="custom"><%= __('custom')%></option>-->
-                        <!--<option value="fixed"><%= __('fixed')%></option>-->
-                      <!--</select>-->
-                    <!--</div>-->
-                  <!--</div>-->
-                  <!--<div class=col-sm-6>-->
-                    <!--<div class="input-group">-->
-                      <!--<div class="input-group-addon"><%= __('shipping-fee')%>: $</div>-->
-                      <!--<input id="shippingFee" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="" disabled="disabled">-->
-                    <!--</div>-->
-                  <!--</div>-->
+                <!--<div class="col-sm-6">-->
+                <!--<div class="form-inline">-->
+                <!--<label><%= __('shipping-type')%>:</label>-->
+                <!--<select id="shippingTypeOpt" class="form-control" style="min-width: 250px;">-->
+                <!--<option value="custom"><%= __('custom')%></option>-->
+                <!--<option value="fixed"><%= __('fixed')%></option>-->
+                <!--</select>-->
                 <!--</div>-->
-              <!--</div>-->
+                <!--</div>-->
+                <!--<div class=col-sm-6>-->
+                <!--<div class="input-group">-->
+                <!--<div class="input-group-addon"><%= __('shipping-fee')%>: $</div>-->
+                <!--<input id="shippingFee" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="" disabled="disabled">-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--</div>-->
 
-              <div class="row">
-                <div class="col-sm-12 col-md-10 col-lg-8">
-                  <div class="box-compact">
-                    <div class="row">
-                      <!--<div class="col-xs-6 vertical-align">-->
+                <div class="row">
+                  <div class="col-sm-12 col-md-10 col-lg-8">
+                    <div class="my-2">
+                      <div class="row">
+                        <!--<div class="col-6 vertical-align">-->
                         <!--<input type="checkbox" id="freeShippingOption" class="regular-checkbox">-->
                         <!--<label style="margin-left: 10px;" for="freeShippingOption"></label>-->
                         <!--<span style="margin-left:10px;"><%= __('offer-free-shipping-amount')%></span>-->
-                      <!--</div>-->
-                      <div class="col-xs-6">
-                        <div class="input-group">
-                          <div class="input-group-addon"><%= __('free-amount')%>: $</div>
-                          <input type="number" pattern="[0-9]*" inputmode="numberic" class="form-control" id="freeAmount" disabled="disabled">
+                        <!--</div>-->
+                        <div class="col-12">
+                          <div class="input-group">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text"><%= __('free-amount')%>: $</span>
+                            </div>
+                            <input type="number" pattern="[0-9]*" inputmode="numberic" class="form-control" id="freeAmount" disabled="disabled">
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                <div class="help-block with-errors"></div>
               </div>
 
-              <div class="help-block with-errors"></div>
-            </div>
+              <div class="form-group mt-4">
+                <label style="margin-right:15px;"><strong>6.<%= __('is-dynamic')%></strong></label>
+                <input type="checkbox" data-toggle="switch-button" id="isSupportDynamicPrice" class="regular-checkbox">
+              </div>
 
-            <div class="form-group" style="margin-top:40px">
-              <label style="margin-right:15px;">6.<%= __('is-dynamic')%></label>
-              <input type="checkbox" data-toggle="switch-button" id="isSupportDynamicPrice" class="regular-checkbox">
-            </div>
-
-            <div class="form-group row" style="margin-top: 30px;">
-              <div class="row">
-                <div class="col-xs-12">
-                  <label style="display: block;" for="">7.<%= __('name-your-meal')%></label><button class="btn btn-default" data-toggle="input-toggle" data-displaystyle="inline-block" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i> </button>
+              <div class="form-group row mt-4">
+                <div class="col-12">
+                  <label style="display: block;" for=""><strong>7.<%= __('name-your-meal')%></strong></label><a data-toggle="input-toggle" data-displaystyle="inline-block" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i> </a>
                   <input id="meal_title" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="7" placeholder="<%= __('full-name')%>" data-required-error="<%= __('need-name')%>" required>
                   <input id="meal_title_en" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="30" placeholder="Meal title" data-required-error="<%= __('need-name')%>">
                   <small>  <%= __('Ex-meal-title')%></small>
                   <div class="help-block with-errors"></div>
                 </div>
               </div>
-            </div>
 
-            <div class="form-group text-center submit">
-              <button name="publish" type="submit" class="btn btn-grey-green btn-lg round active" style="margin-right: 20px;"><%= __('save-and-on')%></button>
-              <button name="save" type="button" class="btn btn-disable btn-lg round text-grey"><%= __('save-and-off')%></button>
-              <div class="alert alert-danger" data-toggle="alert" style="margin-top: 20px;"></div>
-              <div class="alert alert-success" data-toggle="alert" style="margin-top: 20px;"></div>
-            </div>
+              <div class="form-group text-center submit">
+                <button name="publish" type="submit" class="btn btn-grey-green btn-lg round active" style="margin-right: 20px;"><%= __('save-and-on')%></button>
+                <button name="save" type="button" class="btn btn-disable btn-lg round text-grey"><%= __('save-and-off')%></button>
+                <div class="alert alert-danger" data-toggle="alert" style="margin-top: 20px;"></div>
+                <div class="alert alert-success" data-toggle="alert" style="margin-top: 20px;"></div>
+              </div>
 
-          </form>
+            </form>
 
+          </div>
         </div>
       </div>
-
     </div>
+
   </div>
 </div>
 

@@ -14,6 +14,7 @@ var async = require('async');
 var fs = require("fs");
 var notification = require('../services/notification');
 var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUtil.js');
+var moment = require('moment');
 
 module.exports = {
   me : function(req, res){
@@ -341,6 +342,9 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
+      // host.meals = host.meals.filter(function(meal){
+      //   return meal.status === "on" && moment(meal.provideFromTime).isAfter();
+      // });
       if(!host){
         return res.notFound();
       }

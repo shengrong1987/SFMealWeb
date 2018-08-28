@@ -1,13 +1,13 @@
-<div class="default-container text-center relative" style="margin-top:-20px;">
+<div class="default-container text-center relative">
 
-  <div class="pure-banner vertical-align red">
-    <div style="width: 600px;" class="middle banner-text">
-      <div class="row vertical-align" style="margin-bottom: 5px;">
-        <div class="col-sm-3">
-          <a href="/" class="logo logo-sm"></a>
+  <div class="pure-banner red py-4">
+    <div style="width: 600px;" class="col-12 middle banner-text">
+      <div class="d-flex justify-content-around vertical-align" style="margin-bottom: 5px;">
+        <div>
+          <a href="/" class="logo"></a>
         </div>
-        <div class="col-sm-9">
-          <h4 class="text-white"><strong><%= __('welcome')%></strong></h4>
+        <div>
+          <h4 class="text-white text-left none-margin"><strong><%= __('host-public-profile')%></strong></h4>
         </div>
       </div>
     </div>
@@ -15,182 +15,54 @@
 
   <div id="hostProfileView" data-host="<%= host.id%>" class="box" data-title="<%= host.shopNameI18n(locale)%>" data-desc="<%= host.introI18n(locale)%>" data-user="<%= user || ''%>">
 
-    <div class="row">
-      <div class="col-md-5">
-        <div class="box white">
-          <div class="row">
-            <div class="col-xs-12 text-center">
-              <img src="<%= host.picture|| "/images/profile_man.png"%>" class="round_thumb" style="width: 150px;height: 150px;">
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-xs-12">
-              <h4 class="text-dark"><strong><%= host.shopNameI18n(locale) %></strong><br/><br/><small><%= host.introI18n(locale) %></small></h4>
-              <p><% if(host.license && host.license.valid){%><i class="fa fa-certificate fa-2x text-yellow"></i><%= __('has-foodhandler-license')%> <%}%></p>
-              <div>
-                <button id="likeBtn" style="width:45%;margin-right: 15px;" class="btn btn-grey-red btn-lg active"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
-                <button id="followBtn" style="width:45%;" class="btn btn-grey-green btn-lg active" data-followed="<%= (user && (user.follow && user.follow==host.id)) ? true : false%>"><%= (user && (user.follow && user.follow==host.id)) ? __('followed') : __('follow')%> <i class="fa <%= (user && (user.follow && user.follow==host.id)) ? 'fa-star' : 'fa-star-o'%>"></i></button>
-              </div>
-              <div id="actionAlertView" class="alert alert-danger hide"></div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-xs-12">
-              <h4 class="text-left text-red"><strong><%= __('main-dish')%></strong></h4>
-              <div class="divider red none-margin" style="height: 8px;"></div>
-            </div>
-          </div>
-          <div class="row">
-            <%
-              var i = 1;
-              if(host.feature_dishes){
-                  host.feature_dishes.forEach(function(dishObj){
-                    dishObj = dishObj["dish"+i];
-                    var dish = host.dishes.forEach(function(dish){
-                    if(dish.id == dishObj.id){
-            %>
-            <div class="feature-dish col-lg-6 col-md-12 col-xs-6" style="margin-top: 15px;">
-              <div class="white border-round" style="overflow: hidden;">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <img class="photo" src= "<%= dish.photos[0].v %>" data-dish="<%= dish.id %>">
-                  </div>
-                </div>
-                <div class="col-md-12 basic-info">
-                  <h4 class="text-red text-left">$<%= dish.price.toFixed(2) %><br/>
-                    <small class="text-black"><strong><%= dish.title %></strong></small>
-                  </h4>
-                </div>
-                <div class="text-left" style="margin: 0 0 10px 10px;" data-toggle="tooltip" data-placement="bottom" title="<%= dish.score.toFixed(2)%>">
-                  <div class="rating text-left" data-toggle="star-set" data-rate="<%= dish.score.toFixed(2)%>">
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                    <i class="fa fa-star"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <%}});i++;})};%>
-          </div>
+    <div class="box white">
+
+      <div class="row">
+        <div class="col-12">
+          <img src="<%= host.picture|| "/images/profile_man.png"%>" class="round_thumb" style="width: 150px;height: 150px;">
         </div>
       </div>
 
-      <div class="col-md-7">
-        <div class="box white">
-          <div class="row">
-            <!--<div class="col-xs-12">-->
-              <!--<h4 class="text-left text-red"><strong><%= __('my-story')%></strong></h4>-->
-              <!--<div class="divider red none-margin" style="height: 8px;"></div>-->
-              <!--<p style="margin-top: 10px;min-height: 50px;" class="text-left"><%= host.intro%></p>-->
-            <!--</div>-->
-            <div class="col-xs-12">
-              <h4 class="text-left text-red"><%= __('my-dish')%></h4>
-              <div class="divider red none-margin" style="height: 8px;"></div>
-              <h4 class="none-margin text-left"><small><%= __('meal-type-order')%></small></h4>
-              <div class="divider none-margin"></div>
-              <div class="row">
-              <%
-              host.meals.forEach(function(meal){
-              if(meal.type == "order"){
-                  host.dishes.forEach(function(dish){
-              if(dish.id == meal.cover){
-              %>
-                <div class="feature-dish col-lg-4 col-md-6 col-xs-6" style="margin-top: 5px;">
-                  <div class="white border-round" style="overflow: hidden;">
-                    <div class="row">
-                      <div class="col-xs-12">
-                        <img class="photo" src= "<%= meal.coverString %>" data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
-                      </div>
-                    </div>
-                    <div class="col-md-6 basic-info">
-                      <h4 class="text-red text-left">$<%= dish.price.toFixed(2) %><br/>
-                        <small class="text-black"><strong><%= meal.title %></strong></small>
-                      </h4>
-                    </div>
-                    <div class="col-md-6">
-                      <h4><small><%= __('left-how-much-dish',meal.leftQty[dish.id])%></small></h4>
-                    </div>
-                  </div>
-                </div>
-                <%}})}});%>
-              </div>
-              <h4 class="none-margin text-left"><small><%= __('preorder')%></small></h4>
-              <div class="divider none-margin"></div>
-              <div class="row">
-                <%
-                host.meals.forEach(function(meal){
-                if(meal.type == "preorder"){
-                    host.dishes.forEach(function(dish){
-                if(dish.id == meal.cover){
-                %>
-                <div class="feature-dish col-lg-4 col-md-6 col-xs-6" style="margin-top: 5px;">
-                  <div class="white border-round" style="overflow: hidden;">
-                    <div class="row">
-                      <div class="col-xs-12">
-                        <img class="photo" src= "<%= meal.coverString %>" data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
-                      </div>
-                    </div>
-                    <div class="col-md-6 basic-info">
-                      <h4 class="text-red text-left">$<%= dish.price.toFixed(2) %><br/>
-                        <small class="text-black"><strong><%= meal.title %></strong></small>
-                      </h4>
-                    </div>
-                    <div class="col-md-6">
-                      <h4><small><%= __('left-how-much-dish',meal.leftQty[dish.id])%></small></h4>
-                    </div>
-                  </div>
-                </div>
-                <%}})}});%>
-              </div>
-            </div>
-            <div class="col-xs-12">
-              <h4 class="text-left text-red"><strong><%= __('my-review')%></strong></h4>
-              <div class="divider red none-margin" style="height: 8px;"></div>
-              <div id="host-reviews">
-              <%
-                host.reviews.forEach(function(review){
-                if(review.isPublic){
-              %>
-              <div class="item">
-                <div class="row">
-                  <div class="col-sm-9 text-left">
-                    <div data-toggle="tooltip" data-placement="bottom" title="<%= review.score.toFixed(2)%>" style="margin-top: 5px;">
-                      <div class="rating" data-toggle="star-set" data-rate="<%= review.score.toFixed(2)%>">
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                      </div>
-                    </div>
-                    <h4 style="display: inline-block;"><small style="font-size: 16px;" class="text-grey" data-id=<%= review.user %>><%= review.username %> : <%= review.title%> <%= review.price ? "( $" + parseFloat(review.price).toFixed(2) + ")" : ''%> </small></h4>
-                  </div>
-                  <div class="col-sm-3">
-                    <h3 class="text-right"><small><%= review.get_formatted_time() %></small></h3>
-                  </div>
-                </div>
-                <h4 class="text-left"><small class="text-black"><%= review.review %></small></h4>
-                <div class="divider"></div>
-              </div>
-              <%
-              }});
-              %>
-              </div>
-              <nav class="pull-right">
-                <ul class="pagination pagination-red pagination-sm" data-trigger="pagination" data-target="#host-reviews">
-                  <li class="active"><a href="javascript:void(0)">1</a></li>
-                </ul>
-              </nav>
-            </div>
-          </div>
+      <div class="row pt-2">
+        <div class="col-12">
+          <h5 class="text-dark">
+            <%= host.shopNameI18n(locale) %><br/>
+            <small>
+            <% if(!host.license || !host.license.valid){%><i class="fal fa-check text-yellow mr-2"></i><%= __('has-foodhandler-license')%> <%}%>
+              <br/><br/><br/>
+              <span class="text-left"><%= host.introI18n(locale) %></span>
+            </small>
+          </h5>
         </div>
+      </div>
+
+      <div class="d-flex justify-content-center pt-2">
+        <button id="likeBtn" style="width:100%;max-width:250px;" class="btn btn-grey-red btn-lg active mr-2"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
+        <button id="followBtn" style="width:100%;max-width:250px;" class="btn btn-grey-green btn-lg active ml-2" data-followed="<%= (user && (user.follow && user.follow==host.id)) ? true : false%>"><%= (user && (user.follow && user.follow==host.id)) ? __('followed') : __('follow')%> <i class="fa <%= (user && (user.follow && user.follow==host.id)) ? 'fa-star' : 'fa-star-o'%>"></i></button>
       </div>
     </div>
 
-  </div>
+    <div class="d-flex justify-content-between">
+      <h4 class="text-left text-red"><strong><%= __('next-meal')%></strong></h4>
+      <i class="fas fa-angle-right fa-2x text-red"></i>
+    </div>
 
+    <div class="divider red none-margin" style="height: 8px;"></div>
+
+    <ul id="nextMealView" class="d-flex relative p-0" style="overflow-x: scroll;overflow-y: hidden;list-style: none;">
+      <% host.meals.forEach(function(meal){%>
+      <li class="relative col-10 col-md-5 p-0" style="flex-shrink: 0;" data-start="09:00" data-end="10:15" data-content="event-restorative-yoga" data-event="event-4">
+        <div class="absolute d-block m-auto" style="left:0;top:0;height: 80px;background-color:rgba(0, 0, 0, 0.5);">
+          <div class="p-2">
+            <h6 class="text-white"><%= meal.provideDate()%></h6>
+            <h5 class="text-white"><%= meal.title%></h5>
+          </div>
+        </div>
+        <img src="<%= meal.coverString%>" class="w-100">
+      </li>
+      <% })%>
+    </ul>
+  </div>
 </div>
 
 <script>

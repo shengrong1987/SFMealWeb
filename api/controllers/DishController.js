@@ -77,29 +77,35 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        if(!meals.every(function(meal){
-            if(meal.status === "off" || !req.body.price){
-              return true;
-            }
-            return meal.dishes.every(function(dish){
-              return dish.id !== dishId;
-            });
-          })){
-          return res.badRequest({ code : -2, responseText : req.__("meal-active-update-dish")});
-        }
-        sails.log.info(req.body.minimalPrice, req.body.qtyRate, req.body.priceRate);
-        if(req.body.isDynamicPriceOn && (!req.body.minimalPrice || !req.body.qtyRate || !req.body.priceRate)){
-          return res.badRequest({ code : -3, responseText : req.__("dish-update-dynamic-insufficient-info")});
-        }
-        Dish.update(dishId, req.body).exec(function(err, dish){
+        var dishIsNotActive = meals.every(function(meal){
+          if(meal.status === "off" || !req.body.price){
+            return true;
+          }
+          return meal.dishes.every(function(dish){
+            return dish.id !== dishId;
+          });
+        });
+        Dish.findOne(dishId).exec(function(err, d){
           if(err){
             return res.badRequest(err);
           }
-          sails.log.info("env:" + process.env.NODE_ENV);
-          if(req.wantsJSON && process.env.NODE_ENV === "development"){
-            return res.ok(dish[0]);
+          if(!dishIsNotActive && parseFloat(req.body.price) !== d.price){
+            return res.badRequest({ code : -2, responseText : req.__("meal-active-update-dish")});
           }
-          return res.ok({ dishId : dish[0].id });
+          sails.log.info(req.body.minimalPrice, req.body.qtyRate, req.body.priceRate);
+          if(req.body.isDynamicPriceOn && (!req.body.minimalPrice || !req.body.qtyRate || !req.body.priceRate)){
+            return res.badRequest({ code : -3, responseText : req.__("dish-update-dynamic-insufficient-info")});
+          }
+          Dish.update(dishId, req.body).exec(function(err, dish){
+            if(err){
+              return res.badRequest(err);
+            }
+            sails.log.info("env:" + process.env.NODE_ENV);
+            if(req.wantsJSON && process.env.NODE_ENV === "development"){
+              return res.ok(dish[0]);
+            }
+            return res.ok({ dishId : dish[0].id });
+          })
         })
       });
     })

@@ -38,7 +38,13 @@
 
     <!--STYLES-->
     <link rel="stylesheet" href="/styles/bootstrap-dialog.min.css">
+    <link rel="stylesheet" href="/styles/css/bootstrap-grid.css">
+    <link rel="stylesheet" href="/styles/css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="/styles/css/bootstrap-reboot.css">
+    <link rel="stylesheet" href="/styles/css/bootstrap-reboot.min.css">
     <link rel="stylesheet" href="/styles/css/bootstrap-switch.css">
+    <link rel="stylesheet" href="/styles/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/styles/css/ekko-lightbox.min.css">
     <link rel="stylesheet" href="/styles/css/grumble.min.css">
     <link rel="stylesheet" href="/styles/css/simple-sidebar.css">
     <link rel="stylesheet" href="/styles/css/toastr.min.css">
@@ -48,8 +54,10 @@
     <!--SCRIPTS-->
     <script src="/js/dependencies/sails.io.js"></script>
     <script src="/js/dependencies/jquery/jquery-2.1.4.min.js"></script>
+    <script src="/js/dependencies/popper.js"></script>
     <script src="/js/bootstrap/bootstrap.js"></script>
     <script src="/js/dependencies/mixitup/jquery.mixitup.min.js"></script>
+    <script src="/js/dependencies/bootstrap-toolkit-1.5.0.js"></script>
     <script src="/js/dependencies/jquery.i18n.properties.js"></script>
     <script src="/js/dependencies/jquery.mixitup-pagination.min.js"></script>
     <script src="/js/dependencies/jquery.toaster.js"></script>
@@ -98,9 +106,16 @@
 
   <body>
 
-    <%- partial ('header.ejs') %>
+  <div class="device-xs d-block d-sm-none"></div>
+  <div class="device-sm d-none d-sm-block d-md-none"></div>
+  <div class="device-md d-none d-md-block d-lg-none"></div>
+  <div class="device-lg d-none d-lg-block d-xl-none"></div>
+  <div class="device-xl d-none d-xl-block"></div>
+
+  <%- partial ('header.ejs') %>
     <%- body %>
     <%- partial ('footer.ejs') %>
+
 
     <div class="modal fade" id="myModal" role="dialog">
       <div class="modal-dialog">

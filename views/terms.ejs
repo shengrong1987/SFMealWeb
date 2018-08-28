@@ -1,29 +1,33 @@
-<div class="container-fluid default-container text-center relative" style="margin-top:-20px;background-color: #f2f2f2;">
+<div class="container-fluid default-container text-center relative p-3" style="background-color: #f2f2f2;">
 
-  <div id="wrapper">
-    <div id="sidebar-wrapper">
-      <ul class="sidebar-nav">
-        <li class="sidebar-brand">
-          <a class="sidenav-item" href="#">
-            <%= __('terms')%>
-          </a>
-        </li>
-        <li><a href="#menu-toggle" class="btn btn-default" data-toggle="menu-toggle"><%= __('help-menu-collapse')%></a></li>
-        <li><span class="divider"></span></li>
-        <li>
-          <a class="sidenav-item" href="/help#general">常规帮助</a>
-        </li>
-        <li>
-          <a class="sidenav-item" href="#terms"><%= __('terms')%></a>
-        </li>
-        <li>
-          <a class="sidenav-item" href="#privacy"><%= __('privacy-policy')%></a>
-        </li>
-      </ul>
+  <div class="row">
+    <div class="col-md-3">
+      <nav id="termsNav" class="navbar navbar-light bg-light text-center stick-top">
+        <a class="navbar-brand" href="#terms"><%= __('terms')%></a>
+        <nav class="nav nav-pills">
+          <a href="#menu-toggle" class="btn btn-default nav-link" data-toggle="menu-toggle"><%= __('help-menu-collapse')%></a>
+          <a class="nav-link active" href="#terms"><%= __('terms')%></a>
+          <div role="separator" class="divider"></div>
+          <nav class="nav nav-pills">
+            <a class="nav-link active" href="#acceptanceOfTerms"><%= __('acceptance-of-terms')%></a>
+            <a class="nav-link" href="#mainTerms"><%= __('main-terms')%></a>
+            <a class="nav-link" href="#aboutSFMeal"><%= __('about-SFMeal')%></a>
+            <a class="nav-link" href="#accountRegistration"><%= __('account-registration')%></a>
+            <a class="nav-link" href="#orderAndBilling"><%= __('order-and-billing')%></a>
+            <a class="nav-link" href="#feesAndPayment"><%= __('fees-and-payment')%></a>
+            <a class="nav-link" href="#cancellationOfOrder"><%= __('cancellation-of-order')%></a>
+            <a class="nav-link" href="#intellectualPropertyRights"><%= __('intellectual-property-rights')%></a>
+            <a class="nav-link" href="#userGeneratedContent"><%= __('user-generated-content')%></a>
+          </nav>
+          <div role="separator" class="divider"></div>
+          <a class="nav-link" href="#privacy"><%= __('privacy-policy')%></a>
+          <a class="nav-link" href="/help#general"><%= __('general-help')%></a>
+        </nav>
+      </nav>
     </div>
 
-    <div id="page-content-wrapper">
-      <div class="container-fluid">
+    <div class="col-md-9 rounded" style="height: 700px;">
+      <div class="container-fluid white p-md-5 p-4 mh-100 text-left" style="overflow-y: scroll;" data-spy="scroll" data-target="#termsNav" data-offset="0">
         <div class="row">
           <div class="col-lg-12 text-left">
             <div id="terms">
@@ -31,11 +35,11 @@
               <a href="#menu-toggle" class="btn btn-default" data-toggle="menu-toggle"><%= __('terms')%></a>
               <div class="divider"></div>
               <p>
-                <b>1. Acceptance of the Terms</b>
+                <b id="acceptanceOfTerms">1. <%= __('acceptance-of-terms')%></b>
                 <br/><br/>
                 By logging to, connecting to, accessing or using our Site, you acknowledge that you have read and understood the following Terms of Use including the terms of our Privacy Policy (which is available at https://www.sfmeal.com/terms#privacy) (collectively, the “Terms”) and you agree to be bound by them and to comply with all applicable laws and regulations regarding your use of the Site and you acknowledge that these Terms constitute a binding and enforceable legal contract between SFMeal and you. IF YOU DO NOT AGREE TO THESE TERMS, PLEASE DO NOT ENTER TO, CONNECT TO, ACCESS OR USE THE SITE IN ANY MANNER. The Site is available only to individuals who (a) are at least eighteen (16) years old (see Section 11 below); (b) possess the legal authority (on behalf of themselves and their organization) to enter into these Terms and to form a binding agreement under any applicable law; and (c) own a valid credit card and a valid e-mail address.
                 <br/><br/>
-                <b>2. 主要术语</b>
+                <b id="mainTerms">2. 主要术语</b>
                 <br/><br/>
                 SFMeal.com 提供一个在线平台，连接需要分享在家做的食物的厨师与需要订购该食物的吃货（合称为“服务”），该服务可以通过www.sfmeal.com和 SFMeal.com 用来提供服务的其他网站（合称为“网站”）获得以及通过手机、平板电脑和其他智能设备应用程序和应用程序接口（合称为“应用程序”）获得。
                 <br/><br/>
@@ -66,7 +70,7 @@
                 “会员内容”指任何会员发布、上传、发表、提交、传播的所有内容，或在他们的登记中包含的会员简介或者通过网站、应用程序或服务提供的 SFMeal 促销活动。
                 <br/><br/>
 
-                <b>3.What is SFMeal?</b>
+                <b id="aboutSFMeal">3.<%= __('about-SFMeal')%>?</b>
                 <br/><br/>
                 We, at SFMeal, take great measures to provide you with the best experience you can have while using SFMeal's Site; However, SFMeal has no control over the conduct of any Hosts, Guests or any other User and disclaims all liability in this regard. Hosts and Guests are recommended to carefully and thoroughly examine and check with their respective Guests and Hosts all necessary details related to their Order (as defined below) prior to any engagement been made. Participating in food related activities such as picking up meal, delivery meal, cooking ay home or other User's activities as a result, directly or indirectly, from using SFMeal's Site and Services, is entirely at your own risk. PLEASE NOTE THAT SOME HOSTS COOK AND/OR PREPARE IN SUCH FOOD SHARING MEAS RAW AND/OR UNDERCOOKED ANIMAL FOOD. CONSUMING RAW OR UNDERCOOKED MEATS, POULTRY, SEAFOOD, SHELLFISH, OR EGGS MAY INCREASE YOUR RISK OF FOODBORNE ILLNESS, ESPECIALLY IF YOU HAVE A MEDICAL CONDITION. 
                 SFMeal is not a party to any agreement entered into between Hosts and Guests in any circumstances nor does it operate as a place of business for vending food of any sort. User has the sole and ultimate responsibility regarding compliance with all laws, regulation (including without limitation the applicable tax regulations and food regulations), religious duties (if and as promised by Host) or any other duty relating to the Meal. We do not accept any liability for any loss, damage, cost or expense that you may suffer or incur as a result of or in connection with your participation in any Food Share conducted by a User or a third party. Certain Food Share may be subject to separate terms and conditions incurred by their respective Hosts, organizers etc. and we recommend that you review such terms and conditions, as they may be. It is the responsibility of the Host to assure that a Food Share is conducted in compliance with all applicable laws, rules and regulations, including with respect to any tax obligations relating to the Food Shares.
@@ -80,7 +84,7 @@
                 YOUR USE OF THE SITE, THE SERVICES, THE USER GENERATED CONTENT AND/OR THE CONTENT AVAILABLE THEREIN IS ENTIRELY AT YOUR OWN RISK.
                 <br/><br/>
 
-                <b>4.Account Registration</b>
+                <b id="accountRegistration">4.<%= __('account-registration')%></b>
                 <br/><br/>
                 In order to book a Meal and/or to create a Meal, you must register and create an account (“Account”). The registration is free of charge. Registration can be done by using a personal Social Network Account (namely, Facebook or Google) or by completing the registration form (“Registration Form”) available on the Site. You may not have more than one (1) active SFMeal Account.  
                 <br/><br/>
@@ -97,7 +101,7 @@
                 Note that either as a Host or as a Guest, you will be able to edit or remove, at any time, any information contained in your personal Account. CANCELLING YOUR ACCOUNT MAY CAUSE THE LOSS OF CERTAIN INFORMATION YOU PROVIDED US AND/OR THE CAPACITY OF YOUR ACCOUNT. WE DO NOT ACCEPT ANY LIABILITY FOR SUCH LOSS.
                 <br/><br/>
 
-                <b>5.Order and Billing</b>
+                <b id="orderAndBilling">5.<%= __('order-and-billing')%></b>
                 <br/><br/>
                 A. Key Terms
                 <br/><br/>
@@ -114,7 +118,7 @@
                 Once you take your order, the SFMeal.com will charge you for Order Fee. The Order Fee charged from the Guest will be kept faithfully by SFMeal and in compliance with any applicable law, and the Order Fee subtract the Service Fee will only be transferred to the respective Host up to night (9) business days following the order taken date. The Host appoints SFMeal as the Host's limited agent solely for the purpose of collecting payment made by Guests on behalf of the Host.
 
                 <br/><br/>
-                <b>6.Fees and Payments</b>
+                <b id="feesAndPayment">6.Fees and Payments</b>
                 <br/><br/>
                 Payments may be processed via certain online payment service providers (“Online Payment Processors”). We may add or change the Online Payment Processors in our sole discretion. The Online Payment Processors enable you to send payments securely online using a credit card, debit card or bank account. We do not control and are not affiliated with such Online Payment Processors. These Online Payment Processors are independent contractors and have no employment or agency relationship with SFMeal. SFMeal is not responsible in any way for the actions or performance (or lack thereof) of the Online Payment Processors. The use of the Online Payment Processors is at your own risk. It is your responsibility to abide by all the terms specified by the Online Payment Processors in their terms of use and privacy policies list here: <a href="https://stripe.com/us/legal/">https://stripe.com/us/legal/</a>, You acknowledge that you are fully assuming the risks of conducting any transactions via the Online Payment Processors.
                 <br/><br/>
@@ -126,7 +130,7 @@
                 The Company may, at any time and at its sole discretion, amend the fee schedule, payment terms and cancellation policy specified on the Site. Any such changes will take effect immediately after being posted on SFMeal's Site. SFMeal VERIFIED may deduct foreign currency processing costs from any payment.
                 <br/><br/>
 
-                <b>7. Cancellation of Order</b>
+                <b id="cancellationOfOrder">7. Cancellation of Order</b>
                 <br/><br/>
                 All Orders are subject to SFMeal’s cancellation policy, which is specified in the following link:  <a href="/help#cancellationPolicy"><%= __('cancellationPolicy')%></a>
                 Your Order shall be deemed canceled only upon receipt of SFMeal’s confirmation of your cancellation. The Company reserves the right to cancel an Order at any time upon returning full refund of Order Amount to the Guest. 
@@ -135,7 +139,7 @@
                 Additionally, SFMeal reserves the right to charge back from Hosts the Order Fee they received for order if upon the receipt of a complaint by a Guest with respect to such order, SFMeal believes, at its sole discretion, that such order was not compatible with SFMeal’s standards of service, including in compliance with this Terms, or in case of any misconduct of the Host.
                 <br/><br/>
 
-                <b>8. Intellectual Property Rights</b> 
+                <b id="intellectualPropertyRights">8. Intellectual Property Rights</b> 
                 <br/><br/>
                 The Site, the Content and the Company's proprietary assets and any and all intellectual property rights pertaining thereto, including, but not limited to, inventions, patents and patent applications, trademarks, trade names, service marks, copyrightable materials and trade secrets, whether or not registered or capable of being registered (excluding the User Generated Content) (collectively, “Intellectual Property”), are owned by and/or licensed to the Company and are protected by applicable copyright and other intellectual property laws and international conventions. All rights not expressly granted to you hereunder are reserved by the Company and its licensors.
                 <br/><br/>
@@ -144,7 +148,7 @@
                 To the extent you provide any feedbacks, comments or suggestions to SFMeal (“Feedback”), SFMeal shall have an-exclusive, royalty-free, fully paid up, worldwide, perpetual and irrevocable license to incorporate the Feedback into any SFMeal current or future products, technologies or services and use same for any purpose all without further compensation to you and without your approval. You agree that all such Feedback shall be deemed to be non-confidential. Furthermore, you warrant that your Feedback is not subject to any license terms that would purport to require SFMeal to comply with any additional obligations with respect to any SFMeal current or future products, technologies or services that incorporate any Feedback.
 
                 <br/><br/>
-                <b>9. User Generated Content</b>
+                <b id="userGeneratedContent">9. User Generated Content</b>
                 <br/><br/>
                 1. The Site allows you to upload, post, publish and make available through it, including without limitation on our blog, your own copyrightable materials such as literary works, text, images, text material, photos and any other proprietary materials, including without limitation Hosts' posts on their pages and/or any part thereof and links to copyrightable materials (the “User Generated Content”). Please be sure that while you use the Site you respect the proprietary rights including any intellectual property and privacy rights of third parties who have any rights with respect to the User Generated Content you uploaded to the Site. SFMeal will not bear any liability for any loss, damage, cost or expense that you may suffer or incur as a result of or in connection with uploading any User Generated Content.
                 <br/><br/>
@@ -167,12 +171,12 @@
                 9. SFMeal TAKES NO RESPONSIBILITY AND ASSUMES NO LIABILITY FOR ANY USER GENERATED CONTENT UPLOAD, POSTED, PUBLISHED AND MADE AVAILABLE BY YOU OR ANY THIRD PARTY IN THE SITE, OR FOR ANY LOSS OR DAMAGE THERETO, NOR IS SFMeal LIABLE FOR ANY MISTAKES, DEFAMATION, LIBEL, FALSEHOODS, OBSCENITIES OR PORNOGRAPHY YOU OR ANY OTHER THIRD PARTY MAY ENCOUNTER.
 
                 <br/><br/>
-                <b>10.Refund</b>
+                <b id="refund">10.Refund</b>
                 <br/><br/>
                 In the event of misleading representation or misconduct on the Site and in connection with the Service or in the framework of food sharing proccess held by Hosts through the use of SFMeal’s Site and Services, SFMeal may decide, in its sole discretion, to credit you with a refund for the Order Amount paid or part thereof and charge the Host with this amount. No action of SFMeal may be construed as accepting any liability other than as mentioned herein.
                 <br/><br/>
 
-                <b>11.User Restriction</b>
+                <b id="userRestriction">11.User Restriction</b>
                 <br/><br/>
                 There are certain conducts which are strictly prohibited on SFMeal's Site. Please read the following restrictions carefully. Failure to comply with the provisions set forth herein may result in the termination of your access to SFMeal and may also expose you to civil and/or criminal liability.
                 <br/><br/>
@@ -280,7 +284,13 @@
 
   $("[data-toggle='menu-toggle']").click(function(e) {
     e.preventDefault();
-    $("#wrapper").toggleClass("toggled");
+    var navContainer = $("#termsNav").parent();
+    navContainer.toggle();
+    if(navContainer.next().hasClass('col-md-9')){
+      navContainer.next().removeClass('col-md-9').addClass('col-md-12');
+    }else{
+      navContainer.next().addClass('col-md-9').removeClass('col-md-12');
+    }
   });
 
 </script>

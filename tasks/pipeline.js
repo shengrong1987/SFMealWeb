@@ -30,6 +30,7 @@ var jsFilesToInject = [
 
   //load jquery then
   'js/dependencies/jquery/*.js',
+  'js/dependencies/popper.js',
   'js/bootstrap/bootstrap.js',
 
   // Dependencies like jQuery, or Angular are brought in here

@@ -11,6 +11,7 @@
     "aws-sdk": "~2.2.41",
     "bcrypt-nodejs": "0.0.3",
     "blueimp-md5": "^2.10.0",
+    "bootstrap4-dialog": "^4.1.0",
     "bosonnlp": "^0.1.0",
     "browserify": "^9.0.4",
     "classnames": "^2.1.3",

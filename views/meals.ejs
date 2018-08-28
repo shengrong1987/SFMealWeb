@@ -1,117 +1,114 @@
-<div class="container text-center relative" style="margin-top:-20px;">
+<div class="text-center relative">
 
-  <div class="row">
-    <div class="pure-banner red">
-      <div class="middle banner-text">
-        <div class="row vertical-align">
-          <div class="col-lg-3"></div>
-          <div class="col-xs-4 col-lg-2">
-            <img src="/images/welcome-1.png" style="width: 100%;">
-          </div>
-          <div class="col-xs-4 col-lg-2">
-            <a href="/" class="logo-slogan"></a>
-          </div>
-          <div class="col-xs-4 col-lg-2">
-            <img src="/images/welcome-2.png" style="width: 100%;">
-          </div>
-          <div class="col-lg-3"></div>
+  <div class="pure-banner red">
+    <div class="middle banner-text py-3">
+      <div class="row vertical-align">
+        <div class="col-lg-2"></div>
+        <div class="col-5 col-lg-3">
+          <img src="/images/welcome-1.png" style="width: 100%;">
         </div>
+        <div class="col-2 col-lg-2">
+          <a href="/" class="logo-slogan"></a>
+        </div>
+        <div class="col-5 col-lg-3">
+          <img src="/images/welcome-2.png" style="width: 100%;">
+        </div>
+        <div class="col-lg-2"></div>
       </div>
+    </div>
 
-      <div class="absolute logo-container">
+    <div class="d-block d-md-inline-flex logo-container pb-3">
 
-      <div class="relative text-left search-container">
-      <!--<h4 class="text-white"><strong><%= __('searching-word')%></strong></h4>-->
-      <div class="btn-group search-btn-group">
-      <input name="keyword" type="text" class="btn round keyword light input" style="max-width: 150px;" placeholder="<%= __('searching-tips')%>">
-      <input name="zipcode" type="number" class="btn btn-default zipCode" placeholder="<%= __('zipcode')%>" value="<%= user?(user.zip?user.zip:''):''%>">
-      <button class="btn btn-warning round orange text-white searchBtn" onclick="javascript:search(this)">
-      <i class="fa fa-search"></i>
-      <%= __('search')%>
-      </button>
-      </div>
-      </div>
+      <div class="relative text-center mb-3">
+        <!--<h4 class="text-white"><strong><%= __('searching-word')%></strong></h4>-->
+        <div class="btn-group search-btn-group">
+          <input name="keyword" type="text" class="btn round keyword light input" style="max-width: 150px;" placeholder="<%= __('searching-tips')%>">
+          <input name="zipcode" type="number" class="btn btn-default zipCode" placeholder="<%= __('zipcode')%>" value="<%= user?(user.zip?user.zip:''):''%>">
+          <button class="btn btn-warning round orange text-white searchBtn" onclick="javascript:search(this)">
+            <i class="fa fa-search"></i>
+            <%= __('search')%>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
   <h2></h2>
 
-  <div class="container-fluid" style="padding-top: 20px;">
-    <div class="row">
+  <div class="container-fluid pt-3">
+    <% if (typeof search != 'undefined' && search ){ %>
+    <h4><%= __('search-result', (typeof keyword !== 'undefined' ? keyword : ''), zipcode || '' , meals.summary.orderCount,meals.summary.preOrderCount)%></h4>
+    <% } %>
 
-      <% if (typeof search != 'undefined' && search ){ %>
-      <h4><%= __('search-result', (typeof keyword !== 'undefined' ? keyword : ''), zipcode || '' , meals.summary.orderCount,meals.summary.preOrderCount)%></h4>
-      <% } %>
+    <div id="meal-container" class="text-center">
 
-      <div id="meal-container" class="text-center">
-
-        <div class="box">
+      <div>
         <% var dateList = Object.keys(meals.meals); dateList.forEach(function(dateKey){var mealObj = meals.meals[dateKey]; var actualMeals = mealObj.meals; %>
-          <div class="row">
-            <div class="col-sm-1 col-lg-3"></div>
-            <div class="col-sm-2 col-lg-1"><div class="divider red"></div></div>
-            <div class="col-sm-6 col-lg-4 col-xs-12" style="line-height: 46px;"><label class="text-red font-medium">
-                <% if(dateKey === "orders"){ %>
-                  <%= __('chicken-dinner')%>
-                <% }else{ %>
-                  <%= __(mealObj.dayOfWeek)%>，<%= __('month-and-date',mealObj.month,mealObj.date)%>
-                <% }%>
-              </label></div>
-            <div class="col-sm-2 col-lg-1"><div class="divider red"></div></div>
-            <div class="col-sm-1 col-lg-3"></div>
+        <div class="d-flex flex-row justify-content-between vertical-align" data-toggle="flex-scrollbar">
+          <div><a class="control" href="javascipt:void(0);" data-target="#<%= dateKey%>" data-way="left"><i class="fal fa-chevron-left"></i></a></div>
+          <div style="line-height: 46px;">
+            <label class="text-red font-medium">
+              <% if(dateKey === "orders"){ %>
+              <%= __('chicken-dinner')%>
+              <% }else{ %>
+              <%= __(mealObj.dayOfWeek)%> / <%= __('month-and-date',mealObj.month,mealObj.date)%>
+              <% }%>
+            </label>
           </div>
+          <div><a class="control" href="javascipt:void(0);" data-target="#<%= dateKey%>" data-way="right"><i class="fal fa-chevron-right"></i></a></div>
+        </div>
 
-          <div class="row">
-            <% actualMeals.forEach(function(meal){var dish = meal.dishes.filter(function(d){ return d.id === meal.cover })[0]; if(dish){%>
-            <div class="box-compact meal-box meal col-md-4 col-lg-3 col-xs-12 mix appetizer item <%= meal.type %>">
-              <div class="box-grid white relative" style="overflow: hidden;">
-                <div class="relative item-image">
-                  <i class="fa fa-heart fa-2x fav text-white <% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
+        <div class="d-flex flex-row" id="<%= dateKey%>" style="overflow-x:scroll;">
+          <% actualMeals.forEach(function(meal){var dish = meal.dishes.filter(function(d){ return d.id === meal.cover })[0]; if(dish){%>
+          <div class="box-compact meal-box col-12 col-md-4 meal mix appetizer item <%= meal.type %>">
+            <div class="box-grid white relative" style="overflow: hidden;">
+              <div class="relative item-image">
+                <i class="fa fa-heart fa-2x fav text-white <% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
                   text-red
                   <%}})%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>"></i>
-                  <img class="photo" src= <%= meal.coverString %> data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
-                  <div class="hoverLayer">
-                    <div class="text">
-                      <% meal.dishes.forEach(function(_d, index){%>
-                        <% if(index === 4){%>
-                        <p>...</p>
-                        <% }else if(index > 4){%>
+                <img class="photo" src= <%= meal.coverString %> data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
+                <div class="hoverLayer">
+                  <div class="text">
+                    <% meal.dishes.forEach(function(_d, index){%>
+                    <% if(index === 4){%>
+                    <p>...</p>
+                    <% }else if(index > 4){%>
 
-                        <% }else{ %>
-                        <p><%= _d.title %></p>
-                        <% }});%>
-                    </div>
+                    <% }else{ %>
+                    <p><%= _d.title %></p>
+                    <% }});%>
                   </div>
                 </div>
-                <% if(meal.isSupportDynamicPrice && dish.isDynamicPriceOn && meal.dynamicDishes.some(function(d){
-                    return d.id === dish.id;
-                  })) {
-                  var orderAmount = meal.getDynamicDishesTotalOrder(0);
-                  var newPrice = dish.getPrice(orderAmount, meal);
-                if(newPrice !== dish.price){
-                %>
-                <div class="box-float-top red"><h3 class="text-white" style="margin-top: 10px;"><%= __('dish-dynamic-price-success', (dish.price - newPrice).toFixed(2))%></h3></div>
-                <%}else{ var amountNeed = dish.qtyRate - orderAmount;%>
-                <div class="box-float-top red"><h3 class="text-white" style="margin-top: 10px;"><%= __('dish-dynamic-price-pending', amountNeed, (dish.price - dish.getPrice(dish.qtyRate, meal)).toFixed(2))%></h3></div>
-                <%}}%>
-                <!--<div class="box-float-bottom red"><h3 class="text-white" style="margin-top: 10px;"><%= dish.title %></h3></div>-->
               </div>
-              <div class="row">
-                <div class="col-sm-3 xs-hide">
-                  <img class="round_thumb size-small" onclick="location.href='/host/public/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/profile_man.png" %>>
-                </div>
-                <div class="col-sm-9 col-xs-12">
-                  <h4 class="text-left text-dark"><%= meal.title %><br><small><%= __('enter-meal') %></small></h4>
-                </div>
+              <% if(meal.isSupportDynamicPrice && dish.isDynamicPriceOn && meal.dynamicDishes.some(function(d){
+                  return d.id === dish.id;
+                })) {
+                var orderAmount = meal.getDynamicDishesTotalOrder(0);
+                var newPrice = dish.getPrice(orderAmount, meal);
+              if(newPrice !== dish.price){
+              %>
+              <div class="box-float-top red"><h3 class="text-white" style="margin-top: 10px;"><%= __('dish-dynamic-price-success', (dish.price - newPrice).toFixed(2))%></h3></div>
+              <%}else{ var amountNeed = dish.qtyRate - orderAmount;%>
+              <div class="box-float-top red"><h3 class="text-white" style="margin-top: 10px;"><%= __('dish-dynamic-price-pending', amountNeed, (dish.price - dish.getPrice(dish.qtyRate, meal)).toFixed(2))%></h3></div>
+              <%}}%>
+              <!--<div class="box-float-bottom red"><h3 class="text-white" style="margin-top: 10px;"><%= dish.title %></h3></div>-->
+            </div>
+            <div class="row">
+              <div class="col-sm-3 xs-hide">
+                <img class="round_thumb size-small" onclick="location.href='/host/public/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/profile_man.png" %>>
+              </div>
+              <div class="col-sm-9 col-xs-12">
+                <h4 class="text-left text-dark"><%= meal.title %><br><small><%= __('enter-meal') %></small></h4>
               </div>
             </div>
-            <%}});%>
           </div>
+
+          <%}});%>
+        </div>
 
         <%}); %>
 
-        </div>
+      </div>
     </div>
   </div>
 

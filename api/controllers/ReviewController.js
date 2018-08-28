@@ -79,10 +79,6 @@ module.exports = {
         sails.log.debug("no available orders for review");
         return res.badRequest({ code : -1, responseText : req.__('review-no-available')});
       }
-      if(reviews){
-        sails.log.info("reviews: " + reviews);
-        reviews = JSON.parse(reviews);
-      }
       if(reviews && reviews.length > 0){
         async.each(reviews, function(r, next){
           var dishId = r.dish;

@@ -34,7 +34,7 @@
       if(this.$pages > 1){
         this.$element.show();
         for(var i = 0; i < this.$pages; i++){
-          var li = $("<li><a href='javascript:void(0)'></a></li>");
+          var li = $("<li class='page-item'><a class='page-link' href='javascript:void(0)'></a></li>");
           if(this.$curPage && i===this.$curPage-1){
             li.addClass("active");
           }else if(i===0 && !this.$curPage){
@@ -113,6 +113,53 @@
       $(this).hide();
     });
   });
+}(jQuery);
+
++function($){
+  'use strict';
+
+  var Tab = function(element, options){
+    this.element = $(element);
+    this.element.on('click', this.click);
+  }
+
+  Tab.prototype.click = function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    $(this).data("bs.tab").select($(e.currentTarget));
+  }
+
+  Tab.prototype.select = function(button){
+    button.parents("ul").find(".nav-link").removeClass('active');
+    button.addClass('active');
+    var tabTarget = $(button.data("href"));
+    var parent = tabTarget.siblings('.tab-pane').hide().removeClass('active');
+    tabTarget.stop().fadeIn("fast").addClass('active');
+    removeHash();
+  }
+
+  function Plugin(option, root){
+    var hasRoot = typeof root !== 'undefined';
+    return this.each(function(){
+      if(!hasRoot) root = $(this);
+      var $this = $(this);
+      var options = $.extend({}, Tab.DEFAULTS, root.data(), typeof option === 'object' && option);
+      var data = root.data("bs.tab");
+      if(!data) root.data("bs.tab",(data = new Tab(root, options)));
+      if(typeof option === 'string') data[option]($this);
+    });
+  }
+
+  $.fn.tab             = Plugin;
+  $.fn.tab.Constructor = Tab;
+
+  $("document").ready(function(){
+    $("[data-toggle='tab']").each(function(){
+      var tab = $(this);
+      Plugin.call(tab,tab.data());
+    });
+  });
+
 }(jQuery);
 
 +function($){
@@ -1014,18 +1061,18 @@
     var isCoverClass = isCover ? "text-yellow" : "text-grey";
     if(isAppend){
       var li = '<li class="row" data-toggle="manipulate-item" data-meal-id="' + mealId + '" data-id="' + dishId + '" data-cover=' + isCover + '>' +
-      '<div class="col-xs-6">&nbsp;&nbsp;' +
+      '<div class="col-6">&nbsp;&nbsp;' +
         '<i data-type="feature" class="manipulate-button fa fa-star text-grey cursor-pointer"></i>&nbsp;' +
         '<i data-type="fire" class="manipulate-button fa fa-fire text-grey cursor-pointer"></i>&nbsp;' +
         '<i data-type="cover" class="manipulate-button fa fa-camera cursor-pointer ' + isCoverClass + '"></i>&nbsp;' +
         '<label name="title">' + content + '</label>' +
         '</div>' +
-        '<div class="col-xs-1"><i class="fa fa-close cursor-pointer select" data-id="' + dishId + '" data-type="close" style="margin-left:10px;"></i></div>' +
-        '<div class="col-xs-4 vertical-align" style="height:52px;padding-top: -10px;"> ' +
+        '<div class="col-1"><i class="fa fa-close cursor-pointer select" data-id="' + dishId + '" data-type="close" style="margin-left:10px;"></i></div>' +
+        '<div class="col-4 vertical-align" style="height:52px;padding-top: -10px;"> ' +
         '<div class="input-group amount-input" data-toggle="amount-input"> ' +
-        '<div class="input-group-addon minus">-</div> ' +
+        '<div class="input-group-prepend minus"><span class="input-group-text">-</span></div> ' +
         '<input class="form-control" type="number" placeholder="1" value="1" style="min-width: 75px;">' +
-        '<div class="input-group-addon add">+</div> </div> </div><div class="col-xs-3"></div>' +
+        '<div class="input-group-append add"><span class="input-group-text">+</span></div> </div> </div><div class="col-3"></div>' +
         ' </li>';
       $.when(selectedDishContainer.append(li)).done(function(){
         selectedDishContainer.find("[data-type='close']").on('click', selectHandler);
@@ -1135,15 +1182,15 @@
   }
 
   function Plugin(option, root){
-    var hasRoot = typeof root != 'undefined';
+    var hasRoot = typeof root !== 'undefined';
     return this.each(function(){
       if(!hasRoot) root = $(this);
-      var options = $.extend({}, InputToggle.DEFAULTS, root.data(), typeof option == 'object' && option);
+      var options = $.extend({}, InputToggle.DEFAULTS, root.data(), typeof option === 'object' && option);
       var data = root.data('bs.input-toggle');
       if(!data){
         root.data('bs.input-toggle',(data = new InputToggle(root, options)));
       }
-      if(typeof option == 'string'){
+      if(typeof option === 'string'){
         data[option]($(this));
       }
     });
@@ -1165,6 +1212,62 @@
     })
   });
 }(jQuery);
+
+(function($){
+  var PopupTooltip = function(element, options){
+    this.element = element;
+    this.options = options;
+    var trigger = options.trigger;
+    this.element.on(trigger, triggerHandler);
+  }
+
+  PopupTooltip.prototype.trigger = function(){
+    setTooltip(this.element, this.options.popuptext);
+    hideTooltip(this.element);
+  }
+
+  function setTooltip(btn, message) {
+    $(btn).tooltip('hide')
+      .attr('data-original-title', message)
+      .tooltip('show');
+  }
+
+  function hideTooltip(btn) {
+    setTimeout(function() {
+      $(btn).tooltip('hide');
+    }, 1000);
+  }
+
+  function triggerHandler(e){
+    e.preventDefault();
+    Plugin.call($(this), 'trigger');
+  }
+
+  function Plugin(option, root){
+    var hasRoot = typeof root !== 'undefined';
+    return this.each(function(){
+      if(!hasRoot) root = $(this);
+      var options = $.extend({}, PopupTooltip.DEFAULTS, root.data(), typeof option === 'object' && option);
+      var data = root.data('bs.popup-tooltip');
+      if(!data){
+        root.data('bs.popup-tooltip',(data = new PopupTooltip(root, options)));
+      }
+      if(typeof option === 'string'){
+        data[option]($(this));
+      }
+    });
+  }
+
+  $.fn.popupTooltip = Plugin;
+  $.fn.popupTooltip.Construtor = PopupTooltip;
+
+  $(document).ready(function(){
+    $("[data-toggle='popupTooltip']").each(function(){
+      var popupTooltip = $(this);
+      Plugin.call(popupTooltip, popupTooltip.data());
+    })
+  })
+})(jQuery);
 
 (function ($) {
 

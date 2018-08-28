@@ -1,7 +1,6 @@
-<div class="container footer text-center">
-  <h2></h2>
+<div class="footer text-center pt-5 pb-2">
   <div class="row">
-    <div class="col-xs-12">
+    <div class="col">
       <div class="middle">
         <div class="qrcode">
           <img src="/images/qrcode.jpg">
@@ -9,19 +8,31 @@
       </div>
     </div>
   </div>
-  <!--<h5></h5>-->
-  <div class="row">
-    <div class="col-xs-12">
+  <div class="row mt-3">
+    <div class="col">
       <div class="middle">
-        <div class="navbar navbar-nav navbar-center navbar-inverse" style="background:none;border:none;margin-top: 20px;margin-bottom: 0;">
-          <ul class="nav navbar-nav footer-nav">
-            <li><a href="https://www.facebook.com/SFMeal/"><i class="fa fa-facebook-f fa-2x"></i></a></li>
-            <li><a href="javascript:void(0)"><i class="icon-dot text-red" style="font-size: 30px;"></i></a> </li>
-            <li><a href="https://www.instagram.com/sfmeal/"><i class="fa fa-instagram fa-2x"></i></a></li>
-            <li><a href="javascript:void(0)"><i class="icon-dot text-red" style="font-size: 30px;"></i></a> </li>
-            <li><a href="https://www.pinterest.com/sfmeal/"><i class="fa fa-pinterest-p fa-2x"></i></a></li>
-            <li><a href="javascript:void(0)"><i class="icon-dot text-red" style="font-size: 30px;"></i></a> </li>
-            <li><a href="https://twitter.com/sfmeal"><i class="fa fa-twitter fa-2x"></i></a></li>
+        <ul class="nav justify-content-center footer-nav">
+          <li class="nav-item"><a class="nav-link" href="https://www.facebook.com/SFMeal/"><i class="fab fa-facebook-f fa-2x"></i></a></li>
+          <li class="nav-item"><a class="nav-link" href="javascript:void(0)"><i class="icon-dot text-red" style="font-size: 30px;"></i></a> </li>
+          <li class="nav-item"><a class="nav-link" href="https://www.instagram.com/sfmeal/"><i class="fab fa-instagram fa-2x"></i></a></li>
+          <li class="nav-item"><a class="nav-link" href="javascript:void(0)"><i class="icon-dot text-red" style="font-size: 30px;"></i></a> </li>
+          <li class="nav-item"><a class="nav-link" href="https://www.pinterest.com/sfmeal/"><i class="fab fa-pinterest-p fa-2x"></i></a></li>
+          <li class="nav-item"><a class="nav-link" href="javascript:void(0)"><i class="icon-dot text-red" style="font-size: 30px;"></i></a> </li>
+          <li class="nav-item"><a class="nav-link" href="https://twitter.com/sfmeal"><i class="fab fa-twitter fa-2x"></i></a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <div class="middle">
+        <div class="footer-text">
+          <ul class="nav justify-content-center footer-nav">
+            <li class="nav-item"><a class="nav-link" href="/help#aboutUs"><%= __('about-us')%></a></li>
+            <li class="nav-item"><a class="nav-link" href="/help#contactUs"><%= __('contact-us')%></a></li>
+            <li class="nav-item"><a class="nav-link" href="/terms#privacy"><%= __('privacy')%></a></li>
+            <li class="nav-item"><a class="nav-link" href="/apply"><%= __('step1')%></a></li>
           </ul>
         </div>
       </div>
@@ -29,22 +40,7 @@
   </div>
 
   <div class="row">
-    <div class="col-xs-12">
-      <div class="middle">
-        <div class="footer-text navbar navbar-nav navbar-center navbar-inverse none">
-          <ul class="nav navbar-nav footer-nav">
-            <li><a href="/help#aboutUs"><%= __('about-us')%></a></li>
-            <li><a href="/help#contactUs"><%= __('contact-us')%></a></li>
-            <li><a href="/terms#privacy"><%= __('privacy')%></a></li>
-            <li><a href="/apply"><%= __('step1')%></a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-xs-12">
+    <div class="col">
       <h5 class="text-white"> <%= __('footer-bar-info')%></h5>
     </div>
   </div>

@@ -1,52 +1,55 @@
 
-<div id="loginView">
-  <div class="alert alert-danger hide" data-toggle="i18n" data-key="userSignInError"></div>
-  <div class="popup box middle signin" style="width: 300px;">
+<div id="loginView" class="card m-auto" style="min-width: 300px;width:100%;">
 
-    <a class="close relative" onclick="javascript:dismissModal()" style="right: -15px;top:-5px;"><i class="fa fa-close"></i></a>
+  <div class="card-body">
+    <div class="card-title">
+      <button aria-label="close" class="close" onclick="javascript:dismissModal()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="alert alert-danger d-none" data-toggle="i18n" data-key="userSignInError"></div>
+    <div class="signin">
 
-    <button id="FBBtn" class="popline btn btn-blue btn-lg round light" style="margin-left: 15px;">
-      <span><i class="fa fa-facebook-f fa" style="padding-right: 15px;"></i>Facebook <span data-toggle="i18n" data-key="login">账号登录</span></span>
-    </button>
+      <button id="FBBtn" class="popline btn btn-blue btn-lg light" style="margin-left: 15px;">
+        <span><i class="fab fa-facebook-f" style="padding-right: 15px;"></i>Facebook <span data-toggle="i18n" data-key="login">账号登录</span></span>
+      </button>
 
-    <h4></h4>
+      <button id="GoogleBtn" class="popline btn btn-outline-light btn-lg outline text-orange white" style="margin-left: 15px;">
+        <span><img style="width: 30px;height: 30px;margin-right: 15px;display: inline;" src="/images/g-logo.png">Google <span data-toggle="i18n" data-key="login">帐号登陆</span></span>
+      </button>
 
-    <button id="GoogleBtn" class="popline btn btn-outline-light btn-lg outline round text-orange white" style="margin-left: 15px;">
-      <span><img style="width: 30px;height: 30px;margin-right: 15px;display: inline;" src="/images/g-logo.png">Google <span data-toggle="i18n" data-key="login">帐号登陆</span></span>
-    </button>
+      <!--<h4></h4>-->
 
-    <!--<h4></h4>-->
+      <!--<button id="wechatBtn" class="popline btn btn-outline-light btn-lg outline round white text-orange" style="margin-left: 15px;">-->
+      <!--<span><i class="fa fa-wechat" style="padding-right:15px;"></i>微信<span data-toggle="i18n" data-key="login">帐号登陆</span></span>-->
+      <!--</button>-->
 
-    <!--<button id="wechatBtn" class="popline btn btn-outline-light btn-lg outline round white text-orange" style="margin-left: 15px;">-->
-      <!--<span><i class="fa fa-wechat fa-lg" style="padding-right: 15px;"></i>微信<span data-toggle="i18n" data-key="login">帐号登陆</span></span>-->
-    <!--</button>-->
+      <div class="divider"></div>
+      <h4 class="mb-2" data-toggle="i18n" data-key="emailLogin"></h4>
 
-    <h2 data-toggle="i18n" data-key="emailLogin"></h2>
+      <form class="text-center" data-toggle="validator" role="form">
+        <div class="form-group">
+          <label class="sr-only" for="emailInput" data-toggle="i18n" data-key="email"></label>
+          <input type="email" class="form-control" id="emailInput2" data-toggle="i18n" data-pattern-key="emailBadFormat" data-pattern-error="bad format" placeholder="邮箱 (Email)" required>
+          <div class="help-block with-errors"></div>
+        </div>
 
-    <form class="text-center" data-toggle="validator" role="form">
-      <div class="form-group">
-        <label class="sr-only" for="emailInput" data-toggle="i18n" data-key="email"></label>
-        <input type="email" class="form-control" id="emailInput" data-toggle="i18n" data-pattern-key="emailBadFormat" data-pattern-error="bad format" placeholder="邮箱 (Email)" required>
-        <div class="help-block with-errors"></div>
-      </div>
+        <div class="form-group">
+          <label class="sr-only" for="passwordInput" data-toggle="i18n" data-key="password"></label>
+          <input type="password" class="form-control" id="passwordInput2" pattern="^[_A-z0-9]{8,}$" data-toggle="i18n" data-pattern-key="passwordRequirement" placeholder="密码 (Password)" data-pattern-error="bad format" required>
+          <div class="help-block with-errors"></div>
+        </div>
 
-      <div class="form-group">
-        <label class="sr-only" for="passwordInput" data-toggle="i18n" data-key="password"></label>
-        <input type="password" class="form-control" id="passwordInput" pattern="^[_A-z0-9]{8,}$" data-toggle="i18n" data-pattern-key="passwordRequirement" placeholder="密码 (Password)" data-pattern-error="bad format" required>
-        <div class="help-block with-errors"></div>
-      </div>
+        <div class="form-group">
+          <button id="signin-btn" type="submit" class="btn btn-danger btn-lg red popline" data-toggle="i18n" data-key="login">帐号登录</button>
+        </div>
 
-      <div class="form-group">
-        <button id="signin-btn" type="submit" class="btn btn-danger btn-lg round red popline" data-toggle="i18n" data-key="login">帐号登录</button>
-      </div>
-
-    </form>
-
-    <span class="divider popline"></span>
-
+      </form>
+    </div>
+  </div>
+  <div class="card-footer">
     <h6 class="text-center"><span data-toggle="i18n" data-key="newlyJoin">新加入?点这里</span><a toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)" data-toggle="i18n" data-key="register">注册</a></h6>
     <h6 class="text-center"><span data-toggle="i18n" data-key="forgetPassword">忘记密码</span>?<a toggle="modal" data-target="#myModal" data-href="/templates/user/sendEmail.html" href="javascript:void(0)" onclick="toggleModal(event)" data-toggle="i18n" data-key="reset">点击重置</a></h6>
-
   </div>
 </div>
 

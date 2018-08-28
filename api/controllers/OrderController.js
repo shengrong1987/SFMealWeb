@@ -2271,13 +2271,13 @@ module.exports = {
       var dishIds = [];
       var newOrders = [];
       orders.forEach(function(order){
-        newOrders.forEach(function(oldOrder){})
         var isSamePickup = newOrders.some(function(oldOrder){
           var _isSame = oldOrder.pickupInfo.pickupFromTime === order.pickupInfo.pickupFromTime && oldOrder.pickupInfo.pickupTillTime === order.pickupInfo.pickupTillTime && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
           if(_isSame){
             Object.keys(order.orders).forEach(function(dishId){
               oldOrder.orders[dishId] = order.orders[dishId];
             })
+            oldOrder.id += "," + order.id;
             oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
             oldOrder.pickupInfo.comment += order.pickupInfo.comment;
             oldOrder.dishes = oldOrder.dishes.concat(order.dishes);

@@ -9,7 +9,7 @@ $("document").ready(function(){
 });
 function setup(){
   setupLanguage();
-  setupTabButtonAnchor();
+  // setupTabButtonAnchor();
   setupTooltip();
   setupMixin();
   setupDishSelector();
@@ -27,18 +27,20 @@ function setup(){
   setupGlobalLoading();
   setupCrumble();
   setupDateTimePicker();
+  setupLoadingButton();
+  setupFlexScrollBar();
 }
 
 function initData(){
   getCountyInfo();
   loadOrder(true);
   loadPreference();
-  initHashTag();
   loadTimeZone();
 }
 
 function initHashTag(){
-  if (window.location.hash === '#_=_' || (window.location.href.indexOf("#") !== -1 && window.location.href.split("#")[1] === "")){
+  var hashtag = window.location.hash;
+  if (hashtag === '#_=_' || (window.location.href.indexOf("#") !== -1 && window.location.href.split("#")[1] === "")){
 
     // Check if the browser supports history.replaceState.
     if (history.replaceState) {
@@ -55,16 +57,21 @@ function initHashTag(){
       window.location.hash = '';
 
     }
+  }else{
+    var tab = $("[data-href='"+hashtag+"']");
+    tab.tab('select');
   }
 }
 
 function initEventHandler(){
   $('body').on('touchstart.dropdown', '.dropdown-menu', function (e) { e.stopPropagation(); });
   $(window).on('hashchange', function() { setupTabButtonAnchor();});
+  $(window).on('resize', adjustLayout);
   $(window).scroll(updateScroll);
 }
 
 function initLayout(){
+  initHashTag();
   adjustLayout();
   updateCollapseBtn(true);
 }
@@ -129,7 +136,7 @@ function setupLanguage(){
 function setupTabButtonAnchor(){
   var tapName = location.hash;
   if(tapName && tapName !== ""){
-    $("a[href='" + tapName + "']").tab('show');
+    $("a[data-href='" + tapName + "']").tab('select');
   }
 }
 
@@ -142,7 +149,7 @@ function setupTooltip(){
 function setupMixin() {
   $('#meal-container').mixItUp({
     pagination: {
-      limit: 8,
+      limit: 20,
       pagerClass : 'btn btn-mixitup'
     }
   });
@@ -354,15 +361,51 @@ function setupDateTimePicker(){
   })
 }
 
+function setupCollapseButton(){
+  $("#myNavBar").on('show.bs.collapse',function(){
+    $("#myUserBar").removeClass('navbar-transparent').removeClass('bg-faded').removeClass('navbar-dark').addClass('navbar-light').addClass('bg-light');
+    $("#myUserBar .nav-link").addClass('text-black-50');
+  });
+  $("#myNavBar").on('hidden.bs.collapse',function(){
+    $("#myUserBar").addClass('navbar-transparent').addClass('bg-faded').addClass('navbar-dark').removeClass('navbar-light').removeClass('bg-light');
+    $("#myUserBar .nav-link").removeClass('text-black-50');
+  });
+}
+
 function setupCrumble(){
   $('#tour').crumble();
-  // $("#cateringModeBtn").grumble({
-  //   text : "Hello",
-  //   angle : 315,
-  //   distance : 3,
-  //   showAfter : 100,
-  //   useRelativePositioning : true
-  // });
+}
+
+function setupLoadingButton(){
+  $("button[data-loading-text]").on('click', function(){
+    var button = $(this);
+    var loadingText = button.data('loading-text');
+    var originalText = button.html();
+    button.html('<i class="fa fa-circle-o-notch fa-spin"></i> ' + loadingText);
+    button.data('original-text', originalText);
+  })
+}
+
+function setupFlexScrollBar(){
+  $("[data-toggle='flex-scrollbar'] .control").each(function(){
+    var target = $($(this).data("target"));
+    var items = target.find('.item');
+    var way = $(this).data("way");
+    var first = items.first();
+    var last = items.last();
+
+    $(this).on('click', function(){
+      if(way === "left"){
+        target.stop().animate({
+          scrollLeft : target.scrollLeft() + first.offset().left - 20
+        }, 1200);
+      }else{
+        target.stop().animate({
+          scrollLeft : target.scrollLeft() + last.offset().left - 20
+        }, 1200);
+      }
+    })
+  });
 }
 
 /*
@@ -372,7 +415,7 @@ function getCountyInfo(){
   var county = readCookie("county");
   if(county){
     var $citySelector = $("#citySelector");
-    var countyName = $citySelector.find("ul a[value='" + county  + "']").text();
+    var countyName = $citySelector.find(".dropdown-menu a[value='" + county  + "']").text();
     var $citySelectorText = $citySelector.find(">a");
     $citySelectorText.html(countyName + "&nbsp;<span class='caret'></span>");
     $citySelectorText.attr("value",county);
@@ -381,11 +424,10 @@ function getCountyInfo(){
 }
 
 function adjustLayout(){
-  var $myinfo = $("#myinfo");
-  var dishes = $myinfo.find(".dishes .signatureDish li");
-  if(dishes){
-    var count = dishes.length;
-    var height = count * 50 < 50 ? 50 : count * 50;
-    $myinfo.find(".dishes").css("height",height);
+  var nextMealView = $("#nextMealView");
+  var fMeal = nextMealView.find("li img");
+  if(fMeal.length){
+    var h = Math.min(fMeal[0].height, fMeal[0].width);
+    nextMealView.height(h);
   }
 }

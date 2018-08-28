@@ -1,14 +1,14 @@
 
-<div class="container text-center base_container" style="margin-top:-20px;">
+<div class="text-center">
   <div class="row">
-    <div class="pure-banner vertical-align green">
+    <div class="pure-banner vertical-align green p-4">
       <div style="width: 600px;" class="middle banner-text">
-        <div class="vertical-align" style="margin-bottom: 5px;">
-          <div class="col-sm-3">
-            <a href="/" class="logo logo-sm"></a>
+        <div class="d-flex justify-content-around vertical-align" style="margin-bottom: 5px;">
+          <div>
+            <a href="/" class="logo"></a>
           </div>
-          <div class="col-sm-9">
-            <h4 class="text-white"><strong><%= __('welcome') %></strong></h4>
+          <div>
+            <h3 class="text-white text-left none-margin"><strong><%= __('nav-bar-apply-chef')%></strong></h3>
           </div>
         </div>
       </div>
@@ -16,36 +16,37 @@
   </div>
 
   <div id="applyView" data-host-id="<%= user.host ? (user.host.id ? user.host.id : user.host) : '' %>" class="default-container">
-    <div class="box white">
-      <h4 class="text-green"><%= __('apply-title') %></h4>
+    <div class="box white w-50" style="min-width: 500px;">
 
-      <hr>
+      <h4 class="text-green py-2"><%= __('apply-title') %></h4>
 
-      <div class="progress">
-        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="5" style="width: 20%;">
-          <%= __('step-%d-of-%d',1,5)%>
-        </div>
-      </div>
-
-      <div class="navbar">
-        <div class="navbar-inner">
-          <ul class="nav nav-pills">
-            <li class="active nav-item" style="height: 80px;"><a href="#step1" data-toggle="tab" data-pass="<%= user.host || ''%>" data-step="1">1.<%= __('step1')%></a><br/><% if(user.host){%><i class="fa fa-check text-green"></i><%}%></li>
-            <li class="<%= user.host?'':'disabled'%>" style="height: 80px;"><a href="#step2" data-toggle="tab" data-pass="<%= hasAddress%>" data-step="2">2.<%= __('step2')%></a><br/><% if(hasAddress){%><i class="fa fa-check text-green"></i><%}%></li>
-            <li class="<%= user.host?'':'disabled'%>" style="height: 80px;"><a href="#step3" data-toggle="tab" data-pass="<%= hasDish%>" data-step="3">3.<%= __('step3')%></a><br/><%if(hasDish){%><i class="fa fa-check text-green"></i><%}%></li>
-            <li class="<%= user.host?'':'disabled'%>" style="height: 80px;"><a href="#step4" data-toggle="tab" data-pass="<%= hasMeal%>" data-step="4">4.<%= __('step4')%></a><br/><%if(hasMeal){%><i class="fa fa-check text-green"></i><%}%></li>
-            <li class="<%= user.host?'':'disabled'%>" style="height: 80px;"><a href="#step5" data-toggle="tab" data-pass="<%= hasAccount%>" data-step="5">5.<%= __('step5')%></a><br/><%if(hasAccount){%><i class="fa fa-check text-green"></i><%}%></li>
+      <div class="card">
+        <div class="card-body">
+          <div class="card-title">
+            <div class="progress">
+              <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="5" style="width: 20%;">
+                <%= __('step-%d-of-%d',1,5)%>
+              </div>
+            </div>
+          </div>
+          <ul class="nav nav-pills nav-fill bg-light">
+            <li class="nav-item" style="height: 80px;"><a class="nav-link active" data-href="#step1" data-toggle="tab" data-pass="<%= user.host || ''%>" data-step="1">1.<%= __('step1')%></a><br/><% if(user.host){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li class="nav-item <%= user.host?'':'disabled'%>" style="height: 80px;"><a class="nav-link" data-href="#step2" data-toggle="tab" data-pass="<%= hasAddress%>" data-step="2">2.<%= __('step2')%></a><br/><% if(hasAddress){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li class="nav-item <%= user.host?'':'disabled'%>" style="height: 80px;"><a class="nav-link" data-href="#step3" data-toggle="tab" data-pass="<%= hasDish%>" data-step="3">3.<%= __('step3')%></a><br/><%if(hasDish){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li class="nav-item <%= user.host?'':'disabled'%>" style="height: 80px;"><a class="nav-link" data-href="#step4" data-toggle="tab" data-pass="<%= hasMeal%>" data-step="4">4.<%= __('step4')%></a><br/><%if(hasMeal){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li class="nav-item <%= user.host?'':'disabled'%>" style="height: 80px;"><a class="nav-link" data-href="#step5" data-toggle="tab" data-pass="<%= hasAccount%>" data-step="5">5.<%= __('step5')%></a><br/><%if(hasAccount){%><i class="fa fa-check text-green"></i><%}%></li>
             <% if(user.host){%>
-              <li style="height: 80px;"><a href="#step6" data-toggle="tab" data-pass="<%= !verification%>" data-step="6">6. <%= __('step6')%></a><br/><%if(!verification){%><i class="fa fa-check text-green"></i><%}%></li>
+            <li class="nav-item" style="height: 80px;"><a class="nav-link" data-href="#step6" data-toggle="tab" data-pass="<%= !verification%>" data-step="6">6. <%= __('step6')%></a><br/><%if(!verification){%><i class="fa fa-check text-green"></i><%}%></li>
             <%}%>
           </ul>
         </div>
       </div>
-      <div class="tab-content">
-        <div class="tab-pane fade in active" id="step1">
+
+      <div class="tab-content py-4">
+        <div class="tab-pane active" id="step1">
 
           <% if( typeof user.host !== 'undefined' && user.host){%>
-            <div class="well">
+            <div class="card p-2">
               <label><%= __('step1-success')%></label>
               <br>
               <h4><small><%= __('step1-success-tip')%></small></h4>
@@ -53,42 +54,59 @@
             <icon class="fa fa-check text-green"></icon>
             <button class="btn btn-default round next"><%= __('continue')%></button>
           <%}else{%>
-            <div class="well">
-              <label><%= __('step1-ongoing')%></label>
-              <br>
-              <h4><small><%= __('step1-ongoing-tip')%><a href="/terms#terms"> <%= __('SFMeal-agreement')%> </a><%= __('and')%><a href="https://stripe.com/us/legal/"> <%= __('stripe-agreement')%> </a></small></h4>
+            <div class="card mb-4">
+              <div class="card-body p-2">
+                <div class="card-title">
+                  <!--<h5><%= __('step1-ongoing')%></h5>-->
+                </div>
+                <div class="form-group">
+                  <label><%= __('apply-shopname')%></label>
+                  <input class="form-control middle" name="shopName" style="width: 200px;" type="text" required>
+                </div>
+                <div class="form-group">
+                  <label><%= __('phone')%></label>
+                  <input type="tel" class="form-control middle" name="phone" style="width: 200px;" type="text" value="<%= user.phone || ''%>" required>
+                </div>
+              </div>
+              <div class="card-footer">
+                <h4><small><%= __('step1-ongoing-tip')%><a href="/terms#terms"> <%= __('SFMeal-agreement')%> </a><%= __('and')%><a href="https://stripe.com/us/legal/"> <%= __('stripe-agreement')%> </a></small></h4>
+              </div>
             </div>
-            <div class="form-group">
-              <label><%= __('apply-shopname')%></label>
-              <input class="form-control middle" name="shopName" style="width: 200px;" type="text" required>
-            </div>
-          <div class="form-group">
-            <label><%= __('phone')%></label>
-            <input type="tel" class="form-control middle" name="phone" style="width: 200px;" type="text" value="<%= user.phone || ''%>" required>
-          </div>
-            <button id="applyBtn" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> <%= __('step1-action-btn')%>" class="btn btn-info round"><%= __('step1-action-btn')%></button>
+
+            <button id="applyBtn" data-loading-text="<%= __('step1-action-btn')%>" class="btn btn-info btn-lg"><%= __('step1-action-btn')%></button>
             <h2></h2>
             <div class="alert alert-danger" data-toggle="alert"></div>
           <%}%>
         </div>
 
-        <div class="tab-pane fade" id="step2">
+        <div class="tab-pane" id="step2">
 
           <% if( hasAddress ){%>
-          <div class="well">
-            <label><%= __('step2-success')%></label>
-            <br>
-            <h4><small><%= __('step2-success-tip')%></small></h4>
+          <div class="card">
+            <div class="card-body p-2">
+              <div class="card-title">
+                <label><%= __('step2-success')%></label>
+                <h4><small><%= __('step2-success-tip')%></small></h4>
+              </div>
+              <icon class="fa fa-check text-green"></icon>
+              <button class="btn btn-default round next"><%= __('continue')%></button>
+            </div>
           </div>
-          <icon class="fa fa-check text-green"></icon>
-          <button class="btn btn-default round next"><%= __('continue')%></button>
-          <%}else{%>
-          <div class="well">
-            <label><%= __('step2-ongoing')%></label>
-          </div>
-          <a id="addAddress" class="btn btn-info round" <%= user.host?'':'disabled="disabled"'%> title="<%= user.host?'':__('user-not-host')%>" toggle="modal" data-toggle="tooltip" data-target="#myModal" data-host="true" data-id="<%= user.host%>" data-href="/templates/user/address.html"><%= __('step2-action-btn')%></a>
-          <%}%>
 
+          <%}else{%>
+
+          <div class="card">
+            <div class="card-body p-2">
+              <div class="card-title">
+                <label><%= __('step2-ongoing')%></label>
+              </div>
+              <button id="addAddress" class="btn btn-info btn-lg" <%= user.host?'':'disabled="disabled"'%> title="<%= user.host?'':__('user-not-host')%>" toggle="modal" data-toggle="tooltip" data-target="#myModal" data-host="true" data-id="<%= user.host%>" data-href="/templates/user/address.html"><%= __('step2-action-btn')%></button>
+              <% if(!user.host){%>
+              <div class="invalid-feedback d-block"><%= __('apply-to-be-host-first')%></div>
+              <% }%>
+            </div>
+          </div>
+          <%}%>
         </div>
 
         <div class="tab-pane fade" id="step3">

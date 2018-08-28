@@ -621,9 +621,9 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(!isAdmin && meal.status === 'on'){
-        return res.badRequest({responseText : req.__('meal-active-update-dish'), code : -10});
-      }
+      // if(!isAdmin && meal.status === 'on'){
+      //   return res.badRequest({responseText : req.__('meal-active-update-dish'), code : -10});
+      // }
       meal.dishes.add(dishId);
       if(!meal.leftQty.hasOwnProperty(dishId)){
         meal.leftQty[dishId] = 10;
