@@ -1,4 +1,5 @@
 # Agendash
+[![Build Status](https://travis-ci.org/joeframbach/agendash.svg)](https://travis-ci.org/joeframbach/agendash)
 
 A Dashboard for [Agenda](https://github.com/rschmukler/agenda)
 
@@ -11,6 +12,10 @@ A Dashboard for [Agenda](https://github.com/rschmukler/agenda)
 - Dive in to see more details about the job, like the json data
 - Requeue a job (clone the data and run immediately)
 - Delete jobs (Useful for cleaning up old completed jobs)
+
+### Notes
+
+ - Automatically creates additional indexes on several columns (See #24).
 
 ---
 
@@ -29,6 +34,8 @@ A Dashboard for [Agenda](https://github.com/rschmukler/agenda)
 ```
 npm install --save agendash
 ```
+
+*Note*: `Agendash` requires mongodb version >2.6.0 to perform the needed aggregate queries. This is your mongo database version, not your node package version! To check your database version, connect to mongo and run `db.version()`.
 
 ### Standalone usage
 
