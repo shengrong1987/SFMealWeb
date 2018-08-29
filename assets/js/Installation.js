@@ -204,7 +204,7 @@ function setupDishSelector(){
 }
 
 function setupDropdownMenu(){
-  var $dropdownMenu = $('[data-toggle="dropdown"][data-selected="true"]').next().find("li a");
+  var $dropdownMenu = $('[data-toggle="dropdown"][data-selected="true"]').next().find(".dropdown-item");
   $dropdownMenu.click(function(){
     if($(this).attr('disabled')){
       return;
@@ -415,8 +415,8 @@ function getCountyInfo(){
   var county = readCookie("county");
   if(county){
     var $citySelector = $("#citySelector");
-    var countyName = $citySelector.find(".dropdown-menu a[value='" + county  + "']").text();
-    var $citySelectorText = $citySelector.find(">a");
+    var countyName = $citySelector.next().find(".dropdown-item[value='" + county  + "']").text();
+    var $citySelectorText = $citySelector;
     $citySelectorText.html(countyName + "&nbsp;<span class='caret'></span>");
     $citySelectorText.attr("value",county);
   }

@@ -342,7 +342,7 @@
 
       <div class="relative" style="left:0;">
         <div class="box white floater static-floater border">
-          <div id="order-alert" class="alert alert-danger hide" role="alert">
+          <div id="order-alert" class="alert alert-danger d-none" role="alert">
             <%= __('dish-out-tips')%>
           </div>
           <% if(meal.isFull()){%>
@@ -358,7 +358,7 @@
             <%= __('meal-not-start-tips')%>
           </div>
           <%}%>
-          <div class="<%= (meal.isFull() || meal.isExpire() || meal.isNotStart()) ? 'hide' : ''%>">
+          <div class="<%= (meal.isFull() || meal.isExpire() || meal.isNotStart()) ? 'd-none' : ''%>">
             <table id="order" class="table tableBodyScroll" data-err-container="#order-alert">
               <thead>
               <tr>
@@ -448,7 +448,7 @@
             </div>
           </div>
 
-          <div id="orderAlertView" class="alert alert-danger hide" style="margin-top: 10px;"></div>
+          <div id="orderAlertView" class="alert alert-danger d-none" style="margin-top: 10px;"></div>
 
           <div class="scroll-container">
             <table id="confirm-order" class="table text-grey" style="margin-top: 10px;">

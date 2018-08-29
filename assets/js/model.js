@@ -241,7 +241,7 @@ var UserBarView = Backbone.View.extend({
   events : {
     "click #applyToHostBtn" : "applyForHost",
     "mouseover #msgBtn" : "clearMsgBadges",
-    "change #citySelector [data-toggle='dropdown']" : "switchCounty"
+    "change #citySelector" : "switchCounty"
   },
   initialize : function(){
     var userId = this.$el.data("user");
@@ -3633,8 +3633,14 @@ var OrderView = Backbone.View.extend({
 
           BootstrapDialog.show({
             title : jQuery.i18n.prop("tipTitle"),
-            message : "<h4>" + jQuery.i18n.prop('selectTip') + "</h4>" + "<form id='customTip' class='hide'><div class='input-group'><div class='input-group-addon'><span class='input-group-text'>$</span></div> <input name='tip' type='number' class='form-control' require></div></div>" +
-            "<button class='form-control btn btn-info' type='submit'>Confirm</button></form>",
+            message : "<h5>" + jQuery.i18n.prop('selectTip') + "</h5>" +
+            "<form id='customTip' class='d-none'>" +
+            "<div class='input-group'>" +
+            "<div class='input-group-prepend'><span class='input-group-text'>$</span></div>" +
+            "<input name='tip' type='number' class='form-control' require>" + "</div>" +
+            "</div>" +
+            "<button class='form-control btn btn-info' type='submit'>Confirm</button>" +
+            "</form>",
             buttons : [{
                 label : "15%",
                 title : subtotal * 0.15,
@@ -3657,7 +3663,7 @@ var OrderView = Backbone.View.extend({
               }, {
                 label : jQuery.i18n.prop('noTip'),
                 title : jQuery.i18n.prop('noTip'),
-                cssClass: 'btn-default',
+                cssClass: 'btn-light',
                 action : function(dialog){
                   $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, method, mealId, code, points, isLogin, partyMode, 0, $this, button);
                 }

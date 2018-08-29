@@ -99,11 +99,11 @@
         var h4 = '<h4 class="modal-title">' + (this._config.title || "&nbsp;") + '</h4>';
         var btn = '<button type="button" class="close" data-dismiss="modal" aria-label="' + this._config.strings.close + '"><span aria-hidden="true">&times;</span></button>';
 
-        var header = '<div class="modal-header' + (this._config.title || this._config.alwaysShowClose ? '' : ' hide') + '">' + (this._isBootstrap3 ? btn + h4 : h4 + btn) + '</div>';
-        var footer = '<div class="modal-footer' + (this._config.footer ? '' : ' hide') + '">' + (this._config.footer || "&nbsp;") + '</div>';
+        var header = '<div class="modal-header' + (this._config.title || this._config.alwaysShowClose ? '' : ' d-none') + '">' + (this._isBootstrap3 ? btn + h4 : h4 + btn) + '</div>';
+        var footer = '<div class="modal-footer' + (this._config.footer ? '' : ' d-none') + '">' + (this._config.footer || "&nbsp;") + '</div>';
         var body = '<div class="modal-body"><div class="ekko-lightbox-container"><div class="ekko-lightbox-item fade in show"></div><div class="ekko-lightbox-item fade"></div></div></div>';
         var dialog = '<div class="modal-dialog" role="document"><div class="modal-content">' + header + body + footer + '</div></div>';
-        $(this._config.doc.body).append('<div id="' + this._modalId + '" class="ekko-lightbox modal fade" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">' + dialog + '</div>');
+        $(this._config.doc.body).append('<div id="' + this._modalId + '" class="ekko-lightbox modal" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">' + dialog + '</div>');
 
         this._$modal = $('#' + this._modalId, this._config.doc);
         this._$modalDialog = this._$modal.find('.modal-dialog').first();
@@ -118,6 +118,8 @@
 
         this._border = this._calculateBorders();
         this._padding = this._calculatePadding();
+
+        this._config.show = true;
 
         this._galleryName = this._$element.data('gallery');
         if (this._galleryName) {
@@ -141,18 +143,26 @@
           }
         }
 
-        this._$modal.on('show.bs.modal', this._config.onShow.bind(this)).on('shown.bs.modal', function () {
+        $(document).on('show.bs.modal', this._$modal, this._config.onShow.bind(this));
+        $(document).on('shown.bs.modal', this._$modal, function(){
           _this._toggleLoading(true);
           _this._handle();
           return _this._config.onShown.call(_this);
-        }).on('hide.bs.modal', this._config.onHide.bind(this)).on('hidden.bs.modal', function () {
+        });
+        $(document).on('hide.bs.modal', this._$modal, this._config.onHide.bind(this));
+        $(document).on('hidden.bs.modal', this._$modal, function () {
           if (_this._galleryName) {
             $(document).off('keydown.ekkoLightbox');
             $(window).off('resize.ekkoLightbox');
           }
           _this._$modal.remove();
           return _this._config.onHidden.call(_this);
-        }).modal(this._config);
+        });
+
+        $(this._config.doc.body).ready(function(){
+          // $("#myModal").modal('show');
+          _this._$modal.modal('show');
+        })
 
         $(window).on('resize.ekkoLightbox', function () {
           _this._resize(_this._wantedWidth, _this._wantedHeight);
@@ -233,6 +243,7 @@
       }, {
         key: 'close',
         value: function close() {
+          $("#myModal").modal('hide');
           return this._$modal.modal('hide');
         }
 
