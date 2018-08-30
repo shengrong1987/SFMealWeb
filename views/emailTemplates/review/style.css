@@ -10206,12 +10206,6 @@ fieldset[disabled] .btn-red.active {
   right: 6px;
   top: .8em;
 }
-.dropdown-submenu .dropdown-menu {
-  top: 0;
-  left: 100%;
-  margin-left: .1rem;
-  margin-right: .1rem;
-}
 /*nav*/
 .navbar .navbar-nav.footer-nav li {
   float: left;
@@ -15783,8 +15777,8 @@ readers do not read off random characters that represent icons */
   font-family: 'Font Awesome 5 Brands';
   font-style: normal;
   font-weight: normal;
-  src: url("webfonts/fa-brands-400.eot");
-  src: url("webfonts/fa-brands-400.eot?#iefix") format("embedded-opentype"), url("webfonts/fa-brands-400.woff2") format("woff2"), url("webfonts/fa-brands-400.woff") format("woff"), url("webfonts/fa-brands-400.ttf") format("truetype"), url("webfonts/fa-brands-400.svg#fontawesome") format("svg");
+  src: url("/styles/webfonts/fa-brands-400.eot");
+  src: url("/styles/webfonts/fa-brands-400.eot?#iefix") format("embedded-opentype"), url("/styles/webfonts/fa-brands-400.woff2") format("woff2"), url("/styles/webfonts/fa-brands-400.woff") format("woff"), url("/styles/webfonts/fa-brands-400.ttf") format("truetype"), url("/styles/webfonts/fa-brands-400.svg#fontawesome") format("svg");
 }
 .fab {
   font-family: 'Font Awesome 5 Brands';
@@ -15793,8 +15787,8 @@ readers do not read off random characters that represent icons */
   font-family: 'Font Awesome 5 Pro';
   font-style: normal;
   font-weight: 300;
-  src: url("webfonts/fa-light-300.eot");
-  src: url("webfonts/fa-light-300.eot?#iefix") format("embedded-opentype"), url("webfonts/fa-light-300.woff2") format("woff2"), url("webfonts/fa-light-300.woff") format("woff"), url("webfonts/fa-light-300.ttf") format("truetype"), url("webfonts/fa-light-300.svg#fontawesome") format("svg");
+  src: url("/styles/webfonts/fa-light-300.eot");
+  src: url("/styles/webfonts/fa-light-300.eot?#iefix") format("embedded-opentype"), url("/styles/webfonts/fa-light-300.woff2") format("woff2"), url("/styles/webfonts/fa-light-300.woff") format("woff"), url("/styles/webfonts/fa-light-300.ttf") format("truetype"), url("/styles/webfonts/fa-light-300.svg#fontawesome") format("svg");
 }
 .fal {
   font-family: 'Font Awesome 5 Pro';
@@ -15804,8 +15798,8 @@ readers do not read off random characters that represent icons */
   font-family: 'Font Awesome 5 Pro';
   font-style: normal;
   font-weight: 400;
-  src: url("webfonts/fa-regular-400.eot");
-  src: url("webfonts/fa-regular-400.eot?#iefix") format("embedded-opentype"), url("webfonts/fa-regular-400.woff2") format("woff2"), url("webfonts/fa-regular-400.woff") format("woff"), url("webfonts/fa-regular-400.ttf") format("truetype"), url("webfonts/fa-regular-400.svg#fontawesome") format("svg");
+  src: url("/styles/webfonts/fa-regular-400.eot");
+  src: url("/styles/webfonts/fa-regular-400.eot?#iefix") format("embedded-opentype"), url("/styles/webfonts/fa-regular-400.woff2") format("woff2"), url("/styles/webfonts/fa-regular-400.woff") format("woff"), url("/styles/webfonts/fa-regular-400.ttf") format("truetype"), url("/styles/webfonts/fa-regular-400.svg#fontawesome") format("svg");
 }
 .far {
   font-family: 'Font Awesome 5 Pro';
@@ -15815,8 +15809,8 @@ readers do not read off random characters that represent icons */
   font-family: 'Font Awesome 5 Pro';
   font-style: normal;
   font-weight: 900;
-  src: url("webfonts/fa-solid-900.eot");
-  src: url("webfonts/fa-solid-900.eot?#iefix") format("embedded-opentype"), url("webfonts/fa-solid-900.woff2") format("woff2"), url("webfonts/fa-solid-900.woff") format("woff"), url("webfonts/fa-solid-900.ttf") format("truetype"), url("webfonts/fa-solid-900.svg#fontawesome") format("svg");
+  src: url("/styles/webfonts/fa-solid-900.eot");
+  src: url("/styles/webfonts/fa-solid-900.eot?#iefix") format("embedded-opentype"), url("/styles/webfonts/fa-solid-900.woff2") format("woff2"), url("/styles/webfonts/fa-solid-900.woff") format("woff"), url("/styles/webfonts/fa-solid-900.ttf") format("truetype"), url("/styles/webfonts/fa-solid-900.svg#fontawesome") format("svg");
 }
 .fa,
 .fas {
