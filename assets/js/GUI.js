@@ -391,9 +391,9 @@ function refreshPreference(id){
             console.log("index is: " + index, "prop: " + prop);
             var i = parseInt(index) + 1;
             var pref = preferenceBtn.next().find("[data-layer='0']:nth-child(" + i + ")");
-            var propView = pref.find(".variation a[value='" + prop + "']");
-            var extra = propView.data("extra");
-            var variation = propView.closest("[data-layer='1'].variation").find("a").first();
+            var prop = pref.find(".variation a[value='" + prop + "']");
+            var extra = prop.data("extra");
+            var variation = prop.closest("[data-layer='1'].variation").find("a").first();
             if(variation.length){
               variation.attr("value", prop);
               variation.text(prop + " + $" + extra);

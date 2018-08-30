@@ -253,14 +253,14 @@
                           </button>
                           <div class="dropdown-menu text-center" aria-labelledby="dLabel">
                             <div class="dropdown dropdown-submenu" data-layer="0">
-                              <a class="dropdown-toggle dropdown-item" tabindex="0" data-toggle="dropdown"><%= __('the')%>1<%= __('fen')%></a>
+                              <a class="dropdown-toggle dropdown-item" tabindex="0" data-toggle="dropdown" data-selected="true"><%= __('the')%>1<%= __('fen')%></a>
                               <div class="dropdown-menu">
                                 <% Object.keys(dish.preference).forEach(function(key){%>
                                 <div class="dropdown variation" data-layer="1">
                                   <a class="dropdown-toggle dropdown-item dropdown-submenu" tabindex="0" data-toggle="dropdown" data-dish=<%= dish.id%> data-variation=<%= key%> data-selected="true"><%= __(key)%></a>
                                   <div class="dropdown-menu">
                                     <% var options = dish.preference[key]; options.forEach(function(option){%>
-                                    <a class="dropdown-item" tabindex="0" value="<%= option.property%>" data-extra="<%= option.extra%>" href="javascript:void(0);"><%= option.property%> +$<%= option.extra%></a>
+                                    <a class="dropdown-item" tabindex="0"><span value="<%= option.property%>" data-extra="<%= option.extra%>" href="javascript:void(0);"><%= option.property%> +$<%= option.extra%></span></a>
                                     <%});%>
                                   </div>
                                 </div>
@@ -275,7 +275,13 @@
 
                   </div>
                 </div>
+
+                <h1></h1>
               </div>
+              <h1></h1>
+
+              <h1></h1>
+
               <!--<ul class="nav nav-tabs" data-toggle="tabs">-->
               <!--<li class="active"><a href="#review<%= i%>" data-toggle="tab" class="text-red"><%= __('user-review')%></a></li>-->
               <!--&lt;!&ndash;<li><a href="#host<%= i%>" data-toggle="tab" class="text-red"><%= __('host-review')%></a></li>&ndash;&gt;-->
