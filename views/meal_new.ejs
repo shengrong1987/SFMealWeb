@@ -1,21 +1,19 @@
 
 <div>
-  <div class="row">
-    <div class="pure-banner green">
-      <div class="middle banner-text py-3">
-        <div class="row vertical-align">
-          <div class="col-lg-2"></div>
-          <div class="col-5 col-lg-3">
-            <img src="/images/welcome-1.png" style="width: 100%;">
-          </div>
-          <div class="col-2 col-lg-2">
-            <a href="/" class="logo-slogan"></a>
-          </div>
-          <div class="col-5 col-lg-3">
-            <img src="/images/welcome-2.png" style="width: 100%;">
-          </div>
-          <div class="col-lg-2"></div>
+  <div class="pure-banner green">
+    <div class="middle banner-text py-3">
+      <div class="row vertical-align">
+        <div class="col-lg-2"></div>
+        <div class="col-5 col-lg-3">
+          <img src="/images/welcome-1.png" style="width: 100%;">
         </div>
+        <div class="col-2 col-lg-2">
+          <a href="/" class="logo-slogan"></a>
+        </div>
+        <div class="col-5 col-lg-3">
+          <img src="/images/welcome-2.png" style="width: 100%;">
+        </div>
+        <div class="col-lg-2"></div>
       </div>
     </div>
   </div>
@@ -30,8 +28,8 @@
 
     <div class="tab-content">
       <div class="tab-pane active">
-        <div id="mealCreatingView">
-          <div class="box box-shadow box-primary white text-left">
+        <div id="mealCreatingView" class="middle pb-4">
+          <div class="box box-shadow white text-left p-4">
             <h4 class="text-green"><%= __('new-meal')%></h4>
             <h1></h1>
             <form class="form-horizontal" data-host-id="<%= host.id%>" data-err-container=".submit" data-toggle="validator">
@@ -42,17 +40,17 @@
                     <label for="dishList"><strong>1.<%= __('add-to-meal')%></strong><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
                     <ul id="dishList" class="border-lightgrey selectable-list">
                       <% dishes.forEach(function(dish){%>
-                      <li data-id="<%= dish.id%>"><a name="title"><%= dish.title%><i class="fa fa-ticket"></i></a></li>
+                      <li data-id="<%= dish.id%>"><a name="title"><%= dish.title%><i class="fas fa-check"></i></a></li>
                       <%});%>
                     </ul>
                   </div>
 
                   <div class="col-md-7">
-                    <div class="row">
-                      <div class="col-md-2 vertical-align" style="height: 120px;">
-                        <i class="fa fa-arrow-circle-o-right fa-4x"></i>
+                    <div class="d-flex justify-content-around">
+                      <div class="vertical-align d-none d-md-flex mr-4">
+                        <i class="fal fa-arrow-right fa-2x"></i>
                       </div>
-                      <div class="col-md-10">
+                      <div>
                         <div>
                           <%= __('meals-dishes')%>
                           <i class="fa fa-star text-yellow" data-toggle="tooltip" title=<%= __('main-dish-tip')%>></i><%= __('as-main-dishes')%>,
@@ -137,8 +135,8 @@
                                 </div>
                                 <input type='text' class="form-control" readonly="true"/>
                                 <div class="input-group-append">
-                                    <span class="input-group-text">
-                                        <i class="fa fa-calendar"></i>
+                                    <span class="input-group-text datepickerbutton">
+                                        <i class="fa fa-clock"></i>
                                       </span>
                                 </div>
                               </div>
@@ -152,8 +150,8 @@
                                 </div>
                                 <input type='text' class="form-control" readonly="true"/>
                                 <div class="input-group-append">
-                                    <span class="input-group-text">
-                                        <i class="fa fa-calendar"></i>
+                                    <span class="input-group-text datepickerbutton">
+                                        <i class="fa fa-clock"></i>
                                       </span>
                                 </div>
                               </div>
@@ -182,8 +180,8 @@
                                     </span>
                                       <input type='text' class="form-control" readonly="true"/>
                                       <div class="input-group-append">
-                                      <span class="input-group-text">
-                                        <i class="fa fa-calendar"></i>
+                                      <span class="input-group-text datepickerbutton">
+                                        <i class="fa fa-clock"></i>
                                       </span>
                                       </div>
                                     </div>
@@ -198,7 +196,9 @@
                                       </div>
                                       <input type='text' class="form-control" readonly="true"/>
                                       <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                        <span class="input-group-text datepickerbutton">
+                                          <i class="fa fa-clock"></i>
+                                        </span>
                                       </div>
                                     </div>
                                   </div>

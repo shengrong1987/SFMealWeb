@@ -1,21 +1,19 @@
 
 <div>
-  <div class="row">
-    <div class="pure-banner green">
-      <div class="middle banner-text py-3">
-        <div class="row vertical-align">
-          <div class="col-lg-2"></div>
-          <div class="col-5 col-lg-3">
-            <img src="/images/welcome-1.png" style="width: 100%;">
-          </div>
-          <div class="col-2 col-lg-2">
-            <a href="/" class="logo-slogan"></a>
-          </div>
-          <div class="col-5 col-lg-3">
-            <img src="/images/welcome-2.png" style="width: 100%;">
-          </div>
-          <div class="col-lg-2"></div>
+  <div class="pure-banner green">
+    <div class="middle banner-text py-3">
+      <div class="row vertical-align">
+        <div class="col-lg-2"></div>
+        <div class="col-5 col-lg-3">
+          <img src="/images/welcome-1.png" style="width: 100%;">
         </div>
+        <div class="col-2 col-lg-2">
+          <a href="/" class="logo-slogan"></a>
+        </div>
+        <div class="col-5 col-lg-3">
+          <img src="/images/welcome-2.png" style="width: 100%;">
+        </div>
+        <div class="col-lg-2"></div>
       </div>
     </div>
   </div>
@@ -30,8 +28,8 @@
 
     <div class="tab-content">
       <div class="tab-pane active">
-        <div id="mealEditingView">
-          <div class="box box-shadow box-primary white text-left">
+        <div id="mealEditingView" class="middle pb-4">
+          <div class="box box-shadow white text-left p-4">
             <form class="form-horizontal" data-meal-id="<%= meal.id%>" data-id="<%= meal.userId%>" data-host-id="<%= meal.chef.id%>" data-err-container=".submit" data-toggle="validator">
 
               <div class="form-group">
@@ -48,19 +46,19 @@
                           }
                         });
                       if(hasDish){%>
-                      <li class="select" data-id="<%= dish.id%>"><a class="text-white" name="title"><%= dish.title%><i class="fa fa-ticket"></i></a></li>
+                      <li class="select" data-id="<%= dish.id%>"><a class="text-white" name="title"><%= dish.title%><i class="fas fa-check"></i></a></li>
                       <%}else{%>
-                      <li data-id="<%= dish.id%>"><a class="text-green" name="title"><%= dish.title%><i class="fa fa-ticket"></i></a></li>
+                      <li data-id="<%= dish.id%>"><a class="text-green" name="title"><%= dish.title%><i class="fas fa-check"></i></a></li>
                       <%}});%>
                     </ul>
                   </div>
 
                   <div class="col-md-7">
-                    <div class="row">
-                      <div class="col-md-2 vertical-align" style="height: 120px;">
-                        <i class="fa fa-arrow-circle-o-right fa-4x"></i>
+                    <div class="d-flex justify-content-around">
+                      <div class="vertical-align d-none d-md-flex mr-4">
+                        <i class="fal fa-arrow-right fa-2x"></i>
                       </div>
-                      <div class="col-md-10">
+                      <div>
                         <div>
                           <label>
                             <%= __('meals-dishes')%>
@@ -86,8 +84,13 @@
                             if(dish.id == cover){ hasCover = true;}
                             if(features.indexOf(dish.id)>-1){ hasFeatures = true; }
                           %>
-                          <li class="row" data-toggle="manipulate-item" data-meal-id="<%= meal.id || ''%>" data-id="<%= dish.id || ''%>" data-cover="<%= hasCover%>" data-feature="<%= hasFeatures%>" data-fire="<%= hasDynamicDish%>">
-                            <div class="col-6">
+                          <li class="d-flex justify-content-around vertical-align" data-toggle="manipulate-item" data-meal-id="<%= meal.id || ''%>" data-id="<%= dish.id || ''%>" data-cover="<%= hasCover%>" data-feature="<%= hasFeatures%>" data-fire="<%= hasDynamicDish%>">
+                            <div>
+                              <button class="close select" data-id="<%= dish.id%>" data-type="close" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="flex-grow-1 w-100">
                               &nbsp;
                               <i class="manipulate-button fa fa-star <%= (features && features.indexOf(dish.id)!=-1)?'text-yellow':'text-grey'%> cursor-pointer" data-type="feature"></i>
                               <% if(dish.isDynamicPriceOn){%><i class="manipulate-button fa fa-fire <%= hasDynamicDish ?'text-yellow' : 'text-grey'%>  cursor-pointer" data-type="fire"></i>
@@ -95,13 +98,10 @@
                               <i class="manipulate-button fa fa-camera <%= (cover && cover==dish.id)?'text-yellow' : 'text-grey'%>  cursor-pointer" data-type="cover"></i>
                               <label name="title"><%= dish.title%></label>
                             </div>
-                            <div class="col-1">
-                              <i class="fa fa-close cursor-pointer select" data-id="<%= dish.id%>" data-type="close" style="margin-left:10px;"></i>
-                            </div>
-                            <div class="col-4 vertical-align" style="height:52px;padding-top: -10px;">
+                            <div>
                               <div class="input-group amount-input" data-toggle="amount-input">
                                 <div class="input-group-prepend minus"><span class="input-group-text">-</span></div>
-                                <input class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" value="<%= quantity%>" style="min-width: 75px;">
+                                <input class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" value="<%= quantity%>">
                                 <div class="input-group-append add"><span class="input-group-text">+</span></div>
                               </div>
                             </div>
@@ -127,7 +127,7 @@
                       <input type="radio" id="radio-preorder" name="radio-set-1" class="regular-radio" <%= meal.type=="preorder" ? "checked=''" : ''%>><label for="radio-preorder"></label><span style="margin-left: 10px;"><%= __('meal-type-preorder')%></span>
                     </label>
                   </div>
-                  <div class="tab-content">
+                  <div class="tab-content middle">
                     <div id="order" class="tab-pane middle">
                       <div class="mt-3">
                         <label><%= __('from')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
@@ -137,7 +137,7 @@
                               <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= meal.provideFromTime%>">
                                 <input type='text' class="form-control" readonly="true"/>
                                 <div class="input-group-prepend">
-                                  <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                  <span class="input-group-text datepickerbutton"><i class="far fa-clock"></i></span>
                                 </div>
                               </div>
                             </div>
@@ -147,7 +147,7 @@
                               <div class='input-group date' data-toggle="dateTimePicker" data-date="<%= meal.provideTillTime%>">
                                 <input type='text' class="form-control" readonly="true"/>
                                 <div class="input-group-prepend">
-                                  <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                  <span class="input-group-text datepickerbutton"><i class="far fa-clock"></i></span>
                                 </div>
                               </div>
                             </div>
@@ -157,7 +157,7 @@
                       <div class="alert alert-danger" data-toggle="alert"></div>
                     </div>
 
-                    <div id="preorder" class="tab-pane">
+                    <div id="preorder" class="tab-pane middle">
                       <div class="mt-3">
                         <label><%= __('book-time')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
                         <div class="row">
@@ -169,7 +169,7 @@
                                 </div>
                                 <input type='text' class="form-control" readonly="true"/>
                                 <div class="input-group-append">
-                                  <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                  <span class="input-group-text datepickerbutton"><i class="far fa-clock"></i></span>
                                 </div>
                               </div>
                             </div>
@@ -182,7 +182,7 @@
                                 </div>
                                 <input type='text' class="form-control" readonly="true"/>
                                 <div class="input-group-append">
-                                  <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                  <span class="input-group-text datepickerbutton"><i class="far fa-clock"></i></span>
                                 </div>
                               </div>
                             </div>
@@ -213,8 +213,8 @@
                                     </span>
                                       <input type='text' class="form-control" readonly="true"/>
                                       <div class="input-group-append">
-                                      <span class="input-group-text">
-                                        <i class="fa fa-calendar"></i>
+                                      <span class="input-group-text datepickerbutton">
+                                        <i class="far fa-clock"></i>
                                       </span>
                                       </div>
                                     </div>
@@ -229,8 +229,8 @@
                                     </span>
                                       <input type='text' class="form-control" readonly="true"/>
                                       <div class="input-group-append">
-                                      <span class="input-group-text">
-                                        <i class="fa fa-calendar"></i>
+                                      <span class="input-group-text datepickerbutton">
+                                        <i class="far fa-clock"></i>
                                       </span>
                                       </div>
                                     </div>
@@ -311,7 +311,7 @@
                                       <input type='text' class="form-control" readonly="true"/>
                                       <div class="input-group-append">
                                       <span class="input-group-text">
-                                        <i class="fa fa-calendar"></i>
+                                        <i class="fa fa-clock datepickerbutton"></i>
                                       </span>
                                       </div>
                                     </div>
@@ -326,7 +326,7 @@
                                       </div>
                                       <input type='text' class="form-control" readonly="true"/>
                                       <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                        <span class="input-group-text"><i class="fa fa-clock datepickerbutton"></i></span>
                                       </div>
                                     </div>
                                   </div>

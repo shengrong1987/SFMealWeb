@@ -1060,19 +1060,19 @@
     var mealId = this.options.mealid || '';
     var isCoverClass = isCover ? "text-yellow" : "text-grey";
     if(isAppend){
-      var li = '<li class="row" data-toggle="manipulate-item" data-meal-id="' + mealId + '" data-id="' + dishId + '" data-cover=' + isCover + '>' +
-      '<div class="col-6">&nbsp;&nbsp;' +
+      var li = '<li class="d-flex justify-content-around vertical-align" data-toggle="manipulate-item" data-meal-id="' + mealId + '" data-id="' + dishId + '" data-cover=' + isCover + '>' +
+        '<div><button class="close cursor-pointer select" data-id="' + dishId + '" data-type="close" style="margin-left:10px;"><span aria-hidden="true">&times;</span></button></div>' +
+        '<div class="w-100 flex-grow-1">&nbsp;&nbsp;' +
         '<i data-type="feature" class="manipulate-button fa fa-star text-grey cursor-pointer"></i>&nbsp;' +
         '<i data-type="fire" class="manipulate-button fa fa-fire text-grey cursor-pointer"></i>&nbsp;' +
         '<i data-type="cover" class="manipulate-button fa fa-camera cursor-pointer ' + isCoverClass + '"></i>&nbsp;' +
         '<label name="title">' + content + '</label>' +
         '</div>' +
-        '<div class="col-1"><i class="fa fa-close cursor-pointer select" data-id="' + dishId + '" data-type="close" style="margin-left:10px;"></i></div>' +
-        '<div class="col-4 vertical-align" style="height:52px;padding-top: -10px;"> ' +
+        '<div class="vertical-align"> ' +
         '<div class="input-group amount-input" data-toggle="amount-input"> ' +
         '<div class="input-group-prepend minus"><span class="input-group-text">-</span></div> ' +
-        '<input class="form-control" type="number" placeholder="1" value="1" style="min-width: 75px;">' +
-        '<div class="input-group-append add"><span class="input-group-text">+</span></div> </div> </div><div class="col-3"></div>' +
+        '<input class="form-control" type="number" placeholder="1" value="1" style="min-width:50px;">' +
+        '<div class="input-group-append add"><span class="input-group-text">+</span></div> </div> </div>' +
         ' </li>';
       $.when(selectedDishContainer.append(li)).done(function(){
         selectedDishContainer.find("[data-type='close']").on('click', selectHandler);

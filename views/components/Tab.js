@@ -53,9 +53,9 @@ var Tab = createReactClass({
   render: function () {
     var tabs = this.props.cols.map(function (tab, i) {
         if(tab === this.state.tab){
-          return (<li className="active" key={i} onClick={this._onSelect}><a href={"#"+tab} data-toggle="tab">{tab}</a></li>);
+          return (<li className="nav-item" onClick={this._onSelect} data-value={tab} key={i}><a className="nav-link active" href={"#"+tab}>{tab}</a></li>);
         }else{
-          return (<li onClick={this._onSelect} key={i}><a href={"#"+tab} data-toggle="tab">{tab}</a></li>);
+          return (<li className="nav-item" onClick={this._onSelect} data-value={tab} key={i}><a className="nav-link" href={"#"+tab}>{tab}</a></li>);
         }
     }, this);
 

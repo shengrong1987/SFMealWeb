@@ -24,7 +24,7 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      Host.findOne(hostId).populate("dishes",{ sort: 'createdAt DESC' }).populate("meals",{ sort: 'createdAt DESC' }).populate('orders',{ sort: 'createdAt DESC' }).exec(function(err,host){
+      Host.findOne(hostId).populate("dishes",{ sort: 'createdAt DESC' }).populate("meals",{ sort: 'createdAt DESC' }).populate('orders').exec(function(err,host){
         if(err){
           return res.badRequest(err);
         }
@@ -34,33 +34,50 @@ module.exports = {
             return res.badRequest(err);
           }
           //construct orders for host
-          var fullOrders = [];
-          async.each(host.orders,function(order, next){
-            Order.findOne(order.id).populate("meal").populate('customer').populate("host").exec(function(err, o){
-              if(err){
-                return next(err);
-              }
-              fullOrders.push(o);
-              next();
-            });
-          },function(err){
-            if(err){
-              return res.badRequest(err);
-            }
-            host.host_orders = fullOrders;
-            host.host_dishes = host.dishes;
-            Notification.destroy({host : hostId}).exec(function(err){
-              if(err){
-                console.log(err);
-              }
-            });
-            var u = user[0];
-            u.host = host;
-            if(req.wantsJSON && process.env.NODE_ENV === "development"){
-              return res.ok(u);
-            }
-            return res.view('host',{user: u});
+          host.host_orders = host.orders.map(function(o){
+            var meal = host.meals.filter(function(m){
+              return m.id === o.meal;
+            })[0];
+            o.serviceFee = meal.serviceFee;
+            return o;
           });
+          host.host_orders = host.host_orders.sort(function(a,b){
+            return new Date(b.pickupInfo.pickupTillTime).getTime() - new Date(a.pickupInfo.pickupTillTime).getTime();
+          })
+          host.host_dishes = host.dishes;
+          var u = user[0];
+          u.host = host;
+          if(req.wantsJSON && process.env.NODE_ENV === "development"){
+            return res.ok(u);
+          }
+          return res.view('host',{user: u});
+        //   var fullOrders = [];
+        //   async.each(host.orders,function(order, next){
+        //     Order.findOne(order.id).populate("meal").populate('customer').populate("host").exec(function(err, o){
+        //       if(err){
+        //         return next(err);
+        //       }
+        //       fullOrders.push(o);
+        //       next();
+        //     });
+        //   },function(err){
+        //     if(err){
+        //       return res.badRequest(err);
+        //     }
+        //     host.host_orders = fullOrders;
+        //     host.host_dishes = host.dishes;
+        //     Notification.destroy({host : hostId}).exec(function(err){
+        //       if(err){
+        //         console.log(err);
+        //       }
+        //     });
+        //     var u = user[0];
+        //     u.host = host;
+        //     if(req.wantsJSON && process.env.NODE_ENV === "development"){
+        //       return res.ok(u);
+        //     }
+        //     return res.view('host',{user: u});
+        //   });
         })
       });
     });

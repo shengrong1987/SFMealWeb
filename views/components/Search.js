@@ -71,7 +71,7 @@ var Search = createReactClass({
     var divStyle = {
       width : '100%'
     }, criterias = this.props.criteria.map(function(c, i){
-      return (<label key={i} className="radio-inline"><input type="radio" name="criteriaOpt" value={c}/>{c}</label>);
+      return (<div className="form-check form-check-inline"><input className="form-check-input" type="radio" name="criteriaOpt" value={c}/><label key={i} className="form-check-label">{c}</label></div>);
     }, this);
     var buttonStyle = {
       marginLeft: 5 + 'px'
@@ -80,10 +80,10 @@ var Search = createReactClass({
     return (
       <div className="box">
         <div className="input-group row vertical-align">
-          <div className="col-xs-10">
+          <div className="col-10">
             <input id="searchInput" className="input btn-lg btn-outline-blue round text-grey" style={divStyle} type="search"/>
           </div>
-          <div className="col-xs-2">
+          <div className="col-2">
             <div>
               <button className="btn btn-info" onClick={this._onSearch} style={buttonStyle}>Search</button>
             </div>
@@ -96,7 +96,7 @@ var Search = createReactClass({
           </div>
         </div>
         <div className="row">
-          <div className="col-xs-12">
+          <div className="col-12">
             {criterias}
           </div>
         </div>

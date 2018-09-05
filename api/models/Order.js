@@ -144,7 +144,7 @@ module.exports = {
     getTaxRate : function(){
       if(this.meal && this.meal.isTaxIncluded){
         return 0;
-      }else if(!this.meal){
+      }else if(!this.meal || !this.meal.id){
         return this.tax;
       }
       return util.getTaxRate(this.host.county);

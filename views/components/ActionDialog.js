@@ -7,17 +7,21 @@ var React = require('react'),
   PropTypes = require('prop-types'),
   createReactClass = require('create-react-class'),
   ReactDOM = require('react-dom'),
-  Modal = require('react-bootstrap').Modal,
-  Alert = require('react-bootstrap').Alert,
-  Button = require('react-bootstrap').Button,
-  ControlLabel = require('react-bootstrap').ControlLabel,
-  Col = require('react-bootstrap').Col,
-  Form = require('react-bootstrap').Form,
-  FormGroup = require('react-bootstrap').FormGroup,
-  InputGroup = require('react-bootstrap').InputGroup,
-  DropdownButton = require('react-bootstrap').DropdownButton,
-  FormControl = require('react-bootstrap').FormControl,
-  MenuItem = require('react-bootstrap').MenuItem,
+  Modal = require('reactstrap').Modal,
+  ModalHeader = require('reactstrap').ModalHeader,
+  ModalBody = require('reactstrap').ModalBody,
+  ModalFooter = require('reactstrap').ModalFooter,
+  Alert = require('reactstrap').Alert,
+  Button = require('reactstrap').Button,
+  ControlLabel = require('reactstrap').ControlLabel,
+  Col = require('reactstrap').Col,
+  Form = require('reactstrap').Form,
+  Input = require('reactstrap').Input,
+  FormGroup = require('reactstrap').FormGroup,
+  InputGroup = require('reactstrap').InputGroup,
+  DropdownButton = require('reactstrap').DropdownButton,
+  FormControl = require('reactstrap').FormControl,
+  MenuItem = require('reactstrap').MenuItem,
   SFMealAPI =  require('../helpers/SFMealAPI'),
   ActionCreators = require('../actions/ActionCreators'),
   SearchStore = require('../stores/SearchStore'),
@@ -169,22 +173,21 @@ var ActionDialog = createReactClass({
   renderView : function(view){
     return (
       <div className="modal-container">
-      <Modal id="modalView" show={this.state.modalVisible}>
-        <Modal.Header closeButton onClick={this._onClose}>
-        <Modal.Title >{this.props.title}</Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body>
-          <Form horizontal>
-            {view}
-          </Form>
-          </Modal.Body>
-          <Modal.Footer>
-          <Alert bsStyle="danger">{this.state.msgData ? this.state.msgData.errMsg : ""}</Alert>
-        <button className="btn btn-info" type="button" onClick={this._onSubmit}>Save</button>
-        <button className="btn btn-default close" onClick={this._onClose}>Close</button>
-        </Modal.Footer>
-      </Modal>
+        <Modal id="modalView" isOpen={this.state.modalVisible}>
+          <ModalHeader toggle={this._onClose}>
+            {this.props.title}
+          </ModalHeader>
+          <ModalBody>
+            <Form horizontal>
+              {view}
+            </Form>
+          </ModalBody>
+          <ModalFooter>
+            <Alert color="danger">{this.state.msgData ? this.state.msgData.errMsg : ""}</Alert>
+            <button className="btn btn-info" type="button" onClick={this._onSubmit}>Save</button>
+            <button className="btn btn-default close" onClick={this._onClose}>Close</button>
+          </ModalFooter>
+        </Modal>
       </div>
     );
   },
@@ -233,7 +236,7 @@ var ActionDialog = createReactClass({
         inputControl = (<select name={key} value={value} onChange={this._inputOnChange}>{optionsView}</select>)
         break;
       default:
-        inputControl = <FormControl name={key} type={valueObj["type"]} value={value||defaultValue} readOnly={readonly?'readonly':''} onChange={this._inputOnChange}/>;
+        inputControl = <Input name={key} type={valueObj["type"]} value={value||defaultValue} readOnly={readonly?'readonly':''} onChange={this._inputOnChange}/>;
     }
     return inputControl;
   },
