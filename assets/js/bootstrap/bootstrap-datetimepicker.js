@@ -1064,8 +1064,8 @@
                 togglePicker: function (e) {
                     var $this = $(e.target),
                         $parent = $this.closest('ul'),
-                        expanded = $parent.find('.in'),
-                        closed = $parent.find('.collapse:not(.in)'),
+                        expanded = $parent.find('.show'),
+                        closed = $parent.find('.collapse:not(.show)'),
                         collapseData;
 
                     if (expanded && expanded.length) {
