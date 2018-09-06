@@ -1930,9 +1930,9 @@ var DishView = Backbone.View.extend({
   },
   addCustomInput : function(){
     var container = this.$el.find(".variation .customVar");
-    var section = '<div class="row vertical-align"><div class="col-sm-3 col-xs-5">'
-    +  '<input name="variation" class="form-control" type="text" placeholder="Property name" required></div> <div class="col-sm-2 col-xs-5">'
-    +  '<button class="btn btn-default btn-outline continue" data-toggle="i18n" data-key="continueBtn"></button> </div> <div class="col-sm-1 col-xs-2">'
+    var section = '<div class="row vertical-align"><div class="col-sm-3 col-5">'
+    +  '<input name="variation" class="form-control" type="text" placeholder="Property name" required></div> <div class="col-sm-2 col-5">'
+    +  '<button class="btn btn-default btn-outline continue" data-toggle="i18n" data-key="continueBtn"></button> </div> <div class="col-sm-1 col-2">'
     +  '<a class="reset" href="javascript:void(0)" data-toggle="i18n" data-key="resetBtn"></a> </div> </div>';
     container.append(section);
   },
@@ -1962,25 +1962,25 @@ var DishView = Backbone.View.extend({
       "wellness" : ['rare','mediumRare','medium','mediumWell', 'wellDone']
     };
     var container = this.$el.find(".variation .currentVar");
-    var section = '<div class="row option" data-value="' + variation + '"> <div class="col-xs-3">'
+    var section = '<div class="row option" data-value="' + variation + '"> <div class="col-3">'
       + '<h3>' + text + '</h3>'
       + '<a class="deleteBtn" href="javascript:void(0);" data-value="' + variation + '" data-toggle="i18n" data-key="deleteBtn"></a>'
-      + '</div> <div class="col-xs-9"><table class="table table-bordered"> <thead>'
+      + '</div> <div class="col-9"><table class="table table-bordered"> <thead>'
       + '<tr class="active"> <td data-toggle="i18n" data-key="property"></td> <td data-toggle="i18n" data-key="extra"></td> <td data-toggle="i18n" data-key="action"></td> </tr> </thead>'
       + '<tbody> <tr> <td> <div class="dropdown">'
       + '<a class="btn btn-default btn-outline dropdown-toggle property" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="">'
       + '<span data-toggle="i18n" data-key="addVariation"></span> <span class="caret"></span> </a>'
-      + '<ul class="dropdown-menu" aria-labelledby="dLabel">'
-      + '</ul> </div> </td> <td><input name="extra" class="form-control" type="number" value="0"></td><td></td> </tr> </tbody> </table> </div> </div>';
+      + '<div class="dropdown-menu" aria-labelledby="dLabel">'
+      + '</div> </div> </td> <td><input name="extra" class="form-control" type="number" value="0"></td><td></td> </tr> </tbody> </table> </div> </div>';
     container.append(section);
     var dropDownMenu = container.find(".option[data-value='" + variation + "'] .dropdown-menu");
     if(varSets[variation] && varSets[variation].length > 0 ){
       varSets[variation].forEach(function(option){
-        dropDownMenu.append('<li><a href="javascript:void(0);" data-toggle="i18n" data-key="' + option + '" value="' + option + '"></a></li>');
+        dropDownMenu.append('<a class="dropdown-item" href="javascript:void(0);" data-toggle="i18n" data-key="' + option + '" value="' + option + '"></a>');
       });
-      dropDownMenu.append('<li class="disabled"><a data-toggle="i18n" data-key="noOption"></a></li>');
+      dropDownMenu.append('<a class="dropdown-item disabled" href="javascript:void(0);" data-toggle="i18n" data-key="noOption"></a>');
     }
-    dropDownMenu.append('<li><a href="javascript:void(0);" data-toggle="i18n" data-key="customizedOption" value="custom"></a></li>');
+    dropDownMenu.append('<a class="dropdown-item" href="javascript:void(0);" data-toggle="i18n" data-key="customizedOption" value="custom"></a>');
   },
   removeProperty : function(e){
     var target = $(e.currentTarget).closest(".option");
