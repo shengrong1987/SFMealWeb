@@ -2826,7 +2826,6 @@ var MealConfirmView = Backbone.View.extend({
     "change #method" : "switchMethod",
     "click #createNewContactBtn" : "createNewContact",
     "click #createNewContactBtn2" : "createNewContact",
-    "click #addCommentBtn" : "toggleCommentView",
     "keydown" : "onKeyDown",
     "click #verifyAddressBtn" : "verifyAddress",
     "change #payment-cards" : "switchPaymentMethod",
@@ -2837,7 +2836,6 @@ var MealConfirmView = Backbone.View.extend({
     this.alertView.removeClass("d-none").hide();
     this.isCoolDown = true;
     utility.initGoogleMapService();
-    this.$el.find("#commentView").removeClass('d-none').hide();
     this.$el.find(".deliveryInput").removeClass('d-none').hide();
   },
   enterBillingAddress : function(e){
@@ -2960,10 +2958,6 @@ var MealConfirmView = Backbone.View.extend({
     }else{
       toggleModal(e, addressView.enterAddressInfoFromOrder);
     }
-  },
-  toggleCommentView : function(e){
-    e.preventDefault();
-    this.$el.find("#commentView").toggle();
   },
   switchMethod : function(e){
     var isLogin = !!this.$el.data("user");
@@ -3491,7 +3485,7 @@ var OrderView = Backbone.View.extend({
   },
   getCustomizedInfo : function(partyMode, cb){
     if(!partyMode){
-      return cb({ comment : this.$el.find("#commentView [name='comment']").val()});
+      return cb({ comment : this.$el.find("#pickupInfoView [name='comment']").val()});
     }
     var customerInfo = {};
     var customDate = this.$el.find(".customDeliveryDate").data("DateTimePicker");
@@ -3504,7 +3498,7 @@ var OrderView = Backbone.View.extend({
     }
     // var comment = this.$el.find("#commentView [name='comment']").val();
     customerInfo.time = customDate;
-    customerInfo.comment = this.$el.find("#commentView [name='comment']").val();
+    customerInfo.comment = this.$el.find("#pickupInfoView [name='comment']").val();
     return cb(customerInfo);
   },
   getPaymentInfo : function(isLogin, cb){

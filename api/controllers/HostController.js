@@ -45,6 +45,11 @@ module.exports = {
             return new Date(b.pickupInfo.pickupTillTime).getTime() - new Date(a.pickupInfo.pickupTillTime).getTime();
           })
           host.host_dishes = host.dishes;
+          Notification.destroy({host : hostId}).exec(function(err){
+            if(err){
+              console.log(err);
+            }
+          });
           var u = user[0];
           u.host = host;
           if(req.wantsJSON && process.env.NODE_ENV === "development"){
