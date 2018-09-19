@@ -181,6 +181,11 @@ module.exports.policies = {
 
   AccountController : {
     '*' : 'isAdmin'
+  },
+
+  DriverController : {
+    '*' : 'isAdmin',
+    'find' : 'or(isAdmin, and(sessionAuth, isHost))'
   }
 
   /***************************************************************************

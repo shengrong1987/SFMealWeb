@@ -56,33 +56,6 @@ module.exports = {
             return res.ok(u);
           }
           return res.view('host',{user: u});
-        //   var fullOrders = [];
-        //   async.each(host.orders,function(order, next){
-        //     Order.findOne(order.id).populate("meal").populate('customer').populate("host").exec(function(err, o){
-        //       if(err){
-        //         return next(err);
-        //       }
-        //       fullOrders.push(o);
-        //       next();
-        //     });
-        //   },function(err){
-        //     if(err){
-        //       return res.badRequest(err);
-        //     }
-        //     host.host_orders = fullOrders;
-        //     host.host_dishes = host.dishes;
-        //     Notification.destroy({host : hostId}).exec(function(err){
-        //       if(err){
-        //         console.log(err);
-        //       }
-        //     });
-        //     var u = user[0];
-        //     u.host = host;
-        //     if(req.wantsJSON && process.env.NODE_ENV === "development"){
-        //       return res.ok(u);
-        //     }
-        //     return res.view('host',{user: u});
-        //   });
         })
       });
     });
@@ -233,7 +206,9 @@ module.exports = {
           host = host[0];
           async.auto({
             uploadDocument : function(cb){
-              req.file("image").upload(function(err, files){
+              req.file("image").upload({
+                dirname: require('path').resolve(sails.config.appPath, 'assets/images/uploads')
+              },function(err, files){
                 if(err){
                   return cb(err);
                 }

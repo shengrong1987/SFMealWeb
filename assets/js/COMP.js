@@ -131,11 +131,14 @@
 
   Tab.prototype.select = function(button){
     button.parents("ul").find(".nav-link").removeClass('active');
+    button.parents("ul").find(".nav-item").removeClass('active');
+    button.parent().addClass('active');
     button.addClass('active');
     var tabTarget = $(button.data("href"));
     var parent = tabTarget.siblings('.tab-pane').hide().removeClass('active');
     tabTarget.stop().fadeIn("fast").addClass('active');
     removeHash();
+    button.trigger('shown.bs.tab');
   }
 
   function Plugin(option, root){
@@ -847,15 +850,16 @@
   var BtnSet = function(element, options){
     this.element = element;
     this.options = options;
-    this.element.find("button").on("click",clickHandler);
-    this.element.find("button").removeClass("disabled");
+    this.element.children().off("click");
+    this.element.children().on("click",clickHandler);
+    this.element.children().removeClass("disabled");
   }
 
   $.fn.btnSet              = Plugin
   $.fn.btnSet.Constructor  = BtnSet
 
   BtnSet.prototype.switch = function(node){
-    this.element.find("button").each(function(){
+    this.element.children().each(function(){
       $(this).removeClass("active");
       $($(this).data("target")).removeClass("active");
     });
@@ -873,14 +877,14 @@
       if(!data){
         root.data('bs.btn-set',(data = new BtnSet(root, options)));
       }
-      if(typeof option == 'string'){
+      if(typeof option === 'string'){
         data[option]($(this));
       }
     });
   }
 
   var clickHandler = function(e){
-    //e.preventDefault();
+    e.preventDefault();
     Plugin.call($(this),'switch',$(this).parentsUntil('[data-toggle="btn-set"]').length > 0 ? $(this).parentsUntil('[data-toggle="btn-set"]').parent() : $(this).parent());
   }
 

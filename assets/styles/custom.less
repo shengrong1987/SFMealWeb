@@ -598,6 +598,11 @@ input:focus{
 .fa-heart:hover{
   color : red;
 }
+/* nav*/
+.nav-light > .active{
+  background-color: @white;
+  .border-bottom;
+}
 /*signup*/
 
 
@@ -1095,13 +1100,13 @@ label {
 }
 
 /*button*/
-.btn {
-  font-size: 14px;
-  text-transform: uppercase;
-  opacity: 1.0;
-  border : solid 1px transparent !important;
-  height: 35px;
-}
+//.btn {
+//  font-size: 14px;
+//  text-transform: uppercase;
+//  opacity: 1.0;
+//  border : solid 1px transparent;
+//  height: 35px;
+//}
 
 .btn-mixitup{
   padding: 6px 12px !important;
@@ -1573,10 +1578,6 @@ fieldset[disabled] .btn-red.active {
   padding: 15px;
 }
 
-#transaction_container .mix{
-  display : none;
-}
-
 select.form-control{
   height : 38px !important;
 }
@@ -1757,10 +1758,6 @@ select.form-control{
   }
 }
 
-#meal-container .mix{
-  display: none;
-}
-
 #meal-container{
   margin-bottom: 50px;
 }
@@ -1784,7 +1781,7 @@ select.form-control{
 
 .meal{
   .photo{
-    width: 100%;
+    width: 200px;
     //min-height: 200px;
     .cursor-pointer;
   }
@@ -1801,6 +1798,10 @@ select.form-control{
   }
   .fav:hover{
     color: @red !important;
+  }
+  .content{
+    .flex-grow-1;
+    max-width: 300px;
   }
 }
 
@@ -2657,6 +2658,11 @@ select.form-control{
     }
     .basic-info h3{
       text-align: center !important;
+    }
+    .content{
+      .flex-grow-1;
+      .ml-2;
+      max-width: 300px;
     }
   }
 

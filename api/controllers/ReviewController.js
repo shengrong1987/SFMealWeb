@@ -84,6 +84,7 @@ module.exports = {
           var dishId = r.dish;
           var score = r.score;
           var review = r.content;
+          sails.log.info("dishId: " + dishId, " score: " + score, " content: " + review);
           $this.reviewForDish(dishId, mealId, user, orders, score, review, function(err, results){
             if(err){
               return next(err);

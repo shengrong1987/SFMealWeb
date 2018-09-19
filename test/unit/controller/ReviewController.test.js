@@ -59,12 +59,16 @@ describe('ReviewController', function() {
     it('should get a meal ', function (done) {
       agent
           .get('/meal')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err,res){
             if(res.body.length === 0){
               return done(Error("error getting any meal"));
             }
-            var meal = res.body.meals.meals.orders.meals[0];
+            var meal = res.body.meals.filter(function(m){
+              return m.type === "order";
+            })[0];
             mealId = meal.id;
             dishId1 = meal.dishes[0].id;
             dishId2 = meal.dishes[1].id;
@@ -227,7 +231,7 @@ describe('ReviewController', function() {
         .post('/review')
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
-        .send({meal : mealId, reviews : JSON.stringify(reviews),user: guestId})
+        .send({meal : mealId, reviews : reviews,user: guestId})
         .expect(200, done)
     })
 

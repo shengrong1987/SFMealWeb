@@ -253,6 +253,14 @@ var ActionButton = createReactClass({
             }
           }
           break;
+        case "Driver":
+          if(action === "create"){
+            postData = {
+              driverName : { value : ""},
+              phone : { value : ""},
+              availability : { value : ""}
+            }
+          }
     }
     return postData;
   },
@@ -349,6 +357,13 @@ var ActionButton = createReactClass({
           break;
         case "Account":
           actions.push("charge","reject");
+          break;
+        case "Driver":
+          if(!rowData.hasOwnProperty("id")){
+            actions.push("create","delete");
+          }else{
+            actions.push("delete");
+          }
           break;
     }
     if(!this.props.detail){

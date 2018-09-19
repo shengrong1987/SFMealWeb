@@ -650,7 +650,7 @@ describe('MealController', function() {
             return done(err);
           }
           res.body.meals.should.have.property("meals");
-          res.body.meals.meals.should.not.have.property("orders");
+          res.body.meals.meals.should.not.have.property("today");
           res.body.meals.summary.preOrderCount.should.be.equal(0);
           done();
         })
@@ -1200,6 +1200,8 @@ describe('MealController', function() {
     it('should update the meal and appear in the search results of San Mateo County', function(done){
       agent
         .put('/meal/' + mealId + '/on')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
         .expect(200)
         .toPromise()
         .then(function(res){
@@ -1274,13 +1276,13 @@ describe('MealController', function() {
             res.body.meals.summary.orderCount.should.be.equal(1);
             res.body.meals.summary.preOrderCount.should.be.equal(1);
             res.body.meals.should.have.property("meals");
-            res.body.meals.meals.should.have.property("orders");
-            Object.keys(res.body.meals.meals).should.have.length(2);
+            res.body.meals.meals.should.have.property("today");
+            res.body.meals.meals.today.meals.should.have.length(2);
             done();
           })
     })
 
-    it('should search the meals in San Francisco with keyword,county and zipcode', function (done) {
+    it('should search the meals in San Francisco with keyword, county and zipcode', function (done) {
       agent
         .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County&zipcode=94124'))
         .set('Accept', 'application/json')
@@ -1290,8 +1292,8 @@ describe('MealController', function() {
           res.body.meals.summary.orderCount.should.be.equal(1);
           res.body.meals.summary.preOrderCount.should.be.equal(1);
           res.body.meals.should.have.property("meals");
-          res.body.meals.meals.should.have.property("orders");
-          Object.keys(res.body.meals.meals).should.have.length(2);
+          res.body.meals.meals.should.have.property("today");
+          res.body.meals.meals.today.meals.should.have.length(2);
           done();
         })
     })
@@ -1313,8 +1315,8 @@ describe('MealController', function() {
           res.body.meals.summary.orderCount.should.be.equal(1);
           res.body.meals.summary.preOrderCount.should.be.equal(0);
           res.body.meals.should.have.property("meals");
-          res.body.meals.meals.should.have.property("orders");
-          res.body.meals.meals["orders"].meals.should.have.length(1);
+          res.body.meals.meals.should.have.property("today");
+          res.body.meals.meals["today"].meals.should.have.length(1);
           done();
         })
     })

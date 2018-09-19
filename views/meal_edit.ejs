@@ -229,9 +229,9 @@
                                     </span>
                                       <input type='text' class="form-control" readonly="true"/>
                                       <div class="input-group-append">
-                                      <span class="input-group-text datepickerbutton">
-                                        <i class="far fa-clock"></i>
-                                      </span>
+                                        <span class="input-group-text datepickerbutton">
+                                          <i class="far fa-clock"></i>
+                                        </span>
                                       </div>
                                     </div>
                                   </div>
@@ -281,11 +281,36 @@
                                 </div>
                               </div>
 
-                              <div class="form-group phone">
-                                <label><%= __('phone')%></label>
-                                <input type="tel" class="form-control" value="<%= pickup.phone || meal.phone%>">
+                              <div class="row">
+                                <div class="col-12 col-sm-6">
+                                  <div class="form-group deliveryRange">
+                                    <label><%= __('delivery-range')%></label>
+                                    <input class="form-control" type="text" placeholder="5" value="<%= pickup.deliveryRange%>">
+                                  </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                  <div class="dropdown phone">
+                                    <label><%= __('driver')%></label>
+                                    <%
+                                      var driver = drivers.filter(function(d){
+                                        return d.phone.replace(/\D/g,"") == pickup.phone.replace(/\D/g,"");
+                                      });
+                                      if(driver && driver.length){
+                                        driver = driver[0];
+                                      }
+                                    %>
+                                    <button class="btn btn-secondary dropdown-toggle form-control" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="false" value="<%= driver ? driver.phone : ''%>">
+                                      <%= driver.phone ? (driver.driverName + "+" + driver.phone) : (__('driver')+"+"+pickup.phone)%>
+                                      <span class='caret'></span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                      <% drivers.forEach(function(driver){%>
+                                      <a class="dropdown-item" value="<%= driver.phone%>" href="javascript:void(0);"><%= driver.driverName%>+<%= driver.phone%></a>
+                                      <%});%>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
-
 
                             </div>
                           </div>
@@ -372,10 +397,29 @@
                                 </div>
                               </div>
 
-                              <div class="form-group phone">
-                                <label><%= __('phone')%></label>
-                                <input type="tel" class="form-control" value="<%= meal.chef.user.phone || ''%>">
+                              <div class="row">
+                                <div class="col-12 col-sm-6">
+                                  <div class="form-group deliveryRange">
+                                    <label><%= __('delivery-range')%></label>
+                                    <input class="form-control" type="text" placeholder="5">
+                                  </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                  <div class="dropdown phone">
+                                    <label><%= __('driver')%></label>
+                                    <button class="btn btn-secondary dropdown-toggle form-control" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="false" value="<%= driver ? driver.phone : ''%>">
+                                      <%= __('driver')%>
+                                      <span class='caret'></span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                      <% drivers.forEach(function(driver){%>
+                                      <a class="dropdown-item" value="<%= driver.phone%>" href="javascript:void(0);"><%= driver.driverName%>+<%= driver.phone%></a>
+                                      <%});%>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
+
                             </div>
                           </div>
                         </div>

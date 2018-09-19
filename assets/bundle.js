@@ -58843,7 +58843,6 @@ var ActionsCreators = {
   },
 
   getUsers: function (records) {
-
     AppDispatcher.handleServerAction({
       type: ActionTypes.GET_USERS,
       records: records
@@ -58997,6 +58996,20 @@ var ActionsCreators = {
   getAccounts: function (records) {
     AppDispatcher.handleServerAction({
       type: ActionTypes.GET_ACCOUNTS,
+      records: records
+    });
+  },
+
+  getDriver: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_DRIVER,
+      records: records
+    });
+  },
+
+  getDrivers: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_DRIVERS,
       records: records
     });
   },
@@ -59296,6 +59309,14 @@ var ActionButton = createReactClass({
             }
           }
           break;
+        case "Driver":
+          if(action === "create"){
+            postData = {
+              driverName : { value : ""},
+              phone : { value : ""},
+              availability : { value : ""}
+            }
+          }
     }
     return postData;
   },
@@ -59392,6 +59413,13 @@ var ActionButton = createReactClass({
           break;
         case "Account":
           actions.push("charge","reject");
+          break;
+        case "Driver":
+          if(!rowData.hasOwnProperty("id")){
+            actions.push("create","delete");
+          }else{
+            actions.push("delete");
+          }
           break;
     }
     if(!this.props.detail){
@@ -59729,7 +59757,7 @@ var ActionDialog = createReactClass({
 
 module.exports = ActionDialog;
 
-},{"../actions/ActionCreators":68,"../helpers/SFMealAPI":82,"../stores/SearchStore":94,"create-react-class":4,"lodash":19,"prop-types":24,"react":59,"react-dom":31,"reactstrap":67}],71:[function(require,module,exports){
+},{"../actions/ActionCreators":68,"../helpers/SFMealAPI":82,"../stores/SearchStore":95,"create-react-class":4,"lodash":19,"prop-types":24,"react":59,"react-dom":31,"reactstrap":67}],71:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -59750,7 +59778,7 @@ var AdminPanel = createReactClass({
   },
 
   render: function () {
-    var tabs = ['User', 'Host', 'Meal','Dish','Order','Transaction', 'Job', 'Checklist', 'Coupon', 'Email','Review','Account'];
+    var tabs = ['User', 'Host', 'Meal','Dish','Order','Transaction', 'Job', 'Checklist', 'Coupon', 'Email','Review','Account','Driver'];
 
     return (
       React.createElement("div", {className: "box"}, 
@@ -59947,7 +59975,7 @@ var Search = createReactClass({
 
 module.exports = Search;
 
-},{"../helpers/SFMealAPI":82,"../stores/SearchStore":94,"create-react-class":4,"prop-types":24,"react":59}],74:[function(require,module,exports){
+},{"../helpers/SFMealAPI":82,"../stores/SearchStore":95,"create-react-class":4,"prop-types":24,"react":59}],74:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -60024,7 +60052,7 @@ var Tab = createReactClass({
 
 module.exports = Tab;
 
-},{"../helpers/SFMealAPI":82,"../stores/TabStore":95,"create-react-class":4,"prop-types":24,"react":59}],75:[function(require,module,exports){
+},{"../helpers/SFMealAPI":82,"../stores/TabStore":96,"create-react-class":4,"prop-types":24,"react":59}],75:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -60046,6 +60074,7 @@ var React = require('react'),
   EmailStore = require('../stores/EmailStore'),
   ReviewStore = require('../stores/ReviewStore'),
   AccountStore = require('../stores/AccountStore'),
+  DriverStore = require('../stores/DriverStore'),
   TableItem = require('./TableItem');
 
 var Table = createReactClass({
@@ -60105,6 +60134,9 @@ var Table = createReactClass({
       case "Account":
         return {data : AccountStore.getAllAccounts(), detail : AccountStore.isShowDetail()};
         break;
+      case "Driver":
+        return {data: DriverStore.getAllDrivers(), detail : DriverStore.isShowDetail(), isCreate : DriverStore.isCreate()};
+        break;
     }
   },
 
@@ -60129,6 +60161,7 @@ var Table = createReactClass({
     EmailStore.addChangeListener(this._onChange);
     ReviewStore.addChangeListener(this._onChange);
     AccountStore.addChangeListener(this._onChange);
+    DriverStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount: function () {
@@ -60144,6 +60177,7 @@ var Table = createReactClass({
     EmailStore.removeChangeListener(this._onChange);
     ReviewStore.removeChangeListener(this._onChange);
     AccountStore.removeChangeListener(this._onChange);
+    DriverStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function () {
@@ -60203,7 +60237,7 @@ var Table = createReactClass({
 
 module.exports = Table;
 
-},{"../stores/AccountStore":84,"../stores/CheckListStore":85,"../stores/CouponStore":86,"../stores/DishStore":87,"../stores/EmailStore":88,"../stores/HostStore":89,"../stores/JobStore":90,"../stores/MealStore":91,"../stores/OrderStore":92,"../stores/ReviewStore":93,"../stores/TransactionStore":96,"../stores/UserStore":97,"./TableHeader":76,"./TableItem":77,"create-react-class":4,"prop-types":24,"react":59}],76:[function(require,module,exports){
+},{"../stores/AccountStore":84,"../stores/CheckListStore":85,"../stores/CouponStore":86,"../stores/DishStore":87,"../stores/DriverStore":88,"../stores/EmailStore":89,"../stores/HostStore":90,"../stores/JobStore":91,"../stores/MealStore":92,"../stores/OrderStore":93,"../stores/ReviewStore":94,"../stores/TransactionStore":97,"../stores/UserStore":98,"./TableHeader":76,"./TableItem":77,"create-react-class":4,"prop-types":24,"react":59}],76:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -60494,6 +60528,11 @@ var TablePanel = createReactClass({
         details = {id : 'Review ID', 'legal_entity.business_name' : 'business_name', email : 'email', 'legal_entity.verification' : 'verification', 'legal_entity.personal_id_number_provided' : 'id_provided', 'legal_entity.ssn_last_4_provided' : 'ssn_provided', 'legal_entity.address' : 'address', charges_enabled : 'charges_enabled', payouts_enabled : 'payouts_enabled', verification : 'verification', command : 'Command' };
         criterias = ['id', 'email', 'business_name'];
         break;
+      case "Driver":
+        headers = {id: 'Driver ID', driverName : 'driverName', phone: 'phone', availability : 'availability', command : 'Command'}
+        details = {id: 'Driver ID', driverName : 'driverName', phone: 'phone', availability : 'availability', command : 'Command'}
+        criterias = ['id', 'driverName', 'phone'];
+        break;
     }
 
     return (
@@ -60513,7 +60552,7 @@ var TablePanel = createReactClass({
 
 module.exports = TablePanel;
 
-},{"../stores/TabStore":95,"./Pagination":72,"./Search":73,"./Table":75,"create-react-class":4,"react":59}],79:[function(require,module,exports){
+},{"../stores/TabStore":96,"./Pagination":72,"./Search":73,"./Table":75,"create-react-class":4,"react":59}],79:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -60557,6 +60596,8 @@ module.exports = {
     GET_REVIEWS : "GET_REVIEWS",
     GET_ACCOUNT : "GET_ACCOUNT",
     GET_ACCOUNTS : "GET_ACCOUNTS",
+    GET_DRIVERS : "GET_DRIVERS",
+    GET_DRIVER : "GET_DRIVER",
     CREATE_VIEW : "CREATE_VIEW",
     TAB_CHANGE : "TAB_CHANGE",
     SEARCH_CHANGE : "SEARCH_CHANGE",
@@ -60942,6 +60983,35 @@ module.exports = {
     });
   },
 
+  getDriver : function(id){
+    $.ajax({
+      url: '/driver/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getAccount(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getDrivers : function(criteria, value, skip){
+    if(value) {
+      var url = "/driver?skip=" + skip + "&" + criteria + "=" + value;
+    }else{
+      url = "/driver?skip=" + skip;
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json'
+    }).done(function (data) {
+      ActionCreators.getDriver(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
   clean : function(model){
     var isValid;
     switch(model){
@@ -60986,6 +61056,9 @@ module.exports = {
           break;
         case "Account":
           ActionCreators.getAccounts(data);
+          break;
+        case "Driver":
+          ActionCreators.getDrivers(data);
           break;
       }
     }).fail(function(jqXHR, textStatus){
@@ -61105,6 +61178,13 @@ module.exports = {
               ActionCreators.getAccounts(data);
             }
             break;
+          case "Driver":
+            if(detail){
+              ActionCreators.getDriver(data);
+            }else{
+              ActionCreators.getDrivers(data);
+            }
+            break;
         }
       }
     }).fail(function(jqXHR, textStatus){
@@ -61121,6 +61201,7 @@ module.exports = {
     switch(model){
       case "Coupon":
       case "Email":
+      case "Driver":
         isValid = true;
         break;
     }
@@ -61210,6 +61291,13 @@ module.exports = {
           this.getAccount(content);
         }else{
           this.getAccounts(criteria, content, skip);
+        }
+        break;
+      case "Driver":
+        if(criteria === "id" && content){
+          this.getDriver(content);
+        }else{
+          this.getDrivers(criteria, content, skip);
         }
         break;
     }
@@ -61564,6 +61652,96 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
 
 var CHANGE_EVENT = 'change';
 
+var _drivers = [];
+var _showDetail = false;
+var _isCreate;
+
+var DriverStore = _.assign({}, EventEmitter.prototype, {
+  getAllDrivers: function () {
+    return _drivers;
+  },
+
+  isShowDetail : function(){
+    return _showDetail;
+  },
+
+  isCreate : function(){
+    return _isCreate;
+  },
+
+  emitChange: function () {
+    this.emit(CHANGE_EVENT);
+  },
+
+  addChangeListener: function (callback) {
+    this.on(CHANGE_EVENT, callback);
+  },
+
+  removeChangeListener: function (callback) {
+    this.removeListener(CHANGE_EVENT, callback);
+  }
+});
+
+// Register callback to handle all updates
+AppDispatcher.register(function (payload) {
+  var action = payload.action;
+
+  switch (action.type) {
+    case ActionTypes.GET_DRIVERS:
+      _isCreate = false;
+      if(!Array.isArray(action.records)){
+        _drivers = [action.records];
+      }else{
+        _drivers = action.records;
+      }
+      _showDetail = false;
+      DriverStore.emitChange();
+      break;
+    case ActionTypes.GET_DRIVER:
+      _isCreate = false;
+      if(!Array.isArray(action.records)){
+        _drivers = [action.records];
+      }else{
+        _drivers = action.records;
+      }
+      _showDetail = true;
+      DriverStore.emitChange();
+      break;
+
+    case ActionTypes.MODEL_CREATE:
+      _isCreate = true;
+      DriverStore.emitChange();
+      break;
+
+    case ActionTypes.NO_RESULT:
+      _drivers = [];
+      _showDetail = false;
+      _isCreate = false;
+      DriverStore.emitChange();
+      break;
+
+    default:
+      // no op
+  }
+});
+
+module.exports = DriverStore;
+
+},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],89:[function(require,module,exports){
+/*
+ * RecordStore
+ */
+
+'use strict';
+
+var AppDispatcher = require('../dispatcher/AppDispatcher'),
+  EventEmitter = require('events').EventEmitter,
+  AppConstants = require('../constants/AppConstants'),
+  ActionTypes = AppConstants.ActionTypes,
+  _ = require('lodash');
+
+var CHANGE_EVENT = 'change';
+
 var _emails = [];
 var _isCreate = false;
 
@@ -61607,7 +61785,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = EmailStore;
 
-},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],89:[function(require,module,exports){
+},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],90:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -61685,7 +61863,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = HostStore;
 
-},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],90:[function(require,module,exports){
+},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],91:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -61763,7 +61941,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = JobStore;
 
-},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],91:[function(require,module,exports){
+},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],92:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -61842,7 +62020,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = MealStore;
 
-},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],92:[function(require,module,exports){
+},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],93:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -61925,7 +62103,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = OrderStore;
 
-},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],93:[function(require,module,exports){
+},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],94:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -62003,7 +62181,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = ReviewStore;
 
-},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],94:[function(require,module,exports){
+},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],95:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -62069,7 +62247,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = SearchStore;
 
-},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],95:[function(require,module,exports){
+},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],96:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -62121,7 +62299,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = TabStore;
 
-},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],96:[function(require,module,exports){
+},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],97:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -62211,7 +62389,7 @@ AppDispatcher.register(function (payload) {
 
 module.exports = TransactionStore;
 
-},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],97:[function(require,module,exports){
+},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}],98:[function(require,module,exports){
 /*
  * RecordStore
  */
@@ -62289,4 +62467,4 @@ AppDispatcher.register(function (payload) {
 
 module.exports = UserStore;
 
-},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}]},{},[68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97]);
+},{"../constants/AppConstants":80,"../dispatcher/AppDispatcher":81,"events":10,"lodash":19}]},{},[68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98]);

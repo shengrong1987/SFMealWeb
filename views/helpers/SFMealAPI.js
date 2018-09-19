@@ -342,6 +342,35 @@ module.exports = {
     });
   },
 
+  getDriver : function(id){
+    $.ajax({
+      url: '/driver/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getAccount(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getDrivers : function(criteria, value, skip){
+    if(value) {
+      var url = "/driver?skip=" + skip + "&" + criteria + "=" + value;
+    }else{
+      url = "/driver?skip=" + skip;
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json'
+    }).done(function (data) {
+      ActionCreators.getDriver(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
   clean : function(model){
     var isValid;
     switch(model){
@@ -386,6 +415,9 @@ module.exports = {
           break;
         case "Account":
           ActionCreators.getAccounts(data);
+          break;
+        case "Driver":
+          ActionCreators.getDrivers(data);
           break;
       }
     }).fail(function(jqXHR, textStatus){
@@ -505,6 +537,13 @@ module.exports = {
               ActionCreators.getAccounts(data);
             }
             break;
+          case "Driver":
+            if(detail){
+              ActionCreators.getDriver(data);
+            }else{
+              ActionCreators.getDrivers(data);
+            }
+            break;
         }
       }
     }).fail(function(jqXHR, textStatus){
@@ -521,6 +560,7 @@ module.exports = {
     switch(model){
       case "Coupon":
       case "Email":
+      case "Driver":
         isValid = true;
         break;
     }
@@ -610,6 +650,13 @@ module.exports = {
           this.getAccount(content);
         }else{
           this.getAccounts(criteria, content, skip);
+        }
+        break;
+      case "Driver":
+        if(criteria === "id" && content){
+          this.getDriver(content);
+        }else{
+          this.getDrivers(criteria, content, skip);
         }
         break;
     }

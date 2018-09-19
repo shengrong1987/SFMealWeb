@@ -9353,6 +9353,11 @@ hovereffect p {
 .fa-heart:hover {
   color: red;
 }
+/* nav*/
+.nav-light > .active {
+  background-color: #ffffff;
+  border-bottom: 1px solid #dee2e6 !important;
+}
 /*signup*/
 /*font*/
 .font-elegant {
@@ -9765,13 +9770,6 @@ label {
   content: "\f00c";
 }
 /*button*/
-.btn {
-  font-size: 14px;
-  text-transform: uppercase;
-  opacity: 1.0;
-  border: solid 1px transparent !important;
-  height: 35px;
-}
 .btn-mixitup {
   padding: 6px 12px !important;
 }
@@ -10338,9 +10336,6 @@ fieldset[disabled] .btn-red.active {
   color: #999999;
   font-size: 12px;
 }
-#transaction_container .mix {
-  display: none;
-}
 select.form-control {
   height: 38px !important;
 }
@@ -10487,9 +10482,6 @@ select.form-control {
 #address-form[data-host='true'] span {
   color: #63b446 !important;
 }
-#meal-container .mix {
-  display: none;
-}
 #meal-container {
   margin-bottom: 50px;
 }
@@ -10509,7 +10501,7 @@ select.form-control {
   font-size: 20px;
 }
 .meal .photo {
-  width: 100%;
+  width: 200px;
   cursor: pointer;
 }
 .meal .desc {
@@ -10525,6 +10517,11 @@ select.form-control {
 }
 .meal .fav:hover {
   color: #d60e0e !important;
+}
+.meal .content {
+  -ms-flex-positive: 1 !important;
+  flex-grow: 1 !important;
+  max-width: 300px;
 }
 .meal:hover .photo {
   opacity: 0.3;
@@ -11248,6 +11245,12 @@ select.form-control {
   }
   .meal .basic-info h3 {
     text-align: center !important;
+  }
+  .meal .content {
+    -ms-flex-positive: 1 !important;
+    flex-grow: 1 !important;
+    margin-left: 0.5rem !important;
+    max-width: 300px;
   }
   .meal.preorder .desc {
     top: 50px;

@@ -1070,7 +1070,6 @@ var MealSelectionView = Backbone.View.extend({
     utility.initGoogleMapService();
   },
   initDelivery : function(){
-    var range = this.$el.data("range");
     var $this = this;
     if(!this.$el.find(".deliveryOption").length){
       return;
@@ -1081,6 +1080,7 @@ var MealSelectionView = Backbone.View.extend({
       var color = $(this).data("color");
       var area = $(this).data("area");
       var time = $(this).data("time");
+      var range = $(this).data("range");
       utility.geocoding(location, function(err, center){
         if(err){
           makeAToast(err, 'error');
@@ -1560,7 +1560,6 @@ var MealView = Backbone.View.extend({
     var isDelivery = form.find("#isDelivery").prop("checked");
     if(isDelivery){
       var deliveryFee = form.find("#deliveryFeeInput").val();
-      var deliveryRange = form.find("#deliveryRangeInput").val();
       var areaInput = form.find("#areaInput").val();
       var isDeliveryBySystem = this.$el.find("#isDeliveryBySystem").prop("checked");
       if(!deliveryFee || !deliveryRange){
@@ -1608,13 +1607,14 @@ var MealView = Backbone.View.extend({
         var publicLocation = $(this).find(".public-location input").val();
         var pickupInstruction = $(this).find(".instruction input").val();
         var deliveryCenter = $(this).find(".delivery-center input").val();
+        var deliveryRange = $(this).find(".deliveryRange input").val();
         var area = $(this).find(".area input").val();
         var county = $(this).find(".area").data("county");
         if(!publicLocation){
           publicLocation = location;
         }
         var method = $(this).find('.method select').val();
-        var phone = $(this).find('.phone input').val();
+        var phone = $(this).find('.phone button').prop('value');
         if(method === "pickup" && !location){
           pickupValid = false;
           $this.scheduleAlert.show();
@@ -1655,6 +1655,7 @@ var MealView = Backbone.View.extend({
         pickupObj.publicLocation = publicLocation || '';
         pickupObj.comment = pickupInstruction || '';
         pickupObj.deliveryCenter = deliveryCenter || '';
+        pickupObj.deliveryRange = deliveryRange || 5;
         pickupObj.area = area;
         pickupObj.county = county;
         pickups.push(pickupObj);
@@ -1775,7 +1776,6 @@ var MealView = Backbone.View.extend({
       isDelivery : isDelivery,
       isDeliveryBySystem : isDeliveryBySystem,
       delivery_fee : deliveryFee,
-      delivery_range : deliveryRange,
       isShipping : isShipping,
       shippingPolicy : shippingPolicy,
       supportPartyOrder : supportPartyOrder,
@@ -2853,7 +2853,7 @@ var MealConfirmView = Backbone.View.extend({
     if(e.which === 13) e.preventDefault();
   },
   initDelivery : function(){
-    var range = this.$el.data("range");
+
     var $this = this;
     if(!this.$el.find(".deliveryOption").length){
       return;
@@ -2864,6 +2864,7 @@ var MealConfirmView = Backbone.View.extend({
       var color = $(this).data("color");
       var area = $(this).data("area");
       var time = $(this).data("time");
+      var range = $(this).data("range");
       utility.geocoding(location, function(err, center){
         if(err){
           makeAToast(err);

@@ -47,8 +47,28 @@ module.exports = {
       if(req.wantsJSON && process.env.NODE_ENV === "development"){
         return res.ok({ dishes : host.dishes, host : host});
       }
-      return res.view("meal_new",{dishes : host.dishes, host : host});
+      Driver.find().exec(function(err, d){
+        if(err){
+          return res.badRequest(err);
+        }
+        return res.view("meal_new",{dishes : host.dishes, host : host, drivers : d});
+      })
     });
+  },
+
+  today : function(req,res){
+    //find out meals that provide start today or ends today
+    var now = moment();
+    Meal.find({ where : { status : "on", provideFromTime : { '<' : now.toDate()}}}).exec(function(err, meals){
+      if(err){
+        return res.badRequest(err);
+      }
+      meals = meals.filter(function(meal){
+        return meal.county.split("+").indexOf(county) !== -1;
+      });
+      meals = this.composeMealWithDate(meals);
+      res.ok(meals);
+    })
   },
 
   feature : function(req, res){
@@ -146,7 +166,7 @@ module.exports = {
     var keyword = query['keyword'];
     var zipcode = query['zip'];
     var method = query['method'];
-    var county = req.cookies['county'] || query['county']|| "San Francisco County";
+    var county = query['county'] || req.cookies['county'] || "San Francisco County";
     var type = req.param('type');
     var now = new Date();
     var params = {
@@ -416,11 +436,11 @@ module.exports = {
       found = found.filter(function(meal){
         return meal.county.split("+").indexOf(county) !== -1;
       });
-      found = _this.composeMealWithDate(found);
       //test only
       if(req.wantsJSON && process.env.NODE_ENV === "development"){
         return res.ok({meals : found});
       }
+      found = _this.composeMealWithDate(found);
       return res.view("meals",{ meals : found, user : req.session.user, county : county});
     });
   },
@@ -968,8 +988,7 @@ module.exports = {
       if(!meal){
         return res.notFound();
       }
-      var _orders;
-      var _user;
+      var _orders,_user,_drivers;
       async.auto({
         isEditMode : function(cb){
           if(!isEditMode){
@@ -1000,8 +1019,19 @@ module.exports = {
             cb();
           });
         },
+        getDrivers : function(cb){
+          if(!isEditMode){
+            return cb();
+          }
+          Driver.find().exec(function(err, drivers){
+            if(err){
+              return cb(err);
+            }
+            _drivers = drivers;
+            cb();
+          })
+        },
         getMealExtraInfo : ['isPartyMode', function(cb){
-
           Order.find({meal : meal.id, status : ["schedule","preparing"]}).exec(function(err, orders){
             if(err){
               return res.badRequest(err);
@@ -1028,7 +1058,7 @@ module.exports = {
           return res.ok(meal);
         }
         if(isEditMode){
-          res.view('meal_edit',{ meal : meal});
+          res.view('meal_edit',{ meal : meal, drivers: _drivers });
         }else if(req.session.authenticated){
           res.view('meal',{ meal : meal, locale : req.getLocale(), user : _user, orders : _orders});
         }else{
@@ -1066,29 +1096,25 @@ module.exports = {
     var preOrderCount = 0;
     var orderCount = 0;
     meals.forEach(function(meal){
-      if(meal.type === "order"){
-        if(mealDateObj.meals.hasOwnProperty("orders")){
-          mealDateObj.meals["orders"].meals.push(meal);
-        }else{
-          mealDateObj.meals["orders"] = {};
-          mealDateObj.meals["orders"].meals = [meal];
-        }
+      var pickupDate = moment(meal.pickups[0].pickupFromTime);
+      var dayOfWeek = util.getWeekFromDate(pickupDate);
+      var dateDesc = "unknown";
+      if(pickupDate.isSame(moment(),'day')){
+        dateDesc = 'today';
+      }else if(pickupDate.isSame(moment().add(1,'days'),'day')){
+        dateDesc = 'tomorrow';
+      }else{
+        dateDesc = pickupDate.format('dddd')
+      }
+      if(mealDateObj.meals.hasOwnProperty(dateDesc)){
+        mealDateObj.meals[dateDesc].meals.push(meal);
+      }else{
+        mealDateObj.meals[dateDesc] = {};
+        mealDateObj.meals[dateDesc].meals = [meal];
+      }
+      if(meal.type==="order"){
         orderCount++;
       }else{
-        var pickupDate = meal.pickups[0].pickupFromTime;
-        var dayOfWeek = util.getWeekFromDate(pickupDate);
-        var month = util.getMonthFromDate(pickupDate);
-        var date = util.getDayOfMonth(pickupDate);
-        var key = month + date;
-        if(mealDateObj.meals.hasOwnProperty(key)){
-          mealDateObj.meals[key].meals.push(meal);
-        }else{
-          mealDateObj.meals[key] = {};
-          mealDateObj.meals[key].meals = [meal];
-        }
-        mealDateObj.meals[key].dayOfWeek = dayOfWeek;
-        mealDateObj.meals[key].month = month;
-        mealDateObj.meals[key].date = date;
         preOrderCount++;
       }
     });

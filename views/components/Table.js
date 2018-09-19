@@ -19,6 +19,7 @@ var React = require('react'),
   EmailStore = require('../stores/EmailStore'),
   ReviewStore = require('../stores/ReviewStore'),
   AccountStore = require('../stores/AccountStore'),
+  DriverStore = require('../stores/DriverStore'),
   TableItem = require('./TableItem');
 
 var Table = createReactClass({
@@ -78,6 +79,9 @@ var Table = createReactClass({
       case "Account":
         return {data : AccountStore.getAllAccounts(), detail : AccountStore.isShowDetail()};
         break;
+      case "Driver":
+        return {data: DriverStore.getAllDrivers(), detail : DriverStore.isShowDetail(), isCreate : DriverStore.isCreate()};
+        break;
     }
   },
 
@@ -102,6 +106,7 @@ var Table = createReactClass({
     EmailStore.addChangeListener(this._onChange);
     ReviewStore.addChangeListener(this._onChange);
     AccountStore.addChangeListener(this._onChange);
+    DriverStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount: function () {
@@ -117,6 +122,7 @@ var Table = createReactClass({
     EmailStore.removeChangeListener(this._onChange);
     ReviewStore.removeChangeListener(this._onChange);
     AccountStore.removeChangeListener(this._onChange);
+    DriverStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function () {

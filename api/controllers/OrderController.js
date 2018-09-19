@@ -2094,6 +2094,7 @@ module.exports = {
           sails.log.error("verified distance err " + err);
           return cb(err);
         }
+        range = pickupInfo.deliveryRange || range;
         sails.log.debug("distance:" + distance, range);
         if(distance > range){
           if(!params.isPartyMode){
@@ -2429,9 +2430,11 @@ module.exports = {
             pickups.push(order.pickupInfo);
           }
         })
-        pickups.sort(function(a, b){
-          return new Date(a.pickupFromTime).getTime() - new Date(b.pickupFromTime).getTime();
-        })
+        if(pickups){
+          pickups = pickups.sort(function(a, b){
+            return new Date(a.pickupFromTime).getTime() - new Date(b.pickupFromTime).getTime();
+          })
+        }
         res.view('report', { meal : { orders : newOrders, pickups : pickups, dishes : dishes }});
       });
     });

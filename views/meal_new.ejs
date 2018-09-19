@@ -244,9 +244,27 @@
                                 </div>
                               </div>
 
-                              <div class="form-group phone">
-                                <label><%= __('phone')%></label>
-                                <input type="tel" class="form-control" value="<%= host.user.phone || ''%>">
+                              <div class="row">
+                                <div class="col-12 col-sm-6">
+                                  <div class="form-group deliveryRange">
+                                    <label><%= __('delivery-range')%></label>
+                                    <input class="form-control" type="text" placeholder="5">
+                                  </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                  <div class="dropdown phone">
+                                    <label><%= __('driver')%></label>
+                                    <button class="btn btn-secondary dropdown-toggle form-control" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="false">
+                                      <%= __('driver')%>
+                                      <span class='caret'></span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                      <% drivers.forEach(function(driver){%>
+                                      <a class="dropdown-item" value="<%= driver.phone%>" href="javascript:void(0);"><%= driver.driverName%>+<%= driver.phone%></a>
+                                      <%});%>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </div>

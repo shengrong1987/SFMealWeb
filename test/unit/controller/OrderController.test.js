@@ -60,26 +60,30 @@ describe('OrderController', function() {
     var dish1LeftQty;
     it('should get a meal', function (done) {
       agent
-          .get('/meal')
-          .expect(200)
-          .end(function(err,res){
-            if(err){
-              console.log(err);
-              return done(err);
-            }
-            var meal = res.body.meals.meals[Object.keys(res.body.meals.meals)[0]].meals[0];
-            mealId = meal.id;
-            dishId1 = meal.dishes[0].id;
-            dishId2 = meal.dishes[1].id;
-            dishId3 = meal.dishes[2].id;
-            dishId4 = meal.dishes[3].id;
-            price1 = meal.dishes[0].price;
-            price2 = meal.dishes[1].price;
-            price3 = meal.dishes[2].price;
-            price4 = meal.dishes[3].price;
-            dish1LeftQty = meal.leftQty[dishId1];
-            done();
-          })
+        .get('/meal')
+        .set('Accept','application/json')
+        .expect('Content-type',/json/)
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            console.log(err);
+            return done(err);
+          }
+          var meal = res.body.meals.filter(function(m){
+            return m.type === "preorder";
+          })[0];
+          mealId = meal.id;
+          dishId1 = meal.dishes[0].id;
+          dishId2 = meal.dishes[1].id;
+          dishId3 = meal.dishes[2].id;
+          dishId4 = meal.dishes[3].id;
+          price1 = meal.dishes[0].price;
+          price2 = meal.dishes[1].price;
+          price3 = meal.dishes[2].price;
+          price4 = meal.dishes[3].price;
+          dish1LeftQty = meal.leftQty[dishId1];
+          done();
+        })
     });
 
     it('should order the meal with pickup method not match selected method error', function (done) {
@@ -766,23 +770,23 @@ describe('OrderController', function() {
         })
     });
 
-    it('should update host legal_entity', function(done){
-      var legalObj = {
-        personal_id_number : "123456789"
-      };
-      agent
-        .put('/host/' + hostId)
-        .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
-        .field('legal_entity',JSON.stringify(legalObj))
-        .expect(200)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          done();
-        })
-    });
+    // it('should update host legal_entity', function(done){
+    //   var legalObj = {
+    //     personal_id_number : "123456789"
+    //   };
+    //   agent
+    //     .put('/host/' + hostId)
+    //     .set('Accept', 'application/json')
+    //     .expect('Content-Type', /json/)
+    //     .field('legal_entity',JSON.stringify(legalObj))
+    //     .expect(200)
+    //     .end(function(err, res){
+    //       if(err){
+    //         return done(err);
+    //       }
+    //       done();
+    //     })
+    // });
 
     it('should not update any thing on meal with orders', function(done){
       var now = new Date();
@@ -1203,12 +1207,16 @@ describe('OrderController', function() {
       it('should get a order meal', function (done) {
         agent
           .get('/meal')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err,res){
             if(err){
               return done(err);
             }
-            var meal = res.body.meals.meals.orders.meals[0];
+            var meal = res.body.meals.filter(function(m){
+              return m.type === "order";
+            })[0];
             mealId = meal.id;
             dishId1 = meal.dishes[0].id;
             dishId2 = meal.dishes[1].id;
@@ -1275,23 +1283,23 @@ describe('OrderController', function() {
           })
       });
 
-      it('should update host legal_entity', function(done){
-        var legalObj = {
-          personal_id_number : "123456789"
-        };
-        agent
-          .put('/host/' + hostId)
-          .set('Accept', 'application/json')
-          .expect('Content-Type', /json/)
-          .field('legal_entity',JSON.stringify(legalObj))
-          .expect(200)
-          .end(function(err, res){
-            if(err){
-              return done(err);
-            }
-            done();
-          })
-      });
+      // it('should update host legal_entity', function(done){
+      //   var legalObj = {
+      //     personal_id_number : "123456789"
+      //   };
+      //   agent
+      //     .put('/host/' + hostId)
+      //     .set('Accept', 'application/json')
+      //     .expect('Content-Type', /json/)
+      //     .field('legal_entity',JSON.stringify(legalObj))
+      //     .expect(200)
+      //     .end(function(err, res){
+      //       if(err){
+      //         return done(err);
+      //       }
+      //       done();
+      //     })
+      // });
 
       it('should update the meal with support delivery', function(done){
         var now = new Date();
@@ -1401,13 +1409,17 @@ describe('OrderController', function() {
     it('should get a meal', function (done) {
       agent
         .get('/meal')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
           if(err){
             console.log(err);
             return done(err);
           }
-          var meal = res.body.meals.meals[Object.keys(res.body.meals.meals)[1]].meals[0];
+          var meal = res.body.meals.filter(function(m){
+            return m.type === "preorder";
+          })[0];
           mealId = meal.id;
           dishId1 = meal.dishes[0].id;
           dishId2 = meal.dishes[1].id;
@@ -1796,13 +1808,17 @@ describe('OrderController', function() {
     it('should get a meal', function (done) {
       agent
         .get('/meal')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
           if(err){
             console.log(err);
             return done(err);
           }
-          var meal = res.body.meals.meals[Object.keys(res.body.meals.meals)[0]].meals[0];
+          var meal = res.body.meals.filter(function(m){
+            return m.type === "preorder";
+          })[0];
           mealId = meal.id;
           dishId1 = meal.dishes[0].id;
           dishId2 = meal.dishes[1].id;
@@ -2135,13 +2151,17 @@ describe('OrderController', function() {
     it('should get a meal', function (done) {
       agent
         .get('/meal')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
           if(err){
             console.log(err);
             return done(err);
           }
-          var meal = res.body.meals.meals[Object.keys(res.body.meals.meals)[1]].meals[0];
+          var meal = res.body.meals.filter(function(m){
+            return m.type === "preorder";
+          })[0];
           mealId = meal.id;
           dishId1 = meal.dishes[0].id;
           dishId2 = meal.dishes[1].id;
@@ -2219,13 +2239,17 @@ describe('OrderController', function() {
     it('should get meals', function (done) {
       agent
         .get('/meal')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
           if(err){
             console.log(err);
             return done(err);
           }
-          var meal = res.body.meals.meals[Object.keys(res.body.meals.meals)[0]].meals[0];
+          var meal = res.body.meals.filter(function(m){
+            return m.type === "preorder";
+          })[0];
           mealId = meal.id;
           dishId1 = meal.dishes[0].id;
           dishId2 = meal.dishes[1].id;
@@ -2439,13 +2463,17 @@ describe('OrderController', function() {
     it('should get meals', function (done) {
       agent
         .get('/meal')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
           if(err){
             console.log(err);
             return done(err);
           }
-          var meal = res.body.meals.meals[Object.keys(res.body.meals.meals)[0]].meals[0];
+          var meal = res.body.meals.filter(function(m){
+            return m.type === "preorder";
+          })[0];
           mealId = meal.id;
           dishId1 = meal.dishes[0].id;
           dishId2 = meal.dishes[1].id;
@@ -2490,23 +2518,23 @@ describe('OrderController', function() {
         })
     });
 
-    it('should update host legal_entity', function(done){
-      var legalObj = {
-        personal_id_number : "123456789"
-      };
-      agent
-        .put('/host/' + hostId)
-        .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
-        .field('legal_entity',JSON.stringify(legalObj))
-        .expect(200)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          done();
-        })
-    });
+    // it('should update host legal_entity', function(done){
+    //   var legalObj = {
+    //     personal_id_number : "123456789"
+    //   };
+    //   agent
+    //     .put('/host/' + hostId)
+    //     .set('Accept', 'application/json')
+    //     .expect('Content-Type', /json/)
+    //     .field('legal_entity',JSON.stringify(legalObj))
+    //     .expect(200)
+    //     .end(function(err, res){
+    //       if(err){
+    //         return done(err);
+    //       }
+    //       done();
+    //     })
+    // });
 
     it('should be able to update dish left qty on active meal', function(done){
       var totalQty = {};
@@ -2743,13 +2771,17 @@ describe('OrderController', function() {
     it('should get meals', function (done) {
       agent
         .get('/meal')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
           if(err){
             console.log(err);
             return done(err);
           }
-          var meal = res.body.meals.meals[Object.keys(res.body.meals.meals)[0]].meals[0];
+          var meal = res.body.meals.filter(function(m){
+            return m.type === "preorder";
+          })[0];
           mealId = meal.id;
           dishId1 = meal.dishes[0].id;
           dishId2 = meal.dishes[1].id;
@@ -2869,23 +2901,23 @@ describe('OrderController', function() {
         })
     });
 
-    it('should update host legal_entity', function(done){
-      var legalObj = {
-        personal_id_number : "123456789"
-      };
-      agent
-        .put('/host/' + hostId)
-        .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
-        .field('legal_entity',JSON.stringify(legalObj))
-        .expect(200)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          done();
-        })
-    });
+    // it('should update host legal_entity', function(done){
+    //   var legalObj = {
+    //     personal_id_number : "123456789"
+    //   };
+    //   agent
+    //     .put('/host/' + hostId)
+    //     .set('Accept', 'application/json')
+    //     .expect('Content-Type', /json/)
+    //     .field('legal_entity',JSON.stringify(legalObj))
+    //     .expect(200)
+    //     .end(function(err, res){
+    //       if(err){
+    //         return done(err);
+    //       }
+    //       done();
+    //     })
+    // });
 
     it('should update the meals provideTillTime to 3 minute later and see meal schedule end job', function(done){
       var now = moment()._d;

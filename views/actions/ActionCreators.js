@@ -16,7 +16,6 @@ var ActionsCreators = {
   },
 
   getUsers: function (records) {
-
     AppDispatcher.handleServerAction({
       type: ActionTypes.GET_USERS,
       records: records
@@ -170,6 +169,20 @@ var ActionsCreators = {
   getAccounts: function (records) {
     AppDispatcher.handleServerAction({
       type: ActionTypes.GET_ACCOUNTS,
+      records: records
+    });
+  },
+
+  getDriver: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_DRIVER,
+      records: records
+    });
+  },
+
+  getDrivers: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_DRIVERS,
       records: records
     });
   },

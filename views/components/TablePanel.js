@@ -104,6 +104,11 @@ var TablePanel = createReactClass({
         details = {id : 'Review ID', 'legal_entity.business_name' : 'business_name', email : 'email', 'legal_entity.verification' : 'verification', 'legal_entity.personal_id_number_provided' : 'id_provided', 'legal_entity.ssn_last_4_provided' : 'ssn_provided', 'legal_entity.address' : 'address', charges_enabled : 'charges_enabled', payouts_enabled : 'payouts_enabled', verification : 'verification', command : 'Command' };
         criterias = ['id', 'email', 'business_name'];
         break;
+      case "Driver":
+        headers = {id: 'Driver ID', driverName : 'driverName', phone: 'phone', availability : 'availability', command : 'Command'}
+        details = {id: 'Driver ID', driverName : 'driverName', phone: 'phone', availability : 'availability', command : 'Command'}
+        criterias = ['id', 'driverName', 'phone'];
+        break;
     }
 
     return (

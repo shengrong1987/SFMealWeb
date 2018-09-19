@@ -147,22 +147,27 @@ function setupTooltip(){
 }
 
 function setupMixin() {
-  $('#meal-container').mixItUp({
-    pagination: {
-      limit: 20,
-      pagerClass : 'btn btn-mixitup'
-    }
-  });
-  $('#transaction_container').mixItUp({
-    pagination: {
-      limit: 20,
-      pagerClass : 'btn btn-mixitup'
-    },load: {
-      sort: 'created:desc' /* default:asc */
-    },layout : {
-      display : 'block'
-    }
-  });
+  if($("#meal-container").length){
+    mixitup("#meal-container", {
+      pagination: {
+        limit: 20
+      },
+      classNames: {
+        elementPager: 'btn btn-mixitup'
+      }
+    });
+  }
+  if($("#transaction_container").length){
+    mixitup('#transaction_container', {
+      pagination: {
+        limit: 20
+      },load: {
+        sort: 'created:desc' /* default:asc */
+      },layout : {
+        display : 'block'
+      }
+    })
+  }
 }
 
 function setupDishSelector(){
