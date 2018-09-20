@@ -11,18 +11,18 @@
               </div>
             </div>
             <div class="col-12 my-4 text-left">
-              <div class="btn-group" role="group" id="method" data-toggle="btn-set">
+              <ul class="btn-group" role="group" aria-label="Basic example" id="method">
                 <% if(meal.isPartyMode){%>
-                <button data-toggle="tab" data-href="#deliveryTab" class="btn btn-disable btn-fat btn-lg active disabled" value="delivery"><strong><%= __('delivery') %></strong></button>
+                <button data-toggle="tab" data-href="#deliveryTab" class="btn btn-fat btn-lg active" value="delivery"><strong><%= __('delivery')%></strong></button>
                 <%}else{%>
                 <%if(meal.isDelivery){%>
-                <button data-toggle="tab" data-href="#deliveryTab" class="btn btn-disable btn-fat btn-lg disabled" value="delivery"><strong><%= __('delivery') %></strong></button>
+                <button data-toggle="tab" data-href="#deliveryTab" class="btn btn-fat btn-lg" value="delivery"><strong><%= __('delivery')%></strong></button>
                 <%}if(meal.isShipping){%>
-                <button data-toggle="tab" data-href="#shippingTab" class="btn btn-disable btn-fat btn-lg disabled" value="shipping"><strong><%= __('shipping') %></strong></button>
+                <button data-toggle="tab" data-href="#shippingTab" class="btn btn-fat btn-lg" value="shipping"><strong><%= __('shipping')%></strong></button>
                 <%}%>
-                <button data-toggle="tab" data-href="#pickupTab" class="btn btn-disable btn-fat btn-lg active disabled" value="pickup"><strong><%= __('self-pickup') %></strong></button>
+                <button data-toggle="tab" data-href="#pickupTab" class="btn btn-fat btn-lg active" value="pickup"><strong><%= __('self-pickup')%></strong></button>
                 <%}%>
-              </div>
+              </ul>
             </div>
           </div>
         </div>

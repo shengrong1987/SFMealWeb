@@ -132,6 +132,7 @@
   Tab.prototype.select = function(button){
     button.parents("ul").find(".nav-link").removeClass('active');
     button.parents("ul").find(".nav-item").removeClass('active');
+    button.parents(".btn-group").find("button").removeClass('active');
     button.parent().addClass('active');
     button.addClass('active');
     var tabTarget = $(button.data("href"));
