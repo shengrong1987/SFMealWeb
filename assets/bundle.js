@@ -59182,6 +59182,10 @@ var ActionButton = createReactClass({
           postData = {
             discount : { value : this.props.data['discount'], type : 'float'}
           }
+        }else if(action === "paid"){
+          postData = {
+            tip : { value : this.props.data['tip'], type : 'float'}
+          }
         }
         break;
       case "User":
@@ -59352,7 +59356,7 @@ var ActionButton = createReactClass({
       case "Order":
         if(rowData.hasOwnProperty('status')){
           if(rowData['status'] !== 'complete' && rowData['status'] !== 'cancel'){
-            actions = actions.concat(['discount','abort','refund']);
+            actions = actions.concat(['discount','paid','abort','refund']);
           }else if(rowData.hasOwnProperty('charges')){
             if(rowData['charges'] && Object.keys(rowData['charges']).length > 0){
               actions.concat(['discount','refund']);

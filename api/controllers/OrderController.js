@@ -1734,6 +1734,27 @@ module.exports = {
     });
   },
 
+  paid : function(req, res){
+    var orderId = req.params.id;
+    var tip = req.body.tip;
+    Order.findOne(orderId).exec(function(err, order){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(order.status !== "schedule" && order.status !== "preparing"){
+        return res.badRequest({ code : -43, responseText : req.__('order-manipulate-wrong-status')});
+      }
+      order.isPaid = true;
+      order.tip = tip;
+      order.save(function(err, o){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(o);
+      })
+    })
+  },
+
   adjustAdmin : function(req, res){
     var orderId = req.params.id;
     var params = req.body;

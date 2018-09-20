@@ -140,6 +140,7 @@
     tabTarget.stop().fadeIn("fast").addClass('active');
     removeHash();
     button.trigger('shown.bs.tab');
+    button.parent().trigger('change');
   }
 
   function Plugin(option, root){

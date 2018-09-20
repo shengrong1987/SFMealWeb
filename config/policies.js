@@ -119,6 +119,7 @@ module.exports.policies = {
     'refund' : 'isAdmin',
     'update' : 'isAdmin',
     'discount' : 'isAdmin',
+    'paid' : "isAdmin",
     'receipt' : true,
     'downloadReceipt' : true,
     'process' : true,
