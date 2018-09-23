@@ -72,7 +72,7 @@
             </td>
             <td><%= order.customerPhone%></td>
             <td><%= order.contactInfo.address || '自取'%></td>
-            <td><%= order.isPaid ? ("小费:" + order.tip) : ("$" + order.subtotal) %></td>
+            <td><%= order.isPaid ? ("小费:" + order.tip) : ("$" + (parseInt(order.subtotal)-parseInt(order.discount/100))) %></td>
             <td><%= order.pickupInfo.comment || ''%></td>
           </tr>
         <%}})%>
