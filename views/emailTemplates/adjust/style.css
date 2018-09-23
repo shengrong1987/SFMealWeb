@@ -9287,7 +9287,7 @@ hovereffect p {
   background: url("http://www.sfmeal.com/image/SFMeal_email_icon0.jpg") no-repeat center / 70% auto;
 }
 .logo-slogan {
-  background-image: url(../images/sfmeal_logo2.png);
+  background-image: url(../images/SFMeal_logo2.png);
   display: block;
   height: 100px;
   background-size: 100px;
@@ -11260,7 +11260,7 @@ select.form-control {
     line-height: 80px;
   }
   .pure-banner .logo-slogan {
-    background-image: url(../images/sfmeal_logo2.png);
+    background-image: url(../images/SFMeal_logo2.png);
     display: block;
     height: 55px;
     background-size: 55px;
