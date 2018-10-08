@@ -62,6 +62,15 @@
               </div>
               <div class="block-revealer__element" style="transform: scaleX(0); transform-origin: 100% 50% 0px; background-color: rgb(135, 134, 103); opacity: 1;"></div>
             </div>
+            <!--
+            <article> <a href="#">
+            <div class="img" style="background-image: url(images/sample_article.png);"></div>
+            <dl>
+            <dt>2018/00/00</dt>
+            <dd>ダミーテキストが入ります。ここにダミーテキストが入ります。</dd>
+            </dl>
+            </a> </article>
+            -->
             <p id="topMvSns">
               <a href="https://www.facebook.com/SFMeal/" target="_blank" title="Facebook" id="rev-2" class="block-revealer" style="position: relative;"><i class="fab fa-facebook-f fa-2x"></i></a>
               <a href="https://www.instagram.com/sfmeal/" target="_blank" title="Instagram" id="rev-3" class="block-revealer" style="position: relative;"><i class="fab fa-instagram fa-2x"></i></a>
@@ -127,7 +136,10 @@
                     <li>正宗</li>
                     <li class="even last">干净</li>
                   </ul>
-                  <p class="desc">十三香小龙虾，来源于盱眙，发明人是精通中药香料的徐建中。徐建中世代开的是中药铺，于是他按照药理习性选了30多种草药配上五香粉制作了盱眙十三香，从十三香炒田螺到十三香小龙虾，盱眙风味小龙虾随着小龙虾的兴起风靡了半个中国。</p>
+                  <p class="desc">十三香小龙虾，来源于盱眙，发明人是精通中药香料的徐建中。
+                    徐建中世代开的是中药铺，于是他按照药理习性选了30多种草
+                    药配上五香粉制作了盱眙十三香，从十三香炒田螺到十三香小
+                    龙虾，盱眙风味小龙虾随着小龙虾的兴起风靡了半个中国。</p>
                   <p class="btn"><a href="http://sfmeal.com/meal" class="hover"><img src="images/btn_01.png" alt="查看菜单"></a></p>
                 </div>
               </div><div class="block-revealer__element" style="transform: scaleX(0); transform-origin: 0px 50% 0px; background-color: rgb(247, 247, 247); opacity: 1;"></div></div>
@@ -188,59 +200,25 @@
         <section id="anchor01">
           <h2 class="faqHead"><%= __('user')%></h2>
           <dl class="faqDl">
-            <dt data-toggle="collapse" href="#q1">营业时间是星期几几点？</dt>
-            <dd id="q1" class="collapse">
-              <p>我们目前的营业时间是：</p>
-              <p>旧金山市区至中湾（San Mateo）</p>
-              <p>订餐时间为每周日至每周四下午4点。</p>
-              <p>为保证您的订餐质量，我们建议您提前预订。</p>
-            </dd>
-            <dt data-toggle="collapse" href="#q2">有什么支付方式？</dt>
+            <dt data-toggle="collapse" href="#q1">Question1</dt>
+            <div id="q1" class="collapse">
+              <p>Answer1</p>
+            </div>
+            <dt data-toggle="collapse" href="#q1">Question2</dt>
             <dd id="q2" class="collapse">
-              <p>我们目前支持现金，Venmo还有微信支付。</p>
-              <p>现金支付可以在取餐时直接付给送餐师傅或自取时支付给厨师。</p>
-              <p>Venmo支付可以添加@SFMeal支付餐费及小费，支付时请认清我们的LOGO，支付成功后请在微信告知客服venmo名称及金额，待客服确认。</p>
-            </dd>  
-              <dt data-toggle="collapse" href="#q3">有什么取餐方式？</dt>
-            <dd id="q3" class="collapse">
-              <p>我们目前支持送餐及取餐。</p>
-              <p>送餐及自取时间为：</p>
-              <p><b>旧金山市区及附近：</b>每周四、五、六：晚上5:30-6:30；7-8点</p>
-              <p><b>San Mateo附近：</b>周四、五晚上7:30-8:30</p>
-              <p><b>南湾及东湾：</b>周六中午12至14点（满$50起送）</p>
-              <p><b>自取：</b></p>
-              <p><b>自取点1：</b>Daly City厨房（详细地址下单后发送）<br>自取时间：周四、五、六晚上6:00-7:30</p>
-              <p><b>自取点2：</b>T4 Millbrae<br><b>地址：</b>315 Broadway, Millbrae, CA 94030<br><b>自取时间：</b>周六中午11点30至晚上11点</p>
-            </dd>
-              <dt data-toggle="collapse" href="#q4">如何修改订单？</dt>
-            <dd id="q4" class="collapse">
-              <p>我们系统正在升级中。目前，如果您需要修改订单，请点击上方的“联系我们”，用微信扫二维码与我们客服小满联系修改订单。</p>
-            </dd>
-              <dt data-toggle="collapse" href="#q5">如何取消订单？</dt>
-            <dd id="q5" class="collapse">
-              <p>我们系统正在升级中。目前，如果您需要修改订单，请点击上方的“联系我们”，用微信扫二维码与我们客服小满联系取消订单。</p>
-            </dd>
+              <p>Answer2</p>
           </dl>
         </section>
         <section id="anchor02" class="last">
           <h2 class="faqHead"><%= __('chef')%></h2>
           <dl class="faqDl">
-            <dt data-toggle="collapse" href="#q6">成为私厨有什么条件？</dt>
-            <dd id="q6" class="collapse">
-              <p>我们需要私厨有合法ID证件，手机，收款银行，社会安全号（Social number）等资料。</p>
+            <dt data-toggle="collapse" href="#q3">Question1</dt>
+            <dd id="q3" class="collapse">
+              <p>Answer1</p>
             </dd>
-            <dt data-toggle="collapse" href="#q7">目前招募哪些地区的私厨？</dt>
-            <dd id="q7" class="collapse">
-              <p>我们目前集中招募旧金山至San Mateo地区的私厨。</p>
-            </dd>
-            <dt data-toggle="collapse" href="#q8">如何申请成为私厨？</dt>
-            <dd id="q8" class="collapse">
-              <p>1.点击此处“注册”SFMeal平台账号<br>2.登录后点击上方“我做私房菜”按钮<br>3.按照提示完成注册流程<br>4.我们会有专人即使联系您帮您办理各种成为合法私厨的手续</p>
-            </dd>
-            <dt data-toggle="collapse" href="#q9">为什么要加入SFMeal私厨团队？</dt>
-            <dd id="q9" class="collapse">
-              <p>1.SFMeal平台为私房厨师提供厨房及送餐服务，让您专心研究厨艺，我们处理剩余的事情。<br>2.我们是一个集合吃货的平台，为您提供人气及订单。</p>
-            </dd>
+            <dt data-toggle="collapse" href="#q4">Question2</dt>
+            <dd id="q4" class="collapse">
+              <p>Answer2</p>
           </dl>
         </section>
       </div>
@@ -271,6 +249,9 @@
 <!--▲▲/#WRAP ▲▲-->
 
 <!--▲▲/#CONVERSION ▲▲-->
+
+<!--DEFAULT JS-->
+<!--[if lt IE 9]><script src="/lib/cmn_js/html5shiv-printshiv.js"></script><![endif]-->
 
 <!--UNIQ SCRIPT-->
 <script type="text/javascript" src="js/home/slick.js"></script>
