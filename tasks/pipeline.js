@@ -45,7 +45,8 @@ var jsFilesToInject = [
   // Use the "exclude" operator to ignore files
   // '!js/ignore/these/files/*.js'
   '!js/test/**/*.js',
-  '!/revolution/**/*.js'
+  '!/revolution/**/*.js',
+  '!js/home/*.js'
 ];
 
 

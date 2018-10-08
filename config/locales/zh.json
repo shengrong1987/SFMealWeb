@@ -508,6 +508,8 @@
   "meal-query-invalid" : "Meal查询网址不对",
   "meal-lack-of-party-requirement" : "Meal支持团餐模式但缺少团餐要求",
   "meal-invalid-dynamic-dish" : "Meal的拼单菜式已经在另一个拼单Meal里了",
+  "meal-checkout-lack-of-order" : "缺少订单信息，无法确认订单",
+  "meal-checkout-lack-of-date" : "缺少时间信息，无法下单",
   "dish-update-dynamic-insufficient-info" : "缺少价格信息，无法更新爆款菜式。",
   "host-like-once-error" : "你已经给这个厨师点过赞了",
   "host-like-himself-error" : "不可以自己给自己点赞／关注",
@@ -894,5 +896,8 @@
   "next-meal" : "厨师菜单",
   "today" : "今天",
   "tomorrow" : "明天",
-  "driver" : "司机"
+  "driver" : "司机",
+  "go-to-check-out-btn" : "去结账",
+  "select-preference" : "请选择%s",
+  "select": "精选"
 }

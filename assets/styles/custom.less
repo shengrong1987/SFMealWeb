@@ -22,6 +22,12 @@ small{
   color : #777;
 }
 
+.wrapper {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+}
+
 #myUserBar{
   z-index: 101;
   //margin-top: 20px;
@@ -756,6 +762,16 @@ input:focus{
   color : @background-grey !important;
 }
 
+.text-price{
+  .text-orange;
+  font-size: large;
+}
+
+.text-preference{
+  .text-grey;
+  font-size: medium;
+}
+
 /*cursor*/
 .cursor-pointer{
   cursor: pointer;
@@ -1173,22 +1189,6 @@ label {
   border: solid 1px @red !important;
 }
 
-.btn-outline-light{
-  border: solid 1px @light-grey !important;
-}
-
-.btn-outline-light:hover{
-  border: solid 1px @grey !important;
-}
-
-.btn-outline-dark{
-  border: solid 1px @white !important;
-}
-
-.btn-outline-dark:hover{
-  color : @light-grey !important;
-}
-
 /*round*/
 .btn-lg.round {
   border-radius: 24px;
@@ -1217,9 +1217,6 @@ label {
 }
 
 .btn-set{
-  button{
-    margin: 15px 10px 0 10px !important;
-  }
 }
 
 .btn-group{
@@ -1410,6 +1407,24 @@ fieldset[disabled] .btn-red.active {
   left: 100%;
   margin-left: .1rem;
   margin-right: .1rem;
+}
+
+/* sidebar */
+
+.list.list-side{
+  li{
+    height: 50px;
+    line-height: 50px;
+    background-color: @light-grey;
+    margin: 2px 0 2px 0;
+    a{
+      color: black;
+    }
+  }
+  li.active{
+    border-left: 5px solid @orange;
+    background-color: white;
+  }
 }
 
 /*nav*/
@@ -1652,7 +1667,6 @@ select.form-control{
 
 .compact-banner{
   height: 150px;
-  margin-bottom: 15px;
   .img-wrapper {
     height: 150px;
     overflow: hidden;
@@ -1755,6 +1769,15 @@ select.form-control{
   }
   span{
     .text-green;
+  }
+}
+
+.dishItem{
+  .photo{
+    overflow: hidden;
+    img{
+      height:80px;
+    }
   }
 }
 
@@ -1939,6 +1962,10 @@ select.form-control{
   td{
     vertical-align: middle !important;
   }
+}
+
+.sticky-top{
+  z-index : 10;
 }
 
 .border-less{
@@ -2250,9 +2277,6 @@ select.form-control{
 
 .static-floater{
   position: relative;
-  padding-right: 15px;
-  padding-left: 15px;
-  //width: 375px;
   margin-left: 0;
 }
 
@@ -2262,8 +2286,21 @@ select.form-control{
   overflow: auto;
 }
 
-#confirm-order{
+#payment-cards button{
+  height: 100px;
+}
 
+#dishTagsBar{
+  z-index:10;
+}
+
+#dishContentView{
+  //max-height: 1000px;
+  //overflow-y: scroll;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
 
 .dropdown-backdrop{
@@ -2312,6 +2349,12 @@ select.form-control{
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  #dishTagsBar{
+    min-width: 100px;
+    min-height: 100px;
+    opacity: 1;
   }
 
   .mynavbar .navbar-header{
@@ -2545,6 +2588,13 @@ select.form-control{
     .zipCode{
       width: 70px;
       display: inline;
+    }
+  }
+
+  #dishTagsBar{
+    opacity : 0.8;
+    .list{
+      top : 40%;
     }
   }
 
