@@ -897,5 +897,8 @@
   "driver" : "Driver",
   "go-to-check-out-btn" : "Go to checkout",
   "select-preference" : "Please select %s",
-  "select": "Selection"
+  "select": "Selection",
+  "pay-cash-instruction" : "Please pay cash to driver at pickup",
+  "venmo-instruction" : "Please leave your name at checkout",
+  "paypal-instruction" : "Please leave your name at checkout（Add $1 for transaction fee）"
 }

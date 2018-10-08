@@ -1,4 +1,4 @@
-<div id="meal-confirm-container" data-user="<%= user.id || null%>" class="mt-2 p-2 text-center">
+<div id="meal-confirm-container" data-user="<%= user.id || null%>" class="container mt-2 text-center">
   <% var meal = meals.meals[Object.keys(meals.meals)[0]].meals[0]; %>
   <div class="row">
     <div class="col-md-8">
@@ -200,17 +200,9 @@
                         <label class="btn btn-outline-light vertical-inline option pickupOption mix <%= meal.getDateDesc(pickup.pickupFromTime)%>" data-date="<%= meal.getDateDesc(pickup.pickupFromTime)%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-color="<%= colors[i]%>" data-location="<%= pickup.publicLocation || pickup.location%>">
                           <input type="radio" id="pickup-1-<%= i%>" data-index="<%= pickup.index%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
                           <span class="content">
-                          <i class="fa fa-hand-paper-o cursor-pointer text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i>
-                            <span class="location" data-value="<%= pickup.location%>"> <%= pickup.location%></span>
-                            <br/>
-                              <span class="pickupInstruction" data-value="<%= pickup.comment%>"><strong><%= __('pickup-instruction') %></strong>:&nbsp; <%= pickup.comment || ''%></span>
-                              <div class="vertical-align" style="margin-top:15px;">
-                                <div class="pickup-date" style="width: 70px;">
-                                  <span class="col-12"><%= meal.getMonthName(pickup.pickupFromTime)%> <%= meal.getDateFromDate(pickup.pickupFromTime)%></span>
-                                  <span class="col-12"><%= __(meal.getWeekFromDate(pickup.pickupFromTime))%></span>
-                                </div>
-                                <span><%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%></span>
-                              </div>
+                          <i class="fa fa-hand-paper-o cursor-pointer mr-2 text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i><span><%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%></span><br/>
+                            <span class="location" data-value="<%= pickup.location%>"> <%= pickup.location%></span><br/>
+                            <span class="pickupInstruction" data-value="<%= pickup.comment%>"><strong><%= __('pickup-instruction') %></strong>:&nbsp; <%= pickup.comment || ''%></span>
                         </span>
                         </label>
                         <%i++;j++;})}; %>
@@ -233,15 +225,8 @@
                               <div class="s"></div>
                               <input type="radio" id="delivery-2-<%= i%>" data-index="<%= pickup.index%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>
                               <span class="content">
-                              <i class="fa fa-truck cursor-pointer text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i>
-                              <span> <%= pickup.area || pickup.deliveryCenter%> <%= __('nearby')%></span>
-                                <div class="vertical-align" style="margin-top:15px;">
-                                  <div class="pickup-date">
-                                    <span class="col-12"><%= meal.getMonthName(pickup.pickupFromTime)%> <%= meal.getDateFromDate(pickup.pickupFromTime)%></span>
-                                    <span class="col-12"><%= __(meal.getWeekFromDate(pickup.pickupFromTime))%></span>
-                                  </div>
-                                  <%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>
-                                </div>
+                                <i class="fa fa-truck cursor-pointer mr-2 text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i><%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>
+                                <span> <%= pickup.area || pickup.deliveryCenter%> <%= __('nearby')%></span>
                               </span>
                             </label>
                             <%j++;}i++;})}; %>
@@ -273,7 +258,7 @@
 
         <div class="row">
           <div class="col-12">
-            <div id="payment-cards" data-toggle="btn-set" class="btn-set text-left">
+            <div id="payment-cards" class="btn-group text-left pt-2 w-100 row" style="margin: 0;">
               <%
               var userId = user.id;
               if(userId){
@@ -283,29 +268,27 @@
                 var card = cards[j];
                 var last4 = card.last4;
               %>
-              <button class="btn btn-disable btn-fat btn-lg py-2 <%if(card.isDefaultPayment){%> active<%}%> disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
+              <button class="btn btn-disable btn-lg py-2 col-3 <%if(card.isDefaultPayment){%> active<%}%> disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
               <%}}%>
-              <button class="btn btn-disable btn-fat btn-lg py-2 disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
+              <button class="btn btn-disable btn-lg py-2 col-3 disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
               <%}else{%>
-              <button data-toggle="tab" data-href="cashPayment" class="btn btn-disable btn-fat btn-lg active py-2 disabled" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
+              <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable active py-2 col-3 disabled" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
               <%}%>
-              <button data-toggle="tab" data-href="cardPayment" class="btn btn-disable btn-fat btn-lg py-2 disabled" data-method="online"><strong><i class="fa fa-credit-card fa-2x"></i></strong><br/><%= __('bank-card') %></button>
-              <button data-toggle="tab" data-href="venmoPayment" class="btn btn-disable btn-fat btn-lg py-2 disabled" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
-              <button data-toggle="tab" data-href="paypalPayment" class="btn btn-disable btn-fat btn-lg py-2 disabled" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method') %></button>
+              <button data-toggle="tab" data-href="#cardPayment" class="btn btn-disable py-2 col-3 disabled" data-method="online"><strong><i class="fa fa-credit-card fa-2x"></i></strong><br/><%= __('bank-card') %></button>
+              <button data-toggle="tab" data-href="#venmoPayment" class="btn btn-disable  py-2 col-3 disabled" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
+              <button data-toggle="tab" data-href="#paypalPayment" class="btn btn-disable py-2 col-3 disabled" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method') %></button>
               <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg disabled" data-method="alipay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('alipay-method') %></button>-->
               <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg d-none disabled" data-method="wechatpay" style="margin-right: 10px;height: 80px;"><i class="fa fa-wechat fa-2x"></i><br/><%= __('wechatpay-method') %></button>-->
             </div>
           </div>
         </div>
 
-        <div class="divider"></div>
-
         <% if(!user.id){%>
 
         <div class="row">
           <div class="col-12">
-            <div class="tab-content">
-              <form id="cardPayment" class="text-left p-3 tab-pane">
+            <div class="tab-content pt-4">
+              <form id="cardPayment" class="text-left tab-pane">
 
                 <div class="row">
                   <div class="col-12 text-left">
@@ -431,15 +414,26 @@
                 </div>
               </form>
 
-              <div id="cashPayment" class="tab-pane">Cash</div>
-              <div id="venmoPayment" class="tab-pane">Venmo</div>
-              <div id="paypalPayment" class="tab-pane">Paypal</div>
+              <div id="cashPayment" class="tab-pane active">
+                <p><%= __('pay-cash-instruction')%></p>
+              </div>
+              <div id="venmoPayment" class="tab-pane">
+                <div>
+                  <a class="venmo-qr"></a>
+                  <p><%= __('venmo-instruction')%></p>
+                </div>
+              </div>
+              <div id="paypalPayment" class="tab-pane">
+                <p>https://www.paypal.me/sfmeal</p>
+                <p><%= __('paypal-instruction')%></p>
+              </div>
             </div>
           </div>
         </div>
         <%}%>
 
         <h4 class="text-right"><%= __('total')%><span class="total"></span></h4>
+        <div class="divider"></div>
 
         <button type="button" class="btn btn-outline-danger btn-lg" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
       </div>

@@ -2912,7 +2912,6 @@ var MealConfirmView = Backbone.View.extend({
     "click #createNewContactBtn2" : "createNewContact",
     "keydown" : "onKeyDown",
     "click #verifyAddressBtn" : "verifyAddress",
-    "change #payment-cards" : "switchPaymentMethod",
     "click input[name='billingAddress']" : "enterBillingAddress"
   },
   initialize : function(){
@@ -3146,20 +3145,6 @@ var MealConfirmView = Backbone.View.extend({
       makeAToast(jQuery.i18n.prop('addressValid'),'success');
     });
     this.checkOptions(yourAddress);
-  },
-  switchPaymentMethod : function(e){
-    var method = $(e.currentTarget).find("button.active").data("method");
-    var userId = this.$el.data("user");
-    var paymentExpressForm = this.$el.find("#cardPayment");
-    paymentExpressForm.removeClass('d-none');
-    var isLogin = !!userId;
-    if(!isLogin){
-      if(method !== "online"){
-        paymentExpressForm.hide();
-      }else{
-        paymentExpressForm.show();
-      }
-    }
   },
   checkOptions : function(address){
     var deliveryOptions = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio")

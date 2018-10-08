@@ -212,7 +212,7 @@ module.exports = {
         buildOrders : function(next){
           async.each(meals, function(meal, nextIn){
             var orderParam = {};
-            orderParam.subtotal = parseFloat(req.body.subtotal);
+            orderParam.subtotal = parseFloat(meal.subtotal);
             orderParam.orders = req.body.orders;
             orderParam.host = meal.chef.id;
             orderParam.type = meal.type;
@@ -2150,6 +2150,7 @@ module.exports = {
               sails.log.info("listing price updated from " + listPrice + " to " + price);
               orders[dishId].price = price;
             }
+            sails.log.info("dish:" + dish.title + " price: " + price, ",qty: " + qty + ",extra:" + extra);
             actual_subtotal += (qty * price + extra);
           }
           next2();
@@ -2170,8 +2171,8 @@ module.exports = {
       sails.log.debug("dish is valid and enough, checking total price...");
 
       if(actual_subtotal !== subtotal) {
-        sails.log.debug("subtotal supposed to be " + actual_subtotal + ", but get " + subtotal)
-        orderInfo.subtotal = actual_subtotal;
+        sails.log.debug("subtotal supposed to be " + actual_subtotal + ", but get " + subtotal);
+        meal.subtotal = actual_subtotal;
         // return cb({responseText : req.__('order-total-not-match'), code : -3});
       }
       return cb(null);

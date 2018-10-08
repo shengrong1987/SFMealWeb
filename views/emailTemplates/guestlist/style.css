@@ -10497,9 +10497,6 @@ select.form-control {
 .dishItem .photo {
   overflow: hidden;
 }
-.dishItem .photo img {
-  height: 80px;
-}
 #meal-container {
   margin-bottom: 50px;
 }
@@ -10588,7 +10585,7 @@ select.form-control {
   position: absolute;
   cursor: pointer;
 }
-.container-fluid {
+.container {
   min-height: 550px;
 }
 .container-elegant h1,
@@ -10906,6 +10903,13 @@ select.form-control {
     opacity: 0;
   }
 }
+.venmo-qr {
+  background-image: url(../images/venmo-qr.png);
+  background-size: 100%;
+  width: 200px;
+  height: 200px;
+  background-repeat: no-repeat;
+}
 .minWid50 {
   min-width: 50px;
 }
@@ -10929,6 +10933,10 @@ select.form-control {
 }
 .dropdown-backdrop {
   position: static;
+}
+#dishTagsBar {
+  top: 90px;
+  height: 100%;
 }
 /* multiline label*/
 .multi-line-label {
@@ -10970,6 +10978,13 @@ select.form-control {
     min-width: 100px;
     min-height: 100px;
     opacity: 1;
+  }
+  .dishItem .photo {
+    width: 200px;
+    max-height: 100px;
+  }
+  .dishItem .photo img {
+    max-height: 100px;
   }
   .mynavbar .navbar-header {
     margin-left: 100px;
@@ -11176,11 +11191,12 @@ select.form-control {
     width: 70px;
     display: inline;
   }
-  #dishTagsBar {
-    opacity: 0.8;
+  .dishItem .photo {
+    width: 150px;
+    max-height: 80px;
   }
-  #dishTagsBar .list {
-    top: 40%;
+  .dishItem .photo img {
+    max-height: 80px;
   }
   .pickup-map {
     display: block;

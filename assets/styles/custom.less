@@ -1773,9 +1773,6 @@ select.form-control{
 .dishItem{
   .photo{
     overflow: hidden;
-    img{
-      height:80px;
-    }
   }
 }
 
@@ -1885,7 +1882,7 @@ select.form-control{
   }
 }
 
-.container-fluid{
+.container{
   min-height: 550px;
 }
 
@@ -2267,6 +2264,14 @@ select.form-control{
       opacity: 0;
     }
 }
+
+.venmo-qr{
+  background-image: url(../images/venmo-qr.png);
+  background-size: 100%;
+  width: 200px;
+  height: 200px;
+  background-repeat: no-repeat;
+}
 //position
 
 .minWid50{
@@ -2303,6 +2308,11 @@ select.form-control{
 
 .dropdown-backdrop{
   position: static;
+}
+
+#dishTagsBar{
+  top: 90px;
+  height: 100%;
 }
 
 @font-size: 15px;
@@ -2353,6 +2363,14 @@ select.form-control{
     min-width: 100px;
     min-height: 100px;
     opacity: 1;
+  }
+
+  .dishItem .photo{
+    width:200px;
+    max-height: 100px;
+    img{
+      max-height : 100px;
+    }
   }
 
   .mynavbar .navbar-header{
@@ -2589,10 +2607,11 @@ select.form-control{
     }
   }
 
-  #dishTagsBar{
-    opacity : 0.8;
-    .list{
-      top : 40%;
+  .dishItem .photo{
+    width:150px;
+    max-height: 80px;
+    img{
+      max-height : 80px;
     }
   }
 

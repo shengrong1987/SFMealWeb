@@ -899,5 +899,8 @@
   "driver" : "司机",
   "go-to-check-out-btn" : "去结账",
   "select-preference" : "请选择%s",
-  "select": "精选"
+  "select": "精选",
+  "pay-cash-instruction" : "请领取单的时候支付给司机现金",
+  "venmo-instruction" : "付款时请留言下单的姓名",
+  "paypal-instruction" : "付款时请留言下单的姓名（每笔需要额外支付$1元手续费）"
 }

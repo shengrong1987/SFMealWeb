@@ -230,7 +230,7 @@ body * {
   box-sizing: content-box !important; }
 
 a, a:link, a:hover, a:focus {
-  color: #000;
+  /*color: #000;*/
   /*text-decoration: underline;*/
   cursor: pointer;
   outline: none; }
