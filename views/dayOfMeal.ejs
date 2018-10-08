@@ -1,0 +1,107 @@
+<div class="default-container text-center relative">
+
+  <div class="compact-banner w-100 d-none d-md-block">
+    <div class="img-wrapper">
+      <img src="/images/blank.gif" data-echo="/images/home-cover-1.jpg" class="relative middle">
+    </div>
+
+    <div class="absolute">
+      <div class="logo-container row">
+        <div class="col-lg-3 col-sm-4 col relative text-left">
+          <a href="/" class="logo-slogan"></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dayOfMealContainer" class="mx-auto" style="max-width: 800px;" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>">
+
+    <% if(meals && meals.meals){%>
+    <div class="w-100 sticky-top" style="height: 90px;">
+      <ul id="dishDatesBar" class="nav nav-light nav-fill justify-content-center bg-light">
+        <% Object.keys(meals.meals).forEach(function(dateKey,i){ %>
+        <li class="nav-item py-4 <%= i===0?'active':''%>"><a class="nav-link" href="javascript:void(0);" data-filter=".<%= dateKey%>" data-toggle="tab"><%= __(dateKey)%></a></li>
+        <% })%>
+      </ul>
+    </div>
+    <% }%>
+
+    <div class="wrapper">
+      <nav id="dishTagsBar">
+        <ul class="list list-side list-unstyled position-fixed" style="min-width:100px;" data-toggle="btn-set">
+          <% tags.forEach(function(tag, index){%>
+            <li class="cursor-pointer <%= index===0?'active':''%>"><a href="<%= tag%>"><%= __(tag)%></a></li>
+          <% })%>
+        </ul>
+      </nav>
+      <div id="dishContentView" class="content flex-grow-1 text-left">
+        <div id="order">
+          <% tags.forEach(function(tag){%>
+          <div class="light-grey pl-4" style="margin: 2px 0 2px 0;" id="<%= tag%>"><%= __(tag)%></div>
+          <%
+
+            var dateList = Object.keys(meals.meals);
+          dateList.forEach(function(dateKey){
+            var mealObj = meals.meals[dateKey];
+            var actualMeals = mealObj.meals;
+            var _dishes = [];
+          actualMeals.forEach(function(meal){ meal.dishes.forEach(function(dish){
+          if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
+          %>
+          <% if(tag === "all" || dish.type === tag || meal.chef.shopName === tag || (dish.tags && dish.tags.includes(tag))){%>
+          <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem p-4 mix item <%= meal.chef.shopName%> <%= dateKey%><% if(dish.tags){ dish.tags.forEach(function(t){%>
+              <%= " " + t%>
+              <%})}%>">
+            <div class="d-flex flex-row">
+              <div class="photo mr-2">
+                <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
+                <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
+                  <img src="/images/blank.gif" data-echo="<%= index===0? photo.v : ''%>">
+                </a>
+                <% }});%>
+              </div>
+              <div class="d-flex flex-column flex-grow-1">
+                <h5 class="mb-auto"><%= dish.title%></h5>
+                <div class="d-flex">
+                  <div class="text text-price price" data-extra=0 value="<%= dish.price%>">$<%= dish.price.toFixed(2)%></div>
+                  <div class="input-group input-group-sm amount-input round ml-auto" style="max-width:200px;min-width:200px;" data-toggle="amount-input" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
+                    <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">
+                      <span class="input-group-text">-</span>
+                    </div>
+                    <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" style="min-width: 50px;">
+                    <div class="input-group-append add" onclick="javascript:orderFood('<%= dish.id %>',1,true)">
+                      <span class="input-group-text">+</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% }}})})})});%>
+        </div>
+        <div id="shoppingCartView" class="red text-white p-2 align-middle d-block w-100" style="line-height:50px;position: fixed;bottom: 0;left: 0;z-index:90;" onclick="javascript:location.href='#order'">
+          <div class="row">
+            <div class="col-3"><span style="left: 10px;" class="total-preview relative" data-subtotal=""></span></div>
+            <div class="col-6 middle text-center"><button class="btn btn-outline-light" id="gotoCheckoutBtn" class="mr-1"><%= __('go-to-check-out-btn')%></button></div>
+            <div class="col-3 text-right"><div id="orderPreviewBtn" style="right: 10px;" class="btn btn-outline-white order-preview relative" data-toggle="tooltip"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var dayOfMealView = new DayOfMealView({ el : $("#dayOfMealContainer"), model : new Meal()});
+  var coverDishId = $("#meal-detail-container").data("cover");
+  var user = $("#meal-detail-container").data("user");
+  var coverDish = $("#meal-detail-container").find(".dish a[data-gallery='" + coverDishId + "']");
+  var dishTitle = coverDish.data("title");
+  var desc = coverDish.data("footer");
+  setupWechat($("#dayOfMealContainer [data-coverstring]").data("coverstring"),"SFMeal本周菜单", "小龙虾，冷串串，麻辣干锅，冰粉");
+  if(!user){
+    wechatLogin();
+  }
+</script>
+
+<script src="/js/utils/jweixin-1.0.0.js"></script>

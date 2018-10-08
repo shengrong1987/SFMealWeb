@@ -1,0 +1,44 @@
+
+<div id="dishPreferenceView" data-id="<%= dish.id || ''%>">
+
+  <div class="popup box middle">
+    <form class="form">
+      <h4>
+        <%= dish.title%>
+      </h4>
+      <button aria-label="close" type="button" class="close position-absolute" style="top: 20px;right:20px;" onclick="javascript:dismissModal()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <%
+      if(dish.preference){Object.keys(dish.preference).forEach(function(type){ %>
+      <h4><small><%= __('select-preference', type)%></small></h4>
+      <div class="btn-set" data-toggle="btn-set" data-prefType="<%= type%>">
+        <% var options = dish.preference[type]; options.forEach(function(option, index){%>
+          <button type="button" data-index=<%= index%> data-property="<%= option.property || ''%>" data-extra="<%= option.extra || 0%>" class="btn btn-outline-dark <%= index===0?'active':''%>"><%= option.property%>(+$<%= option.extra%>)</button>
+        <% });%>
+      </div>
+      <% });}%>
+      <div class="d-flex vertical-align my-4">
+        <div class="text text-price price" data-price="<%= dish.price%>">$<%= dish.price %></div>
+        <div class="text text-preference ml-2 properties">Mild | None</div>
+        <div class="input-group input-group-sm amount-input round ml-auto flex-grow-1" data-toggle="amount-input" data-max="100" data-dish="<%= dish.id%>">
+          <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1,false)">
+            <span class="input-group-text">-</span>
+          </div>
+          <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" style="min-width: 50px;">
+          <div class="input-group-append add" onclick="javascript:orderFood('<%= dish.id %>',1,false)">
+            <span class="input-group-text">+</span>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-warning btn-lg text-white w-100"><b style="font-size: large;"><%= __('confirm')%></b></button>
+    </form>
+  </div>
+</div>
+
+<script>
+  new DishPreferenceView({ el : $("#dishPreferenceView"), model : new Dish()});
+  loadPreference();
+  $("[data-toggle='btn-set']").btnSet();
+  $("[data-toggle='amount-input']").amountInput();
+</script>
