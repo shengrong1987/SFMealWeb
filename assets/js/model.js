@@ -1050,10 +1050,35 @@ var Meal = Backbone.Model.extend({
         return this.urlRoot + "/" + this.get("id");
       }
     }else{
+      if(this.action){
+        return this.urlRoot + "/" + this.action;
+      }
       return this.urlRoot;
     }
   }
 });
+
+var DayOfMealView = Backbone.View.extend({
+  events : {
+    "click #gotoCheckoutBtn" : "gotoCheckout"
+  },
+  initialize : function() {
+
+  },
+  gotoCheckout : function(e){
+    var orderedDishes = []
+    Object.keys(localOrders).forEach(function(dishId){
+      if(localOrders[dishId].number>0){
+        orderedDishes.push(dishId);
+      }
+    });
+    if(!orderedDishes.length){
+      makeAToast(jQuery.i18n.prop('noOrderTaken'));
+      return;
+    }
+    location.href = "/meal/checkout?dishes=" + orderedDishes.join(",");
+  }
+})
 
 var MealSelectionView = Backbone.View.extend({
   events : {
@@ -1447,13 +1472,17 @@ var MealView = Backbone.View.extend({
   addNewPickup : function(e){
     e.preventDefault();
     var county = this.$el.find(".pickup_container").data("county");
+    var pickups = this.$el.find(".pickup_container .pickup");
+    var firstPickup = pickups.first();
+    var driversOption = firstPickup.find(".phone .dropdown-menu").children();
+    var phone = firstPickup.find(".phone button").attr('value');
     this.$el.find("#pickupAlert").hide();
     var pickupView = '<div class="pickup autoCompleteTarget py-2"> ' +
       '<div class="card"><div class="card-body"><h5 class="card-title text-right"><button type="button" class="close" aria-label="Close"> <span aria-hidden="true">&times;</span> </button></h5> ' +
       '<label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> ' +
       '<div class="row">' +
-      '<div class="col-12 col-sm-6"> <div class="form-group start-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <div class="input-group-prepend"><span class="input-group-text" data-toggle="i18n" data-key="from"></span></div> <input type="text" class="form-control" readonly="true"/> <div class="input-group-append"><span class="input-group-text datepickerbutton"> <i class="fa fa-clock"></i> </span></span> </div></div></div> </div>' +
-      '<div class="col-12 col-sm-6"> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <div class="input-group-prepend"><span class="input-group-text" data-toggle="i18n" data-key="end"></span></div> <input type="text" class="form-control" readonly="true"/> <div class="input-group-append"><span class="input-group-text datepickerbutton"><i class="fa fa-clock"></i></span> </div> </div></div></div>' +
+      '<div class="col-12 col-sm-6"> <div class="form-group start-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <div class="input-group-prepend"><span class="input-group-text" data-toggle="i18n" data-key="from"></span></div> <input type="text" class="form-control" readonly="true"/> <div class="input-group-append"><span class="input-group-text datepickerbutton"> <i class="far fa-clock"></i> </span></span> </div></div></div> </div>' +
+      '<div class="col-12 col-sm-6"> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <div class="input-group-prepend"><span class="input-group-text" data-toggle="i18n" data-key="end"></span></div> <input type="text" class="form-control" readonly="true"/> <div class="input-group-append"><span class="input-group-text datepickerbutton"><i class="far fa-clock"></i></span> </div> </div></div></div>' +
       '</div>' +
       '<div class="form-group location pickup-item"> <label data-toggle="i18n" data-key="pickupAddress"></label> <input type="text" class="form-control"> </div>' +
       '<div class="form-group delivery-center delivery-item" style="display: none;"> <label data-toggle="i18n" data-key="deliveryCenter"></label> <input type="text" class="form-control"></div>' +
@@ -1463,17 +1492,22 @@ var MealView = Backbone.View.extend({
       '<div class="col-12 col-sm-6"><div class="form-group area" data-county="' + county + '"> <label data-toggle="i18n" data-key="area"></label> <input class="form-control" type="text" readonly="readonly" value=""> </div></div>' +
       '<div class="col-12 col-sm-6"><div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control" style="height: 38px;"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div></div>' +
       '</div>' +
-      '<div class="form-group phone"> <label data-toggle="i18n" data-key="telephone"></label> <input type="tel" class="form-control"> </div></div></div> </div> </div>';
+      '<div class="row">' +
+      '<div class="col-12 col-sm-6"><div class="form-group deliveryRange"><label data-toggle="i18n" data-key="deliveryRange"></label><input class="form-control" type="text" placeholder="5" value=""></div></div>'+
+      '<div class="col-12 col-sm-6"><div class="dropdown phone"><label data-toggle="i18n" data-key="driver"></label><button class="btn btn-secondary dropdown-toggle form-control" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="false" value="' + phone + '">' + phone + '<span class="caret"></span></button><div class="dropdown-menu"></div></div>'
+      '</div>' +
+      '</div></div> </div> </div>';
     this.$el.find(".pickup_container").append(pickupView);
+    var phoneMenu = this.$el.find(".pickup_container .pickup").last().find(".phone .dropdown-menu").append(driversOption);
     this.$el.find("[data-toggle='dateTimePicker']").datetimepicker({
       icons:{
-        time: "fa fa-clock-o",
-        date: "fa fa-calendar",
-        up: "fa fa-arrow-up",
-        down: "fa fa-arrow-down",
-        previous : "fa fa-arrow-left",
-        next : "fa fa-arrow-right",
-        today : "fa fa-calendar-times-o"
+        time: "fal fa-clock",
+        date: "fal fa-calendar",
+        up: "fas fa-arrow-up",
+        down: "fas fa-arrow-down",
+        previous : "fas fa-arrow-left",
+        next : "fas fa-arrow-right",
+        today : "far fa-calendar-alt"
       },
       stepping : 30,
       showTodayButton : true,
@@ -2780,6 +2814,56 @@ var TransactionView = Backbone.View.extend({
   }
 });
 
+var DishPreferenceView = Backbone.View.extend({
+  events : {
+    "change .btn-set[data-prefType]" : "changePreference",
+    "submit form" : 'savePreference'
+  },
+  changePreference : function(e){
+    var btnSet = $(e.currentTarget);
+    var dishId = this.$el.data("id");
+    var property = btnSet.find("button.active").data("property");
+    var extra = btnSet.find("button.active").data("extra");
+    var index = btnSet.find("button.active").data("index");
+    var prefType = btnSet.data('preftype');
+    var amount = parseInt(this.$el.find(".amount").text());
+    var prefList = localOrders[dishId].preference;
+    var properties, preObj, isExist = false;
+    if(prefList && amount <= prefList.length){
+      preObj = prefList[amount-1];
+      preObj.extra = preObj.extra || 0;
+      preObj.extra += extra;
+      properties = preObj.property;
+      if(properties && properties.length){
+        var j = 0;
+        properties.map(function(propObj, i){
+          if(propObj.preftype === prefType){
+            j = i;
+            isExist = true;
+            propObj.property = property;
+          }
+        });
+      }
+      if(index===0){
+        properties.splice(j,1);
+      }
+    }
+    if(!isExist && index){
+      if(properties){
+        properties.push({ preftype : prefType, property : property});
+      }else{
+        properties = [{ preftype : prefType, property : property}];
+      }
+    }
+    refreshPreference(dishId);
+    updateOrderPreview();
+  },
+  savePreference : function(e){
+    e.preventDefault();
+    dismissModal();
+  }
+});
+
 var ContactInfoView = Backbone.View.extend({
   events : {
     "blur input" : "saveInfo"
@@ -2787,7 +2871,7 @@ var ContactInfoView = Backbone.View.extend({
   saveInfo : function(e){
     e.preventDefault();
     var userId = this.$el.data("user");
-    var isLogin = userId ? true : false;
+    var isLogin = !!userId;
     var form = $(e.currentTarget).closest('form');
     if(!isLogin){
       return;
@@ -2836,7 +2920,7 @@ var MealConfirmView = Backbone.View.extend({
     this.alertView.removeClass("d-none").hide();
     this.isCoolDown = true;
     utility.initGoogleMapService();
-    this.$el.find(".deliveryInput").removeClass('d-none').hide();
+    this.$el.find(".pickupInput").removeClass('d-none').hide();
   },
   enterBillingAddress : function(e){
     var isChecked = $(e.currentTarget).prop("checked");
@@ -2853,18 +2937,23 @@ var MealConfirmView = Backbone.View.extend({
     if(e.which === 13) e.preventDefault();
   },
   initDelivery : function(){
-
     var $this = this;
     if(!this.$el.find(".deliveryOption").length){
       return;
     }
-    var map;
-    this.$el.find(".deliveryOption").each(function () {
+    var map,spots=[];
+    this.$el.find(".deliveryOption:visible").each(function () {
       var location = $(this).data("center");
       var color = $(this).data("color");
       var area = $(this).data("area");
       var time = $(this).data("time");
       var range = $(this).data("range");
+      if(spots.some(function(spot){
+        return spot.location === location && spot.time === time;
+      })){
+        return;
+      }
+      spots.push({location: location, time: time});
       utility.geocoding(location, function(err, center){
         if(err){
           makeAToast(err);
@@ -2921,8 +3010,15 @@ var MealConfirmView = Backbone.View.extend({
         makeAToast(err);
         return;
       }
-      $this.$el.find(".pickupOption").each(function () {
+      var spots = [];
+      $this.$el.find(".pickupOption:visible").each(function () {
         var location = $(this).data("location");
+        if(spots.some(function(spot){
+            return spot.location === location;
+          })){
+          return;
+        }
+        spots.push({location: location});
         var title = '<div><h4><small><span data-toggle="i18n" data-key="pickup"></span>:' + location + '</small></h4></div>';
         var infowindow = new google.maps.InfoWindow({
           content: title
@@ -3010,9 +3106,9 @@ var MealConfirmView = Backbone.View.extend({
       makeAToast(jQuery.i18n.prop('addressIncomplete'));
       return false;
     }
-    var range = this.$el.data("range");
+    var range = 5;
     var yourAddress = street + ", " + city + ", " + state + " " + zipcode;
-    var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
+    var deliveryOption = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio:checked");
     if(!deliveryOption.length && !isPartyMode){
       makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
       return false;
@@ -3020,6 +3116,7 @@ var MealConfirmView = Backbone.View.extend({
       var deliveryCenter = this.$el.find('.deliveryOption').data('center');
     }else{
       deliveryCenter = deliveryOption.parent().data('center');
+      range = deliveryOption.parent().data("range");
     }
     if(checkOnly){
       return yourAddress;
@@ -3032,6 +3129,7 @@ var MealConfirmView = Backbone.View.extend({
       if(btn){
         btn.html(btn.data('original-text'));
       }
+      console.log("distance: " + distance, " range:" + range);
       if(distance > range){
         if(!isPartyMode){
           makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
@@ -3064,8 +3162,7 @@ var MealConfirmView = Backbone.View.extend({
     }
   },
   checkOptions : function(address){
-    var range = this.$el.data("range");
-    var deliveryOptions = this.$el.find("#deliveryTab .deliveryOption .regular-radio")
+    var deliveryOptions = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio")
     deliveryOptions.each(function(index){
       var deliveryOption = $(this);
       deliveryOption.parent().addClass('disabled');
@@ -3074,6 +3171,7 @@ var MealConfirmView = Backbone.View.extend({
       setTimeout(function() {
         utility.distance(deliveryCenter, address, function(err, distance) {
           deliveryOption.parent().find('.s').removeClass('spinner');
+          var range = deliveryOption.data("range");
           if (err) {
             makeAToast(err);
             return;
@@ -3088,7 +3186,8 @@ var MealConfirmView = Backbone.View.extend({
     });
   },
   switchAddress : function(e, cb, yourAddress){
-    var range = this.$el.data("range");
+    var deliveryOption = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio:checked");
+    var range = deliveryOption.parent().data("range") || 5;
     var $this = this;
     var isLogin = !!this.$el.data("user");
     var form = this.$el.find("#order");
@@ -3482,7 +3581,10 @@ var OrderView = Backbone.View.extend({
       }
   },
   getPickupOption : function(method){
-    return parseInt(this.$el.find("#" + method + "Tab" + " .option." + method +  "Option .regular-radio:checked").data("index"));
+    var optionItem = this.$el.find("#" + method + "Tab" + " .option." + method +  "Option .regular-radio:checked");
+    var index = optionItem.data("index");
+    var date = optionItem.parent().data("date");
+    return { index : index, date: date};
   },
   getCustomizedInfo : function(partyMode, cb){
     if(!partyMode){
@@ -3592,12 +3694,12 @@ var OrderView = Backbone.View.extend({
           return;
         }
         var form = $this.$el.find("#order");
-        var mealId = form.data("meal");
         var partyMode = form.data("party");
-        var orderId = form.data("order");
 
         //pickup option
-        var pickupOption = $this.getPickupOption(method);
+        var pickupObj = $this.getPickupOption(method);
+        var pickupOption = pickupObj.index;
+        var pickupDate = pickupObj.date;
         $this.getCustomizedInfo(partyMode, function(customInfo){
           if(!customInfo){
             return;
@@ -3605,7 +3707,7 @@ var OrderView = Backbone.View.extend({
           var currentOrder = localOrders;
 
           //subtotal
-          var subtotal = form.find(".subtotal").data("value");
+          var subtotal = parseFloat(form.find(".subtotal").data("value"));
           if (subtotal === 0) {
             makeAToast(jQuery.i18n.prop('orderEmptyError'));
             return;
@@ -3641,9 +3743,9 @@ var OrderView = Backbone.View.extend({
                 title : subtotal * 0.15,
                 cssClass: 'btn-primary',
                 action : function(dialog){
-                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, method, mealId, code, points, isLogin, partyMode, subtotal * 0.15, $this, button);
+                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate, method, code, points, isLogin, partyMode, subtotal * 0.15, $this, button);
                 }
-              }, {
+              },{
                 label : jQuery.i18n.prop('customTip'),
                 title : jQuery.i18n.prop('customTip'),
                 cssClass: 'btn-primary',
@@ -3652,7 +3754,7 @@ var OrderView = Backbone.View.extend({
                   $("#customTip").submit(function(e){
                     e.preventDefault();
                     var tip = $(e.currentTarget).find("[name='tip']").val();
-                    $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, method, mealId, code, points, isLogin, partyMode, tip, $this, button);
+                    $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate, method, code, points, isLogin, partyMode, tip, $this, button);
                   });
                 }
               }, {
@@ -3660,7 +3762,7 @@ var OrderView = Backbone.View.extend({
                 title : jQuery.i18n.prop('noTip'),
                 cssClass: 'btn-light',
                 action : function(dialog){
-                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, method, mealId, code, points, isLogin, partyMode, 0, $this, button);
+                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate, method, code, points, isLogin, partyMode, 0, $this, button);
                 }
               }
             ]
@@ -3732,7 +3834,7 @@ var OrderView = Backbone.View.extend({
       }
     })
   },
-  submitOrder : function(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, method, mealId, code, points, isLogin, partyMode, tip, $this, button){
+  submitOrder : function(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, pickupDate, method, code, points, isLogin, partyMode, tip, $this, button){
     console.log("order include tips: " + tip);
     $this.model.clear();
     $this.model.set({
@@ -3742,8 +3844,8 @@ var OrderView = Backbone.View.extend({
       paymentInfo : paymentInfo,
       customInfo : customInfo,
       pickupOption: pickupOption,
+      pickupDate : pickupDate,
       method: method,
-      mealId: mealId,
       couponCode: code,
       points: points,
       isLogin : isLogin,
@@ -3754,8 +3856,12 @@ var OrderView = Backbone.View.extend({
     $this.model.save({}, {
       success: function (model, result) {
         button.html(button.data('original-text'));
+        var orderIds = result.orders.map(function(order){
+          return order.id;
+        }).join("+");
         if(paymentInfo.method === "alipay" || paymentInfo.method === "wechatpay"){
-          var source = result.source;
+          var order = result[0];
+          var source = order.source;
           var redirectUrl = source.redirect.url;
           var orderId = source.metadata.orderId;
           var mealId = source.metadata.mealId;
@@ -3767,13 +3873,13 @@ var OrderView = Backbone.View.extend({
                 label: jQuery.i18n.prop('confirmPayment'),
                 action: function(dialog) {
                   $.get(
-                    '/order/' + orderId + '/verifyOrder'
+                    '/order/' + orderIds + '/verifyOrder'
                   ).done(function(){
                     $this.clear();
                     if(isLogin){
                       reloadUrl("/user/me", "#myorder");
                     }else{
-                      location.href = "/order/" + result.id + '/receipt';
+                      location.href = "/order/" + orderIds + '/receipt';
                     }
                   }).fail(function(err){
                     dialog.setMessage(err.responseJSON.responseText);
@@ -3792,11 +3898,11 @@ var OrderView = Backbone.View.extend({
           location.href = redirectUrl;
         }else{
           $this.clear();
-          BootstrapDialog.alert(jQuery.i18n.prop('newOrderTakenSuccessfully',result.id), function () {
+          BootstrapDialog.alert(jQuery.i18n.prop('newOrderTakenSuccessfully',orderIds), function () {
             if(isLogin){
               reloadUrl("/user/me", "#myorder");
             }else{
-              location.href = "/order/" + result.id + '/receipt';
+              location.href = "/order/" + orderIds + '/receipt';
             }
           });
         }

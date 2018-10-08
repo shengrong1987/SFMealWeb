@@ -235,6 +235,18 @@ module.exports = {
       return dateUtil.getTimeOfDay(date);
     },
 
+    getDateDesc : function(date){
+      var pickupDate = moment(date);
+      if(pickupDate.isSame(moment(),'day')){
+        var dateDesc = 'today';
+      }else if(pickupDate.isSame(moment().add(1,'days'),'day')){
+        dateDesc = 'tomorrow';
+      }else{
+        dateDesc = pickupDate.format('dddd')
+      }
+      return dateDesc;
+    },
+
     dateIsValid : function(params){
       params = this;
       var provideFromTime = params.provideFromTime;

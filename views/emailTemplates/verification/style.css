@@ -8872,9 +8872,7 @@ small {
   color: #777;
 }
 .wrapper {
-  display: flex;
   width: 100%;
-  align-items: stretch;
 }
 #myUserBar {
   z-index: 101;

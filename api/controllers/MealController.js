@@ -33,6 +33,7 @@ const DELIVERY_FEE = 0;
  * -16 : meal query is invalid
  * -17 : meal lack of party requirement
  * -18 : meal lack county information, unable to perform search
+ * -19 : meal lack of order information
  */
 
 module.exports = {
@@ -56,18 +57,59 @@ module.exports = {
     });
   },
 
-  today : function(req,res){
+  dayOfMeal : function(req,res){
     //find out meals that provide start today or ends today
-    var now = moment();
-    Meal.find({ where : { status : "on", provideFromTime : { '<' : now.toDate()}}}).exec(function(err, meals){
+    var _this = this;
+    var day = req.param("day");
+    var county = req.cookies['county'] || req.param('county') || "San Francisco County";
+    var withinSevenDay = moment().add(7,'days');
+    Meal.find({ where : { status : "on", provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
       if(err){
         return res.badRequest(err);
       }
       meals = meals.filter(function(meal){
         return meal.county.split("+").indexOf(county) !== -1;
       });
-      meals = this.composeMealWithDate(meals);
-      res.ok(meals);
+      var _u=null,_tags=[];
+      async.auto({
+        findUser : function(next){
+          if(!req.session.authenticated){
+            return next();
+          }
+          User.find(req.session.id).exec(function(err, u){
+            if(err){
+              return next(err);
+            }
+            _u = u;
+            next();
+          })
+        },
+        findDishTags : function(next){
+          _tags.push("select");
+          meals.forEach(function(meal){
+            if(!_tags.includes(meal.chef.shopName)){
+              _tags.push(meal.chef.shopName);
+            }
+            meal.dishes.forEach(function(dish){
+              if(dish.tags){
+                dish.tags.forEach(function(tag){
+                  if(!_tags.includes(tag)){
+                    _tags.push(tag);
+                  }
+                })
+              }
+            })
+          })
+          _tags.push("dessert");
+          next();
+        },
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        meals = _this.composeMealWithDate(meals);
+        res.view("dayOfMeal",{ meals : meals, user : _u, tags: _tags});
+      })
     })
   },
 
@@ -250,68 +292,62 @@ module.exports = {
     });
   },
 
-  confirm : function(req, res){
-    var mealId = req.param("id");
-    var u = req.session.user;
-    Meal.findOne(mealId).populate("dishes").populate("dynamicDishes").populate("chef").exec(function(err,m){
+  checkout : function(req, res) {
+    var _this = this;
+    var orderedDishes = req.query.dishes;
+    if (!orderedDishes){
+      return res.badRequest({code: -19, responseText: req.__('meal-checkout-lack-of-order')});
+    }
+    orderedDishes = orderedDishes.split(",");
+
+    Meal.find({where: {status: "on", provideTillTime: {'>': moment().toDate()}}}).populate('dishes').exec(function(err, meals){
       if(err){
         return res.badRequest(err);
       }
-      if(!m){
-        return res.badRequest({ code : -3, responseText : req.__('meal-not-found')});
-      }
-      var isPartyMode = req.query['party'];
+      meals = meals.filter(function(meal){
+        return meal.dishes.some(function(d){
+          return orderedDishes.includes(d.id);
+        });
+      });
+      var pickups = [], u = {};
       async.auto({
-        getPartyMeal : function(cb){
-          if(isPartyMode !== 'true'){
-            return cb();
-          }
-          Dish.find({ chef : m.chef.id, isVerified : true}).exec(function(err, dishes){
-            if(err){
-              return res.badRequest(err);
-            }
-            m.isPartyMode = true;
-            m.delivery_range = m.delivery_range * stripe.PARTY_ORDER_RANGE_MULTIPLIER;
-            m.delivery_fee = 0;
-            m.dishes = dishes;
-            cb();[]
+        combinePickups : function(next){
+          meals.forEach(function(meal){
+            var newPickups = meal.pickups.filter(function(p1){
+              return !(pickups.length && pickups.some(function(p2){
+                if(p1.pickupFromTime === p2.pickupFromTime && p1.pickupTillTime === p2.pickupTillTime && p1.location === p2.location){
+                  return true;
+                }
+                return false;
+              }))
+            });
+            pickups = pickups.concat(newPickups);
           })
+          next();
         },
-        getMeal : function(cb){
+        getUser : function(next){
           if(!req.session.authenticated){
-            return cb();
+            return next();
           }
-          User.findOne(u.id).populate('auth').populate("payment").populate("orders").exec(function(err,user){
+          User.findOne(req.session.user.id).populate("collects").exec(function(err, user){
             if(err){
-              return cb(err);
+              return next(err);
             }
-            if(!user){
-              return cb({ code : -99, responseText : "can not find user"});
-            }
-            user.firstOrder = true;
-            user.firstOrder = user.orders.every(function(order){
-              return order.status === "cancel";
-            });
-            user.orders = user.orders.filter(function(order){
-              return order.status === "schedule" || order.status === "preparing";
-            });
             u = user;
-            cb();
-          });
+            next()
+          })
         }
       }, function(err){
         if(err){
           return res.badRequest(err);
         }
         if(req.wantsJSON && process.env.NODE_ENV === "development"){
-          return res.ok({meal : m, user : u, locale : req.getLocale()});
+          return res.ok({ pickups : pickups, meals: meals, user : u, locale : req.getLocale()});
         }
-        if(!req.session.authenticated){
-          u = {}
-        }
-        return res.view("confirm",{meal : m, user : u, locale : req.getLocale()});
-      });
-    });
+        meals = _this.composeMealWithDate(meals);
+        return res.view("checkout",{ pickups : pickups, meals: meals, user : u, locale : req.getLocale()});
+      })
+    })
   },
 
   off : function(req, res){
@@ -958,7 +994,6 @@ module.exports = {
   },
 
   findOne : function(req, res){
-
     var mealId = req.param('id');
     if(!mealId){
       return res.badRequest({ code : -3, responseText : req.__('meal-not-found')})

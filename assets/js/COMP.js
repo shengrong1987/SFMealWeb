@@ -351,12 +351,7 @@
   };
 
   AmountInput.prototype.add = function(node){
-    if(this.$options.max){
-      if(this.$value < this.$options.max){
-        this.$value = this.$value + 1;
-        node.prev().val(this.$value);
-      }
-    }else{
+    if(this.$value < this.$options.max){
       this.$value = this.$value + 1;
       node.prev().val(this.$value);
     }
@@ -867,6 +862,11 @@
     });
     node.addClass("active");
     $(node.data("target")).addClass("active");
+    var a = node.find("a");
+    if(a.length){
+      var href = a.attr('href');
+      jumpTo(href);
+    }
     this.element.trigger('change');
   }
 

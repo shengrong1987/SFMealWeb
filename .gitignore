@@ -180,3 +180,13 @@ node_modules/winston/test/fixtures/keys/
 *.icloud
 *.icloud
 *.icloud
+node_modules/component-emitter 2/
+node_modules/react 2/
+node_modules/react-dom 2/dist/
+node_modules/react-dom 2/lib/
+node_modules/react-dom 2/node_modules/fbjs/
+node_modules/react-dom 2/node_modules/prop-types/lib/
+node_modules/react-dom 2/node_modules/prop-types/node_modules/loose-envify/
+views/checkout.ejs
+views/dayOfMeal.ejs
+views/preference.ejs

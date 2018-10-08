@@ -16,6 +16,16 @@ module.exports = {
     return res.view("dish_new",{user : user});
   },
 
+  preference : function(req, res){
+	  var dishId = req.params.id;
+	  Dish.findOne(dishId).exec(function(err, dish){
+	    if(err){
+	      return res.badRequest(err);
+      }
+      res.view('preference', { layout : "popup", dish : dish });
+    })
+  },
+
   verify : function(req, res){
     var dishId = req.params.id;
     Dish.findOne(dishId).populate("chef").exec(function(err, dish){

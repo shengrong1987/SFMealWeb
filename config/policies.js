@@ -76,11 +76,12 @@ module.exports.policies = {
     'find' : true,
     'findOne' : true,
     'search' : true,
-    'confirm' : true,
+    'checkout' : true,
     'findAll' : 'isAdmin',
     'searchAll' : 'isAdmin',
     'findReview' : 'isAdmin',
     'findOrder' : 'isAdmin',
+    'dayOfMeal' : true,
     'update' : 'or(and(sessionAuth,isHost,isOwnerOfMeal,isNotFields("isScheduled","chef","score","numberOfReviews","msg","commission")),isAdmin)'
   },
 
@@ -135,7 +136,8 @@ module.exports.policies = {
     'fail' : 'isAdmin',
     'destroy' : 'or(and(sessionAuth, isHost, isOwnerOfDish), isAdmin)',
     'update' : 'or(and(sessionAuth, isHost, isOwnerOfDish, isNotFields("sold","numberOfReviews","score","chef", "isFeature", "isVerified","dynamicPrice")), isAdmin)',
-    'findReview' : 'isAdmin'
+    'findReview' : 'isAdmin',
+    'preference' : true
   },
 
   NotificationController : {

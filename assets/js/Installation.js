@@ -147,13 +147,45 @@ function setupTooltip(){
 }
 
 function setupMixin() {
-  if($("#meal-container").length){
-    mixitup("#meal-container", {
+  if($("#pickupTab").length){
+    var firstFilter = $("#dishDatesBar").find("a[data-filter]").first().data('filter');
+    mixitup("#pickupTab", {
       pagination: {
-        limit: 20
+        limit: 10
       },
       classNames: {
         elementPager: 'btn btn-mixitup'
+      },
+      load: {
+        filter : firstFilter
+      }
+    });
+  }
+  if($("#deliveryTab").length){
+    var firstFilter = $("#dishDatesBar").find("a[data-filter]").first().data('filter');
+    mixitup("#deliveryTab", {
+      pagination: {
+        limit: 10
+      },
+      classNames: {
+        elementPager: 'btn btn-mixitup'
+      },
+      load: {
+        filter : firstFilter
+      }
+    });
+  }
+  if($("#dishContentView").length){
+    var firstFilter = $("#dishDatesBar").find("a[data-filter]").first().data('filter');
+    mixitup("#dishContentView", {
+      pagination: {
+        limit: 50
+      },
+      classNames: {
+        elementPager: 'btn btn-mixitup'
+      },
+      load: {
+        filter : firstFilter
       }
     });
   }
@@ -322,7 +354,7 @@ function setupSwitchButton(){
 }
 function setupEchoBox(){
   echo.init({
-    offset: 1000
+    offset: 100
   });
 }
 function setupGlobalLoading(){

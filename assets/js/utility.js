@@ -36,6 +36,9 @@
           }else if(typeof mealConfirmView !== 'undefined' && mealConfirmView){
             mealConfirmView.initDelivery();
             mealConfirmView.initPickups();
+          }else if(typeof dayOfMealView !== 'undefined' && dayOfMealView){
+            dayOfMealView.initDelivery();
+            dayOfMealView.initPickups();
           }
         },error : function(err){
           console.log(err.statusText);

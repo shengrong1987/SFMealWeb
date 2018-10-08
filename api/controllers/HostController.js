@@ -35,9 +35,15 @@ module.exports = {
           }
           //construct orders for host
           host.host_orders = host.orders.map(function(o){
+            if(!o){
+              return;
+            }
             var meal = host.meals.filter(function(m){
               return m.id === o.meal;
             })[0];
+            if(!meal){
+              return;
+            }
             o.serviceFee = meal.serviceFee;
             return o;
           });

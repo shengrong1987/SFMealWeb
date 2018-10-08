@@ -83,6 +83,10 @@ function toggleModal(event,cb){
   var target = event.currentTarget ? event.currentTarget : event;
   var url = $(target).data('href');
   var modalId = $(target).data('target');
+  toggleModalUrl(url, modalId, target, cb);
+}
+
+function toggleModalUrl(url, modalId, target, cb){
   var modal = $(modalId);
   if(modal.hasClass('show')){
     modal.modal('hide');
@@ -94,7 +98,7 @@ function toggleModal(event,cb){
         modal.modal('show');
         if(cb){cb(target);}
       });
-      $($(target).data("target")+' .modal-content').load($(target).data("href"));
+      $(modalId+' .modal-content').load(url);
       modal.modal();
     });
   }else{
@@ -104,7 +108,7 @@ function toggleModal(event,cb){
       modal.modal('show');
       if(cb){cb(target);}
     });
-    $($(target).data("target")+' .modal-content').load($(target).data("href"));
+    $(modalId +' .modal-content').load(url);
     modal.modal();
     modal.modal('show');
   }
@@ -265,8 +269,8 @@ function loadOrder(fromCache){
   loadCoupon(fromCache);
   loadPoints(fromCache);
   refreshMenu();
+  updateOrderPreview();
 }
-
 
 function loadPreference(){
   $("#order").find(".item").each(function(){
@@ -295,14 +299,15 @@ function updateOrderWindow(fromCache, isTrigger){
       }
       localOrders[dishId] = localDish;
       var left = parseInt($(this).attr("data-left-amount") - parseInt(localOrders[dishId].number));
-      var dishItem = $("#meal-detail-container").find(".dish[data-id='" + dishId + "']");
-      dishItem.find(".dish-number").val(localOrders[dishId].number);
+      var dishItem = $("#order").find(".dish[data-id='" + dishId + "']");
+      dishItem.find(".amount").val(localOrders[dishId].number);
+      dishItem.find(".amount").text(localOrders[dishId].number);
       $(this).amountInput('update',dishItem.find("[data-toggle='amount-input']"));
       $(this).data("left-amount", left);
       updateMenuView(dishId, isTrigger);
     }else{
       localOrders[dishId] = {
-        number : parseInt($(this).find(".amount").data("value")),
+        number : parseInt($(this).find(".amount").val()),
         preference : $(this).data("preference"),
         price : $(this).find(".price").attr("value")
       };
@@ -320,7 +325,7 @@ function updateMenuView(id, triggerExpand){
   var number = localOrders[id].number;
   var item = $("#order").find(".item[data-id=" + id + "]");
   var left = item.data("left-amount");
-  item.find(".amount").html(number);
+  item.find(".amount").val(number);
   var priceItem = item.find(".price");
   var preference = localOrders[id].preference;
   var oldPrice = priceItem.attr("old-value");
@@ -351,58 +356,71 @@ function updateMenuView(id, triggerExpand){
       priceItem.html("$" + price);
     }
   }
-  var dishItem = $("#meal-detail-container").find(".dish[data-id='" + id + "']");
-  if(number > 0){
-    dishItem.find(".beforeOrder").hide();
-    dishItem.find(".afterOrder").show();
-    dishItem.find(".dish-number").val(number);
-    item.addClass("success");
-    item.show();
-  }else{
-    dishItem.find(".beforeOrder").show();
-    dishItem.find(".afterOrder").hide();
-    item.removeClass("success");
-    if(triggerExpand){
-      item.toggle();
-    }else{
-      item.hide();
-    }
-  }
+  var dishItem = $("#order").find(".dish[data-id='" + id + "']");
+  // if(number > 0){
+  //   dishItem.find(".beforeOrder").hide();
+  //   dishItem.find(".afterOrder").show();
+  //   dishItem.find(".dish-number").val(number);
+  //   item.addClass("success");
+  //   item.show();
+  // }else{
+  //   dishItem.find(".beforeOrder").show();
+  //   dishItem.find(".afterOrder").hide();
+  //   item.removeClass("success");
+  //   if(triggerExpand){
+  //     item.toggle();
+  //   }else{
+  //     item.hide();
+  //   }
+  // }
   dishItem.find(".left-amount span").attr("value",left);
   dishItem.find(".left-amount span").html(left);
 }
 
 function refreshPreference(id){
-  var number = localOrders[id].number;
-  var preferences = localOrders[id].preference;
-  var preferenceBtn = $('[data-submenu][data-dish="' + id + '"]');
-  preferenceBtn.data("key", jQuery.i18n.prop('orderNo', number));
-  preferenceBtn.data('value', number);
-  if(number > 1){
-    preferenceBtn.submenupicker('updateMenu', preferenceBtn);
+  var preferenceView = $("#dishPreferenceView[data-id='" + id +  "']");
+  if(!preferenceView.length){
+    return;
   }
+  var propertiesLabel = preferenceView.find(".properties");
+  var numberInput = preferenceView.find(".amount");
+  var amountInput = preferenceView.find(".amount-input");
+  var priceLabel = preferenceView.find(".price");
+  var price = priceLabel.data("price");
+  var number = localOrders[id].number || 1;
+  var preferences = localOrders[id].preference;
+  var propertiesText = "";
+  var item = $("#order").find(".item[data-id=" + id + "]");
+  var max = item.find(".amount-input").data("max");
   if(_.isArray(preferences)){
     preferences.forEach(function(preference, index){
       var props = preference.property;
-      if(props){
-        var propInArray = props.split(",");
+      var extra = preference.extra;
+      if(props && props.length){
+        var propInArray = props;
         if(_.isArray(propInArray)){
           propInArray.forEach(function(prop){
-            console.log("index is: " + index, "prop: " + prop);
-            var i = parseInt(index) + 1;
-            var pref = preferenceBtn.next().find("[data-layer='0']:nth-child(" + i + ")");
-            var propView = pref.find(".variation a[value='" + prop + "']");
-            var extra = propView.data("extra");
-            var variation = propView.closest("[data-layer='1'].variation").find("a").first();
-            if(variation.length){
-              variation.attr("value", prop);
-              variation.text(prop + " + $" + extra);
+            var button = preferenceView.find("[data-property='" + prop.property + "'] button.active");
+            if(button.length){
+              button.parent().children().removeClass("active");
+              button.addClass("active");
+            }
+            if(button.data("index")){
+              if(propertiesText){
+                propertiesText += " | ";
+              }
+              propertiesText += prop.property;
             }
           })
         }
       }
     });
   }
+  amountInput.data("max",max);
+  numberInput.val(number);
+  numberInput.text(number);
+  propertiesLabel.text(propertiesText);
+  priceLabel.text("$" + (price*number).toFixed(2));
 }
 
 function loadCoupon(fromCache){
@@ -432,61 +450,122 @@ function loadPoints(fromCache){
 
 //order food
 function orderFood(id,number,initial){
-
-  var dishItem = $("#meal-detail-container").find(".dish[data-id='" + id + "']");
-  if(!!initial){
-    if(number > 0){
-      $(this).amountInput('add',dishItem.find("[data-toggle='amount-input']"));
-    }else if(number < 0){
-      $(this).amountInput('minus',dishItem.find("[data-toggle='amount-input']"));
+  var $order = $("#order");
+  var item = $order.find(".item[data-id=" + id + "]");
+  var prefs = item.data('prefs');
+  orderFoodLogic(id, number, initial)
+  if(prefs>0 && number>0){
+    if(!$("#myModal").hasClass('show')) {
+      var url = "/dish/" + id + "/preference";
+      toggleModalUrl(url, "#myModal");
     }
   }
+}
+
+function orderFoodLogic(id, number, initial){
+
   var $order = $("#order");
-  var alertView = $($order.data("err-container"));
-  alertView.removeClass("hide");
-  alertView.hide();
   var item = $order.find(".item[data-id=" + id + "]");
-  var price = parseInt(item.find(".price").attr("value"));
+  if(!initial){
+    if(number > 0){
+      $(this).amountInput('add',item.find("[data-toggle='amount-input']"));
+    }else if(number < 0){
+      $(this).amountInput('minus',item.find("[data-toggle='amount-input']"));
+    }
+  }
+  var price = parseInt(item.find(".price").attr("price"));
   localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : [{ property : '', extra : 0}], price : price};
   localOrders[id].number += number;
-  var preferenceBtn = $('[data-submenu][data-dish="' + id + '"]');
-  preferenceBtn.data('value', jQuery.i18n.prop('the') + localOrders[id].number + jQuery.i18n.prop('fen'));
   var left = parseInt(item.data("left-amount"));
   if(number < 0){
     if(localOrders[id].number<0){
       localOrders[id].number = 0;
-      return;
-    }
-    left++;
-    localOrders[id].preference.pop();
-    item.data("left-amount", left);
-    if(localOrders[id].number >= 1){
-      preferenceBtn.submenupicker('removeMenu', preferenceBtn);
     }else{
-      resetDropdownMenu(preferenceBtn);
+      left++;
+      localOrders[id].preference.pop();
+      item.data("left-amount", left);
     }
   }else{
     if(left<=0 && number > 0){
       localOrders[id].number -= number;
-      alertView.show();
-      return;
-    }
-    left--;
-    item.data("left-amount",left);
-    var preferences = localOrders[id].preference;
-    if(!preferences.length){
-      preferences.push({ extra : 0, property : ""});
     }else{
-      preferences.push(preferences[0]);
-    }
-    if(localOrders[id].number > 1){
-      preferenceBtn.submenupicker('insertMenu', preferenceBtn);
+      left--;
+      item.data("left-amount",left);
+      var preferences = localOrders[id].preference;
+      var preferenceView = $("#dishPreferenceView[data-id='" + id +  "']");
+      var prefObj = {};
+      if(preferenceView && preferenceView.length){
+        var properties = [];
+        var extra = 0;
+        var optionBtns = preferenceView.find("[data-prefType]");
+        optionBtns.each(function(){
+          var activeBtn = $(this).find("button.active");
+          var prefType = $(this).data("preftype");
+          var index = activeBtn.data("index");
+          if(index){
+            var p = activeBtn.data("property");
+            var e = parseFloat(activeBtn.data("extra"));
+            var t = prefType;
+            properties.push({ property : p, preftype : t});
+            extra += e;
+          }
+        })
+        prefObj.property = properties;
+        prefObj.extra = extra;
+      }else{
+        if(!preferences.length){
+          prefObj.extra = 0;
+          prefObj.property = [];
+        }else{
+          prefObj = preferences[preferences.length-1];
+        }
+      }
+      preferences.push(prefObj);
     }
   }
   createCookie(id,JSON.stringify(localOrders[id]),1);
   updateMenuView(id);
   refreshMenu();
+  refreshPreference(id);
   setupDropdownMenu();
+  updateOrderPreview();
+}
+
+function updateOrderPreview(){
+  var orderPreviewListText = "";
+  if(localOrders){
+    Object.keys(localOrders).forEach(function(dishId){
+      var dishTitle = $("#order .dishItem[data-id='" + dishId +"']").find("[data-title]").data("title");
+      var order = localOrders[dishId];
+      if(!order.number){
+        return;
+      }
+      if(orderPreviewListText){
+        orderPreviewListText += "\n";
+      }
+      orderPreviewListText += dishTitle + "x" + order.number;
+      if(order.preference){
+        var preferenceText = "";
+        order.preference.forEach(function(p,index){
+          preferenceText += "(";
+          p.property.forEach(function(pro){
+            if(preferenceText.charAt(preferenceText.length-1)!=="("){
+              preferenceText += ",";
+            }
+            preferenceText+= pro.property;
+          })
+          if(p.extra){
+            preferenceText += "+$" + p.extra;
+          }
+          preferenceText += ")";
+        })
+      }
+      orderPreviewListText += preferenceText;
+    })
+  }
+  $("#orderPreviewBtn").attr('title', orderPreviewListText)
+    .tooltip('_fixTitle')
+    .tooltip('show');
 }
 
 function applyCoupon(isApply, amount, code){
@@ -517,26 +596,28 @@ function applyPoints(isApply, amount){
 //render menu view
 var refreshMenu = function(){
   var numberOfItem = 0;
-  for(var key in localOrders){
-    var $meal = $("#meal-detail-container");
-    if(localOrders[key].number===0){
-      $meal.find(".dish[data-id=" + key + "]").find(".untake-order").hide('slow');
-    }else{
-      numberOfItem += localOrders[key].number;
-      $meal.find(".dish[data-id=" + key + "]").find(".untake-order").show('slow');
-    }
-  }
   var subtotal = 0;
   var method = $("#method").find(".active").attr("value");
   var $order = $("#order");
-  $order.find(".item").each(function(){
+  var _dishes = [];
+  $order.find(".item:visible").each(function(){
+    var dishId = $(this).data("id");
+    if(_dishes.includes(dishId)){
+      return;
+    }else{
+      _dishes.push(dishId);
+    }
     var unitPrice = parseInt($(this).find(".price").attr("value"));
-    subtotal += parseFloat($(this).find(".amount").text()) * unitPrice + parseInt($(this).find(".price").data("extra"));
+    var _subtotal = parseFloat($(this).find(".amount").val()) * unitPrice + parseInt($(this).find(".price").data("extra"))
+    if(_subtotal > 0){
+      numberOfItem+=parseInt($(this).find(".amount").val());
+    }
+    subtotal += _subtotal;
   });
   $order.find(".subtotal").html("$" + subtotal.toFixed(2));
   $order.find(".subtotal").data("value", subtotal.toFixed(2));
   if(method === "delivery"){
-    var delivery = $order.find(".delivery").data("value");
+    var delivery = parseFloat($order.find(".delivery").data("value"));
     $order.find(".deliveryOpt").show();
     $order.find(".pickupOpt").hide();
   }else{
@@ -544,9 +625,10 @@ var refreshMenu = function(){
     $order.find(".pickupOpt").show();
     delivery = 0;
   }
-  $(".delivery").text("$" + delivery.toFixed(2));
-  var taxRate = $order.find(".tax").data("taxrate");
-  var tax = parseFloat(subtotal * taxRate);
+  $(".delivery").text("$" + delivery);
+  var taxRate = $order.find("[data-taxrate]").data("taxrate");
+  // var tax = parseFloat(subtotal * taxRate);
+  var tax = 0;
   var serviceFee = 0;
   $order.find(".tax").text(" $" + tax.toFixed(2));
   var coupons = Object.keys(localCoupon);
@@ -614,27 +696,27 @@ var setupStepContainer = function(){
   for( var i=0; i < count ; i++){
     $(steps[i]).find(".next-step").click(function(){
       var currentStep = parseInt($(this).attr("data-step")) - 1;
-      $(steps[currentStep]).addClass('hide');
-      $(steps[currentStep+1]).removeClass('hide');
+      $(steps[currentStep]).addClass('d-none');
+      $(steps[currentStep+1]).removeClass('d-none');
     });
     $(steps[i]).find(".last-step").click(function(){
       var currentStep = parseInt($(this).attr("data-step")) - 1;
-      $(steps[currentStep]).addClass('hide');
-      $(steps[currentStep-1]).removeClass('hide');
+      $(steps[currentStep]).addClass('d-none');
+      $(steps[currentStep-1]).removeClass('d-none');
     });
   }
   return {
     nextStep : function(event){
       var steps = $(".step-container .step");
       var currentStep = parseInt($(event.target).attr("data-step")) - 1;
-      $(steps[currentStep]).addClass('hide');
-      $(steps[currentStep+1]).removeClass('hide');
+      $(steps[currentStep]).addClass('d-none');
+      $(steps[currentStep+1]).removeClass('d-none');
     },
     lastStep : function(event){
       var steps = $(".step-container .step");
       var currentStep = parseInt($(event.target).attr("data-step")) - 1;
-      $(steps[currentStep]).addClass('hide');
-      $(steps[currentStep-1]).removeClass('hide');
+      $(steps[currentStep]).addClass('d-none');
+      $(steps[currentStep-1]).removeClass('d-none');
     }
   }
 };
