@@ -60,12 +60,14 @@
                 var title = '';
                 preference.forEach(function(pref){
                   var dishProps = "";
-                  pref.property.forEach(function(pro){
-                    if(dishProps){
-                      dishProps += ",";
-                    }
-                    dishProps += pro.property;
-                  })
+                  if(pref.property && Array.isArray(pref.property)){
+                    pref.property.forEach(function(pro){
+                      if(dishProps){
+                        dishProps += ",";
+                      }
+                      dishProps += pro.property;
+                    })
+                  }
                   title += "(" + dishProps + ')';
                 });
               %>
