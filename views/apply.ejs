@@ -94,7 +94,7 @@
               <div class="card-title">
                 <label><%= __('step2-ongoing')%></label>
               </div>
-              <button id="addAddress" class="btn btn-info btn-lg" <%= user.host?'':'disabled="disabled"'%> title="<%= user.host?'':__('user-not-host')%>" toggle="modal" data-toggle="tooltip" data-target="#myModal" data-host="true" data-id="<%= user.host%>" data-href="/templates/user/address.html"><%= __('step2-action-btn')%></button>
+              <button id="addAddress" class="btn btn-info btn-lg" <%= user.host?'':'disabled="disabled"'%> title="<%= user.host?'':__('user-not-host')%>" toggle="modal" data-toggle="tooltip" data-target="#myModal" data-host="true" data-id="<%= user.host ? user.host.id : ''%>" data-href="/templates/user/address.html"><%= __('step2-action-btn')%></button>
               <% if(!user.host){%>
               <div class="invalid-feedback d-block"><%= __('apply-to-be-host-first')%></div>
               <% }%>

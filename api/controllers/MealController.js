@@ -57,10 +57,9 @@ module.exports = {
     });
   },
 
-  dayOfMeal : function(req,res){
+  find : function(req,res){
     //find out meals that provide start today or ends today
     var _this = this;
-    var day = req.param("day");
     var county = req.cookies['county'] || req.param('county') || "San Francisco County";
     var withinSevenDay = moment().add(7,'days');
     Meal.find({ where : { status : "on", provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
@@ -129,13 +128,13 @@ module.exports = {
 
         User.findOne(user.id).populate("collects").exec(function(err,u){
           if(err){
-            return res.badRequest(err);
+            // return res.badRequest(err);
           }
           meals = _this.composeMealWithDate(meals);
           if(req.wantsJSON && process.env.NODE_ENV === "development"){
             return res.ok({meals : meals, user : u, county : county, locale : req.getLocale()});
           }
-          return res.view('meals',{meals : meals, user : u, county : county, locale : req.getLocale()});
+          return res.redirect('/meal');
         });
       });
     }else{
@@ -329,7 +328,7 @@ module.exports = {
           if(!req.session.authenticated){
             return next();
           }
-          User.findOne(req.session.user.id).populate("collects").exec(function(err, user){
+          User.findOne(req.session.user.id).populate("payment").populate("collects").exec(function(err, user){
             if(err){
               return next(err);
             }
@@ -461,7 +460,7 @@ module.exports = {
     });
   },
 
-  find : function(req, res){
+  oldmeals : function(req, res){
     var county = req.query['county'] || req.cookies['county'] || req.param('county') || "San Francisco County";
     var now = new Date();
     var _this = this;

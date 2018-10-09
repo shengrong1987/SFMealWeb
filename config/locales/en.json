@@ -900,5 +900,7 @@
   "select": "Selection",
   "pay-cash-instruction" : "Please pay cash to driver at pickup",
   "venmo-instruction" : "Please leave your name at checkout",
-  "paypal-instruction" : "Please leave your name at checkout（Add $1 for transaction fee）"
+  "paypal-instruction" : "Please leave your name at checkout（Add $1 for transaction fee）",
+  "dish-tag-default" : "Street food",
+  "dish-tag" : "Tag"
 }

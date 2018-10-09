@@ -221,7 +221,12 @@
             </div>
 
             <div class="form-group">
-              <label for="instagramInput">9.<%= __('is-dynamic') %></label><br/>
+              <label for="tagInput">9.<%= __('dish-tag')%></label>
+              <input type="text" id="tagInput" class="form-control" value="<%= dish.tag || ''%>">
+            </div>
+
+            <div class="form-group">
+              <label for="instagramInput">10.<%= __('is-dynamic') %></label><br/>
               <input class="form-control" type="checkbox" data-toggle="switch-button" id="isDynamicPriceOn" <%= !!dish.isDynamicPriceOn?"checked='checked'":""%>>
               <div id="dynamicDishSettingView" class="form-group form-inline <%= !!dish.isDynamicPriceOn?"":"d-none"%>" style="margin-top:20px;">
                 <div class="card">

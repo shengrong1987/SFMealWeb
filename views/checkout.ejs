@@ -30,7 +30,7 @@
           </div>
         </div>
 
-        <div id="pickupInfoView">
+        <div id="pickupInfoView" class="text-left">
           <div class="row">
             <div class="col-12">
               <div class="box-compact light-grey">
@@ -268,13 +268,13 @@
                 var card = cards[j];
                 var last4 = card.last4;
               %>
-              <button class="btn btn-disable btn-lg py-2 col-3 <%if(card.isDefaultPayment){%> active<%}%> disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
+              <button class="btn btn-disable py-2 col-3 <%if(card.isDefaultPayment){%> active<%}%> disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
               <%}}%>
-              <button class="btn btn-disable btn-lg py-2 col-3 disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
+              <button class="btn btn-disable py-2 col-3 disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
               <%}else{%>
-              <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable active py-2 col-3 disabled" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
-              <%}%>
               <button data-toggle="tab" data-href="#cardPayment" class="btn btn-disable py-2 col-3 disabled" data-method="online"><strong><i class="fa fa-credit-card fa-2x"></i></strong><br/><%= __('bank-card') %></button>
+              <%}%>
+              <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable <%= cards.length ? '' : 'active'%> py-2 col-3 disabled" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
               <button data-toggle="tab" data-href="#venmoPayment" class="btn btn-disable  py-2 col-3 disabled" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
               <button data-toggle="tab" data-href="#paypalPayment" class="btn btn-disable py-2 col-3 disabled" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method') %></button>
               <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg disabled" data-method="alipay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('alipay-method') %></button>-->
@@ -283,11 +283,13 @@
           </div>
         </div>
 
-        <% if(!user.id){%>
+
 
         <div class="row">
           <div class="col-12">
             <div class="tab-content pt-4">
+
+              <% if(!user.id){%>
               <form id="cardPayment" class="text-left tab-pane">
 
                 <div class="row">
@@ -413,6 +415,7 @@
                   </div>
                 </div>
               </form>
+              <%}%>
 
               <div id="cashPayment" class="tab-pane active">
                 <p><%= __('pay-cash-instruction')%></p>
@@ -427,10 +430,10 @@
                 <p>https://www.paypal.me/sfmeal</p>
                 <p><%= __('paypal-instruction')%></p>
               </div>
+
             </div>
           </div>
         </div>
-        <%}%>
 
         <h4 class="text-right"><%= __('total')%><span class="total"></span></h4>
         <div class="divider"></div>

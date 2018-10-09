@@ -70,7 +70,6 @@ module.exports.routes = {
   '/meal/:id/coupon/:code' : 'CouponController.applyCoupon',
   '/meal/:id/report' : "MealController.report",
   '/meal/:id/update' : "MealController.update",
-  '/meal/day/:day' : "MealController.dayOfMeal",
   '/meal/checkout' : "MealController.checkout",
   '/dish/:id/verify' : 'DishController.verify',
   '/dish/:id/fail' : 'DishController.fail',

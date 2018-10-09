@@ -83,6 +83,7 @@ module.exports = function(agenda) {
             return cb(err);
           }
           meal.leftQty = meal.totalQty;
+          meal.status = "off";
           meal.save(function(err, m){
             if(err){
               return cb(err);
@@ -337,6 +338,7 @@ module.exports = function(agenda) {
                   return done(err);
                 }
                 meal.leftQty = meal.totalQty;
+                meal.status = "off";
                 meal.save(done);
               });
             }else{

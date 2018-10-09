@@ -902,5 +902,7 @@
   "select": "精选",
   "pay-cash-instruction" : "请领取单的时候支付给司机现金",
   "venmo-instruction" : "付款时请留言下单的姓名",
-  "paypal-instruction" : "付款时请留言下单的姓名（每笔需要额外支付$1元手续费）"
+  "paypal-instruction" : "付款时请留言下单的姓名（每笔需要额外支付$1元手续费）",
+  "dish-tag-default" : "街头小吃",
+  "dish-tag" : "标签"
 }
