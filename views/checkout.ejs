@@ -274,7 +274,7 @@
               <%}else{%>
               <button data-toggle="tab" data-href="#cardPayment" class="btn btn-disable py-2 col-3 disabled" data-method="online"><strong><i class="fa fa-credit-card fa-2x"></i></strong><br/><%= __('bank-card') %></button>
               <%}%>
-              <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable <%= cards.length ? '' : 'active'%> py-2 col-3 disabled" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
+              <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable <%= (user.id && user.payment && user.payment.length) ? '' : 'active'%> py-2 col-3 disabled" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
               <button data-toggle="tab" data-href="#venmoPayment" class="btn btn-disable  py-2 col-3 disabled" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
               <button data-toggle="tab" data-href="#paypalPayment" class="btn btn-disable py-2 col-3 disabled" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method') %></button>
               <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg disabled" data-method="alipay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('alipay-method') %></button>-->
