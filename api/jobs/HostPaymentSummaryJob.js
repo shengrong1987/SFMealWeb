@@ -43,7 +43,7 @@ module.exports = function(agenda) {
 
         hosts = hosts.filter(function (host) {
           host.orders = host.orders.filter(function (order) {
-            return !order.isPaid && (order.status === "review" || order.status === "complete") && order.createdAt.getTime() > fromDate && order.createdAt < toDate;
+            return !order.isClear && (order.status === "review" || order.status === "complete") && order.createdAt.getTime() > fromDate && order.createdAt < toDate;
           });
           return host.orders.length !== 0;
         });
@@ -160,7 +160,7 @@ module.exports = function(agenda) {
                 if(err){
                   return next2(err);
                 }
-                order.isPaid = true;
+                order.isClear = true;
                 order.save(next2);
               });
             }, function (err) {

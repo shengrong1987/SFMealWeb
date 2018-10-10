@@ -2904,54 +2904,31 @@ var ContactInfoView = Backbone.View.extend({
   }
 });
 
-var MealConfirmView = Backbone.View.extend({
-  events : {
-    "click #applyCouponBtn" : "applyCouponCode",
-    "click #applyPointsBtn" : "addPointsToOrder",
-    "change #deliveryTab .regular-radio" : "switchAddress",
-    "change #method" : "switchMethod",
-    "click #createNewContactBtn" : "createNewContact",
-    "click #createNewContactBtn2" : "createNewContact",
-    "keydown" : "onKeyDown",
-    "click #verifyAddressBtn" : "verifyAddress",
-    "click input[name='billingAddress']" : "enterBillingAddress"
-  },
+var MapView = Backbone.View.extend({
   initialize : function(){
-    this.alertView = this.$el.find("#orderAlertView");
-    this.alertView.removeClass("d-none").hide();
-    this.isCoolDown = true;
-    utility.initGoogleMapService();
-    this.$el.find(".pickupInput").removeClass('d-none').hide();
-  },
-  enterBillingAddress : function(e){
-    var isChecked = $(e.currentTarget).prop("checked");
-    if(isChecked){
-      var contactInfoView = this.$el.find("#contactInfoView");
-      var paymentInfoView = this.$el.find("#cardPayment");
-      var fieldsToCopy = ['input[name="street"]','input[name="city"]','input[name="state"]','input[name="zipcode"]'];
-      fieldsToCopy.forEach(function(field){
-        paymentInfoView.find(field).val(contactInfoView.find(field).val());
-      });
+    this.$target = $(this.attributes.target);
+    if(!utility.googleMapLoaded){
+      utility.initGoogleMapService();
+    }else{
+      this.initDelivery();
+      this.initPickups();
     }
-  },
-  onKeyDown : function(e){
-    if(e.which === 13) e.preventDefault();
   },
   initDelivery : function(){
     var $this = this;
-    if(!this.$el.find(".deliveryOption").length){
+    if(!this.$target.find(".deliveryOption").length){
       return;
     }
     var map,spots=[];
-    this.$el.find(".deliveryOption:visible").each(function () {
+    this.$target.find(".deliveryOption:visible").each(function () {
       var location = $(this).data("center");
       var color = $(this).data("color");
       var area = $(this).data("area");
       var time = $(this).data("time");
       var range = $(this).data("range");
       if(spots.some(function(spot){
-        return spot.location === location && spot.time === time;
-      })){
+          return spot.location === location && spot.time === time;
+        })){
         return;
       }
       spots.push({location: location, time: time});
@@ -3001,10 +2978,10 @@ var MealConfirmView = Backbone.View.extend({
   initPickups : function(){
     var mapCenter = '';
     var $this = this;
-    if(this.$el.find(".pickupOption").length === 0){
+    if(this.$target.find(".pickupOption").length === 0){
       mapCenter = "25 Washington St, Daly City";
     }else{
-      mapCenter = this.$el.find(".pickupOption").data('location');
+      mapCenter = this.$target.find(".pickupOption").data('location');
     }
     utility.geocoding(mapCenter, function(err, center, map){
       if(err){
@@ -3024,7 +3001,7 @@ var MealConfirmView = Backbone.View.extend({
         var infowindow = new google.maps.InfoWindow({
           content: title
         });
-        utility.initMap($this.$el.find("#googlemap")[0], center, function(err, map) {
+        utility.initMap($this.$target.find("#googlemap")[0], center, function(err, map) {
           if (err) {
             makeAToast(err, 'error');
             return;
@@ -3047,6 +3024,40 @@ var MealConfirmView = Backbone.View.extend({
         });
       })
     });
+  }
+})
+
+var MealConfirmView = Backbone.View.extend({
+  events : {
+    "click #applyCouponBtn" : "applyCouponCode",
+    "click #applyPointsBtn" : "addPointsToOrder",
+    "change #deliveryTab .regular-radio" : "switchAddress",
+    "change #method" : "switchMethod",
+    "click #createNewContactBtn" : "createNewContact",
+    "click #createNewContactBtn2" : "createNewContact",
+    "keydown" : "onKeyDown",
+    "click #verifyAddressBtn" : "verifyAddress",
+    "click input[name='billingAddress']" : "enterBillingAddress"
+  },
+  initialize : function(){
+    this.alertView = this.$el.find("#orderAlertView");
+    this.alertView.removeClass("d-none").hide();
+    this.isCoolDown = true;
+    this.$el.find(".pickupInput").removeClass('d-none').hide();
+  },
+  enterBillingAddress : function(e){
+    var isChecked = $(e.currentTarget).prop("checked");
+    if(isChecked){
+      var contactInfoView = this.$el.find("#contactInfoView");
+      var paymentInfoView = this.$el.find("#cardPayment");
+      var fieldsToCopy = ['input[name="street"]','input[name="city"]','input[name="state"]','input[name="zipcode"]'];
+      fieldsToCopy.forEach(function(field){
+        paymentInfoView.find(field).val(contactInfoView.find(field).val());
+      });
+    }
+  },
+  onKeyDown : function(e){
+    if(e.which === 13) e.preventDefault();
   },
   createNewContact : function(e){
     e.preventDefault();
@@ -3152,21 +3163,20 @@ var MealConfirmView = Backbone.View.extend({
     var deliveryOptions = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio")
     deliveryOptions.each(function(index){
       var deliveryOption = $(this);
-      deliveryOption.parent().addClass('disabled');
       deliveryOption.parent().find('.s').addClass('spinner');
       var deliveryCenter = deliveryOption.parent().data('center');
       setTimeout(function() {
         utility.distance(deliveryCenter, address, function(err, distance) {
           deliveryOption.parent().find('.s').removeClass('spinner');
-          var range = deliveryOption.data("range");
+          var range = deliveryOption.parent().data("range");
           if (err) {
             makeAToast(err);
             return;
           }
           if(distance > range){
-            deliveryOption.parent().addClass('disabled');
+            deliveryOption.parent().hide();
           }else{
-            deliveryOption.parent().removeClass('disabled');
+            deliveryOption.parent().show();
           }
         })
       }, index*2000);

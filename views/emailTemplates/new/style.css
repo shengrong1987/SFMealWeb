@@ -10659,7 +10659,6 @@ select.form-control {
 }
 .tableBodyScroll tbody.scroll {
   display: block;
-  max-height: 250px;
   overflow-y: scroll;
 }
 .tableBodyScroll thead,
@@ -10670,7 +10669,6 @@ select.form-control {
 }
 /* scrollText */
 .scrollText {
-  max-height: 200px;
   overflow-y: scroll;
 }
 /*list*/
@@ -11000,7 +10998,6 @@ select.form-control {
   }
   #dishEditView,
   #dishNewView,
-  #order,
   #preorder,
   #myorder,
   #mycollect,

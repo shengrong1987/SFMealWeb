@@ -171,7 +171,14 @@
 
             <div class="col-12">
               <div class="box-compact light-grey">
-                <h3 class="text-left px-5"><%= __('pickup-option') %></h3>
+                <div class="d-flex justify-content-between align-base">
+                  <div class="pl-5">
+                    <h3><%= __('pickup-option') %></h3>
+                  </div>
+                  <div class="pr-5">
+                    <h5><small><a toggle="modal" data-target="#myModal" data-href="/templates/meal/map.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fas fa-map-marker-alt"></i> <%= __('show-map') %></a></small></h5>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -239,12 +246,6 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-sm-6">
-            <div id="googlemap" data-target="#googleMapAlignView"></div>
           </div>
         </div>
 
@@ -448,14 +449,17 @@
           <%= __('no-dish-left') %>
         </div>
 
-        <button type="button" data-action="takeOrder" class="btn btn-red d-none d-sm-block"><%= __('placeorder') %></button>
+        <!--<button type="button" data-action="showMenu" class="btn btn-outline-dark w-100">-->
+          <!--<%= __('toggleMenu') %>-->
+          <!--<span><i class="fas fa-arrow-down"></i></span>-->
+        <!--</button>-->
 
         <table id="order" class="table tableBodyScroll" data-err-container="#alert-order">
           <thead>
           <tr>
             <th><%= __('name') %></th>
             <td><%= __('price') %></td>
-            <td><%= __('quantity') %></td>
+            <td colspan="2"><%= __('quantity') %></td>
           </tr>
           </thead>
           <tbody class="scroll">
@@ -468,7 +472,7 @@
               <tr class="success dish item" data-id=<%= dish.id %> data-left-amount=<%= meal.leftQty[dish.id]%>>
                 <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span></td>
                 <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
-                <td>
+                <td colspan="2">
                   <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">-</button>
                   <span class="amount" style="padding: 5px;">  0  </span>
                   <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',1,true)">+</button>

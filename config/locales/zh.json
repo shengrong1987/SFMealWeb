@@ -904,5 +904,6 @@
   "venmo-instruction" : "付款时请留言下单的姓名",
   "paypal-instruction" : "付款时请留言下单的姓名（每笔需要额外支付$1元手续费）",
   "dish-tag-default" : "街头小吃",
-  "dish-tag" : "标签"
+  "dish-tag" : "标签",
+  "toggleMenu" : "展开/缩起菜单"
 }

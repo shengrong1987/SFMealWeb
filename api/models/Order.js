@@ -179,6 +179,9 @@ module.exports = {
     },
     clientSecret : {
       type : 'string'
+    },
+    isClear : {
+      type : 'boolean'
     }
   }
 };

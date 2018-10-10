@@ -210,9 +210,10 @@ module.exports = {
           });
         },
         buildOrders : function(next){
+          var index = 0;
           async.each(meals, function(meal, nextIn){
             var orderParam = {};
-            orderParam.subtotal = parseFloat(meal.subtotal);
+            orderParam.subtotal = parseFloat(meal.subtotal) || 0;
             orderParam.orders = req.body.orders;
             orderParam.host = meal.chef.id;
             orderParam.type = meal.type;
@@ -222,35 +223,41 @@ module.exports = {
             orderParam.phone = meal.chef.phone;
             orderParam.tax = _this.getTax(req.body.subtotal, meal.chef.county, meal.isTaxIncluded);
             orderParam.serviceFee = meal.serviceFee;
-            orderParam.tip = req.body.tip.toFixed(2);
+            if(!index){
+              orderParam.tip = parseFloat(req.body.tip).toFixed(2);
+            }else{
+              orderParam.tip = 0;
+            }
             orderParam.paymentInfo = req.body.paymentInfo;
             orderParam.contactInfo = req.body.contactInfo;
             orderParam.pickupInfo = _logisticInfo.pickupInfo;
+            orderParam.customInfo = req.body.customInfo;
             orderParam.delivery_fee = _logisticInfo.delivery_fee;
+            index++;
             if(meal.type === "order"){
               orderParam.status = "preparing";
             }else{
               orderParam.status = "schedule";
             }
             async.auto({
-              normalCheckOut : function(next){
+              normalCheckOut : function(nextIn2){
                 if(!req.session.authenticated){
-                  return next();
+                  return nextIn2();
                 }
                 User.findOne(userId).populate('payment').populate("coupons").exec(function (err, found) {
                   if (err) {
-                    return next(err);
+                    return nextIn2(err);
                   }
                   var contactInfo = req.body.contactInfo;
                   var paymentInfo = req.body.paymentInfo;
                   if(paymentInfo.method === 'online' && (!found.payment || found.payment.length === 0)){
-                    return next({ responseText : req.__('order-lack-payment'), code : -5});
+                    return nextIn2({ responseText : req.__('order-lack-payment'), code : -5});
                   }
                   if(!found.phone && !contactInfo.phone){
-                    return next({ responseText : req.__('order-lack-contact'), code : -31});
+                    return nextIn2({ responseText : req.__('order-lack-contact'), code : -31});
                   }
                   if(!found.firstname && !contactInfo.name){
-                    return next({ responseText : req.__('order-lack-contact'), code : -31});
+                    return nextIn2({ responseText : req.__('order-lack-contact'), code : -31});
                   }
                   orderParam.customerName = contactInfo.name || found.firstname;
                   orderParam.customerPhone = contactInfo.phone || found.phone;
@@ -259,13 +266,13 @@ module.exports = {
                   orderParam.isExpressCheckout = false;
 
                   if(code && pointsRedeem){
-                    return next({ code : -23, responseText : req.__('order-duplicate-discount')});
+                    return nextIn2({ code : -23, responseText : req.__('order-duplicate-discount')});
                   }
 
                   //validate Coupon
                   $this.verifyCoupon(req, code, found, m, function(err, coupon){
                     if(err){
-                      return next(err);
+                      return nextIn2(err);
                     }
                     var subtotalAfterTax = req.body.subtotal + req.body.tax/100;
                     $this.redeemPoints(req, pointsRedeem, found, subtotalAfterTax, function(err, discount){
@@ -275,32 +282,32 @@ module.exports = {
                       //calculate total
                       $this.redeemCoupon(req, code, subtotalAfterTax, coupon, found, discount, function(err, discount){
                         if(err){
-                          return next(err);
+                          return nextIn2(err);
                         }
                         if(coupon){
                           orderParam.coupon = coupon.id;
                         }
                         orderParam.discount = discount;
-                        next();
+                        nextIn2();
                       });
                     });
                   });
                 });
               },
-              expressCheckout : function(next) {
+              expressCheckout : function(nextIn2) {
                 if(req.session.authenticated){
-                  return next();
+                  return nextIn2();
                 }
                 var contactInfo = req.body.contactInfo;
                 var paymentInfo = req.body.paymentInfo;
                 if(paymentInfo.method === 'online' && !paymentInfo.token){
-                  return next({ responseText : req.__('order-lack-payment'), code : -5});
+                  return nextIn2({ responseText : req.__('order-lack-payment'), code : -5});
                 }
                 if(paymentInfo.method === 'cash' && (!contactInfo.phone || !contactInfo.name)){
-                  return next({ responseText : req.__('order-cash-miss-profile'), code : -27});
+                  return nextIn2({ responseText : req.__('order-cash-miss-profile'), code : -27});
                 }
                 if(!contactInfo.phone){
-                  return next(req.__('order-lack-contact'));
+                  return nextIn2(req.__('order-lack-contact'));
                 }
                 orderParam.guestEmail = process.env.ADMIN_EMAIL;
                 orderParam.customerName = contactInfo.name || req.__('user');
@@ -313,11 +320,11 @@ module.exports = {
                   email : process.env.ADMIN_EMAIL
                 }, function(err, customer){
                   if(err){
-                    return next({ code : -45, responseText : err.message });
+                    return nextIn2({ code : -45, responseText : err.message });
                   }
                   orderParam.customerId = customer.id;
                   orderParam.discount = 0;
-                  next();
+                  nextIn2();
                 });
               }
             }, function(err){
@@ -340,7 +347,7 @@ module.exports = {
             next();
           })
         },
-        makePayments : function(next){
+        makePayments : [ 'buildOrders', function(next){
           async.each(_orders, function(order, nextIn){
             if(order.paymentMethod === "alipay" || order.paymentMethod === "wechatpay"){
               stripe.newSource({
@@ -384,9 +391,9 @@ module.exports = {
                 discount : order.discount * 100,
                 email : email,
                 customerId : order.customerId,
-                destination : m.chef.accountId,
+                destination : order.meal.chef.accountId,
                 meal : order.meal,
-                method : method,
+                method : order.method,
                 tax : order.tax,
                 isPartyMode : order.isPartyMode,
                 metadata : {
@@ -434,8 +441,8 @@ module.exports = {
             }
             next();
           })
-        },
-        updateMeal : function(next){
+        }],
+        updateMeal : [ 'makePayments', function(next){
           async.each(_orders, function(order, nextIn){
             _this.updateMealLeftQty(order, order.meal, _this.clearOrder(order.orders), order.orders, function(err, meal){
               if(err){
@@ -450,8 +457,8 @@ module.exports = {
             }
             next();
           });
-        },
-        addReferralPoints : function(next){
+        }],
+        addReferralPoints : [ 'updateMeal',function(next){
           async.each(_orders, function (order, nextIn) {
             _this.addReferrerPoints(order.customer, nextIn);
           }, function(err){
@@ -460,9 +467,10 @@ module.exports = {
             }
             next();
           })
-        },
-        finalizeOrder : function(next){
+        }],
+        finalizeOrder : ['addReferralPoints', function(next){
           async.each(_orders, function(order, nextIn){
+            order.meal = order.meal.id;
             order.save(function(err, o){
               if(err){
                 return nextIn(err);
@@ -476,7 +484,7 @@ module.exports = {
             }
             next();
           })
-        }
+        }]
       }, function(err){
         if(err){
           return res.badRequest(err);
@@ -1608,30 +1616,37 @@ module.exports = {
       if(req.body.customInfo){
         req.body.customInfo = JSON.parse(req.body.customInfo);
       }
+      if(req.body.comment){
+        req.body.customInfo.comment = req.body.comment;
+      }
       Meal.findOne(mealId).populate("chef").exec(function(err, meal){
         if(err){
           return res.badRequest(err);
         }
-        _this.validateOption(req.body, meal, req, function(err){
+        _this.validateOption(req.body, [meal], req, function(err){
           if(err){
             return res.badRequest(err);
           }
-          req.body = _this.buildDeliveryData(req.body, meal);
-
-          _this.cancelOrderJob(orderId, '', function(err){
-            if(err){
-              return res.badRequest(err);
-            }
-            req.body.isScheduled = false;
-            Order.update(order.id, req.body).exec(function(err, result){
+          _this.buildDeliveryData(req.body, meal, function(_logisticInfo){
+            req.body.pickupInfo = _logisticInfo.pickupInfo;
+            req.body.delivery_fee = _logisticInfo.delivery_fee;
+            _this.cancelOrderJob(orderId, '', function(err){
               if(err){
                 return res.badRequest(err);
               }
-              result.meal = meal;
-              result.host = order.host;
-              res.ok(result);
+              req.body.isScheduled = false;
+              Order.update(order.id, req.body).exec(function(err, result){
+                if(err){
+                  return res.badRequest(err);
+                }
+                result.meal = meal;
+                result.host = order.host;
+                res.ok(result);
+              });
             });
           });
+
+
         });
       })
     });
@@ -2172,9 +2187,9 @@ module.exports = {
 
       if(actual_subtotal !== subtotal) {
         sails.log.debug("subtotal supposed to be " + actual_subtotal + ", but get " + subtotal);
-        meal.subtotal = actual_subtotal;
         // return cb({responseText : req.__('order-total-not-match'), code : -3});
       }
+      meal.subtotal = actual_subtotal;
       return cb(null);
     });
   },

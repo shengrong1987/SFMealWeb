@@ -30,15 +30,9 @@
           $this.directionsService = new google.maps.DirectionsService;
           $this.geocoder = new google.maps.Geocoder();
           $this.getAutoComplete();
-          if(typeof mealSelectionView !== 'undefined' && mealSelectionView){
-            mealSelectionView.initDelivery();
-            mealSelectionView.initPickups();
-          }else if(typeof mealConfirmView !== 'undefined' && mealConfirmView){
-            mealConfirmView.initDelivery();
-            mealConfirmView.initPickups();
-          }else if(typeof dayOfMealView !== 'undefined' && dayOfMealView){
-            dayOfMealView.initDelivery();
-            dayOfMealView.initPickups();
+          if(typeof mapView !== 'undefined' && mapView){
+            mapView.initDelivery();
+            mapView.initPickups();
           }
         },error : function(err){
           console.log(err.statusText);
@@ -56,14 +50,6 @@
         zoom: 11
       });
       utility.directionsDisplay.setMap(map);
-      // var alignmentHeight = $($(ele).data("target")).height();
-      $(ele).parent().on("shown.bs.collapse", function(e){
-        e.preventDefault();
-        google.maps.event.trigger(utility.map, "resize");
-        utility.map.setCenter(center);
-      });
-      // $(ele).height(alignmentHeight);
-      // $(ele).parent().height(alignmentHeight);
       google.maps.event.trigger(utility.map, "resize");
       utility.map.setCenter(center);
     }

@@ -92,6 +92,7 @@ function toggleModalUrl(url, modalId, target, cb){
     modal.modal('hide');
     modal.removeData('bs.modal');
     modal.on('hidden.bs.modal',function(){
+      utility.map = null;
       modal.off('hidden.bs.modal');
       modal.on('shown.bs.modal',function(){
         modal.off('shown.bs.modal');
@@ -105,6 +106,10 @@ function toggleModalUrl(url, modalId, target, cb){
     modal.removeData('bs.modal');
     modal.on('shown.bs.modal',function(){
       modal.off('shown.bs.modal');
+      modal.on('hidden.bs.modal',function(){
+        utility.map = null;
+        modal.off('hidden.bs.modal');
+      });
       modal.modal('show');
       if(cb){cb(target);}
     });
@@ -326,6 +331,12 @@ function updateMenuView(id, triggerExpand){
   var item = $("#order").find(".item[data-id=" + id + "]");
   var left = item.data("left-amount");
   item.find(".amount").val(number);
+  item.find(".amount").text(number);
+  if(number>0){
+    item.addClass("table-success");
+  }else{
+    item.removeClass("table-success");
+  }
   var priceItem = item.find(".price");
   var preference = localOrders[id].preference;
   var oldPrice = priceItem.attr("old-value");
@@ -488,6 +499,7 @@ function orderFoodLogic(id, number, initial){
   }else{
     if(left<=0 && number > 0){
       localOrders[id].number -= number;
+      makeAToast(jQuery.i18n.prop("dishSold"));
     }else{
       left--;
       item.data("left-amount",left);
