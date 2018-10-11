@@ -2989,7 +2989,7 @@ var MapView = Backbone.View.extend({
         return;
       }
       var spots = [];
-      $this.$el.find(".pickupOption:visible").each(function () {
+      $this.$target.find(".pickupOption:visible").each(function () {
         var location = $(this).data("location");
         if(spots.some(function(spot){
             return spot.location === location;
@@ -3001,7 +3001,7 @@ var MapView = Backbone.View.extend({
         var infowindow = new google.maps.InfoWindow({
           content: title
         });
-        utility.initMap($this.$target.find("#googlemap")[0], center, function(err, map) {
+        utility.initMap($this.$el.find("#googlemap")[0], center, function(err, map) {
           if (err) {
             makeAToast(err, 'error');
             return;

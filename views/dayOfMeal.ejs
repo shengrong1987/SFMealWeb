@@ -93,9 +93,9 @@
 
 <script>
   var dayOfMealView = new DayOfMealView({ el : $("#dayOfMealContainer"), model : new Meal()});
-  var coverDishId = $("#meal-detail-container").data("cover");
-  var user = $("#meal-detail-container").data("user");
-  var coverDish = $("#meal-detail-container").find(".dish a[data-gallery='" + coverDishId + "']");
+  var coverDishId = $("#dayOfMealContainer").data("cover");
+  var user = $("#dayOfMealContainer").data("user");
+  var coverDish = $("#dayOfMealContainer").find(".dish a[data-gallery='" + coverDishId + "']");
   var dishTitle = coverDish.data("title");
   var desc = coverDish.data("footer");
   setupWechat($("#dayOfMealContainer [data-coverstring]").data("coverstring"),"SFMeal本周菜单", "小龙虾，冷串串，麻辣干锅，冰粉");
