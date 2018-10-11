@@ -75,7 +75,7 @@ module.exports = {
           if(!req.session.authenticated){
             return next();
           }
-          User.find(req.session.id).exec(function(err, u){
+          User.find(req.session.user.id).exec(function(err, u){
             if(err){
               return next(err);
             }
