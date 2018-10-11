@@ -85,7 +85,7 @@ module.exports = {
     },
     county : {
       type : 'string',
-      enum : ["San Francisco County", "Sacramento County", "San Mateo County", "Santa Clara County"]
+      enum : ["San Francisco County", "Sacramento County", "San Mateo County", "Santa Clara County","Alameda County"]
     },
     zip : {
       type : 'string',

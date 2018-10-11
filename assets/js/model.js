@@ -3044,6 +3044,7 @@ var MealConfirmView = Backbone.View.extend({
     this.alertView.removeClass("d-none").hide();
     this.isCoolDown = true;
     this.$el.find(".pickupInput").removeClass('d-none').hide();
+    utility.initGoogleMapService();
   },
   enterBillingAddress : function(e){
     var isChecked = $(e.currentTarget).prop("checked");
@@ -3459,7 +3460,7 @@ var OrderView = Backbone.View.extend({
   },
   getContactInfo : function(method, isLogin, cb){
     var contactObj = {};
-    var contactView = isLogin ? this.$el.find("#" + method + "Tab" + " .contactOption .regular-radio:checked") : this.$el.find("#contactInfoView");
+    var contactView = this.$el.find("#contactInfoView");
     switch(method) {
       case "pickup":
         if (!isLogin) {
@@ -3516,7 +3517,7 @@ var OrderView = Backbone.View.extend({
           contactObj.name = name;
           contactObj.phone = phone;
         } else {
-          var t = contactView.next().next().text();
+          var t = contactView.find(".contactOption .regular-radio:checked").next().next();
           if (t) {
             var address = t.split("+")[0];
             phone = t.split("+")[1];
