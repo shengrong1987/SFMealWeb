@@ -3192,7 +3192,7 @@ var MealConfirmView = Backbone.View.extend({
     var isPartyMode = form.data("party");
     if(!yourAddress) {
       if (isLogin) {
-        var deliveryLocationOption = this.$el.find("#deliveryTab .contactOption .regular-radio:checked");
+        var deliveryLocationOption = this.$el.find(".deliveryInput .contactOption .regular-radio:checked");
         if (!deliveryLocationOption.length) {
           makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
           if (cb) {
@@ -3200,7 +3200,7 @@ var MealConfirmView = Backbone.View.extend({
           }
           return;
         }
-        yourAddress = deliveryLocationOption.next().next().text();
+        yourAddress = deliveryLocationOption.next().next().text().split("+")[0];
       } else {
         yourAddress = $this.verifyAddress(e, true);
       }
@@ -3460,7 +3460,7 @@ var OrderView = Backbone.View.extend({
   },
   getContactInfo : function(method, isLogin, cb){
     var contactObj = {};
-    var contactView = this.$el.find("#contactInfoView");
+    var contactView = this.$el.find("#pickupInfoView");
     switch(method) {
       case "pickup":
         if (!isLogin) {
@@ -3473,7 +3473,7 @@ var OrderView = Backbone.View.extend({
           contactObj.name = name;
           contactObj.phone = phone;
         } else {
-          var t = contactView.next().next().text();
+          var t = contactView.find(".pickupInput .contactOption .regular-radio:checked").next().next().text();
           if (t) {
             name = t.split("+")[0];
             phone = t.split("+")[1];
@@ -3517,7 +3517,7 @@ var OrderView = Backbone.View.extend({
           contactObj.name = name;
           contactObj.phone = phone;
         } else {
-          var t = contactView.find(".contactOption .regular-radio:checked").next().next();
+          var t = contactView.find(".deliveryInput .contactOption .regular-radio:checked").next().next().text();
           if (t) {
             var address = t.split("+")[0];
             phone = t.split("+")[1];

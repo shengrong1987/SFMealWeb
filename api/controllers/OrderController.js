@@ -2201,9 +2201,11 @@ module.exports = {
     var pickups = [];
     var existInMeals = meals.forEach(function(meal){
       var pickup = meal.pickups.filter(function(pickup){
-        return pickup.index === params.pickupOption;
+        return pickup.index == params.pickupOption;
       })[0];
-      pickups.push(pickup);
+      if(pickup){
+        pickups.push(pickup);
+      }
     });
     var isSamePickup = pickups.every(function(p){
       var p2 = pickups[0];

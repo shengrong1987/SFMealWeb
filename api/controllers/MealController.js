@@ -62,7 +62,7 @@ module.exports = {
     var _this = this;
     var county = req.cookies['county'] || req.param('county') || "San Francisco County";
     var withinSevenDay = moment().add(7,'days');
-    Meal.find({ where : { status : "on", provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
+    Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
       if(err){
         return res.badRequest(err);
       }
@@ -299,7 +299,7 @@ module.exports = {
     }
     orderedDishes = orderedDishes.split(",");
 
-    Meal.find({where: {status: "on", provideTillTime: {'>': moment().toDate()}}}).populate('dishes').exec(function(err, meals){
+    Meal.find({where: {status: "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime: {'>': moment().toDate()}}}).populate('dishes').exec(function(err, meals){
       if(err){
         return res.badRequest(err);
       }
