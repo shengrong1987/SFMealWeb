@@ -79,6 +79,7 @@
               <div class="radio-box flex" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
                 <%
                 var addresses= user.address;
+                var firstname = user.firstname;
                 if(addresses){
                   var keys = Object.keys(addresses);
                 keys.forEach(function(key){
@@ -86,7 +87,7 @@
                   var address = addressObj.street + ", " + addressObj.city + ", CA " + addressObj.zip + ", +" + addressObj.phone;
                 %>
                 <label class="btn btn-default vertical-inline option contactOption">
-                  <input type="radio" id="delivery-1-<%= i%>" name="delivery-location-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="delivery-1-<%= i%>"></label>
+                  <input type="radio" id="delivery-1-<%= i%>" data-username="<%= firstname%>" name="delivery-location-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="delivery-1-<%= i%>"></label>
                   <span style="margin-left: 10px;"><%= address %></span>
                 </label>
                 <%i++;})}; %>

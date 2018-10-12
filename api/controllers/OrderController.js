@@ -160,7 +160,7 @@ module.exports = {
       return res.badRequest({code : -20, responseText: req.__('meal-checkout-lack-of-date')});
     }
 
-    Meal.find({where: {status: "on", provideTillTime: {'>': moment().toDate()}}}).populate("chef").populate('dishes').exec(function(err, meals) {
+    Meal.find({where: {status: "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime: {'>': moment().toDate()}}}).populate("chef").populate('dishes').exec(function(err, meals) {
       if (err) {
         return res.badRequest(err);
       }
@@ -260,28 +260,31 @@ module.exports = {
                   if(!found.firstname && !contactInfo.name){
                     return nextIn2({ responseText : req.__('order-lack-contact'), code : -31});
                   }
+                  orderParam.guestEmail = req.body.guestEmail;
                   orderParam.customerName = contactInfo.name || found.firstname;
                   orderParam.customerPhone = contactInfo.phone || found.phone;
                   orderParam.customerId = found.payment[0] ? found.payment[0].customerId : null;
                   orderParam.paymentMethod = paymentInfo.method;
                   orderParam.isExpressCheckout = false;
 
+                  var code = req.body.couponCode, pointsRedeem = req.body.points;
+
                   if(code && pointsRedeem){
                     return nextIn2({ code : -23, responseText : req.__('order-duplicate-discount')});
                   }
 
                   //validate Coupon
-                  $this.verifyCoupon(req, code, found, m, function(err, coupon){
+                  _this.verifyCoupon(req, code, found, meal, function(err, coupon){
                     if(err){
                       return nextIn2(err);
                     }
                     var subtotalAfterTax = req.body.subtotal + req.body.tax/100;
-                    $this.redeemPoints(req, pointsRedeem, found, subtotalAfterTax, function(err, discount){
+                    _this.redeemPoints(req, pointsRedeem, found, subtotalAfterTax, function(err, discount){
                       if(err){
                         return res.badRequest(err);
                       }
                       //calculate total
-                      $this.redeemCoupon(req, code, subtotalAfterTax, coupon, found, discount, function(err, discount){
+                      _this.redeemCoupon(req, code, subtotalAfterTax, coupon, found, discount, function(err, discount){
                         if(err){
                           return nextIn2(err);
                         }
@@ -2455,7 +2458,6 @@ module.exports = {
       orders = orders.filter(function(order){
         var numberOfWeek = util.getWeekOfYear(order.pickupInfo.pickupFromTime);
         var year = new Date(order.pickupInfo.pickupFromTime).getFullYear();
-        sails.log.info("number of week:" + numberOfWeek, "& year: " + year);
         var isYearMatch = yearWanted ? (parseInt(yearWanted) === year) : true;
         return numberOfWeek === parseInt(weekWanted) && isYearMatch;
       });

@@ -3517,7 +3517,8 @@ var OrderView = Backbone.View.extend({
           contactObj.name = name;
           contactObj.phone = phone;
         } else {
-          var t = contactView.find(".deliveryInput .contactOption .regular-radio:checked").next().next().text();
+          var optionView = contactView.find(".deliveryInput .contactOption .regular-radio:checked");
+          var t = optionView.next().next().text();
           if (t) {
             var address = t.split("+")[0];
             phone = t.split("+")[1];
@@ -3527,6 +3528,7 @@ var OrderView = Backbone.View.extend({
             }
             contactObj.address = address;
             contactObj.phone = phone;
+            contactObj.name = optionView.data("username");
           } else {
             makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'));
             return cb(false);
@@ -3833,7 +3835,6 @@ var OrderView = Backbone.View.extend({
     })
   },
   submitOrder : function(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, pickupDate, method, code, points, isLogin, partyMode, tip, $this, button){
-    console.log("order include tips: " + tip);
     $this.model.clear();
     $this.model.set({
       orders: currentOrder,
