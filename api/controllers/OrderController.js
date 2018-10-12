@@ -214,7 +214,7 @@ module.exports = {
           async.each(meals, function(meal, nextIn){
             var orderParam = {};
             orderParam.subtotal = parseFloat(meal.subtotal) || 0;
-            orderParam.orders = req.body.orders;
+            orderParam.orders = meal.orders;
             orderParam.host = meal.chef.id;
             orderParam.type = meal.type;
             orderParam.dishes = meal.dishes;
@@ -223,6 +223,7 @@ module.exports = {
             orderParam.phone = meal.chef.phone;
             orderParam.tax = _this.getTax(req.body.subtotal, meal.chef.county, meal.isTaxIncluded);
             orderParam.serviceFee = meal.serviceFee;
+            orderParam.eta = meal.eta;
             if(!index){
               orderParam.tip = parseFloat(req.body.tip).toFixed(2);
             }else{
@@ -630,7 +631,7 @@ module.exports = {
             meal.dishes = dishes;
           }
           order.service_fee = order.meal.serviceFee;
-          $this.validateMeal(meal, params.orders, order.orders, subtotal, req, order, function(err){
+          $this.validateMeal(meal, params.orders, order.orders, req, order, function(err){
             if(err){
               sails.log.error(err.responseText);
               return res.badRequest(err);
@@ -1528,9 +1529,11 @@ module.exports = {
     }
     preferences.forEach(function(preference){
       var props = preference.property;
-      props.forEach(function(prop){
-        properties.push(prop);
-      });
+      if(props){
+        props.forEach(function(prop){
+          properties.push(prop);
+        });
+      }
     });
     return properties;
   },
@@ -1549,6 +1552,9 @@ module.exports = {
     }
     var leftQty = meal.leftQty;
     Object.keys(lastOrder).forEach(function(dishId){
+      if(!order[dishId] || !lastOrder[dishId]){
+        return;
+      }
       leftQty[dishId] = parseInt(parseInt(lastOrder[dishId].number) - parseInt(order[dishId].number)) + parseInt(leftQty[dishId]);
       sails.log.info("updating dish " + dishId + " to quantity of " + leftQty[dishId]);
     });
@@ -1872,7 +1878,7 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(order.status !== "schedule" && order.status !== "preparing"){
+      if(order.status === "cancel"){
         return res.badRequest({ code : -43, responseText : req.__('order-manipulate-wrong-status')});
       }
       order.isPaid = true;
@@ -1897,7 +1903,7 @@ module.exports = {
       // if(order.coupon){
       //   return res.badRequest({ code : -18, responseText : req.__('adjust-with-coupon-error')});
       // }
-      if(order.status !== "schedule" && order.status !== "preparing"){
+      if(order.status === "cancel"){
         return res.badRequest({ code : -43, responseText : req.__('order-manipulate-wrong-status')});
       }
       Meal.findOne(order.meal.id).populate("dishes").populate("dynamicDishes").exec(function(err, meal){
@@ -1912,7 +1918,7 @@ module.exports = {
           if(!!order.isPartyMode) {
             meal.dishes = dishes;
           }
-          $this.validateMeal(meal, params.orders, order.orders, params.subtotal, req, order, function(err){
+          $this.validateMeal(meal, params.orders, order.orders, req, order, function(err){
             if(err){
               sails.log.error(err.responseText);
               return res.badRequest(err);
@@ -2118,14 +2124,17 @@ module.exports = {
     var actual_subtotal = 0;
     var validDish = false;
     var $this = this;
+    var mealOrder = Object.assign({}, orders);;
 
     async.each(Object.keys(orders), function(dishId, next){
       var qty = parseInt(orders[dishId].number);
       var properties = $this.getProperties(orders[dishId].preference);
       var lastQty = lastOrders ? parseInt(lastOrders[dishId].number) : 0;
       if(qty > 0 || lastQty > 0){
+        var hasDish;
         async.each(meal.dishes, function(dish, next2){
           if(dish.id === dishId){
+            hasDish = true;
             if(!dish.isVerified){
               return next2({responseText : req.__('order-invalid-dish',dishId), code : -2});
             }
@@ -2160,10 +2169,10 @@ module.exports = {
             }
             var totalQty = meal.getDynamicDishesTotalOrder(qty);
             var price = dish.getPrice(totalQty, meal);
-            var listPrice = parseInt(orders[dishId].price);
+            var listPrice = parseInt(mealOrder[dishId].price);
             if(price !== listPrice){
               sails.log.info("listing price updated from " + listPrice + " to " + price);
-              orders[dishId].price = price;
+              mealOrder[dishId].price = price;
             }
             sails.log.info("dish:" + dish.title + " price: " + price, ",qty: " + qty + ",extra:" + extra);
             actual_subtotal += (qty * price + extra);
@@ -2172,6 +2181,9 @@ module.exports = {
         }, function(err){
           if(err){
             return next(err);
+          }
+          if(!hasDish){
+            delete mealOrder[dishId];
           }
           next();
         });
@@ -2190,6 +2202,7 @@ module.exports = {
         // return cb({responseText : req.__('order-total-not-match'), code : -3});
       }
       meal.subtotal = actual_subtotal;
+      meal.orders = mealOrder;
       return cb(null);
     });
   },
