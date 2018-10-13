@@ -3584,7 +3584,8 @@ var OrderView = Backbone.View.extend({
     var optionItem = this.$el.find("#" + method + "Tab" + " .option." + method +  "Option .regular-radio:checked");
     var index = optionItem.data("index");
     var date = optionItem.parent().data("date");
-    return { index : index, date: date};
+    var meal = optionItem.parent().data("meal");
+    return { index : index, date: date, meal: meal};
   },
   getCustomizedInfo : function(partyMode, cb){
     if(!partyMode){
@@ -3700,6 +3701,7 @@ var OrderView = Backbone.View.extend({
         var pickupObj = $this.getPickupOption(method);
         var pickupOption = pickupObj.index;
         var pickupDate = pickupObj.date;
+        var pickupMeal = pickupObj.meal;
         $this.getCustomizedInfo(partyMode, function(customInfo){
           if(!customInfo){
             return;
@@ -3743,7 +3745,7 @@ var OrderView = Backbone.View.extend({
                 title : subtotal * 0.15,
                 cssClass: 'btn-primary',
                 action : function(dialog){
-                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate, method, code, points, isLogin, partyMode, subtotal * 0.15, $this, button);
+                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, subtotal * 0.15, $this, button);
                 }
               },{
                 label : jQuery.i18n.prop('customTip'),
@@ -3754,7 +3756,7 @@ var OrderView = Backbone.View.extend({
                   $("#customTip").submit(function(e){
                     e.preventDefault();
                     var tip = $(e.currentTarget).find("[name='tip']").val();
-                    $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate, method, code, points, isLogin, partyMode, tip, $this, button);
+                    $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, tip, $this, button);
                   });
                 }
               }, {
@@ -3762,7 +3764,7 @@ var OrderView = Backbone.View.extend({
                 title : jQuery.i18n.prop('noTip'),
                 cssClass: 'btn-light',
                 action : function(dialog){
-                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate, method, code, points, isLogin, partyMode, 0, $this, button);
+                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, 0, $this, button);
                 }
               }
             ]
@@ -3834,7 +3836,7 @@ var OrderView = Backbone.View.extend({
       }
     })
   },
-  submitOrder : function(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, pickupDate, method, code, points, isLogin, partyMode, tip, $this, button){
+  submitOrder : function(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, pickupDate, pickupMeal, method, code, points, isLogin, partyMode, tip, $this, button){
     $this.model.clear();
     $this.model.set({
       orders: currentOrder,
@@ -3844,6 +3846,7 @@ var OrderView = Backbone.View.extend({
       customInfo : customInfo,
       pickupOption: pickupOption,
       pickupDate : pickupDate,
+      pickupMeal : pickupMeal,
       method: method,
       couponCode: code,
       points: points,

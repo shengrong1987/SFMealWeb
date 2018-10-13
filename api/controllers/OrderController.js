@@ -159,6 +159,10 @@ module.exports = {
     if(!pickupDate){
       return res.badRequest({code : -20, responseText: req.__('meal-checkout-lack-of-date')});
     }
+    var targetMeal = req.body.pickupMeal;
+    if(!targetMeal){
+      return res.badRequest({code : -21, responseText: req.__('meal-checkout-lack-of-meal')});
+    }
 
     Meal.find({where: {status: "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime: {'>': moment().toDate()}}}).populate("chef").populate('dishes').exec(function(err, meals) {
       if (err) {
@@ -171,6 +175,10 @@ module.exports = {
         }
       });
 
+      targetMeal = meals.filter(function(meal){
+        return meal.id === targetMeal;
+      })[0];
+
       meals = meals.filter(function (meal) {
         var hasDish = meal.dishes.some(function(d) {
           return orderedDishes.includes(d.id);
@@ -178,7 +186,8 @@ module.exports = {
         var isSameDay = meal.pickups.some(function(p){
           return meal.getDateDesc(p.pickupFromTime) === pickupDate;
         })
-        return hasDish && isSameDay;
+        var isSameProvideTime = moment(meal.provideFromTime).isSame(moment(targetMeal.provideFromTime),'minute') && moment(meal.provideTillTime).isSame(moment(targetMeal.provideTillTime),'minute');
+        return hasDish && isSameDay && isSameProvideTime;
       });
 
       if(!meals.length){
@@ -352,7 +361,7 @@ module.exports = {
           })
         },
         makePayments : [ 'buildOrders', function(next){
-          async.each(_orders, function(order, nextIn){
+          async.eachSeries(_orders, function(order, nextIn){
             if(order.paymentMethod === "alipay" || order.paymentMethod === "wechatpay"){
               stripe.newSource({
                 type : order.paymentMethod,
@@ -2217,7 +2226,7 @@ module.exports = {
     var pickups = [];
     var existInMeals = meals.forEach(function(meal){
       var pickup = meal.pickups.filter(function(pickup){
-        return pickup.index == params.pickupOption;
+        return pickup.index === params.pickupOption;
       })[0];
       if(pickup){
         pickups.push(pickup);
