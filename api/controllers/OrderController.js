@@ -2225,7 +2225,7 @@ module.exports = {
     });
     var isSamePickup = pickups.every(function(p){
       var p2 = pickups[0];
-      return p.pickupFromTime === p2.pickupFromTime && p.pickupTillTime === p2.pickupTillTime && p.location === p2.location;
+      return moment(p.pickupFromTime).isSame(moment(p2.pickupFromTime), 'minute') && moment(p.pickupTillTime).isSame(moment(p2.pickupTillTime), 'minute') && p.location === p2.location;
     });
     if(!isSamePickup){
       return cb({ code : -51, responseText : req.__('meal-not-same-pickup-option')});
