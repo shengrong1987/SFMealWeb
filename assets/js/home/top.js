@@ -32,7 +32,7 @@
 				revealSettings: {
 					duration: 700,
 					delay: 1000,
-					bgcolor: '#878667',
+					bgcolor: '#151f45',
 					onCover: function (contentEl, revealerEl) {
 						contentEl.style.opacity = 1;
 						anime({
@@ -52,7 +52,7 @@
 					duration: 700,
 					delay: 1000,
 					direction: 'tb',
-					bgcolor: '#697878',
+					bgcolor: '#151f45',
 					onCover: function (contentEl, revealerEl) {
 						contentEl.style.opacity = 1;
 						anime({
@@ -69,7 +69,7 @@
 
 			var rev3 = new RevealFx(document.querySelector('#rev-3'), {
 				revealSettings: {
-					bgcolor: '#403D3C',
+					bgcolor: '#151f45',
 					delay: 1000,
 					duration: 700,
 					direction: 'tb',
@@ -82,7 +82,7 @@
 
 			var rev4 = new RevealFx(document.querySelector('#rev-4'), {
 				revealSettings: {
-					bgcolor: '#697878',
+					bgcolor: '#151f45',
 					delay: 1000,
 					duration: 700,
 					direction: 'tb',
@@ -95,7 +95,7 @@
 
 			var rev5 = new RevealFx(document.querySelector('#rev-5'), {
 				revealSettings: {
-					bgcolor: '#403D3C',
+					bgcolor: '#151f45',
 					delay: 1000,
 					duration: 700,
 					direction: 'tb',
@@ -108,7 +108,7 @@
 
 			var rev6 = new RevealFx(document.querySelector('#rev-6'), {
 				revealSettings: {
-					bgcolor: '#697878',
+					bgcolor: '#151f45',
 					delay: 1000,
 					duration: 700,
 					direction: 'tb',
@@ -121,7 +121,7 @@
 
 			var rev7 = new RevealFx(document.querySelector('#rev-7'), {
 				revealSettings: {
-					bgcolor: '#697878',
+					bgcolor: '#151f45',
 					delay: 1000,
 					duration: 700,
 					onCover: function (contentEl, revealerEl) {
@@ -163,7 +163,7 @@
 					watcher_23 = scrollMonitor.create(scrollElemToWatch_23, -100),
 					rev23 = new RevealFx(scrollElemToWatch_23, {
 						revealSettings: {
-							bgcolor: '#878667',
+							bgcolor: '#9A0000',
 							duration: 700,
 							delay: 700,
 							onStart: function (contentEl, revealerEl) {
@@ -196,7 +196,7 @@
 					watcher_21 = scrollMonitor.create(scrollElemToWatch_21, -100),
 					rev21 = new RevealFx(scrollElemToWatch_21, {
 						revealSettings: {
-							bgcolor: '#E8E8E8',
+							bgcolor: '#eee',
 							duration: 700,
 							delay: 700,
 							onStart: function (contentEl, revealerEl) {
@@ -229,7 +229,7 @@
 					watcher_22 = scrollMonitor.create(scrollElemToWatch_22, -100),
 					rev22 = new RevealFx(scrollElemToWatch_22, {
 						revealSettings: {
-							bgcolor: '#252525',
+							bgcolor: '#151f45',
 							duration: 700,
 							delay: 700,
 							onStart: function (contentEl, revealerEl) {
@@ -262,7 +262,7 @@
 					watcher_24 = scrollMonitor.create(scrollElemToWatch_24, -100),
 					rev24 = new RevealFx(scrollElemToWatch_24, {
 						revealSettings: {
-							bgcolor: '#E6E5DB',
+							bgcolor: '#151f45',
 							duration: 1200,
 							delay: 0,
 							onStart: function (contentEl, revealerEl) {
@@ -295,7 +295,7 @@
 					watcher_25 = scrollMonitor.create(scrollElemToWatch_25, -100),
 					rev25 = new RevealFx(scrollElemToWatch_25, {
 						revealSettings: {
-							bgcolor: '#E6E5DB',
+							bgcolor: '#151f45',
 							duration: 1200,
 							delay: 300,
 							onStart: function (contentEl, revealerEl) {
@@ -328,7 +328,7 @@
 					watcher_26 = scrollMonitor.create(scrollElemToWatch_26, -100),
 					rev26 = new RevealFx(scrollElemToWatch_26, {
 						revealSettings: {
-							bgcolor: '#E6E5DB',
+							bgcolor: '#151f45',
 							duration: 1200,
 							delay: 600,
 							onStart: function (contentEl, revealerEl) {
@@ -361,7 +361,7 @@
 					watcher_27 = scrollMonitor.create(scrollElemToWatch_27, -100),
 					rev27 = new RevealFx(scrollElemToWatch_27, {
 						revealSettings: {
-							bgcolor: '#E6E5DB',
+							bgcolor: '#9A0000',
 							duration: 1200,
 							delay: 1000,
 							onStart: function (contentEl, revealerEl) {
@@ -394,9 +394,10 @@
 					watcher_28 = scrollMonitor.create(scrollElemToWatch_28, -100),
 					rev28 = new RevealFx(scrollElemToWatch_28, {
 						revealSettings: {
-							bgcolor: '#697878',
-							duration: 1200,
-							delay: 1400,
+							bgcolor: '#151f45',
+							duration: 700,
+							direction: 'rl',
+							delay: 500,
 							onStart: function (contentEl, revealerEl) {
 								anime.remove(contentEl);
 								contentEl.style.opacity = 0;
@@ -408,7 +409,7 @@
 									duration: 700,
 									delay: 400,
 									easing: 'easeOutExpo',
-									translateX: [-80, 0],
+									translateX: [100, 0],
 									opacity: [0, 1]
 								});
 							}
@@ -430,7 +431,7 @@
 					watcher_29 = scrollMonitor.create(scrollElemToWatch_29, -100),
 					rev29 = new RevealFx(scrollElemToWatch_29, {
 						revealSettings: {
-							bgcolor: '#F7F7F7',
+							bgcolor: '#151f45',
 							duration: 700,
 							direction: 'rl',
 							delay: 0,
@@ -466,7 +467,7 @@
 					watcher_30 = scrollMonitor.create(scrollElemToWatch_30, -100),
 					rev30 = new RevealFx(scrollElemToWatch_30, {
 						revealSettings: {
-							bgcolor: '#F7F7F7',
+							bgcolor: '#151f45',
 							duration: 700,
 							direction: 'rl',
 							delay:0,
@@ -500,7 +501,7 @@
 					watcher_31 = scrollMonitor.create(scrollElemToWatch_31, -100),
 					rev31 = new RevealFx(scrollElemToWatch_31, {
 						revealSettings: {
-							bgcolor: '#F7F7F7',
+							bgcolor: '#151f45',
 							duration: 700,
 							delay: 0,
 							opacity: [0],
@@ -537,7 +538,7 @@
 					watcher_32 = scrollMonitor.create(scrollElemToWatch_32, -100),
 					rev32 = new RevealFx(scrollElemToWatch_32, {
 						revealSettings: {
-							bgcolor: '#F7F7F7',
+							bgcolor: '#151f45',
 							duration: 700,
 							delay:0,
 							onStart: function (contentEl, revealerEl) {
@@ -571,7 +572,7 @@ setTimeout(rev33, 10);
 					watcher_33 = scrollMonitor.create(scrollElemToWatch_33, -100),
 					rev33 = new RevealFx(scrollElemToWatch_33, {
 						revealSettings: {
-							bgcolor: '#F7F7F7',
+							bgcolor: '#151f45',
 							duration: 700,
 							direction: 'rl',
 							delay: 0,
@@ -608,7 +609,7 @@ setTimeout(rev33, 10);
 					watcher_34 = scrollMonitor.create(scrollElemToWatch_34, -100),
 					rev34 = new RevealFx(scrollElemToWatch_34, {
 						revealSettings: {
-							bgcolor: '#F7F7F7',
+							bgcolor: '#151f45',
 							duration: 700,
 							delay:0,
 							direction: 'rl',
@@ -639,7 +640,7 @@ setTimeout(rev33, 10);
 
 			var revSample = new RevealFx(document.querySelector('#rev-Sample'), {
 				revealSettings: {
-					bgcolor: '#ffffff',
+					bgcolor: '#151f45',
 					delay: 700,
 					duration: 700,
 					direction: 'tb',

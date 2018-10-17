@@ -36,8 +36,8 @@ dfn {
   font-style: italic; }
 
 mark {
-  background: #ff0;
-  color: #000; }
+  background: #ffd833;
+  color: #151f45; }
 
 code, kbd, pre, samp {
   font-family: monospace, serif;
@@ -76,7 +76,7 @@ figure {
   margin: 0; }
 
 fieldset {
-  border: 1px solid silver;
+  border: 1px solid #999999;
   margin: 0 2px;
   padding: 0.35em 0.625em 0.75em; }
 
@@ -242,13 +242,13 @@ ul, ol {
   list-style-type: none; }
 
 ::selection {
-  background-color: #E6E5DB;
-  color: #000;
+  background-color: #eee;
+  color: #151f45;
   /* Safari */ }
 
 ::-moz-selection {
-  background-color: #E6E5DB;
-  color: #000;
+  background-color: #eee;
+  color: #151f45;
   /* Firefox */ }
 
 a {
@@ -348,7 +348,7 @@ div.clear {
 
 /*-- HEADER --*/
 #header {
-  border-right: 1px solid #E5E5E5;
+  border-right: 1px solid #eee;
   position: fixed;
   top: 0;
   bottom: 0;
@@ -370,7 +370,7 @@ div.clear {
 #gNav ul li {
   position: relative; }
   #gNav ul li a {
-    color: #231815;
+    color: #151f45;
     display: block;
     padding: 10px 0;
     text-align: center;
@@ -386,7 +386,7 @@ div.clear {
       position: relative;
       z-index: 3; }
 #gNav ul li a:after {
-  color: #DBDAD1;
+  color: #eee;
   display: inline;
   font-size: 30px;
   position: absolute;
@@ -399,7 +399,7 @@ div.clear {
   font-size: 40px;
   margin: -18% 0 0 -18%; }
 #gNav ul li a:hover {
-  color: #878665; }
+  color: #ff7601; }
 
 #spHeader {
   background-color: rgba(255, 255, 255, 0.9);
@@ -440,7 +440,7 @@ div.clear {
         text-align: center;
         text-transform: uppercase; }
         #spHeader .spHT ul li a {
-          background-color: #111;
+          background-color: #151f45;
           color: #FFF;
           display: block;
           height: 60pxs;
@@ -452,12 +452,12 @@ div.clear {
             height: 15px;
             margin-bottom: 6px; }
       #spHeader .spHT ul li:last-child {
-        background-color: #ec3205;
+        background-color: #ff7601;
         color: #FFF; }
   #spHeader #my-button {
     transition: 0.2s; }
   #spHeader #my-button a {
-    background-color: #ec3205;
+    background-color: #ff7601;
     color: #FFF;
     display: block;
     text-decoration: none;
@@ -594,7 +594,7 @@ div.clear {
       font-weight: 500;
       letter-spacing: 0.1em; }
       #containerHd .chNav ul li a {
-        color: #111;
+        color: #151f45;
         display: inline-block; }
     #containerHd .chNav ul li:not(:last-child):after {
       content: '/';
@@ -607,7 +607,7 @@ div.clear {
       margin-left: 10px;
       text-transform: uppercase; }
       #containerHd .chBtns ul li a {
-        background-color: #111;
+        background-color: #151f45;
         color: #FFF;
         display: block;
         font-family: 'Arial', 'PingFang SC';
@@ -652,24 +652,24 @@ p {
   line-height: 1.8; }
 
 #footer {
-  background-color: #111;
+  background-color: #151f45;
   padding: 30px 0; }
   #footer .logo {
     text-align: center; }
   #footer .name {
-    color: #CCC9AD;
+    color: #dcb97d;
     font-size: 15px;
     font-size: 1.5rem;
     margin-bottom: 10px;
     text-align: center; }
   #footer .address {
-    color: #CCC9AD;
+    color: #dcb97d;
     font-size: 11px;
     font-size: 1.1rem;
     margin-bottom: 30px;
     text-align: center; }
   #footer .address a {
-    color: #CCC9AD; }
+    color: #dcb97d; }
   #footer .chBtns {
     margin-bottom: 25px; }
     #footer .chBtns ul {
@@ -680,8 +680,8 @@ p {
         margin-left: 10px;
         text-transform: uppercase; }
         #footer .chBtns ul li a {
-          background-color: #111;
-          border: 1px solid #AAA;
+          background-color: #151f45;
+          border: 1px solid #999999;
           color: #FFF;
           display: inline-block;
           font-family: 'Arial', 'PingFang SC';
@@ -709,7 +709,7 @@ p {
         width: 12px;
         vertical-align: middle; }
       #footer .chBtns ul li a:after {
-        background-color: #AAA;
+        background-color: #999999;
         content: '';
         display: inline-block;
         vertical-align: middle;
@@ -719,8 +719,8 @@ p {
       #footer .chBtns ul li:first-child a:after {
         width: 4.5vw; }
   #footer .ftNav {
-    border-bottom: 1px solid #333;
-    border-top: 1px solid #333;
+    border-bottom: 1px solid #151f45;
+    border-top: 1px solid #151f45;
     padding: 10px; }
     #footer .ftNav ul {
       text-align: center; }
@@ -761,7 +761,7 @@ p {
     text-align: center;
     font-family: 'Arial', 'PingFang SC';
     font-weight: normal;
-    font-size: 10px;
+    font-size: 1.2rem;
     letter-spacing: 0.2em; }
 
 #mega {
@@ -800,7 +800,7 @@ p {
           transition: all 400ms cubic-bezier(0.455, 0.03, 0.515, 0.955);
           /* easeInOutQuad */ }
         #mega ul li a span.en {
-          color: #878667;
+          color: #999999;
           font-family: 'Arial', 'PingFang SC';
           font-weight: normal;
           font-size: 18px;
