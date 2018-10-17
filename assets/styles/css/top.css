@@ -106,11 +106,12 @@
       top: 0;
       right: -55px;
       text-orientation: sideways;
-      /*-webkit-writing-mode: vertical-rl;*/
+      -webkit-writing-mode: vertical-rl;
       -ms-writing-mode: tb-rl;
       /*writing-mode: vertical-rl; */
     }
       .topMv .mvArea #topMvSns a {
+        color: #151f45;
         display: inline-block;
         margin-bottom: 20px;
         text-decoration: none;
@@ -118,7 +119,7 @@
         -o-transition: 0.4s;
         transition: 0.4s; }
       .topMv .mvArea #topMvSns a:hover {
-        color: #878665; }
+        color: #ff7601; }
     .topMv .mvArea #topMvUtility {
       font-family: 'Lato', serif;
       font-size: 11px;
@@ -134,6 +135,7 @@
       -ms-writing-mode: tb-rl;
       writing-mode: vertical-rl; }
       .topMv .mvArea #topMvUtility a {
+        color: #151f45;
         display: inline-block;
         margin: 10px 0;
         text-decoration: none;
@@ -141,7 +143,7 @@
         -o-transition: 0.4s;
         transition: 0.4s; }
       .topMv .mvArea #topMvUtility a:hover {
-        color: #878665; }
+        color: #9A0000; }
     .topMv .mvArea #topMvScroll {
       font-family: 'Arial', 'PingFang SC';
       font-size: 11px;
@@ -221,10 +223,11 @@
       padding: 0 0 30px 230px;
       text-transform: uppercase; }
     .topMessage .topMessageInr .dataArea {
-      background-color: #E6E5DB;
+      background-color: #eee;
       padding: 65px 50px 130px;
       position: relative; }
       .topMessage .topMessageInr .dataArea .select {
+        color: #151f45;
         font-size: 60px;
         font-size: 6rem;
         font-weight: 500;
@@ -235,18 +238,19 @@
         top: -170px;
         left: 20px; }
         .topMessage .topMessageInr .dataArea .select span {
+          color: #151f45;
           display: block;
           font-family: 'Arial', 'PingFang SC';
           font-size: 120px;
           font-size: 12rem;
           font-weight: bold;
-          letter-spacing: 0.1em; }
+          letter-spacing: 0.1em;}
       .topMessage .topMessageInr .dataArea .line {
         margin-bottom: 30px; }
         .topMessage .topMessageInr .dataArea .line em {
           display: block; }
         .topMessage .topMessageInr .dataArea .line span {
-          background-color: #111;
+          background-color: #151f45;
           color: #FFF;
           display: inline-block;
           font-size: 26px;
@@ -265,8 +269,8 @@
         line-height: 2; }
       .topMessage .topMessageInr .dataArea .btn {
         position: absolute;
-        bottom: -45px;
-        right: 340px; }
+        bottom: 25px;
+        right: 332px; }
     .topMessage .topMessageInr .img {
       position: absolute;
       bottom: -45px;
@@ -365,7 +369,7 @@
         .topPlan .planBoxWrap .planBox .data .cell ul.tag {
           margin-bottom: 25px; }
           .topPlan .planBoxWrap .planBox .data .cell ul.tag li {
-            background-color: #111;
+            background-color: #9A0000;
             border-radius: 20px;
             color: #FFF;
             display: inline-block;
@@ -388,7 +392,7 @@
             width: 100%;
             max-width: 400px; }
   .topPlan .planBoxWrap .planBox.hokende {
-    background-color: #998D67; }
+    background-color: #151F45; }
     .topPlan .planBoxWrap .planBox.hokende .img {
       background: url(/images/img_plan_01.png) center center no-repeat;
       background-size: cover; }
@@ -398,7 +402,7 @@
       height: 40px;
       width: 71px; }
   .topPlan .planBoxWrap .planBox.jihide {
-    background-color: #998D67;
+    background-color: #151F45;
     -webkit-box-orient: horizontal;
     -webkit-box-direction: reverse;
     -ms-flex-direction: row-reverse;
@@ -412,7 +416,7 @@
       height: 32px;
       width: 52px; }
   .topPlan .planBoxWrap .planBox.jibunmo {
-    background-color: #998D67; }
+    background-color: #151F45; }
     .topPlan .planBoxWrap .planBox.jibunmo .img {
       background: url(/images/img_plan_03.png) center center no-repeat;
       background-size: cover; }
@@ -607,10 +611,12 @@
           font-size: 1.2rem;
           margin: 15px 20px 20px 15px; }
         .topMessage .topMessageInr .dataArea .btn {
-          margin: 0 15px;
-          position: static; }
+          margin: 0 -24px;
+          position: static;
+          height: 50px;
+          width: 400px; }
           .topMessage .topMessageInr .dataArea .btn img {
-            width: 100%; }
+            width: 100%;}
       .topMessage .topMessageInr .img {
         margin-bottom: 30px;
         position: static; }
@@ -685,12 +691,14 @@
             line-height: 2;
             margin-bottom: 30px; }
           .topPlan .planBoxWrap .planBox .data .cell p.btn {
+            height: 100px;
             margin: 0;
             width: auto; }
             .topPlan .planBoxWrap .planBox .data .cell p.btn img {
               height: auto;
               width: 100%;
-              max-width: 400px; }
+              max-width: 400px;
+              margin-top: -24px; }
   .topPickup {
     margin-bottom: 0 !important;
     padding-bottom: 40px; }
