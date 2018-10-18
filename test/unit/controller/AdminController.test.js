@@ -99,9 +99,9 @@ describe('AdminController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(4);
+          res.body.should.have.length(5);
           mealId = res.body[0].id;
-          res.body[2].status.should.be.equal("off");
+          res.body[2].status.should.be.equal("on");
           offlineMealId = res.body[2].id;
           done();
         })
@@ -109,7 +109,7 @@ describe('AdminController', function() {
 
     it('should be able to search meals with keyword', function (done) {
       agent
-        .get(encodeURI('/meal/searchAll?keyword=私房面馆'))
+        .get(encodeURI('/meal/searchAll?keyword=私房面馆-即点2'))
         .expect(200)
         .end(function(err, res){
           if(err){
@@ -128,7 +128,7 @@ describe('AdminController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(5);
+          res.body.should.have.length(7);
           done();
         })
     })
@@ -159,15 +159,15 @@ describe('AdminController', function() {
         })
     })
 
-    it('should be able to turn a meal off', function (done) {
+    it('should not be able to turn a meal off', function (done) {
       agent
         .get(encodeURI('/meal/' + offlineMealId + '/off'))
-        .expect(200)
+        .expect(400)
         .end(function(err, res){
           if(err){
             return done(err);
           }
-          res.body.id.should.be.equal(offlineMealId);
+          res.body.code.should.be.equal(-4);
           done();
         })
     })
@@ -206,24 +206,6 @@ describe('AdminController', function() {
           done();
         })
     });
-
-    // it('should update host legal_entity', function(done){
-    //   var legalObj = {
-    //     personal_id_number : "123456789"
-    //   };
-    //   agent
-    //     .put('/host/' + hostId)
-    //     .set('Accept', 'application/json')
-    //     .expect('Content-Type', /json/)
-    //     .field('legal_entity',JSON.stringify(legalObj))
-    //     .expect(200)
-    //     .end(function(err, res){
-    //       if(err){
-    //         return done(err);
-    //       }
-    //       done();
-    //     })
-    // });
 
     it('should log out user', function(done){
       agent
@@ -264,8 +246,10 @@ describe('AdminController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(7);
-          scheduledOrderId = res.body[0].id;
+          res.body.should.have.length(9);
+          scheduledOrderId = res.body.filter(function(order){
+            return Object.keys(order.transfer).length;
+          })[0].id;
           redeemPoints = res.body[0].redeemPoints;
           done();
         })
@@ -284,7 +268,7 @@ describe('AdminController', function() {
         })
     })
 
-    it('should be able to refund order', function (done) {
+    it('should be able to refund an discount order and reverse the transfer to host', function (done) {
       agent
         .get('/order/' + scheduledOrderId + '/refund')
         .expect(200)
@@ -313,7 +297,7 @@ describe('AdminController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(5);
+          res.body.should.have.length(4);
           cancelOrderId = res.body[0].id;
           done();
         })

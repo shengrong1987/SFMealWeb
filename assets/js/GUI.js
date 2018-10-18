@@ -273,7 +273,7 @@ function loadOrder(fromCache){
   updateOrderWindow(fromCache);
   loadCoupon(fromCache);
   loadPoints(fromCache);
-  refreshMenu();
+  refreshCheckoutMenu();
   updateOrderPreview();
 }
 
@@ -294,6 +294,7 @@ function updateOrderWindow(fromCache, isTrigger){
     updateCollapseBtn(false);
   }
   $("#order").find(".item").each(function(){
+    var _this = $(this);
     var dishId = $(this).data("id");
     if(fromCache){
       var localDish = readCookie(dishId);
@@ -304,12 +305,14 @@ function updateOrderWindow(fromCache, isTrigger){
       }
       localOrders[dishId] = localDish;
       var left = parseInt($(this).attr("data-left-amount") - parseInt(localOrders[dishId].number));
-      var dishItem = $("#order").find(".dish[data-id='" + dishId + "']");
-      dishItem.find(".amount").val(localOrders[dishId].number);
-      dishItem.find(".amount").text(localOrders[dishId].number);
-      $(this).amountInput('update',dishItem.find("[data-toggle='amount-input']"));
+      var dishItems = $("#order").find(".dish[data-id='" + dishId + "']");
+      dishItems.each(function(){
+        $(this).find(".amount").val(localOrders[dishId].number);
+        $(this).find(".amount").text(localOrders[dishId].number);
+        _this.amountInput('update',$(this).find("[data-toggle='amount-input']"));
+      })
       $(this).data("left-amount", left);
-      updateMenuView(dishId, isTrigger);
+      updateMenuView(dishId);
     }else{
       localOrders[dishId] = {
         number : parseInt($(this).find(".amount").val()),
@@ -326,66 +329,55 @@ function updateOrderWindow(fromCache, isTrigger){
  - price update
  - quantity update
  */
-function updateMenuView(id, triggerExpand){
+function updateMenuView(id){
   var number = localOrders[id].number;
-  var item = $("#order").find(".item[data-id=" + id + "]");
-  var left = item.data("left-amount");
-  item.find(".amount").val(number);
-  item.find(".amount").text(number);
-  if(number>0){
-    item.addClass("table-success");
-  }else{
-    item.removeClass("table-success");
-  }
-  var priceItem = item.find(".price");
-  var preference = localOrders[id].preference;
-  var oldPrice = priceItem.attr("old-value");
-  var price = priceItem.attr("value");
-  if(preference && preference.length){
-    var extra = preference.reduce(function(total, next){
-      return total + next.extra;
-    }, 0);
-    priceItem.data("extra", extra);
-    if(extra > 0){
-      if(oldPrice){
-        priceItem.html("$" + price + " <s>$" + oldPrice + "</s>" + " ($" + extra + ")");
+  var dishItems = $("#order").find(".item[data-id=" + id + "]");
+  dishItems.each(function(){
+    var dishItem = $(this);
+    var left = dishItem.data("left-amount");
+    dishItem.find(".amount").val(number);
+    dishItem.find(".amount").text(number);
+    if($("#myModal").hasClass('show')){
+      dishItem.amountInput('update',dishItem.find("[data-toggle='amount-input']"));
+    }
+    if(number>0){
+      dishItem.addClass("table-success");
+    }else{
+      dishItem.removeClass("table-success");
+    }
+    dishItem.find(".left-amount span").attr("value",left);
+    dishItem.find(".left-amount span").html(left);
+    var priceItem = dishItem.find(".price");
+    var preference = localOrders[id].preference;
+    var oldPrice = priceItem.attr("old-value");
+    var price = priceItem.attr("value");
+    if(preference && preference.length){
+      var extra = preference.reduce(function(total, next){
+        return total + next.extra;
+      }, 0);
+      priceItem.data("extra", extra);
+      if(extra > 0){
+        if(oldPrice){
+          priceItem.html("$" + price + " <s>$" + oldPrice + "</s>" + " ($" + extra + ")");
+        }else{
+          priceItem.html("$" + price + " ($" + extra + ")");
+        }
       }else{
-        priceItem.html("$" + price + " ($" + extra + ")");
+        if(oldPrice){
+          priceItem.html("$" + price + " <s>$" + oldPrice + "</s>");
+        }else{
+          priceItem.html("$" + price);
+        }
       }
     }else{
+      priceItem.data("extra", 0);
       if(oldPrice){
         priceItem.html("$" + price + " <s>$" + oldPrice + "</s>");
       }else{
         priceItem.html("$" + price);
       }
     }
-  }else{
-    priceItem.data("extra", 0);
-    if(oldPrice){
-      priceItem.html("$" + price + " <s>$" + oldPrice + "</s>");
-    }else{
-      priceItem.html("$" + price);
-    }
-  }
-  var dishItem = $("#order").find(".dish[data-id='" + id + "']");
-  // if(number > 0){
-  //   dishItem.find(".beforeOrder").hide();
-  //   dishItem.find(".afterOrder").show();
-  //   dishItem.find(".dish-number").val(number);
-  //   item.addClass("success");
-  //   item.show();
-  // }else{
-  //   dishItem.find(".beforeOrder").show();
-  //   dishItem.find(".afterOrder").hide();
-  //   item.removeClass("success");
-  //   if(triggerExpand){
-  //     item.toggle();
-  //   }else{
-  //     item.hide();
-  //   }
-  // }
-  dishItem.find(".left-amount span").attr("value",left);
-  dishItem.find(".left-amount span").html(left);
+  })
 }
 
 function refreshPreference(id){
@@ -430,6 +422,7 @@ function refreshPreference(id){
   amountInput.data("max",max);
   numberInput.val(number);
   numberInput.text(number);
+  item.amountInput('update',item.find("[data-toggle='amount-input']"));
   propertiesLabel.text(propertiesText);
   priceLabel.text("$" + (price*number).toFixed(2));
 }
@@ -537,7 +530,7 @@ function orderFoodLogic(id, number, initial){
   }
   createCookie(id,JSON.stringify(localOrders[id]),1);
   updateMenuView(id);
-  refreshMenu();
+  refreshCheckoutMenu();
   refreshPreference(id);
   setupDropdownMenu();
   updateOrderPreview();
@@ -591,7 +584,7 @@ function applyCoupon(isApply, amount, code){
     localCoupon = {};
     eraseCookie('coupon');
   }
-  refreshMenu();
+  refreshCheckoutMenu();
 }
 
 function applyPoints(isApply, amount){
@@ -602,11 +595,11 @@ function applyPoints(isApply, amount){
     localPoints = 0;
     eraseCookie('points');
   }
-  refreshMenu();
+  refreshCheckoutMenu();
 }
 
 //render menu view
-var refreshMenu = function(){
+var refreshCheckoutMenu = function(){
   var numberOfItem = 0;
   var subtotal = 0;
   var method = $("#method").find(".active").attr("value");

@@ -124,18 +124,19 @@ describe('ReviewController', function() {
           contactInfo : { name : "sheng", address : address, phone : phone },
           paymentInfo : { method : 'online'},
           method : "pickup",
-          mealId : mealId,
-          pickupOption : 1
+          pickupMeal : mealId,
+          pickupOption : 1,
+          tip : 0
         })
         .expect(200)
         .end(function(err,res){
           if(err){
             return done(err);
           }
-          if(res.body.customer !== guestId){
+          if(res.body.orders[0].customer !== guestId){
             return done(Error("error making order"));
           }
-          orderId = res.body.id;
+          orderId = res.body.orders[0].id;
           done();
         })
     })

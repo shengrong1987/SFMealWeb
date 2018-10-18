@@ -8874,6 +8874,12 @@ small {
 .wrapper {
   width: 100%;
 }
+.not-active {
+  pointer-events: none;
+  cursor: default;
+  text-decoration: none;
+  color: black;
+}
 #myUserBar {
   z-index: 101;
 }

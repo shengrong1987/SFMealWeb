@@ -903,5 +903,8 @@
   "paypal-instruction" : "Please leave your name at checkout（Add $1 for transaction fee）",
   "dish-tag-default" : "Street food",
   "dish-tag" : "Tag",
-  "toggleMenu" : "Toggle Menu"
+  "toggleMenu" : "Toggle Menu",
+  "received" : "Received",
+  "readied" : "Readied",
+  "ordered-dish-not-found" : "Contain dish that can not be founded."
 }

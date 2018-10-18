@@ -641,11 +641,11 @@ describe('UsersController', function() {
 
     it('should request and verify wechat api', function(done){
       agent
-        .get('/auth/wechatSignature?url=https://sfmeal.com')
+        .get('/auth/wechatSignature?url=http://sfmeal.com')
         .expect(200)
         .end(function(err, res){
           console.log(res.body);
-          res.body.url.should.be.equal('https://sfmeal.com');
+          res.body.url.should.be.equal('http://sfmeal.com');
           should.exist(res.body.appid);
           should.exist(res.body.timestamp);
           should.exist(res.body.nonceStr);

@@ -289,11 +289,11 @@
                         <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('reject')%></a><br/>
                         <a href="#"><%= __('contact-user')%></a>
                         <%}else if(order.status == "preparing"){%>
-                        <a href="javascript:void(0)" data-action="ready" data-order="<%= order.id%>"><%= __('complete')%></a><br/>
+                        <a href="javascript:void(0)" data-action="ready" data-success-text="<%= __('readied')%>" data-order="<%= order.id%>"><%= __('complete')%></a><br/>
                         <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
                         <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customerName || __('user')%>" data-placement="bottom" data-content="<%= order.customerPhone %>"><%= __('contact-user')%></a>
                         <%}else if(order.status == "ready"){%>
-                        <a href="javascript:void(0)" data-action="receive" data-order="<%= order.id%>"><%= __('confirm-pickup')%></a><br/>
+                        <a href="javascript:void(0)" data-action="receive" data-success-text="<%= __('received')%>" data-order="<%= order.id%>"><%= __('confirm-pickup')%></a><br/>
                         <% if(order.method == 'delivery'){%>
                         <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customerName || __('user')%>" data-placement="top" data-content="<%= order.contactInfo.address%>"><%= __('see-address')%></a><br/>
                         <%}%>

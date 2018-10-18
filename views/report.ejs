@@ -27,6 +27,8 @@
         <td><%= __('user')%></td>
         <td><%= __('order-number')%></td>
         <td><%= __('content')%></td>
+        <td></td>
+        <td></td>
         <td><%= __('contact')%></td>
         <td><%= __('delivery-location')%></td>
         <td><%= __('amount-owe')%></td>
@@ -44,7 +46,7 @@
               <span class="dbClick" data-trigger="dblclick" data-toggle="popupTooltip" data-popupText="copied" data-copy-text="<%= id%>"><%= id.slice(-4)%></span>
               <% })%>
             </td>
-            <td>
+            <td colspan="3">
               <% Object.keys(order.orders).forEach(function(dishId){
                 var amount = order.orders[dishId].number;
                 var preference = order.orders[dishId].preference;

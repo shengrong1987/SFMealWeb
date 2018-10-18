@@ -52,11 +52,11 @@ describe('PocketController', function() {
           var incomes = trans.filter(function(tran){
             return tran.type === "type-payment";
           })
-          incomes.should.have.length(9);
+          incomes.should.have.length(10);
           var fees = trans.filter(function(tran){
             return tran.type === "type-fee";
           });
-          fees.should.have.length(4);
+          fees.should.have.length(3);
           res.body.pocket.transactions.should.have.length(15, 'transactions number not match');
           done()
         })
@@ -113,7 +113,7 @@ describe('PocketController', function() {
             return done(err);
           }
           should.exist(res.body.pocket.transactions);
-          res.body.pocket.transactions.should.have.length(10, 'user transactions number not match');
+          res.body.pocket.transactions.should.have.length(11, 'user transactions number not match');
           done()
         })
     })

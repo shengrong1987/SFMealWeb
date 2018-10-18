@@ -559,7 +559,7 @@ module.exports = {
     var _this = this;
     var transferIds = Object.keys(transfers);
     var amount = metadata.amount;
-    sails.log.info("total money to transfer: $" + amount/100);
+    sails.log.info("total money to transfer: $" + amount/100 + "& transfers: " + transferIds);
     var refundingAmount;
     async.each(transferIds, function(transferId, next){
       var thisAmount = transfers[transferId];
@@ -586,6 +586,7 @@ module.exports = {
         if(err){
           return next(err);
         }
+        sails.log.info("refunded amount: " + refund.amount, "transfer left: " + transfers[transferId]);
         transfers[transferId] -= refund.amount;
         next();
       });

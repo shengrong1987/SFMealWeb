@@ -106,6 +106,9 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
+        if(req.wantsJSON && process.env.NODE_ENV === "development"){
+          return res.ok({ meals : meals, user : _u, tags: _tags });
+        }
         meals = _this.composeMealWithDate(meals);
         res.view("dayOfMeal",{ meals : meals, user : _u, tags: _tags});
       })
@@ -187,9 +190,12 @@ module.exports = {
         found = found.filter(function(meal){
           var dishes = meal.dishes;
           var valid = false;
+          if(meal.title === keyword){
+            return true;
+          }
           for(var i=0; i < dishes.length; i++){
             var dish = dishes[i];
-            if(meal.title.indexOf(keyword) !== -1 || dish.title.indexOf(keyword) !== -1 || dish.description.indexOf(keyword) !== -1 || dish.type.indexOf(keyword) !== -1){
+            if(dish.title.indexOf(keyword) !== -1 || dish.description.indexOf(keyword) !== -1 || dish.type.indexOf(keyword) !== -1){
               valid = true;
               break;
             }
@@ -308,17 +314,24 @@ module.exports = {
           return orderedDishes.includes(d.id);
         });
       });
+      if(!meals.length){
+        return res.badRequest({ code : -3, responseText: req.__('meal-not-found')});
+      }
       var pickups = [], u = {};
       async.auto({
         combinePickups : function(next){
           meals.forEach(function(meal){
             var newPickups = meal.pickups.filter(function(p1){
-              return !(pickups.length && pickups.some(function(p2){
-                if(p1.pickupFromTime === p2.pickupFromTime && p1.pickupTillTime === p2.pickupTillTime && p1.location === p2.location){
-                  return true;
-                }
-                return false;
-              }))
+              if(!pickups.length){
+                return true;
+              }
+              return !pickups.some(function(p2){
+                return p1.pickupFromTime === p2.pickupFromTime && p1.pickupTillTime === p2.pickupTillTime && p1.location === p2.location;
+              })
+            });
+            newPickups = newPickups.map(function(pickup){
+              pickup.meal = meal.id;
+              return pickup;
             });
             pickups = pickups.concat(newPickups);
           })

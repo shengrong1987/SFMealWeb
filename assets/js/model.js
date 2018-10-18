@@ -1213,7 +1213,7 @@ var MealSelectionView = Backbone.View.extend({
     var dishId = $(e.currentTarget).data("dish");
     this.saveOption(orderIndex, option, dishId);
     updateMenuView(dishId);
-    refreshMenu();
+    refreshCheckoutMenu();
   },
   saveOption : function(index, option, dishId){
     var localDish = readCookie(dishId);
@@ -2818,47 +2818,31 @@ var TransactionView = Backbone.View.extend({
 
 var DishPreferenceView = Backbone.View.extend({
   events : {
-    "change .btn-set[data-prefType]" : "changePreference",
+    "change .btn-set[data-prefType]" : "updatePreferences",
     "submit form" : 'savePreference'
   },
-  changePreference : function(e){
-    var btnSet = $(e.currentTarget);
+  updatePreferences : function(e){
     var dishId = this.$el.data("id");
-    var property = btnSet.find("button.active").data("property");
-    var extra = btnSet.find("button.active").data("extra");
-    var index = btnSet.find("button.active").data("index");
-    var prefType = btnSet.data('preftype');
-    var amount = parseInt(this.$el.find(".amount").text());
     var prefList = localOrders[dishId].preference;
-    var properties, preObj, isExist = false;
-    if(prefList && amount <= prefList.length){
-      preObj = prefList[amount-1];
-      preObj.extra = preObj.extra || 0;
-      preObj.extra += extra;
-      properties = preObj.property;
-      if(properties && properties.length){
-        var j = 0;
-        properties.map(function(propObj, i){
-          if(propObj.preftype === prefType){
-            j = i;
-            isExist = true;
-            propObj.property = property;
-          }
-        });
-      }
-      if(index===0){
-        properties.splice(j,1);
-      }
-    }
-    if(!isExist && index){
-      if(properties){
+    var btnsets = this.$el.find("[data-preftype]");
+    var amount = parseInt(this.$el.find(".amount").text());
+    var properties = [], extra = 0;
+    btnsets.each(function(){
+      var btnSet = $(this);
+      var property = btnSet.find("button.active").data("property");
+      var e = btnSet.find("button.active").data("extra");
+      var index = btnSet.find("button.active").data("index");
+      var prefType = btnSet.data('preftype');
+      if(index){
         properties.push({ preftype : prefType, property : property});
-      }else{
-        properties = [{ preftype : prefType, property : property}];
+        extra += e;
       }
-    }
+    })
+    prefList[amount-1] = { property : properties, extra : extra };
     refreshPreference(dishId);
+    updateMenuView(dishId);
     updateOrderPreview();
+    createCookie(dishId,JSON.stringify(localOrders[dishId]),1);
   },
   savePreference : function(e){
     e.preventDefault();
@@ -3105,7 +3089,7 @@ var MealConfirmView = Backbone.View.extend({
         $('#contactInfoView').show();
       }
     }
-    refreshMenu();
+    refreshCheckoutMenu();
   },
   verifyAddress : function(e, checkOnly){
     var btn = e ? $(e.currentTarget) : null;
@@ -3150,11 +3134,11 @@ var MealConfirmView = Backbone.View.extend({
         }else{
           var delivery_fee = (distance - range) * MILEAGE_FEE;
           form.find(".delivery").data("value", delivery_fee);
-          refreshMenu();
+          refreshCheckoutMenu();
         }
       }else if(isPartyMode){
         form.find(".delivery").data("value", 0);
-        refreshMenu();
+        refreshCheckoutMenu();
       }
       makeAToast(jQuery.i18n.prop('addressValid'),'success');
     });
@@ -3250,11 +3234,11 @@ var MealConfirmView = Backbone.View.extend({
           }else{
             var delivery_fee = (distance - range) * MILEAGE_FEE;
             form.find(".delivery").data("value", delivery_fee);
-            refreshMenu();
+            refreshCheckoutMenu();
           }
         }else if(isPartyMode){
           form.find(".delivery").data("value", 0);
-          refreshMenu();
+          refreshCheckoutMenu();
         }
         deliveryOption.parent().removeClass('disabled')
         makeAToast(jQuery.i18n.prop('addressValid'),'success');
@@ -3373,13 +3357,15 @@ var OrderView = Backbone.View.extend({
   },
   receive : function(e){
     e.preventDefault();
+    var target = $(e.currentTarget);
     var orderId = $(e.target).data("order");
     this.model.set({ id : orderId});
     this.model.action = "receive";
     this.model.save({},{
       success : function(model,result){
         BootstrapDialog.alert(result.responseText, function(){
-          reloadUrl("/host/me", "#myorder");
+          target.html(target.data('success-text'));
+          target.addClass("not-active");
         });
       },error : function(model, err){
         BootstrapDialog.alert(getMsgFromError(err));
@@ -3394,7 +3380,8 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         BootstrapDialog.alert(result.responseText, function(){
-          reloadUrl("/host/me", "#myorder");
+          target.html(target.data('success-text'));
+          target.addClass("not-active");
         });
       },error : function(model, err){
         BootstrapDialog.alert(getMsgFromError(err));
@@ -3680,7 +3667,6 @@ var OrderView = Backbone.View.extend({
     e.preventDefault();
     var $this = this;
     var button = $(e.currentTarget);
-
     var userId = this.$el.data("user");
     var isLogin = !!userId;
     var params = {};
@@ -3837,6 +3823,7 @@ var OrderView = Backbone.View.extend({
     })
   },
   submitOrder : function(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, pickupDate, pickupMeal, method, code, points, isLogin, partyMode, tip, $this, button){
+    $('body').addClass("loading");
     $this.model.clear();
     $this.model.set({
       orders: currentOrder,
@@ -3857,6 +3844,7 @@ var OrderView = Backbone.View.extend({
 
     $this.model.save({}, {
       success: function (model, result) {
+        $('body').removeClass("loading");
         button.html(button.data('original-text'));
         var orderIds = result.orders.map(function(order){
           return order.id;

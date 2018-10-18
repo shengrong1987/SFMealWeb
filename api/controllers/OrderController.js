@@ -66,6 +66,11 @@ var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUt
 //-51 : meals don't have same pickup option
 //-52 : meals not found
 //-53 : order not found
+//-54 : meal lack of order
+//-55 : meal lack of date
+//-56 : meal lack of meal
+//-57 : ordered dish not found in meal
+//-58 : coupon,points need login to redeem
 //-98 : result not found
 
 
@@ -153,24 +158,25 @@ module.exports = {
 
     var orders = req.body.orders;
     if(!orders){
-      return res.badRequest({code: -19, responseText: req.__('meal-checkout-lack-of-order')});
+      return res.badRequest({code: -54, responseText: req.__('meal-checkout-lack-of-order')});
     }
-    var pickupDate = req.body.pickupDate;
-    if(!pickupDate){
-      return res.badRequest({code : -20, responseText: req.__('meal-checkout-lack-of-date')});
-    }
+    // var pickupDate = req.body.pickupDate;
+    // if(!pickupDate){
+    //   return res.badRequest({code : -55, responseText: req.__('meal-checkout-lack-of-date')});
+    // }
     var targetMeal = req.body.pickupMeal;
     if(!targetMeal){
-      return res.badRequest({code : -21, responseText: req.__('meal-checkout-lack-of-meal')});
+      return res.badRequest({code : -56, responseText: req.__('meal-checkout-lack-of-meal')});
     }
 
-    Meal.find({where: {status: "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime: {'>': moment().toDate()}}}).populate("chef").populate('dishes').exec(function(err, meals) {
-      if (err) {
+    Meal.find({where: {status: "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime: {'>': moment().toDate()}}}).populate("chef").populate('dishes').populate("dynamicDishes").exec(function(err, meals) {
+      if(err){
         return res.badRequest(err);
       }
       var orderedDishes = [];
       Object.keys(orders).forEach(function(dishId){
         if(orders[dishId].number > 0){
+          sails.log.info("ordered dish:" + dishId);
           orderedDishes.push(dishId);
         }
       });
@@ -179,16 +185,37 @@ module.exports = {
         return meal.id === targetMeal;
       })[0];
 
+      if(!targetMeal){
+        return res.badRequest({ code : -57, responseText : req.__('ordered-dish-not-found')});
+      }
+
       meals = meals.filter(function (meal) {
-        var hasDish = meal.dishes.some(function(d) {
+
+        var mealHasDish = meal.dishes.some(function(d) {
           return orderedDishes.includes(d.id);
         });
-        var isSameDay = meal.pickups.some(function(p){
-          return meal.getDateDesc(p.pickupFromTime) === pickupDate;
-        })
+        // var isSameDay = meal.pickups.some(function(p){
+        //   return meal.getDateDesc(p.pickupFromTime) === pickupDate;
+        // })
         var isSameProvideTime = moment(meal.provideFromTime).isSame(moment(targetMeal.provideFromTime),'minute') && moment(meal.provideTillTime).isSame(moment(targetMeal.provideTillTime),'minute');
-        return hasDish && isSameDay && isSameProvideTime;
+        sails.log.info("target meal: " + targetMeal.title + "is from " + targetMeal.provideFromTime + " till " + targetMeal.provideTillTime + "&& meal:" + meal.title + " is from " + meal.provideFromTime + " till " + meal.provideTillTime);
+        if(mealHasDish && isSameProvideTime){
+          sails.log.info("meal: " + meal.title);
+        }
+        return mealHasDish && isSameProvideTime;
       });
+
+      var orderedDishInMeal = orderedDishes.every(function(orderedDishId){
+        return meals.some(function(meal){
+          return meal.dishes.some(function(d){
+            return d.id === orderedDishId;
+          })
+        })
+      })
+
+      if(!orderedDishInMeal){
+        return res.badRequest({ code : -57, responseText : req.__('ordered-dish-not-found')});
+      }
 
       if(!meals.length){
         return res.badRequest({ code: -52, responseText: req.__('meal-not-found')})
@@ -202,7 +229,7 @@ module.exports = {
         validateParams : function(next){
           _this.validateOption(req.body, meals, req, next);
         },
-        validateOrders : function(next){
+        validateOrders : ['validateParams', function(next){
           async.each(meals, function(meal, nextIn){
             _this.validateMeal(meal, orders, null, req, null, nextIn);
           }, function(err){
@@ -211,14 +238,14 @@ module.exports = {
             }
             next();
           })
-        },
-        buildOptions : function(next){
+        }],
+        buildOptions : ['validateOrders', function(next){
           _this.buildDeliveryData(req.body, meals[0], function(logisticInfo){
             _logisticInfo = logisticInfo;
             next();
           });
-        },
-        buildOrders : function(next){
+        }],
+        buildOrders : ['buildOptions', function(next){
           var index = 0;
           async.each(meals, function(meal, nextIn){
             var orderParam = {};
@@ -227,6 +254,7 @@ module.exports = {
             orderParam.host = meal.chef.id;
             orderParam.type = meal.type;
             orderParam.dishes = meal.dishes;
+            orderParam.method = req.body.method;
             orderParam.meal = meal.id;
             orderParam.hostEmail = meal.chef.email;
             orderParam.phone = meal.chef.phone;
@@ -275,6 +303,7 @@ module.exports = {
                   orderParam.customerId = found.payment[0] ? found.payment[0].customerId : null;
                   orderParam.paymentMethod = paymentInfo.method;
                   orderParam.isExpressCheckout = false;
+                  orderParam.customer = userId;
 
                   var code = req.body.couponCode, pointsRedeem = req.body.points;
 
@@ -287,11 +316,12 @@ module.exports = {
                     if(err){
                       return nextIn2(err);
                     }
-                    var subtotalAfterTax = req.body.subtotal + req.body.tax/100;
+                    var subtotalAfterTax = meal.subtotal + orderParam.tax/100;
                     _this.redeemPoints(req, pointsRedeem, found, subtotalAfterTax, function(err, discount){
                       if(err){
                         return res.badRequest(err);
                       }
+                      orderParam.redeemPoints = pointsRedeem;
                       //calculate total
                       _this.redeemCoupon(req, code, subtotalAfterTax, coupon, found, discount, function(err, discount){
                         if(err){
@@ -300,6 +330,7 @@ module.exports = {
                         if(coupon){
                           orderParam.coupon = coupon.id;
                         }
+                        orderParam.discountAmount = discount;
                         orderParam.discount = discount;
                         nextIn2();
                       });
@@ -313,6 +344,10 @@ module.exports = {
                 }
                 var contactInfo = req.body.contactInfo;
                 var paymentInfo = req.body.paymentInfo;
+                var code = req.body.couponCode, pointsRedeem = req.body.points;
+                if(code || pointsRedeem){
+                  return nextIn2({ responseText : req.__('order-redeem-not-login'), code: -58});
+                }
                 if(paymentInfo.method === 'online' && !paymentInfo.token){
                   return nextIn2({ responseText : req.__('order-lack-payment'), code : -5});
                 }
@@ -359,7 +394,7 @@ module.exports = {
             }
             next();
           })
-        },
+        }],
         makePayments : [ 'buildOrders', function(next){
           async.eachSeries(_orders, function(order, nextIn){
             if(order.paymentMethod === "alipay" || order.paymentMethod === "wechatpay"){
@@ -372,7 +407,7 @@ module.exports = {
                 discount : order.discount * 100,
                 email : process.env.ADMIN_EMAIL,
                 meal : order.meal,
-                method : method,
+                method : order.method,
                 tax : order.tax,
                 metadata : {
                   mealId : order.meal.id,
@@ -391,7 +426,7 @@ module.exports = {
                 order.status = "pending-payment";
                 order.sourceId = source.id;
                 order.client_secret = source.client_secret;
-                order.service_fee = m.serviceFee;
+                order.service_fee = order.meal.serviceFee;
                 nextIn();
               });
             }else{
@@ -483,10 +518,14 @@ module.exports = {
         }],
         finalizeOrder : ['addReferralPoints', function(next){
           async.each(_orders, function(order, nextIn){
+            var _m = order.meal;
             order.meal = order.meal.id;
             order.save(function(err, o){
               if(err){
                 return nextIn(err);
+              }
+              if(process.env.NODE_ENV === "development"){
+                order.meal = _m;
               }
               notification.notificationCenter("Order", "new", o, true, false, req);
               nextIn();
@@ -1288,6 +1327,7 @@ module.exports = {
         return res.badRequest(err);
       }
       var lastStatus = order.lastStatus;
+      order.adjusting_orders = {};
       order.lastStatus = order.status;
       order.status = lastStatus;
       order.msg = params.msg;
@@ -1398,18 +1438,36 @@ module.exports = {
   },
 
   downloadReceipt : function(req, res) {
-    var orderId = req.params.id;
-    Order.findOne(orderId).populate("dishes").populate('host').populate("meal").exec(function(err, order){
+    var orderIds = req.params.id;
+    if(!orderIds){
+      return res.notFound();
+    }
+    orderIds = orderIds.split("+");
+    var _orders = [];
+
+    async.each(orderIds, function(orderId,next){
+      Order.findOne(orderId).populate("dishes").populate('host').populate("meal").exec(function(err, order){
+        if(err){
+          return res.badRequest(err);
+        }
+        notification.transitLocaleTimeZone(order);
+        order.layout = false;
+        order.download = true;
+        _orders.push(order);
+        next();
+      })
+    }, function(err){
+      if(err && err.code === -53){
+        return res.notFound();
+      }
       if(err){
         return res.badRequest(err);
       }
-      notification.transitLocaleTimeZone(order);
       var dateString = moment().format("ddd, hA");
-      order.layout = false;
-      order.download = true;
       res.set('Content-Disposition','attachment; filename="' + dateString + '"-receipt.html" ')
-      res.view('receipt', order);
+      res.view('receipt', { orders : _orders});
     })
+
   },
 
   verifyOrder : function(req, res){
@@ -1563,6 +1621,7 @@ module.exports = {
       return cb(null, meal);
     }
     var leftQty = meal.leftQty;
+    sails.log.info("meal: " + meal.title + "left qty:" + leftQty);
     Object.keys(lastOrder).forEach(function(dishId){
       if(!order[dishId] || !lastOrder[dishId]){
         return;
@@ -2157,6 +2216,7 @@ module.exports = {
                   var hasPreference = Object.keys(dish.preference).some(function(preference){
                     var props = dish.preference[preference];
                     var hasPros = props.some(function(p){
+                      sails.log.info(p.property, property.property);
                       if(p.property === property.property){
                         extra += parseInt(p.extra);
                         return true;
@@ -2166,7 +2226,7 @@ module.exports = {
                     sails.log.info("dish has property: " + property.property + " : " + hasPros);
                     return hasPros;
                   });
-                  sails.log.info("dish has preference: " + property.property + " : " + hasPreference);
+                  sails.log.info("dish:" + dish.title + " has preference: " + property.property + " : " + hasPreference);
                   return hasPreference;
                 }else{
                   return true;
@@ -2182,9 +2242,11 @@ module.exports = {
             var totalQty = meal.getDynamicDishesTotalOrder(qty);
             var price = dish.getPrice(totalQty, meal);
             var listPrice = parseInt(mealOrder[dishId].price);
+            sails.log.info("price: " + price + " list price: " + listPrice);
             if(price !== listPrice){
               sails.log.info("listing price updated from " + listPrice + " to " + price);
               mealOrder[dishId].price = price;
+              orders[dishId].price = price;
             }
             sails.log.info("dish:" + dish.title + " price: " + price, ",qty: " + qty + ",extra:" + extra);
             actual_subtotal += (qty * price + extra);
@@ -2253,6 +2315,7 @@ module.exports = {
           return next({responseText: req.__('order-incomplete-address'), code: -29});
         }
         var full_address = contactInfo.address;
+        sails.log.info("meal: " + meal.title);
         if(!meal.isDelivery && !params.isPartyMode) {
           return next({responseText: req.__('order-invalid-method'), code: -11});
         }
@@ -2303,7 +2366,7 @@ module.exports = {
           }else if(params.isPartyMode){
             params.delivery_fee = 0;
           }
-          cb();
+          next();
         })
       }else{
         var subtotal = parseFloat(params.subtotal);
@@ -2372,6 +2435,7 @@ module.exports = {
       return cb(null, discount);
     }
     var diff = total - coupon.amount;
+    sails.log.info("total: " + diff);
     if(diff < 0){ coupon.amount += diff; }
     user.coupons.add(coupon.id);
     user.save(function(err, u){
@@ -2483,7 +2547,7 @@ module.exports = {
             oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
             oldOrder.pickupInfo.comment += order.pickupInfo.comment;
             oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
-            if(oldOrder.paymentMethod === "cash"){
+            if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
               oldOrder.charges['cash'] += order.charges['cash'];
             }
           }
