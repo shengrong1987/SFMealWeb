@@ -68,7 +68,7 @@
                     <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">
                       <span class="input-group-text">-</span>
                     </div>
-                    <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0">
+                    <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
                     <div class="input-group-append add" onclick="javascript:orderFood('<%= dish.id %>',1,true)">
                       <span class="input-group-text">+</span>
                     </div>

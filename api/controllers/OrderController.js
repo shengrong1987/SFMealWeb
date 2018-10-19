@@ -153,7 +153,7 @@ module.exports = {
       var userId = req.session.user.id;
       var email = req.session.user.auth.email;
       req.body.customer = userId;
-      req.body.guestEmail = email;
+      req.body.guestEmail = email || process.env.ADMIN_EMAIL;
     }
 
     var orders = req.body.orders;
@@ -2617,15 +2617,21 @@ module.exports = {
           var wantsReport = req.query.report;
           if(!wantsReport){
             order.deliveryCenter = order.pickupInfo.deliveryCenter;
-            order.charge = order.charges[Object.keys(order.charges)[0]];
-            order.application_fee = order.application_fees[Object.keys(order.application_fees)[0]];
+            if(order.charges){
+              order.charge = order.charges[Object.keys(order.charges)[0]];
+            }
+            if(order.application_fees){
+              order.application_fee = order.application_fees[Object.keys(order.application_fees)[0]];
+            }
             order.pickupFromTime = order.pickupInfo.pickupFromTime;
             order.pickupTillTime = order.pickupInfo.pickupTillTime;
             order.pickupPhone = order.contactInfo.phone;
             order.deliveryAddress = order.contactInfo.address;
             order.method = order.pickupInfo.method;
             order.location = order.pickupInfo.location;
-            order.instruction = order.customInfo.comment;
+            if(order.customInfo){
+              order.instruction = order.customInfo.comment;
+            }
             delete order.customer;
             delete order.meal;
             delete order.host;

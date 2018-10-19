@@ -3897,7 +3897,7 @@ var OrderView = Backbone.View.extend({
           });
         }
       }, error: function (model, err) {
-        button.button('reset');
+        $('body').removeClass("loading");
         BootstrapDialog.show({
           title: jQuery.i18n.prop('error'),
           message: err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText

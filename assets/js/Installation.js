@@ -193,10 +193,12 @@ function setupMixin() {
     mixitup('#transaction_container', {
       pagination: {
         limit: 20
-      },load: {
-        sort: 'created:desc' /* default:asc */
-      },layout : {
-        display : 'block'
+      },
+      classNames: {
+        elementPager: 'btn btn-mixitup'
+      },
+      load: {
+        sort : 'created:desc'
       }
     })
   }
