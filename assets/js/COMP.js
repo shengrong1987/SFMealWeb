@@ -343,7 +343,8 @@
   };
 
   AmountInput.DEFAULTS = {
-    init : 1
+    init : 1,
+    max : 100
   };
 
   AmountInput.prototype.update = function(){

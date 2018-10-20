@@ -944,7 +944,7 @@ module.exports = {
               }
               stripe.batchRefund(order.feeCharges, null, metadata, function (err) {
                 if (err) {
-                  return cb(err);
+                  return next(err);
                 }
                 order.charges['cash'] = 0;
                 order.application_fees['cash'] = 0;

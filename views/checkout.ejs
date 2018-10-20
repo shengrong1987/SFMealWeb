@@ -44,6 +44,10 @@
                         <a class="text-orange cursor-pointer" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html"><u><%= __('signup-tips')%></u></a>
                         <a class="text-orange cursor-pointer" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" title="<%= __('login-tips')%>%>"><u><%= __('nav-bar-login')%></u></a>
                       </small>
+                      <% }else{%>
+                        <small>
+                          <button id="verifyAddressBtn2" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Saving" class="btn btn-info form-control"><%= __('calculate-delivery')%></button>
+                        </small>
                       <% }%>
                     </h5>
                   </div>

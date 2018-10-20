@@ -3021,6 +3021,7 @@ var MealConfirmView = Backbone.View.extend({
     "click #createNewContactBtn2" : "createNewContact",
     "keydown" : "onKeyDown",
     "click #verifyAddressBtn" : "verifyAddress",
+    "click #verifyAddressBtn2" : "verifyAddress",
     "click input[name='billingAddress']" : "enterBillingAddress"
   },
   initialize : function(){
@@ -3092,19 +3093,31 @@ var MealConfirmView = Backbone.View.extend({
     refreshCheckoutMenu();
   },
   verifyAddress : function(e, checkOnly){
-    var btn = e ? $(e.currentTarget) : null;
-    var street = this.$el.find("input[name='street']").val();
-    var city = this.$el.find("input[name='city']").val();
-    var state = this.$el.find("input[name='state']").val();
-    var zipcode = this.$el.find("input[name='zipcode']").val();
-    var form = this.$el.find("#order");
-    var isPartyMode = form.data("party");
-    if(!street || !city || !state || !zipcode){
-      makeAToast(jQuery.i18n.prop('addressIncomplete'));
-      return false;
+    var isLogin = !!this.$el.data("user");
+    if(!isLogin){
+      var btn = e ? $(e.currentTarget) : null;
+      var street = this.$el.find("input[name='street']").val();
+      var city = this.$el.find("input[name='city']").val();
+      var state = this.$el.find("input[name='state']").val();
+      var zipcode = this.$el.find("input[name='zipcode']").val();
+      var form = this.$el.find("#order");
+      var isPartyMode = form.data("party");
+      if(!street || !city || !state || !zipcode){
+        makeAToast(jQuery.i18n.prop('addressIncomplete'));
+        return false;
+      }
+      var range = 5;
+      var yourAddress = street + ", " + city + ", " + state + " " + zipcode;
+    }else{
+      var contactOption = this.$el.find("#pickupInfoView .contactOption:visible .regular-radio:checked");
+      var contactText = contactOption.next().next().text();
+      if(!contactText.split("+").length){
+        makeAToast(jQuery.i18n.prop('addressIncomplete'));
+        return false;
+      }
+      yourAddress = contactText.split("+")[0];
     }
-    var range = 5;
-    var yourAddress = street + ", " + city + ", " + state + " " + zipcode;
+
     var deliveryOption = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio:checked");
     if(!deliveryOption.length && !isPartyMode){
       makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
