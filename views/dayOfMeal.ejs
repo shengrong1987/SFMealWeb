@@ -20,7 +20,7 @@
     <div class="w-100 sticky-top" style="height: 90px;">
       <ul id="dishDatesBar" class="nav nav-light nav-fill justify-content-center bg-light">
         <% Object.keys(meals.meals).forEach(function(dateKey,i){ %>
-        <li class="nav-item py-4 <%= i===0?'active':''%>"><a class="nav-link" href="javascript:void(0);" data-filter=".<%= dateKey%>" data-toggle="tab"><%= __(dateKey)%></a></li>
+        <li class="nav-item py-4 <%= i===0?'active':''%>"><a class="nav-link" href="javascript:void(0);" data-filter=".<%= dateKey.replace(' ','')%>" data-toggle="tab"><%= __(dateKey)%></a></li>
         <% })%>
       </ul>
     </div>
@@ -49,7 +49,7 @@
           if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
           %>
           <% if(tag === "all" || dish.type === tag || meal.chef.shopName === tag || (dish.tags && dish.tags.includes(tag))){%>
-          <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem p-4 mix item <%= meal.chef.shopName%> <%= dateKey%><% if(dish.tags){ dish.tags.forEach(function(t){%>
+          <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem p-4 mix item <%= meal.chef.shopName%> <%= dateKey.replace(" ",'')%><% if(dish.tags){ dish.tags.forEach(function(t){%>
               <%= " " + t%>
               <%})}%>">
             <div class="d-flex flex-row">

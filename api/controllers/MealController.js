@@ -66,9 +66,9 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      meals = meals.filter(function(meal){
-        return meal.county.split("+").indexOf(county) !== -1;
-      });
+      // meals = meals.filter(function(meal){
+      //   return meal.county.split("+").indexOf(county) !== -1;
+      // });
       var _u=null,_tags=[];
       async.auto({
         findUser : function(next){
@@ -309,6 +309,9 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
+      // meals = meals.filter(function(meal){
+      //   return meal.county.split("+").indexOf(county) !== -1;
+      // });
       meals = meals.filter(function(meal){
         return meal.dishes.some(function(d){
           return orderedDishes.includes(d.id);
