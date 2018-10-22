@@ -14,7 +14,7 @@
     </div>
   </div>
 
-  <div id="dayOfMealContainer" class="mx-auto" style="max-width: 800px;" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>">
+  <div id="dayOfMealContainer" class="mx-auto" style="max-width: 800px;" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>" data-pickup-nickname="<%= pickupNickname || ''%>">
 
     <% if(meals && meals.meals){%>
     <div class="w-100 sticky-top" style="height: 90px;">
@@ -30,7 +30,7 @@
       <nav id="dishTagsBar" class="sticky-top">
         <ul class="list list-side list-unstyled" style="min-width:100px;" data-toggle="btn-set">
           <% tags.forEach(function(tag, index){%>
-            <li class="cursor-pointer <%= index===0?'active':''%>"><a href="<%= tag%>"><%= __(tag)%></a></li>
+            <li class="cursor-pointer border-bottom <%= index===0?'active':''%>"><a href="<%= tag%>"><%= __(tag)%></a></li>
           <% })%>
         </ul>
       </nav>

@@ -2298,10 +2298,6 @@ select.form-control{
   height: 100px;
 }
 
-#dishTagsBar{
-  z-index:10;
-}
-
 #dishContentView{
   //max-height: 1000px;
   //overflow-y: scroll;
@@ -2318,6 +2314,13 @@ select.form-control{
 #dishTagsBar{
   top: 90px;
   height: 100%;
+  z-index:1;
+  background-color: #eeeeee;
+}
+
+#dishDatesBar{
+  flex-wrap: nowrap;
+  -ms-flex-wrap: nowrap;
 }
 
 @font-size: 15px;
@@ -2617,6 +2620,10 @@ select.form-control{
     max-height: 80px;
     img{
       max-height : 80px;
+    }
+    a{
+      position: relative;
+      left: -10%;
     }
   }
 

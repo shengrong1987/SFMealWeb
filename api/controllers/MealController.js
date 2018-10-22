@@ -60,6 +60,7 @@ module.exports = {
   find : function(req,res){
     //find out meals that provide start today or ends today
     var _this = this;
+    var pickupNickname = req.param('pickup');
     var county = req.cookies['county'] || req.param('county') || "San Francisco County";
     var withinSevenDay = moment().add(7,'days');
     Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
@@ -69,6 +70,13 @@ module.exports = {
       // meals = meals.filter(function(meal){
       //   return meal.county.split("+").indexOf(county) !== -1;
       // });
+      if(pickupNickname){
+        meals = meals.filter(function(meal){
+          return meal.pickups.some(function(p){
+            return p.nickname && p.nickname === pickupNickname;
+          })
+        })
+      }
       var _u=null,_tags=[];
       async.auto({
         findUser : function(next){
@@ -110,7 +118,7 @@ module.exports = {
           return res.ok({ meals : meals, user : _u, tags: _tags });
         }
         meals = _this.composeMealWithDate(meals);
-        res.view("dayOfMeal",{ meals : meals, user : _u, tags: _tags});
+        res.view("dayOfMeal",{ meals : meals, user : _u, tags: _tags, pickupNickname : pickupNickname});
       })
     })
   },
@@ -303,7 +311,10 @@ module.exports = {
     if (!orderedDishes){
       return res.badRequest({code: -19, responseText: req.__('meal-checkout-lack-of-order')});
     }
+
     orderedDishes = orderedDishes.split(",");
+
+    var pickupNickname = req.param("pickup");
 
     Meal.find({where: {status: "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime: {'>': moment().toDate()}}}).populate('dishes').exec(function(err, meals){
       if(err){
@@ -317,6 +328,14 @@ module.exports = {
           return orderedDishes.includes(d.id);
         });
       });
+
+      if(pickupNickname){
+        meals = meals.filter(function(meal){
+          return meal.pickups.some(function(p){
+            return p.nickname && p.nickname === pickupNickname;
+          })
+        })
+      }
       if(!meals.length){
         return res.badRequest({ code : -3, responseText: req.__('meal-not-found')});
       }

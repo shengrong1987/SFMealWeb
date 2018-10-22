@@ -1076,7 +1076,13 @@ var DayOfMealView = Backbone.View.extend({
       makeAToast(jQuery.i18n.prop('noOrderTaken'));
       return;
     }
-    location.href = "/meal/checkout?dishes=" + orderedDishes.join(",");
+    var pickupNickname = this.$el.data("pickup-nickname");
+    if(pickupNickname){
+      location.href = "/meal/" + pickupNickname + "/checkout?dishes=" + orderedDishes.join(",");
+    }else{
+      location.href = "/meal/checkout?dishes=" + orderedDishes.join(",");
+    }
+
   }
 })
 
@@ -3028,7 +3034,13 @@ var MealConfirmView = Backbone.View.extend({
     this.alertView = this.$el.find("#orderAlertView");
     this.alertView.removeClass("d-none").hide();
     this.isCoolDown = true;
-    this.$el.find(".pickupInput").removeClass('d-none').hide();
+    var hasDelivery = this.$el.find("#pickupInfoView").data("hasdelivery");
+    if(hasDelivery){
+      this.$el.find(".pickupInput").removeClass('d-none').hide();
+    }else{
+      this.$el.find(".pickupInput").removeClass('d-none');
+      this.$el.find(".deliveryInput").hide();
+    }
     utility.initGoogleMapService();
   },
   enterBillingAddress : function(e){

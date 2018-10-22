@@ -71,6 +71,7 @@ module.exports.routes = {
   '/meal/:id/report' : "MealController.report",
   '/meal/:id/update' : "MealController.update",
   '/meal/checkout' : "MealController.checkout",
+  '/meal/:pickup/checkout' : "MealController.checkout",
   '/dish/:id/verify' : 'DishController.verify',
   '/dish/:id/fail' : 'DishController.fail',
   '/dish/:id/review' : 'DishController.findReview',
@@ -119,7 +120,8 @@ module.exports.routes = {
   '/help' : { view : 'help'},
   '/trust' : { view : 'trust'},
   '/terms' : {view : 'terms'},
-  "/apply" : "HostController.apply"
+  "/apply" : "HostController.apply",
+  "/pickup/:pickup" : "MealController.find"
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

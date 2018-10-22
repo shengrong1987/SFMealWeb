@@ -12,25 +12,27 @@
             </div>
             <div class="col-12 my-4 text-left">
               <ul class="btn-group" role="group" aria-label="Basic example" id="method">
-                <%if(pickups.some(function(pickup){
+                <%
+                  var hasDelivery = pickups.some(function(pickup){
                     return pickup.method === "delivery";
-                  })){%>
-                <button data-toggle="tab" data-href="#deliveryTab" class="btn btn-fat btn-lg active" value="delivery"><strong><%= __('delivery')%></strong></button>
-                <%} if(pickups.some(function(pickup){
+                  });
+                  if(hasDelivery){%>
+                    <button data-toggle="tab" data-href="#deliveryTab" class="btn btn-fat btn-lg active" value="delivery"><strong><%= __('delivery')%></strong></button>
+                  <%}if(pickups.some(function(pickup){
                     return pickup.method === "shipping";
                   })){%>
                 <button data-toggle="tab" data-href="#shippingTab" class="btn btn-fat btn-lg" value="shipping"><strong><%= __('shipping')%></strong></button>
                 <%} if(pickups.some(function(pickup){
                     return pickup.method === "pickup";
                   })){%>
-                <button data-toggle="tab" data-href="#pickupTab" class="btn btn-fat btn-lg" value="pickup"><strong><%= __('self-pickup')%></strong></button>
+                <button data-toggle="tab" data-href="#pickupTab" class="btn btn-fat btn-lg <%= hasDelivery?'':'active'%>" value="pickup"><strong><%= __('self-pickup')%></strong></button>
                 <% }%>
               </ul>
             </div>
           </div>
         </div>
 
-        <div id="pickupInfoView" class="text-left">
+        <div id="pickupInfoView" class="text-left" data-hasDelivery="<%= hasDelivery%>">
           <div class="row">
             <div class="col-12">
               <div class="box-compact light-grey">
@@ -203,7 +205,7 @@
 
             <div class="col-12">
               <div class="tab-content">
-                <div id="pickupTab" class="tab-pane" role="tabpanel">
+                <div id="pickupTab" class="tab-pane <%= hasDelivery?'':'active'%>" role="tabpanel">
                   <div class="card">
                     <div class="card-body">
                       <div class="radio-box flex" id="pickupMethod" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
@@ -229,7 +231,7 @@
                   </div>
                 </div>
 
-                <div id="deliveryTab" class="tab-pane active" role="tabpanel">
+                <div id="deliveryTab" class="tab-pane <%= hasDelivery?'active':''%>" role="tabpanel">
                   <div class="row text-left">
                     <div class="col-12">
                       <div class="card">

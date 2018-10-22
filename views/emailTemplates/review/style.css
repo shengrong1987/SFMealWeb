@@ -10929,9 +10929,6 @@ select.form-control {
 #payment-cards button {
   height: 100px;
 }
-#dishTagsBar {
-  z-index: 10;
-}
 ::-webkit-scrollbar {
   display: none;
 }
@@ -10941,6 +10938,12 @@ select.form-control {
 #dishTagsBar {
   top: 90px;
   height: 100%;
+  z-index: 1;
+  background-color: #eeeeee;
+}
+#dishDatesBar {
+  flex-wrap: nowrap;
+  -ms-flex-wrap: nowrap;
 }
 /* multiline label*/
 .multi-line-label {
@@ -11200,6 +11203,10 @@ select.form-control {
   }
   .dishItem .photo img {
     max-height: 80px;
+  }
+  .dishItem .photo a {
+    position: relative;
+    left: -10%;
   }
   .pickup-map {
     display: block;

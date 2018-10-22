@@ -469,4 +469,8 @@ function adjustLayout(){
     var h = Math.min(fMeal[0].height, fMeal[0].width);
     nextMealView.height(h);
   }
+  var dishTagsBar = $("#dishTagsBar");
+  if(dishTagsBar.length){
+    dishTagsBar.height($("#dishContentView").height()/2);
+  }
 }
