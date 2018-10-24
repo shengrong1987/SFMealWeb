@@ -603,7 +603,7 @@ var refreshCheckoutMenu = function(){
   var numberOfItem = 0;
   var subtotal = 0;
   var method = $("#method").find(".active").attr("value");
-  var $order = $("#meal-confirm-container #order");
+  var $order = $("#order");
   var _dishes = [];
   $order.find(".item:visible").each(function(){
     var dishId = $(this).data("id");
@@ -617,11 +617,6 @@ var refreshCheckoutMenu = function(){
     var _subtotal = amount * unitPrice + parseInt($(this).find(".price").data("extra"))
     if(_subtotal > 0){
       numberOfItem+=amount;
-    }
-    if(amount){
-      $(this).show();
-    }else{
-      $(this).hide();
     }
     subtotal += _subtotal;
   });

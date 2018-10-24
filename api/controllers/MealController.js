@@ -1173,7 +1173,7 @@ module.exports = {
       }else if(pickupDate.isSame(moment().add(1,'days'),'day')){
         dateDesc = 'tomorrow';
       }else{
-        dateDesc = pickupDate.format('dddd M-D')
+        dateDesc = pickupDate.format('dddd')
       }
       if(mealDateObj.meals.hasOwnProperty(dateDesc)){
         mealDateObj.meals[dateDesc].meals.push(meal);

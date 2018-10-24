@@ -3106,8 +3106,8 @@ var MealConfirmView = Backbone.View.extend({
   },
   verifyAddress : function(e, checkOnly){
     var isLogin = !!this.$el.data("user");
+    var btn = e ? $(e.currentTarget) : null;
     if(!isLogin){
-      var btn = e ? $(e.currentTarget) : null;
       var street = this.$el.find("input[name='street']").val();
       var city = this.$el.find("input[name='city']").val();
       var state = this.$el.find("input[name='state']").val();
@@ -3115,6 +3115,7 @@ var MealConfirmView = Backbone.View.extend({
       var form = this.$el.find("#order");
       var isPartyMode = form.data("party");
       if(!street || !city || !state || !zipcode){
+        if(btn) {btn.trigger('reset')};
         makeAToast(jQuery.i18n.prop('addressIncomplete'));
         return false;
       }
@@ -3124,16 +3125,20 @@ var MealConfirmView = Backbone.View.extend({
       var contactOption = this.$el.find("#pickupInfoView .contactOption:visible .regular-radio:checked");
       var contactText = contactOption.next().next().text();
       if(!contactText.split("+").length){
+        if(btn) {btn.trigger('reset')}
         makeAToast(jQuery.i18n.prop('addressIncomplete'));
         return false;
       }
       yourAddress = contactText.split("+")[0];
     }
 
+    var deliveryOptions = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio").first();
     var deliveryOption = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio:checked");
     if(!deliveryOption.length && !isPartyMode){
-      makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
-      return false;
+      deliveryOptions.prop('checked',true);
+      deliveryOption = deliveryOptions;
+      // makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
+      // return false;
     }else if(isPartyMode){
       var deliveryCenter = this.$el.find('.deliveryOption').data('center');
     }else{
@@ -3141,15 +3146,17 @@ var MealConfirmView = Backbone.View.extend({
       range = deliveryOption.parent().data("range");
     }
     if(checkOnly){
+      if(btn) {btn.trigger('reset')}
       return yourAddress;
     }
     utility.distance(deliveryCenter, yourAddress, function(err, distance) {
       if(err) {
+        if(btn) {btn.trigger('reset')}
         makeAToast(err, 'error');
         return;
       }
       if(btn){
-        btn.html(btn.data('original-text'));
+        btn.trigger('reset');
       }
       console.log("distance: " + distance, " range:" + range);
       if(distance > range){

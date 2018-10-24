@@ -242,7 +242,7 @@ module.exports = {
       }else if(pickupDate.isSame(moment().add(1,'days'),'day')){
         dateDesc = 'tomorrow';
       }else{
-        dateDesc = pickupDate.format('ddddM-D')
+        dateDesc = pickupDate.format('dddd')
       }
       return dateDesc;
     },

@@ -423,6 +423,11 @@ function setupLoadingButton(){
     button.html('<i class="fa fa-circle-o-notch fa-spin"></i> ' + loadingText);
     button.data('original-text', originalText);
   })
+  $("button[data-loading-text]").on('reset', function(){
+    var button = $(this);
+    var originalText = button.data('original-text');
+    button.html(originalText);
+  })
 }
 
 function setupFlexScrollBar(){

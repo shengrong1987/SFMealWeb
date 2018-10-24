@@ -213,9 +213,8 @@
                         var i = 0;
                         var j = i+1;
                         if(pickups){
-                          colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
-                        pickups.forEach(function(pickup){ if(pickup.method!=='pickup'){return;}
-
+                          var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue',];
+                          pickups.forEach(function(pickup){ if(pickup.method!=='pickup'){return;}
                         %>
                         <label class="btn btn-outline-light vertical-inline option pickupOption mix <%= meal.getDateDesc(pickup.pickupFromTime)%>" data-meal="<%= pickup.meal%>" data-date="<%= meal.getDateDesc(pickup.pickupFromTime)%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-color="<%= colors[i]%>" data-location="<%= pickup.publicLocation || pickup.location%>">
                           <input type="radio" id="pickup-1-<%= i%>" data-index="<%= pickup.index%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
@@ -238,7 +237,7 @@
                         <div class="card-body">
                           <div class="radio-box flex" id="deliveryMethod">
                             <%
-                            colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue'];
+                            colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue',];
                             i= 0;j = 0;
                             if(pickups){ pickups.forEach(function(pickup){ if(pickup.method == 'delivery'){ %>
                             <label class="btn btn-outline-light option deliveryOption mix <%= meal.getDateDesc(pickup.pickupFromTime)%>" data-meal="<%= pickup.meal%>" data-date="<%= meal.getDateDesc(pickup.pickupFromTime)%>" data-range="<%= pickup.deliveryRange%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-area="<%= pickup.area || '' %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
