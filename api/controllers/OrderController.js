@@ -460,27 +460,28 @@ module.exports = {
                     }
                     return nextIn({ code : -39, responseText : err.message });
                   });
-                }
-                order.source = "charged";
-                order.charges = {};
-                order.transfer = {};
-                order.feeCharges = {};
-                order.application_fees = {};
+                }else{
+                  order.source = "charged";
+                  order.charges = {};
+                  order.transfer = {};
+                  order.feeCharges = {};
+                  order.application_fees = {};
 
-                if(order.paymentMethod === "cash"){
-                  order.charges['cash'] = order.charges['cash'] || 0;
-                  order.application_fees['cash'] = order.application_fees['cash'] || 0;
-                  order.charges['cash'] += charge.amount;
-                  order.application_fees['cash'] += charge.application_fee;
-                  order.feeCharges[charge.id] = charge.application_fee;
-                }else if(charge){
-                  order.charges[charge.id] = charge.amount;
-                  order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
+                  if(order.paymentMethod === "cash"){
+                    order.charges['cash'] = order.charges['cash'] || 0;
+                    order.application_fees['cash'] = order.application_fees['cash'] || 0;
+                    order.charges['cash'] += charge.amount;
+                    order.application_fees['cash'] += charge.application_fee;
+                    order.feeCharges[charge.id] = charge.application_fee;
+                  }else if(charge){
+                    order.charges[charge.id] = charge.amount;
+                    order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
+                  }
+                  if(transfer){
+                    order.transfer[transfer.id] = transfer.amount;
+                  }
+                  nextIn();
                 }
-                if(transfer){
-                  order.transfer[transfer.id] = transfer.amount;
-                }
-                nextIn();
               });
             }
           }, function(err){
@@ -946,8 +947,12 @@ module.exports = {
                 if (err) {
                   return next(err);
                 }
-                order.charges['cash'] = 0;
-                order.application_fees['cash'] = 0;
+                if(order.charges){
+                  order.charges['cash'] = 0;
+                }
+                if(order.application_fees){
+                  order.application_fees['cash'] = 0;
+                }
                 next();
               });
             }
@@ -1079,15 +1084,25 @@ module.exports = {
                   return next({ code : -39, responseText : err.message });
                 }
                 if(order.paymentMethod === "cash"){
-                  order.charges['cash'] = order.charges['cash'] || 0;
-                  order.application_fees['cash'] = order.application_fees['cash'] || 0;
-                  order.charges['cash'] += charge.amount;
-                  order.application_fees['cash'] += charge.application_fee;
-                  order.feeCharges[charge.id] = charge.application_fee;
+                  if(order.charges){
+                    order.charges['cash'] = order.charges['cash'] || 0;
+                    order.charges['cash'] += charge.amount;
+                  }
+                  if(order.application_fees){
+                    order.application_fees['cash'] = order.application_fees['cash'] || 0;
+                    order.application_fees['cash'] += charge.application_fee;
+                  }
+                  if(order.feeCharges){
+                    order.feeCharges[charge.id] = charge.application_fee;
+                  }
                 }else{
                   if(charge){
-                    order.charges[charge.id] = charge.amount;
-                    order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
+                    if(order.charges){
+                      order.charges[charge.id] = charge.amount;
+                    }
+                    if(order.application_fees){
+                      order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
+                    }
                   }
                   if(transfer){
                     order.transfer[transfer.id] = transfer.amount;
@@ -1140,8 +1155,12 @@ module.exports = {
                     if(err) {
                       return cb(err);
                     }
-                    order.charges["cash"] += adjustAmount;
-                    order.application_fees['cash'] -= refundedFee;
+                    if(order.charges){
+                      order.charges["cash"] += adjustAmount;
+                    }
+                    if(order.application_fees){
+                      order.application_fees['cash'] -= refundedFee;
+                    }
                     next();
                   })
                 }
@@ -1233,8 +1252,12 @@ module.exports = {
                 if(err) {
                   return next(err);
                 }
-                order.charges['cash'] = 0;
-                order.application_fees['cash'] = 0;
+                if(order.charges){
+                  order.charges['cash'] = 0;
+                }
+                if(order.application_fees){
+                  order.application_fees['cash'] = 0;
+                }
                 next();
               })
             }
@@ -1838,8 +1861,12 @@ module.exports = {
             if (err) {
               return next(err);
             }
-            order.charges['cash'] = 0;
-            order.application_fees['cash'] = 0;
+            if(order.charges){
+              order.charges['cash'] = 0;
+            }
+            if(order.application_fees){
+              order.application_fees['cash'] = 0;
+            }
             next();
           });
         }
@@ -1904,8 +1931,12 @@ module.exports = {
             if (err) {
               return next(err);
             }
-            order.charges['cash'] -= discount;
-            order.application_fees['cash'] -= refundedFee;
+            if(order.charges){
+              order.charges['cash'] -= discount;
+            }
+            if(order.application_fees){
+              order.application_fees['cash'] -= refundedFee;
+            }
             next();
           });
         },
@@ -2035,15 +2066,23 @@ module.exports = {
                     return next({ responseText : req.__('order-adjust-stripe-error',charge.status), code : -37});
                   }
                   if(order.paymentMethod === "cash"){
-                    order.charges['cash'] = order.charges['cash'] || 0;
-                    order.application_fees['cash'] = order.application_fees['cash'] || 0;
-                    order.charges['cash'] += charge.amount;
-                    order.application_fees['cash'] += charge.application_fee;
-                    order.feeCharges[charge.id] = charge.application_fee;
+                    if(order.charges){
+                      order.charges['cash'] = order.charges['cash'] || 0;
+                      order.charges['cash'] += charge.amount;
+                    }
+                    if(order.application_fees){
+                      order.application_fees['cash'] = order.application_fees['cash'] || 0;
+                      order.application_fees['cash'] += charge.application_fee;
+                    }
+                    if(order.feeCharges){
+                      order.feeCharges[charge.id] = charge.application_fee;
+                    }
                   }else{
-                    order.charges[charge.id] = charge.amount;
+                    if(order.charges){
+                      order.charges[charge.id] = charge.amount;
+                    }
                   }
-                  if(transfer){
+                  if(transfer && order.transfer){
                     order.transfer[transfer.id] = transfer.amount;
                   }
                   next();
@@ -2096,8 +2135,12 @@ module.exports = {
                       if (err) {
                         return next2(err);
                       }
-                      order.application_fees['cash'] += refundedFee;
-                      order.charges['cash'] += netDiff;
+                      if(order.application_fees){
+                        order.application_fees['cash'] += refundedFee;
+                      }
+                      if(order.charges){
+                        order.charges['cash'] += netDiff;
+                      }
                       next2();
                     })
                   }
