@@ -61,7 +61,7 @@
                 <% }});%>
               </div>
               <div class="d-flex flex-column flex-grow-1">
-                <h5 class="mb-auto"><%= dish.title%></h5>
+                <h5 class="mb-auto"><%= dish.title%><small> <%= dish.quantity%></small></h5>
                 <div class="d-flex">
                   <div class="text text-price price mr-2" data-extra=0 value="<%= dish.price%>">$<%= dish.price.toFixed(2)%></div>
                   <div class="input-group input-group-sm amount-input round ml-auto" style="max-width:200px;min-width:30px;" data-toggle="amount-input" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">

@@ -92,11 +92,11 @@ module.exports = {
           })
         },
         findDishTags : function(next){
-          _tags.push("select");
+          _tags.push('select');
           meals.forEach(function(meal){
-            if(!_tags.includes(meal.chef.shopName)){
-              _tags.push(meal.chef.shopName);
-            }
+            // if(!_tags.includes(meal.chef.shopName)){
+            //   _tags.push(meal.chef.shopName);
+            // }
             meal.dishes.forEach(function(dish){
               if(dish.tags){
                 dish.tags.forEach(function(tag){
@@ -107,7 +107,6 @@ module.exports = {
               }
             })
           })
-          _tags.push("dessert");
           next();
         },
       }, function(err){
