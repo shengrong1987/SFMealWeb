@@ -77,7 +77,7 @@ module.exports = {
           })
         })
       }
-      var _u=null,_tags=[];
+      var _u=null,_tags=["select"];
       async.auto({
         findUser : function(next){
           if(!req.session.authenticated){
@@ -92,11 +92,7 @@ module.exports = {
           })
         },
         findDishTags : function(next){
-          _tags.concat(['select']);
           meals.forEach(function(meal){
-            // if(!_tags.includes(meal.chef.shopName)){
-            //   _tags.push(meal.chef.shopName);
-            // }
             meal.dishes.forEach(function(dish){
               if(dish.tags){
                 dish.tags.forEach(function(tag){

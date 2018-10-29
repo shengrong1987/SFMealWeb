@@ -362,7 +362,8 @@ describe('OrderController', function() {
           method : "delivery",
           pickupOption : 2,
           pickupMeal : mealId,
-          pickupDate : 'today'
+          pickupDate : 'today',
+          tip : 0
         })
         .expect(400)
         .end(function(err,res){
@@ -718,7 +719,7 @@ describe('OrderController', function() {
           })
       })
 
-      it('should not take order with meals of different pickup option', function (done) {
+      it('should not take order with meals of different ', function (done) {
         var dishObj = {};
         dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
         dishObj[dishId7] = { number : 1 , preference : [{ property : '', extra : 0}], price : price7 };

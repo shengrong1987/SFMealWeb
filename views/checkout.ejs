@@ -562,8 +562,11 @@
 </div>
 
 <script>
-  new OrderView({ el : $("#meal-confirm-container"), model : new Order()})
-  var addressView = new AddressView({ el : $("#meal-confirm-container"), model : new User()})
-  var mealConfirmView = new MealConfirmView( { el : $("#meal-confirm-container"), model : new Meal()})
-  new ContactInfoView({ el : $("#contactInfoView"), model : new User()});
+  var addressView, mealConfirmationView;
+  $(document).ready(function(){
+    new OrderView({ el : $("#meal-confirm-container"), model : new Order()})
+    addressView = new AddressView({ el : $("#meal-confirm-container"), model : new User()})
+    mealConfirmView = new MealConfirmView( { el : $("#meal-confirm-container"), model : new Meal()})
+    new ContactInfoView({ el : $("#contactInfoView"), model : new User()});
+  })
 </script>

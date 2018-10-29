@@ -191,12 +191,17 @@ module.exports = {
 
       meals = meals.filter(function (meal) {
 
-        var hasSameFlag = targetMeal.flag && meal.flag && targetMeal.flag === meal.flag;
+        var hasSameFlag;
+        if(!targetMeal.flag && !meal.flag){
+          var hasSameFlag = true;
+        }else if(targetMeal.flag === meal.flag){
+          hasSameFlag = true;
+        }else{
+          hasSameFlag = false;
+        }
         var mealHasDish = meal.dishes.some(function(d) {
           return orderedDishes.includes(d.id);
         });
-        // var isSameProvideTime = moment(meal.provideFromTime).isSame(moment(targetMeal.provideFromTime),'minute') && moment(meal.provideTillTime).isSame(moment(targetMeal.provideTillTime),'minute');
-        // sails.log.info("target meal: " + targetMeal.title + "is from " + targetMeal.provideFromTime + " till " + targetMeal.provideTillTime + "&& meal:" + meal.title + " is from " + meal.provideFromTime + " till " + meal.provideTillTime);
         if(mealHasDish && hasSameFlag){
           sails.log.info("meal: " + meal.title);
         }
@@ -2329,6 +2334,7 @@ module.exports = {
     var pickups = [];
     var existInMeals = meals.forEach(function(meal){
       var pickup = meal.pickups.filter(function(pickup){
+        sails.log.info("pickup index: " + pickup.index + " pickup option: " + params.pickupOption);
         return pickup.index === params.pickupOption;
       })[0];
       if(pickup){
@@ -2337,6 +2343,8 @@ module.exports = {
     });
     var isSamePickup = pickups.every(function(p){
       var p2 = pickups[0];
+      sails.log.info("from time1: " + moment(p2.pickupFromTime).format("LT") + " from time1:" + moment(p.pickupFromTime).format("LT"));
+      sails.log.info("till time1: " + moment(p2.pickupTillTime).format("LT") + " till time2:" + moment(p.pickupTillTime).format("LT"));
       return moment(p.pickupFromTime).isSame(moment(p2.pickupFromTime), 'minute') && moment(p.pickupTillTime).isSame(moment(p2.pickupTillTime), 'minute') && p.location === p2.location;
     });
     if(!isSamePickup){

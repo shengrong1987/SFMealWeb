@@ -60,6 +60,17 @@ function initHashTag(){
   }else{
     var tab = $("[data-href='"+hashtag+"']");
     tab.tab('select');
+    hashtag = hashtag.replace("#","");
+    hashtag = "." + hashtag;
+    var filter = $("[data-filter='" + hashtag + "']");
+    if(filter.length){
+      if(dateMixer){
+        dateMixer.filter(hashtag);
+        createCookie("date", hashtag);
+        $("#dishDatesBar li").removeClass("active");
+        $("#dishDatesBar [data-filter='" + hashtag + "']").parent().addClass("active");
+      }
+    }
   }
 }
 
@@ -146,10 +157,12 @@ function setupTooltip(){
   });
 }
 
+var pickupMixer, deliveryMixer, dateMixer;
+
 function setupMixin() {
   if($("#pickupTab").length){
     var firstFilter = $("#dishDatesBar").find("a[data-filter]").first().data('filter');
-    mixitup("#pickupTab", {
+    pickupMixer = mixitup("#pickupTab", {
       pagination: {
         limit: 10
       },
@@ -163,7 +176,7 @@ function setupMixin() {
   }
   if($("#deliveryTab").length){
     var firstFilter = $("#dishDatesBar").find("a[data-filter]").first().data('filter');
-    mixitup("#deliveryTab", {
+    deliveryMixer = mixitup("#deliveryTab", {
       pagination: {
         limit: 10
       },
@@ -177,7 +190,7 @@ function setupMixin() {
   }
   if($("#dishContentView").length){
     var firstFilter = $("#dishDatesBar").find("a[data-filter]").first().data('filter');
-    mixitup("#dishContentView", {
+    dateMixer = mixitup("#dishContentView", {
       pagination: {
         limit: 200
       },
@@ -349,6 +362,9 @@ function setupAnchor(){
   }
   if(anchor === "Sacramento" || anchor === "San Francisco"){
     setCountyInfo(anchor + " County");
+  }
+  if(anchor === "Friday" || anchor === "Thursday" || anchor === "Saturday"){
+
   }
 }
 function setupSwitchButton(){

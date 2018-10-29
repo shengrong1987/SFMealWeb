@@ -1060,10 +1060,17 @@ var Meal = Backbone.Model.extend({
 
 var DayOfMealView = Backbone.View.extend({
   events : {
-    "click #gotoCheckoutBtn" : "gotoCheckout"
+    "click #gotoCheckoutBtn" : "gotoCheckout",
+    "mixClick #dishContentView" : "selectDate"
   },
   initialize : function() {
 
+  },
+  selectDate : function(e){
+    var originalEvent = e.originalEvent.detail.originalEvent;
+    var currentTarget = $(originalEvent.currentTarget);
+    var dateDesc = currentTarget.data("filter");
+    createCookie("date", dateDesc);
   },
   gotoCheckout : function(e){
     var orderedDishes = []
@@ -3044,6 +3051,16 @@ var MealConfirmView = Backbone.View.extend({
       this.$el.find(".deliveryInput").hide();
     }
     utility.initGoogleMapService();
+    var dateDesc = readCookie("date");
+    if(dateDesc){
+      this.$el.find("#dishDatesBar li").removeClass("active");
+      this.$el.find("#dishDatesBar [data-filter='" + dateDesc + "']").parent().addClass("active");
+      if(hasDelivery){
+        deliveryMixer.filter(dateDesc);
+      }else{
+        pickupMixer.filter(dateDesc);
+      }
+    }
   },
   enterBillingAddress : function(e){
     var isChecked = $(e.currentTarget).prop("checked");

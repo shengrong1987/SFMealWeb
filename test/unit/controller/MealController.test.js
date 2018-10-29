@@ -303,7 +303,8 @@ describe('MealController', function() {
             status : 'off',
             isDelivery : false,
             preference : preference,
-            isTaxIncluded : true
+            isTaxIncluded : true,
+            flag : "order"
           })
           .expect(200)
           .end(function(err,res){
@@ -454,7 +455,8 @@ describe('MealController', function() {
               "delivery_center" : "1974 Palou Ave, San Francisco, CA 94124"
             }),
             supportPartyOrder : true,
-            isTaxIncluded : true
+            isTaxIncluded : true,
+            flag : "ahhhh"
           })
           .expect(200)
           .end(function(err,res){
@@ -530,7 +532,7 @@ describe('MealController', function() {
         .post('/meal')
         .send({
           provideFromTime: now,
-          provideTillTime: new Date(now.getTime() + 1000 * 7200),
+          provideTillTime: new Date(now.getTime() + 1000 * 3600),
           pickups : JSON.stringify(pickups),
           isDelivery : true,
           leftQty: leftQty,
@@ -546,7 +548,8 @@ describe('MealController', function() {
             "delivery_center" : "1974 Palou Ave, San Francisco, CA 94124"
           }),
           supportPartyOrder : true,
-          isTaxIncluded : true
+          isTaxIncluded : true,
+          flag : "ahhhh"
         })
         .expect(200)
         .end(function(err,res){
@@ -612,7 +615,8 @@ describe('MealController', function() {
           status : "off",
           cover : dish1,
           minimalOrder : 1,
-          isTaxIncluded : true
+          isTaxIncluded : true,
+          flag : "ahhhh"
         })
         .expect(200)
         .end(function(err,res){
@@ -1485,7 +1489,7 @@ describe('MealController', function() {
     it('should turn another meal off and cancel meal job', function (done) {
       agent
         .post('/meal/' + preorderMealId + "/off")
-        .expect(302)
+        .expect(200)
         .end(done)
     })
 
@@ -1643,7 +1647,7 @@ describe('MealController', function() {
         })
     })
 
-    it('should find dayOfMeal', function(done){
+    it('should get dish tags of menu page', function(done){
       agent
         .get('/meal')
         .set('Accept', 'application/json')
@@ -1653,7 +1657,7 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          res.body.tags.should.containDeep(['select','dessert','The Tea House']);
+          res.body.tags.should.containDeep(['select']);
           done();
         })
     })
