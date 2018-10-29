@@ -191,18 +191,16 @@ module.exports = {
 
       meals = meals.filter(function (meal) {
 
+        var hasSameFlag = targetMeal.flag && meal.flag && targetMeal.flag === meal.flag;
         var mealHasDish = meal.dishes.some(function(d) {
           return orderedDishes.includes(d.id);
         });
-        // var isSameDay = meal.pickups.some(function(p){
-        //   return meal.getDateDesc(p.pickupFromTime) === pickupDate;
-        // })
-        var isSameProvideTime = moment(meal.provideFromTime).isSame(moment(targetMeal.provideFromTime),'minute') && moment(meal.provideTillTime).isSame(moment(targetMeal.provideTillTime),'minute');
-        sails.log.info("target meal: " + targetMeal.title + "is from " + targetMeal.provideFromTime + " till " + targetMeal.provideTillTime + "&& meal:" + meal.title + " is from " + meal.provideFromTime + " till " + meal.provideTillTime);
-        if(mealHasDish && isSameProvideTime){
+        // var isSameProvideTime = moment(meal.provideFromTime).isSame(moment(targetMeal.provideFromTime),'minute') && moment(meal.provideTillTime).isSame(moment(targetMeal.provideTillTime),'minute');
+        // sails.log.info("target meal: " + targetMeal.title + "is from " + targetMeal.provideFromTime + " till " + targetMeal.provideTillTime + "&& meal:" + meal.title + " is from " + meal.provideFromTime + " till " + meal.provideTillTime);
+        if(mealHasDish && hasSameFlag){
           sails.log.info("meal: " + meal.title);
         }
-        return mealHasDish && isSameProvideTime;
+        return mealHasDish && hasSameFlag;
       });
 
       var orderedDishInMeal = orderedDishes.every(function(orderedDishId){

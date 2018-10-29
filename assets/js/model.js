@@ -1779,6 +1779,7 @@ var MealView = Backbone.View.extend({
       }
     }
 
+    var flag = form.find("#flagInput").val();
     var status = this.isActivate? "on" : "off";
     var title = form.find("#meal_title").val();
     var title_en = form.find("#meal_title_en").val();
@@ -1820,7 +1821,8 @@ var MealView = Backbone.View.extend({
       shippingPolicy : shippingPolicy,
       supportPartyOrder : supportPartyOrder,
       partyRequirement : partyRequirement,
-      isSupportDynamicPrice : isSupportDynamicPrice
+      isSupportDynamicPrice : isSupportDynamicPrice,
+      flag : flag
     });
     $this = this;
     this.model.save({},{
@@ -3406,7 +3408,8 @@ var OrderView = Backbone.View.extend({
   },
   ready : function(e){
     e.preventDefault();
-    var orderId = $(e.target).data("order");
+    var orderId = target.data("order");
+    var target = $(e.currentTarget);
     this.model.set({ id : orderId});
     this.model.action = "ready";
     this.model.save({},{

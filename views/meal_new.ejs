@@ -444,13 +444,18 @@
               </div>
 
               <div class="form-group mt-4">
-                <label style="margin-right:15px;"><strong>6.<%= __('is-dynamic')%></strong></label>
+                <label style="margin-right:15px;"><strong>6.<%= __('flag')%></strong></label>
+                <input type="text" id="flagInput" class="form-control">
+              </div>
+
+              <div class="form-group mt-4">
+                <label style="margin-right:15px;"><strong>7.<%= __('is-dynamic')%></strong></label>
                 <input type="checkbox" data-toggle="switch-button" id="isSupportDynamicPrice" class="regular-checkbox">
               </div>
 
               <div class="form-group row mt-4">
                 <div class="col-12">
-                  <label style="display: block;" for=""><strong>7.<%= __('name-your-meal')%></strong></label><a data-toggle="input-toggle" data-displaystyle="inline-block" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i> </a>
+                  <label style="display: block;" for=""><strong>8.<%= __('name-your-meal')%></strong></label><a data-toggle="input-toggle" data-displaystyle="inline-block" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i> </a>
                   <input id="meal_title" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="7" placeholder="<%= __('full-name')%>" data-required-error="<%= __('need-name')%>" required>
                   <input id="meal_title_en" class="form-control" style="width: 200px;display: inline-block;" type="text" maxlength="30" placeholder="Meal title" data-required-error="<%= __('need-name')%>">
                   <small>  <%= __('Ex-meal-title')%></small>

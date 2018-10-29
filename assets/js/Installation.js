@@ -179,7 +179,7 @@ function setupMixin() {
     var firstFilter = $("#dishDatesBar").find("a[data-filter]").first().data('filter');
     mixitup("#dishContentView", {
       pagination: {
-        limit: 50
+        limit: 200
       },
       classNames: {
         elementPager: 'btn btn-mixitup'

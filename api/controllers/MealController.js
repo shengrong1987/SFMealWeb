@@ -92,7 +92,7 @@ module.exports = {
           })
         },
         findDishTags : function(next){
-          _tags.push('select');
+          _tags.concat(['select']);
           meals.forEach(function(meal){
             // if(!_tags.includes(meal.chef.shopName)){
             //   _tags.push(meal.chef.shopName);
@@ -431,7 +431,7 @@ module.exports = {
               if(isAdmin) {
                 return res.ok(meal[0]);
               }
-              return res.redirect("/host/me#mymeal");
+              return res.ok(meal[0]);
             });
           });
         });

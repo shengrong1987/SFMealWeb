@@ -174,6 +174,9 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
+    flag : {
+      type : 'string'
+    },
     /*
       type : "fixed/custom",
       price : "5.00",
