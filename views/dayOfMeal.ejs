@@ -37,19 +37,23 @@
       <div id="dishContentView" class="content flex-grow-1 text-left">
         <div id="order">
           <% tags.forEach(function(tag){%>
-          <div class="light-grey pl-4" style="margin: 2px 0 2px 0;" id="<%= tag%>"><%= __(tag)%></div>
+          <% if(tag==="limited"){%>
+            <div class="yellow pl-4 py-4" style="margin: 2px 0 2px 0;" id="<%= tag%>"><%= __(tag)%></div>
+          <% }else{%>
+            <div class="light-grey pl-4" style="margin: 2px 0 2px 0;" id="<%= tag%>"><%= __(tag)%></div>
+          <% }%>
           <%
 
             var dateList = Object.keys(meals.meals);
-          dateList.forEach(function(dateKey){
-            var mealObj = meals.meals[dateKey];
-            var actualMeals = mealObj.meals;
-            var _dishes = [];
-          actualMeals.forEach(function(meal){ meal.dishes.forEach(function(dish){
-          if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
-          %>
-          <% if(tag === "all" || dish.type === tag || meal.chef.shopName === tag || (dish.tags && dish.tags.includes(tag))){%>
-          <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem p-4 mix item <%= meal.chef.shopName%> <%= dateKey.replace(" ",'')%><% if(dish.tags){ dish.tags.forEach(function(t){%>
+            dateList.forEach(function(dateKey){
+              var mealObj = meals.meals[dateKey];
+              var actualMeals = mealObj.meals;
+              var _dishes = [];
+              actualMeals.forEach(function(meal){ meal.dishes.forEach(function(dish){
+              if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
+              %>
+              <% if(tag === "all" || dish.type === tag || meal.chef.shopName === tag || (dish.tags && dish.tags.includes(tag))){%>
+            <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem p-2 mix item <%= meal.chef.shopName%> <%= dateKey.replace(" ",'')%><% if(dish.tags){ dish.tags.forEach(function(t){%>
               <%= " " + t%>
               <%})}%>">
             <div class="d-flex flex-row">
@@ -61,7 +65,11 @@
                 <% }});%>
               </div>
               <div class="d-flex flex-column flex-grow-1">
-                <h5 class="mb-auto"><%= dish.title%><small> <%= dish.quantity%></small></h5>
+                <h6 class="mb-auto"><%= dish.title%><small> <%= dish.quantity%></small>
+                  <% if(tag==="limited"){%>
+                    <span></span>
+                  <%}%>
+                </h6>
                 <div class="d-flex">
                   <div class="text text-price price mr-2" data-extra=0 value="<%= dish.price%>">$<%= dish.price.toFixed(2)%></div>
                   <div class="input-group input-group-sm amount-input round ml-auto" style="max-width:200px;min-width:30px;" data-toggle="amount-input" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">

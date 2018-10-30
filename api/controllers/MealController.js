@@ -77,7 +77,7 @@ module.exports = {
           })
         })
       }
-      var _u=null,_tags=["select"];
+      var _u=null,_tags=["select","limited"];
       async.auto({
         findUser : function(next){
           if(!req.session.authenticated){

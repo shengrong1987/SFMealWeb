@@ -908,5 +908,6 @@
   "toggleMenu" : "展开/缩起菜单",
   "received" : "已取货",
   "readied" : "已准备好",
-  "ordered-dish-not-found" : "有菜式不在可点范围中"
+  "ordered-dish-not-found" : "有菜式不在可点范围中",
+  "limited" : "限时预定"
 }

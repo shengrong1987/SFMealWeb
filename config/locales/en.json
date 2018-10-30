@@ -906,5 +906,6 @@
   "toggleMenu" : "Toggle Menu",
   "received" : "Received",
   "readied" : "Readied",
-  "ordered-dish-not-found" : "Contain dish that can not be founded."
+  "ordered-dish-not-found" : "Contain dish that can not be founded.",
+  "limited" : "Limited Time"
 }
