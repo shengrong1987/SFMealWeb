@@ -416,7 +416,7 @@ module.exports = {
   },
 
   charge : function(attr, cb){
-    if(attr.paymentMethod === "cash"){
+    if(attr.paymentMethod === "cash" || attr.paymentMethod === "venmo" || attr.paymentMethod === "paypal"){
       this.calculateTotal(attr);
       this.chargeCash(attr, cb);
     }else if(attr.paymentMethod === "online"){

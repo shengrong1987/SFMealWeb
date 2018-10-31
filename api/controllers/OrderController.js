@@ -470,7 +470,7 @@ module.exports = {
                   order.feeCharges = {};
                   order.application_fees = {};
 
-                  if(order.paymentMethod === "cash"){
+                  if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
                     order.charges['cash'] = order.charges['cash'] || 0;
                     order.application_fees['cash'] = order.application_fees['cash'] || 0;
                     order.charges['cash'] += charge.amount;
@@ -574,7 +574,7 @@ module.exports = {
           order.status = "schedule";
         }
 
-        if(order.paymentMethod === "cash"){
+        if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
           order.charges['cash'] = order.charges['cash'] || 0;
           order.application_fees['cash'] = order.application_fees['cash'] || 0;
           order.charges['cash'] += charge.amount;
@@ -738,7 +738,7 @@ module.exports = {
                     if(charge.status !== "succeeded") {
                       return next({ responseText : req.__('order-adjust-stripe-error',charge.status), code : -37});
                     }
-                    if(order.paymentMethod === "cash"){
+                    if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
                       order.charges['cash'] = order.charges['cash'] || 0;
                       order.application_fees['cash'] = order.application_fees['cash'] || 0;
                       order.charges['cash'] += charge.amount;
@@ -762,7 +762,7 @@ module.exports = {
                   sails.log.info("refunding amount plus tax: " + netDiff);
                   async.auto({
                     refundOrders : function(next2) {
-                      if (order.paymentMethod === "cash") {
+                      if (order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal") {
                         return next2();
                       }
                       var metadata = {
@@ -783,7 +783,7 @@ module.exports = {
                       });
                     },
                     refundFeeForCashOrder: function (next2) {
-                      if (order.paymentMethod !== "cash") {
+                      if (order.paymentMethod === "cash" || order.paymentMethod !== "venmo" || order.paymentMethod !== "paypal") {
                         return next2();
                       }
                       var refundedFee = Math.abs(netDiff * order.meal.commission);
@@ -926,7 +926,7 @@ module.exports = {
 
           async.auto({
             refundOrders : function(next){
-              if(order.paymentMethod === "cash"){
+              if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
                 return next();
               }
               var metadata = {
@@ -1086,7 +1086,7 @@ module.exports = {
                 if (err) {
                   return next({ code : -39, responseText : err.message });
                 }
-                if(order.paymentMethod === "cash"){
+                if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
                   if(order.charges){
                     order.charges['cash'] = order.charges['cash'] || 0;
                     order.charges['cash'] += charge.amount;
@@ -1124,7 +1124,7 @@ module.exports = {
 
               async.auto({
                 refundOrders : function(next){
-                  if(order.paymentMethod === "cash"){
+                  if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
                     return next();
                   }
                   var metadata = {
@@ -1230,7 +1230,7 @@ module.exports = {
           };
           async.auto({
             refundOrder : function(next){
-              if(order.paymentMethod === "cash"){
+              if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
                 return next();
               }
               stripe.batchRefund(order.charges, order.transfer, metadata, function(err) {
@@ -1840,7 +1840,7 @@ module.exports = {
       };
       async.auto({
         refundOrder : function(next){
-          if(order.paymentMethod === "cash"){
+          if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
             return next();
           }
           stripe.batchRefund(order.charges, order.transfer, metadata, function(err) {
@@ -1908,7 +1908,7 @@ module.exports = {
       };
       async.auto({
         refundOrder : function(next){
-          if(order.paymentMethod === "cash"){
+          if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
             return next();
           }
           stripe.batchRefund(order.charges, order.transfer, metadata, function(err) {
@@ -2068,7 +2068,7 @@ module.exports = {
                   if(charge.status !== "succeeded") {
                     return next({ responseText : req.__('order-adjust-stripe-error',charge.status), code : -37});
                   }
-                  if(order.paymentMethod === "cash"){
+                  if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
                     if(order.charges){
                       order.charges['cash'] = order.charges['cash'] || 0;
                       order.charges['cash'] += charge.amount;
@@ -2101,7 +2101,7 @@ module.exports = {
                 sails.log.info("refunding amount plus tax: " + netDiff);
                 async.auto({
                   refundOrders : function(next2) {
-                    if (order.paymentMethod === "cash") {
+                    if (order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal") {
                       return next2();
                     }
                     var metadata = {
