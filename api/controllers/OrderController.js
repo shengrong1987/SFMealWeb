@@ -990,6 +990,7 @@ module.exports = {
                       return res.badRequest(err);
                     }
                     if(req.wantsJSON && process.env.NODE_ENV === "development"){
+                      result.meal = meal;
                       return res.ok(result);
                     }
                     return res.ok({responseText : req.__('order-cancel-ok'), tax : order.tax, paymentMethod : order.paymentMethod, charges : order.charges, feeCharges : order.feeCharges, application_fees : order.application_fees});
@@ -1010,9 +1011,9 @@ module.exports = {
           //send notification
           result.service_fee = result.meal.serviceFee;
           notification.notificationCenter("Order", "cancelling", result, isSendToHost, false, req);
-          // if(req.wantsJSON){
-          //   return res.ok(result);
-          // }
+          if(req.wantsJSON && process.env.NODE_ENV === "development"){
+            return res.ok(result);
+          }
           if(result.isSendToHost){
             return res.ok({responseText : req.__('order-cancel-request-user')});
           }else{
@@ -2241,7 +2242,7 @@ module.exports = {
     var actual_subtotal = 0;
     var validDish = false;
     var $this = this;
-    var mealOrder = Object.assign({}, orders);;
+    var mealOrder = Object.assign({}, orders);
 
     async.each(Object.keys(orders), function(dishId, next){
       var qty = parseInt(orders[dishId].number);

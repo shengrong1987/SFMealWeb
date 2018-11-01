@@ -3052,7 +3052,7 @@ var MealConfirmView = Backbone.View.extend({
     }
     utility.initGoogleMapService();
     var dateDesc = readCookie("date");
-    if(dateDesc){
+    if(dateDesc && dateDesc !== "undefined"){
       this.$el.find("#dishDatesBar li").removeClass("active");
       this.$el.find("#dishDatesBar [data-filter='" + dateDesc + "']").parent().addClass("active");
       if(hasDelivery){

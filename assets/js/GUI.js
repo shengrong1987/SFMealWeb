@@ -469,7 +469,7 @@ function orderFood(id,number,initial){
 function orderFoodLogic(id, number, initial){
 
   var $order = $("#order");
-  var item = $order.find(".item[data-id=" + id + "]");
+  var item = $order.find(".item[data-id=" + id + "]:visible");
   if(!initial){
     if(number > 0){
       $(this).amountInput('add',item.find("[data-toggle='amount-input']"));

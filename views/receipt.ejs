@@ -13,7 +13,7 @@
       <%
         var subtotal = 0,discount = 0,delivery_fee = 0,tip = 0;
         orders.forEach(function(o){
-          subtotal += parseInt(o.subtotal);
+          subtotal += parseFloat(o.subtotal);
           discount += parseInt(o.discount);
           delivery_fee += parseInt(o.delivery_fee);
           tip += parseInt(o.tip);
@@ -45,7 +45,7 @@
                 return dish.id === dishId;
               })[0];
               if(!dish){return}
-              var price = parseInt(orderedDish.price);%>
+              var price = parseFloat(orderedDish.price);%>
         <tr>
           <td class="xs-hide"><img class="dishImg" src="<%= dish.photos[0].v%>" style="width: 100px;"></td>
           <td class="text-green" style="vertical-align: middle;" data-dish-id="<%= dish.id%>"><%= dish.title%><%= title%></td>

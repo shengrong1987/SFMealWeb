@@ -603,6 +603,7 @@ describe('OrderController', function() {
         .end(done)
     });
 
+    var _multipleOrderId;
     describe("take order with multiple meals", function(){
 
       it('should take order with multiple meals', function (done) {
@@ -634,6 +635,7 @@ describe('OrderController', function() {
             o.meal.leftQty[dishId1].should.be.equal(dish1LeftQty);
             o.customer.should.be.equal(guestId);
             o.customerName.should.be.equal("sheng");
+            _multipleOrderId = o.id;
             done();
           })
       })
