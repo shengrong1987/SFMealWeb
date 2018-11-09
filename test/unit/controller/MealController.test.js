@@ -71,7 +71,7 @@ describe('MealController', function() {
     it('should create couple dishes', function (done) {
       agent
           .post('/dish')
-          .send({title : '韭菜盒子',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
+          .send({title : '韭菜盒子',price: 10, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
           .expect(200)
           .end(function(err,res){
             should.exist(res.body.id);
@@ -80,7 +80,7 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '猪肉馅饼',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
+          .send({title : '猪肉馅饼',price: 10, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
           .expect(200)
           .end(function(err,res){
             should.exist(res.body.id);
@@ -89,7 +89,7 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '五彩面',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'entree', chef : hostId})
+          .send({title : '五彩面',price: 16, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'entree', chef : hostId})
           .expect(200)
           .end(function(err,res){
             should.exist(res.body.id);
@@ -100,7 +100,7 @@ describe('MealController', function() {
           .post('/dish')
           .send({
             title : '糖水',
-            price: 8,
+            price: 16,
             photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
             type: 'dessert',
             chef : hostId,
@@ -378,7 +378,8 @@ describe('MealController', function() {
           status : "off",
           cover : dish1,
           minimalOrder : 1,
-          supportPartyOrder : true
+          supportPartyOrder : true,
+          nickname : "custom"
         })
         .expect(400)
         .end(function(err,res){
@@ -387,60 +388,74 @@ describe('MealController', function() {
         })
     })
 
+    it('should not create an preorder type meal with lack of pickup options', function (done) {
+      var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
+      var now = new Date();
+      agent
+        .post('/meal')
+        .send({
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          nickname : "custom",
+          isDelivery : true,
+          leftQty: leftQty,
+          totalQty: totalQty,
+          title : "私房面馆",
+          type : "preorder",
+          dishes : dishes,
+          status : "off",
+          cover : dish1,
+          minimalOrder : 1,
+          supportPartyOrder : true
+        })
+        .expect(400)
+        .end(function(err,res){
+          res.body.code.should.be.equal(-20)
+          done();
+        })
+    })
+
+    it('should not create an preorder type meal with empty store hour nickname', function (done) {
+      var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
+      var now = new Date();
+      agent
+        .post('/meal')
+        .send({
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 7200),
+          isDelivery : true,
+          leftQty: leftQty,
+          totalQty: totalQty,
+          title : "预定订单四点",
+          type : "preorder",
+          dishes : dishes,
+          status : "off",
+          cover : dish1,
+          minimalOrder : 1,
+          partyRequirement : JSON.stringify({
+            "minimal" : 50,
+            "delivery_center" : "1974 Palou Ave, San Francisco, CA 94124"
+          }),
+          supportPartyOrder : true,
+          isTaxIncluded : true,
+          flag : "ahhhh",
+          nickname: "pickupSet2"
+        })
+        .expect(200)
+        .end(function(err,res){
+          res.body.code.should.be.equal(-24);
+          done();
+        })
+    })
+
     it('should create an preorder type meal ', function (done) {
       var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
       var now = new Date();
-      var pickups = [{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 2),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 3),
-        "location" : "1455 Market St, San Francisco, CA 94124",
-        "publicLocation" : "Uber HQ",
-        "pickupInstruction" : "11th st and Market st",
-        "method" : "pickup",
-        "area" : "Market & Downtown",
-        "county" : "San Francisco County",
-        "phone" : "(415)802-3853",
-        "index" : 1
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 3),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 4),
-        "method" : "delivery",
-        "location" : "1974 Palou Ave, San Francisco, CA 94124, USA",
-        "deliveryCenter" : "1974 Palou Ave, San Francisco, CA 94124, USA",
-        "area" : "Bay View",
-        "county" : "San Francisco County",
-        "phone" : "(415)802-3854",
-        "deliveryRange" : 10,
-        "index" : 2
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 2),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 3),
-        "location" : "25 Washington St, Daly City",
-        "publicLocation" : "John Daly Blvd",
-        "pickupInstruction" : "John Daly Blvd",
-        "method" : "pickup",
-        "county" : "San Mateo County",
-        "area" : "Daly City",
-        "phone" : "(415)802-3853",
-        "index" : 3
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 4),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 5),
-        "location" : "665 W Olive Ave, Sunnyvale, CA 94086",
-        "publicLocation" : "Sunnyvalue",
-        "pickupInstruction" : "Sunnyvalue library",
-        "method" : "pickup",
-        "county" : "Santa Clara County",
-        "area" : "Sunnyvale",
-        "phone" : "(415)802-3853",
-        "index" : 4
-      }];
       agent
           .post('/meal')
           .send({
             provideFromTime: now,
             provideTillTime: new Date(now.getTime() + 1000 * 7200),
-            pickups : JSON.stringify(pickups),
             isDelivery : true,
             leftQty: leftQty,
             totalQty: totalQty,
@@ -449,14 +464,14 @@ describe('MealController', function() {
             dishes : dishes,
             status : "off",
             cover : dish1,
-            minimalOrder : 1,
             partyRequirement : JSON.stringify({
               "minimal" : 50,
               "delivery_center" : "1974 Palou Ave, San Francisco, CA 94124"
             }),
             supportPartyOrder : true,
             isTaxIncluded : true,
-            flag : "ahhhh"
+            flag : "ahhhh",
+            nickname: "pickupSet1"
           })
           .expect(200)
           .end(function(err,res){
@@ -483,57 +498,11 @@ describe('MealController', function() {
       var totalQty = {};
       totalQty[dish6] = 5;
       var now = new Date();
-      var pickups = [{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 2),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 3),
-        "location" : "1455 Market St, San Francisco, CA 94124",
-        "publicLocation" : "Uber HQ",
-        "pickupInstruction" : "11th st and Market st",
-        "method" : "pickup",
-        "area" : "Market & Downtown",
-        "county" : "San Francisco County",
-        "phone" : "(415)802-3853",
-        "index" : 1
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 3),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 4),
-        "method" : "delivery",
-        "location" : "1974 Palou Ave, San Francisco, CA 94124, USA",
-        "deliveryCenter" : "1974 Palou Ave, San Francisco, CA 94124, USA",
-        "area" : "Bay View",
-        "county" : "San Francisco County",
-        "phone" : "(415)802-3854",
-        "deliveryRange" : 10,
-        "index" : 2
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 2),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 3),
-        "location" : "25 Washington St, Daly City",
-        "publicLocation" : "John Daly Blvd",
-        "pickupInstruction" : "John Daly Blvd",
-        "method" : "pickup",
-        "county" : "San Mateo County",
-        "area" : "Daly City",
-        "phone" : "(415)802-3853",
-        "index" : 3
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 4),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 5),
-        "location" : "665 W Olive Ave, Sunnyvale, CA 94086",
-        "publicLocation" : "Sunnyvalue",
-        "pickupInstruction" : "Sunnyvalue library",
-        "method" : "pickup",
-        "county" : "Santa Clara County",
-        "area" : "Sunnyvale",
-        "phone" : "(415)802-3853",
-        "index" : 4
-      }];
       agent
         .post('/meal')
         .send({
           provideFromTime: now,
           provideTillTime: new Date(now.getTime() + 1000 * 3600),
-          pickups : JSON.stringify(pickups),
           isDelivery : true,
           leftQty: leftQty,
           totalQty: totalQty,
@@ -549,7 +518,8 @@ describe('MealController', function() {
           }),
           supportPartyOrder : true,
           isTaxIncluded : true,
-          flag : "ahhhh"
+          flag : "ahhhh",
+          nickname : "pickupSet1"
         })
         .expect(200)
         .end(function(err,res){
@@ -606,6 +576,7 @@ describe('MealController', function() {
           delivery_fee : "4.99",
           isDelivery : true,
           isDeliveryBySystem : true,
+          minimalTotal : 31,
           leftQty: leftQty,
           totalQty: totalQty,
           county : 'San Mateo County',
@@ -614,9 +585,9 @@ describe('MealController', function() {
           dishes : dishes,
           status : "off",
           cover : dish1,
-          minimalOrder : 1,
           isTaxIncluded : true,
-          flag : "ahhhh"
+          flag : "ahhhh",
+          nickname : "custom"
         })
         .expect(200)
         .end(function(err,res){
@@ -657,7 +628,8 @@ describe('MealController', function() {
           dishes : dishes,
           status : "off",
           cover : dish1,
-          minimalOrder : 1
+          minimalOrder : 1,
+          nickname : "custom"
         })
         .expect(400)
         .end(function(err,res){
@@ -697,7 +669,8 @@ describe('MealController', function() {
           dishes : dishes,
           status : "on",
           cover : dish1,
-          minimalOrder : 1
+          minimalOrder : 1,
+          nickname : "custom"
         })
         .expect(400)
         .end(function(err,res){
@@ -739,57 +712,11 @@ describe('MealController', function() {
 
     it('should be able to update meals with no orders', function(done){
       var now = new Date();
-      var pickups = [{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 2),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 3),
-        "location" : "1455 Market St, San Francisco, CA 94124",
-        "publicLocation" : "Uber HQ",
-        "pickupInstruction" : "11th st and Market st",
-        "method" : "pickup",
-        "area" : "Market & Downtown",
-        "county" : "San Francisco County",
-        "phone" : "(415)123-1234",
-        "index" : 1
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 3),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 4),
-        "method" : "delivery",
-        "location" : "1974 Palou Ave, San Francisco, CA 94124, USA",
-        "deliveryCenter" : "1974 Palou Ave, San Francisco, CA 94124, USA",
-        "area" : "Bay View",
-        "county" : "San Francisco County",
-        "phone" : "(415)123-1234",
-        "index" : 2,
-        "deliveryRange" : 20
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 2),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 3),
-        "location" : "25 Washington St, Daly City",
-        "publicLocation" : "John Daly Blvd",
-        "pickupInstruction" : "John Daly Blvd",
-        "method" : "pickup",
-        "county" : "San Mateo County",
-        "area" : "Daly City",
-        "phone" : "(415)123-1234",
-        "index" : 3
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 4),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 5),
-        "location" : "665 W Olive Ave, Sunnyvale, CA 94086",
-        "publicLocation" : "Sunnyvalue",
-        "pickupInstruction" : "Sunnyvalue library",
-        "method" : "pickup",
-        "county" : "Santa Clara County",
-        "area" : "Sunnyvale",
-        "phone" : "(415)123-1234",
-        "index" : 4
-      }];
       agent
         .put('/meal/' + preorderMealId)
         .send({
           provideFromTime: now,
-          provideTillTime: new Date(now.getTime() + 1000 * 7200),
-          pickups : JSON.stringify(pickups),
+          provideTillTime: new Date(now.getTime() + 1000 * 3600),
           isDelivery : true,
           minimalTotal : 1,
           supportPartyOrder : true,
@@ -797,7 +724,9 @@ describe('MealController', function() {
             "minimal" : 50,
             "delivery_center" : "1974 Palou Ave, San Francisco, CA 94124"
           }),
-          status : 'off'
+          status : 'off',
+          type : "preorder",
+          nickname : "pickupSet1"
         })
         .expect(200)
         .end(done)
@@ -1308,7 +1237,9 @@ describe('MealController', function() {
           status : 'on',
           provideFromTime : fiveMinutesLater,
           provideTillTime : twoHourLater,
-          minimalOrder : 1
+          minimalOrder : 1,
+          nickname : "custom",
+          type : "order"
         })
         .expect(200)
         .end(done)
@@ -1348,7 +1279,8 @@ describe('MealController', function() {
           status : 'on',
           provideFromTime : now,
           provideTillTime : tenHourLater,
-          minimalOrder : 1
+          minimalOrder : 1,
+          type : "order"
         })
         .expect(200)
         .toPromise()

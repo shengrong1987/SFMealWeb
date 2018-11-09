@@ -258,13 +258,33 @@ var ActionButton = createReactClass({
           }
           break;
         case "Driver":
-          if(action === "create"){
+          if(action === "create" || action === "update"){
             postData = {
-              driverName : { value : ""},
-              phone : { value : ""},
-              availability : { value : ""}
+              driverName : { value : this.props.data['driverName'] || ''},
+              phone : { value : this.props.data['phone'] || ''},
+              availability : { value : this.props.data['availability'] || ''}
             }
           }
+          break;
+        case "PickupOption":
+          if(action === "create" || action === "update"){
+            postData = {
+              pickupFromTime : { value : this.props.data['pickupFromTime'] || '', type : "Date"},
+              pickupTillTime : { value : this.props.data['pickupTillTime'] || '', type : "Date"},
+              location : { value : this.props.data['location'] || ''},
+              method : {value: this.props.data['method'] || ''},
+              phone : {value: this.props.data['phone'] || ''},
+              publicLocation : {value: this.props.data['publicLocation'] || ''},
+              comment : {value: this.props.data['comment'] || ''},
+              deliveryCenter : {value: this.props.data['deliveryCenter'] || ''},
+              deliveryRange : {value: this.props.data['deliveryRange'] || ''},
+              area : {value: this.props.data['area'] || ''},
+              county : {value: this.props.data['county'] || ''},
+              index : {value: this.props.data['index'] || ''},
+              nickname : {value: this.props.data['nickname'] || ''}
+             }
+          }
+          break;
     }
     return postData;
   },
@@ -364,11 +384,18 @@ var ActionButton = createReactClass({
           break;
         case "Driver":
           if(!rowData.hasOwnProperty("id")){
-            actions.push("create","delete");
+            actions.push("create","update");
           }else{
-            actions.push("delete");
+            actions.push("update","delete");
           }
           break;
+      case "PickupOption":
+        if(!rowData.hasOwnProperty("id")){
+          actions.push("create","update");
+        }else{
+          actions.push("update","delete");
+        }
+        break;
     }
     if(!this.props.detail){
       actions.push('view');

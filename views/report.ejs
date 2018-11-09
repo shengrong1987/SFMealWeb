@@ -86,7 +86,7 @@
             <td><%= order.customerPhone%></td>
             <td><%= order.contactInfo.address || '自取'%></td>
             <td><%= order.paymentMethod%></td>
-            <td><%= "$" + (parseInt(order.subtotal)-parseInt(order.discount/100)) + "（" + order.tip +"）" %></td>
+            <td><%= "$" + (parseFloat(order.subtotal)-parseFloat(order.discount/100)).toFixed(2) + "（" + order.tip +"）" %></td>
             <td><%= order.isPaid ? "已付" : "未付"%></td>
             <td><%= order.pickupInfo.comment || ''%></td>
           </tr>

@@ -20,6 +20,7 @@ var React = require('react'),
   ReviewStore = require('../stores/ReviewStore'),
   AccountStore = require('../stores/AccountStore'),
   DriverStore = require('../stores/DriverStore'),
+  PickupOptionStore = require('../stores/PickupOptionStore'),
   TableItem = require('./TableItem');
 
 var Table = createReactClass({
@@ -82,6 +83,9 @@ var Table = createReactClass({
       case "Driver":
         return {data: DriverStore.getAllDrivers(), detail : DriverStore.isShowDetail(), isCreate : DriverStore.isCreate()};
         break;
+      case "PickupOption":
+        return {data: PickupOptionStore.getAllPickups(), detail : PickupOptionStore.isShowDetail(), isCreate : PickupOptionStore.isCreate()};
+        break;
     }
   },
 
@@ -107,6 +111,7 @@ var Table = createReactClass({
     ReviewStore.addChangeListener(this._onChange);
     AccountStore.addChangeListener(this._onChange);
     DriverStore.addChangeListener(this._onChange);
+    PickupOptionStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount: function () {
@@ -123,6 +128,7 @@ var Table = createReactClass({
     ReviewStore.removeChangeListener(this._onChange);
     AccountStore.removeChangeListener(this._onChange);
     DriverStore.removeChangeListener(this._onChange);
+    PickupOptionStore.removeChangeListener(this._onChange);
   },
 
   _onChange: function () {
@@ -146,6 +152,8 @@ var Table = createReactClass({
 
     var model = this.props.model;
     var isCreate = this.state.isCreate;
+    var tableStyle = { minHeight : '500px' };
+
 
     if(isCreate){
       var tableRows = <TableItem
@@ -168,7 +176,7 @@ var Table = createReactClass({
 
     return (
         <div>
-          <table className="table table-striped table-bordered table-hover table-sm table-responsive">
+          <table className="table table-striped table-bordered table-hover table-sm table-responsive" style={tableStyle}>
             <tbody><tr><td colSpan={header.length}>{this.state.headData}</td></tr></tbody>
             <TableHeader cols={header}/>
             <tbody>

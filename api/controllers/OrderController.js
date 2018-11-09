@@ -71,6 +71,8 @@ var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUt
 //-56 : meal lack of meal
 //-57 : ordered dish not found in meal
 //-58 : coupon,points need login to redeem
+//-59 : user address exist, can not autosave
+//-60 : order total is not enough
 //-98 : result not found
 
 
@@ -79,7 +81,7 @@ module.exports = {
   /*
   Build pick-up info
    */
-  buildDeliveryData : function(params, meal, cb){
+  buildDeliveryData : function(params, meal, req, cb){
     //check meals both have the same pickupOption
     var pickUpInfo,delivery_fee = 0;
     if(params.method === "shipping"){
@@ -92,7 +94,7 @@ module.exports = {
       delivery_fee = 0;
     }else{
       sails.log.info("method: " + params.method, " party mode: " + params.isPartyMode);
-      if(params.method === "delivery" && params.isPartyMode !== true){
+      if(params.method === "delivery" && !params.isPartyMode){
         if(params.isDeliveryBySystem){
           delivery_fee = stripe.SYSTEM_DELIVERY_FEE;
         }else{
@@ -110,7 +112,7 @@ module.exports = {
       });
     }
     var customComment = params.customInfo ? (params.customInfo.comment) || '' : '';
-    var pickupComment = pickUpInfo.comment || pickUpInfo.instruction || '';
+    var pickupComment = pickUpInfo.comment || '';
     pickUpInfo.comment = customComment + pickupComment;
     if(params.isPartyMode){
       pickUpInfo.pickupFromTime = params.customInfo.time;
@@ -208,345 +210,416 @@ module.exports = {
         return mealHasDish && hasSameFlag;
       });
 
+      var notInMealDish;
       var orderedDishInMeal = orderedDishes.every(function(orderedDishId){
-        return meals.some(function(meal){
+        var dishInMeal = meals.some(function(meal){
           return meal.dishes.some(function(d){
             return d.id === orderedDishId;
           })
-        })
+        });
+        if(!dishInMeal){
+          notInMealDish = orderedDishId;
+        }
+        return dishInMeal;
       })
 
       if(!orderedDishInMeal){
-        return res.badRequest({ code : -57, responseText : req.__('ordered-dish-not-found')});
-      }
-
-      if(!meals.length){
-        return res.badRequest({ code: -52, responseText: req.__('meal-not-found')})
-      }
-
-      var _logisticInfo, _orders = [];
-      async.auto({
-        /*
-        * Check parameters pass from client are correct
-        */
-        validateParams : function(next){
-          _this.validateOption(req.body, meals, req, next);
-        },
-        validateOrders : ['validateParams', function(next){
-          async.each(meals, function(meal, nextIn){
-            _this.validateMeal(meal, orders, null, req, null, nextIn);
-          }, function(err){
-            if(err){
-              return next(err);
-            }
-            next();
-          })
-        }],
-        buildOptions : ['validateOrders', function(next){
-          _this.buildDeliveryData(req.body, meals[0], function(logisticInfo){
-            _logisticInfo = logisticInfo;
-            next();
-          });
-        }],
-        buildOrders : ['buildOptions', function(next){
-          var index = 0;
-          async.each(meals, function(meal, nextIn){
-            var orderParam = {};
-            orderParam.subtotal = parseFloat(meal.subtotal) || 0;
-            orderParam.orders = meal.orders;
-            orderParam.host = meal.chef.id;
-            orderParam.type = meal.type;
-            orderParam.dishes = meal.dishes;
-            orderParam.method = req.body.method;
-            orderParam.meal = meal.id;
-            orderParam.hostEmail = meal.chef.email;
-            orderParam.phone = meal.chef.phone;
-            orderParam.tax = _this.getTax(req.body.subtotal, meal.chef.county, meal.isTaxIncluded);
-            orderParam.serviceFee = meal.serviceFee;
-            orderParam.eta = meal.eta;
-            if(!index){
-              orderParam.tip = parseFloat(req.body.tip).toFixed(2);
+        Dish.findOne(notInMealDish).exec(function(err, dish){
+          if(err){
+            return res.badRequest(err);
+          }
+          return res.badRequest({ code : -57, responseText : req.__('ordered-dish-not-found', dish.title)});
+        })
+      }else{
+        if(!meals.length){
+          return res.badRequest({ code: -52, responseText: req.__('meal-not-found')})
+        }
+        var _logisticInfo, _orders = [];
+        async.auto({
+          /*
+           * Check parameters pass from client are correct
+           */
+          validateParams : function(next){
+            _this.validateOption(req.body, meals, req, next);
+          },
+          validateOrders : ['validateParams', function(next){
+            async.each(meals, function(meal, nextIn){
+              _this.validateMeal(meal, orders, null, req, null, nextIn);
+            }, function(err){
+              if(err){
+                return next(err);
+              }
+              next();
+            })
+          }],
+          validateSubtotal : ['validateOrders', function(next){
+            var subtotal = 0;
+            if(meals && meals.length){
+              meals.forEach(function(meal){
+                subtotal += meal.subtotal;
+              });
+              var ms = meals.filter(function(m){
+                sails.log.info("subtotal: " + subtotal, "minimal order amount:" + m.minimalTotal);
+                return parseFloat(subtotal) < parseFloat(m.minimalTotal);
+              });
+              if(ms.length){
+                return next({ code: -60, responseText : req.__('order-single-minimal-not-reach', meals[0].minimalTotal)});
+              }
+              next();
             }else{
-              orderParam.tip = 0;
+              next();
             }
-            orderParam.paymentInfo = req.body.paymentInfo;
-            orderParam.contactInfo = req.body.contactInfo;
-            orderParam.pickupInfo = _logisticInfo.pickupInfo;
-            orderParam.customInfo = req.body.customInfo;
-            orderParam.delivery_fee = _logisticInfo.delivery_fee;
-            index++;
-            if(meal.type === "order"){
-              orderParam.status = "preparing";
-            }else{
-              orderParam.status = "schedule";
+          }],
+          saveAddress : ['validateSubtotal', function(next){
+            if(!req.session.authenticated){
+              return next();
             }
-            async.auto({
-              normalCheckOut : function(nextIn2){
-                if(!req.session.authenticated){
-                  return nextIn2();
+            var method = req.body.method;
+            var address = req.body.contactInfo.address;
+            var phone = req.body.contactInfo.phone;
+            if(method !== "delivery" && !address){
+              return next();
+            }
+            User.findOne(req.session.user.id).exec(function(err, user){
+              if(err){
+                return next(err);
+              }
+              if(user.address.length){
+                return next();
+              }
+              require('../services/geocode').geocode(address, function (err, result) {
+                if (err) {
+                  sails.log.debug(err);
+                  return next(req.__('meal-error-address'));
                 }
-                User.findOne(userId).populate('payment').populate("coupons").exec(function (err, found) {
-                  if (err) {
-                    return nextIn2(err);
+                sails.log.debug("geocoded result: " + result);
+                if (result.length === 0) {
+                  return next(req.__('meal-error-address2'));
+                }
+                var administration = result[0].administrativeLevels;
+                user.county = administration.level2long;
+                user.city = result[0].city;
+                user.full_address = result[0].formattedAddress;
+                user.lat = result[0].latitude;
+                user.long = result[0].longitude;
+                user.zip = result[0].zipcode;
+                var addObj = {};
+                addObj.id = new Date().getTime();
+                addObj.street = result[0].streetNumber + " " + result[0].streetName;
+                addObj.city = result[0].city;
+                addObj.zip = result[0].zipcode;
+                addObj.phone = phone;
+                user.address = [addObj];
+                user.save(next);
+              });
+            })
+          }],
+          buildOptions : ['saveAddress', function(next){
+            _this.buildDeliveryData(req.body, meals[0], req, function(logisticInfo){
+              _logisticInfo = logisticInfo;
+              next();
+            });
+          }],
+          buildOrders : ['buildOptions', function(next){
+            var index = 0;
+            async.each(meals, function(meal, nextIn){
+              var orderParam = {};
+              orderParam.subtotal = parseFloat(meal.subtotal) || 0;
+              orderParam.orders = meal.orders;
+              orderParam.host = meal.chef.id;
+              orderParam.type = meal.type;
+              orderParam.dishes = meal.dishes;
+              orderParam.method = req.body.method;
+              orderParam.meal = meal.id;
+              orderParam.hostEmail = meal.chef.email;
+              orderParam.phone = meal.chef.phone;
+              orderParam.tax = _this.getTax(req.body.subtotal, meal.chef.county, meal.isTaxIncluded);
+              orderParam.serviceFee = meal.serviceFee;
+              orderParam.eta = meal.eta;
+              if(!index){
+                orderParam.tip = parseFloat(req.body.tip).toFixed(2);
+              }else{
+                orderParam.tip = 0;
+              }
+              orderParam.paymentInfo = req.body.paymentInfo;
+              orderParam.contactInfo = req.body.contactInfo;
+              orderParam.pickupInfo = _logisticInfo.pickupInfo;
+              orderParam.customInfo = req.body.customInfo;
+              orderParam.delivery_fee = _logisticInfo.delivery_fee;
+              index++;
+              if(meal.type === "order"){
+                orderParam.status = "preparing";
+              }else{
+                orderParam.status = "schedule";
+              }
+              async.auto({
+                normalCheckOut : function(nextIn2){
+                  if(!req.session.authenticated){
+                    return nextIn2();
                   }
-                  var contactInfo = req.body.contactInfo;
-                  var paymentInfo = req.body.paymentInfo;
-                  if(paymentInfo.method === 'online' && (!found.payment || found.payment.length === 0)){
-                    return nextIn2({ responseText : req.__('order-lack-payment'), code : -5});
-                  }
-                  if(!found.phone && !contactInfo.phone){
-                    return nextIn2({ responseText : req.__('order-lack-contact'), code : -31});
-                  }
-                  if(!found.firstname && !contactInfo.name){
-                    return nextIn2({ responseText : req.__('order-lack-contact'), code : -31});
-                  }
-                  orderParam.guestEmail = req.body.guestEmail;
-                  orderParam.customerName = contactInfo.name || found.firstname;
-                  orderParam.customerPhone = contactInfo.phone || found.phone;
-                  orderParam.customerId = found.payment[0] ? found.payment[0].customerId : null;
-                  orderParam.paymentMethod = paymentInfo.method;
-                  orderParam.isExpressCheckout = false;
-                  orderParam.customer = userId;
-
-                  var code = req.body.couponCode, pointsRedeem = req.body.points;
-
-                  if(code && pointsRedeem){
-                    return nextIn2({ code : -23, responseText : req.__('order-duplicate-discount')});
-                  }
-
-                  //validate Coupon
-                  _this.verifyCoupon(req, code, found, meal, function(err, coupon){
-                    if(err){
+                  User.findOne(userId).populate('payment').populate("coupons").exec(function (err, found) {
+                    if (err) {
                       return nextIn2(err);
                     }
-                    var subtotalAfterTax = meal.subtotal + orderParam.tax/100;
-                    _this.redeemPoints(req, pointsRedeem, found, subtotalAfterTax, function(err, discount){
+                    var contactInfo = req.body.contactInfo;
+                    var paymentInfo = req.body.paymentInfo;
+                    if(paymentInfo.method === 'online' && (!found.payment || found.payment.length === 0)){
+                      return nextIn2({ responseText : req.__('order-lack-payment'), code : -5});
+                    }
+                    if(!found.phone && !contactInfo.phone){
+                      return nextIn2({ responseText : req.__('order-lack-contact'), code : -31});
+                    }
+                    if(!found.firstname && !contactInfo.name){
+                      return nextIn2({ responseText : req.__('order-lack-contact'), code : -31});
+                    }
+                    orderParam.guestEmail = req.body.guestEmail;
+                    orderParam.customerName = contactInfo.name || found.firstname;
+                    orderParam.customerPhone = contactInfo.phone || found.phone;
+                    orderParam.customerId = found.payment[0] ? found.payment[0].customerId : null;
+                    orderParam.paymentMethod = paymentInfo.method;
+                    orderParam.isExpressCheckout = false;
+                    orderParam.customer = userId;
+
+                    var code = req.body.couponCode, pointsRedeem = req.body.points;
+
+                    if(code && pointsRedeem){
+                      return nextIn2({ code : -23, responseText : req.__('order-duplicate-discount')});
+                    }
+
+                    //validate Coupon
+                    _this.verifyCoupon(req, code, found, meal, function(err, coupon){
                       if(err){
-                        return res.badRequest(err);
+                        return nextIn2(err);
                       }
-                      orderParam.redeemPoints = pointsRedeem;
-                      //calculate total
-                      _this.redeemCoupon(req, code, subtotalAfterTax, coupon, found, discount, function(err, discount){
+                      var subtotalAfterTax = meal.subtotal + orderParam.tax/100;
+                      _this.redeemPoints(req, pointsRedeem, found, subtotalAfterTax, function(err, discount){
                         if(err){
-                          return nextIn2(err);
+                          return res.badRequest(err);
                         }
-                        if(coupon){
-                          orderParam.coupon = coupon.id;
-                        }
-                        orderParam.discountAmount = discount;
-                        orderParam.discount = discount;
-                        nextIn2();
+                        orderParam.redeemPoints = pointsRedeem;
+                        //calculate total
+                        _this.redeemCoupon(req, code, subtotalAfterTax, coupon, found, discount, function(err, discount){
+                          if(err){
+                            return nextIn2(err);
+                          }
+                          if(coupon){
+                            orderParam.coupon = coupon.id;
+                          }
+                          orderParam.discountAmount = discount;
+                          orderParam.discount = discount;
+                          nextIn2();
+                        });
                       });
                     });
                   });
-                });
-              },
-              expressCheckout : function(nextIn2) {
-                if(req.session.authenticated){
-                  return nextIn2();
-                }
-                var contactInfo = req.body.contactInfo;
-                var paymentInfo = req.body.paymentInfo;
-                var code = req.body.couponCode, pointsRedeem = req.body.points;
-                if(code || pointsRedeem){
-                  return nextIn2({ responseText : req.__('order-redeem-not-login'), code: -58});
-                }
-                if(paymentInfo.method === 'online' && !paymentInfo.token){
-                  return nextIn2({ responseText : req.__('order-lack-payment'), code : -5});
-                }
-                if(paymentInfo.method === 'cash' && (!contactInfo.phone || !contactInfo.name)){
-                  return nextIn2({ responseText : req.__('order-cash-miss-profile'), code : -27});
-                }
-                if(!contactInfo.phone){
-                  return nextIn2(req.__('order-lack-contact'));
-                }
-                orderParam.guestEmail = process.env.ADMIN_EMAIL;
-                orderParam.customerName = contactInfo.name || req.__('user');
-                orderParam.customerPhone = contactInfo.phone;
-                orderParam.paymentMethod = paymentInfo.method;
-                orderParam.locale = req.getLocale();
-                orderParam.isExpressCheckout = true;
-                stripe.newCustomerWithCard({
-                  token : paymentInfo.token,
-                  email : process.env.ADMIN_EMAIL
-                }, function(err, customer){
-                  if(err){
-                    return nextIn2({ code : -45, responseText : err.message });
+                },
+                expressCheckout : function(nextIn2) {
+                  if(req.session.authenticated){
+                    return nextIn2();
                   }
-                  orderParam.customerId = customer.id;
-                  orderParam.discount = 0;
-                  nextIn2();
+                  var contactInfo = req.body.contactInfo;
+                  var paymentInfo = req.body.paymentInfo;
+                  var code = req.body.couponCode, pointsRedeem = req.body.points;
+                  if(code || pointsRedeem){
+                    return nextIn2({ responseText : req.__('order-redeem-not-login'), code: -58});
+                  }
+                  if(paymentInfo.method === 'online' && !paymentInfo.token){
+                    return nextIn2({ responseText : req.__('order-lack-payment'), code : -5});
+                  }
+                  if(paymentInfo.method === 'cash' && (!contactInfo.phone || !contactInfo.name)){
+                    return nextIn2({ responseText : req.__('order-cash-miss-profile'), code : -27});
+                  }
+                  if(!contactInfo.phone){
+                    return nextIn2(req.__('order-lack-contact'));
+                  }
+                  orderParam.guestEmail = process.env.ADMIN_EMAIL;
+                  orderParam.customerName = contactInfo.name || req.__('user');
+                  orderParam.customerPhone = contactInfo.phone;
+                  orderParam.paymentMethod = paymentInfo.method;
+                  orderParam.locale = req.getLocale();
+                  orderParam.isExpressCheckout = true;
+                  stripe.newCustomerWithCard({
+                    token : paymentInfo.token,
+                    email : process.env.ADMIN_EMAIL
+                  }, function(err, customer){
+                    if(err){
+                      return nextIn2({ code : -45, responseText : err.message });
+                    }
+                    orderParam.customerId = customer.id;
+                    orderParam.discount = 0;
+                    nextIn2();
+                  });
+                }
+              }, function(err){
+                if(err){
+                  return nextIn(err);
+                }
+                Order.create(orderParam).exec(function (err, order) {
+                  if (err) {
+                    return nextIn(err);
+                  }
+                  order.meal = meal;
+                  _orders.push(order);
+                  nextIn();
+                });
+              })
+            }, function(err){
+              if(err){
+                return next(err);
+              }
+              next();
+            })
+          }],
+          makePayments : [ 'buildOrders', function(next){
+            async.eachSeries(_orders, function(order, nextIn){
+              if(order.paymentMethod === "alipay" || order.paymentMethod === "wechatpay"){
+                stripe.newSource({
+                  type : order.paymentMethod,
+                  isInitial : true,
+                  amount : order.subtotal * 100,
+                  tip : order.tip,
+                  deliveryFee : parseInt(order.delivery_fee * 100),
+                  discount : order.discount * 100,
+                  email : process.env.ADMIN_EMAIL,
+                  meal : order.meal,
+                  method : order.method,
+                  tax : order.tax,
+                  metadata : {
+                    mealId : order.meal.id,
+                    hostId : order.meal.chef.id,
+                    orderId : order.id,
+                    userId : userId,
+                    deliveryFee : parseInt(order.delivery_fee * 100),
+                    tax : order.tax,
+                    discount : order.discount * 100
+                  }
+                }, function(err, source){
+                  if(err){
+                    return nextIn({ code : -45, responseText : err.message });
+                  }
+                  order.source = source;
+                  order.status = "pending-payment";
+                  order.sourceId = source.id;
+                  order.client_secret = source.client_secret;
+                  order.service_fee = order.meal.serviceFee;
+                  nextIn();
+                });
+              }else{
+                stripe.charge({
+                  paymentMethod : order.paymentMethod,
+                  isInitial : true,
+                  amount : order.subtotal * 100,
+                  tip : order.tip,
+                  deliveryFee : parseInt(order.delivery_fee * 100),
+                  discount : order.discount * 100,
+                  email : email,
+                  customerId : order.customerId,
+                  destination : order.meal.chef.accountId,
+                  meal : order.meal,
+                  method : order.method,
+                  tax : order.tax,
+                  isPartyMode : order.isPartyMode,
+                  metadata : {
+                    mealId : order.meal.id,
+                    hostId : order.meal.chef.id,
+                    orderId : order.id,
+                    userId : userId,
+                    deliveryFee : parseInt(order.delivery_fee * 100),
+                    tax : order.tax
+                  }
+                },function(err, charge, transfer){
+                  if(err){
+                    Order.destroy(order.id).exec(function(err2){
+                      if(err2){
+                        return nextIn(err2);
+                      }
+                      return nextIn({ code : -39, responseText : err.message });
+                    });
+                  }else{
+                    order.source = "charged";
+                    order.charges = {};
+                    order.transfer = {};
+                    order.feeCharges = {};
+                    order.application_fees = {};
+
+                    if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
+                      order.charges['cash'] = order.charges['cash'] || 0;
+                      order.application_fees['cash'] = order.application_fees['cash'] || 0;
+                      order.charges['cash'] += charge.amount;
+                      order.application_fees['cash'] += charge.application_fee;
+                      order.feeCharges[charge.id] = charge.application_fee;
+                    }else if(charge){
+                      order.charges[charge.id] = charge.amount;
+                      order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
+                    }
+                    if(transfer){
+                      order.transfer[transfer.id] = transfer.amount;
+                    }
+                    nextIn();
+                  }
                 });
               }
             }, function(err){
               if(err){
-                return nextIn(err);
+                return next(err);
               }
-              Order.create(orderParam).exec(function (err, order) {
-                if (err) {
+              next();
+            })
+          }],
+          updateMeal : [ 'makePayments', function(next){
+            async.each(_orders, function(order, nextIn){
+              _this.updateMealLeftQty(order, order.meal, _this.clearOrder(order.orders), order.orders, function(err, meal){
+                if(err){
                   return nextIn(err);
                 }
-                order.meal = meal;
-                _orders.push(order);
+                order.leftQty = meal.leftQty;
                 nextIn();
-              });
-            })
-          }, function(err){
-            if(err){
-              return next(err);
-            }
-            next();
-          })
-        }],
-        makePayments : [ 'buildOrders', function(next){
-          async.eachSeries(_orders, function(order, nextIn){
-            if(order.paymentMethod === "alipay" || order.paymentMethod === "wechatpay"){
-              stripe.newSource({
-                type : order.paymentMethod,
-                isInitial : true,
-                amount : order.subtotal * 100,
-                tip : order.tip,
-                deliveryFee : parseInt(order.delivery_fee * 100),
-                discount : order.discount * 100,
-                email : process.env.ADMIN_EMAIL,
-                meal : order.meal,
-                method : order.method,
-                tax : order.tax,
-                metadata : {
-                  mealId : order.meal.id,
-                  hostId : order.meal.chef.id,
-                  orderId : order.id,
-                  userId : userId,
-                  deliveryFee : parseInt(order.delivery_fee * 100),
-                  tax : order.tax,
-                  discount : order.discount * 100
-                }
-              }, function(err, source){
-                if(err){
-                  return nextIn({ code : -45, responseText : err.message });
-                }
-                order.source = source;
-                order.status = "pending-payment";
-                order.sourceId = source.id;
-                order.client_secret = source.client_secret;
-                order.service_fee = order.meal.serviceFee;
-                nextIn();
-              });
-            }else{
-              stripe.charge({
-                paymentMethod : order.paymentMethod,
-                isInitial : true,
-                amount : order.subtotal * 100,
-                tip : order.tip,
-                deliveryFee : parseInt(order.delivery_fee * 100),
-                discount : order.discount * 100,
-                email : email,
-                customerId : order.customerId,
-                destination : order.meal.chef.accountId,
-                meal : order.meal,
-                method : order.method,
-                tax : order.tax,
-                isPartyMode : order.isPartyMode,
-                metadata : {
-                  mealId : order.meal.id,
-                  hostId : order.meal.chef.id,
-                  orderId : order.id,
-                  userId : userId,
-                  deliveryFee : parseInt(order.delivery_fee * 100),
-                  tax : order.tax
-                }
-              },function(err, charge, transfer){
-                if(err){
-                  Order.destroy(order.id).exec(function(err2){
-                    if(err2){
-                      return nextIn(err2);
-                    }
-                    return nextIn({ code : -39, responseText : err.message });
-                  });
-                }else{
-                  order.source = "charged";
-                  order.charges = {};
-                  order.transfer = {};
-                  order.feeCharges = {};
-                  order.application_fees = {};
-
-                  if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
-                    order.charges['cash'] = order.charges['cash'] || 0;
-                    order.application_fees['cash'] = order.application_fees['cash'] || 0;
-                    order.charges['cash'] += charge.amount;
-                    order.application_fees['cash'] += charge.application_fee;
-                    order.feeCharges[charge.id] = charge.application_fee;
-                  }else if(charge){
-                    order.charges[charge.id] = charge.amount;
-                    order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
-                  }
-                  if(transfer){
-                    order.transfer[transfer.id] = transfer.amount;
-                  }
-                  nextIn();
-                }
-              });
-            }
-          }, function(err){
-            if(err){
-              return next(err);
-            }
-            next();
-          })
-        }],
-        updateMeal : [ 'makePayments', function(next){
-          async.each(_orders, function(order, nextIn){
-            _this.updateMealLeftQty(order, order.meal, _this.clearOrder(order.orders), order.orders, function(err, meal){
+              })
+            }, function(err){
               if(err){
-                return nextIn(err);
+                return next(err);
               }
-              order.leftQty = meal.leftQty;
-              nextIn();
-            })
-          }, function(err){
-            if(err){
-              return next(err);
-            }
-            next();
-          });
-        }],
-        addReferralPoints : [ 'updateMeal',function(next){
-          async.each(_orders, function (order, nextIn) {
-            _this.addReferrerPoints(order.customer, nextIn);
-          }, function(err){
-            if(err){
-              return next(err);
-            }
-            next();
-          })
-        }],
-        finalizeOrder : ['addReferralPoints', function(next){
-          async.each(_orders, function(order, nextIn){
-            var _m = order.meal;
-            order.meal = order.meal.id;
-            order.save(function(err, o){
-              if(err){
-                return nextIn(err);
-              }
-              if(process.env.NODE_ENV === "development"){
-                order.meal = _m;
-              }
-              notification.notificationCenter("Order", "new", o, true, false, req);
-              nextIn();
+              next();
             });
-          }, function(err){
-            if(err){
-              return next(err);
-            }
-            next();
-          })
-        }]
-      }, function(err){
-        if(err){
-          return res.badRequest(err);
-        }
-        res.ok({ orders : _orders});
-      })
+          }],
+          addReferralPoints : [ 'updateMeal',function(next){
+            async.each(_orders, function (order, nextIn) {
+              _this.addReferrerPoints(order.customer, nextIn);
+            }, function(err){
+              if(err){
+                return next(err);
+              }
+              next();
+            })
+          }],
+          finalizeOrder : ['addReferralPoints', function(next){
+            async.each(_orders, function(order, nextIn){
+              var _m = order.meal;
+              order.meal = order.meal.id;
+              order.save(function(err, o){
+                if(err){
+                  return nextIn(err);
+                }
+                if(process.env.NODE_ENV === "development"){
+                  order.meal = _m;
+                }
+                notification.notificationCenter("Order", "new", o, true, false, req);
+                nextIn();
+              });
+            }, function(err){
+              if(err){
+                return next(err);
+              }
+              next();
+            })
+          }]
+        }, function(err){
+          if(err){
+            return res.badRequest(err);
+          }
+          res.ok({ orders : _orders});
+        })
+      }
     });
   },
 
@@ -783,7 +856,7 @@ module.exports = {
                       });
                     },
                     refundFeeForCashOrder: function (next2) {
-                      if (order.paymentMethod === "cash" || order.paymentMethod !== "venmo" || order.paymentMethod !== "paypal") {
+                      if (order.paymentMethod !== "cash" && order.paymentMethod !== "venmo" && order.paymentMethod !== "paypal") {
                         return next2();
                       }
                       var refundedFee = Math.abs(netDiff * order.meal.commission);
@@ -2217,7 +2290,7 @@ module.exports = {
 
     var orderInfo = order || req.body;
     var isPartyMode = orderInfo.isPartyMode;
-    if(!!isPartyMode){
+    if(isPartyMode){
       var partyRequire = meal.partyRequirement;
       if(!partyRequire){
         return cb({ responseText : req.__('order-lack-of-party-requirement'), code : -32});
@@ -2247,7 +2320,11 @@ module.exports = {
     async.each(Object.keys(orders), function(dishId, next){
       var qty = parseInt(orders[dishId].number);
       var properties = $this.getProperties(orders[dishId].preference);
-      var lastQty = lastOrders ? parseInt(lastOrders[dishId].number) : 0;
+      if(lastOrders && lastOrders[dishId]){
+        var lastQty = lastOrders ? parseInt(lastOrders[dishId].number) : 0;
+      }else{
+        lastQty = 0;
+      }
       if(qty > 0 || lastQty > 0){
         var hasDish;
         async.each(meal.dishes, function(dish, next2){
@@ -2288,7 +2365,7 @@ module.exports = {
             }
             var totalQty = meal.getDynamicDishesTotalOrder(qty);
             var price = dish.getPrice(totalQty, meal);
-            var listPrice = parseInt(mealOrder[dishId].price);
+            var listPrice = parseFloat(mealOrder[dishId].price);
             sails.log.info("price: " + price + " list price: " + listPrice);
             if(price !== listPrice){
               sails.log.info("listing price updated from " + listPrice + " to " + price);

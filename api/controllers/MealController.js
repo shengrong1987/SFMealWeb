@@ -34,6 +34,11 @@ const DELIVERY_FEE = 0;
  * -17 : meal lack of party requirement
  * -18 : meal lack county information, unable to perform search
  * -19 : meal lack of order information
+ * -20 : meal use custom store hour but lack of pickup options
+ * -21 : provide from time is later than provide till time
+ * -22 : provide till time is in the past
+ * -23 : provide time too short
+ * -24 : can not find any pickup options by the given nickname
  */
 
 module.exports = {
@@ -52,7 +57,19 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        return res.view("meal_new",{dishes : host.dishes, host : host, drivers : d});
+        var _pickups = []
+        PickupOption.find().exec(function(err, pickups){
+          if(err){
+            return res.badRequest(err);
+          }
+          pickups.forEach(function(p){
+            if(!_pickups.includes(p.nickname)){
+              _pickups.push(p.nickname);
+            }
+          })
+          _pickups.push("custom");
+          return res.view("meal_new",{dishes : host.dishes, host : host, drivers : d, pickups : _pickups});
+        })
       })
     });
   },
@@ -318,10 +335,40 @@ module.exports = {
       // meals = meals.filter(function(meal){
       //   return meal.county.split("+").indexOf(county) !== -1;
       // });
+
+      //get all meals that contain the order dishes
       meals = meals.filter(function(meal){
         return meal.dishes.some(function(d){
           return orderedDishes.includes(d.id);
         });
+      });
+
+      //remove dates of meals which can not have all the ordered dishes
+      var dateDescs = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+      dateDescs.forEach(function(dateDesc){
+        var mealsOnSameDate = meals.filter(function(meal){
+          var pickupDate = moment(meal.pickups[0].pickupFromTime).format('dddd');
+          return pickupDate === dateDesc;
+        });
+        if(!mealsOnSameDate.length){
+          return;
+        }
+        var mealHaveAllOrderedDishes = orderedDishes.every(function(orderedDishId){
+          var dishInMeal = mealsOnSameDate.some(function(m){
+            return m.dishes.some(function(d){
+              return d.id === orderedDishId;
+            });
+          });
+          return dishInMeal;
+        });
+        if(!mealHaveAllOrderedDishes){
+          meals = meals.filter(function(m){
+            var mealNeedToRemove = mealsOnSameDate.some(function(m2){
+              return m2.id === m.id;
+            })
+            return !mealNeedToRemove;
+          })
+        }
       });
 
       if(pickupNickname){
@@ -515,15 +562,21 @@ module.exports = {
     req.body.chef = hostId;
     var $this = this;
 
-    if(this.dateIsValid(req.body)){
-      this.requirementIsValid(req.body, null, req, function(err){
+    this.dateIsValid(req.body, req, function(err){
+      if(err){
+        return res.badRequest(err);
+      }
+      sails.log.info("pass date check");
+      $this.requirementIsValid(req.body, null, req, function(err){
         if(err){
           return res.badRequest(err);
         }
+        sails.log.info("pass meal requirement check");
         $this.dishIsValid(req.body, req, function(err){
           if(err){
             return res.badRequest(err);
           }
+          sails.log.info("pass dish check");
           Host.findOne(hostId).populate("meals").populate("dishes").populate("user").exec(function(err, host){
             if(err){
               return res.badRequest(err);
@@ -562,10 +615,7 @@ module.exports = {
           });
         });
       });
-    }else{
-      console.log("Date format of meal is not valid");
-      return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
-    }
+    });
   },
 
   update : function(req, res){
@@ -601,7 +651,10 @@ module.exports = {
         return res.badRequest(err);
       }
       sails.log.info("chef id: " + hostId);
-      if($this.dateIsValid(req.body)){
+      $this.dateIsValid(req.body, req, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
         Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,meal){
           if(err){
             return res.badRequest(err);
@@ -690,10 +743,7 @@ module.exports = {
             });
           });
         });
-      }else{
-        console.log("Date format of meal is not valid");
-        return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
-      }
+      })
     });
   },
 
@@ -796,7 +846,7 @@ module.exports = {
       params.delivery_fee = DELIVERY_FEE;
     }
 
-    if(params.isDelivery && params.type === "preorder" && (!params.pickups || (params.pickups && !JSON.parse(params.pickups).some(function(pickup){
+    if(params.isDelivery && params.type === "preorder" && (!params.pickups || (params.pickups && !params.pickups.some(function(pickup){
       return pickup.method === "delivery";
     })))){
       return cb({ responseText : req.__('meal-delivery-on-option'), code : -15})
@@ -808,7 +858,7 @@ module.exports = {
         if(!params.pickups){
           return cb();
         }
-        var pickupArrays = JSON.parse(params.pickups);
+        var pickupArrays = params.pickups;
         pickupArrays.forEach(function(pickup, index){
           if(!pickup.county){
             return;
@@ -875,7 +925,7 @@ module.exports = {
     //   return cb({ code : -6, responseText : req.__('')});
     // }
     var type = params.type;
-    if(params.isDelivery && type === 'preorder' && !JSON.parse(params.pickups).some(function(pickup){
+    if(params.isDelivery && type === 'preorder' && !params.pickups.some(function(pickup){
         return pickup.method === 'delivery';
       })){
       sails.log.debug("support delivery but no delivery time was added");
@@ -891,7 +941,11 @@ module.exports = {
       return cb({ code : -17, responseText : req.__('meal-lack-of-party-requirement')});
     }
 
-    if(!params.isDelivery && params.pickups && JSON.parse(params.pickups).some(function(pickup){
+    if(params.storeHourNickname === "custom" && !params.pickups){
+      return cb({ code : -20, responseText : req.__('meal-custom-hour-lack-of-pickup-options')})
+    }
+
+    if(!params.isDelivery && params.pickups && params.pickups.some(function(pickup){
       return pickup.method === "delivery";})
     ){
       return cb({ code : -12, responseText : req.__('meal-delivery-conflict')});
@@ -925,7 +979,7 @@ module.exports = {
     });
   },
 
-  dateIsValid : function(params){
+  dateIsValid : function(params, req, cb){
     var provideFromTime = params.provideFromTime;
     var provideTillTime = params.provideTillTime;
     var now = new Date();
@@ -933,35 +987,71 @@ module.exports = {
     sails.log.info("start: " + provideFromTime, " end: " + provideTillTime);
 
     if(provideFromTime >= provideTillTime){
-      sails.log.warn("provide from time is later than provide till time");
-      return false;
+      return cb({ code : -21, responseText : req.__('provide-from-time-is-later-than-provide-till-time')});
     }else if(new Date(provideTillTime) < now){
-      sails.log.warn("provide till time should be in the future");
-      return false;
+      return cb({ code : -22, responseText : req.__('provide-till-time-is-in-the-past')});
     }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
-      sails.log.warn("provide from time and provide till time is too short");
-      return false;
+      return cb({ code : -23, responseText : req.__('provide-time-too-short')});
     }
-    var valid = true;
-    if(params.pickups){
-      JSON.parse(params.pickups).forEach(function(pickup){
-        if(!pickup.isDateCustomized){
-          var pickupFromTime = pickup.pickupFromTime;
-          var pickupTillTime = pickup.pickupTillTime;
-          if(pickupFromTime >= pickupTillTime){
-            console.log("pickup time not valid");
-            valid = false;
-          }else if(moment.duration(moment(pickupTillTime).diff(moment(pickupFromTime))).asMinutes() < 30){
-            console.log("pickup time too short");
-            valid = false;
-          }else if(pickupFromTime <= provideTillTime && params.type === "preorder"){
-            console.log("pickup time too early");
-            valid = false;
+
+    sails.log.info("provide time checked");
+    async.auto({
+      findPickups : function(next){
+        if(params.type === "order"){
+          return next();
+        }else{
+          if(params.pickups){
+            try{
+              params.pickups = JSON.parse(params.pickups);
+              next();
+            }catch(e){
+              return next(e);
+            }
+          }else if(params.nickname && params.nickname !== "custom"){
+            PickupOption.find({ nickname: params.nickname}).exec(function(err, options){
+              if(err){
+                return next(err);
+              }
+              if(!options || !options.length){
+                return next({code: -24, responseText : req.__('meal-nickname-empty')});
+              }
+              sails.log.info("pickup options: " + options);
+              params.pickups = options;
+              next();
+            })
+          }else{
+            return next({ code : -20, responseText : req.__('meal-custom-hour-lack-of-pickup-options')});
           }
         }
-      });
-    }
-    return valid;
+      }
+    }, function(err){
+      if(err){
+        return cb(err);
+      }
+      var valid = true;
+      if(params.pickups){
+        params.pickups.forEach(function(pickup){
+          if(!pickup.isDateCustomized){
+            var pickupFromTime = pickup.pickupFromTime;
+            var pickupTillTime = pickup.pickupTillTime;
+            if(pickupFromTime >= pickupTillTime){
+              console.log("pickup time not valid");
+              valid = false;
+            }else if(moment.duration(moment(pickupTillTime).diff(moment(pickupFromTime))).asMinutes() < 30){
+              console.log("pickup time too short");
+              valid = false;
+            }else if(pickupFromTime <= provideTillTime && params.type === "preorder"){
+              console.log("pickup time too early");
+              valid = false;
+            }
+          }
+        });
+      }
+      if(!valid){
+        return cb({ code : -5, responseText : req.__('meal-invalid-date')});
+      }
+      cb();
+    })
   },
 
   mealActiveCheck : function(params, meal, req, cb){
@@ -972,11 +1062,12 @@ module.exports = {
 
       if (orders.length > 0) {
         if(params.status === "on"){
-          if(params.pickups || params.type){
-            cb({ code : -14, responseText : req.__("meal-modify-active-error")});
-          }else{
-            cb();
-          }
+          // if(params.pickups){
+          //   cb({ code : -14, responseText : req.__("meal-modify-active-error")});
+          // }else{
+          //   cb();
+          // }
+          cb();
         }else{
           return cb({code: -4, responseText: req.__('meal-active-error')});
         }
@@ -1052,7 +1143,7 @@ module.exports = {
       if(!meal){
         return res.notFound();
       }
-      var _orders,_user,_drivers;
+      var _orders,_user,_drivers,_pickups=[];
       async.auto({
         isEditMode : function(cb){
           if(!isEditMode){
@@ -1095,6 +1186,23 @@ module.exports = {
             cb();
           })
         },
+        getStoreHours : function(cb){
+          if(!isEditMode){
+            return cb();
+          }
+          PickupOption.find().exec(function(err, pickups){
+            if(err){
+              return cb(err);
+            }
+            pickups.forEach(function(p){
+              if(!_pickups.includes(p.nickname)){
+                _pickups.push(p.nickname);
+              }
+            })
+            _pickups.push("custom");
+            cb();
+          })
+        },
         getMealExtraInfo : ['isPartyMode', function(cb){
           Order.find({meal : meal.id, status : ["schedule","preparing"]}).exec(function(err, orders){
             if(err){
@@ -1122,7 +1230,7 @@ module.exports = {
           return res.ok(meal);
         }
         if(isEditMode){
-          res.view('meal_edit',{ meal : meal, drivers: _drivers });
+          res.view('meal_edit',{ meal : meal, drivers: _drivers, pickups : _pickups });
         }else if(req.session.authenticated){
           res.view('meal',{ meal : meal, locale : req.getLocale(), user : _user, orders : _orders});
         }else{
@@ -1161,7 +1269,6 @@ module.exports = {
     var orderCount = 0;
     meals.forEach(function(meal){
       var pickupDate = moment(meal.pickups[0].pickupFromTime);
-      var dayOfWeek = util.getWeekFromDate(pickupDate);
       var dateDesc = "unknown";
       if(pickupDate.isSame(moment(),'day')){
         dateDesc = 'today';

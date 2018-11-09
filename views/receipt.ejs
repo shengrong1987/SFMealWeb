@@ -14,9 +14,9 @@
         var subtotal = 0,discount = 0,delivery_fee = 0,tip = 0;
         orders.forEach(function(o){
           subtotal += parseFloat(o.subtotal);
-          discount += parseInt(o.discount);
-          delivery_fee += parseInt(o.delivery_fee);
-          tip += parseInt(o.tip);
+          discount += parseFloat(o.discount);
+          delivery_fee += parseFloat(o.delivery_fee);
+          tip += parseFloat(o.tip);
           Object.keys(o.orders).forEach(function(dishId){
             var orderedDish = o.orders[dishId];
             var amount = parseInt(orderedDish.number);
@@ -37,7 +37,7 @@
                 title += "(" + dishProps + ')';
               });
               extra = preference.reduce(function (total, next) {
-                return total + parseInt(next.extra);
+                return total + parseFloat(next.extra);
               },0);
             }
             if(amount > 0){

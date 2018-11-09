@@ -331,12 +331,12 @@ function updateOrderWindow(fromCache, isTrigger){
  */
 function updateMenuView(id){
   var number = localOrders[id].number;
-  var dishItems = $("#order").find(".item[data-id=" + id + "]");
+  var dishItems = $("#order").find(".item[data-id=" + id + "]:visible");
   dishItems.each(function(){
     var dishItem = $(this);
     var left = dishItem.data("left-amount");
     dishItem.find(".amount").val(number);
-    dishItem.find(".amount").text(number);
+    // dishItem.find(".amount").text(number);
     if($("#myModal").hasClass('show')){
       dishItem.amountInput('update',dishItem.find("[data-toggle='amount-input']"));
     }
@@ -457,7 +457,7 @@ function orderFood(id,number,initial){
   var $order = $("#order");
   var item = $order.find(".item[data-id=" + id + "]");
   var prefs = item.data('prefs');
-  orderFoodLogic(id, number, initial)
+  orderFoodLogic(id, number, initial);
   if(prefs>0 && number>0){
     if(!$("#myModal").hasClass('show')) {
       var url = "/dish/" + id + "/preference";
@@ -477,17 +477,18 @@ function orderFoodLogic(id, number, initial){
       $(this).amountInput('minus',item.find("[data-toggle='amount-input']"));
     }
   }
-  var price = parseInt(item.find(".price").attr("price"));
+  var price = parseFloat(item.find(".price").attr("price"));
   localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : [{ property : '', extra : 0}], price : price};
   localOrders[id].number += number;
   var left = parseInt(item.data("left-amount"));
+  var amount = parseInt(item.find(".amount").val());
   if(number < 0){
-    if(localOrders[id].number<0){
-      localOrders[id].number = 0;
-    }else{
+    if(amount > 0){
       left++;
       localOrders[id].preference.pop();
       item.data("left-amount", left);
+    }else{
+      localOrders[id].number -= number;
     }
   }else{
     if(left<=0 && number > 0){
@@ -553,12 +554,14 @@ function updateOrderPreview(){
         var preferenceText = "";
         order.preference.forEach(function(p,index){
           preferenceText += "(";
-          p.property.forEach(function(pro){
-            if(preferenceText.charAt(preferenceText.length-1)!=="("){
-              preferenceText += ",";
-            }
-            preferenceText+= pro.property;
-          })
+          if(p.property){
+            p.property.forEach(function(pro){
+              if(preferenceText.charAt(preferenceText.length-1)!=="("){
+                preferenceText += ",";
+              }
+              preferenceText+= pro.property;
+            })
+          }
           if(p.extra){
             preferenceText += "+$" + p.extra;
           }
@@ -612,9 +615,9 @@ var refreshCheckoutMenu = function(){
     }else{
       _dishes.push(dishId);
     }
-    var unitPrice = parseInt($(this).find(".price").attr("value"));
+    var unitPrice = parseFloat($(this).find(".price").attr("value"));
     var amount = parseInt($(this).find(".amount").val());
-    var _subtotal = amount * unitPrice + parseInt($(this).find(".price").data("extra"))
+    var _subtotal = amount * unitPrice + parseFloat($(this).find(".price").data("extra"))
     if(_subtotal > 0){
       numberOfItem+=amount;
     }

@@ -282,21 +282,21 @@ var UserBarView = Backbone.View.extend({
       io.socket.get("/user/" + userId + "/meals");
       io.socket.get("/user/" + userId);
       io.socket.on("order", function(result){
-        if(result.data){
-          $this.handleNotification(result.verb, result.data.action, result.id, "order");
-        }
+        // if(result.data){
+        //   $this.handleNotification(result.verb, result.data.action, result.id, "order");
+        // }
         $this.handleBadge(false, "order");
       });
       io.socket.on("meal", function(result){
-        if(result.data){
-          $this.handleNotification(result.verb, result.data.action, result.id, "meal");
-        }
+        // if(result.data){
+        //   $this.handleNotification(result.verb, result.data.action, result.id, "meal");
+        // }
         $this.handleBadge(false, "meal");
       });
       io.socket.on("user", function(result){
-        if(result.data){
-          $this.handleNotification(result.verb, result.data.action, result.data.id, "user");
-        }
+        // if(result.data){
+        //   $this.handleNotification(result.verb, result.data.action, result.data.id, "user");
+        // }
         $this.handleBadge(false, "user");
       })
     }
@@ -358,7 +358,7 @@ var UserBarView = Backbone.View.extend({
     if(userId){
       $.ajax("/user/" + userId + "/notifications").done(function(data){
         data.forEach(function(notification){
-          $this.handleNotification(notification.verb, notification.action, notification.recordId, notification.model);
+          // $this.handleNotification(notification.verb, notification.action, notification.recordId, notification.model);
           $this.handleBadge(false, notification.model);
         });
       });
@@ -1370,7 +1370,8 @@ var MealView = Backbone.View.extend({
     "change .method select" : "changeMethod",
     "click #orderTypeBtn" : "switchMealType",
     "click #preorderTypeBtn" : 'switchMealType',
-    "change #dishSelected [data-toggle='manipulate-item']" : "dishOperationHandler"
+    "change #dishSelected [data-toggle='manipulate-item']" : "dishOperationHandler",
+    "change #storeHoursBtn" : "selectStoreHour"
   },
   initialize : function(){
     var form = this.$el.find("form");
@@ -1386,7 +1387,18 @@ var MealView = Backbone.View.extend({
     var dishesAlert = form.find("#dish-selector .alert");
     dishesAlert.hide();
     this.dishAlert = dishesAlert;
+    var pickup_container = this.$el.find(".pickup_container");
+    pickup_container.removeClass("d-none").hide();
 
+  },
+  selectStoreHour : function(e){
+    var btn = $(e.currentTarget);
+    var value = btn.attr("value");
+    if(value==="custom"){
+      this.$el.find(".pickup_container").show();
+    }else{
+      this.$el.find(".pickup_container").hide();
+    }
   },
   dishOperationHandler : function(e){
     var dishItem = $(e.currentTarget);
@@ -1640,77 +1652,81 @@ var MealView = Backbone.View.extend({
       var endBookingDatePicker = form.find("#preorder .end-booking [data-toggle='dateTimePicker']");
       var endBookingDate = endBookingDatePicker.data("DateTimePicker").date();
 
-      var pickupViews = form.find("#preorder .pickup_container .pickup");
-      var pickups = [];
-      var pickupValid = true;
+      var storeHourNickname = form.find("#storeHoursBtn").attr("value");
+      if(storeHourNickname!=="custom"){
 
-      var $this = this;
+      }else{
+        var pickupViews = form.find("#preorder .pickup_container .pickup");
+        var pickups = [];
+        var pickupValid = true;
 
-      pickupViews.each(function(){
-        var pickupObj = {};
-        var pickupFromTime = $(this).find(".start-pickup [data-toggle='dateTimePicker']").data("DateTimePicker").date();
-        var pickupTillTime = $(this).find(".end-pickup [data-toggle='dateTimePicker']").data("DateTimePicker").date();
-        var location = $(this).find(".location input").val();
-        var publicLocation = $(this).find(".public-location input").val();
-        var pickupInstruction = $(this).find(".instruction input").val();
-        var deliveryCenter = $(this).find(".delivery-center input").val();
-        var deliveryRange = $(this).find(".deliveryRange input").val();
-        var area = $(this).find(".area input").val();
-        var county = $(this).find(".area").data("county");
-        if(!publicLocation){
-          publicLocation = location;
-        }
-        var method = $(this).find('.method select').val();
-        var phone = $(this).find('.phone button').prop('value');
-        if(method === "pickup" && !location){
-          pickupValid = false;
-          $this.scheduleAlert.show();
-          $this.scheduleAlert.html(jQuery.i18n.prop('pickupLocationEmptyError'));
-          jumpTo("preorder");
-          return;
-        }
-        if(!pickupFromTime || !pickupTillTime){
-          pickupValid = false;
-          $this.scheduleAlert.show();
-          $this.scheduleAlert.html(jQuery.i18n.prop('pickupTimeEmptyError'));
-          jumpTo("preorder");
-          return;
-        }else if(pickupFromTime.isSame(pickupTillTime)){
-          pickupValid = false;
-          $this.scheduleAlert.show();
-          $this.scheduleAlert.html(jQuery.i18n.prop('provideTimeError'));
-          jumpTo("preorder");
-          return;
-        }else if(pickupFromTime.isAfter(pickupTillTime)){
-          pickupValid = false;
-          $this.scheduleAlert.show();
-          $this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeInvalidError'));
-          jumpTo("preorder");
-          return;
-        }else if(moment.duration(pickupTillTime.diff(pickupFromTime)).asMinutes() < 30){
-          pickupValid = false;
-          $this.scheduleAlert.show();
-          $this.scheduleAlert.html(jQuery.i18n.prop('pickupTimeError'));
-          jumpTo("preorder");
-          return;
-        }
-        pickupObj.pickupFromTime = pickupFromTime._d;
-        pickupObj.pickupTillTime = pickupTillTime._d;
-        pickupObj.location = location;
-        pickupObj.method = method;
-        pickupObj.phone = phone;
-        pickupObj.publicLocation = publicLocation || '';
-        pickupObj.comment = pickupInstruction || '';
-        pickupObj.deliveryCenter = deliveryCenter || '';
-        pickupObj.deliveryRange = deliveryRange || 5;
-        pickupObj.area = area;
-        pickupObj.county = county;
-        pickups.push(pickupObj);
-      });
+        var $this = this;
 
-      if(!pickupValid){
-        jumpTo("preorder");
-        return;
+        pickupViews.each(function(){
+          var pickupObj = {};
+          var pickupFromTime = $(this).find(".start-pickup [data-toggle='dateTimePicker']").data("DateTimePicker").date();
+          var pickupTillTime = $(this).find(".end-pickup [data-toggle='dateTimePicker']").data("DateTimePicker").date();
+          var location = $(this).find(".location input").val();
+          var publicLocation = $(this).find(".public-location input").val();
+          var pickupInstruction = $(this).find(".instruction input").val();
+          var deliveryCenter = $(this).find(".delivery-center input").val();
+          var deliveryRange = $(this).find(".deliveryRange input").val();
+          var area = $(this).find(".area input").val();
+          var county = $(this).find(".area").data("county");
+          if(!publicLocation){
+            publicLocation = location;
+          }
+          var method = $(this).find('.method select').val();
+          var phone = $(this).find('.phone button').prop('value');
+          if(method === "pickup" && !location){
+            pickupValid = false;
+            $this.scheduleAlert.show();
+            $this.scheduleAlert.html(jQuery.i18n.prop('pickupLocationEmptyError'));
+            jumpTo("preorder");
+            return;
+          }
+          if(!pickupFromTime || !pickupTillTime){
+            pickupValid = false;
+            $this.scheduleAlert.show();
+            $this.scheduleAlert.html(jQuery.i18n.prop('pickupTimeEmptyError'));
+            jumpTo("preorder");
+            return;
+          }else if(pickupFromTime.isSame(pickupTillTime)){
+            pickupValid = false;
+            $this.scheduleAlert.show();
+            $this.scheduleAlert.html(jQuery.i18n.prop('provideTimeError'));
+            jumpTo("preorder");
+            return;
+          }else if(pickupFromTime.isAfter(pickupTillTime)){
+            pickupValid = false;
+            $this.scheduleAlert.show();
+            $this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeInvalidError'));
+            jumpTo("preorder");
+            return;
+          }else if(moment.duration(pickupTillTime.diff(pickupFromTime)).asMinutes() < 30){
+            pickupValid = false;
+            $this.scheduleAlert.show();
+            $this.scheduleAlert.html(jQuery.i18n.prop('pickupTimeError'));
+            jumpTo("preorder");
+            return;
+          }
+          pickupObj.pickupFromTime = pickupFromTime._d;
+          pickupObj.pickupTillTime = pickupTillTime._d;
+          pickupObj.location = location;
+          pickupObj.method = method;
+          pickupObj.phone = phone;
+          pickupObj.publicLocation = publicLocation || '';
+          pickupObj.comment = pickupInstruction || '';
+          pickupObj.deliveryCenter = deliveryCenter || '';
+          pickupObj.deliveryRange = deliveryRange || 5;
+          pickupObj.area = area;
+          pickupObj.county = county;
+          pickups.push(pickupObj);
+        });
+        if(!pickupValid){
+          jumpTo("preorder");
+          return;
+        }
       }
 
       if(!startBookingDate || !endBookingDate){
@@ -1761,10 +1777,10 @@ var MealView = Backbone.View.extend({
       }
     }
 
-    var min_order = form.find("#min-order").val() || 0;
+    var singleOrderMinimal = form.find("#singleOrderInput").val() || 0;
     var min_total = form.find("#min-total").val() || 0;
 
-    if(!min_order && !min_total){
+    if(!singleOrderMinimal && !min_total){
       form.find(".order-require .alert").show();
       form.find(".order-require .alert").html(form.find("#min-order").data("error"));
       jumpTo("min-order");
@@ -1816,7 +1832,7 @@ var MealView = Backbone.View.extend({
       type : type,
       title : title,
       title_en : title_en,
-      minimalOrder : min_order,
+      minimalOrder : singleOrderMinimal,
       minimalTotal : min_total,
       cover : cover,
       features : features,
@@ -1829,7 +1845,9 @@ var MealView = Backbone.View.extend({
       supportPartyOrder : supportPartyOrder,
       partyRequirement : partyRequirement,
       isSupportDynamicPrice : isSupportDynamicPrice,
-      flag : flag
+      flag : flag,
+      nickname : storeHourNickname
+
     });
     $this = this;
     this.model.save({},{
@@ -2867,7 +2885,7 @@ var DishPreferenceView = Backbone.View.extend({
 
 var ContactInfoView = Backbone.View.extend({
   events : {
-    "blur input" : "saveInfo"
+    // "blur input" : "saveInfo"
   },
   saveInfo : function(e){
     e.preventDefault();
@@ -3096,7 +3114,7 @@ var MealConfirmView = Backbone.View.extend({
       this.$el.find(".shippingInput").hide();
       this.$el.find(".deliveryInput").show();
       if(isLogin){
-        $('#contactInfoView').hide();
+        // $('#contactInfoView').hide();
         this.switchAddress(e);
       }else{
         this.verifyAddress(e);
@@ -3106,7 +3124,7 @@ var MealConfirmView = Backbone.View.extend({
       this.$el.find(".deliveryInput").hide();
       this.$el.find(".shippingInput").show();
       if(isLogin){
-        $('#contactInfoView').hide();
+        // $('#contactInfoView').hide();
         this.switchAddress(e);
       }else{
         this.verifyAddress(e);
@@ -3116,9 +3134,9 @@ var MealConfirmView = Backbone.View.extend({
       this.$el.find(".shippingInput").hide();
       this.$el.find(".pickupInput").show();
       if(isLogin){
-        $('#contactInfoView').hide();
+        // $('#contactInfoView').hide();
       }else{
-        $('#contactInfoView').show();
+        // $('#contactInfoView').show();
       }
     }
     refreshCheckoutMenu();
@@ -3126,7 +3144,7 @@ var MealConfirmView = Backbone.View.extend({
   verifyAddress : function(e, checkOnly){
     var isLogin = !!this.$el.data("user");
     var btn = e ? $(e.currentTarget) : null;
-    if(!isLogin){
+    if(this.$el.find("#contactInfoView").length){
       var street = this.$el.find("input[name='street']").val();
       var city = this.$el.find("input[name='city']").val();
       var state = this.$el.find("input[name='state']").val();
@@ -3223,10 +3241,11 @@ var MealConfirmView = Backbone.View.extend({
     var range = deliveryOption.parent().data("range") || 5;
     var $this = this;
     var isLogin = !!this.$el.data("user");
+    var isFirstAddress = !this.$el.find("#contactInfoView").length;
     var form = this.$el.find("#order");
     var isPartyMode = form.data("party");
     if(!yourAddress) {
-      if (isLogin) {
+      if (isFirstAddress) {
         var deliveryLocationOption = this.$el.find(".deliveryInput .contactOption .regular-radio:checked");
         if (!deliveryLocationOption.length) {
           makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
@@ -3425,8 +3444,8 @@ var OrderView = Backbone.View.extend({
   },
   ready : function(e){
     e.preventDefault();
-    var orderId = target.data("order");
     var target = $(e.currentTarget);
+    var orderId = target.data("order");
     this.model.set({ id : orderId});
     this.model.action = "ready";
     this.model.save({},{
@@ -3502,7 +3521,7 @@ var OrderView = Backbone.View.extend({
     var contactView = this.$el.find("#pickupInfoView");
     switch(method) {
       case "pickup":
-        if (!isLogin) {
+        if(contactView.find("#contactInfoView").length){
           var name = contactView.find("input[name='name']").val();
           var phone = contactView.find("input[name='phone']").val();
           if (!name || !phone) {
@@ -3511,7 +3530,7 @@ var OrderView = Backbone.View.extend({
           }
           contactObj.name = name;
           contactObj.phone = phone;
-        } else {
+        }else {
           var t = contactView.find(".pickupInput .contactOption .regular-radio:checked").next().next().text();
           if (t) {
             name = t.split("+")[0];
@@ -3522,22 +3541,28 @@ var OrderView = Backbone.View.extend({
             }
             contactObj.name = name;
             contactObj.phone = phone;
-          } else {
-            contactView = this.$el.find("#contactInfoView");
-            name = contactView.find("input[name='name']").val();
-            phone = contactView.find("input[name='phone']").val();
-            if (!name || !phone) {
-              makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
-              return cb(false);
-            }
-            contactObj.name = name;
-            contactObj.phone = phone;
           }
         }
+        // if (!isLogin) {
+        //
+        // } else {
+
+          // } else {
+          //   contactView = this.$el.find("#contactInfoView");
+          //   name = contactView.find("input[name='name']").val();
+          //   phone = contactView.find("input[name='phone']").val();
+          //   if (!name || !phone) {
+          //     makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
+          //     return cb(false);
+          //   }
+          //   contactObj.name = name;
+          //   contactObj.phone = phone;
+          // }
+        // }
         cb(contactObj);
         break;
       case "delivery":
-        if (!isLogin) {
+        if (contactView.find("#contactInfoView").length) {
           name = contactView.find("input[name='name']").val();
           phone = contactView.find("input[name='phone']").val();
           var street = contactView.find("input[name='street']").val();

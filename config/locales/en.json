@@ -353,7 +353,7 @@
   "meal-type-title": "Is this meal an 'Order' or 'Pre-Order'?",
   "meal-type-order": "Order",
   "meal-type-preorder": "Pre-Order",
-  "meal-minimal-requirement-title": "Minimal number of order or dollar amount？",
+  "meal-minimal-requirement-title": "Single order minimal and order total minimal",
   "meal-orders": "Orders from foodies",
   "meal-orders-login-can-see": "Logged in to see orders from foodies",
   "user": "Foodies",
@@ -503,6 +503,7 @@
   "meal-delivery-on-option" : "Meal support delivery but no delivery option was provided.",
   "meal-query-invalid" : "Meal query is invalid",
   "meal-lack-of-party-requirement" : "Meal support catering but lack of requirement",
+  "meal-custom-hour-lack-of-pickup-options" : "Meal use custom hour but lack of delivery/pickup options",
   "meal-invalid-dynamic-dish" : "The Meal has a price-dynamic dish that exist in another open meal that support dynamic price",
   "meal-checkout-lack-of-order" : "Lack of order information, can not proceed to checkout.",
   "meal-checkout-lack-of-date" : "Lack of date, can not proceed to checkout",
@@ -796,7 +797,7 @@
   "party-meal-pickup-tip" : "Please order catering at least 24 hours in advanced with $%s minimal order(Free delivery within the delivery range, please enter your preferred location and time at checkout)",
   "am" : "Morning",
   "pm" : "Afternoon",
-  "enter-new-contact" : "Enter new contact",
+  "enter-new-contact" : "Enter new address",
   "login-tips" : "If you already registered, login to get saved contact method.",
   "login-tips-payment" : "If you already registered, login to get saved payment method.",
   "signup-tips" : "Register now",
@@ -906,6 +907,9 @@
   "toggleMenu" : "Toggle Menu",
   "received" : "Received",
   "readied" : "Readied",
-  "ordered-dish-not-found" : "Contain dish that can not be founded.",
-  "limited" : "Limited Time"
+  "ordered-dish-not-found" : "Dish: %s not in the current delivery option, please remove it and try again",
+  "limited" : "Limited Time",
+  "store-hours" : "Store Hour",
+  "custom" : "Custom Hour",
+  "order-single-minimal-not-reach" : "Order minimal order is $%s"
 }

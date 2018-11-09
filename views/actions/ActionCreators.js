@@ -187,6 +187,20 @@ var ActionsCreators = {
     });
   },
 
+  getPickup: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_PICKUPOPTION,
+      records: records
+    });
+  },
+
+  getPickups: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_PICKUPOPTIONS,
+      records: records
+    });
+  },
+
   switchTab : function(tab){
     AppDispatcher.handleViewAction({
       type : ActionTypes.TAB_CHANGE,

@@ -618,6 +618,7 @@ describe('OrderController', function() {
             subtotal : price1 * 1 + price2 * 2 + price5,
             contactInfo : { name : "sheng", address : address, phone : phone },
             paymentInfo : { method : 'online'},
+            customInfo : { comment : "hhh"},
             method : "delivery",
             pickupOption : 2,
             pickupMeal : mealId,
@@ -632,10 +633,24 @@ describe('OrderController', function() {
             res.body.orders.should.have.length(2);
             dish1LeftQty--;
             var o = res.body.orders[0];
-            o.meal.leftQty[dishId1].should.be.equal(dish1LeftQty);
             o.customer.should.be.equal(guestId);
             o.customerName.should.be.equal("sheng");
+            o.pickupInfo.comment.should.be.equal("hhh");
             _multipleOrderId = o.id;
+            done();
+          })
+      })
+
+      it('should get user address', function(done){
+        agent
+          .get('/user/me')
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            res.body.address.should.have.length(1);
+            res.body.address[0].street.should.be.equal("221 Woodrow Street");
             done();
           })
       })
@@ -747,6 +762,32 @@ describe('OrderController', function() {
             done();
           })
       })
+
+      it('should not take order not reach minimal order ', function (done) {
+        var dishObj = {};
+        dishObj[dishId7] = { number : 1 , preference : [{ property : '', extra : 0}], price : price7 };
+        agent
+          .post('/order')
+          .send({
+            orders : dishObj,
+            subtotal : price1 + price7,
+            contactInfo : { name : "sheng", address : address, phone : phone },
+            paymentInfo : { method : 'cash'},
+            method : "delivery",
+            pickupOption : 2,
+            pickupMeal : systemDeliveryMealId,
+            pickupDate : 'today',
+            tip : 0
+          })
+          .expect(400)
+          .end(function(err,res){
+            if(err){
+              return done(err);
+            }
+            res.body.code.should.be.equal(-60);
+            done();
+          })
+      })
     })
 
     describe('order meal with points', function(){
@@ -854,7 +895,7 @@ describe('OrderController', function() {
             o.redeemPoints.should.be.equal("13");
             var chargesTotal = ((price3 * 1) + SERVICE_FEE) + 3.99 - 1.3;
             o.charges[Object.keys(o.charges)[0]].should.be.equal(Math.round(chargesTotal * 100));
-            o.application_fees[Object.keys(o.application_fees)[0]].should.be.equal(160);
+            o.application_fees[Object.keys(o.application_fees)[0]].should.be.equal(320);
             o.meal.leftQty[dishId1].should.be.equal(dish1LeftQty);
             done();
           })
@@ -893,7 +934,7 @@ describe('OrderController', function() {
           })
       });
 
-      it('should not update any thing on meal with orders', function(done){
+      it('should update any thing on meal with orders', function(done){
         var now = new Date();
         agent
           .put('/meal/' + mealId)
@@ -901,16 +942,18 @@ describe('OrderController', function() {
             status : 'on',
             provideFromTime : now,
             provideTillTime : new Date(now.getTime() + 1000 * 2 * 3600),
-            delivery_fee : 10.00
+            delivery_fee : 10.00,
+            type : "preorder",
+            nickname : "pickupSet1",
+            isDelivery : true
           })
           .expect(200)
           .end(function(err, res){
             res.body.delivery_fee.should.be.equal(10.00);
-            res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
             done();
           })
       });
-    //
+
       it('should not cancel the order at schedule as a host', function(done){
         agent
           .put('/order/' + orderId + '/cancel')
@@ -1510,7 +1553,7 @@ describe('OrderController', function() {
               return done(err);
             }
             var meal = res.body.meals.filter(function(m){
-              return m.type === "preorder";
+              return m.type === "preorder" && m.nickname === "pickupSet1" && m.title === "预定订单四点";
             })[0];
             mealId = meal.id;
             dishId1 = meal.dishes[0].id;
@@ -1687,7 +1730,7 @@ describe('OrderController', function() {
             o.discountAmount.should.be.equal(1);
             o.transfer[Object.keys(o.transfer)[0]].should.be.equal(100);
             o.charges[Object.keys(o.charges)[0]].should.be.equal(Math.round((price1+SERVICE_FEE-1)*100));
-            o.application_fees[Object.keys(o.application_fees)[0]].should.be.equal(80);
+            o.application_fees[Object.keys(o.application_fees)[0]].should.be.equal(200);
             dish1LeftQty--;
             o.leftQty[dishId1].should.be.equal(dish1LeftQty);
             orderId = o.id;
@@ -1726,8 +1769,8 @@ describe('OrderController', function() {
               return done(err);
             }
             var o = res.body.orders[0];
-            o.discountAmount.should.be.equal(price2);
-            o.transfer[Object.keys(o.transfer)[0]].should.be.equal((price2 - price2*0.2)*100);
+            o.discountAmount.should.be.equal(5);
+            o.transfer[Object.keys(o.transfer)[0]].should.be.equal(500);
             orderId = o.id;
             o.leftQty[dishId1].should.be.equal(dish1LeftQty);
             done();
@@ -2323,220 +2366,220 @@ describe('OrderController', function() {
       });
     });
 
-    describe('order a meal with party order', function() {
-
-      // var mealId;
-      // var dishId1;
-      // var dishId2;
-      // var dishId3;
-      // var dishId4;
-      // var price1;
-      // var price2;
-      // var price3;
-      // var price4;
-      // var price5;
-      // var orderId;
-      // var dishId5;
-      // var dish1LeftQty;
-      //
-      // it('should get meals', function (done) {
-      //   agent
-      //     .get('/meal')
-      //     .set('Accept', 'application/json')
-      //     .expect('Content-Type', /json/)
-      //     .expect(200)
-      //     .end(function(err,res){
-      //       if(err){
-      //         console.log(err);
-      //         return done(err);
-      //       }
-      //       var meal = res.body.meals.filter(function(m){
-      //         return m.type === "preorder";
-      //       })[0];
-      //       mealId = meal.id;
-      //       dishId1 = meal.dishes[0].id;
-      //       dishId2 = meal.dishes[1].id;
-      //       dishId3 = meal.dishes[2].id;
-      //       dishId4 = meal.dishes[3].id;
-      //       price1 = meal.dishes[0].price;
-      //       price2 = meal.dishes[1].price;
-      //       price3 = meal.dishes[2].price;
-      //       price4 = meal.dishes[3].price;
-      //       dish1LeftQty = meal.leftQty[dishId1];
-      //       done();
-      //     })
-      // })
-      //
-      // it('should get a meal"s catering menu', function(done){
-      //   agent
-      //     .get('/meal/' + mealId + '?party=true')
-      //     .set('Accept', 'application/json')
-      //     .expect('Content-Type', /json/)
-      //     .expect(200)
-      //     .end(function(err, res){
-      //       if(err){
-      //         return done(err);
-      //       }
-      //       res.body.should.have.property('partyRequirement');
-      //       res.body.should.have.property('dishes').with.length(7);
-      //       var dish5 = res.body.dishes[4];
-      //       dishId5 = dish5.id;
-      //       price5 = dish5.price;
-      //       done();
-      //     })
-      // })
-      //
-      // it('should be able to order a catering meal', function(done){
-      //   var dishObj = {};
-      //   dishObj[dishId1] = { number : 5 , preference : [{ property : '', extra : 0}], price : price1 };
-      //   dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}], price : price2 };
-      //   dishObj[dishId3] = { number : 5 , preference : [{ property : '', extra : 0}], price : price3 };
-      //   dishObj[dishId5] = { number : 5 , preference : [{ property : '', extra : 0}], price : price4 };
-      //   var deliveryDate = moment().add(2,'days')._d;
-      //   agent
-      //     .post('/order')
-      //     .send({
-      //       orders : dishObj,
-      //       subtotal : price1 * 5 + price2 * 5 + price3 * 5 + price5 * 5,
-      //       pickupOption : 5,
-      //       method : "delivery",
-      //       pickupMeal : mealId,
-      //       contactInfo : { phone : "(415)111-1111", name : "abc", address : "7116 tiant way, Elk Grove, CA 95758"},
-      //       paymentInfo : { method : 'cash'},
-      //       customInfo : { time : deliveryDate, comment : "so exciting, please bring some utensils"},
-      //       isPartyMode : true,
-      //       tip : 0
-      //     })
-      //     .expect(200)
-      //     .end(function(err,res){
-      //       if(err){
-      //         return done(err);
-      //       }
-      //       res.body.isPartyMode.should.be.true();
-      //       res.body.delivery_fee.should.be.above(25);
-      //       new Date(res.body.pickupInfo.pickupFromTime).getTime().should.be.equal(deliveryDate.getTime());
-      //       res.body.pickupInfo.deliveryCenter.should.be.equal("1974 Palou Ave, San Francisco, CA 94124, USA");
-      //       res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
-      //       done();
-      //     })
-      // });
-      //
-      // it('should not be able to order a catering meal with less than minimal amount', function(done){
-      //   var dishObj = {};
-      //   dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
-      //   dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
-      //   dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
-      //   dishObj[dishId5] = { number : 0 , preference : [{ property : '', extra : 0}], price : price5 };
-      //   agent
-      //     .post('/order')
-      //     .send({
-      //       orders : dishObj,
-      //       subtotal : price1,
-      //       pickupOption : 5,
-      //       method : "delivery",
-      //       mealId : mealId,
-      //       contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
-      //       paymentInfo : { method : 'cash'},
-      //       customInfo : { time : new Date(2018, 5, 29), comment : "so exciting, please bring some utensils"},
-      //       isPartyMode : true
-      //     })
-      //     .expect(400)
-      //     .end(function(err,res){
-      //       if(err){
-      //         return done(err);
-      //       }
-      //       res.body.code.should.be.equal(-33);
-      //       done();
-      //     })
-      // });
-      //
-      // it('should not be able to order a catering meal within 24 hours from now', function(done){
-      //   var dishObj = {};
-      //   dishObj[dishId1] = { number : 5 , preference : [{ property : '', extra : 0}], price : price1 };
-      //   dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}], price : price2 };
-      //   dishObj[dishId3] = { number : 5 , preference : [{ property : '', extra : 0}], price : price3 };
-      //   dishObj[dishId5] = { number : 5 , preference : [{ property : '', extra : 0}], price : price5 };
-      //   agent
-      //     .post('/order')
-      //     .send({
-      //       orders : dishObj,
-      //       subtotal : price1 * 5 + price2 * 5 + price3 * 5 + price5 * 5,
-      //       pickupOption : 5,
-      //       method : "delivery",
-      //       mealId : mealId,
-      //       contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
-      //       paymentInfo : { method : 'cash'},
-      //       customInfo : { time : new Date(), comment : "so exciting, please bring some utensils"},
-      //       isPartyMode : true
-      //     })
-      //     .expect(400)
-      //     .end(function(err,res){
-      //       if(err){
-      //         return done(err);
-      //       }
-      //       res.body.code.should.be.equal(-34);
-      //       done();
-      //     })
-      // });
-      //
-      // it('should not be able to order a catering meal without custom info', function(done){
-      //   var dishObj = {};
-      //   dishObj[dishId1] = { number : 5 , preference : [{ property : '', extra : 0}], price : price1 };
-      //   dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}], price : price2 };
-      //   dishObj[dishId3] = { number : 5 , preference : [{ property : '', extra : 0}], price : price3 };
-      //   dishObj[dishId5] = { number : 5 , preference : [{ property : '', extra : 0}], price : price5 };
-      //   agent
-      //     .post('/order')
-      //     .send({
-      //       orders : dishObj,
-      //       subtotal : price1 * 5 + price2 * 5 + price3 * 5 + price5 * 5,
-      //       pickupOption : 5,
-      //       method : "delivery",
-      //       mealId : mealId,
-      //       contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
-      //       paymentInfo : { method : 'cash'},
-      //       isPartyMode : true
-      //     })
-      //     .expect(400)
-      //     .end(function(err,res){
-      //       if(err){
-      //         return done(err);
-      //       }
-      //       res.body.code.should.be.equal(-35);
-      //       done();
-      //     })
-      // });
-      //
-      // it('should not be able to order a catering meal with wrong pickup method', function(done){
-      //   var dishObj = {};
-      //   dishObj[dishId1] = { number : 5 , preference : [{ property : '', extra : 0}], price : price1 };
-      //   dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}], price : price2 };
-      //   dishObj[dishId3] = { number : 5 , preference : [{ property : '', extra : 0}], price : price3 };
-      //   dishObj[dishId5] = { number : 5 , preference : [{ property : '', extra : 0}], price : price5 };
-      //   agent
-      //     .post('/order')
-      //     .send({
-      //       orders : dishObj,
-      //       subtotal : price1 * 5 + price2 * 5 + price3 * 5 + price5 * 5,
-      //       pickupOption : 4,
-      //       method : "pickup",
-      //       mealId : mealId,
-      //       contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
-      //       paymentInfo : { method : 'cash'},
-      //       customInfo : { time : new Date(2017, 5, 29), comment : "so exciting, please bring some utensils"},
-      //       isPartyMode : true
-      //     })
-      //     .expect(400)
-      //     .end(function(err,res){
-      //       if(err){
-      //         return done(err);
-      //       }
-      //       res.body.code.should.be.equal(-36);
-      //       done();
-      //     })
-      // });
-    });
-
+  //   describe('order a meal with party order', function() {
+  //
+  //     // var mealId;
+  //     // var dishId1;
+  //     // var dishId2;
+  //     // var dishId3;
+  //     // var dishId4;
+  //     // var price1;
+  //     // var price2;
+  //     // var price3;
+  //     // var price4;
+  //     // var price5;
+  //     // var orderId;
+  //     // var dishId5;
+  //     // var dish1LeftQty;
+  //     //
+  //     // it('should get meals', function (done) {
+  //     //   agent
+  //     //     .get('/meal')
+  //     //     .set('Accept', 'application/json')
+  //     //     .expect('Content-Type', /json/)
+  //     //     .expect(200)
+  //     //     .end(function(err,res){
+  //     //       if(err){
+  //     //         console.log(err);
+  //     //         return done(err);
+  //     //       }
+  //     //       var meal = res.body.meals.filter(function(m){
+  //     //         return m.type === "preorder";
+  //     //       })[0];
+  //     //       mealId = meal.id;
+  //     //       dishId1 = meal.dishes[0].id;
+  //     //       dishId2 = meal.dishes[1].id;
+  //     //       dishId3 = meal.dishes[2].id;
+  //     //       dishId4 = meal.dishes[3].id;
+  //     //       price1 = meal.dishes[0].price;
+  //     //       price2 = meal.dishes[1].price;
+  //     //       price3 = meal.dishes[2].price;
+  //     //       price4 = meal.dishes[3].price;
+  //     //       dish1LeftQty = meal.leftQty[dishId1];
+  //     //       done();
+  //     //     })
+  //     // })
+  //     //
+  //     // it('should get a meal"s catering menu', function(done){
+  //     //   agent
+  //     //     .get('/meal/' + mealId + '?party=true')
+  //     //     .set('Accept', 'application/json')
+  //     //     .expect('Content-Type', /json/)
+  //     //     .expect(200)
+  //     //     .end(function(err, res){
+  //     //       if(err){
+  //     //         return done(err);
+  //     //       }
+  //     //       res.body.should.have.property('partyRequirement');
+  //     //       res.body.should.have.property('dishes').with.length(7);
+  //     //       var dish5 = res.body.dishes[4];
+  //     //       dishId5 = dish5.id;
+  //     //       price5 = dish5.price;
+  //     //       done();
+  //     //     })
+  //     // })
+  //     //
+  //     // it('should be able to order a catering meal', function(done){
+  //     //   var dishObj = {};
+  //     //   dishObj[dishId1] = { number : 5 , preference : [{ property : '', extra : 0}], price : price1 };
+  //     //   dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}], price : price2 };
+  //     //   dishObj[dishId3] = { number : 5 , preference : [{ property : '', extra : 0}], price : price3 };
+  //     //   dishObj[dishId5] = { number : 5 , preference : [{ property : '', extra : 0}], price : price4 };
+  //     //   var deliveryDate = moment().add(2,'days')._d;
+  //     //   agent
+  //     //     .post('/order')
+  //     //     .send({
+  //     //       orders : dishObj,
+  //     //       subtotal : price1 * 5 + price2 * 5 + price3 * 5 + price5 * 5,
+  //     //       pickupOption : 5,
+  //     //       method : "delivery",
+  //     //       pickupMeal : mealId,
+  //     //       contactInfo : { phone : "(415)111-1111", name : "abc", address : "7116 tiant way, Elk Grove, CA 95758"},
+  //     //       paymentInfo : { method : 'cash'},
+  //     //       customInfo : { time : deliveryDate, comment : "so exciting, please bring some utensils"},
+  //     //       isPartyMode : true,
+  //     //       tip : 0
+  //     //     })
+  //     //     .expect(200)
+  //     //     .end(function(err,res){
+  //     //       if(err){
+  //     //         return done(err);
+  //     //       }
+  //     //       res.body.isPartyMode.should.be.true();
+  //     //       res.body.delivery_fee.should.be.above(25);
+  //     //       new Date(res.body.pickupInfo.pickupFromTime).getTime().should.be.equal(deliveryDate.getTime());
+  //     //       res.body.pickupInfo.deliveryCenter.should.be.equal("1974 Palou Ave, San Francisco, CA 94124, USA");
+  //     //       res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
+  //     //       done();
+  //     //     })
+  //     // });
+  //     //
+  //     // it('should not be able to order a catering meal with less than minimal amount', function(done){
+  //     //   var dishObj = {};
+  //     //   dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
+  //     //   dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
+  //     //   dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+  //     //   dishObj[dishId5] = { number : 0 , preference : [{ property : '', extra : 0}], price : price5 };
+  //     //   agent
+  //     //     .post('/order')
+  //     //     .send({
+  //     //       orders : dishObj,
+  //     //       subtotal : price1,
+  //     //       pickupOption : 5,
+  //     //       method : "delivery",
+  //     //       mealId : mealId,
+  //     //       contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+  //     //       paymentInfo : { method : 'cash'},
+  //     //       customInfo : { time : new Date(2018, 5, 29), comment : "so exciting, please bring some utensils"},
+  //     //       isPartyMode : true
+  //     //     })
+  //     //     .expect(400)
+  //     //     .end(function(err,res){
+  //     //       if(err){
+  //     //         return done(err);
+  //     //       }
+  //     //       res.body.code.should.be.equal(-33);
+  //     //       done();
+  //     //     })
+  //     // });
+  //     //
+  //     // it('should not be able to order a catering meal within 24 hours from now', function(done){
+  //     //   var dishObj = {};
+  //     //   dishObj[dishId1] = { number : 5 , preference : [{ property : '', extra : 0}], price : price1 };
+  //     //   dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}], price : price2 };
+  //     //   dishObj[dishId3] = { number : 5 , preference : [{ property : '', extra : 0}], price : price3 };
+  //     //   dishObj[dishId5] = { number : 5 , preference : [{ property : '', extra : 0}], price : price5 };
+  //     //   agent
+  //     //     .post('/order')
+  //     //     .send({
+  //     //       orders : dishObj,
+  //     //       subtotal : price1 * 5 + price2 * 5 + price3 * 5 + price5 * 5,
+  //     //       pickupOption : 5,
+  //     //       method : "delivery",
+  //     //       mealId : mealId,
+  //     //       contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+  //     //       paymentInfo : { method : 'cash'},
+  //     //       customInfo : { time : new Date(), comment : "so exciting, please bring some utensils"},
+  //     //       isPartyMode : true
+  //     //     })
+  //     //     .expect(400)
+  //     //     .end(function(err,res){
+  //     //       if(err){
+  //     //         return done(err);
+  //     //       }
+  //     //       res.body.code.should.be.equal(-34);
+  //     //       done();
+  //     //     })
+  //     // });
+  //     //
+  //     // it('should not be able to order a catering meal without custom info', function(done){
+  //     //   var dishObj = {};
+  //     //   dishObj[dishId1] = { number : 5 , preference : [{ property : '', extra : 0}], price : price1 };
+  //     //   dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}], price : price2 };
+  //     //   dishObj[dishId3] = { number : 5 , preference : [{ property : '', extra : 0}], price : price3 };
+  //     //   dishObj[dishId5] = { number : 5 , preference : [{ property : '', extra : 0}], price : price5 };
+  //     //   agent
+  //     //     .post('/order')
+  //     //     .send({
+  //     //       orders : dishObj,
+  //     //       subtotal : price1 * 5 + price2 * 5 + price3 * 5 + price5 * 5,
+  //     //       pickupOption : 5,
+  //     //       method : "delivery",
+  //     //       mealId : mealId,
+  //     //       contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+  //     //       paymentInfo : { method : 'cash'},
+  //     //       isPartyMode : true
+  //     //     })
+  //     //     .expect(400)
+  //     //     .end(function(err,res){
+  //     //       if(err){
+  //     //         return done(err);
+  //     //       }
+  //     //       res.body.code.should.be.equal(-35);
+  //     //       done();
+  //     //     })
+  //     // });
+  //     //
+  //     // it('should not be able to order a catering meal with wrong pickup method', function(done){
+  //     //   var dishObj = {};
+  //     //   dishObj[dishId1] = { number : 5 , preference : [{ property : '', extra : 0}], price : price1 };
+  //     //   dishObj[dishId2] = { number : 5 , preference : [{ property : '', extra : 0}], price : price2 };
+  //     //   dishObj[dishId3] = { number : 5 , preference : [{ property : '', extra : 0}], price : price3 };
+  //     //   dishObj[dishId5] = { number : 5 , preference : [{ property : '', extra : 0}], price : price5 };
+  //     //   agent
+  //     //     .post('/order')
+  //     //     .send({
+  //     //       orders : dishObj,
+  //     //       subtotal : price1 * 5 + price2 * 5 + price3 * 5 + price5 * 5,
+  //     //       pickupOption : 4,
+  //     //       method : "pickup",
+  //     //       mealId : mealId,
+  //     //       contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+  //     //       paymentInfo : { method : 'cash'},
+  //     //       customInfo : { time : new Date(2017, 5, 29), comment : "so exciting, please bring some utensils"},
+  //     //       isPartyMode : true
+  //     //     })
+  //     //     .expect(400)
+  //     //     .end(function(err,res){
+  //     //       if(err){
+  //     //         return done(err);
+  //     //       }
+  //     //       res.body.code.should.be.equal(-36);
+  //     //       done();
+  //     //     })
+  //     // });
+  //   });
+  //
     describe('order a meal with dynamic price dish', function(){
       var mealId;
       var dishId1;
@@ -2576,7 +2619,7 @@ describe('OrderController', function() {
               return done(err);
             }
             var meal = res.body.meals.filter(function(m){
-              return m.type === "preorder";
+              return m.type === "preorder" && m.nickname === "pickupSet1" ;
             })[0];
             mealId = meal.id;
             dishId1 = meal.dishes[0].id;
@@ -2622,24 +2665,6 @@ describe('OrderController', function() {
           })
       });
 
-      // it('should update host legal_entity', function(done){
-      //   var legalObj = {
-      //     personal_id_number : "123456789"
-      //   };
-      //   agent
-      //     .put('/host/' + hostId)
-      //     .set('Accept', 'application/json')
-      //     .expect('Content-Type', /json/)
-      //     .field('legal_entity',JSON.stringify(legalObj))
-      //     .expect(200)
-      //     .end(function(err, res){
-      //       if(err){
-      //         return done(err);
-      //       }
-      //       done();
-      //     })
-      // });
-
       it('should be able to update dish left qty on active meal', function(done){
         var totalQty = {};
         totalQty[dishId1] = 20;
@@ -2654,7 +2679,10 @@ describe('OrderController', function() {
             provideFromTime: now,
             provideTillTime: new Date(now.getTime() + 1000 * 60 * 30),
             status : "on",
-            isSupportDynamicPrice : true
+            isSupportDynamicPrice : true,
+            type : "preorder",
+            nickname : "pickupSet1",
+            isDelivery : true
           })
           .expect(200)
           .end(function(err, res){
@@ -2864,7 +2892,7 @@ describe('OrderController', function() {
       });
     });
 
-    describe('order a meal with Alipay', function(){
+    describe('order a meal with Alipay,venmo & paypal', function(){
       var mealId,dishId1,dishId2,dishId3,dishId4,price1,price2,price3,price4,price5;
       var orderId;
       var dishId5;
@@ -2899,6 +2927,64 @@ describe('OrderController', function() {
       });
 
       var sourceId,client_secret;
+
+      it('should be able to submit order with Venmo', function(done){
+        var dishObj = {};
+        dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}], price : price1 };
+        dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
+        dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+        dishObj[dishId4] = { number : 1 , preference : [{ property : '', extra : 0}], price : price4 };
+        agent
+          .post('/order')
+          .send({
+            orders : dishObj,
+            subtotal : price3 ,
+            pickupOption : 1,
+            method : "pickup",
+            pickupMeal : mealId,
+            tip : 0,
+            contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+            paymentInfo : { method : 'venmo'}
+          })
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            var o = res.body.orders[0];
+            o.paymentMethod.should.be.equal("venmo");
+            done();
+          })
+      })
+
+      it('should be able to submit order with Paypal', function(done){
+        var dishObj = {};
+        dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}], price : price1 };
+        dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
+        dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+        dishObj[dishId4] = { number : 1 , preference : [{ property : '', extra : 0}], price : price4 };
+        agent
+          .post('/order')
+          .send({
+            orders : dishObj,
+            subtotal : price3 ,
+            pickupOption : 1,
+            method : "pickup",
+            pickupMeal : mealId,
+            tip : 0,
+            contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+            paymentInfo : { method : 'paypal'}
+          })
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            var o = res.body.orders[0];
+            o.paymentMethod.should.be.equal("paypal");
+            done();
+          })
+      })
 
       it('should be able to submit order with Alipay', function(done){
         var dishObj = {};
@@ -3016,7 +3102,9 @@ describe('OrderController', function() {
             status : 'on',
             provideFromTime : mealProvideFrom,
             provideTillTime : threeMinutesLater,
-            minimalOrder : 5
+            minimalOrder : 5,
+            nickname : "pickupSet1",
+            isDelivery : true
           })
           .expect(200)
           .end(done)

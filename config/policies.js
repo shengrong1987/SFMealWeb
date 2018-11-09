@@ -189,6 +189,11 @@ module.exports.policies = {
   DriverController : {
     '*' : 'isAdmin',
     'find' : 'or(isAdmin, and(sessionAuth, isHost))'
+  },
+
+  PickupOptionController : {
+    '*' : 'isAdmin',
+    'find' : 'or(isAdmin, and(sessionAuth, isHost))'
   }
 
   /***************************************************************************

@@ -109,6 +109,11 @@ var TablePanel = createReactClass({
         details = {id: 'Driver ID', driverName : 'driverName', phone: 'phone', availability : 'availability', command : 'Command'}
         criterias = ['id', 'driverName', 'phone'];
         break;
+      case "PickupOption":
+        headers =  {id : "PickupOption ID", pickupFromTime : "from", pickupTillTime : "till", location : "location", method : "method", command : "Command"}
+        details =  {id : "PickupOption ID", pickupFromTime : "from", pickupTillTime : "till", location : "location", method : "method", phone : "phone", publicLocation : "publicLocation", comment : "comment", deliveryCenter : "deliveryCenter", deliveryRange : "deliveryRange", area : "area", county : "county", index : "index", nickname : "nickname", command : "Command"}
+        criterias = ["id","nickname", "phone"];
+        break;
     }
 
     return (

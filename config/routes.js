@@ -121,7 +121,8 @@ module.exports.routes = {
   '/trust' : { view : 'trust'},
   '/terms' : {view : 'terms'},
   "/apply" : "HostController.apply",
-  "/pickup/:pickup" : "MealController.find"
+  "/pickup/:pickup" : "MealController.find",
+  "/pickupoption/:id/update" : "PickupOptionController.update"
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

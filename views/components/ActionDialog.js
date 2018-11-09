@@ -156,7 +156,7 @@ var ActionDialog = createReactClass({
           orders[key] = JSON.parse(keyValues[key]);
           delete keyValues[key];
         }
-      }else if(key === "street" || key === "zip" ||  key === "city" || key === "state" || key === "county"){
+      }else if(key === "street" || key === "zip" ||  key === "city" || key === "state"){
         addressObj = addressObj || {};
         addressObj[key] = keyValues[key];
         delete keyValues[key];

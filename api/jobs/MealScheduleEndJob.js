@@ -331,7 +331,7 @@ module.exports = function(agenda) {
             orders.forEach(function(order){
               total += order.subtotal;
             });
-            if(orders.length < meal.minimalOrder || total < meal.minimalTotal){
+            if(total < meal.minimalTotal){
               notification.notificationCenter("Meal","cancel",meal,true,false,null);
               _this.cancelOrders(mealId, function(err){
                 if(err){

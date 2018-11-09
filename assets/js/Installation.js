@@ -372,7 +372,7 @@ function setupSwitchButton(){
 }
 function setupEchoBox(){
   echo.init({
-    offset: 100
+    offset: 500
   });
 }
 function setupGlobalLoading(){
@@ -392,10 +392,8 @@ function setupDateTimePicker(){
     if(typeof dateString !== "undefined" && dateString !== "undefined"){
       var date = new Date(dateString);
       var mDate = moment(date.toISOString());
-      // if(mDate.isBefore(moment()) && $(this).data("min") == "now"){
-      //   mDate = moment();
-      // }
     }else{
+      mDate = new Date();
       minDate = $(this).data("min");
     }
     $(this).datetimepicker({

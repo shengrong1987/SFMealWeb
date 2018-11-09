@@ -46,10 +46,6 @@
                         <a class="text-orange cursor-pointer" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html"><u><%= __('signup-tips')%></u></a>
                         <a class="text-orange cursor-pointer" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" title="<%= __('login-tips')%>%>"><u><%= __('nav-bar-login')%></u></a>
                       </small>
-                      <% }else{%>
-                        <small>
-                          <button id="verifyAddressBtn2" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Saving" class="btn btn-info form-control"><%= __('calculate-delivery')%></button>
-                        </small>
                       <% }%>
                     </h5>
                   </div>
@@ -100,7 +96,7 @@
               </div>
             </div>
 
-            <% if(user && Object.keys(user).length !== 0){%>
+            <% if(user && Object.keys(user).length !== 0 && user.address && user.address.length){%>
             <div class="col-12 text-left">
               <div class="radio-box">
                 <label class="btn btn-default vertical-inline option">
@@ -110,15 +106,9 @@
               </div>
               <!--<u><a id="createNewContactBtn" class="text-orange cursor-pointer" toggle="modal" data-id="<%= user.id%>" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0)"><%= __('enter-new-contact')%></a></u>-->
             </div>
-            <%}%>
+            <%}else{%>
 
-            <div class="col <%= user.id ? '' : 'd-none'%>">
-              <div class="form-group">
-                <input class="form-control" name="comment" placeholder="<%= __('comment')%>">
-              </div>
-            </div>
-
-            <form class="col-12 pt-4 <%= user.id ? 'd-none' : ''%>" id="contactInfoView" style="max-width: 500px;" data-user="<%= user.id || null%>" data-toggle="validator" role="form">
+            <form class="col-12 pt-4" id="contactInfoView" style="max-width: 500px;" data-user="<%= user.id || null%>" data-toggle="validator" role="form">
               <div class="row deliveryInput shippingInput">
                 <div class="col-12">
                   <div class="form-group">
@@ -156,13 +146,13 @@
               <div class="row">
                 <div class="col-6">
                   <div class="form-group">
-                    <input class="form-control" placeholder="<%= __('enter-phone')%>" name="phone" type="tel" minlength="13" data-error="<%= __('phone-bad-format')%>">
+                    <input class="form-control" placeholder="<%= __('enter-phone')%>" name="phone" type="tel" minlength="13" data-error="<%= __('phone-bad-format')%>" value="<%= user.phone || ''%>">
                     <div class="help-block with-errors"></div>
                   </div>
                 </div>
                 <div class="col-6">
                   <div class="form-group">
-                    <input class="form-control" name="name" placeholder="<%= __('enter-name')%>">
+                    <input class="form-control" name="name" placeholder="<%= __('enter-name')%>" value="<%= user.firstname || ''%>">
                   </div>
                 </div>
               </div>
@@ -175,6 +165,7 @@
                 </div>
               </div>
             </form>
+            <%}%>
           </div>
         </div>
 

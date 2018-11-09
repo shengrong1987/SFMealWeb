@@ -19,7 +19,23 @@
     <% if(meals && meals.meals){%>
     <div class="w-100 sticky-top" style="height: 90px;">
       <ul id="dishDatesBar" class="nav nav-light nav-fill justify-content-center bg-light">
-        <% Object.keys(meals.meals).forEach(function(dateKey,i){ %>
+        <%
+          var dates = Object.keys(meals.meals);
+          dates = dates.sort(function(d1,d2){
+              var dateObj = {
+                  "today" : 8,
+                  "tomorrow" : 7,
+                  "Monday" : 6,
+                  "Tuesday" : 5,
+                  "Wednesday" : 4,
+                  "Thursday" : 3,
+                  "Friday" : 2,
+                  "Saturday" : 1,
+                  "Sunday" : 0
+              }
+              return dateObj[d2] - dateObj[d1];
+          })
+        dates.forEach(function(dateKey,i){ %>
         <li class="nav-item py-4 <%= i===0?'active':''%>"><a class="nav-link" href="javascript:void(0);" data-filter=".<%= dateKey.replace(' ','')%>" data-toggle="tab"><%= __(dateKey)%></a></li>
         <% })%>
       </ul>

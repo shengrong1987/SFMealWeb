@@ -89,7 +89,7 @@ module.exports = {
     },
     minimalOrder : {
       type : 'integer',
-      defaultsTo : 0
+      defaultsTo : 10
     },
     minimalTotal : {
       type : 'float',

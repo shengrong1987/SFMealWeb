@@ -160,6 +160,18 @@
                         </div>
                       </div>
 
+                      <label><%= __('store-hours')%></label>
+
+                      <button id="storeHoursBtn" class="btn btn-secondary dropdown-toggle form-control" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="false">
+                        <%= __('store-hours')%>
+                        <span class='caret'></span>
+                      </button>
+                      <div class="dropdown-menu">
+                        <% pickups.forEach(function(pickup){%>
+                        <a class="dropdown-item" value="<%= pickup%>" href="javascript:void(0);"><%= __(pickup)%></a>
+                        <%});%>
+                      </div>
+
                       <div class="pickup_container" data-county="<%= host.county || ''%>">
                         <div class="pickup autoCompleteTarget py-2">
                           <div class="card">
@@ -269,10 +281,10 @@
                             </div>
                           </div>
                         </div>
+                        <div id="pickupAlert" class="alert alert-danger" data-toggle="alert"><%= __('need-one-pickup-location')%></div>
+                        <button id="addNewPickupBtn" class="btn btn-info pull-right"><%= __('add-new-pickup')%></button>
                       </div>
 
-                      <div id="pickupAlert" class="alert alert-danger" data-toggle="alert"><%= __('need-one-pickup-location')%></div>
-                      <button id="addNewPickupBtn" class="btn btn-info pull-right"><%= __('add-new-pickup')%></button>
                     </div>
                   </div>
                 </div>
@@ -288,9 +300,9 @@
                     <div class="row box-compact">
                       <div class="col-sm-4">
                         <div class="input-group">
-                          <input id="min-order" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="999" value=1 data-error="<%= __('need-minimal-requirement')%>">
+                          <input id="singleOrderInput" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="999" value=10 data-error="<%= __('need-minimal-requirement')%>">
                           <div class="input-group-append">
-                            <span class="input-group-text"><%= __('fen')%></span>
+                            <span class="input-group-text"><%= __('dollar')%></span>
                           </div>
                         </div>
                       </div>

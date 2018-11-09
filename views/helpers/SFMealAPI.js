@@ -348,7 +348,7 @@ module.exports = {
       type: 'GET',
       dataType: 'json',
     }).done(function (data) {
-      ActionCreators.getAccount(data);
+      ActionCreators.getDriver(data);
     }).fail(function(jqXHR, textStatus){
       ActionCreators.noResult(jqXHR.responseText);
     });
@@ -366,6 +366,35 @@ module.exports = {
       dataType: 'json'
     }).done(function (data) {
       ActionCreators.getDriver(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getPickup : function(id){
+    $.ajax({
+      url: '/pickupOption/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getPickup(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getPickups : function(criteria, value, skip){
+    if(value) {
+      var url = "/pickupOption?skip=" + skip + "&" + criteria + "=" + value;
+    }else{
+      url = "/pickupOption?skip=" + skip;
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json'
+    }).done(function (data) {
+      ActionCreators.getPickup(data);
     }).fail(function(jqXHR, textStatus){
       ActionCreators.noResult(jqXHR.responseText);
     });
@@ -418,6 +447,9 @@ module.exports = {
           break;
         case "Driver":
           ActionCreators.getDrivers(data);
+          break;
+        case "PickupOption":
+          ActionCreators.getPickups(data);
           break;
       }
     }).fail(function(jqXHR, textStatus){
@@ -544,6 +576,13 @@ module.exports = {
               ActionCreators.getDrivers(data);
             }
             break;
+          case "PickupOption":
+            if(detail){
+              ActionCreators.getPickup(data);
+            }else{
+              ActionCreators.getPickups(data);
+            }
+            break;
         }
       }
     }).fail(function(jqXHR, textStatus){
@@ -561,6 +600,7 @@ module.exports = {
       case "Coupon":
       case "Email":
       case "Driver":
+      case "PickupOption":
         isValid = true;
         break;
     }
@@ -657,6 +697,13 @@ module.exports = {
           this.getDriver(content);
         }else{
           this.getDrivers(criteria, content, skip);
+        }
+        break;
+      case "PickupOption":
+        if(criteria === "id" && content){
+          this.getPickup(content);
+        }else{
+          this.getPickups(criteria, content, skip);
         }
         break;
     }
