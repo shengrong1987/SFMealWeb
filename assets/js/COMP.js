@@ -917,7 +917,8 @@
     var a = node.find("a");
     if(a.length){
       var href = a.attr('href');
-      jumpTo(href);
+      var offset = a.data("offset");
+      jumpTo(href, offset);
     }
     this.element.trigger('change');
   }

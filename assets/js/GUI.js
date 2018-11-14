@@ -154,13 +154,13 @@ function getPosition(element){
   return [left, top];
 }
 
-function jumpTo(id){
+function jumpTo(id, offset){
   // var coordinate = getPosition(id);
   if(!$("#" + id).length){
     return;
   }
   $("html,body").animate({
-    scrollTop : $("#" + id).offset().top
+    scrollTop : $("#" + id).offset().top + offset
   },1000)
   // window.scrollTo(coordinate[0],coordinate[1]);
 }
