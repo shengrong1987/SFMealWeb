@@ -536,6 +536,7 @@ function orderFoodLogic(id, number, initial){
   updateOrderPreview();
 }
 
+var _tooltipAnimateId;
 function updateOrderPreview(){
   var orderPreviewListText = "";
   if(localOrders){
@@ -571,8 +572,7 @@ function updateOrderPreview(){
     })
   }
   $("#orderPreviewBtn").attr('title', orderPreviewListText)
-    .tooltip('_fixTitle')
-    .tooltip('show');
+    .tooltip('_fixTitle');
 }
 
 function applyCoupon(isApply, amount, code){

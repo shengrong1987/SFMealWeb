@@ -259,7 +259,6 @@
                               <input type="radio" id="delivery-2-<%= i%>" data-index="<%= pickup.index%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>
                               <span class="content">
                                 <i class="fa fa-truck cursor-pointer mr-2 text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i><%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>
-                                <span> <%= pickup.area || pickup.deliveryCenter%> <%= __('nearby')%></span>
                               </span>
                             </label>
                             <%j++;}i++;})}; %>
@@ -485,7 +484,7 @@
           <tr>
             <th><%= __('name') %></th>
             <td><%= __('price') %></td>
-            <td colspan="2"><%= __('quantity') %></td>
+            <td colspan="3"><%= __('quantity') %></td>
           </tr>
           </thead>
           <tbody class="scroll">
@@ -498,10 +497,15 @@
               <tr class="success dish item" data-id=<%= dish.id %> data-left-amount=<%= meal.leftQty[dish.id]%>>
                 <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span></td>
                 <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
-                <td colspan="2">
-                  <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">-</button>
-                  <span class="amount" style="padding: 5px;">  0  </span>
-                  <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',1,true)">+</button>
+
+                <td colspan="3" class="input-group input-group-sm amount-input round ml-auto" style="max-width:200px;min-width:30px;" data-toggle="amount-input" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
+                  <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">
+                    <span class="input-group-text">-</span>
+                  </div>
+                  <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
+                  <div class="input-group-append add" onclick="javascript:orderFood('<%= dish.id %>',1,true)">
+                    <span class="input-group-text">+</span>
+                  </div>
                 </td>
               </tr>
           <% }});})});%>
