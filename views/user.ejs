@@ -19,11 +19,11 @@
   <div>
     <div>
       <ul class="nav nav-tabs nav-fill bg-light pt-3">
-        <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder"><%= __('nav-bar-order')%></a></li>
+        <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder"><%= __('nav-bar-order')%><span class="badge pull-right"><%= user.orders.filter(function(order){return order.status !== "cancel" && order.status !== "review" && order.status !== "complete" && order.meal}).length || '' %></span></a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#mycollect"><%= __('user-nav-collect')%></a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#myinfo"><%= __('user-nav-info')%></a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#myaddress"><%= __('user-nav-address')%></a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#myreview"><%= __('nav-bar-review')%></a></li>
+        <li class="nav-item"><a class="nav-link veritcal-align" data-toggle="tab" role="tab" data-href="#myreview"><%= __('nav-bar-review')%><span class="badge pull-right"><%= user.orders.filter(function(order){return order.status == "review" && order.meal}).length || ''%></span></a></li>
       </ul>
 
       <div class="tab-content">
@@ -34,8 +34,8 @@
             <div class="divider"></div>
             <%}else{%>
             <ul class="nav nav-pills nav-justified p-3">
-              <li class="nav-item"><a class="nav-link" data-toggle="tab" data-href="#myorder-order"><h4><strong><%= __('order-nav-order')%></strong></h4></a></li>
-              <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder-preorder"><h4><strong><%= __('order-nav-preorder')%></strong></h4></a></li>
+              <li class="nav-item"><a class="nav-link" data-toggle="tab" data-href="#myorder-order"><h4><strong><%= __('order-nav-order')%><span class="badge pull-right"><%= user.orders.filter(function(order){return order.status !== "cancel" && order.status !== "review" && order.status !== "complete" && order.type === "order" && order.meal}).length || '' %></span></strong></h4></a></li>
+              <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder-preorder"><h4><strong><%= __('order-nav-preorder')%><span class="badge pull-right"><%= user.orders.filter(function(order){return order.status !== "cancel" && order.status !== "review" && order.status !== "complete" && order.type === "preorder" && order.meal}).length || '' %></span></strong></h4></a></li>
             </ul>
             <div class="tab-content">
               <div id="myorder-order" class="tab-pane middle pb-4">
@@ -49,7 +49,7 @@
                 ];%>
                 <ul class="nav nav-tabs my-2">
                   <% tabsData.forEach(function(tabData, i){%>
-                  <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark <%= i===0?'active':''%>"><%= __(tabData.title)%></a></li>
+                  <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark <%= i===0?'active':''%>"><%= __(tabData.title)%><span class="badge pull-right"><%= user.orders.filter(function(order){return order.status === tabData.status && order.status !== "complete" && order.type === tabData.type && order.meal}).length || ''%></span></a></li>
                   <% });%>
                 </ul>
                 <div class="tab-content box-scroll">
@@ -195,7 +195,7 @@
                 ];%>
                 <ul class="nav nav-tabs my-2">
                   <% tabsData.forEach(function(tabData, i){%>
-                  <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link <%= i===0?'active':''%> text-dark"><%= __(tabData.title)%></a></li>
+                  <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link <%= i===0?'active':''%> text-dark"><%= __(tabData.title)%><span class="badge pull-right"><%= user.orders.filter(function(order){return order.status === tabData.status && order.status !== "complete" && order.type === tabData.type && order.meal}).length || ''%></span></a></li>
                   <% });%>
                 </ul>
                 <div class="tab-content">
@@ -744,8 +744,8 @@
             <%}})})%>
                 <div class="row" style="margin-top:10px;">
                   <div class="col-12 text-right">
-                    <div id="meal-review-<%= j%>" class="alert alert-danger d-none"><%= __('review-warning')%></div>
-                    <div class="btn btn-grey-red leaveReview active" data-target="#meal-review-<%= j%>" data-host="<%= order.host.id%>" data-meal="<%= order.meal.id%>" data-err-container="#meal-review-<%= j%>" style="margin-right:20px;"><%= __('submit')%></div>
+                    <div id="meal-review-alert-<%= j%>" class="alert alert-danger d-none"><%= __('review-warning')%></div>
+                    <div class="btn btn-grey-red leaveReview active" data-target="#meal-review-<%= j%>" data-order="<%= order.id%>" data-host="<%= order.host.id%>" data-meal="<%= order.meal.id%>" data-err-container="#meal-review-alert-<%= j%>" style="margin-right:20px;"><%= __('submit')%></div>
                   </div>
                 </div>
               </div>

@@ -346,7 +346,7 @@ module.exports = {
       if(!host){
         return res.notFound();
       }
-      Review.find({ where : { host : hostId }, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req) }).exec(function(err, reviews){
+      Review.find({ where : { host : hostId }, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req)}).sort("createdAt DESC").exec(function(err, reviews){
         if(err){
           return res.badRequest(err);
         }

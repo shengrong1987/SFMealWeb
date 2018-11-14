@@ -399,6 +399,55 @@
 
 }(jQuery);
 
+
++function($){
+  'use strict';
+
+  var CountDown = function(element, options){
+    this.$element = $(element);
+    this.$options = $.extend({},CountDown.DEFAULTS, options);
+    this.$diff = this.$element.data("diff");
+    var _this = this;
+    setInterval(function(){
+      _this.update();
+    },1000);
+  };
+
+  CountDown.DEFAULTS = {
+  };
+
+  CountDown.prototype.update = function () {
+    this.$diff -= 1000;
+    var f = moment.utc(this.$diff).format("D day HH:mm:ss");
+    this.$element.text(f);
+  }
+
+  function Plugin(option,root){
+    var hasRoot = typeof root !== 'undefined';
+    return this.each(function(){
+      if(!hasRoot) root = $(this);
+      var $this = $(this);
+      var options = $.extend({}, CountDown.DEFAULTS, root.data(), typeof option === 'object' && option);
+      var data = root.data("bs.count-down");
+      if(!data) root.data("bs.conut-down",(data = new CountDown(root, options)));
+      if(typeof option === 'string') data[option]($this);
+    });
+  }
+
+  $.fn.countDown             = Plugin;
+  $.fn.countDown.Constructor = CountDown;
+
+  $("document").ready(function(){
+    $('[data-toggle="count-down"]').each(function(){
+      var countDown = $(this);
+      Plugin.call(countDown,countDown.data());
+    });
+  });
+
+}(jQuery);
+
+
+
 +function($){
   'use strict';
   var ExclusiveInput = function(element, options){

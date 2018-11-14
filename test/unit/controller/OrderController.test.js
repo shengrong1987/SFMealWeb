@@ -2841,10 +2841,10 @@ describe('OrderController', function() {
             }
             var o = res.body.orders[0];
             dynamicDishOrderNumber += 8;
-            price4 = price4 - (dynamicDishOrderNumber / qtyRate4) * priceRate4;
-            price4 = Math.max(price4, minimalPrice4);
-            console.log(newPrice1, price4)
-            o.subtotal.should.be.equal(newPrice1+price4*7);
+            var newPrice4 = price4 - parseInt(dynamicDishOrderNumber / qtyRate4) * priceRate4;
+            newPrice4 = Math.max(newPrice4, minimalPrice4);
+            console.log(newPrice1, newPrice4)
+            o.subtotal.should.be.equal(newPrice1+newPrice4*7);
             done();
           })
       });
@@ -2883,7 +2883,11 @@ describe('OrderController', function() {
             }
             var o = res.body.orders[0];
             dynamicDishOrderNumber += 2;
-            var newPrice4 = price4 - (dynamicDishOrderNumber / qtyRate4) * priceRate4;
+            console.log(dynamicDishOrderNumber);
+            console.log(parseInt(dynamicDishOrderNumber / qtyRate4));
+            console.log(parseInt(dynamicDishOrderNumber / qtyRate4) * priceRate4);
+            var newPrice4 = price4 - parseInt(dynamicDishOrderNumber / qtyRate4) * priceRate4;
+            console.log(newPrice4, minimalPrice4);
             newPrice4 = Math.max(newPrice4, minimalPrice4);
             o.orders[dishId4].price.should.be.equal(newPrice4);
             o.subtotal.should.be.equal(newPrice4 * 2);

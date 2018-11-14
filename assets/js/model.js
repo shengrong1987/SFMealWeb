@@ -1070,7 +1070,7 @@ var DayOfMealView = Backbone.View.extend({
     var originalEvent = e.originalEvent.detail.originalEvent;
     var currentTarget = $(originalEvent.currentTarget);
     var dateDesc = currentTarget.data("filter");
-    createCookie("date", dateDesc);
+    createCookie("date", encodeURI(dateDesc));
   },
   gotoCheckout : function(e){
     var orderedDishes = []
@@ -1389,7 +1389,16 @@ var MealView = Backbone.View.extend({
     this.dishAlert = dishesAlert;
     var pickup_container = this.$el.find(".pickup_container");
     pickup_container.removeClass("d-none").hide();
-
+    pickup_container.find(".pickup").each(function(){
+      var method = $(this).find(".method select").attr("value");
+      if(method === "delivery"){
+        $(this).find(".pickup-item").hide();
+        $(this).find(".delivery-item").show();
+      }else{
+        $(this).find(".pickup-item").show();
+        $(this).find(".delivery-item").hide();
+      }
+    })
   },
   selectStoreHour : function(e){
     var btn = $(e.currentTarget);
@@ -2707,14 +2716,28 @@ var ReviewView = Backbone.View.extend({
     var mealId = ele.data("meal");
     var hostId = ele.data("host");
     var orderId = this.$el.data("order");
-    var score;
+    var score,reviews = [];
+    var hasNegativeReivew = false;
     if(dishId){
       //single dish review
-      score = rating_container.find(".rating .text-yellow").length;
-      var content = rating_container.find(".review").val();
+      rating_container.find(".dish-item").each(function () {
+        var score = $(this).find(".rating .text-yellow").length;
+        if(!score){
+          return;
+        }
+        if(score === 1){
+          hasNegativeReivew = true;
+        }
+          var content = $(this).find(".review").val();
+        var reviewObj = {
+          dish : dishId,
+          score : score,
+          content : content
+        }
+        reviews.push(reviewObj);
+      })
     }else if(mealId){
       //meal review
-      var reviews = [];
       var scoreNotRated = false;
       rating_container.find(".dish-item").each(function(){
         var reviewObj = {};
@@ -2723,6 +2746,9 @@ var ReviewView = Backbone.View.extend({
         reviewObj.content = $(this).find(".review").val();
         if(reviewObj.score === 0){
           scoreNotRated = true;
+        }
+        if(reviewObj.score === 1){
+          hasNegativeReivew = true;
         }
         reviews.push(reviewObj);
       });
@@ -2736,7 +2762,7 @@ var ReviewView = Backbone.View.extend({
       makeAToast(jQuery.i18n.prop('reviewScoreEmpty'));
       return;
     }
-    if(score <= 1){
+    if(hasNegativeReivew){
       BootstrapDialog.show({
         title: jQuery.i18n.prop('tip'),
         message : jQuery.i18n.prop('reviewPrivate'),
@@ -2748,12 +2774,15 @@ var ReviewView = Backbone.View.extend({
               dish : dishId,
               score : score,
               host : hostId,
-              reviews : reviews,
-              review : content
+              reviews : reviews
             });
             $this.model.save({},{
-              success : function(){
-                reloadUrl("/user/me","#myreview");
+              success : function(model, result){
+                BootstrapDialog.alert(jQuery.i18n.prop("privateReviewSent"), function(){
+                  reloadUrl('/user/me','#myreview');
+                  $this.$el.find(".item[data-id='" + ele.data("order") +"']").remove();
+                  BootstrapDialog.closeAll();
+                });
               },error : function(model, err){
                 alertView.html(getMsgFromError(err));
                 alertView.show();
@@ -2774,12 +2803,13 @@ var ReviewView = Backbone.View.extend({
       dish : dishId,
       score : score,
       host : hostId,
-      reviews : reviews,
-      review : content
+      reviews : reviews
     });
     this.model.save({},{
-      success : function(){
-        reloadUrl("/user/me","#myreview");
+      success : function(model, result){
+        BootstrapDialog.alert(jQuery.i18n.prop("reviewSuccessTip"), function(){
+          location.href = "/host/public/" + result.host;
+        })
       },error : function(model, err){
         alertView.html(getMsgFromError(err));
         alertView.show();
@@ -3069,15 +3099,12 @@ var MealConfirmView = Backbone.View.extend({
       this.$el.find(".deliveryInput").hide();
     }
     utility.initGoogleMapService();
-    var dateDesc = readCookie("date");
+    var dateDesc = decodeURI(readCookie("date"));
     if(dateDesc && dateDesc !== "undefined"){
       this.$el.find("#dishDatesBar li").removeClass("active");
       this.$el.find("#dishDatesBar [data-filter='" + dateDesc + "']").parent().addClass("active");
-      if(hasDelivery){
-        deliveryMixer.filter(dateDesc);
-      }else{
-        pickupMixer.filter(dateDesc);
-      }
+      deliveryMixer.filter(dateDesc);
+      pickupMixer.filter(dateDesc);
     }
   },
   enterBillingAddress : function(e){
@@ -3395,8 +3422,9 @@ var receiptView = Backbone.View.extend({
     this.model.action = "review";
     this.model.save({}, {
       success : function(model, result){
-        BootstrapDialog.alert(result.responseText, function(){
-          reloadUrl("/meal/" + mealId, "");
+        var hostId = result.host;
+        BootstrapDialog.alert(jQuery.i18n.prop('reviewSuccessTip'), function(){
+          location.href = "/host/public/" + hostId;
         });
       },
       error : function(model, err){
@@ -3653,7 +3681,7 @@ var OrderView = Backbone.View.extend({
   },
   getCustomizedInfo : function(partyMode, cb){
     if(!partyMode){
-      return cb({ comment : this.$el.find("#pickupInfoView [name='comment']").val()});
+      return cb({ comment : this.$el.find("#pickupInfoView [name='comment']:visible").val()});
     }
     var customerInfo = {};
     var customDate = this.$el.find(".customDeliveryDate").data("DateTimePicker");
@@ -3666,7 +3694,7 @@ var OrderView = Backbone.View.extend({
     }
     // var comment = this.$el.find("#commentView [name='comment']").val();
     customerInfo.time = customDate;
-    customerInfo.comment = this.$el.find("#pickupInfoView [name='comment']").val();
+    customerInfo.comment = this.$el.find("#pickupInfoView [name='comment']:visible").val();
     return cb(customerInfo);
   },
   getPaymentInfo : function(isLogin, cb){
@@ -3855,11 +3883,7 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         BootstrapDialog.alert(result.responseText, function(){
-          if(location.href.indexOf("host/me")===-1){
-            reloadUrl("/user/me", "#myorder");
-          }else{
-            reloadUrl("/host/me","#myorder");
-          }
+          location.reload();
         });
       },error : function(model, err){
         BootstrapDialog.alert(err.responseJSON ? err.responseJSON.responseText : err.responseText);

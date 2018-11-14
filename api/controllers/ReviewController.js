@@ -55,7 +55,7 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          return res.redirect('/host/public/' + order.host);
+          return res.ok(order);
         })
       })
     });
@@ -80,6 +80,7 @@ module.exports = {
         return res.badRequest({ code : -1, responseText : req.__('review-no-available')});
       }
       if(reviews && reviews.length > 0){
+        var hostId;
         async.each(reviews, function(r, next){
           var dishId = r.dish;
           var score = r.score;
@@ -89,8 +90,9 @@ module.exports = {
             if(err){
               return next(err);
             }
+            hostId = results.host.id;
             next();
-          });
+          }, req);
         },function(err){
           if(err){
             return res.badRequest(err);
@@ -107,7 +109,7 @@ module.exports = {
               return res.badRequest(err);
             }
             sails.log.info("successfully leave a review");
-            return res.ok({});
+            return res.ok({ host : hostId});
           });
         }, req);
       }else{

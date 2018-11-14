@@ -250,6 +250,14 @@ module.exports = {
       return dateDesc;
     },
 
+    getTimeDiff : function(provideTill, locale){
+      // provideTill = moment(provideTill).unix();
+      // var now = moment().unix();
+      // var diff = provideTill - now;
+      moment.locale(locale);
+      return moment(provideTill).from(moment());
+    },
+
     dateIsValid : function(params){
       params = this;
       var provideFromTime = params.provideFromTime;

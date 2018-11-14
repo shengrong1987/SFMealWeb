@@ -911,5 +911,6 @@
   "limited" : "Limited Time",
   "store-hours" : "Store Hour",
   "custom" : "Custom Hour",
-  "order-single-minimal-not-reach" : "Order minimal order is $%s"
+  "order-single-minimal-not-reach" : "Order minimal order is $%s",
+  "ends" : "ends"
 }

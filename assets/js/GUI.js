@@ -135,7 +135,6 @@ function reloadUrl(url, tag){
     location.href = url + tag;
   }else if(tag !== hash){
     location.href = url + tag;
-    location.reload();
   }else{
     location.reload();
   }

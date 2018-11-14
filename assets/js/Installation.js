@@ -29,6 +29,7 @@ function setup(){
   setupDateTimePicker();
   setupLoadingButton();
   setupFlexScrollBar();
+  setupCollapse();
 }
 
 function initData(){
@@ -463,6 +464,12 @@ function setupFlexScrollBar(){
         }, 1200);
       }
     })
+  });
+}
+
+function setupCollapse(){
+  $(".collapse").collapse({
+    toggle: false
   });
 }
 

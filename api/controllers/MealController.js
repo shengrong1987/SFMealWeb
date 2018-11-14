@@ -130,7 +130,7 @@ module.exports = {
           return res.ok({ meals : meals, user : _u, tags: _tags });
         }
         meals = _this.composeMealWithDate(meals);
-        res.view("dayOfMeal",{ meals : meals, user : _u, tags: _tags, pickupNickname : pickupNickname});
+        res.view("dayOfMeal",{ meals : meals, user : _u, tags: _tags, pickupNickname : pickupNickname, locale : req.getLocale()});
       })
     })
   },
