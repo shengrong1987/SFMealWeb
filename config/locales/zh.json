@@ -264,7 +264,7 @@
   "delivery-available" : "是否提供送餐服务",
   "delivery-by-system" : "是否使用系统配送",
   "delivery-center" : "送餐中心点",
-  "calculate-delivery" : "验证地址",
+  "calculate-delivery" : "查看可送时间",
   "miles" : "英里",
   "pickup-location" : "取餐地点",
   "pickup-public-location" : " 取餐大概地址（公开显示）",

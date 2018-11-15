@@ -3225,7 +3225,7 @@ var MealConfirmView = Backbone.View.extend({
       console.log("distance: " + distance, " range:" + range);
       if(distance > range){
         if(!isPartyMode){
-          makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
+          // makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
           return;
         }else{
           var delivery_fee = (distance - range) * MILEAGE_FEE;
