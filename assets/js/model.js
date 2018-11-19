@@ -1069,7 +1069,7 @@ var DayOfMealView = Backbone.View.extend({
   selectDate : function(e){
     var originalEvent = e.originalEvent.detail.originalEvent;
     var currentTarget = $(originalEvent.currentTarget);
-    var dateDesc = currentTarget.data("filter");
+    var dateDesc = currentTarget.data("filter").replace(".","");
     createCookie("date", encodeURI(dateDesc));
   },
   gotoCheckout : function(e){
@@ -3084,8 +3084,8 @@ var MealConfirmView = Backbone.View.extend({
     "click #createNewContactBtn2" : "createNewContact",
     "keydown" : "onKeyDown",
     "click #verifyAddressBtn" : "verifyAddress",
-    "click #verifyAddressBtn2" : "verifyAddress",
-    "click input[name='billingAddress']" : "enterBillingAddress"
+    "click input[name='billingAddress']" : "enterBillingAddress",
+    "mixEnd #deliveryTab" : "switchDate"
   },
   initialize : function(){
     this.alertView = this.$el.find("#orderAlertView");
@@ -3102,9 +3102,13 @@ var MealConfirmView = Backbone.View.extend({
     var dateDesc = decodeURI(readCookie("date"));
     if(dateDesc && dateDesc !== "undefined"){
       this.$el.find("#dishDatesBar li").removeClass("active");
-      this.$el.find("#dishDatesBar [data-filter='" + dateDesc + "']").parent().addClass("active");
-      deliveryMixer.filter(dateDesc);
-      pickupMixer.filter(dateDesc);
+      this.$el.find("#dishDatesBar [data-filter='." + dateDesc + "']").parent().addClass("active");
+      deliveryMixer.filter("." + dateDesc);
+      pickupMixer.filter("." + dateDesc);
+    }
+    var method = $("#pickupMethodView #method .active").attr("value");
+    if(method === "delivery"){
+      $("#pickupOptionsView .step-2").hide();
     }
   },
   enterBillingAddress : function(e){
@@ -3140,6 +3144,11 @@ var MealConfirmView = Backbone.View.extend({
       this.$el.find(".pickupInput").hide();
       this.$el.find(".shippingInput").hide();
       this.$el.find(".deliveryInput").show();
+      if(this.addressVerified){
+        $("#pickupOptionsView .step-2").show();
+      }else{
+        $("#pickupOptionsView .step-2").hide();
+      }
       if(isLogin){
         // $('#contactInfoView').hide();
         this.switchAddress(e);
@@ -3160,6 +3169,7 @@ var MealConfirmView = Backbone.View.extend({
       this.$el.find(".deliveryInput").hide();
       this.$el.find(".shippingInput").hide();
       this.$el.find(".pickupInput").show();
+      $("#pickupOptionsView .step-2").show();
       if(isLogin){
         // $('#contactInfoView').hide();
       }else{
@@ -3169,8 +3179,16 @@ var MealConfirmView = Backbone.View.extend({
     refreshCheckoutMenu();
   },
   verifyAddress : function(e, checkOnly){
+    var value = this.$el.find("#method button.active").attr("value");
+    if(value === "pickup"){
+      return;
+    }
     var isLogin = !!this.$el.data("user");
     var btn = e ? $(e.currentTarget) : null;
+    var dateDesc = decodeURI(readCookie('date'));
+    if(dateDesc === "undefined"){
+      dateDesc = this.$el.find("#deliveryTab .deliveryOption").first().data("date");
+    }
     if(this.$el.find("#contactInfoView").length){
       var street = this.$el.find("input[name='street']").val();
       var city = this.$el.find("input[name='city']").val();
@@ -3196,37 +3214,47 @@ var MealConfirmView = Backbone.View.extend({
       yourAddress = contactText.split("+")[0];
     }
 
-    var deliveryOptions = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio").first();
-    var deliveryOption = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio:checked");
-    if(!deliveryOption.length && !isPartyMode){
-      deliveryOptions.prop('checked',true);
-      deliveryOption = deliveryOptions;
-      // makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
-      // return false;
-    }else if(isPartyMode){
-      var deliveryCenter = this.$el.find('.deliveryOption').data('center');
-    }else{
-      deliveryCenter = deliveryOption.parent().data('center');
-      range = deliveryOption.parent().data("range");
-    }
     if(checkOnly){
       if(btn) {btn.trigger('reset')}
       return yourAddress;
     }
-    utility.distance(deliveryCenter, yourAddress, function(err, distance) {
-      if(err) {
+
+    var deliveryOption = this.$el.find("#deliveryTab .deliveryOption[data-date='" + dateDesc + "'] .regular-radio:checked");
+    var firstOpt = this.$el.find("#deliveryTab .deliveryOption[data-date='" + dateDesc + "'] .regular-radio").first();
+    if(!deliveryOption.length){
+      firstOpt.prop('checked',true);
+      deliveryOption = firstOpt;
+    }
+
+    var lat = deliveryOption.parent().data('lat');
+    var long = deliveryOption.parent().data('long');
+    if(!long || !lat){
+      if(btn){
+        btn.trigger("reset");
+      }
+      makeAToast("error reading delivery central location","error");
+      console.log("error reading delivery central location");
+      return;
+    }
+    var location = { lat : lat, long : long};
+    var range = deliveryOption.parent().data("range");
+    utility.geocoding(yourAddress, function(err, customerLoc) {
+      if (err) {
         if(btn) {btn.trigger('reset')}
         makeAToast(err, 'error');
         return;
       }
-      if(btn){
-        btn.trigger('reset');
+      if(btn){btn.trigger('reset');}
+      var cusLocation = {
+        lat : customerLoc.lat(),
+        long : customerLoc.lng()
       }
+      var distance = utility.getDistance(cusLocation, location, "N");
       console.log("distance: " + distance, " range:" + range);
       if(distance > range){
         if(!isPartyMode){
           // makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
-          return;
+          // return;
         }else{
           var delivery_fee = (distance - range) * MILEAGE_FEE;
           form.find(".delivery").data("value", delivery_fee);
@@ -3235,37 +3263,55 @@ var MealConfirmView = Backbone.View.extend({
       }else if(isPartyMode){
         form.find(".delivery").data("value", 0);
         refreshCheckoutMenu();
+      }else{
+        makeAToast(jQuery.i18n.prop('addressValid'),'success');
       }
-      makeAToast(jQuery.i18n.prop('addressValid'),'success');
     });
-    this.checkOptions(yourAddress);
+    this.checkOptions(yourAddress, dateDesc);
   },
-  checkOptions : function(address){
-    var deliveryOptions = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio")
-    deliveryOptions.each(function(index){
-      var deliveryOption = $(this);
-      deliveryOption.parent().find('.s').addClass('spinner');
-      var deliveryCenter = deliveryOption.parent().data('center');
-      setTimeout(function() {
-        utility.distance(deliveryCenter, address, function(err, distance) {
-          deliveryOption.parent().find('.s').removeClass('spinner');
-          var range = deliveryOption.parent().data("range");
-          if (err) {
-            makeAToast(err);
-            return;
-          }
+  checkOptions : function(address, dateDesc){
+    var deliveryOptions = this.$el.find("#deliveryTab .deliveryOption .regular-radio");
+    $("#pickupOptionsView .step-2").show();
+    deliveryOptions.parent().addClass("spinning").addClass("is-disabled");
+
+    utility.geocoding(address, function(err, cusLocation) {
+      if (err) {
+        makeAToast(err, "err");
+        return;
+      }
+      var newCusLocation = {
+        lat: cusLocation.lat(),
+        long: cusLocation.lng()
+      }
+      deliveryOptions.each(function(index){
+        var deliveryOption = $(this);
+        var lat = deliveryOption.parent().data('lat');
+        var long = deliveryOption.parent().data('long');
+        var location = { lat : lat, long : long};
+        var range = deliveryOption.parent().data("range");
+        var distance = utility.getDistance(newCusLocation, location, "N");
+        if(dateDesc === deliveryOption.parent().data("date")){
           if(distance > range){
             deliveryOption.parent().hide();
           }else{
             deliveryOption.parent().show();
           }
-        })
-      }, index*2000);
+        }
+      });
+      deliveryOptions.parent().removeClass("spinning").removeClass("is-disabled");
     });
   },
   switchAddress : function(e, cb, yourAddress){
     var deliveryOption = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio:checked");
-    var range = deliveryOption.parent().data("range") || 5;
+    if(!deliveryOption.length){
+      makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
+      if(cb){
+        return cb(false);
+      }
+      return;
+    }
+    var btn = e ? $(e.currentTarget) : null;
+    deliveryOption.parent().addClass("spinning").addClass("is-disabled");
     var $this = this;
     var isLogin = !!this.$el.data("user");
     var isFirstAddress = !this.$el.find("#contactInfoView").length;
@@ -3287,71 +3333,49 @@ var MealConfirmView = Backbone.View.extend({
       }
     }
 
-    if (!yourAddress) {
-      return;
-    }
+    if (!yourAddress) {return;}
 
     if(e && $(e.currentTarget).parent().hasClass('contactOption')){
-      this.checkOptions(yourAddress);
+      this.checkOptions(yourAddress, deliveryOption.data("desc"));
     }
 
-    if(!isPartyMode){
-      var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
-      var deliveryCenter = deliveryOption.parent().data('center');
-    }else{
-      deliveryOption = this.$el.find("#deliveryTab .deliveryOption");
-      deliveryCenter = deliveryOption.data('center');
-    }
-    if(!deliveryOption.length || !deliveryCenter){
-      // makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
-      if(cb){
-        return cb(false);
+    var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
+    var long = deliveryOption.parent().data('long');
+    var lat = deliveryOption.parent().data("lat");
+    if(!long || !lat){
+      if(btn) {
+        btn.trigger("reset");
       }
+      makeAToast("error reading delivery central location", "error");
+      console.log("error reading delivery central location");
       return;
     }
-
-    var cdTime = 1800;
-    if(this.isCoolDown){
-      this.isCoolDown = false;
-      utility.distance(deliveryCenter, yourAddress, function(err, distance){
-        if(err){
-          makeAToast(err);
-          if(cb){
-            return cb(false);
-          }
-          return;
-        }
-        if(distance > range){
-          if(!isPartyMode){
-            makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
-            if(cb){
-              return cb(false);
-            }
-            return;
-          }else{
-            var delivery_fee = (distance - range) * MILEAGE_FEE;
-            form.find(".delivery").data("value", delivery_fee);
-            refreshCheckoutMenu();
-          }
-        }else if(isPartyMode){
-          form.find(".delivery").data("value", 0);
-          refreshCheckoutMenu();
-        }
-        deliveryOption.parent().removeClass('disabled')
-        makeAToast(jQuery.i18n.prop('addressValid'),'success');
-        if(cb){
-          cb(true);
-        }
-      })
-      setTimeout(function(){
-        $this.isCoolDown = true;
-      }, cdTime);
-    }else {
-      makeAToast(jQuery.i18n.prop("apiCooldown"));
-      if(cb){
-        cb(true);
-      }
+    var location = {
+      long : long,
+      lat : lat
     }
+
+    utility.geocoding(yourAddress, function(err, cusLoc){
+      if(err){
+        makeAToast(err, "err");
+        return;
+      }
+      cusLoc = {
+        lat : cusLoc.lat(),
+        long : cusLoc.lng()
+      }
+      var range = deliveryOption.parent().data("range") || 5;
+      var distance = utility.getDistance(cusLoc, location, "N");
+      if(distance > range){
+        makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
+        if(cb){
+          return cb(false);
+        }
+        return;
+      }
+      deliveryOption.parent().removeClass("spinning").removeClass("is-disabled");
+      makeAToast(jQuery.i18n.prop('addressValid'),'success');
+    })
   },
   applyCouponCode : function(e) {
     e.preventDefault();
@@ -3407,6 +3431,11 @@ var MealConfirmView = Backbone.View.extend({
       return;
     }
     applyPoints(true, pointRedeem);
+  },
+  switchDate : function(e){
+    var dateDesc = $("#dishDatesBar .mixitup-control-active").data("filter").replace(".","");
+    createCookie("date", dateDesc);
+    this.verifyAddress();
   }
 })
 

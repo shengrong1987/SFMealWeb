@@ -369,6 +369,8 @@
   "firstname": "First name",
   "lastname": "Last name",
   "address-info": "Credit card info",
+  "location-info" : "Address",
+  "contact-info" : "Contact",
   "address": "Billing address",
   "street": "Street",
   "city": "City",
@@ -900,7 +902,7 @@
   "select-preference" : "Please select %s",
   "select": "Selection",
   "pay-cash-instruction" : "Please pay cash to driver at pickup",
-  "venmo-instruction" : "Please leave your name at checkout",
+  "venmo-instruction" : "Venmo Id: @SFMeal, leave your name as comment.",
   "paypal-instruction" : "Please leave your name at checkout（Add $1 for transaction fee）",
   "dish-tag-default" : "Street food",
   "dish-tag" : "Tag",
@@ -912,5 +914,6 @@
   "store-hours" : "Store Hour",
   "custom" : "Custom Hour",
   "order-single-minimal-not-reach" : "Order minimal order is $%s",
-  "ends" : "ends"
+  "ends" : "ends",
+  "already-signup" : "Have an account？Login"
 }

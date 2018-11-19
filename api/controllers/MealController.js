@@ -76,6 +76,7 @@ module.exports = {
 
   find : function(req,res){
     //find out meals that provide start today or ends today
+    moment.locale('zh-cn');
     var _this = this;
     var pickupNickname = req.param('pickup');
     var county = req.cookies['county'] || req.param('county') || "San Francisco County";

@@ -2648,6 +2648,7 @@ module.exports = {
   },
 
   findOrdersOfWeek : function(req, res){
+    moment.locale('en');
     var weekWanted = req.params['numberOfWeek'];
     var yearWanted = req.query.year;
     var status = req.query.status || { '!' : ['cancel','pending-payment']};

@@ -372,6 +372,8 @@
   "firstname" : "名字",
   "lastname" : "姓",
   "address-info" : "信用卡信息",
+  "location-info" : "地址",
+  "contact-info" : "联系人",
   "address" : "账单地址",
   "street" : "号码／公寓／街道",
   "city" : " 城市",
@@ -905,7 +907,7 @@
   "select-preference" : "请选择%s",
   "select": "精选",
   "pay-cash-instruction" : "请领取单的时候支付给司机现金",
-  "venmo-instruction" : "付款时请留言下单的姓名",
+  "venmo-instruction" : "Venmo号: @SFMeal,付款时请附言下单的姓名",
   "paypal-instruction" : "付款时请留言下单的姓名（每笔需要额外支付$1元手续费）",
   "dish-tag-default" : "街头小吃",
   "dish-tag" : "标签",
@@ -917,5 +919,6 @@
   "store-hours" : "营业时间",
   "custom" : "自定义营业时间",
   "order-single-minimal-not-reach" : "订单最低金额未达到：$%s",
-  "ends" : "结束于"
+  "ends" : "结束于",
+  "already-signup" : "已有账号？登录"
 }

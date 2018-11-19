@@ -616,6 +616,9 @@ var refreshCheckoutMenu = function(){
     }
     var unitPrice = parseFloat($(this).find(".price").attr("value"));
     var amount = parseInt($(this).find(".amount").val());
+    if(!amount){
+      $("#meal-confirm-container .dish[data-id='" + dishId + "']").hide();
+    }
     var _subtotal = amount * unitPrice + parseFloat($(this).find(".price").data("extra"))
     if(_subtotal > 0){
       numberOfItem+=amount;

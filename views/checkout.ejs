@@ -2,16 +2,16 @@
   <% var meal = meals.meals[Object.keys(meals.meals)[0]].meals[0]; %>
   <div class="row">
     <div class="col-md-8">
-      <div class="box white">
+      <div class="white">
         <div id="pickupMethodView">
           <div class="row">
             <div class="col-12 my-2">
-              <div class="box-compact light-grey">
-                <h3 class="text-left px-5"><%= __('pickup-method') %></h3>
+              <div class="light-grey py-2 text-left">
+                <h5 class="mb-0 pl-2"><%= __('pickup-method') %></h5>
               </div>
             </div>
             <div class="col-12 my-4 text-left">
-              <ul class="btn-group" role="group" aria-label="Basic example" id="method">
+              <ul class="btn-group btn-group-lg padding-none" role="group" aria-label="Basic example" id="method">
                 <%
                   var hasDelivery = pickups.some(function(pickup){
                     return pickup.method === "delivery";
@@ -35,16 +35,16 @@
         <div id="pickupInfoView" class="text-left" data-hasDelivery="<%= hasDelivery%>">
           <div class="row">
             <div class="col-12">
-              <div class="box-compact light-grey">
-                <div class="d-flex justify-content-between align-base">
-                  <div class="pl-5">
-                    <h3><%= __('pickup-info') %></h3>
+              <div class="light-grey py-2">
+                <div class="d-flex justify-content-between vertical-align">
+                  <div>
+                    <h5 class="mb-0 pl-2"><%= __('pickup-info') %></h5>
                   </div>
                   <div class="pr-5">
-                    <h5><% if(!user || Object.keys(user).length == 0){%>
+                    <h5 class="mb-0"><% if(!user || Object.keys(user).length == 0){%>
                       <small>
-                        <a class="text-orange cursor-pointer" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html"><u><%= __('signup-tips')%></u></a>
-                        <a class="text-orange cursor-pointer" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" title="<%= __('login-tips')%>%>"><u><%= __('nav-bar-login')%></u></a>
+                        <!--<a class="text-orange cursor-pointer" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html"><u><%= __('signup-tips')%></u></a>-->
+                        <a class="text-green cursor-pointer" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" title="<%= __('login-tips')%>%>"><u><%= __('already-signup')%></u></a>
                       </small>
                       <% }%>
                     </h5>
@@ -114,7 +114,24 @@
             </div>
             <%}else{%>
 
-            <form class="col-12 pt-4" id="contactInfoView" style="max-width: 500px;" data-user="<%= user.id || null%>" data-toggle="validator" role="form">
+            <form class="col-12 pt-4" id="contactInfoView" data-user="<%= user.id || null%>" data-toggle="validator" role="form">
+
+              <h5><small class="text-black" style="font-size:0.8em;"><%= __('contact-info')%></small></h5>
+              <div class="row">
+                <div class="col-6">
+                  <div class="form-group">
+                    <input class="form-control" name="name" placeholder="<%= __('name')%>" value="<%= user.firstname || ''%>">
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="form-group">
+                    <input class="form-control" placeholder="<%= __('phone')%>" name="phone" type="tel" minlength="13" data-error="<%= __('phone-bad-format')%>" value="<%= user.phone || ''%>">
+                    <div class="help-block with-errors"></div>
+                  </div>
+                </div>
+              </div>
+
+              <h5><small class="text-black" style="font-size:0.8em;"><%= __('location-info')%></small></h5>
               <div class="row deliveryInput shippingInput">
                 <div class="col-12">
                   <div class="form-group">
@@ -124,14 +141,9 @@
               </div>
 
               <div class="row deliveryInput shippingInput">
-                <div class="col-6">
+                <div class="col-12">
                   <div class="form-group">
                     <input class="form-control" name="city" placeholder="<%= __('city')%>">
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="form-group">
-                    <input class="form-control" name="state" placeholder="<%= __('state')%>">
                   </div>
                 </div>
               </div>
@@ -139,26 +151,12 @@
               <div class="row deliveryInput shippingInput">
                 <div class="col-6">
                   <div class="form-group">
+                    <input class="form-control" name="state" placeholder="<%= __('state')%>">
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="form-group">
                     <input class="form-control" name="zipcode" placeholder="<%= __('zipcode')%>">
-                  </div>
-                </div>
-                <div class="col-6 deliveryInput">
-                  <div class="form-group">
-                    <button id="verifyAddressBtn" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Saving" class="btn btn-info form-control"><%= __('calculate-delivery')%></button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-6">
-                  <div class="form-group">
-                    <input class="form-control" placeholder="<%= __('enter-phone')%>" name="phone" type="tel" minlength="13" data-error="<%= __('phone-bad-format')%>" value="<%= user.phone || ''%>">
-                    <div class="help-block with-errors"></div>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="form-group">
-                    <input class="form-control" name="name" placeholder="<%= __('enter-name')%>" value="<%= user.firstname || ''%>">
                   </div>
                 </div>
               </div>
@@ -167,6 +165,14 @@
                 <div class="col">
                   <div class="form-group">
                     <input class="form-control" name="comment" placeholder="<%= __('comment')%>">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12 deliveryInput">
+                  <div class="form-group text-center">
+                    <button id="verifyAddressBtn" style="height: 50px;width:160px;" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Saving" class="btn btn-lg btn-green form-control"><strong><%= __('next-step')%></strong></button>
                   </div>
                 </div>
               </div>
@@ -180,11 +186,11 @@
           <div class="row my-4 text-left">
 
             <div class="col-12">
-              <div class="box-compact light-grey">
+              <div class="light-grey py-2 text-left">
                 <div class="d-flex justify-content-between align-base">
-                  <div class="pl-5">
-                    <h3 class="deliveryInput"><%= __('delivery-option') %></h3>
-                    <h3 class="pickupInput"><%= __('pickup-option') %></h3>
+                  <div class="mb-0 pl-2">
+                    <h5 class="deliveryInput"><%= __('delivery-option') %></h5>
+                    <h5 class="pickupInput"><%= __('pickup-option') %></h5>
                   </div>
                   <div class="pr-5">
                     <h5><small><a toggle="modal" data-target="#myModal" data-href="/templates/meal/map.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fas fa-map-marker-alt"></i> <%= __('show-map') %></a></small></h5>
@@ -193,7 +199,7 @@
               </div>
             </div>
 
-            <div class="col-12">
+            <div class="col-12 step-2">
               <ul id="dishDatesBar" class="nav nav-light nav-fill justify-content-center bg-light">
                 <%
                 var dates = Object.keys(meals.meals);
@@ -207,17 +213,26 @@
                     "Thursday" : 3,
                     "Friday" : 2,
                     "Saturday" : 1,
-                    "Sunday" : 0
+                    "Sunday" : 0,
+                    "今天" : 8,
+                    "明天" : 7,
+                    "星期一" : 6,
+                    "星期二" : 5,
+                    "星期三" : 4,
+                    "星期四" : 3,
+                    "星期五" : 2,
+                    "星期六" : 1,
+                    "星期天" : 0
                   }
                   return dateObj[d2] - dateObj[d1];
                 })
                 dates.forEach(function(dateKey,i){ %>
-                <li class="nav-item py-4 <%= i===0?'active':''%>"><a class="nav-link" href="javascript:void(0);" data-filter=".<%= dateKey.replace(" ",'')%>" data-toggle="tab"><%= __(dateKey)%></a></li>
+                <li class="nav-item py-4 <%= i===0?'active':''%>"><a class="nav-link" href="javascript:void(0);" data-mixitup-control data-filter=".<%= dateKey.replace(" ",'')%>" data-toggle="tab"><%= __(dateKey)%></a></li>
                 <% })%>
               </ul>
             </div>
 
-            <div class="col-12">
+            <div class="col-12 step-2">
               <div class="tab-content">
                 <div id="pickupTab" class="tab-pane <%= hasDelivery?'':'active'%>" role="tabpanel">
                   <div class="card">
@@ -254,7 +269,7 @@
                             colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue',];
                             i= 0;j = 0;
                             if(pickups){ pickups.forEach(function(pickup){ if(pickup.method == 'delivery'){ %>
-                            <label class="btn btn-outline-light option deliveryOption mix <%= meal.getDateDesc(pickup.pickupFromTime)%>" data-meal="<%= pickup.meal%>" data-date="<%= meal.getDateDesc(pickup.pickupFromTime)%>" data-range="<%= pickup.deliveryRange%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-area="<%= pickup.area || '' %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
+                            <label class="btn btn-outline-light option deliveryOption mix <%= meal.getDateDesc(pickup.pickupFromTime)%>" data-meal="<%= pickup.meal%>" data-date="<%= meal.getDateDesc(pickup.pickupFromTime)%>" data-range="<%= pickup.deliveryRange%>" data-lat="<%= pickup.lat || ''%>" data-long="<%= pickup.long || ''%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-area="<%= pickup.area || '' %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
                               <div class="s"></div>
                               <input type="radio" id="delivery-2-<%= i%>" data-index="<%= pickup.index%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>
                               <span class="content">
@@ -276,8 +291,8 @@
 
         <div class="row my-2">
           <div class="col-12">
-            <div class="box-compact light-grey">
-              <h3 class="text-left px-5"><%= __('payment-method') %></h3>
+            <div class="light-grey py-2 text-left">
+              <h5 class="pl-2 mb-0"><%= __('payment-method') %></h5>
             </div>
           </div>
         </div>
@@ -448,7 +463,7 @@
               </div>
               <div id="venmoPayment" class="tab-pane">
                 <div>
-                  <a class="venmo-qr"></a>
+                  <!--<a class="venmo-qr"></a>-->
                   <p><%= __('venmo-instruction')%></p>
                 </div>
               </div>
