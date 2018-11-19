@@ -49,7 +49,7 @@
                 ];%>
                 <ul class="nav nav-tabs my-2">
                   <% tabsData.forEach(function(tabData, i){%>
-                  <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark <%= i===0?'active':''%>"><%= __(tabData.title)%><span class="badge pull-right"><%= user.orders.filter(function(order){return order.status === tabData.status && order.status !== "complete" && order.type === tabData.type && order.meal}).length || ''%></span></a></li>
+                  <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark <%= i===0?'active':''%>"><%= __(tabData.title)%><span class="badge pull-right"><%= user.orders.filter(function(order){return order.status === tabData.status && order.status !== "review" && order.type === tabData.type && order.meal}).length || ''%></span></a></li>
                   <% });%>
                 </ul>
                 <div class="tab-content box-scroll">

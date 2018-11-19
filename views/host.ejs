@@ -32,7 +32,7 @@
     <div class="row">
       <div class="col-12">
         <ul class="nav nav-tabs nav-fill bg-light pt-3">
-          <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder"><%= __('host-nav-order')%></a></li>
+          <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder"><%= __('host-nav-order')%><span class="badge pull-right"><%= user.host.host_orders.filter(function(order){return order && order.status !== "cancel" && order.status !== "review" && order.status !== "complete" && order.meal}).length || '' %></span></a></li>
           <li class="nav-item"><a class="nav-link" data-toggle="tab" data-href="#mymeal"><%= __('host-nav-meal')%></a></li>
           <li class="nav-item"><a class="nav-link" data-toggle="tab" data-href="#mydish"><%= __('host-nav-dish')%></a></li>
           <li class="nav-item"><a class="nav-link" data-toggle="tab" data-href="#myinfo"><%= __('host-nav-info')%></a></li>
@@ -44,8 +44,8 @@
       <div id="myorder" class="tab-pane middle active">
         <div class="box box-base box-shadow white">
           <ul class="nav nav-pills nav-justified p-3">
-            <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder-order"><h4><strong><%= __('order-nav-order')%></strong></h4></a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" data-href="#myorder-preorder"><h4><strong><%= __('order-nav-preorder')%></strong></h4></a></li>
+            <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder-order"><h4><strong><%= __('order-nav-order')%><span class="badge pull-right"><%= user.host.host_orders.filter(function(order){return order && order.status !== "cancel" && order.status !== "review" && order.status !== "complete" && order.type === "order" && order.meal}).length || '' %></span></strong></h4></a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" data-href="#myorder-preorder"><h4><strong><%= __('order-nav-preorder')%><span class="badge pull-right"><%= user.host.host_orders.filter(function(order){return order && order.status !== "cancel" && order.status !== "review" && order.status !== "complete" && order.type === "preorder" && order.meal}).length || '' %></span></strong></h4></a></li>
           </ul>
           <div class="tab-content">
             <div id="myorder-order" class="tab-pane middle active">
@@ -59,7 +59,7 @@
               ];%>
               <ul class="nav nav-tabs my-2">
                 <% tabsData.forEach(function(tabData, i){%>
-                <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark <%= i===0?'active':''%>"><strong><%= __(tabData.title)%></strong></a></li>
+                <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark <%= i===0?'active':''%>"><strong><%= __(tabData.title)%></strong><span class="badge pull-right"><%= user.host.host_orders.filter(function(order){return order && order.status === tabData.status && order.status !== "review" && order.type === tabData.type && order.meal}).length || ''%></span></a></li>
                 <% });%>
               </ul>
               <div class="tab-content box-scroll">
@@ -200,7 +200,7 @@
               ];%>
               <ul class="nav nav-tabs my-2">
                 <% tabsData.forEach(function(tabData, i){%>
-                <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark <%= i===0?'active':''%>"><strong><%= __(tabData.title)%></strong></a></li>
+                <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark <%= i===0?'active':''%>"><strong><%= __(tabData.title)%></strong><span class="badge pull-right"><%= user.host.host_orders.filter(function(order){return order && order.status === tabData.status && order.status !== "review" && order.type === tabData.type && order.meal}).length || ''%></span></a></li>
                 <% });%>
               </ul>
               <div class="tab-content box-scroll">
