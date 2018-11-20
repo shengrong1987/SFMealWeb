@@ -3379,6 +3379,7 @@ var MealConfirmView = Backbone.View.extend({
       }
       deliveryOption.parent().removeClass("spinning").removeClass("is-disabled");
       makeAToast(jQuery.i18n.prop('addressValid'),'success');
+      if(cb){return cb( true );}
     })
   },
   applyCouponCode : function(e) {
@@ -3817,10 +3818,12 @@ var OrderView = Backbone.View.extend({
 
     this.getContactInfo(method, isLogin, function(contactInfo){
       if(!contactInfo){
+        button.trigger("reset");
         return;
       }
       $this.getPaymentInfo(isLogin, function(paymentInfo) {
         if (!paymentInfo) {
+          button.trigger("reset");
           return;
         }
         var form = $this.$el.find("#order");
@@ -3833,6 +3836,7 @@ var OrderView = Backbone.View.extend({
         var pickupMeal = pickupObj.meal;
         $this.getCustomizedInfo(partyMode, function(customInfo){
           if(!customInfo){
+            button.trigger("reset");
             return;
           }
           var currentOrder = localOrders;
@@ -3840,6 +3844,7 @@ var OrderView = Backbone.View.extend({
           //subtotal
           var subtotal = parseFloat(form.find(".subtotal").data("value"));
           if (subtotal === 0) {
+            button.trigger("reset");
             makeAToast(jQuery.i18n.prop('orderEmptyError'));
             return;
           }
@@ -3847,6 +3852,7 @@ var OrderView = Backbone.View.extend({
           if(partyMode){
             var minimal = form.data("minimal");
             if(subtotal < minimal){
+              button.trigger("reset");
               makeAToast(jQuery.i18n.prop('orderAmountInsufficient', minimal));
               return;
             }
@@ -3984,7 +3990,7 @@ var OrderView = Backbone.View.extend({
     $this.model.save({}, {
       success: function (model, result) {
         $('body').removeClass("loading");
-        button.html(button.data('original-text'));
+        button.trigger("reset");
         var orderIds = result.orders.map(function(order){
           return order.id;
         }).join("+");
@@ -4037,6 +4043,7 @@ var OrderView = Backbone.View.extend({
         }
       }, error: function (model, err) {
         $('body').removeClass("loading");
+        button.trigger("reset");
         BootstrapDialog.show({
           title: jQuery.i18n.prop('error'),
           message: err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText
