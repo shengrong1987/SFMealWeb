@@ -3106,6 +3106,9 @@ var MealConfirmView = Backbone.View.extend({
       this.$el.find("#dishDatesBar [data-filter='." + dateDesc + "']").parent().addClass("active");
       deliveryMixer.filter("." + dateDesc);
       pickupMixer.filter("." + dateDesc);
+    }else{
+      dateDesc = this.$el.find("#dishDatesBar [data-mixitup-control]").data("filter").replace(".","");
+      createCookie("date", dateDesc);
     }
     var method = $("#pickupMethodView #method .active").attr("value");
     if(method === "delivery"){
@@ -3187,8 +3190,8 @@ var MealConfirmView = Backbone.View.extend({
     var isLogin = !!this.$el.data("user");
     var btn = e ? $(e.currentTarget) : null;
     var dateDesc = decodeURI(readCookie('date'));
-    if(dateDesc === "undefined"){
-      dateDesc = this.$el.find("#deliveryTab .deliveryOption").first().data("date");
+    if(dateDesc === "undefined" || dateDesc === "null"){
+      dateDesc = this.$el.find("#dishDateBar [data-mixitup-control]").data("filter").replace(".","");
     }
     if(this.$el.find("#contactInfoView").length){
       var street = this.$el.find("input[name='street']").val();
@@ -3434,7 +3437,12 @@ var MealConfirmView = Backbone.View.extend({
     applyPoints(true, pointRedeem);
   },
   switchDate : function(e){
-    var dateDesc = $("#dishDatesBar .mixitup-control-active").data("filter").replace(".","");
+    var activeDate = $("#dishDatesBar .mixitup-control-active");
+    if(activeDate.length){
+      var dateDesc = activeDate.data("filter").replace(".","");
+    }else{
+      dateDesc = this.$el.find("#dishDatesBar [data-mixitup-control]").data("filter").replace(".","");
+    }
     createCookie("date", dateDesc);
     this.verifyAddress();
   }
