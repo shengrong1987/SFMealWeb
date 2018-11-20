@@ -154,7 +154,7 @@ function getPosition(element){
   return [left, top];
 }
 
-function jumpTo(id, offset){
+function jumpTo(id, offset = 0){
   // var coordinate = getPosition(id);
   if(!$("#" + id).length){
     return;

@@ -274,6 +274,7 @@
                               </span>
                             </label>
                             <%j++;}i++;})}; %>
+                            <h5 class="empty d-none"><small><%= __('delivery-out-of-range-error')%></small></h5>
                           </div>
                         </div>
                       </div>
@@ -488,10 +489,10 @@
           <%= __('no-dish-left') %>
         </div>
 
-        <!--<button type="button" data-action="showMenu" class="btn btn-outline-dark w-100">-->
-          <!--<%= __('toggleMenu') %>-->
-          <!--<span><i class="fas fa-arrow-down"></i></span>-->
-        <!--</button>-->
+        <button type="button" data-action="showMenu" class="btn btn-outline-dark w-100">
+          <%= __('toggleMenu') %>
+          <span><i class="fas fa-arrow-down"></i></span>
+        </button>
 
         <table id="order" class="table tableBodyScroll" data-err-container="#alert-order">
           <thead>

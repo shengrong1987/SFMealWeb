@@ -404,8 +404,14 @@
                     <a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('edit')%></a><br>
                     <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-container="#mymeal" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:deleteMeal" data-argument="<%= meal.id%>"><%= __('delete')%></a><br/>
                   <td class="align-middle">
-                    <button name="action" data-loading-text="<%= __('loading')%>" class="btn btn-outline text-red <%= meal.status === 'on' ? '' : 'd-none'%>" data-id="<%= meal.id%>" data-action="off"><%= __('off')%></button>
-                    <button name="action" data-loading-text="<%= __('loading')%>" class="btn btn-outline <%= meal.status === 'off' ? '' : 'd-none'%>" data-id="<%= meal.id%>" data-action="on"><%= __('on')%></button>
+                    <button name="action" class="btn btn-outline ld-ext-right text-red <%= meal.status === 'on' ? '' : 'd-none'%>" data-id="<%= meal.id%>" data-action="off">
+                      <%= __('off')%>
+                      <div class="ld ld-ring ld-spin"></div>
+                    </button>
+                    <button name="action" class="btn btn-outline ld-ext-right <%= meal.status === 'off' ? '' : 'd-none'%>" data-id="<%= meal.id%>" data-action="on">
+                      <%= __('on')%>
+                      <div class="ld ld-ring ld-spin"></div>
+                    </button>
                   </td>
                 </tr>
                 </tbody>

@@ -67,7 +67,10 @@
               <div class="card-footer">
                 <h4><small><%= __('step1-ongoing-tip')%><a href="/terms#terms"> <%= __('SFMeal-agreement')%> </a><%= __('and')%><a href="https://stripe.com/us/legal/"> <%= __('stripe-agreement')%> </a></small></h4>
               </div>
-              <button id="applyBtn" data-loading-text="<%= __('step1-action-btn')%>" class="btn btn-info btn-lg"><%= __('step1-action-btn')%></button>
+              <button id="applyBtn" class="btn btn-info btn-lg ld-ext-right">
+                <%= __('step1-action-btn')%>
+                <div class="ld ld-ring ld-spin"></div>
+              </button>
               <div class="alert alert-danger pt-2" data-toggle="alert"></div>
               <% }%>
             </div>

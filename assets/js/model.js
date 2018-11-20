@@ -601,12 +601,13 @@ var ApplyView = Backbone.View.extend({
       return;
     }
     var btn = $(e.currentTarget);
+    btn.addClass("running");
     this.model.url = "/user/becomeHost?shopName=" + shopName + '&phone=' + phone;
     this.model.fetch({
       success : function(){
         location.reload();
       },error : function(model,err){
-        btn.html(btn.data('original-text'));
+        btn.removeClass("running");
         BootstrapDialog.alert(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
       }
     });
@@ -1062,7 +1063,8 @@ var Meal = Backbone.Model.extend({
 var DayOfMealView = Backbone.View.extend({
   events : {
     "click #gotoCheckoutBtn" : "gotoCheckout",
-    "mixClick #dishContentView" : "selectDate"
+    "mixClick #dishContentView" : "selectDate",
+    "mixEnd #dishContentView" : "renderImage"
   },
   initialize : function() {
 
@@ -1072,6 +1074,9 @@ var DayOfMealView = Backbone.View.extend({
     var currentTarget = $(originalEvent.currentTarget);
     var dateDesc = currentTarget.data("filter").replace(".","");
     createCookie("date", encodeURI(dateDesc));
+  },
+  renderImage : function(){
+    echo.render();
   },
   gotoCheckout : function(e){
     var orderedDishes = []
@@ -2533,14 +2538,14 @@ var MyMealView = Backbone.View.extend({
     e.preventDefault();
     var _this = this;
     var target = $(e.currentTarget);
+    target.addClass("running");
     var mealId = target.data("id");
     var action = target.data("action");
     this.model.set("id",mealId);
     this.model.action = action;
     this.model.fetch({
       success : function(){
-        target.html(target.data('original-text'));
-        target.addClass("d-none");
+        target.removeClass("running").addClass("d-none");
         if(action === "on"){
           target.parent().find("[data-action='off']").removeClass("d-none");
         }else if(action === "off"){
@@ -2550,7 +2555,7 @@ var MyMealView = Backbone.View.extend({
         }
       },
       error : function(model, err){
-        target.html(target.data('original-text'));
+        target.removeClass("running");
         BootstrapDialog.alert(err.responseJSON ? err.responseJSON.responseText : err.responseText);
       }
     })
@@ -3086,7 +3091,8 @@ var MealConfirmView = Backbone.View.extend({
     "keydown" : "onKeyDown",
     "click #verifyAddressBtn" : "verifyAddress",
     "click input[name='billingAddress']" : "enterBillingAddress",
-    "mixEnd #deliveryTab" : "switchDate"
+    "mixEnd #deliveryTab" : "switchDate",
+    "click [data-action]" : "go"
   },
   initialize : function(){
     this.alertView = this.$el.find("#orderAlertView");
@@ -3113,6 +3119,12 @@ var MealConfirmView = Backbone.View.extend({
     var method = $("#pickupMethodView #method .active").attr("value");
     if(method === "delivery"){
       $("#pickupOptionsView .step-2").hide();
+    }
+  },
+  go : function(e){
+    var action = $(e.currentTarget).data("action");
+    if(action === "showMenu"){
+      this.$el.find("#order .dish:not(.table-success)").toggle();
     }
   },
   enterBillingAddress : function(e){
@@ -3274,9 +3286,9 @@ var MealConfirmView = Backbone.View.extend({
     this.checkOptions(yourAddress, dateDesc);
   },
   checkOptions : function(address, dateDesc){
+    var _this = this;
     var deliveryOptions = this.$el.find("#deliveryTab .deliveryOption .regular-radio");
     $("#pickupOptionsView .step-2").show();
-    deliveryOptions.parent().addClass("spinning").addClass("is-disabled");
 
     utility.geocoding(address, function(err, cusLocation) {
       if (err) {
@@ -3302,7 +3314,14 @@ var MealConfirmView = Backbone.View.extend({
           }
         }
       });
-      deliveryOptions.parent().removeClass("spinning").removeClass("is-disabled");
+      var visibleOptions = _this.$el.find("#deliveryTab:visible");
+      var emptyView = $("#pickupOptionsView #deliveryTab .empty");
+      if(visibleOptions.length){
+        emptyView.hide();
+      }else{
+        emptyView.removeClass("d-none").show();
+      }
+      jumpTo("pickupOptionsView");
     });
   },
   switchAddress : function(e, cb, yourAddress){
@@ -3665,12 +3684,7 @@ var OrderView = Backbone.View.extend({
             return cb(false);
           }
         }
-        mealConfirmView.switchAddress(null, function (valid) {
-          if (!valid) {
-            return cb(false);
-          }
-          return cb(contactObj);
-        }, contactObj.address);
+        return cb(contactObj);
         break;
       case "shipping":
         if(!isLogin){
@@ -3818,64 +3832,71 @@ var OrderView = Backbone.View.extend({
 
     this.getContactInfo(method, isLogin, function(contactInfo){
       if(!contactInfo){
-        button.trigger("reset");
+        jumpTo("pickupInfoView");
         return;
       }
-      $this.getPaymentInfo(isLogin, function(paymentInfo) {
-        if (!paymentInfo) {
-          button.trigger("reset");
+      mealConfirmView.switchAddress(null, function (valid) {
+        if (!valid) {
+          jumpTo("pickupOptionsView");
           return;
         }
-        var form = $this.$el.find("#order");
-        var partyMode = form.data("party");
-
-        //pickup option
-        var pickupObj = $this.getPickupOption(method);
-        var pickupOption = pickupObj.index;
-        var pickupDate = pickupObj.date;
-        var pickupMeal = pickupObj.meal;
-        $this.getCustomizedInfo(partyMode, function(customInfo){
-          if(!customInfo){
+        $this.getPaymentInfo(isLogin, function(paymentInfo) {
+          if (!paymentInfo) {
+            jumpTo("payment-cards");
             button.trigger("reset");
             return;
           }
-          var currentOrder = localOrders;
+          var form = $this.$el.find("#order");
+          var partyMode = form.data("party");
 
-          //subtotal
-          var subtotal = parseFloat(form.find(".subtotal").data("value"));
-          if (subtotal === 0) {
-            button.trigger("reset");
-            makeAToast(jQuery.i18n.prop('orderEmptyError'));
-            return;
-          }
-
-          if(partyMode){
-            var minimal = form.data("minimal");
-            if(subtotal < minimal){
+          //pickup option
+          var pickupObj = $this.getPickupOption(method);
+          var pickupOption = pickupObj.index;
+          var pickupDate = pickupObj.date;
+          var pickupMeal = pickupObj.meal;
+          $this.getCustomizedInfo(partyMode, function(customInfo){
+            if(!customInfo){
+              jumpTo("pickupInfoView");
               button.trigger("reset");
-              makeAToast(jQuery.i18n.prop('orderAmountInsufficient', minimal));
               return;
             }
-          }
+            var currentOrder = localOrders;
 
-          //coupon & points
-          var points = localPoints;
-          var couponValue = localCoupon;
-          if (couponValue) {
-            var code = Object.keys(couponValue)[0];
-          }
+            //subtotal
+            var subtotal = parseFloat(form.find(".subtotal").data("value"));
+            if (subtotal === 0) {
+              button.trigger("reset");
+              makeAToast(jQuery.i18n.prop('orderEmptyError'));
+              return;
+            }
 
-          BootstrapDialog.show({
-            title : jQuery.i18n.prop("tipTitle"),
-            message : "<h5>" + jQuery.i18n.prop('selectTip') + "</h5>" +
-            "<form id='customTip' class='d-none'>" +
-            "<div class='input-group'>" +
-            "<div class='input-group-prepend'><span class='input-group-text'>$</span></div>" +
-            "<input name='tip' type='number' class='form-control' require>" + "</div>" +
-            "</div>" +
-            "<button class='form-control btn btn-info' type='submit'>Confirm</button>" +
-            "</form>",
-            buttons : [{
+            if(partyMode){
+              var minimal = form.data("minimal");
+              if(subtotal < minimal){
+                button.trigger("reset");
+                makeAToast(jQuery.i18n.prop('orderAmountInsufficient', minimal));
+                return;
+              }
+            }
+
+            //coupon & points
+            var points = localPoints;
+            var couponValue = localCoupon;
+            if (couponValue) {
+              var code = Object.keys(couponValue)[0];
+            }
+
+            BootstrapDialog.show({
+              title : jQuery.i18n.prop("tipTitle"),
+              message : "<h5>" + jQuery.i18n.prop('selectTip') + "</h5>" +
+              "<form id='customTip' class='d-none'>" +
+              "<div class='input-group'>" +
+              "<div class='input-group-prepend'><span class='input-group-text'>$</span></div>" +
+              "<input name='tip' type='number' class='form-control' require>" + "</div>" +
+              "</div>" +
+              "<button class='form-control btn btn-info' type='submit'>Confirm</button>" +
+              "</form>",
+              buttons : [{
                 label : "15%",
                 title : subtotal * 0.15,
                 cssClass: 'btn-primary',
@@ -3902,10 +3923,11 @@ var OrderView = Backbone.View.extend({
                   $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, 0, $this, button);
                 }
               }
-            ]
+              ]
+            });
           });
         });
-      });
+      }, contactInfo.address);
     });
   },
   adjust : function(e){

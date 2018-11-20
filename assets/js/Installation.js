@@ -27,7 +27,6 @@ function setup(){
   setupGlobalLoading();
   setupCrumble();
   setupDateTimePicker();
-  setupLoadingButton();
   setupFlexScrollBar();
   setupCollapse();
 }
@@ -431,21 +430,6 @@ function setupCollapseButton(){
 
 function setupCrumble(){
   $('#tour').crumble();
-}
-
-function setupLoadingButton(){
-  $("button[data-loading-text]").on('click', function(){
-    var button = $(this);
-    var loadingText = button.data('loading-text');
-    var originalText = button.html();
-    button.html('<i class="fa fa-circle-o-notch fa-spin"></i> ' + loadingText);
-    button.data('original-text', originalText);
-  })
-  $("button[data-loading-text]").on('reset', function(){
-    var button = $(this);
-    var originalText = button.data('original-text');
-    button.html(originalText);
-  })
 }
 
 function setupFlexScrollBar(){
