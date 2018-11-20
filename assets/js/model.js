@@ -816,6 +816,7 @@ var AddressView = Backbone.View.extend({
     this.isCoolDown = true;
   },
   deleteAddress : function(e){
+    var _this = this;
     var target = $(event.target);
     var address_id = target.data("address-id");
     this.model.set({
@@ -826,7 +827,7 @@ var AddressView = Backbone.View.extend({
     });
     this.model.save({},{
       success : function(){
-        reloadUrl("/user/me","#myaddress");
+        _this.$el.find("[data-address-id='" + address_id + "']").parentsUntil(".addressItem").remove();
       },error : function(model, err){
         BootstrapDialog.alert(err.responseText);
       }
