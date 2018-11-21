@@ -330,6 +330,7 @@ function updateOrderWindow(fromCache, isTrigger){
  */
 function updateMenuView(id){
   var number = localOrders[id].number;
+  var dateDesc = decodeURI(readCookie("date"));
   var dishItems = $("#order").find(".item[data-id=" + id + "]");
   dishItems.each(function(){
     var dishItem = $(this);
@@ -340,7 +341,10 @@ function updateMenuView(id){
       dishItem.amountInput('update',dishItem.find("[data-toggle='amount-input']"));
     }
     if(number>0){
-      dishItem.addClass("table-success").show();
+      dishItem.addClass("table-success");
+      if(dishItem.hasClass(dateDesc)){
+        dishItem.show();
+      }
     }else{
       dishItem.removeClass("table-success");
     }
@@ -607,7 +611,7 @@ var refreshCheckoutMenu = function(){
   var method = $("#method").find(".active").attr("value");
   var $order = $("#order");
   var _dishes = [];
-  $order.find(".item:visible").each(function(){
+  $order.find(".item").each(function(){
     var dishId = $(this).data("id");
     if(_dishes.includes(dishId)){
       return;
@@ -616,8 +620,11 @@ var refreshCheckoutMenu = function(){
     }
     var unitPrice = parseFloat($(this).find(".price").attr("value"));
     var amount = parseInt($(this).find(".amount").val());
+    var dishView = $("#meal-confirm-container").find(".dish[data-id='" + dishId + "']");
     if(amount){
-      $("#meal-confirm-container .dish[data-id='" + dishId + "']").show();
+      dishView.addClass("table-success").show();
+    }else if(dishView.hasClass("table-success")){
+      dishView.removeClass("table-success").hide();
     }
     var _subtotal = amount * unitPrice + parseFloat($(this).find(".price").data("extra"))
     if(_subtotal > 0){

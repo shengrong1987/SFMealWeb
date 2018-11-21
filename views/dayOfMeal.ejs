@@ -45,7 +45,7 @@
               return dateObj[d2] - dateObj[d1];
           })
         dates.forEach(function(dateKey,i){ %>
-        <li class="nav-item py-4 <%= i===0?'active':''%>"><a class="nav-link" href="javascript:void(0);" data-filter=".<%= dateKey.replace(' ','')%>" data-toggle="tab"><%= __(dateKey)%></a></li>
+        <li class="nav-item py-4 <%= i===0?'active':''%>"><a class="nav-link" data-mixitup-control href="javascript:void(0);" data-filter=".<%= dateKey.replace(' ','')%>" data-toggle="tab"><%= __(dateKey)%></a></li>
         <% })%>
       </ul>
     </div>

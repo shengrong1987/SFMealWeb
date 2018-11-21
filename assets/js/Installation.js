@@ -171,6 +171,9 @@ function setupMixin() {
       },
       load: {
         filter : firstFilter
+      },
+      selectors: {
+        control : '[data-mixitup-control]'
       }
     });
   }
@@ -202,6 +205,9 @@ function setupMixin() {
       },
       load: {
         filter : firstFilter
+      },
+      selectors: {
+        control : '[data-mixitup-control]'
       }
     });
   }
