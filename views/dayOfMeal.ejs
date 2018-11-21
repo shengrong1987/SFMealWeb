@@ -51,7 +51,7 @@
     </div>
     <% }%>
 
-    <div class="wrapper d-flex">
+    <div class="w-100 d-flex">
       <nav id="dishTagsBar" class="sticky-top">
         <ul class="list list-side list-unstyled" style="min-width:100px;" data-toggle="btn-set">
           <% tags.forEach(function(tag, index){%>
@@ -78,7 +78,7 @@
               if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
               %>
               <% if(tag === "all" || dish.type === tag || meal.chef.shopName === tag || (dish.tags && dish.tags.includes(tag))){%>
-            <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem p-2 mix item <%= meal.chef.shopName%> <%= dateKey.replace(" ",'')%><% if(dish.tags){ dish.tags.forEach(function(t){%>
+            <div style="display:none;" data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem p-2 mix item <%= meal.chef.shopName%> <%= dateKey.replace(" ",'')%><% if(dish.tags){ dish.tags.forEach(function(t){%>
               <%= " " + t%>
               <%})}%>">
             <div class="d-flex flex-row">
@@ -126,7 +126,9 @@
 </div>
 
 <script>
-  var dayOfMealView = new DayOfMealView({ el : $("#dayOfMealContainer"), model : new Meal()});
+  $(document).ready(function(){
+    var dayOfMealView = new DayOfMealView({ el : $("#dayOfMealContainer"), model : new Meal()});
+  });
   var coverDishId = $("#dayOfMealContainer").data("cover");
   var user = $("#dayOfMealContainer").data("user");
   var coverDish = $("#dayOfMealContainer").find(".dish a[data-gallery='" + coverDishId + "']");

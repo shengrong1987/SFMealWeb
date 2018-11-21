@@ -1067,7 +1067,14 @@ var DayOfMealView = Backbone.View.extend({
     "mixEnd #dishContentView" : "renderImage"
   },
   initialize : function() {
-
+    var activeFilters = this.$el.find("#dishDatesBar .mixitup-control-active");
+    var filter = "";
+    if(activeFilters.length){
+      filter = activeFilters.data("filter");
+    }else{
+      filter = this.$el.find("#dishDatesBar nav-link").data("filter");
+    }
+    dateMixer.filter(filter);
   },
   selectDate : function(e){
     var originalEvent = e.originalEvent.detail.originalEvent;
@@ -3107,7 +3114,7 @@ var MealConfirmView = Backbone.View.extend({
     }
     utility.initGoogleMapService();
     var dateDesc = decodeURI(readCookie("date"));
-    if(dateDesc && dateDesc !== "undefined"){
+    if(dateDesc && dateDesc !== "undefined" && dateDesc !== "null"){
       this.$el.find("#dishDatesBar li").removeClass("active");
       this.$el.find("#dishDatesBar [data-filter='." + dateDesc + "']").parent().addClass("active");
       deliveryMixer.filter("." + dateDesc);
@@ -3325,6 +3332,10 @@ var MealConfirmView = Backbone.View.extend({
     });
   },
   switchAddress : function(e, cb, yourAddress){
+    var method = this.$el.find("#method .active").attr("value");
+    if(method !== "delivery"){
+      return cb(true);
+    }
     var deliveryOption = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio:checked");
     if(!deliveryOption.length){
       makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));

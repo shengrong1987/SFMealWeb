@@ -509,7 +509,7 @@
             var mealObj = meals.meals[dateKey];
             var actualMeals = mealObj.meals;
             actualMeals.forEach(function(meal) {meal.dishes.forEach(function(dish) {if(!dishes.includes(dish.id)){dishes.push(dish.id);%>
-              <tr class="success dish item px-2" data-id=<%= dish.id %> data-left-amount=<%= meal.leftQty[dish.id]%>>
+              <tr class="success dish item px-2" data-id=<%= dish.id %> data-left-amount=<%= meal.leftQty[dish.id]%> style="display: none;">
                 <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span></td>
                 <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
 

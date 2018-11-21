@@ -154,15 +154,15 @@ function getPosition(element){
   return [left, top];
 }
 
-function jumpTo(id, offset = 0){
+function jumpTo(id, offset){
   // var coordinate = getPosition(id);
   if(!$("#" + id).length){
     return;
   }
+  offset = offset || 0;
   $("html,body").animate({
     scrollTop : $("#" + id).offset().top + offset
   },1000)
-  // window.scrollTo(coordinate[0],coordinate[1]);
 }
 
 //on user search action - redirect
@@ -330,7 +330,7 @@ function updateOrderWindow(fromCache, isTrigger){
  */
 function updateMenuView(id){
   var number = localOrders[id].number;
-  var dishItems = $("#order").find(".item[data-id=" + id + "]:visible");
+  var dishItems = $("#order").find(".item[data-id=" + id + "]");
   dishItems.each(function(){
     var dishItem = $(this);
     var left = dishItem.data("left-amount");
@@ -340,7 +340,7 @@ function updateMenuView(id){
       dishItem.amountInput('update',dishItem.find("[data-toggle='amount-input']"));
     }
     if(number>0){
-      dishItem.addClass("table-success");
+      dishItem.addClass("table-success").show();
     }else{
       dishItem.removeClass("table-success");
     }
@@ -616,8 +616,8 @@ var refreshCheckoutMenu = function(){
     }
     var unitPrice = parseFloat($(this).find(".price").attr("value"));
     var amount = parseInt($(this).find(".amount").val());
-    if(!amount){
-      $("#meal-confirm-container .dish[data-id='" + dishId + "']").hide();
+    if(amount){
+      $("#meal-confirm-container .dish[data-id='" + dishId + "']").show();
     }
     var _subtotal = amount * unitPrice + parseFloat($(this).find(".price").data("extra"))
     if(_subtotal > 0){

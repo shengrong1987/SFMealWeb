@@ -8867,10 +8867,6 @@ a.text-dark:focus {
 body {
   min-height: 550px;
 }
-.is-disabled {
-  opacity: .5;
-  pointer-events: none;
-}
 small {
   font-size: 75%;
   color: #777;

@@ -200,6 +200,9 @@
   };
 
   utility.geocoding = function(address, cb){
+    if(!utility.geocoder){
+      return cb("geocoder not initialized");
+    }
     utility.geocoder.geocode({ address : address}, function(data, status){
       if (status === google.maps.GeocoderStatus.OK) {
         if (data.length > 0) {

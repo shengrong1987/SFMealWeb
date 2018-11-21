@@ -17,7 +17,8 @@ var tmpPath = '.tmp/public/';
 //  to change `assets/styles/importer.less` instead.)
 var cssFilesToInject = [
   'styles/**/*.css',
-  '!styles/revolution/**.css'
+  '!styles/revolution/**.css',
+  "!styles/home-css/*.css"
 ];
 
 
