@@ -290,7 +290,7 @@ describe('OrderController', function() {
           res.body.orders.should.have.length(1);
           var o = res.body.orders[0];
           var chargesTotal = Math.round(((price1 + price2 * 2 + (price4*2+3)) + SERVICE_FEE + 10) * 100);
-          userPoints += Math.floor(chargesTotal / 100);
+          userPoints += Math.floor(chargesTotal / 200);
           // res.body.tax.should.be.equal(tax);
           o.customerName.should.be.equal('sheng');
           o.customerPhone.should.be.equal(phone);
@@ -416,7 +416,7 @@ describe('OrderController', function() {
           }
           // var tax = Math.round(price1 * 0.085 * 100);
           // res.body.tax.should.be.equal(tax);
-          userPoints -= Math.floor((price2*2 + price4*2+3));
+          userPoints -= (Math.floor((price2*2 + price4*2+3)/2) + 1);
           res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
@@ -547,7 +547,7 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          userPoints += Math.floor(price3 * 1);
+          userPoints += Math.round(price3/2);
           res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
@@ -1917,7 +1917,7 @@ describe('OrderController', function() {
       var adminEmail = 'admin@sfmeal.com';
       var password = '12345678';
       var user5Email = "referraltest@gmail.com";
-      var userId;
+      var userId, userPoints;
 
       it('should login a guest account', function (done) {
         agent
@@ -1941,6 +1941,7 @@ describe('OrderController', function() {
             res.body.should.have.property("auth");
             res.body.auth.email.should.be.equal(user5Email, "login user email does not match");
             userId = res.body.id;
+            userPoints = res.body.points;
             done()
           })
       });
@@ -2039,6 +2040,7 @@ describe('OrderController', function() {
               return done(err);
             }
             // res.body.tax.should.be.equal(price3 * 0.085 * 100);
+            userPoints += Math.floor((price3+SERVICE_FEE)/2);
             var o = res.body.orders[0];
             o.application_fees['cash'].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
             o.feeCharges[Object.keys(o.feeCharges)[0]].should.be.equal((price3 * 0.2 + SERVICE_FEE) * 100);
@@ -2046,6 +2048,19 @@ describe('OrderController', function() {
             o.customerName.should.be.equal(customerName);
             orderId = o.id;
             done();
+          })
+      });
+
+      it('user should get certain reward points', function(done){
+        agent
+          .get('/user/me')
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            res.body.points.should.be.equal(userPoints);
+            done()
           })
       });
 
@@ -3132,7 +3147,7 @@ describe('OrderController', function() {
           .end(done)
       })
 
-      it('referral should have 50 points', function (done) {
+      it('should set referrers code to null', function (done) {
         agent
           .get('/user/me')
           .set('Accept', 'application/json')
@@ -3142,7 +3157,7 @@ describe('OrderController', function() {
             if (err) {
               return done(err);
             }
-            res.body.points.should.be.equal(50);
+            should.equal(res.body.referrerCode, null);
             done();
           })
       })

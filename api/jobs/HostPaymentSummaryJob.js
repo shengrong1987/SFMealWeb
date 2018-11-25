@@ -99,6 +99,9 @@ module.exports = function(agenda) {
                           if(err){
                             return next(err);
                           }
+                          if(!fee){
+                            return next();
+                          }
                           if(chargeId === "cash"){
                             var date = moment(new Date(order.createdAt).getTime());
                             charge.income = order.charges['cash'];

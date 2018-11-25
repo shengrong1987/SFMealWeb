@@ -162,10 +162,7 @@ module.exports = {
     if(!orders){
       return res.badRequest({code: -54, responseText: req.__('meal-checkout-lack-of-order')});
     }
-    // var pickupDate = req.body.pickupDate;
-    // if(!pickupDate){
-    //   return res.badRequest({code : -55, responseText: req.__('meal-checkout-lack-of-date')});
-    // }
+
     var targetMeal = req.body.pickupMeal;
     if(!targetMeal){
       return res.badRequest({code : -56, responseText: req.__('meal-checkout-lack-of-meal')});
@@ -582,7 +579,7 @@ module.exports = {
               next();
             });
           }],
-          addReferralPoints : [ 'updateMeal',function(next){
+          addPoints : [ 'updateMeal',function(next){
             async.each(_orders, function (order, nextIn) {
               _this.addReferrerPoints(order.customer, nextIn);
             }, function(err){
@@ -592,7 +589,7 @@ module.exports = {
               next();
             })
           }],
-          finalizeOrder : ['addReferralPoints', function(next){
+          finalizeOrder : ['addPoints', function(next){
             async.each(_orders, function(order, nextIn){
               var _m = order.meal;
               order.meal = order.meal.id;
@@ -2613,6 +2610,23 @@ module.exports = {
       req.body.redeemPoints = parseInt(points);
       cb(null, points/10);
     });
+  },
+
+  addPoint : function(customer, order, cb){
+    if(!customer){
+      return cb();
+    }
+    var userId = customer.id || customer;
+    var points = parseInt((order.subtotal - order.discount) / 5);
+    User.findOne(userId).exec(function(err, u){
+      if(err){
+        return cb(err);
+      }
+      u.points = u.points || 0;
+      u.points += points;
+      sails.log.info("adding points: " + points + " for ordering");
+      u.save(cb);
+    })
   },
 
   addReferrerPoints : function(customer, cb){

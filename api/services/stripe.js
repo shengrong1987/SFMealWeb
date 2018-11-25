@@ -136,6 +136,7 @@ module.exports = {
   },
 
   chargeCash : function(attr, cb){
+    var _this = this;
     if(attr.metadata.application_fee === 0){
       return cb(null, { id : 'cash', status : 'succeeded', amount : attr.metadata.total, application_fee : attr.metadata.application_fee}, { amount : 0, application_fee : 0});
     }
@@ -182,7 +183,12 @@ module.exports = {
       if(err){
         return cb(err);
       }
-      cb(null, { id : charge.id, status : charge.status, amount : attr.metadata.total, application_fee : charge.amount}, transfer);
+      _this.handlePoint(attr.metadata.total, attr.metadata.userId, function(err, user){
+        if(err){
+          return cb(err);
+        }
+        cb(null, { id : charge.id, status : charge.status, amount : attr.metadata.total, application_fee : charge.amount}, transfer);
+      });
     });
   },
 
@@ -436,7 +442,7 @@ module.exports = {
         return cb(err);
       }
       var points = user.points || 0;
-      var earnedPoints = Math.floor(amount/100);
+      var earnedPoints = Math.floor(amount/200);
       var newPoints = points + earnedPoints;
       sails.log.info("user old points: " + points);
       sails.log.info("points difference: " + earnedPoints);

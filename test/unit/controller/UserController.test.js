@@ -526,6 +526,31 @@ describe('UsersController', function() {
           })
     })
 
+    it('should not verify email without providing email', function(done){
+        agent
+          .put('/user/' + userId + '/sendEmailVerification')
+          .send({})
+          .expect(403)
+          .end(function(err, res){
+            res.body.code.should.be.equal(-5);
+            done();
+          })
+    })
+
+    it('should send verification email if email is verified', function(done){
+      agent
+        .put('/user/' + userId + '/sendEmailVerification')
+        .send({
+          email : email
+        })
+        .expect(200)
+        .end(function(err, res){
+          res.body.emailVerified.should.be.false();
+          should.exist(res.body.verificationUrl);
+          done();
+        })
+    })
+
     it('should update other user info', function (done) {
       agent
         .put('/user/' + userId)

@@ -941,6 +941,9 @@ var AddressView = Backbone.View.extend({
     }
     this.model.action = "sendEmailVerification";
     var $this = this;
+    this.model.set({
+      email : email
+    })
     this.model.save({}, {
       success : function(){
         BootstrapDialog.show({
@@ -1075,6 +1078,7 @@ var DayOfMealView = Backbone.View.extend({
       filter = this.$el.find("#dishDatesBar nav-link").data("filter");
     }
     dateMixer.filter(filter);
+    dateMixer.filter(".Thursday");
   },
   selectDate : function(e){
     var originalEvent = e.originalEvent.detail.originalEvent;

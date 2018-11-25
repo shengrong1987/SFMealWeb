@@ -384,8 +384,12 @@ module.exports = require('waterlock').actions.user({
 
   sendEmailVerification : function(req, res){
     var userId = req.params.id;
+    var email = req.body.email;
+    if(!email){
+      return res.badRequest({ code : -5, responseText : req.__('user-lack-of-email')});
+    }
     var verifyToken = notification.generateToken();
-    User.update(userId, { verifyToken : verifyToken}).exec(function(err, users){
+    User.update(userId, { verifyToken : verifyToken, email : email }).exec(function(err, users){
       if(err){
         return res.badRequest(err);
       }
@@ -394,6 +398,9 @@ module.exports = require('waterlock').actions.user({
       User.findOne(userId).populate('auth').exec(function(err, u){
         if(err){
           return res.badRequest(err);
+        }
+        if(u.emailVerified){
+          return res.ok(u);
         }
         u.verificationUrl = host + "/user/verify/" + verifyToken.token;
         notification.sendEmail("User","verification",u,req);
