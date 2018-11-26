@@ -352,7 +352,7 @@ function updateMenuView(id){
     dishItem.find(".left-amount span").html(left);
     var priceItem = dishItem.find(".price");
     var preference = localOrders[id].preference;
-    var oldPrice = priceItem.attr("old-value");
+    var oldPrice = priceItem.data("original-price");
     var price = priceItem.attr("value");
     if(preference && preference.length){
       var extra = preference.reduce(function(total, next){
@@ -361,13 +361,13 @@ function updateMenuView(id){
       priceItem.data("extra", extra);
       if(extra > 0){
         if(oldPrice){
-          priceItem.html("$" + price + " <s>$" + oldPrice + "</s>" + " ($" + extra + ")");
+          priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s><br/>" + "$" + price + " ($" + extra + ")");
         }else{
           priceItem.html("$" + price + " ($" + extra + ")");
         }
       }else{
         if(oldPrice){
-          priceItem.html("$" + price + " <s>$" + oldPrice + "</s>");
+          priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s><br/>" + "$" + price);
         }else{
           priceItem.html("$" + price);
         }
@@ -375,7 +375,7 @@ function updateMenuView(id){
     }else{
       priceItem.data("extra", 0);
       if(oldPrice){
-        priceItem.html("$" + price + " <s>$" + oldPrice + "</s>");
+        priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s><br/>" + "$" + price);
       }else{
         priceItem.html("$" + price);
       }

@@ -109,7 +109,9 @@
                   </small>
                 </h6>
                 <div class="d-flex">
-                  <div class="text text-price price mr-2" data-extra=0 value="<%= dish.price%>">$<%= dish.price.toFixed(2)%></div>
+                  <div class="text text-price price mr-2" data-extra=0 value="<%= dish.price%>" data-original-price="<%= dish.originalPrice || ''%>">
+                    $<%= dish.price.toFixed(2)%>
+                  </div>
                   <div class="input-group input-group-sm amount-input round ml-auto" style="max-width:200px;min-width:30px;" data-toggle="amount-input" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
                     <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">
                       <span class="input-group-text">-</span>
