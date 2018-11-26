@@ -18,7 +18,7 @@
 
     <% if(meals && meals.meals){%>
     <div class="w-100 sticky-top" style="height: 90px;">
-      <ul id="dishDatesBar" class="nav nav-light nav-fill justify-content-center bg-light">
+      <ul id="dishDatesBar" class="nav nav-light bg-light d-flex none-padding" style="overflow-x: scroll;height: 89px;list-style: none;">
         <%
           var dates = Object.keys(meals.meals);
           dates = dates.sort(function(d1,d2){
@@ -42,10 +42,22 @@
                   "星期六" : 1,
                   "星期天" : 0
               }
-              return dateObj[d2] - dateObj[d1];
+              if(dateObj.hasOwnProperty(d1) && dateObj.hasOwnProperty(d2)){
+                return dateObj[d2] - dateObj[d1];
+              }else{
+                var month1 = d1.split("-")[0];
+                var day1 = d1.split("-")[1];
+                var month2 = d2.split("-")[0];
+                var day2 = d2.split("-")[1];
+                if(month1 === month2){
+                    return day1 - day2;
+                }else{
+                    return month1 - month2;
+                }
+              }
           })
         dates.forEach(function(dateKey,i){ %>
-        <li class="nav-item py-4 <%= i===0?'active':''%>"><a class="nav-link" data-mixitup-control href="javascript:void(0);" data-filter=".<%= dateKey.replace(' ','')%>" data-toggle="tab"><%= __(dateKey)%></a></li>
+        <li class="nav-item py-4 col-4 <%= i===0?'active':''%>"><a class="nav-link" data-mixitup-control href="javascript:void(0);" data-filter=".<%= dateKey.replace('-','').replace(" ","")%>" data-toggle="tab"><%= __(dateKey).replace("day",'')%></a></li>
         <% })%>
       </ul>
     </div>

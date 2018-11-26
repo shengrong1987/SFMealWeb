@@ -51,7 +51,7 @@
 
     <ul id="nextMealView" class="d-flex relative p-0" style="overflow-x: scroll;overflow-y: hidden;list-style: none;">
       <% host.meals.forEach(function(meal){%>
-      <li class="relative col-10 col-md-5 p-0" style="flex-shrink: 0;" data-start="09:00" data-end="10:15" data-content="event-restorative-yoga" data-event="event-4">
+      <li class="relative col-10 col-md-5 p-0" style="flex-shrink: 0;">
         <div class="absolute d-block m-auto" style="left:0;top:0;height: 80px;background-color:rgba(0, 0, 0, 0.5);">
           <div class="p-2">
             <h6 class="text-white"><%= meal.provideDate()%></h6>

@@ -950,9 +950,32 @@ var AddressView = Backbone.View.extend({
           title : jQuery.i18n.prop('tip'),
           message : jQuery.i18n.prop('emailVerificationSent'),
           buttons : [{
-            label : jQuery.i18n.prop('emailVerificationComplete'),
+            label : jQuery.i18n.prop('emailVerificationCheck'),
             action : function(dialog){
-              location.reload();
+              BootstrapDialog.alert(jQuery.i18n.prop('emailVerificationSent'), function(){
+                var email = $this.model.get("email");
+                if(!email){
+                  return;
+                }
+                if(email.indexOf('@gmail.com')!==-1){
+                  var url = "https://mail.google.com";
+                }else if(email.indexOf('hotmail.com')!==-1){
+                  url = "https://hotmail.com";
+                }else if(email.indexOf('@aol.com')!==-1){
+                  url = "https://aol.com";
+                }else if(email.indexOf('@yahoo.com')!==-1){
+                  url = "https://yahoo.com	";
+                }else if(email.indexOf('@outlook.com')!==-1){
+                  url = "https://outlook.com";
+                }else if(email.indexOf('@icloud.com')!==-1){
+                  url = "https://www.icloud.com/#mail";
+                }else if(email.indexOf('@qq.com')!==-1){
+                  url = "https://mail.qq.com";
+                }else{
+                  url = '';
+                }
+                window.open(url);
+              });
             }
           }]
         });
@@ -1078,7 +1101,6 @@ var DayOfMealView = Backbone.View.extend({
       filter = this.$el.find("#dishDatesBar nav-link").data("filter");
     }
     dateMixer.filter(filter);
-    dateMixer.filter(".Thursday");
   },
   selectDate : function(e){
     var originalEvent = e.originalEvent.detail.originalEvent;
@@ -2475,7 +2497,30 @@ var UserProfileView = Backbone.View.extend({
     var $this = this;
     this.model.save({}, {
       success : function(){
-        BootstrapDialog.alert(jQuery.i18n.prop('emailVerificationSent'));
+        BootstrapDialog.alert(jQuery.i18n.prop('emailVerificationSent'), function(){
+          var email = $this.model.get("email");
+          if(!email){
+            return;
+          }
+          if(email.indexOf('@gmail.com')!==-1){
+            var url = "https://mail.google.com";
+          }else if(email.indexOf('hotmail.com')!==-1){
+            url = "https://hotmail.com";
+          }else if(email.indexOf('@aol.com')!==-1){
+            url = "https://aol.com";
+          }else if(email.indexOf('@yahoo.com')!==-1){
+            url = "https://yahoo.com	";
+          }else if(email.indexOf('@outlook.com')!==-1){
+            url = "https://outlook.com";
+          }else if(email.indexOf('@icloud.com')!==-1){
+            url = "https://www.icloud.com/#mail";
+          }else if(email.indexOf('@qq.com')!==-1){
+            url = "https://mail.qq.com";
+          }else{
+            url = '';
+          }
+          window.open(url);
+        });
       },error : function(err, model){
         $this.sucessView.hide();
         $this.alertView.html(err.responseJSON ? err.responseJSON.responseText : err.responseText);
