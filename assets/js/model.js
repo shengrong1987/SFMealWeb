@@ -2494,6 +2494,11 @@ var UserProfileView = Backbone.View.extend({
   sendEmail : function(e){
     e.preventDefault();
     this.model.action = "sendEmailVerification";
+    var email = this.$el.find("#emailInput").val();
+    if(!email){return;}
+    this.model.set({
+      email : email
+    });
     var $this = this;
     this.model.save({}, {
       success : function(){

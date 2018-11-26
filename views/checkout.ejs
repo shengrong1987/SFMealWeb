@@ -563,7 +563,7 @@
           <% if(user && !user.emailVerified){%>
           <tr id="emailVerificationView">
             <th style="vertical-align: middle;"><i class="fa fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i> <%= __('email')%></th>
-            <th><input class="form-control" name="email" style="width:170px;" type="email" value="<%= user.auth ? user.auth.email : ''%>"></th>
+            <th><input class="form-control" name="email" style="width:170px;" type="email" value="<%= user.auth ? (user.auth.email || '') : ''%>"></th>
           </tr>
           <tr>
             <th class="text-right"><button id="emailVerifyBtn" class="btn btn-grey-green active"><%= __('verify-email')%></button></th>

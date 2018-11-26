@@ -105,6 +105,9 @@ module.exports = {
     minimalPrice : {
       type : 'float'
     },
+    originalPrice : {
+      type : 'float'
+    },
     getPrice : function(orderQty, meal){
       var _this = this;
       if(!meal.isSupportDynamicPrice || !this.isDynamicPriceOn || !meal.dynamicDishes.some(function(dish){
