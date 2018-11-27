@@ -4040,7 +4040,8 @@ var OrderView = Backbone.View.extend({
     })
   },
   pay : function(e){
-    var orderId = $(e.currentTarget).data("order");
+    var target = $(e.currentTarget);
+    var orderId = target.data("order");
     this.model.set({
       id : orderId
     });
@@ -4054,6 +4055,7 @@ var OrderView = Backbone.View.extend({
       }
     })
   },
+
   submitOrder : function(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, pickupDate, pickupMeal, method, code, points, isLogin, partyMode, tip, $this, button){
     $('body').addClass("loading");
     $this.model.clear();

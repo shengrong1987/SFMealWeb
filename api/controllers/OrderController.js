@@ -73,6 +73,8 @@ var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUt
 //-58 : coupon,points need login to redeem
 //-59 : user address exist, can not autosave
 //-60 : order total is not enough
+//-61 : Alipay lack of source id
+//-62 : Wrong payment api
 //-98 : result not found
 
 
@@ -546,6 +548,7 @@ module.exports = {
                       order.application_fees['cash'] += charge.application_fee;
                       order.feeCharges[charge.id] = charge.application_fee;
                     }else if(charge){
+                      order.isPaid = true;
                       order.charges[charge.id] = charge.amount;
                       order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
                     }
@@ -652,6 +655,7 @@ module.exports = {
           order.feeCharges[charge.id] = charge.application_fee;
         }else{
           if(charge){
+            order.isPaid = true;
             order.charges[charge.id] = charge.amount;
             order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
           }
@@ -1392,20 +1396,48 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      var sourceId = order.sourceId;
-      stripe.getSource({
-        id : sourceId
-      }, function(err, source){
-        if(err){
-          return res.badRequest({ code : -45, responseText : err.message });
+      async.auto({
+        alipay : function(next){
+          if(order.paymentMethod !== "alipay"){
+            return next( { code : -62, responseText : req.__('wrong-payment-api', order.paymentMethod)});
+          }
+          var sourceId = order.sourceId;
+          if(!sourceId){
+            return next({ code : -61, responseText : req.__('alipayment-lack-of-source')});
+          }
+          stripe.getSource({
+            id : sourceId
+          }, function(err, source){
+            if(err){
+              return next({ code : -45, responseText : err.message });
+            }
+            if(source.status !== "pending"){
+              return next({ code : -39, responseText : req.__('ali-payment-failure')});
+            }
+            order.source = source;
+            next();
+          });
         }
-        if(source.status !== "pending"){
-          return res.badRequest({ code : -39, responseText : req.__('ali-payment-failure')});
-        }
-        order.source = source;
-        res.ok(order);
-      });
+      })
+    }, function(err){
+      if(err){
+        return res.badRequest(err);
+      }
+      return res.ok(order);
     });
+  },
+
+  payment : function(req, res){
+    var orderId = req.params.id;
+    Order.findOne(orderId).exec(function(err, order){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(order.paymentMethod === "alipay"){
+        return next( { code : -62, responseText : req.__('wrong-payment-api', order.paymentMethod)});
+      }
+      return res.view('topay', { order : order, layout : 'popup' });
+    })
   },
 
   /*

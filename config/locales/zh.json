@@ -292,7 +292,7 @@
   "order-fee" : "订单金额",
   "name" : "名称",
   "user-name" : "姓名",
-  "meal-fee" : "订单小计: ",
+  "meal-fee" : "小计: ",
   "pickup-method" : "取餐方式",
   "pickup-info": "取餐信息",
   "pickup-option" : "取餐时段",
@@ -840,6 +840,8 @@
   "ali-payment-failure" : "支付宝支付失败了，请关闭此窗口并确认支付宝操作无误。",
   "ali-payment-cancel" : "支付宝支付取消了，请关闭此窗口并重新下订单。",
   "ali-payment-awaiting" : "等待付款中，请前往支付宝页面完成支付。",
+  "alipayment-lack-of-source" : "支付宝支付需要一个SourceId，请联系客服以支付",
+  "wrong-payment-api" : "订单使用%s支付方式，但是使用了错误的支付接口",
   "pay" : "付款",
   "learn-more" : "了解更多",
   "is-dynamic" : "是否开启爆款价格?",
@@ -920,5 +922,7 @@
   "custom" : "自定义营业时间",
   "order-single-minimal-not-reach" : "订单最低金额未达到：$%s",
   "ends" : "结束于",
-  "already-signup" : "已有账号？登录"
+  "already-signup" : "已有账号？登录",
+  "question-tip" : "如果你对支付有任何问题，请联系微信：sillyuniversal 或者电话: (415)-8023853",
+  "payment-title" : "您选择的支付方式: %s，请按照以下方法支付"
 }

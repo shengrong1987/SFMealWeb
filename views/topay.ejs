@@ -1,0 +1,56 @@
+<div id="topayView">
+  <div class="popup box middle">
+    <h5 class="text-red"><%= __('payment-title', order.paymentMethod)%></h5>
+    <% if(order.paymentMethod === "cash"){%>
+      <p><%= __('pay-cash-instruction')%></p>
+    <% }else if(order.paymentMethod === "venmo"){%>
+      <p><%= __('venmo-instruction')%></p>
+      <p><%= __('name')%>: <%= order.customerName%></p>
+    <% }else if(order.paymentMethod === "paypal"){%>
+      <p>https://www.paypal.me/sfmeal</p>
+      <p><%= __('paypal-instruction')%></p>
+      <p><%= __('name')%>: <%= order.customerName%></p>
+    <% } %>
+    <span class="divider popline"></span>
+    <p><%= __('meal-fee')%> $<label class="subtotal"><%= (order.subtotal - order.discount).toFixed(2)%></label></p>
+    <form>
+      <div class="form-row align-items-center">
+        <div class="col-auto">
+          <label><%= __('tip')%>: $</label>
+        </div>
+
+        <div class="col-auto">
+          <input name="tipInput" type="text" placeholder="5" class="form-control" style="max-width:60px;" value=<%= order.tip || 0 %>>
+        </div>
+
+        <div class="col-auto">
+          <div class="btn-set">
+            <button class="btn btn-outline" type="button" data-subtotal="<%= order.subtotal%>" data-percentage="15">15%</button>
+            <button class="btn btn-outline" type="button" data-subtotal="<%= order.subtotal%>" data-percentage="10">10%</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-row mt-4">
+        <div class="col-auto">
+          <%= __('total')%> $<label id="totalLabel"><%= (order.subtotal - order.discount + order.tip).toFixed(2)%></label>
+        </div>
+      </div>
+    </form>
+    <span class="divider popline"></span>
+    <p><%= __('question-tip')%></p>
+  </div>
+</div>
+
+<script>
+  $("[data-subtotal][data-percentage]").click(function(){
+     var tip = $(this).data("subtotal") * $(this).data("percentage") / 100;
+     $("[name='tipInput']").val(tip.toFixed(2));
+     var subtotal = parseFloat($(".subtotal").text()) + tip;
+     $("#totalLabel").text(subtotal.toFixed(2));
+  });
+  $("[name='tipInput']").on('blur',function(){
+    var tip = parseFloat($(this).val());
+    var subtotal = parseFloat($(".subtotal").text()) + tip;
+    $("#totalLabel").text(subtotal.toFixed(2));
+  })
+</script>

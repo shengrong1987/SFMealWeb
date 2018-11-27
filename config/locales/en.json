@@ -289,7 +289,7 @@
   "order-fee": "Fee",
   "name": "Name",
   "user-name": "Name",
-  "meal-fee": "Order Subtotal: ",
+  "meal-fee": "Subtotal: ",
   "pickup-method": "Pickup method",
   "pickup-info": "Pickup Info",
   "pickup-option" : "Pickup Option",
@@ -835,6 +835,8 @@
   "ali-payment-failure" : "Alipay payment failed, please close this window and verify your payment process.",
   "ali-payment-cancel" : "Alipay payment canceled, please close this window and take your order again.",
   "ali-payment-awaiting" : "Alipay payment is pending, please go to Alipay to finish the payment.",
+  "alipayment-lack-of-source" : "Alipay payment need a source id to pay to, but can not find one.",
+  "wrong-payment-api" : "The order use %s payment method, but use wrong pay API",
   "pay" : "Pay",
   "learn-more" : "Learn More",
   "is-dynamic" : "Is dynamic price on?",
@@ -901,7 +903,7 @@
   "go-to-check-out-btn" : "Go to checkout",
   "select-preference" : "Please select %s",
   "select": "Selection",
-  "pay-cash-instruction" : "Please pay cash to driver at pickup",
+  "pay-cash-instruction" : "Please pay cash to driver at pickup, tips appreciated :)",
   "venmo-instruction" : "Venmo Id: @SFMeal, leave your name as comment.",
   "paypal-instruction" : "Please leave your name at checkout（Add $1 for transaction fee）",
   "dish-tag-default" : "Street food",
@@ -915,5 +917,7 @@
   "custom" : "Custom Hour",
   "order-single-minimal-not-reach" : "Order minimal order is $%s",
   "ends" : "ends",
-  "already-signup" : "Have an account？Login"
+  "already-signup" : "Have an account？Login",
+  "question-tip" : "If you have any question about payment, please contact Wechat: sillyuniversal, or by phone: (415)-8023853",
+  "payment-title" : "Selected payment method: %s, please pay as instructed."
 }

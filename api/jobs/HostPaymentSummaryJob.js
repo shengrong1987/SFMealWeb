@@ -97,10 +97,10 @@ module.exports = function(agenda) {
                         }
                         stripe.retrieveApplicationFee(charge.application_fee, function(err, fee){
                           if(err){
-                            return next(err);
+                            return next3(err);
                           }
                           if(!fee){
-                            return next();
+                            return next3();
                           }
                           if(chargeId === "cash"){
                             var date = moment(new Date(order.createdAt).getTime());

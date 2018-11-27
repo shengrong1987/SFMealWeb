@@ -295,6 +295,7 @@ describe('OrderController', function() {
           o.customerName.should.be.equal('sheng');
           o.customerPhone.should.be.equal(phone);
           o.customer.should.be.equal(guestId);
+          o.isPaid.should.be.true();
           Object.keys(o.charges).should.have.length(1);
           o.charges[Object.keys(o.charges)[0]].should.be.equal(chargesTotal);
           dish1LeftQty = dish1LeftQty - 1;
