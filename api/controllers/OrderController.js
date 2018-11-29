@@ -1833,7 +1833,7 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          _this.buildDeliveryData(req.body, meal, function(_logisticInfo){
+          _this.buildDeliveryData(req.body, meal, req, function(_logisticInfo){
             req.body.pickupInfo = _logisticInfo.pickupInfo;
             req.body.delivery_fee = _logisticInfo.delivery_fee;
             _this.cancelOrderJob(orderId, '', function(err){

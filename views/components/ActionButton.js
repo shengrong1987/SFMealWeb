@@ -273,7 +273,7 @@ var ActionButton = createReactClass({
               pickupTillTime : { value : this.props.data['pickupTillTime'] || '', type : "Date"},
               location : { value : this.props.data['location'] || ''},
               method : {value: this.props.data['method'] || ''},
-              phone : {value: this.props.data['phone'] || ''},
+              phone : {value: this.props.data['phone'] || '', type : 'select', options : this.props.data['drivers']},
               publicLocation : {value: this.props.data['publicLocation'] || ''},
               comment : {value: this.props.data['comment'] || ''},
               deliveryCenter : {value: this.props.data['deliveryCenter'] || ''},

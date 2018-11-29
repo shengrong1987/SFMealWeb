@@ -216,6 +216,7 @@ var ActionDialog = createReactClass({
     var readonly = !!valueObj['readonly'];
     var inputControl;
     var action = this.props.action;
+    var model = this.props.model;
     var _this = this;
     switch(valueObj.type){
       case "select":
@@ -229,6 +230,8 @@ var ActionDialog = createReactClass({
             }else if(!option.isDateCustomized){
               return <option value={option.index}>{(option.location||option.deliveryCenter) + ":(" + option.method + ")" + new Date(option.pickupFromTime).toLocaleString() + " to " + new Date(option.pickupTillTime).toLocaleString()}</option>
             }
+          }else if(model === "PickupOption"){
+            return <option value={option.phone}>{option.driverName}:{option.phone}</option>
           }else{
             return <option value={option.index}>{option.value}</option>
           }

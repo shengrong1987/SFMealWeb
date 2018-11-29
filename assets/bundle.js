@@ -59893,7 +59893,7 @@ var ActionButton = createReactClass({
               pickupTillTime : { value : this.props.data['pickupTillTime'] || '', type : "Date"},
               location : { value : this.props.data['location'] || ''},
               method : {value: this.props.data['method'] || ''},
-              phone : {value: this.props.data['phone'] || ''},
+              phone : {value: this.props.data['phone'] || '', type : 'select', options : this.props.data['drivers']},
               publicLocation : {value: this.props.data['publicLocation'] || ''},
               comment : {value: this.props.data['comment'] || ''},
               deliveryCenter : {value: this.props.data['deliveryCenter'] || ''},
@@ -60282,6 +60282,7 @@ var ActionDialog = createReactClass({
     var readonly = !!valueObj['readonly'];
     var inputControl;
     var action = this.props.action;
+    var model = this.props.model;
     var _this = this;
     switch(valueObj.type){
       case "select":
@@ -60295,6 +60296,8 @@ var ActionDialog = createReactClass({
             }else if(!option.isDateCustomized){
               return React.createElement("option", {value: option.index}, (option.location||option.deliveryCenter) + ":(" + option.method + ")" + new Date(option.pickupFromTime).toLocaleString() + " to " + new Date(option.pickupTillTime).toLocaleString())
             }
+          }else if(model === "PickupOption"){
+            return React.createElement("option", {value: option.phone}, option.driverName, ":", option.phone)
           }else{
             return React.createElement("option", {value: option.index}, option.value)
           }
