@@ -912,7 +912,7 @@
   "venmo-instruction" : "Venmo号: @SFMeal,付款时请附言下单的姓名",
   "paypal-instruction" : "付款时请留言下单的姓名（每笔需要额外支付$1元手续费）",
   "dish-tag-default" : "街头小吃",
-  "dish-tag" : "标签",
+  "dish-tag" : "标签(多个用逗号分隔)",
   "toggleMenu" : "展开/缩起菜单",
   "received" : "已取货",
   "readied" : "已准备好",

@@ -470,26 +470,44 @@ function orderFood(id,number,initial){
 }
 
 function orderFoodLogic(id, number, initial){
+  updateAmountInput(id, number);
+  updateLocalOrders(id, number);
+  createCookie(id,JSON.stringify(localOrders[id]),1);
+  updateMenuView(id);
+  refreshCheckoutMenu();
+  refreshPreference(id);
+  updateOrderPreview();
+}
 
+//更新菜式已点数量
+function updateAmountInput(id, number){
   var $order = $("#order");
-  var item = $order.find(".item[data-id=" + id + "]:visible");
-  if(!initial){
+  $order.find(".item[data-id=" + id + "]:hidden").each(function(){
+    var item = $(this);
     if(number > 0){
-      $(this).amountInput('add',item.find("[data-toggle='amount-input']"));
+      item.find("[data-toggle='amount-input']").amountInput('add',item.find("[data-toggle='amount-input']"));
     }else if(number < 0){
-      $(this).amountInput('minus',item.find("[data-toggle='amount-input']"));
+      item.find("[data-toggle='amount-input']").amountInput('minus',item.find("[data-toggle='amount-input']"));
     }
-  }
-  var price = parseFloat(item.find(".price").attr("price"));
+    var left = parseInt(item.data("left-amount"));
+    item.data("left-amount", left);
+  })
+}
+
+//更新本地订单缓存
+function updateLocalOrders(id, number){
+  var $order = $("#order");
+  var theItem = $order.find(".item[data-id=" + id + "]:visible");
+  var price = parseFloat(theItem.find(".price").attr("price"));
   localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : [{ property : '', extra : 0}], price : price};
   localOrders[id].number += number;
-  var left = parseInt(item.data("left-amount"));
-  var amount = parseInt(item.find(".amount").val());
+  var left = parseInt(theItem.data("left-amount"));
+  var amount = parseInt(theItem.find(".amount").val());
   if(number < 0){
     if(amount > 0){
       left++;
       localOrders[id].preference.pop();
-      item.data("left-amount", left);
+      theItem.data("left-amount", left);
     }else{
       localOrders[id].number -= number;
     }
@@ -499,7 +517,7 @@ function orderFoodLogic(id, number, initial){
       makeAToast(jQuery.i18n.prop("dishSold"));
     }else{
       left--;
-      item.data("left-amount",left);
+      theItem.data("left-amount",left);
       var preferences = localOrders[id].preference;
       var preferenceView = $("#dishPreferenceView[data-id='" + id +  "']");
       var prefObj = {};
@@ -532,15 +550,10 @@ function orderFoodLogic(id, number, initial){
       preferences.push(prefObj);
     }
   }
-  createCookie(id,JSON.stringify(localOrders[id]),1);
-  updateMenuView(id);
-  refreshCheckoutMenu();
-  refreshPreference(id);
-  setupDropdownMenu();
-  updateOrderPreview();
 }
 
 var _tooltipAnimateId;
+//更新已点菜式预览
 function updateOrderPreview(){
   var orderPreviewListText = "";
   if(localOrders){
@@ -579,32 +592,7 @@ function updateOrderPreview(){
     .tooltip('_fixTitle');
 }
 
-function applyCoupon(isApply, amount, code){
-  //set localVar and cookie
-  if(!!isApply){
-    localCoupon = localCoupon || {};
-    localCoupon[code] = amount;
-    createCookie('coupon',JSON.stringify(localCoupon),5);
-  }else{
-    $(".coupon-code").val('');
-    localCoupon = {};
-    eraseCookie('coupon');
-  }
-  refreshCheckoutMenu();
-}
-
-function applyPoints(isApply, amount){
-  if(!!isApply){
-    localPoints = amount;
-    createCookie('points',localPoints,5);
-  }else{
-    localPoints = 0;
-    eraseCookie('points');
-  }
-  refreshCheckoutMenu();
-}
-
-//render menu view
+//更新结账界面
 var refreshCheckoutMenu = function(){
   var numberOfItem = 0;
   var subtotal = 0;
@@ -693,6 +681,31 @@ function refreshCart(subtotal, numberOfItem){
   shoppingCart.find(".total-preview").data('subtotal', subtotal);
   shoppingCart.find(".order-preview").text(numberOfItem);
   shoppingCart.find(".order-preview").data('item',numberOfItem);
+}
+
+function applyCoupon(isApply, amount, code){
+  //set localVar and cookie
+  if(!!isApply){
+    localCoupon = localCoupon || {};
+    localCoupon[code] = amount;
+    createCookie('coupon',JSON.stringify(localCoupon),5);
+  }else{
+    $(".coupon-code").val('');
+    localCoupon = {};
+    eraseCookie('coupon');
+  }
+  refreshCheckoutMenu();
+}
+
+function applyPoints(isApply, amount){
+  if(!!isApply){
+    localPoints = amount;
+    createCookie('points',localPoints,5);
+  }else{
+    localPoints = 0;
+    eraseCookie('points');
+  }
+  refreshCheckoutMenu();
 }
 
 function updateCollapseBtn(initialize){

@@ -1093,12 +1093,19 @@ var DayOfMealView = Backbone.View.extend({
     "mixEnd #dishContentView" : "renderImage"
   },
   initialize : function() {
-    var activeFilters = this.$el.find("#dishDatesBar .mixitup-control-active");
-    var filter = "";
-    if(activeFilters.length){
-      filter = activeFilters.data("filter");
+    var dateDesc = decodeURI(readCookie("date"));
+    if(!dateDesc){
+      var activeFilters = this.$el.find("#dishDatesBar .mixitup-control-active");
+      var filter = "";
+      if(activeFilters.length){
+        filter = activeFilters.data("filter");
+      }else{
+        filter = this.$el.find("#dishDatesBar nav-link").data("filter");
+      }
     }else{
-      filter = this.$el.find("#dishDatesBar nav-link").data("filter");
+      filter = "." + dateDesc;
+      this.$el.find("#dishDatesBar li").removeClass("active");
+      this.$el.find("#dishDatesBar [data-filter='" + filter + "']").parent().addClass("active");
     }
     dateMixer.filter(filter);
   },
@@ -2231,7 +2238,7 @@ var DishView = Backbone.View.extend({
     var priceRate = form.find("#priceRateInput").val();
     var qtyRate = form.find("#qtyRateInput").val();
     var minimalPrice = form.find("#minimalPriceInput").val();
-    var dishTag = form.find("#tagInput").val();
+    var dishTags = form.find("#tagInput").val().split(",");
     if(isDynamicPriceOn && (!priceRate || !qtyRate || !minimalPrice)){
       this.dynamicPriceAlert.show();
       this.dynamicPriceAlert.html(jQuery.i18n.prop("dynamic-price-incomplete"));
@@ -2297,7 +2304,7 @@ var DishView = Backbone.View.extend({
             priceRate : priceRate,
             qtyRate : qtyRate,
             minimalPrice : minimalPrice,
-            tag : dishTag
+            tags : dishTags
           });
 
           $this.model.save({},{

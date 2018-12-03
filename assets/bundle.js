@@ -59802,11 +59802,13 @@ var ActionButton = createReactClass({
         break;
       case "Dish":
         if(action === "update"){
+          var tags = this.props.data['tags'];
           postData = {
             title : { value : this.props.data['title'] },
             price : { value : this.props.data['price'] },
             type : { value : this.props.data['type'] },
-            description : { value : this.props.data['description']}
+            description : { value : this.props.data['description']},
+            tags : { value : tags }
           };
         }
         break;

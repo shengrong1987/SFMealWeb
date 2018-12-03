@@ -170,7 +170,7 @@
                         <%}%>
                         <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customerName || __('user')%>" data-placement="bottom" data-content="<%= order.customerPhone %>"><%= __('contact-user')%></a><br/>
                         <%}else if(order.status == "complete"){%>
-                        <a href="/host/<%= order.host.id%>"><%= __('see-review')%></a><br/>
+                        <a href="/host/public/<%= order.host%>"><%= __('see-review')%></a><br/>
                         <%}%>
                         <a href="/order/<%= order.id%>/receipt" target="__blank"><%= __('view-receipt')%></a>
                       </td>
@@ -308,7 +308,7 @@
                         <%}%>
                         <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customerName || __('user')%>" data-placement="bottom" data-content="<%= order.customerPhone %>"><%= __('contact-user')%></a>
                         <%}else if(order.status == "complete"){%>
-                        <a href="/host/<%= order.host.id%>"><%= __('see-review')%></a>
+                        <a href="/host/public/<%= order.host%>"><%= __('see-review')%></a>
                         <%}%>
                         <a href="/order/<%= order.id%>/receipt" target="__blank"><%= __('view-receipt')%></a>
                       </td>

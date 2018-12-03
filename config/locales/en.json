@@ -907,7 +907,7 @@
   "venmo-instruction" : "Venmo Id: @SFMeal, leave your name as comment.",
   "paypal-instruction" : "Please leave your name at checkout（Add $1 for transaction fee）",
   "dish-tag-default" : "Street food",
-  "dish-tag" : "Tag",
+  "dish-tag" : "Tag(Multiple tags separate with comma)",
   "toggleMenu" : "Toggle Menu",
   "received" : "Received",
   "readied" : "Readied",

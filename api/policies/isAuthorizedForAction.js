@@ -56,6 +56,11 @@ module.exports = function(req, res, next) {
         return res.forbidden("you can only delete order that is not paid.");
       }
       return next();
+    }else if(action === "payment"){
+      if(order.isPaid){
+        return res.forbidden("order already paid");
+      }
+      return next();
     }else{
       return res.forbidden('unauthorized action');
     }

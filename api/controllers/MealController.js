@@ -1275,7 +1275,7 @@ module.exports = {
         dateDesc = 'today';
       }else if(pickupDate.isSame(moment().add(1,'days'),'day')){
         dateDesc = 'tomorrow';
-      }else if(pickupDate.isSame(moment(),'week')){
+      }else if(moment.duration(pickupDate.diff(moment())).asDays() <= 7){
         dateDesc = pickupDate.format('dddd');
       }else{
         dateDesc = pickupDate.format('[day]M-DD');
