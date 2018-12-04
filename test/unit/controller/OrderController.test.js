@@ -298,6 +298,7 @@ describe('OrderController', function() {
           o.isPaid.should.be.true();
           Object.keys(o.charges).should.have.length(1);
           o.charges[Object.keys(o.charges)[0]].should.be.equal(chargesTotal);
+          o.application_fees[Object.keys(o.application_fees)[0]].should.be.equal((price1 + price2 * 2 + (price4*2+3)) * 100 * 0.2 + 10 * 100);
           dish1LeftQty = dish1LeftQty - 1;
           o.leftQty[dishId1].should.be.equal(dish1LeftQty);
           parseFloat(o.tip).should.be.equal(10);

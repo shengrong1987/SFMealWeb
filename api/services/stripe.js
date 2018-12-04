@@ -400,7 +400,11 @@ module.exports = {
     sails.log.info("tip is: " + tip);
 
     //calculate application fee
-    var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee;
+    if(attr.paymentMethod === "online"){
+      var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee + tip;
+    }else{
+      application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee;
+    }
 
     sails.log.info("application fee is: " + application_fee);
 
@@ -416,7 +420,7 @@ module.exports = {
     attr.metadata.total = originalTotal - discount;
     attr.metadata.application_fee = application_fee;
     attr.metadata.total = attr.metadata.total < 0 ? 0 : attr.metadata.total;
-    attr.metadata.tip = attr.tip;
+    attr.metadata.tip = attr.tip || 0;
 
     sails.log.info("charge total: " + attr.metadata.total);
   },

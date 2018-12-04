@@ -75,7 +75,7 @@ describe('MealController', function() {
           .expect(200)
           .end(function(err,res){
             should.exist(res.body.id);
-            dish1 = res.body.id;
+            dish1 = res.body.id
           })
 
       agent
@@ -806,8 +806,14 @@ describe('MealController', function() {
     it('should not turn one meal on because missing account verifications', function (done) {
       agent
         .post('/meal/' + mealId + "/on")
-        .expect(302)
-        .end(done)
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-7);
+          done();
+        })
     })
 
     it('should update host legal_entity', function(done){
