@@ -58,15 +58,25 @@ function initHashTag(){
 
     }
   }else{
+    var dateObjs = { "Monday" : "星期一", "Tuesday" : "星期二", "Wednesday" : "星期三", "Thursday" : "星期四","Friday" : "星期五","Saturday" : "星期六", "Sunday" : "星期日"};
     var tab = $("[data-href='"+hashtag+"']");
     tab.tab('select');
     hashtag = hashtag.replace("#","");
+    if(dateObjs.hasOwnProperty(hashtag)){
+      var hashTagCN = dateObjs[hashtag];
+      hashTagCN = "." + hashTagCN;
+    }
     hashtag = "." + hashtag;
-    var filter = $("[data-filter='" + hashtag + "']");
-    if(filter.length){
+    if($("[data-filter='" + hashtag + "']").length){
+      var filter = $("[data-filter='" + hashtag + "']");
+    }else if($("[data-filter='" + hashTagCN + "']").length){
+      filter = $("[data-filter='" + hashTagCN + "']");
+      hashtag = hashTagCN;
+    }
+    if(filter && filter.length){
       if(dateMixer){
         dateMixer.filter(hashtag);
-        createCookie("date", hashtag);
+        createCookie("date", hashtag.replace(".",""));
         $("#dishDatesBar li").removeClass("active");
         $("#dishDatesBar [data-filter='" + hashtag + "']").parent().addClass("active");
       }
