@@ -1094,7 +1094,7 @@ var DayOfMealView = Backbone.View.extend({
   },
   initialize : function() {
     var dateDesc = decodeURI(readCookie("date"));
-    if(!dateDesc){
+    if(!dateDesc || dateDesc === "null"){
       var activeFilters = this.$el.find("#dishDatesBar .mixitup-control-active");
       var filter = "";
       if(activeFilters.length){
@@ -2624,7 +2624,12 @@ var MyMealView = Backbone.View.extend({
       },
       error : function(model, err){
         target.removeClass("running");
-        BootstrapDialog.alert(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+        BootstrapDialog.alert(err.responseJSON ? err.responseJSON.responseText : err.responseText, function(){
+          var code = err.responseJSON.code;
+          if(code === "-7"){
+            location.href = "/apply";
+          }
+        });
       }
     })
   }

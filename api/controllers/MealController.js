@@ -503,10 +503,7 @@ module.exports = {
             return res.badRequest(err);
           }
           if(!host.passGuide || !host.dishVerifying){
-            if(isAdmin){
-              return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
-            }
-            return res.redirect("/apply");
+            return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
           }
           if(!meal.dateIsValid()){
             console.log("Date format of meal is not valid");
@@ -526,10 +523,7 @@ module.exports = {
                 if(err){
                   return res.badRequest(err);
                 }
-                if(isAdmin || (req.wantsJSON && process.env.NODE_ENV === "development")){
-                  return res.ok(meal);
-                }
-                return res.redirect("/host/me#mymeal");
+                res.ok(meal);
               });
             })
           });
