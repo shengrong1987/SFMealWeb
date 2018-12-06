@@ -17,8 +17,8 @@
   <div id="dayOfMealContainer" class="mx-auto" style="max-width: 800px;" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>" data-pickup-nickname="<%= pickupNickname || ''%>">
 
     <% if(meals && meals.meals){%>
-    <div class="w-100 sticky-top" style="height: 90px;">
-      <ul id="dishDatesBar" class="nav nav-light bg-light d-flex none-padding" style="overflow-x: scroll;height: 89px;list-style: none;">
+    <div class="w-100 sticky-top" style="height: 60px;">
+      <ul id="dishDatesBar" class="nav nav-light bg-light d-flex none-padding" style="overflow-x: scroll;height: 59px;list-style: none;">
         <%
           var dates = Object.keys(meals.meals);
           dates = dates.sort(function(d1,d2){
@@ -57,7 +57,7 @@
               }
           })
         dates.forEach(function(dateKey,i){ %>
-        <li class="nav-item py-4 col-4 <%= i===0?'active':''%>"><a class="nav-link" data-mixitup-control href="javascript:void(0);" data-filter=".<%= dateKey.replace('-','').replace(" ","")%>" data-toggle="tab"><%= __(dateKey).replace("day",'')%></a></li>
+        <li class="nav-item py-2 col-4 <%= i===0?'active':''%>"><a class="nav-link" data-mixitup-control href="javascript:void(0);" data-filter=".<%= dateKey.replace('-','').replace(" ","")%>" data-toggle="tab"><%= __(dateKey).replace("day",'')%></a></li>
         <% })%>
       </ul>
     </div>

@@ -393,7 +393,7 @@ module.exports = {
                       var subtotalAfterTax = meal.subtotal + orderParam.tax/100;
                       _this.redeemPoints(req, pointsRedeem, found, subtotalAfterTax, function(err, discount){
                         if(err){
-                          return res.badRequest(err);
+                          return nextIn2(err);
                         }
                         orderParam.redeemPoints = pointsRedeem;
                         //calculate total
