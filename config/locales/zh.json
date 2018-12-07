@@ -485,7 +485,7 @@
   "about-sfmeal-context-1" : "SFMeal是一个私房菜分享平台让厨师在我们的商业厨房或者注册家庭厨房分享他们的拿手美食, 这是一种家乡的味道, 也是爸爸妈妈/奶奶爷爷的味道。SFMeal致力于处理所有从厨师家到你家的流程, 我们只依赖你做好美食,以及享受美食。",
   "about-kitchen-context-1" : "我们的商业厨房位于Daly City, 莅临280和1号公路交汇处，处于三藩市和半岛的必经之路。作为一个共享厨房，环境整洁，地方宽敞，设施齐备是必须的条件，除此之外安全是最重要的，厨师需要购买商业保险和获得食品操作安全证书来使用厨房准备食物。",
   "footer-bar-info" : "©2018 SFMeal.com - 私房菜分享平台",
-  "delivery-out-of-range-error" : "地址超出送餐范围",
+  "delivery-out-of-range-error" : "地址超出送餐范围, 东湾南湾请选择周六",
   "meal-modify-active-error" : "无法更改在线Meal的信息，请先下线或完成当前订单。",
   "meal-error-address" : "地址解析错误,请刷新再试.",
   "meal-error-address2" : "地址格式不对或地址不存在.",

@@ -2631,7 +2631,7 @@ module.exports = {
       return cb({ code : -25, responseText : req.__('order-points-insufficient')});
     }
     if(!user.emailVerified){
-      return cb({ code : -48, reponseText : req.__('coupon-unverified-email')});
+      return cb({ code : -48, responseText : req.__('coupon-unverified-email')});
     }
     //apply points
     user.points -= points;

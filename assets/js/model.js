@@ -1094,7 +1094,12 @@ var DayOfMealView = Backbone.View.extend({
   },
   initialize : function() {
     var dateDesc = decodeURI(readCookie("date"));
-    if(!dateDesc || dateDesc === "null"){
+    var currentDateControl = this.$el.find("#dishDatesBar [data-filter='" + filter + "']");
+    if(currentDateControl.length){
+      filter = "." + dateDesc;
+      this.$el.find("#dishDatesBar li").removeClass("active");
+      currentDateControl.parent().addClass("active");
+    }else{
       var activeFilters = this.$el.find("#dishDatesBar .mixitup-control-active");
       var filter = "";
       if(activeFilters.length){
@@ -1102,10 +1107,6 @@ var DayOfMealView = Backbone.View.extend({
       }else{
         filter = this.$el.find("#dishDatesBar nav-link").data("filter");
       }
-    }else{
-      filter = "." + dateDesc;
-      this.$el.find("#dishDatesBar li").removeClass("active");
-      this.$el.find("#dishDatesBar [data-filter='" + filter + "']").parent().addClass("active");
     }
     dateMixer.filter(filter);
   },
@@ -3387,7 +3388,7 @@ var MealConfirmView = Backbone.View.extend({
           }
         }
       });
-      var visibleOptions = _this.$el.find("#deliveryTab:visible");
+      var visibleOptions = _this.$el.find("#deliveryTab .deliveryOption:visible");
       var emptyView = $("#pickupOptionsView #deliveryTab .empty");
       if(visibleOptions.length){
         emptyView.hide();

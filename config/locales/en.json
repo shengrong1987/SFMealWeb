@@ -482,7 +482,7 @@
   "about-sfmeal-context-1": "SFMeal is a private kitchens sharing platform. Through it chef can share their cuisine at our licensed commercial kitchen or licensed home kitchen. This is the taste of a home, but also the taste of mom and dad or grandpa and grandma.SFMeal commits to handle all process from chef’s home to your home, all you have to do is preparing food and enjoying the food.",
   "about-kitchen-context-1": "Our kitchen locates at Daly City which is the gateway of the Peninsula and has very easily access to 280 and highway 1. As a commercial share kitchen, it has large preparation area, state-proved facilities and clean environment. The most important is safety, all chefs are required to purchase insurance and obtain food handler's permit.",
   "footer-bar-info": "©2018 SFMeal.com - Private Kitchens Sharing Platform",
-  "delivery-out-of-range-error": "Address is out of delivery range",
+  "delivery-out-of-range-error": "Address is out of delivery range, please select Saturday for East Bay, South Bay delivery",
   "meal-modify-active-error" : "Can not modify such information on active meal, please offline meal first.",
   "meal-error-address": "Address parsing error, please refresh and try again.",
   "meal-error-address2": "Address format is wrong or does not exist.",
