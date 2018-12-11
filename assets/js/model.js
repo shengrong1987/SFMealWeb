@@ -1094,7 +1094,7 @@ var DayOfMealView = Backbone.View.extend({
   },
   initialize : function() {
     var dateDesc = decodeURI(readCookie("date"));
-    var currentDateControl = this.$el.find("#dishDatesBar [data-filter='" + filter + "']");
+    var currentDateControl = this.$el.find("#dishDatesBar [data-filter='." + dateDesc + "']");
     if(currentDateControl.length){
       filter = "." + dateDesc;
       this.$el.find("#dishDatesBar li").removeClass("active");

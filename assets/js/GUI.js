@@ -335,8 +335,10 @@ function updateMenuView(id){
   dishItems.each(function(){
     var dishItem = $(this);
     var left = dishItem.data("left-amount");
-    dishItem.find(".amount").val(number);
-    // dishItem.find(".amount").text(number);
+    if(dishItem.is(':hidden')){
+      dishItem.find(".amount").val(number);
+    }
+    dishItem.find(".amount").text(number);
     if($("#myModal").hasClass('show')){
       dishItem.amountInput('update',dishItem.find("[data-toggle='amount-input']"));
     }
