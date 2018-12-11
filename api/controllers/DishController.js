@@ -106,6 +106,9 @@ module.exports = {
           if(req.body.isDynamicPriceOn && (!req.body.minimalPrice || !req.body.qtyRate || !req.body.priceRate)){
             return res.badRequest({ code : -3, responseText : req.__("dish-update-dynamic-insufficient-info")});
           }
+          if(req.body.tags){
+            req.body.tags = req.body.tags.split(",");
+          }
           Dish.update(dishId, req.body).exec(function(err, dish){
             if(err){
               return res.badRequest(err);

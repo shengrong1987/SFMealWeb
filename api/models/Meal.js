@@ -240,12 +240,15 @@ module.exports = {
 
     getDateDesc : function(date){
       var pickupDate = moment(date);
+      var dateDesc = "unknown";
       if(pickupDate.isSame(moment(),'day')){
-        var dateDesc = 'today';
+        dateDesc = 'today';
       }else if(pickupDate.isSame(moment().add(1,'days'),'day')){
         dateDesc = 'tomorrow';
+      }else if(moment.duration(pickupDate.diff(moment())).asDays() <= 7){
+        dateDesc = pickupDate.format('dddd');
       }else{
-        dateDesc = pickupDate.format('dddd')
+        dateDesc = pickupDate.format('[day]M-DD');
       }
       return dateDesc;
     },

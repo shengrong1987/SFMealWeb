@@ -20,6 +20,9 @@ module.exports = {
         }
         meals = meals.filter(function(meal){
           return meal.pickups.some(function(pickup){
+            if(!pickup){
+              return false;
+            }
             return pickup.id === pickupOptionId;
           })
         });

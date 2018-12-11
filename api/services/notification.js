@@ -221,6 +221,7 @@ var notification = {
       sails.log.info("sending email to: " + basicInfo.recipientEmail + " with email template: " + template);
       return;
     }
+
     sails.hooks.email.send(template, params,{
       to : basicInfo.recipientEmail,
       subject : "SFMeal support"

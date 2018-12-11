@@ -40,6 +40,7 @@ module.exports = {
     }else{
       charge.paymentMethod = "online";
     }
+    charge.tip = order.tip;
     charge.deliveryFee = order.delivery_fee;
     charge.orderStatus = order.status;
     charge.host = {
@@ -264,6 +265,7 @@ module.exports = {
                       if(err){
                         return next2(err);
                       }
+                      order.application_fees =  order.application_fees || {};
                       if(chargeId === "cash"){
                         charge.application_fee = order.application_fees['cash'];
                       }else{

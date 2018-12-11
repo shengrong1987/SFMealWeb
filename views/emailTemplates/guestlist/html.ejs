@@ -23,7 +23,9 @@
       <h3 class="text-green"><u><%= title%></u></h3>
     <%}%>
 
+
     <%
+      if(orders.length){
     pickups.forEach(function(pickup, index){if(pickup.method === "delivery"){%>
       <p><%= deliverytime%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%></p>
     <%}else if(pickup.method === "pickup"){%>
@@ -45,7 +47,7 @@
       </tr>
       </thead>
       <% orders.forEach(function(order){
-      if(order.method === pickup.method && order.pickupOption === pickup.index){%>
+      if(order.pickupInfo.method === pickup.method && order.pickupInfo.pickupFromTime === pickup.pickupFromTime && order.pickupInfo.pickupTillTime === pickup.pickupTillTime && order.pickupInfo.location === pickup.location){%>
       <tbody>
         <tr>
           <td><%= order.customerName %></td>
@@ -83,7 +85,7 @@
       </tbody>
       <%}})%>
     </table>
-    <% });%>
+    <% })};%>
 
     <div class="divider"></div>
 

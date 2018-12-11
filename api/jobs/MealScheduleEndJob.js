@@ -89,6 +89,17 @@ module.exports = function(agenda) {
               return cb(err);
             }
             m.orders = orders;
+            var pickups = [];
+            m.pickups.forEach(function(p){
+              var isOldPickupOption = pickups.some(function(pickupInfo){
+                return (pickupInfo.pickupFromTime === p.pickupFromTime && pickupInfo.pickupTillTime === p.pickupTillTime)
+                  &&  pickupInfo.location === p.location && pickupInfo.method === p.method;
+              })
+              if(!isOldPickupOption){
+                pickups.push(p);
+              }
+            })
+            m.pickups = pickups;
             notification.notificationCenter("Meal","mealScheduleEnd",m,true);
             console.log("sending guest list to host");
             cb();

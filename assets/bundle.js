@@ -61098,7 +61098,7 @@ var TablePanel = createReactClass({
         break;
       case "Order":
         headers = {id : 'Order ID', 'meal.id' : 'Meal ID', subtotal : 'subtotal', type : 'OrderType', pickupInfo : 'pickupInfo', orders : "OrderDishes", pickups : "pickupOptions", status : 'Status', customerPhone : "customerPhone", customerName : "customerName", command : 'Command'};
-        details = {id : 'Order ID', 'mealId' : 'Meal ID', subtotal : 'subtotal', type : 'OrderType', pickupInfo : 'pickupInfo', orders : 'OrderDishes', pickups : "pickupOptions", status : 'Status', tax : 'tax', guestEmail : 'UserEmail', hostEmail : 'ChefEmail', lastStatus : 'lastStatus', msg : 'Message', 'host.id' : 'Host ID', 'customer.id' : 'User ID', delivery_fee : 'DeliveryFee', method : 'DeliveryMethod', address : 'DeliveryAddress', customerPhone : "customerPhone", customerName : "customerName",  command : 'Command'};
+        details = {id : 'Order ID', 'meal.id' : 'Meal ID', subtotal : 'subtotal', type : 'OrderType', pickupInfo : 'pickupInfo', orders : 'OrderDishes', pickups : "pickupOptions", status : 'Status', tax : 'tax', guestEmail : 'UserEmail', hostEmail : 'ChefEmail', lastStatus : 'lastStatus', msg : 'Message', 'host.id' : 'Host ID', 'customer.id' : 'User ID', delivery_fee : 'DeliveryFee', method : 'DeliveryMethod', address : 'DeliveryAddress', customerPhone : "customerPhone", customerName : "customerName",  command : 'Command'};
         criterias = ['id','hostId','userId','meal','status','hostEmail', 'guestEmail','contactInfo.name'];
         break;
       case "Transaction":

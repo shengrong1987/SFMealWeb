@@ -224,7 +224,8 @@ function setupMixin() {
   if($("#transaction_container").length){
     mixitup('#transaction_container', {
       pagination: {
-        limit: 20
+        limit: 50,
+        hidePageListIfSinglePage: true
       },
       classNames: {
         elementPager: 'btn btn-mixitup'

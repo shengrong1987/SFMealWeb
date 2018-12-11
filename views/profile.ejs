@@ -58,7 +58,7 @@
             <h5 class="text-white"><%= meal.title%></h5>
           </div>
         </div>
-        <img src="<%= meal.coverString%>" class="w-100 cursor-pointer" onclick="javascript:location.href='/meal/<%= meal.id%>'">
+        <img src="<%= meal.coverString%>" class="w-100 cursor-pointer" onclick="javascript:location.href='/meal#<%= meal.getDateDesc(meal.pickups[0].pickupFromTime)%>'">
       </li>
       <% })%>
     </ul>

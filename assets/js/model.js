@@ -2239,7 +2239,7 @@ var DishView = Backbone.View.extend({
     var priceRate = form.find("#priceRateInput").val();
     var qtyRate = form.find("#qtyRateInput").val();
     var minimalPrice = form.find("#minimalPriceInput").val();
-    var dishTags = form.find("#tagInput").val().split(",");
+    var dishTags = form.find("#tagInput").val();
     if(isDynamicPriceOn && (!priceRate || !qtyRate || !minimalPrice)){
       this.dynamicPriceAlert.show();
       this.dynamicPriceAlert.html(jQuery.i18n.prop("dynamic-price-incomplete"));
