@@ -338,8 +338,8 @@
     this.$element = $(element);
     this.$options = $.extend({},AmountInput.DEFAULTS, options);
     this.$value = parseInt(this.$element.find("input").val());
-    this.$element.find(".add").on('click',addHandler);
-    this.$element.find(".minus").on('click',minusHandler);
+    // this.$element.find(".add").on('click',addHandler);
+    // this.$element.find(".minus").on('click',minusHandler);
   };
 
   AmountInput.DEFAULTS = {
@@ -368,11 +368,13 @@
   var addHandler = function(e){
     e.preventDefault();
     Plugin.call($(this),'add',$(this).parentsUntil("[data-toggle='amount-input']").length > 0 ? $(this).parentsUntil("[data-toggle='amount-input']").parent() : $(this).parent())
+    $(this).trigger('change');
   };
 
   var minusHandler = function(e){
     e.preventDefault();
     Plugin.call($(this),'minus',$(this).parentsUntil("[data-toggle='amount-input']").length > 0 ? $(this).parentsUntil("[data-toggle='amount-input']").parent() : $(this).parent());
+    $(this).trigger('change');
   };
 
   function Plugin(option,root){

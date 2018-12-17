@@ -297,7 +297,7 @@ function updateOrderWindow(fromCache, isTrigger){
     var dishId = $(this).data("id");
     if(fromCache){
       var localDish = readCookie(dishId);
-      if(localDish){
+      if(localDish && localDish !== "undefined"){
         localDish = JSON.parse(localDish);
       }else{
         localDish = {number : 0, preference : [], price : $(this).find(".price").attr("value")};
@@ -309,6 +309,7 @@ function updateOrderWindow(fromCache, isTrigger){
         $(this).find(".amount").val(localOrders[dishId].number);
         $(this).find(".amount").text(localOrders[dishId].number);
         _this.amountInput('update',$(this).find("[data-toggle='amount-input']"));
+        $(this).find("[data-toggle='amount-input']").on('change', refreshCheckoutMenu);
       })
       $(this).data("left-amount", left);
       updateMenuView(dishId);
@@ -335,13 +336,9 @@ function updateMenuView(id){
   dishItems.each(function(){
     var dishItem = $(this);
     var left = dishItem.data("left-amount");
-    if(dishItem.is(':hidden')){
-      dishItem.find(".amount").val(number);
-    }
     dishItem.find(".amount").text(number);
-    if($("#myModal").hasClass('show')){
-      dishItem.amountInput('update',dishItem.find("[data-toggle='amount-input']"));
-    }
+    dishItem.find(".amount").val(number);
+    dishItem.amountInput('update',dishItem.find("[data-toggle='amount-input']"));
     if(number>0){
       dishItem.addClass("table-success");
       if(dishItem.hasClass(dateDesc)){
