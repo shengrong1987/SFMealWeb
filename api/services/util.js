@@ -127,7 +127,7 @@ module.exports = {
     }else if(moment.duration(date.diff(moment())).asDays() <= 7){
       dateDesc = date.format('dddd');
     }else{
-      dateDesc = date.format('[day]M-DD');
+      dateDesc = date.format('[day]M/D');
     }
     return dateDesc;
   },

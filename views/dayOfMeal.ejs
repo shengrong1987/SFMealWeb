@@ -57,7 +57,7 @@
               }
           })
         dates.forEach(function(dateKey,i){ %>
-        <li class="nav-item py-2 col-4 <%= i===0?'active':''%>"><a class="nav-link" data-mixitup-control href="javascript:void(0);" data-filter=".<%= dateKey.replace('-','').replace(" ","")%>" data-toggle="tab"><%= __(dateKey).replace("day",'')%></a></li>
+        <li class="nav-item py-2 col-4 <%= i===0?'active':''%>"><a class="nav-link" data-mixitup-control href="javascript:void(0);" data-filter=".<%= dateKey.replace('/','').replace(" ","")%>" data-toggle="tab"><%= __(dateKey).replace("day",'')%></a></li>
         <% })%>
       </ul>
     </div>
@@ -75,9 +75,21 @@
         <div id="order">
           <% tags.forEach(function(tag){%>
           <% if(tag==="limited"){%>
-            <div class="pl-4 py-4 text-center text-green" style="margin: 2px 0 2px 0;" id="<%= tag%>"><h5><%= __(tag)%></h5></div>
+            <div class="pl-4 py-3 text-center text-green" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag%>">
+              <div class="d-flex vertical-align">
+                <div class="divider none-margin">-</div>
+                <h6 class="none" style="min-width: 100px;"><%= __(tag)%></h6>
+                <div class="divider none-margin">-</div>
+              </div>
+            </div>
           <% }else{%>
-            <div class="pl-4 text-center text-green" style="margin: 2px 0 2px 0;" id="<%= tag%>"><h5><%= __(tag)%></h5></div>
+              <div class="pl-4 py-3 text-center text-green" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag%>">
+                <div class="d-flex vertical-align">
+                  <div class="divider none-margin">-</div>
+                  <h6 class="none" style="min-width: 100px;"><%= __(tag)%></h6>
+                  <div class="divider none-margin">-</div>
+                </div>
+              </div>
           <% }%>
           <%
 
@@ -90,7 +102,7 @@
               if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
               %>
               <% if(tag === "all" || dish.type === tag || meal.chef.shopName === tag || (dish.tags && dish.tags.includes(tag))){%>
-            <div style="display:none;" data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem p-2 mix item <%= meal.chef.shopName%> <%= dateKey.replace(" ",'')%><% if(dish.tags){ dish.tags.forEach(function(t){%>
+            <div style="display:none;" data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem p-2 mix item <%= meal.chef.shopName%> <%= dateKey.replace(" ",'').replace('/','')%><% if(dish.tags){ dish.tags.forEach(function(t){%>
               <%= " " + t%>
               <%})}%>">
             <div class="d-flex flex-row">

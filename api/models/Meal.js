@@ -254,9 +254,6 @@ module.exports = {
     },
 
     getTimeDiff : function(provideTill, locale){
-      // provideTill = moment(provideTill).unix();
-      // var now = moment().unix();
-      // var diff = provideTill - now;
       moment.locale(locale);
       return moment(provideTill).from(moment());
     },
