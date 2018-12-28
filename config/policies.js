@@ -77,6 +77,7 @@ module.exports.policies = {
     'findOne' : true,
     'search' : true,
     'checkout' : true,
+    'catering' : true,
     'findAll' : 'isAdmin',
     'searchAll' : 'isAdmin',
     'findReview' : 'isAdmin',

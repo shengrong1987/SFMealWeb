@@ -82,7 +82,7 @@
   },
   "scripts": {
     "debug": "node debug app.js",
-    "start": "node app.js",
+    "start": "node $NODE_DEBUG_OPTION app.js",
     "install": "./bin/install.sh",
     "finalize": "./bin/finalize.sh",
     "env": "./bin/exportENV.sh",

@@ -3980,9 +3980,6 @@ input[type="button"].btn-block {
   color: rgba(0, 0, 0, 0.5);
   border-color: rgba(0, 0, 0, 0.1);
 }
-.navbar-light .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 0, 0, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-}
 .navbar-light .navbar-text {
   color: rgba(0, 0, 0, 0.5);
 }
@@ -4019,9 +4016,6 @@ input[type="button"].btn-block {
 .navbar-dark .navbar-toggler {
   color: rgba(255, 255, 255, 0.5);
   border-color: rgba(255, 255, 255, 0.1);
-}
-.navbar-dark .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }
 .navbar-dark .navbar-text {
   color: rgba(255, 255, 255, 0.5);
@@ -5336,36 +5330,29 @@ button.close {
   -webkit-transform: translateX(0);
   transform: translateX(0);
 }
-@supports ((-webkit-transform-style: preserve-3d) or (transform-style: preserve-3d)) {
-  .carousel-item-next.carousel-item-left,
-  .carousel-item-prev.carousel-item-right {
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-  }
+.carousel-item-next.carousel-item-left,
+.carousel-item-prev.carousel-item-right {
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .carousel-item-next,
 .active.carousel-item-right {
   -webkit-transform: translateX(100%);
   transform: translateX(100%);
 }
-@supports ((-webkit-transform-style: preserve-3d) or (transform-style: preserve-3d)) {
-  .carousel-item-next,
-  .active.carousel-item-right {
-    -webkit-transform: translate3d(100%, 0, 0);
-    transform: translate3d(100%, 0, 0);
-  }
+.active.carousel-item-right {
+  -webkit-transform: translate3d(100%, 0, 0);
+  transform: translate3d(100%, 0, 0);
+}
+.carousel-item-next,
+.active.carousel-item-right {
+  -webkit-transform: translate3d(100%, 0, 0);
+  transform: translate3d(100%, 0, 0);
 }
 .carousel-item-prev,
 .active.carousel-item-left {
   -webkit-transform: translateX(-100%);
   transform: translateX(-100%);
-}
-@supports ((-webkit-transform-style: preserve-3d) or (transform-style: preserve-3d)) {
-  .carousel-item-prev,
-  .active.carousel-item-left {
-    -webkit-transform: translate3d(-100%, 0, 0);
-    transform: translate3d(-100%, 0, 0);
-  }
 }
 .carousel-fade .carousel-item {
   opacity: 0;
@@ -5389,15 +5376,13 @@ button.close {
   -webkit-transform: translateX(0);
   transform: translateX(0);
 }
-@supports ((-webkit-transform-style: preserve-3d) or (transform-style: preserve-3d)) {
-  .carousel-fade .carousel-item-next,
-  .carousel-fade .carousel-item-prev,
-  .carousel-fade .carousel-item.active,
-  .carousel-fade .active.carousel-item-left,
-  .carousel-fade .active.carousel-item-prev {
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-  }
+.carousel-fade .carousel-item-next,
+.carousel-fade .carousel-item-prev,
+.carousel-fade .carousel-item.active,
+.carousel-fade .active.carousel-item-left,
+.carousel-fade .active.carousel-item-prev {
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .carousel-control-prev,
 .carousel-control-next {
@@ -5437,12 +5422,6 @@ button.close {
   height: 20px;
   background: transparent no-repeat center center;
   background-size: 100% 100%;
-}
-.carousel-control-prev-icon {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3E%3Cpath d='M5.25 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3E%3C/svg%3E");
-}
-.carousel-control-next-icon {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3E%3Cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E");
 }
 .carousel-indicators {
   position: absolute;
@@ -6677,13 +6656,11 @@ button.bg-dark:focus {
   left: 0;
   z-index: 1030;
 }
-@supports ((position: -webkit-sticky) or (position: sticky)) {
-  .sticky-top {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    z-index: 1020;
-  }
+.sticky-top {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 1020;
 }
 .sr-only {
   position: absolute;
@@ -8898,6 +8875,50 @@ small {
 .bg-light .nav-link:hover {
   color: rgba(0, 0, 0, 0.75);
 }
+.bg-light .nav-link.active {
+  color: rgba(0, 0, 0, 0.75);
+}
+.bg-light .nav-link.highlight.active {
+  text-decoration: underline;
+}
+.catering-gallery .flex-column {
+  max-width: 260px;
+}
+.catering-gallery .item img {
+  -webkit-filter: brightness(100%);
+  -webkit-transition: 0.3s ease-in-out;
+  transition: 0.3s ease-in-out;
+}
+.catering-gallery .item {
+  position: relative;
+  margin: 5px;
+  overflow: hidden;
+}
+.catering-gallery .item .text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  opacity: 0;
+  transition: all 0.8s ease;
+}
+.catering-gallery .item .text h1 {
+  margin: 0;
+  color: white;
+}
+.catering-gallery .item:hover .text {
+  opacity: 1;
+}
+.catering-gallery .item:hover img {
+  transform: scale(1.3);
+  -webkit-filter: brightness(70%);
+  -webkit-transition: all 1s ease;
+  -moz-transition: all 1s ease;
+  -o-transition: all 1s ease;
+  -ms-transition: all 1s ease;
+  transition: all 1s ease;
+}
 /* Start by setting display:none to make this hidden.
    Then we position it in relation to the viewport window
    with position:fixed. Width, height, top and left speak
@@ -8911,7 +8932,7 @@ small {
   left: 0;
   height: 100%;
   width: 100%;
-  background: rgba(255, 255, 255, 0.8) url('../images/loadingGif.gif') 50% 50% no-repeat;
+  background: rgba(255, 255, 255, 0.8) url("../images/loadingGif.gif") 50% 50% no-repeat;
 }
 /* When the body has the loading class, we turn
    the scrollbar off with overflow:hidden */
@@ -9122,7 +9143,6 @@ input:focus {
   transition: all 0.35s;
 }
 .hovereffect:hover img {
-  filter: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg"><filter id="filter"><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="linear" slope="0.6" /><feFuncG type="linear" slope="0.6" /><feFuncB type="linear" slope="0.6" /></feComponentTransfer></filter></svg>#filter');
   filter: brightness(0.6);
   -webkit-filter: brightness(0.6);
 }
@@ -9213,7 +9233,6 @@ hovereffect p {
   bottom: 20px;
   left: 20px;
   border: 1px solid #fff;
-  content: '';
   opacity: 0;
   filter: alpha(opacity=0);
   -webkit-transition: opacity 0.35s, -webkit-transform 0.45s;
@@ -9228,7 +9247,6 @@ hovereffect p {
   bottom: 20px;
   left: 20px;
   border: 1px solid #fff;
-  content: '';
   opacity: 0;
   filter: alpha(opacity=0);
   -webkit-transition: opacity 0.35s, -webkit-transform 0.45s;
@@ -9267,6 +9285,9 @@ hovereffect p {
 }
 .pickup-map {
   display: none;
+}
+.fa-calendar-remote {
+  background: url("http://www.sfmeal.com/images/fa-calendar.png") no-repeat center / 70% auto;
 }
 .fa-facebook-remote {
   background: url("http://www.sfmeal.com/images/fa-facebook.png") no-repeat center / 70% auto;
@@ -9333,8 +9354,8 @@ hovereffect p {
   background-size: 225px 60px;
 }
 .logo-remote {
-  padding: 30px 150px 50px 150px;
-  background: url("http://www.sfmeal.com/images/sfmeal_logo.png") no-repeat center / 100% auto;
+  padding: 30px 100px 50px 100px;
+  background: url("http://www.sfmeal.com/images/sfmeal_logo.png") no-repeat center / 80% auto;
   background-color: transparent;
 }
 .logo-sm {
@@ -9704,6 +9725,15 @@ label {
 .checkbox input[type=checkbox]:checked + label {
   text-decoration: line-through;
   color: #8090a0;
+}
+.list-group-grey .list-group-item-action {
+  color: #999999;
+}
+.list-group-grey .list-group-item.active {
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  color: #4d4049;
+  font-weight: bold;
 }
 /* pickup option*/
 .option {
@@ -10453,9 +10483,6 @@ select.form-control {
   width: 100%;
   min-height: 200px;
 }
-.email-banner {
-  height: 120px;
-}
 .compact-banner {
   height: 150px;
 }
@@ -10890,6 +10917,9 @@ select.form-control {
 #our-story .cover {
   max-height: 330px;
 }
+.fp-slidesNav {
+  text-align: center;
+}
 .rating {
   unicode-bidi: bidi-override;
   direction: rtl;
@@ -11239,6 +11269,12 @@ select.form-control {
   }
 }
 @media (max-width: 767px) {
+  #fullpage {
+    text-align: center;
+  }
+  .catering-gallery .flex-column {
+    max-width: 100%;
+  }
   .search-btn-group .zipCode {
     width: 70px;
     display: inline;
@@ -11601,6 +11637,9 @@ select.form-control {
 @media (max-width: 576px) {
   .container {
     width: 100%;
+  }
+  .catering-gallery .flex-column {
+    max-width: 100%;
   }
 }
 /*!

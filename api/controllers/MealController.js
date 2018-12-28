@@ -74,6 +74,67 @@ module.exports = {
     });
   },
 
+  catering : function(req, res){
+    Host.find({ passGuide : true }).populate("dishes").exec(function(err, hosts){
+      if(err){
+        return res.badRequest(err);
+      }
+
+      var _dishes = [],_types = [];
+      async.auto({
+        findDishes : function(next){
+          hosts.forEach(function(host){
+            var dishes = host.dishes.filter(function(dish){
+              return dish.isVerified;
+            });
+            _dishes = _dishes.concat(dishes);
+          })
+          next();
+        },
+        findDishTypes : ['findDishes', function(next){
+          _dishes.forEach(function(dish){
+            if(dish.type){
+              if(!_types.includes(dish.type)){
+                _types.push(dish.type);
+              }
+            }
+          })
+          next();
+        },
+        ]
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate("dishes").exec(function(err, meals) {
+          if (err) {
+            return res.badRequest(err);
+          }
+          meals.forEach(function (meal) {
+            meal.dishes.forEach(function (dish) {
+              _dishes = _dishes.map(function (d) {
+                if (d && dish && d.id === dish.id) {
+                  d.availableAfter = util.humanizeDate(meal.pickups[0].pickupFromTime);
+                }
+                return d;
+              })
+            })
+          })
+          _dishes = _dishes.map(function(d){
+            if(!d || d.availableAfter){
+              return d;
+            }
+            var availableDate = moment().add(d.prepareDay,'days');
+            d.availableDate = availableDate;
+            return d;
+          })
+          res.view("catering", { dishes : _dishes, types : _types});
+        });
+      })
+    })
+
+  },
+
   find : function(req,res){
     //find out meals that provide start today or ends today
     moment.locale('zh-cn');
@@ -95,7 +156,7 @@ module.exports = {
           })
         })
       }
-      var _u=null,_tags=["select","limited"];
+      var _u=null,_tags=[];
       async.auto({
         findUser : function(next){
           if(!req.session.authenticated){
@@ -114,12 +175,25 @@ module.exports = {
             meal.dishes.forEach(function(dish){
               if(dish.tags){
                 dish.tags.forEach(function(tag){
-                  if(!_tags.includes(tag)){
+                  if(!_tags.includes(tag) && !_tags.includes(req.__(tag))){
                     _tags.push(tag);
                   }
                 })
               }
             })
+          })
+          var tagOrder = {
+            "select" : 100,
+            "限时礼品" : 90,
+            "limited" : 80,
+            "dessert" : 0
+          };
+          _tags = _tags.sort(function(a,b){
+            if(tagOrder.hasOwnProperty(a) && tagOrder.hasOwnProperty(b)){
+              return tagOrder[b] - tagOrder[a];
+            }else{
+              return 0;
+            }
           })
           next();
         },
@@ -1263,17 +1337,7 @@ module.exports = {
     var preOrderCount = 0;
     var orderCount = 0;
     meals.forEach(function(meal){
-      var pickupDate = moment(meal.pickups[0].pickupFromTime);
-      var dateDesc = "unknown";
-      if(pickupDate.isSame(moment(),'day')){
-        dateDesc = 'today';
-      }else if(pickupDate.isSame(moment().add(1,'days'),'day')){
-        dateDesc = 'tomorrow';
-      }else if(moment.duration(pickupDate.diff(moment())).asDays() <= 7){
-        dateDesc = pickupDate.format('dddd');
-      }else{
-        dateDesc = pickupDate.format('[day]M-DD');
-      }
+      var dateDesc = util.humanizeDate(meal.pickups[0].pickupFromTime);
       if(mealDateObj.meals.hasOwnProperty(dateDesc)){
         mealDateObj.meals[dateDesc].meals.push(meal);
       }else{

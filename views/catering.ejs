@@ -1,0 +1,144 @@
+
+<div id="fullpage">
+  <div class="section" style="margin-top: -56px;">
+    <h1 style="text-align: center;padding-top: 50px;font-family: 'Droid Sans', sans-serif;font-weight: bold;">Catering Experience</h1>
+    <p style="text-align: center;padding: 25px;font-size: 18px;color: #999;">Your perfect treat</p>
+
+    <div class="d-flex flex-row flex-wrap justify-content-center catering-gallery">
+
+      <div class="d-flex flex-column">
+        <div class="item">
+          <span class="text"><h1>Birthday</h1></span>
+          <img src="https://images.unsplash.com/photo-1485963631004-f2f00b1d6606?auto=format&fit=crop&w=668&q=80" class="img-fluid">
+        </div>
+
+        <div class="item">
+          <span class="text"><h1>Birthday</h1></span>
+          <img src="https://images.unsplash.com/photo-1502865787650-3f8318917153?auto=format&fit=crop&w=334&q=80" class="img-fluid">
+        </div>
+      </div>
+
+      <div class="d-flex flex-column">
+        <div class="item">
+          <span class="text"><h1>下午茶</h1></span>
+          <img src="https://images.unsplash.com/photo-1500816558239-6b91f4256ead?auto=format&fit=crop&w=331&q=80" class="img-fluid">
+        </div>
+
+        <div class="item">
+          <span class="text"><h1>Birthday</h1></span>
+          <img src="https://images.unsplash.com/photo-1487376318617-f43c7b41e2e2?auto=format&fit=crop&w=750&q=80" class="img-fluid scale">
+        </div>
+
+      </div>
+
+      <div class="d-flex flex-column">
+        <div class="item">
+          <span class="text"><h1>Birthday</h1></span>
+          <img src="https://images.unsplash.com/photo-1497888329096-51c27beff665?auto=format&fit=crop&w=751&q=80" class="img-fluid scale mb-2">
+        </div>
+
+        <div class="item">
+          <span class="text"><h1>Birthday</h1></span>
+          <img src="https://images.unsplash.com/photo-1505253468034-514d2507d914?auto=format&fit=crop&w=334&q=80"  class="img-fluid">
+        </div>
+      </div>
+
+      <div class="d-flex flex-column">
+        <div class="item">
+          <span class="text"><h1>Birthday</h1></span>
+          <img src="https://images.unsplash.com/photo-1502550900787-e956c314a221?auto=format&fit=crop&w=334&q=80" class="img-fluid m-1 p-1">
+        </div>
+
+        <div class="item">
+          <span class="text"><h1>Birthday</h1></span>
+          <img src="https://images.unsplash.com/photo-1455853659719-4b521eebc76d?auto=format&fit=crop&w=750&q=80" class="img-fluid image m-1 p-1">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dishView" class="section" style="padding-bottom:40px;">
+    <div class="green d-flex justify-content-center vertical-align text-center" style="height: 56px;">
+      <div class="btn-group mr-3">
+        <button class="btn nav-item dropdown-toggle" data-selected="true" style="height: 38px;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Event Type
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" value="treat" href="javascript:void(0);"><%= __('treat')%></a>
+          <a class="dropdown-item" value="lunch" href="javascript:void(0);"><%= __('lunch')%></a>
+          <a class="dropdown-item" value="wedding" href="javascript:void(0);"><%= __('wedding')%></a>
+          <a class="dropdown-item" value="party" href="javascript:void(0);"><%= __('party')%></a>
+          <a class="dropdown-item" value="birthday" href="javascript:void(0);"><%= __('birthday')%></a>
+          <a class="dropdown-item" value="business" href="javascript:void(0);"><%= __('business')%></a>
+        </div>
+      </div>
+      <input class="form-control mr-3" style="width: 100px;" type="text" placeholder="Zipcode">
+      <div class='input-group date mr-3' style="width:250px;" data-toggle="dateTimePicker">
+        <input type='text' class="form-control"/>
+        <div class="input-group-prepend">
+          <span class="input-group-text datepickerbutton" style="background-color: white;border-left:none;"><i class="fal fa-angle-left"></i></span>
+        </div>
+        <div class="input-group-prepend">
+          <span class="input-group-text datepickerbutton" style="background-color: white;border-left:none;"><i class="fal fa-angle-right"></i></span>
+        </div>
+      </div>
+      <div class="btn btn-info" style="height: 38px;">Search</div>
+    </div>
+    <% types.forEach(function(type){%>
+    <div class="slide" data-anchor="<%= type%>">
+      <div class="light-grey pl-4" style="margin: 2px 0 2px 0;"  id="<%= type%>"><%= __(type)%></div>
+      <% dishes.forEach(function(dish){ if(dish.type === type){%>
+      <div class="row">
+        <div class="col-12">
+          <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-id="<%= dish.id%>" class="dish dishItem p-2 mix item <%= type%>">
+            <div class="d-flex flex-row">
+              <div class="photo mr-2">
+                <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
+                <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
+                  <img data-src="<%= index===0? photo.v : ''%>">
+                </a>
+                <% }});%>
+              </div>
+              <div class="d-flex flex-column flex-grow-1">
+                <h6 class="mb-auto"><%= dish.title%>
+                  <small>
+                    <%= dish.quantity%> <%= __('minimal-order')%>:<%= dish.cateringMinimalOrder%> <br/>
+                    Available from <%= dish.availableAfter%><br/>
+                    Minimal Order: <%= dish.cateringMinimalOrder%>
+                  </small>
+                </h6>
+                <div class="d-flex">
+                  <div class="text text-price price mr-2" data-extra=0 value="<%= dish.price%>" data-original-price="<%= dish.originalPrice || ''%>">
+                    $<%= dish.price.toFixed(2)%>
+                  </div>
+                  <div class="input-group input-group-sm amount-input round ml-auto" style="max-width:200px;min-width:30px;" data-toggle="amount-input" data-dish="<%= dish.id%>">
+                    <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">
+                      <span class="input-group-text">-</span>
+                    </div>
+                    <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
+                    <div class="input-group-append add" onclick="javascript:orderFood('<%= dish.id %>',1,true)">
+                      <span class="input-group-text">+</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% }});%>
+    </div>
+    <% });%>
+  </div>
+
+  <div class="section">
+    123
+  </div>
+
+  <nav class="nav bg-light white" id="dishTypeMenu" style="position: absolute;bottom: 0;">
+    <% types.forEach(function(type){%>
+    <a class="nav-link highlight" href="#menu/<%= type%>" data-menuanchor="<%= type%>"><%= type%></a>
+    <% });%>
+  </nav>
+
+</div>

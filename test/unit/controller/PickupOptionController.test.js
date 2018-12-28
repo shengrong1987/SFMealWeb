@@ -74,7 +74,9 @@ describe('PickupOptionController', function() {
           "phone" : "(415)802-3854",
           "deliveryRange" : 10,
           "index" : 2,
-          "nickname" : "pickupSet1"
+          "nickname" : "pickupSet1",
+          "lat" : "37.738140",
+          "long" : "-122.397720"
         })
         .expect(201)
         .end(function(err, res){

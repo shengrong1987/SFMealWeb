@@ -1,44 +1,63 @@
-<div class="email-banner vertical-align dark">
-  <div style="width: 600px;" class="middle banner-text">
-    <div class="row" style="margin-bottom: 5px;">
-      <div class="col-xs-3 cursor-pointer" onclick="location.href='https://www.sfmeal.com'">
-        <a href="/" class="logo-remote"></a>
-      </div>
-      <div class="col-xs-9 text-right">
-        <a class="btn btn-red btn-inline" href='https://www.sfmeal.com'><%= enterwebsite%></a>
-      </div>
-    </div>
-  </div>
-</div>
+<%- include ../email_header %>
 
 <div class="green" style="padding: 25px;">
 
-  <div class="container box-email white relative middle text-center">
-    <h2><%= yourfollowedchef%>"<%= host.shopName%>"<%= menuoftheweek%></h2>
+  <div class="container white relative middle text-center py-5">
+    <h3><%= yourfollowedchef%>"<%= host.shopName%>"<%= menuoftheweek%></h3>
     <p><%= hometaste1%></p>
-    <a class="btn btn-red btn-lg round" style="height: 40px;" href="http://www.sfmeal.com/meal"><%= seemore%></a>
-    <div class="divider"></div>
-    <table class="table-email middle" style="margin-top: 25px;">
-      <% var i=0;var j=0; meals.forEach(function(meal){%>
-      <% if(i%2==0){ j++;%><tr><%}%>
-        <td style="max-width: 350px;padding: 10px;">
-          <a href="http://www.sfmeal.com/meal/<%= meal.id%>">
-            <img src="<%= meal.coverString %>" class="cursor-pointer" style="width: 100%;">
-            <p class="text-left" style="margin-top: 5px;font-size: medium;"><%= meal.title%></p>
+    <p class="text-red" style="font-size: larger;">
+      <i class="fa-calendar-remote p-4"></i>
+      <%= deliverytime%>:
+      <% meals.forEach(function(meal){%>
+      <%= meal.getDateDesc(meal.pickups[0].pickupFromTime);%>
+      <% });%>
+    </p>
+    <div class="divider">-</div>
+    <div>
+      <%
+        var dishes = [];
+        meals.forEach(function(meal){
+            if(!dishes.length){
+              dishes = meal.dishes;
+            }else{
+              meal.dishes.forEach(function(d1){
+                  var hasDish = dishes.some(function(d2){
+                      return d1.id===d2.id;
+                  })
+                if(!hasDish){
+                  dishes.push(d1);
+                }
+              })
+            }
+        })
+      %>
+      <% dishes.forEach(function(dish){%>
+        <div class="text-center margin-auto d-inline-block" style="min-width : 200px;max-width:45%;">
+          <a href="http://www.sfmeal.com/meal" class="mb-2">
+            <img src="<%= dish.photos[0].v %>" class="cursor-pointer w-100">
           </a>
-        </td>
-      <% if(j%2==0){ j=0;%><tr><%}%>
-        <% i++;});%>
-    </table>
-    <div class="btn-group" style="margin-top: 25px;">
-      <input name="keyword" type="text" class="btn btn-outline-light round input" style="max-width: 150px;height: 40px;" placeholder="<%= searchingtips%>">
-      <a class="btn btn-warning round orange text-white searchBtn" style="height: 40px;padding: 8px 15px 5px 5px;" href="http://sfmeal.com/meal">
-        <i class="fa fa-search"></i>
-        <%= search%>
-      </a>
+          <div class="text-red" style="font-size: large;"><%= dish.title%> <%= dish.quantity%></div>
+          <% if(dish.originalPrice){%>
+            <div class="text-orange" style="font-size:large;">特惠价：$<%= dish.originalPrice%></div>
+            <div class="text-darksgrey" style="font-size:larger;"><s>原价：$<%= dish.price%></s></div>
+            <% }else{%>
+            <div class="text-darkgrey" style="font-size:large;">价格：$<%= dish.price%></div>
+            <% }%>
+          </div>
+      <% });%>
+    </div>
+    <div class="mt-4">
+      <a class="btn btn-primary" style="height:40px;" href="http://www.sfmeal.com/meal"><%= seemore%></a>
     </div>
   </div>
 
 </div>
+
+<script>
+  var onSearch = function(){
+      var keyword = document.getElementsByName("keyword");
+      location.href = "http://sfmeal.com/meal/search?keyword=" + keyword;
+  }
+</script>
 
 <%- include ../email_footer %>

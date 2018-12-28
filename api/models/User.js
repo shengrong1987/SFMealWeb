@@ -140,7 +140,6 @@ module.exports = {
     },
     points : {
       type : 'integer',
-      at1000Max : true,
       defaultsTo : 0
     },
     emailVerified : {

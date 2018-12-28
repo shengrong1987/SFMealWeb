@@ -1,5 +1,6 @@
 @remoteHost : "http://www.sfmeal.com";
 @sfmeal_logo : %("%s/images/sfmeal_logo.png", @remoteHost);
+@fa-calendar : %("%s/images/fa-calendar.png", @remoteHost);
 @fa-facebook : %("%s/images/fa-facebook.png", @remoteHost);
 @fa-instagram : %("%s/images/fa-instagram.png", @remoteHost);
 @fa-pinterest : %("%s/images/fa-pinterest.png", @remoteHost);
@@ -56,6 +57,60 @@ small{
   color: rgba(0, 0, 0, 0.75);
 }
 
+.bg-light .nav-link.active{
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.bg-light .nav-link.highlight.active{
+  text-decoration: underline;
+}
+
+//gallery style
+.catering-gallery .flex-column {
+  max-width: 260px;
+}
+
+.catering-gallery .item img{
+  -webkit-filter: brightness(100%);
+  -webkit-transition: .3s ease-in-out;
+  transition: .3s ease-in-out;
+}
+
+.catering-gallery .item{
+  position: relative;
+  margin: 5px;
+  overflow: hidden;
+}
+
+.catering-gallery .item .text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  opacity: 0;
+  transition: all 0.8s ease;
+}
+
+.catering-gallery .item .text h1 {
+  margin: 0;
+  color: white;
+}
+
+.catering-gallery .item:hover .text{
+  opacity : 1;
+}
+
+.catering-gallery .item:hover img {
+  transform: scale(1.3);
+  -webkit-filter: brightness(70%);
+  -webkit-transition: all 1s ease;
+  -moz-transition: all 1s ease;
+  -o-transition: all 1s ease;
+  -ms-transition: all 1s ease;
+  transition: all 1s ease;
+}
+
 /* Start by setting display:none to make this hidden.
    Then we position it in relation to the viewport window
    with position:fixed. Width, height, top and left speak
@@ -70,9 +125,7 @@ small{
   height:     100%;
   width:      100%;
   background: rgba( 255, 255, 255, .8 )
-  url('../images/loadingGif.gif')
-  50% 50%
-  no-repeat;
+  url("../images/loadingGif.gif") 50% 50% no-repeat;
 }
 
 /* When the body has the loading class, we turn
@@ -325,7 +378,6 @@ input:focus{
 }
 
 .hovereffect:hover img {
-  filter: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg"><filter id="filter"><feComponentTransfer color-interpolation-filters="sRGB"><feFuncR type="linear" slope="0.6" /><feFuncG type="linear" slope="0.6" /><feFuncB type="linear" slope="0.6" /></feComponentTransfer></filter></svg>#filter');
   filter: brightness(0.6);
   -webkit-filter: brightness(0.6);
 }
@@ -425,7 +477,7 @@ input:focus{
   bottom: 20px;
   left: 20px;
   border: 1px solid #fff;
-  content: '';
+  //content: '';
   opacity: 0;
   filter: alpha(opacity=0);
   -webkit-transition: opacity 0.35s, -webkit-transform 0.45s;
@@ -441,7 +493,7 @@ input:focus{
   bottom: 20px;
   left: 20px;
   border: 1px solid #fff;
-  content: '';
+  //content: '';
   opacity: 0;
   filter: alpha(opacity=0);
   -webkit-transition: opacity 0.35s, -webkit-transform 0.45s;
@@ -490,6 +542,10 @@ input:focus{
 
 #googlemapContainer{
 
+}
+
+.fa-calendar-remote{
+  background: url("@{fa-calendar}") no-repeat center/70% auto;
 }
 
 .fa-facebook-remote{
@@ -568,9 +624,9 @@ input:focus{
 }
 
 .logo-remote{
-  padding: 30px 150px 50px 150px;
-  background: url("@{sfmeal_logo}") no-repeat center/100% auto;
-  background-color: transparent
+  padding: 30px 100px 50px 100px;
+  background: url("@{sfmeal_logo}") no-repeat center/80% auto;
+  background-color: transparent;
 }
 
 .logo-sm{
@@ -1029,6 +1085,17 @@ label {
 .checkbox input[type=checkbox]:checked + label {
   text-decoration: line-through;
   color: rgb(128, 144, 160);
+}
+
+.list-group-grey .list-group-item-action{
+  color : @medium-grey;
+}
+
+.list-group-grey .list-group-item.active{
+  background-color : white;
+  border : 1px solid rgba(0, 0, 0, 0.125);
+  color : @dark-grey;
+  font-weight : bold;
 }
 
 /* pickup option*/
@@ -1706,10 +1773,6 @@ select.form-control{
   min-height: 200px;
 }
 
-.email-banner{
-  height: 120px;
-}
-
 .compact-banner{
   height: 150px;
   .img-wrapper {
@@ -2234,6 +2297,11 @@ select.form-control{
   }
 }
 
+//fullpage style
+.fp-slidesNav{
+  text-align: center;
+}
+
 .rating {
   unicode-bidi: bidi-override;
   direction: rtl;
@@ -2648,6 +2716,13 @@ select.form-control{
 
 @media (max-width: 767px){
 
+  #fullpage{
+    text-align: center;
+  }
+  .catering-gallery .flex-column {
+    max-width: 100%;
+  }
+
   .search-btn-group{
     .zipCode{
       width: 70px;
@@ -2995,5 +3070,9 @@ select.form-control{
 
 @media (max-width: 576px) {
   .container {
-    width: 100%; } }
+    width: 100%; }
+  .catering-gallery .flex-column {
+    max-width: 100%;
+  }
+}
 

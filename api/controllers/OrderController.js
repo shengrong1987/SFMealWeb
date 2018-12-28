@@ -874,7 +874,7 @@ module.exports = {
                           return next2(err);
                         }
                         order.application_fees['cash'] -= refundedFee;
-                        order.charges['cash'] -= netDiff;
+                        order.charges['cash'] += netDiff;
                         next2();
                       })
                     }
@@ -1428,15 +1428,32 @@ module.exports = {
   },
 
   payment : function(req, res){
-    var orderId = req.params.id;
-    Order.findOne(orderId).exec(function(err, order){
+    var orderIds = req.params.id.split("+");
+    var subtotal = 0, discount = 0, tip = 0, o;
+    async.each(orderIds, function(orderId, next){
+      Order.findOne(orderId).exec(function(err, order){
+        if(err){
+          return next(err);
+        }
+        if(!o){
+          o = order;
+        }
+        subtotal += order.subtotal;
+        discount += order.discount;
+        tip += order.tip;
+        next();
+      })
+    }, function(err){
       if(err){
         return res.badRequest(err);
       }
-      if(order.paymentMethod === "alipay"){
-        return next( { code : -62, responseText : req.__('wrong-payment-api', order.paymentMethod)});
+      o.subtotal = subtotal;
+      o.discount = discount;
+      o.tip = tip;
+      if(o.paymentMethod === "alipay"){
+        return next( { code : -62, responseText : req.__('wrong-payment-api', o.paymentMethod)});
       }
-      return res.view('topay', { order : order, layout : 'popup' });
+      return res.view('topay', { order : o, layout : 'popup' });
     })
   },
 
@@ -2450,7 +2467,7 @@ module.exports = {
     });
     var isSamePickup = pickups.every(function(p){
       var p2 = pickups[0];
-      sails.log.info("from time1: " + moment(p2.pickupFromTime).format("LT") + " from time1:" + moment(p.pickupFromTime).format("LT"));
+      sails.log.info("from time1: " + moment(p2.pickupFromTime).format("LT") + " from time2:" + moment(p.pickupFromTime).format("LT"));
       sails.log.info("till time1: " + moment(p2.pickupTillTime).format("LT") + " till time2:" + moment(p.pickupTillTime).format("LT"));
       return moment(p.pickupFromTime).isSame(moment(p2.pickupFromTime), 'minute') && moment(p.pickupTillTime).isSame(moment(p2.pickupTillTime), 'minute') && p.location === p2.location;
     });

@@ -316,6 +316,7 @@ module.exports = require('waterlock').actions.user({
           });
         })
       }else{
+        //combine dishes and get feature dishes
         async.each(found.orders, function(order,next){
           Order.findOne(order.id).populate("dishes").populate("host").populate("meal").exec(function (err, result) {
             if(err){
@@ -343,10 +344,44 @@ module.exports = require('waterlock').actions.user({
               next();
             }
           });
-        },function(err){
+        }, function(err){
           if(err){
             return res.badRequest(err);
           }
+          var newOrders = [], dishIds = [];
+          found.orders.forEach(function(order){
+            var isSamePickup = newOrders.some(function(oldOrder){
+              var _isSame = moment(oldOrder.pickupInfo.pickupFromTime).isSame(moment(order.pickupInfo.pickupFromTime), 'minute') && moment(oldOrder.pickupInfo.pickupTillTime).isSame(moment(order.pickupInfo.pickupTillTime), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
+              if(_isSame){
+                Object.keys(order.orders).forEach(function(dishId){
+                  if(oldOrder.orders.hasOwnProperty(dishId)){
+                    oldOrder.orders[dishId].number += order.orders[dishId].number;
+                  }else{
+                    oldOrder.orders[dishId] = order.orders[dishId];
+                  }
+                })
+                oldOrder.id += "+" + order.id;
+                oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
+                oldOrder.tip = parseFloat(oldOrder.tip) + parseFloat(order.tip);
+                oldOrder.pickupInfo.comment += order.pickupInfo.comment;
+                oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
+                if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
+                  oldOrder.charges['cash'] += order.charges['cash'];
+                }
+              }
+              return _isSame;
+            })
+            if(!isSamePickup){
+              newOrders.push(order);
+            }
+          });
+          newOrders.forEach(function(order){
+            dishIds = dishIds.concat(Object.keys(order.orders));
+            dishIds = dishIds.filter(function(item, pos){
+              return dishIds.indexOf(item) === pos;
+            });
+          })
+          found.orders = newOrders;
           async.each(found.collects, function(collect,next){
             Meal.findOne(collect.id).populate("chef").exec(function(err, meal){
               if(err){
@@ -377,7 +412,7 @@ module.exports = require('waterlock').actions.user({
               return res.view('user',{user: found});
             })
           });
-        });
+        })
       }
     });
   },

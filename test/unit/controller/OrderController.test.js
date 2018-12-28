@@ -772,7 +772,7 @@ describe('OrderController', function() {
           .post('/order')
           .send({
             orders : dishObj,
-            subtotal : price1 + price7,
+            subtotal : price7,
             contactInfo : { name : "sheng", address : address, phone : phone },
             paymentInfo : { method : 'cash'},
             method : "delivery",

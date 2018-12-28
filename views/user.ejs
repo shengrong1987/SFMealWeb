@@ -86,14 +86,14 @@
                             var number = dishOrdered.number;
                             var preference = dishOrdered.preference || [];
                             if(!preference.length){preference = [preference];}
-                            var oldTotal = (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount/100 + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
+                            var oldTotal = (order.subtotal * (1 + order.getTaxRate()) + order.tip + order.delivery_fee - order.discount/100 + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
                             var extra = preference.reduce(function(total,next){
                               return total + parseInt(next.extra);
                             },0);
 
                             if(order.status=="adjust") {
                               var adjustingNumber = order.adjusting_orders[key].number;
-                              var newTotal = (order.adjusting_subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount/100 + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
+                              var newTotal = (order.adjusting_subtotal * (1 + order.getTaxRate()) + order.tip + order.delivery_fee - order.discount/100 + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
                             }
 
                             if(number == 0 && (adjustingNumber == 0 || !adjustingNumber)){
@@ -130,7 +130,7 @@
                           <% if(order.status==="adjust"){%>
                           <s>$<%= oldTotal%></s> -> $<%= newTotal%>
                           <% }else{%>
-                          <b><%= oldTotal%></b>(<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : "0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= (order.discount/100).toFixed(2)%>)</td>
+                          <b><%= oldTotal%></b>(<%= __('tip')%>: $<%= order.tip%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= (order.discount/100).toFixed(2)%>)</td>
                         <% }%>
                         </td>
                             <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
@@ -235,11 +235,11 @@
                         var extra = preference.reduce(function(total,next){
                           return total + parseInt(next.extra);
                         },0);
-                        var oldTotal = (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount/100 + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
+                        var oldTotal = (order.subtotal * (1 + order.getTaxRate()) + order.tip + order.delivery_fee - order.discount/100 + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
 
                         if(order.status=="adjust") {
                           var adjustingNumber = order.adjusting_orders[key].number;
-                          var newTotal = (order.adjusting_subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount/100 + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
+                          var newTotal = (order.adjusting_subtotal * (1 + order.getTaxRate()) + order.tip + order.delivery_fee - order.discount/100 + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
                         }
 
                         if(number == 0 && (adjustingNumber == 0 || !adjustingNumber)){
@@ -282,7 +282,7 @@
                             <% if(order.status==="adjust"){%>
                               <s>$<%= oldTotal%></s> -> $<%= newTotal%>
                             <% }else{%>
-                             <b><%= oldTotal%></b>(<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : "0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= (order.discount/100).toFixed(2)%>)</td>
+                             <b><%= oldTotal%></b>(<%= __('tip')%>: $<%= order.tip%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= (order.discount/100).toFixed(2)%>)</td>
                             <% }%>
                         <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                         <td class="minWid50 vetical-align" rowspan="<%= list.length%>">

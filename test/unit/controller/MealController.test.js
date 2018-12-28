@@ -71,7 +71,7 @@ describe('MealController', function() {
     it('should create couple dishes', function (done) {
       agent
           .post('/dish')
-          .send({title : '韭菜盒子',price: 10, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
+          .send({title : '韭菜盒子',price: 10, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', tags : "select", type: 'appetizer', chef : hostId})
           .expect(200)
           .end(function(err,res){
             should.exist(res.body.id);
@@ -80,7 +80,7 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '猪肉馅饼',price: 10, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
+          .send({title : '猪肉馅饼',price: 10, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', tags : "select", type: 'appetizer', chef : hostId})
           .expect(200)
           .end(function(err,res){
             should.exist(res.body.id);
@@ -89,7 +89,7 @@ describe('MealController', function() {
 
       agent
           .post('/dish')
-          .send({title : '五彩面',price: 16, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'entree', chef : hostId})
+          .send({title : '五彩面',price: 16, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', tags : "select,frozen", type: 'entree', chef : hostId})
           .expect(200)
           .end(function(err,res){
             should.exist(res.body.id);
@@ -102,6 +102,7 @@ describe('MealController', function() {
             title : '糖水',
             price: 16,
             photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
+            tags : "select",
             type: 'dessert',
             chef : hostId,
             preference : {
@@ -121,6 +122,7 @@ describe('MealController', function() {
           title : '隐藏菜式',
           price: 10,
           photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
+          tags : "select",
           type: 'dessert',
           chef : hostId,
           preference : {
@@ -141,6 +143,7 @@ describe('MealController', function() {
           price: 30,
           photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
           type: 'entree',
+          tags : "select,limited",
           chef : hostId,
           preference : {
             spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
@@ -159,6 +162,7 @@ describe('MealController', function() {
           price: 30,
           photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
           type: 'entree',
+          tags : "limited",
           chef : hostId
         })
         .expect(200)
@@ -184,6 +188,7 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
+          res.body.tags.should.have.length(1);
           res.body.id.should.be.equal(dish1);
           done();
         })
@@ -333,7 +338,9 @@ describe('MealController', function() {
         "pickupInstruction" : "11th st and Market st",
         "method" : "pickup",
         "area" : "Market & Downtown",
-        "county" : "San Francisco County"
+        "county" : "San Francisco County",
+        "lat" : "37.772640",
+        "long" : "-122.415000"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
@@ -341,7 +348,9 @@ describe('MealController', function() {
         "deliveryCenter" : "1974 Palou Ave, San Francisco, CA 94124, USA",
         "area" : "Bay View",
         "county" : "San Francisco County",
-        "phone" : "(415)222-2222"
+        "phone" : "(415)222-2222",
+        "lat" : "37.738140",
+        "long" : "-122.397720"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
@@ -554,7 +563,9 @@ describe('MealController', function() {
         "location" : "455 Post St, San Francisco",
         "county" : "San Francisco County",
         "index" : 1,
-        "deliveryRange" : 20
+        "deliveryRange" : 20,
+        "lat" : "37.787710",
+        "long" : "-122.409320"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 4),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 5),
@@ -565,7 +576,9 @@ describe('MealController', function() {
         "county" : "San Francisco County",
         "phone" : "(415)802-3854",
         "deliveryRange" : 10,
-        "index" : 2
+        "index" : 2,
+        "lat" : "37.738140",
+        "long" : "-122.397720"
       }];
       agent
         .post('/meal')
@@ -897,8 +910,14 @@ describe('MealController', function() {
     it('should not turn meal on for invalid host because none dish is verified', function(done){
       agent
         .post('/meal/' + mealId + "/on")
-        .expect(302)
-        .end(done)
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-7);
+          done();
+        })
     });
 
     it('should login as administrator', function (done) {
@@ -1595,7 +1614,7 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          res.body.tags.should.containDeep(['select']);
+          res.body.tags.should.containDeep([]);
           done();
         })
     })

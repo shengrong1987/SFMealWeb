@@ -417,6 +417,7 @@
   "nav-bar-trust" : "信任与安全",
   "nav-bar-user" : "用户面板",
   "nav-bar-host" : "厨师面板",
+  "nav-bar-catering" : "团餐",
   "pocket-my-bank":"我的银行账号",
   "bank-update":"更新银行信息",
   "bank-new" : "您尚未创建银行信息，请点击创建",
@@ -752,7 +753,7 @@
   "landing-title-4" : "SFMEAL私房菜分享平台",
   "view-order" : "查看即点菜单",
   "view-preorder" : "查看预定菜单",
-  "see-more" : "查看更多",
+  "see-more" : "点击查看完整菜单",
   "landing-sfmeal" : "SFMEAL.COM 是一个美食分享平台，不是美食售卖平台。所有货币标示是建议的打赏额（捐款）。我们鼓励吃货和私房厨师以分享及欣赏美食为目的使用该平台。我们支持和帮助烹饪美食爱好者找到他们的知音人。加入我们分享私房菜吧！",
   "subscribe" : "订阅",
   "subscribe-title" : "输入邮箱获取私房菜",
@@ -927,5 +928,12 @@
   "ends" : "结束于",
   "already-signup" : "已有账号？登录",
   "question-tip" : "如果你对支付有任何问题，请联系微信：sillyuniversal 或者电话: (415)-8023853",
-  "payment-title" : "您选择的支付方式: %s，请按照以下方法支付"
+  "payment-title" : "您选择的支付方式: %s，请按照以下方法支付",
+  "minimal-order" : "最少",
+  "treat" : "下午茶/小吃",
+  "lunch" : "午餐",
+  "wedding" : "婚礼",
+  "party" : "主题派对",
+  "birthday" : "生日",
+  "business" : "商务活动配餐"
 }

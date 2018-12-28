@@ -29,6 +29,7 @@ function setup(){
   setupDateTimePicker();
   setupFlexScrollBar();
   setupCollapse();
+  setupFullPage();
 }
 
 function initData(){
@@ -474,6 +475,20 @@ function setupFlexScrollBar(){
 function setupCollapse(){
   $(".collapse").collapse({
     toggle: false
+  });
+}
+
+function setupFullPage(){
+  var myFullpage = new fullpage('#fullpage', {
+    verticalCentered: false,
+    anchors: ['experience', 'menu', 'customize'],
+    navigationTooltips: ['Experience', 'Menu', 'Customize'],
+    scrollOverflow : true,
+    menu: "#dishTypeMenu",
+    paddingTop : '56px',
+    afterSlideLoad : function(section, origin, destination, direction){
+      fullpage_api.reBuild();
+    }
   });
 }
 

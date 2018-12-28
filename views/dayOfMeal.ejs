@@ -75,9 +75,9 @@
         <div id="order">
           <% tags.forEach(function(tag){%>
           <% if(tag==="limited"){%>
-            <div class="yellow pl-4 py-4" style="margin: 2px 0 2px 0;" id="<%= tag%>"><%= __(tag)%></div>
+            <div class="pl-4 py-4 text-center text-green" style="margin: 2px 0 2px 0;" id="<%= tag%>"><h5><%= __(tag)%></h5></div>
           <% }else{%>
-            <div class="light-grey pl-4" style="margin: 2px 0 2px 0;" id="<%= tag%>"><%= __(tag)%></div>
+            <div class="pl-4 text-center text-green" style="margin: 2px 0 2px 0;" id="<%= tag%>"><h5><%= __(tag)%></h5></div>
           <% }%>
           <%
 
@@ -94,7 +94,7 @@
               <%= " " + t%>
               <%})}%>">
             <div class="d-flex flex-row">
-              <div class="photo mr-2">
+              <div class="photo text-center">
                 <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
                 <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
                   <img src="/images/blank.gif" data-echo="<%= index===0? photo.v : ''%>">

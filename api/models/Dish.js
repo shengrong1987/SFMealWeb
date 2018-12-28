@@ -95,7 +95,7 @@ module.exports = {
     },
     type : {
       type : 'string',
-      enum : ['appetizer','entree','dessert'],
+      enum : ['snack','appetizer','rice&noodle','dimsum','pastry','entree','dessert','soup','frozen'],
       defaultsTo : 'entree'
     },
     isVerified : {
@@ -107,6 +107,17 @@ module.exports = {
     },
     originalPrice : {
       type : 'float'
+    },
+    cateringMinimalOrder : {
+      type : 'integer',
+      defaultsTo : 10
+    },
+    availableAfter : {
+      type : 'string'
+    },
+    prepareDay : {
+      type : 'integer',
+      defaultsTo : 7
     },
     getPrice : function(orderQty, meal){
       var _this = this;

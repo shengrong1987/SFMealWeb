@@ -1,99 +1,89 @@
-<div class="email-banner vertical-align dark">
-  <div style="width: 600px;" class="middle banner-text">
-    <div class="row vertical-align" style="margin-bottom: 5px;">
-      <div class="col-xs-3 cursor-pointer" onclick="location.href='/'">
-        <a href="/" class="logo-remote"></a>
-      </div>
-      <div class="col-xs-9 text-right">
-        <a class="btn btn-red btn-inline" href='http://www.sfmeal.com'>进入网站</a>
-      </div>
-    </div>
-  </div>
-</div>
+<%- include ../email_header %>
 
 <div class="green" style="padding: 25px;">
   <div class="box-email white relative middle text-left">
     <h4 class="text-green"><%= orders.length == 0 ? guestlistnotitle : guestlisttitle%></h4>
     <p>Hi <%= recipientName%>,</p>
-    <p><%= orders.length == 0 ? guestlistnocontext : guestlistcontext%></p>
-
-    <% if(orders.length == 0){%>
-      <h3 class="text-green"><u><%= title%></u> <small><%= guestlistnotips%></small></h3>
-    <%}else{%>
-      <h3 class="text-green"><u><%= title%></u></h3>
-    <%}%>
-
 
     <%
-      if(orders.length){
-    pickups.forEach(function(pickup, index){if(pickup.method === "delivery"){%>
-      <p><%= deliverytime%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%></p>
-    <%}else if(pickup.method === "pickup"){%>
-    <p>
-      <%= pickuptime%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/>
-      <%= pickuplocation%>: <%= pickup.location%>
-    </p>
-    <%}%>
-    <table class="table table-bordered">
-      <thead>
-      <tr>
-        <td><%= user%></td>
-        <td><%= ordernumber%></td>
-        <td><%= content%></td>
-        <td><%= contact%></td>
-        <td><%= deliverylocation%></td>
-        <td><%= amountowe%></td>
-        <td><%= comment%></td>
-      </tr>
-      </thead>
-      <% orders.forEach(function(order){
-      if(order.pickupInfo.method === pickup.method && order.pickupInfo.pickupFromTime === pickup.pickupFromTime && order.pickupInfo.pickupTillTime === pickup.pickupTillTime && order.pickupInfo.location === pickup.location){%>
-      <tbody>
+    var orderSummary = {};
+    orders.forEach(function(order){
+      Object.keys(order.orders).forEach(function(dishId){
+        var dish = order.dishes.filter(function(d){
+          return d.id === dishId;
+        })[0];
+        if(!dish){
+          return;
+        }
+        var orderDetail = order.orders[dishId];
+        if(orderSummary.hasOwnProperty(dishId)){
+          if(order.orders[dishId].number){
+            orderSummary[dishId].amount += orderDetail.number;
+            orderDetail.preference.forEach(function(prefs){
+              prefs.property.forEach(function(prop){
+                if(orderSummary[dishId].preference){
+                  orderSummary[dishId].preference += ",";
+                }
+                if(prop.property && prop.property !== "undefined"){
+                  orderSummary[dishId].preference += prop.property;
+                }
+              })
+            })
+          }
+        }else if(order.orders[dishId].number){
+          var dishObj = {};
+          dishObj.title = dish.title;
+          dishObj.amount = orderDetail.number;
+          dishObj.price = orderDetail.price;
+          dishObj.preference = "";
+          orderDetail.preference.forEach(function(prefs){
+            prefs.property.forEach(function(prop){
+              if(dishObj.preference){
+                dishObj.preference += ",";
+              }
+              if(prop.property && prop.property !== "undefined"){
+                dishObj.preference += prop.property;
+              }
+            })
+          })
+          orderSummary[dishId] = dishObj;
+        }
+      })
+    })
+      var orderSummaryKey = Object.keys(orderSummary);
+    %>
+    <p><%= orderSummaryKey.length == 0 ? guestlistnocontext : guestlistcontext%></p>
+
+    <% if(orderSummaryKey.length){ %>
+      <table class="table table-email">
+        <thead>
         <tr>
-          <td><%= order.customerName %></td>
-          <td><%= order.id%></td>
-          <td>
-            <% Object.keys(order.orders).forEach(function(dishId){
-              var amount = order.orders[dishId].number;
-              var preference = order.orders[dishId].preference;
-              if(amount > 0){
-                var dish;
-                dishes.forEach(function(d){
-                  if(d.id == dishId){
-                    dish = d;
-                  }
-                })
-                if(!dish){return;}
-            %>
-            <% if(preference && preference.length > 0){
-              var title = '';
-              preference.forEach(function(pref){
-                title += "(" + pref.property + ')';
-              });
-            %>
-            <%= dish.title%>(<%= amount%>)<%= title%>
-            <% }else{%>
-            <%= dish.title%>(<%= amount%>)
-            <% }%>
-            <%}});%>
-          </td>
-          <td><%= order.customerPhone%></td>
-          <td><%= order.contactInfo.address%></td>
-          <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges ? order.charges['cash']/100 : '') : ''%></td>
-          <td><%= order.pickupInfo.comment || ''%></td>
+          <td><%= title%></td>
+          <td><%= price%></td>
+          <td><%= quantity%></td>
+          <td><%= comment%></td>
         </tr>
-      </tbody>
-      <%}})%>
-    </table>
-    <% })};%>
+        </thead>
+        <tbody>
+        <% orderSummaryKey.forEach(function(dishId){ var dishObj = orderSummary[dishId]; %>
+          <tr>
+            <td><%= dishObj.title %></td>
+            <td><%= dishObj.price%></td>
+            <td><%= dishObj.amount%></td>
+            <td><%= dishObj.preference%></td>
+          </tr>
+        <% })%>
+        </tbody>
+      </table>
+    <% };%>
 
     <div class="divider"></div>
 
     <div class="row text-center">
-      <% if(orders.length == 0){%>
-        <a class="btn btn-green btn-inline" href="http://www.sfmeal.com/meal/<%= id%>?edit=true"><%= openmeal%></a>
+      <% if(orderSummaryKey.length == 0){%>
+        <a class="btn btn-outline-primary" style="border:1px solid #007bff;" href="http://www.sfmeal.com/meal/<%= id%>?edit=true"><%= openmeal%></a>
       <%}else{%>
-        <a class="btn btn-green btn-inline" href="http://www.sfmeal.com/meal/<%= id%>/report"><%= printlist%></a>
+        <a class="btn btn-outline-primary" style="border:1px solid #007bff;" href="http://www.sfmeal.com/meal/<%= id%>/report"><%= printlist%></a>
       <%}%>
 
     </div>

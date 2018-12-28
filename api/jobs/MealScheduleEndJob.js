@@ -316,7 +316,7 @@ module.exports = function(agenda) {
           }
           if(orders.length === 0){
             meal.orders = [];
-            notification.notificationCenter("Meal","mealScheduleEnd",meal,true);
+            notification.notificationCenter("Meal","mealScheduleEnd", meal ,true);
             return done();
           }
           async.each(orders, function(order, next){

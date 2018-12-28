@@ -216,7 +216,7 @@ var notification = {
     params.recipientName = basicInfo.recipientName;
     params.senderName = "SFMeal.com";
 
-    //juice it using email-template
+    // juice it using email-template
     if(process.env.NODE_ENV==="development"){
       sails.log.info("sending email to: " + basicInfo.recipientEmail + " with email template: " + template);
       return;
@@ -372,7 +372,7 @@ var notification = {
   },
 
   mergeI18N : function(model, action, req, locale, params){
-    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','our-mailing-address','tax','service-fee','question-email','click-enter-info','click-upload-info','click-apply','comment'];
+    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','our-mailing-address','tax','service-fee','question-email','click-enter-info','click-upload-info','click-apply','comment','about-us','contact-us','privacy','step1','footer-bar-info'];
     if(model === "Order"){
       switch(action){
         case "new":
@@ -412,7 +412,7 @@ var notification = {
     }else if(model === "Meal"){
       switch(action){
         case "mealScheduleEnd":
-          i18ns = i18ns.concat(['guest-list-title','guest-list-context','guest-list-no-title','guest-list-no-context','guest-list-no-tips','delivery-location','delivery-time','pickup-time','pickup-location','print-list','content','contact','amount-owe','open-meal']);
+          i18ns = i18ns.concat(['guest-list-title','guest-list-context','guest-list-no-title','guest-list-no-context','guest-list-no-tips','delivery-location','delivery-time','pickup-time','pickup-location','print-list','content','contact','amount-owe','open-meal','price','quantity']);
           break;
         case "start":
           i18ns = i18ns.concat(['meal-name','meal-number','meal-order-start-title','meal-order-start-context','step2','provide-time','ready-time','min']);
@@ -421,7 +421,7 @@ var notification = {
           i18ns = i18ns.concat(['pity','cancel','de-order','cancel-meal-title','meal-create-time','preorder-start-time','preorder-end-time','cancel-meal-context','meal-fail-requirement','open-meal','preorder-end-time','cancel-time','meal-number',"qty","left","cancel-reason"]);
           break;
         case "chefSelect":
-          i18ns = i18ns.concat(['search','searching-tips','yourfollowedchef','menuoftheweek','hometaste1','see-more']);
+          i18ns = i18ns.concat(['search','searching-tips','delivery-time','yourfollowedchef','menuoftheweek','hometaste1','see-more']);
           break;
       }
     }else if(model === "Host"){
@@ -480,9 +480,17 @@ var notification = {
         pickup.pickupTillTime = moment(pickup.pickupTillTime).local().format('ddd, L, LT');
       });
     }
-    if(params.createdAt && params.updatedAt){
+    if(params.createdAt && moment(params.createdAt).isValid()){
       params.createdAt = moment(params.createdAt).local().format('L, LT');
+    }
+    if(params.updatedAt && moment(params.updatedAt).isValid()){
       params.updatedAt = moment(params.updatedAt).local().format('L, LT');
+    }
+    if(params.orders && params.orders.length){
+      params.orders.forEach(function(order){
+        order.pickupInfo.pickupFromTime = moment(order.pickupInfo.pickupFromTime).local().format('ddd, L, LT');
+        order.pickupInfo.pickupTillTime = moment(order.pickupInfo.pickupTillTime).local().format('ddd, L, LT');
+      });
     }
   }
 }

@@ -160,9 +160,10 @@ function jumpTo(id, offset){
     return;
   }
   offset = offset || 0;
+
   $("html,body").animate({
     scrollTop : $("#" + id).offset().top + offset
-  },1000)
+  },1000);
 }
 
 //on user search action - redirect

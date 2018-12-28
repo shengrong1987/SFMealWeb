@@ -414,6 +414,7 @@
   "nav-bar-trust" : "Trust & Safety",
   "nav-bar-user" : "User panel",
   "nav-bar-host" : "Host panel",
+  "nav-bar-catering" : "Catering",
   "pocket-my-bank": "Bank Account",
   "bank-update": "Update Bank Account",
   "bank-new": "You haven't setup a bank account, click here to create.",
@@ -745,7 +746,7 @@
   "landing-title-4": "Food Sharing Platform.",
   "view-order": "Check Meals",
   "view-preorder": "Check Pre-Order Meals",
-  "see-more": "Read More",
+  "see-more": "Click to see full menu",
   "landing-sfmeal": "SFMeal.com,LLC is a platform to connect We encourage foodie and private chef to share and enjoy the food for the purpose of using this platform. We support and help cooking food lovers find their soul mate. Join us to share private kitchens!",
   "subscribe" : "Subscribe",
   "subscribe-title" : "Get food from grandma",
@@ -922,5 +923,12 @@
   "ends" : "ends",
   "already-signup" : "Have an account？Login",
   "question-tip" : "If you have any question about payment, please contact Wechat: sillyuniversal, or by phone: (415)-8023853",
-  "payment-title" : "Selected payment method: %s, please pay as instructed."
+  "payment-title" : "Selected payment method: %s, please pay as instructed.",
+  "minimal-order" : "Minimal order:",
+  "treat" : "Treat",
+  "lunch" : "Lunch",
+  "wedding" : "Wedding",
+  "party" : "Party",
+  "birthday" : "Birthday",
+  "business" : "Business catering"
 }
