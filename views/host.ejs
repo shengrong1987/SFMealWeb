@@ -133,7 +133,7 @@
                         <%= number%>
                         <%}%><br/><span class="preference"><%= preference.property || ''%></span></td>
                       <%if(index==0){%>
-                      <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount/100 + order.serviceFee).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.serviceFee%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= (order.discount/100).toFixed(2)%>)</td>
+                      <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal + order.tax/100 + order.delivery_fee - order.discount/100 + order.serviceFee).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.serviceFee%> + <%= __('tax')%>: $<%= order.tax/100%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= (order.discount/100).toFixed(2)%>)</td>
                       <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                       <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                         <% if(order.status == "schedule"){ %>
@@ -272,7 +272,7 @@
                         <%= number%>
                         <%}%><br/><span class="preference"><%= preference.property || ""%></span></td>
                       <%if(index==0){%>
-                      <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount/100 + order.serviceFee).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.serviceFee%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= (order.discount/100).toFixed(2)%>)</td>
+                      <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal +  + order.tax/100 + order.delivery_fee - order.discount/100 + order.serviceFee).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.serviceFee%> + <%= __('tax')%>: $<%= order.tax/100 %> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= (order.discount/100).toFixed(2)%>)</td>
                       <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                       <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
                         <% if(order.status === "schedule"){ %>
@@ -702,18 +702,10 @@
               <div class="col-12" style="margin-bottom: 15px;">
                 <img class="cursor-pointer round_thumb size-large" src="<% if(user.picture){%><%= user.picture%><%}else{%>/images/profile_man.png<%}%>" onclick="location.href='/user/me#info'">
               </div>
-              <h4>
-                <%= user.firstname || __('chef') %>&nbsp;<%= user.lastname || ''%> <i class="fa fa-edit text-lightgrey cursor-pointer" onclick="location.href='/user/me#myinfo'"></i>
-              </h4>
-              <h5>
-                <%= __('phone')%>: +<%= user.phone%> <i class="fa fa-edit text-lightgrey cursor-pointer" onclick="location.href='/user/me#myinfo'"></i>
-              </h5>
-              <h5>
-                <%= user.desc %> <i class="fa fa-edit text-lightgrey cursor-pointer" onclick="location.href='/user/me#myinfo'"></i>
-              </h5>
-              <h5>
-                <p class="text-grey"><%= __('email')%> <%= user.host.email%></p>
-              </h5>
+              <p class="text-orange"><%= user.firstname || __('chef') %>&nbsp;<%= user.lastname || ''%> <i class="fa fa-edit text-lightgrey cursor-pointer" onclick="location.href='/user/me#myinfo'"></i></p>
+              <p><%= __('phone')%>: +<%= user.phone%> <i class="fa fa-edit text-lightgrey cursor-pointer" onclick="location.href='/user/me#myinfo'"></i></p>
+              <p><%= user.desc %> <i class="fa fa-edit text-lightgrey cursor-pointer" onclick="location.href='/user/me#myinfo'"></i></p>
+              <p class="text-grey"><%= __('email')%> <%= user.host.email%></p>
             </div>
           </div>
         </div>

@@ -334,8 +334,8 @@
   "cover-dish-tip" : "封面款式会作为默认菜式显示在菜单上，适合放招牌菜或爆款。",
   "add-to-meal" : "点击添加想要提供的菜式和份量",
   "stock" : "供应量",
-  "how-much-for-one" : "一份卖多少钱？",
-  "how-many-for-one" : "一份有多少呢?",
+  "how-much-for-one" : "一份卖多少钱?团餐多少份起卖?",
+  "how-many-for-one" : "一份有多少呢?一份多少人份?",
   "what-kind" : "属于什么类？",
   "appetizer" : "前菜",
   "main" : "主食",
@@ -346,7 +346,7 @@
   "save-receipt" : "保存清单和收据",
   "24hours" : "将在24小时内审核完毕",
   "dollar" : "美元",
-  "fenliang" : "十二个/二两",
+  "fenliang" : "份量",
   "or" : "或",
   "price-incorrect" : "价格格式不正确（最多$100, 最少$1）",
   "new-dish" : "正在新建一款新菜式",
@@ -418,6 +418,7 @@
   "nav-bar-user" : "用户面板",
   "nav-bar-host" : "厨师面板",
   "nav-bar-catering" : "团餐",
+  "nav-bar-dish" : "我的菜式",
   "pocket-my-bank":"我的银行账号",
   "bank-update":"更新银行信息",
   "bank-new" : "您尚未创建银行信息，请点击创建",
@@ -935,5 +936,8 @@
   "wedding" : "婚礼",
   "party" : "主题派对",
   "birthday" : "生日",
-  "business" : "商务活动配餐"
+  "business" : "商务活动配餐",
+  "switch-lan" : "切换语言",
+  "people" : "人数",
+  "frozen" : "冷冻"
 }

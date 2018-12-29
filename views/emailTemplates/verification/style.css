@@ -11081,23 +11081,6 @@ select.form-control {
   #checkListView .info {
     display: block;
   }
-  #dishEditView,
-  #dishNewView,
-  #preorder,
-  #myorder,
-  #mycollect,
-  #myaddress,
-  #myreview,
-  #mymeal,
-  #mydish,
-  #myinfo,
-  #mydetail,
-  #mypurse,
-  #mypayment,
-  #mealCreatingView,
-  #mealEditingView {
-    width: 90%;
-  }
   .dish-operator {
     padding-top: 15px;
   }

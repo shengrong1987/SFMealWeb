@@ -2230,8 +2230,10 @@ var DishView = Backbone.View.extend({
     var title = $("#mealTitleInput").val();
     var titleEn = $("#mealTitleInput-en").val();
     var price = $("#priceInput").val();
+    var peopleServe = form.find("#peopleServeInput").val();
     var category = $("#categoryInput").val();
     var quantity = form.find("#quantityInput").val();
+    var cateringMinimalOrder = form.find("#cateringMinimalOrderInput").val();
     var desc = form.find("#descriptionInput").val();
     var descEn = form.find("#descriptionInput-en").val();
     var instagram = form.find("#instagramInput").val();
@@ -2305,7 +2307,9 @@ var DishView = Backbone.View.extend({
             priceRate : priceRate,
             qtyRate : qtyRate,
             minimalPrice : minimalPrice,
-            tags : dishTags
+            tags : dishTags,
+            peopleServe : peopleServe,
+            cateringMinimalOrder : cateringMinimalOrder
           });
 
           $this.model.save({},{

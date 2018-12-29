@@ -1,22 +1,11 @@
 
 <div>
-  <div class="row">
-    <div class="pure-banner green">
-      <div class="middle banner-text py-3">
-        <div class="row vertical-align">
-          <div class="col-lg-2"></div>
-          <div class="col-5 col-lg-3">
-            <img src="/images/welcome-1.png" style="width: 100%;">
-          </div>
-          <div class="col-2 col-lg-2">
-            <a href="/" class="logo-slogan"></a>
-          </div>
-          <div class="col-5 col-lg-3">
-            <img src="/images/welcome-2.png" style="width: 100%;">
-          </div>
-          <div class="col-lg-2"></div>
-        </div>
-      </div>
+  <div class="d-flex justify-content-center pure-banner vertical-align red p-4">
+    <div class="cursor-pointer mr-4">
+      <a href="/" class="logo" style="left: 0;"></a>
+    </div>
+    <div>
+      <h3 class="text-white text-left none-margin"><strong><%= __('nav-bar-dish')%></strong></h3>
     </div>
   </div>
 
@@ -36,7 +25,9 @@
           <form data-id="<%= user.id %>" data-toggle="validator" data-err-container=".submit">
             <div class="form-group">
               <label for="mealTitleInput">1.<%= __('dish-name') %></label>
-              <a data-toggle="input-toggle" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i></a>
+              <button class="btn btn-info m-2" data-toggle="input-toggle" title="<%= __('toggle-language')%>">
+                <i class="fas fa-retweet-alt"></i> <%= __('switch-lan')%>
+              </button>
               <input id="mealTitleInput" class="form-control" type="text" placeholder="<%= __('full-name') %>" maxlength="7" data-error="<%= __('full-name') %>" required>
               <input id="mealTitleInput-en" class="form-control" type="text" placeholder="<%= __('full-name-en') %>" maxlength="40" data-error="<%= __('full-name') %>">
               <div class="help-block with-errors"></div>
@@ -85,23 +76,33 @@
 
             <div class="form-group">
               <label for="priceInput">3.<%= __('how-much-for-one') %></label>
-              <div class="input-group" style="width: 250px;">
+              <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text">$</span>
                 </div>
                 <input type="text" class="form-control" id="priceInput" placeholder="<%= __('dollar') %>" min="1" max="100" data-error="<%= __('price-incorrect') %>" required>
-                <div class="input-group-append">
-                  <span class="input-group-text">.00</span>
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><%= __('fen')%></span>
                 </div>
+                <input type="text" class="form-control" id="cateringMinimalOrderInput" placeholder="10" required>
               </div>
-              <div class="help-block with-errors"></div>
+
+              <div class="help-block with-errors text-red"></div>
             </div>
 
             <div class="form-group">
               <label for="priceInput">4.<%= __('how-many-for-one') %></label>
-              <div class="input-group" style="width: 250px;">
-                <input type="text" class="form-control" id="quantityInput" placeholder="<%= __('fenliang') %>">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><%= __('fenliang')%></span>
+                </div>
+                <input type="text" class="form-control" id="quantityInput" placeholder="<%= __('fenliang') %>" required>
+                <div class="input-group-append">
+                  <span class="input-group-text"><%= __('people')%></span>
+                </div>
+                <input type="text" class="form-control" id="peopleServeInput" placeholder="<%= __('people') %>" required>
               </div>
+              <div class="help-block with-errors text-red"></div>
             </div>
 
             <div class="form-group">

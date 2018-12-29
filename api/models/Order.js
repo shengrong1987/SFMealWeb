@@ -145,7 +145,7 @@ module.exports = {
       if(this.meal && this.meal.isTaxIncluded){
         return 0;
       }else if(!this.meal || !this.meal.id){
-        return this.tax;
+        return this.tax / 100;
       }
       return util.getTaxRate(this.host.county);
     },

@@ -164,7 +164,7 @@ module.exports = {
     },
     isTaxIncluded : {
       type : 'boolean',
-      defaultsTo : false
+      defaultsTo : true
     },
     isSupportDynamicPrice : {
       type : 'boolean',

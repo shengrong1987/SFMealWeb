@@ -186,6 +186,7 @@ module.exports = {
             "select" : 100,
             "限时礼品" : 90,
             "limited" : 80,
+            "frozen" : 10,
             "dessert" : 0
           };
           _tags = _tags.sort(function(a,b){
