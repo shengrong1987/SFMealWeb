@@ -351,7 +351,7 @@ module.exports = require('waterlock').actions.user({
           var newOrders = [], dishIds = [];
           found.orders.forEach(function(order){
             var isSamePickup = newOrders.some(function(oldOrder){
-              var _isSame = moment(oldOrder.pickupInfo.pickupFromTime).isSame(moment(order.pickupInfo.pickupFromTime), 'minute') && moment(oldOrder.pickupInfo.pickupTillTime).isSame(moment(order.pickupInfo.pickupTillTime), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
+              var _isSame = oldOrder.status === order.status && moment(oldOrder.pickupInfo.pickupFromTime).isSame(moment(order.pickupInfo.pickupFromTime), 'minute') && moment(oldOrder.pickupInfo.pickupTillTime).isSame(moment(order.pickupInfo.pickupTillTime), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
               if(_isSame){
                 Object.keys(order.orders).forEach(function(dishId){
                   if(oldOrder.orders.hasOwnProperty(dishId)){

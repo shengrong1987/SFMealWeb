@@ -578,7 +578,7 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
-          res.body.leftQty[dishId1].should.be.equal(dish1LeftQty);
+          res.body[0].leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
     });
@@ -2260,12 +2260,13 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
-            res.body.paymentMethod.should.be.equal('cash');
-            res.body.should.have.property('feeCharges');
-            Object.keys(res.body.feeCharges).should.have.length(1);
-            res.body.feeCharges[Object.keys(res.body.feeCharges)[0]].should.be.equal(0);
-            res.body.charges['cash'].should.be.equal(0);
-            res.body.application_fees['cash'].should.be.equal(0);
+            var o = res.body[0];
+            o.paymentMethod.should.be.equal('cash');
+            o.should.have.property('feeCharges');
+            Object.keys(o.feeCharges).should.have.length(1);
+            o.feeCharges[Object.keys(o.feeCharges)[0]].should.be.equal(0);
+            o.charges['cash'].should.be.equal(0);
+            o.application_fees['cash'].should.be.equal(0);
             done();
           })
       });

@@ -170,7 +170,7 @@ module.exports = {
               });
             }, function (err) {
               if(err){
-                return next(err);
+                return next2(err);
               }
               next1();
             });

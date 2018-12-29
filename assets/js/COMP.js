@@ -338,8 +338,11 @@
     this.$element = $(element);
     this.$options = $.extend({},AmountInput.DEFAULTS, options);
     this.$value = parseInt(this.$element.find("input").val());
-    // this.$element.find(".add").on('click',addHandler);
-    // this.$element.find(".minus").on('click',minusHandler);
+    if(this.$options.customclickhandle){
+      return;
+    }
+    this.$element.find(".add").on('click',addHandler);
+    this.$element.find(".minus").on('click',minusHandler);
   };
 
   AmountInput.DEFAULTS = {

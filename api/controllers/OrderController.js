@@ -963,139 +963,154 @@ module.exports = {
     var userId = req.session.user.id;
     var hostId = req.session.user.host ? (req.session.user.host.id || req.session.user.host) : null;
     var email = req.session.user.auth.email;
-    var orderId = req.params.id;
+    var orderIds = req.params.id.split("+");
     var params = req.body;
     var $this = this;
-    Order.findOne(orderId).populate("meal").populate("host").populate("dishes").populate("customer").populate("coupon").exec(function(err,order){
-      if(err){
-        return res.badRequest(err)
-      }
+    var orders = [];
+    async.each(orderIds, function(orderId, nextOut){
+      Order.findOne(orderId).populate("meal").populate("host").populate("dishes").populate("customer").populate("coupon").exec(function(err,order){
+        if(err){
+          return nextOut(err)
+        }
 
-      if(order.coupon){
-        return res.badRequest({ code : -19, responseText : req.__('cancel-with-coupon-error')});
-      }
+        if(order.coupon){
+          return nextOut({ code : -19, responseText : req.__('cancel-with-coupon-error')});
+        }
 
-      var isSendToHost = true;
-      if(hostId === order.host.id){
-        isSendToHost = false;
-      }
+        var isSendToHost = true;
+        if(hostId === order.host.id){
+          isSendToHost = false;
+        }
 
-      if(order.status === "schedule"){
-        //can cancel without permission of host
-        User.findOne(order.customer.id).populate('payment').exec(function (err, user) {
-          if(err) {
-            return res.badRequest(err);
-          }
-          if(order.paymentMethod === 'online' && (!user.payment || user.payment.length === 0)){
-            return res.badRequest({ responseText : req.__('order-lack-payment'), code : -5});
-          }
-
-          var metadata = {
-            userName: order.customerName,
-            userPhone: order.customerPhone,
-            paymentMethod : order.paymentMethod,
-            reverse_transfer : false,
-            refund_application_fee : false
-          };
-
-          async.auto({
-            refundOrders : function(next){
-              if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
-                return next();
-              }
-              var metadata = {
-                userId : !!order.customer ? order.customer.id : null,
-                paymentMethod : order.paymentMethod,
-                reverse_transfer : true,
-                refund_application_fee : true
-              };
-              stripe.batchRefund(order.charges, order.transfer, metadata, function(err){
-                if(err){
-                  return next(err);
-                }
-                next();
-              })
-            },
-            refundApplicationFeeForCashOrder : function(next){
-              if (order.paymentMethod !== "cash") {
-                return next();
-              }
-              stripe.batchRefund(order.feeCharges, null, metadata, function (err) {
-                if (err) {
-                  return next(err);
-                }
-                if(order.charges){
-                  order.charges['cash'] = 0;
-                }
-                if(order.application_fees){
-                  order.application_fees['cash'] = 0;
-                }
-                next();
-              });
+        if(order.status === "schedule"){
+          //can cancel without permission of host
+          User.findOne(order.customer.id).populate('payment').exec(function (err, user) {
+            if(err) {
+              return nextOut(err);
             }
-          },function(err){
-            if(err){
-              return res.badRequest(err);
+            if(order.paymentMethod === 'online' && (!user.payment || user.payment.length === 0)){
+              return nextOut({ responseText : req.__('order-lack-payment'), code : -5});
             }
-            var emptyOrders = $this.clearOrder(order.orders);
-            $this.updateMealLeftQty(order, order.meal, order.orders, emptyOrders, function(err, m) {
-              if (err) {
-                return res.badRequest(err);
-              }
-              order.leftQty = m.leftQty;
-              order.tax = 0;
-              order.status = "cancel";
-              order.last_orders = order.orders;
-              order.service_fee = order.meal.serviceFee;
-              order.meal = m.id;
-              order.redeemPoints = 0;
-              order.discount = 0;
-              order.save(function (err, result) {
-                if(err){
-                  return res.badRequest(err);
+
+            var metadata = {
+              userName: order.customerName,
+              userPhone: order.customerPhone,
+              paymentMethod : order.paymentMethod,
+              reverse_transfer : false,
+              refund_application_fee : false
+            };
+
+            async.auto({
+              refundOrders : function(next){
+                if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
+                  return next();
                 }
-                Meal.findOne(m.id).populate("dishes").exec(function(err, meal){
+                var metadata = {
+                  userId : !!order.customer ? order.customer.id : null,
+                  paymentMethod : order.paymentMethod,
+                  reverse_transfer : true,
+                  refund_application_fee : true
+                };
+                stripe.batchRefund(order.charges, order.transfer, metadata, function(err){
                   if(err){
-                    return res.badRequest(err);
+                    return next(err);
                   }
-                  notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
-                  $this.cancelOrderJob(result.id,'', function(err){
-                    if(err){
-                      return res.badRequest(err);
-                    }
-                    if(req.wantsJSON && process.env.NODE_ENV === "development"){
-                      result.meal = meal;
-                      return res.ok(result);
-                    }
-                    return res.ok({responseText : req.__('order-cancel-ok'), tax : order.tax, paymentMethod : order.paymentMethod, charges : order.charges, feeCharges : order.feeCharges, application_fees : order.application_fees});
-                  });
+                  next();
+                })
+              },
+              refundApplicationFeeForCashOrder : function(next){
+                if (order.paymentMethod !== "cash") {
+                  return next();
+                }
+                stripe.batchRefund(order.feeCharges, null, metadata, function (err) {
+                  if (err) {
+                    return next(err);
+                  }
+                  if(order.charges){
+                    order.charges['cash'] = 0;
+                  }
+                  if(order.application_fees){
+                    order.application_fees['cash'] = 0;
+                  }
+                  next();
                 });
-              })
-            });
-          })
-        });
-      }else if(order.status === "preparing"){
-        order.isSendToHost = isSendToHost;
-        order.lastStatus = order.status;
-        order.status = "cancelling";
-        order.save(function(err,result){
-          if(err){
-            return res.badRequest(err);
-          }
-          //send notification
-          result.service_fee = result.meal.serviceFee;
-          notification.notificationCenter("Order", "cancelling", result, isSendToHost, false, req);
-          if(req.wantsJSON && process.env.NODE_ENV === "development"){
-            return res.ok(result);
-          }
-          if(result.isSendToHost){
-            return res.ok({responseText : req.__('order-cancel-request-user')});
-          }else{
-            return res.ok({responseText : req.__('order-cancel-request-host')});
-          }
-        });
+              }
+            },function(err){
+              if(err){
+                return nextOut(err);
+              }
+              var emptyOrders = $this.clearOrder(order.orders);
+              $this.updateMealLeftQty(order, order.meal, order.orders, emptyOrders, function(err, m) {
+                if (err) {
+                  return nextOut(err);
+                }
+                order.leftQty = m.leftQty;
+                order.tax = 0;
+                order.status = "cancel";
+                order.last_orders = order.orders;
+                order.service_fee = order.meal.serviceFee;
+                order.meal = m.id;
+                order.redeemPoints = 0;
+                order.discount = 0;
+                order.save(function (err, result) {
+                  if(err){
+                    return nextOut(err);
+                  }
+                  Meal.findOne(m.id).populate("dishes").exec(function(err, meal){
+                    if(err){
+                      return nextOut(err);
+                    }
+                    notification.notificationCenter("Order", "cancel", result, isSendToHost, false, req);
+                    $this.cancelOrderJob(result.id,'', function(err){
+                      if(err){
+                        return nextOut(err);
+                      }
+                      result.meal = meal;
+                      orders.push(result);
+                      nextOut();
+                    });
+                  });
+                })
+              });
+            })
+          });
+        }else if(order.status === "preparing"){
+          order.isSendToHost = isSendToHost;
+          order.lastStatus = order.status;
+          order.status = "cancelling";
+          order.save(function(err,result){
+            if(err){
+              return nextOut(err);
+            }
+            //send notification
+            result.service_fee = result.meal.serviceFee;
+            notification.notificationCenter("Order", "cancelling", result, isSendToHost, false, req);
+            orders.push(result);
+            nextOut();
+          });
+        }
+      });
+    }, function(err){
+      if(err){
+        return res.badRequest(err);
       }
-    });
+      if(req.wantsJSON && process.env.NODE_ENV === "development"){
+        return res.ok(orders);
+      }
+      var isPreparing = orders.some(function(order){
+        return order.lastStatus === "preparing";
+      });
+      if(isPreparing){
+        if(orders[0].isSendToHost){
+          return res.ok({responseText : req.__('order-cancel-request-user')});
+        }else{
+          return res.ok({responseText : req.__('order-cancel-request-host')});
+        }
+      }else{
+        res.ok({responseText : req.__('order-cancel-ok'), tax : orders[0].tax, paymentMethod : orders[0].paymentMethod, charges : orders[0].charges, feeCharges : orders[0].feeCharges, application_fees : orders[0].application_fees});
+      }
+    })
+
   },
 
   /*

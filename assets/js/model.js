@@ -3673,11 +3673,7 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         BootstrapDialog.alert(result.responseText, function(){
-          if(location.href.indexOf("host/me")===-1){
-            reloadUrl("/user/me", "#myorder");
-          }else{
-            reloadUrl("/host/me","#myorder");
-          }
+          location.reload();
         });
       },error : function(model, err){
         BootstrapDialog.alert(getMsgFromError(err));
