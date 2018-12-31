@@ -587,6 +587,8 @@
   "user-lack-of-email" : "Email needed to become a host",
   "user-email-can-not-change" : "User's email can't be changed.",
   "user-email-exist" : "The email already exist, please login first and connect Wechat with that account.",
+  "user-not-authenticated" : "Need to login or register",
+  "user-reward-redeemed" : "New user reward was redeemed.",
   "enter-website": "Enter the website",
   "our-mailing-address" : "Our mailing address is",
   "footer-send-by": "This email was sent by SFMeal.com. If you have problems, please contact SFMeal Customer Service Email:",
@@ -934,5 +936,11 @@
   "business" : "Business catering",
   "switch-lan" : "Switch Language",
   "people" : "ppl",
-  "frozen" : "Frozen"
+  "frozen" : "Frozen",
+  "verify-email" : "Verify Email",
+  "redeem-reward" : "Redeem Reward",
+  "reward-redeemed" : "Reward Redeemed!",
+  "new-user-reward-1" : "New registration can redeem",
+  "new-user-reward-2" : "$10.00 Points Got! Use Now",
+  "new-user-reward-title" : "New user Reward"
 }

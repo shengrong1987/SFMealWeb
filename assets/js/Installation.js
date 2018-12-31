@@ -85,6 +85,29 @@ function initHashTag(){
   }
 }
 
+function initQuery(){
+  var querys = window.location.search.replace("?","").split("&");
+  var queryObj = {};
+  querys.forEach(function(query){
+    queryObj[query.split("=")[0]] = query.split("=")[1];
+  })
+  if(queryObj.from && queryObj.from === "emailverification"){
+    // BootstrapDialog.show({
+    //   title : jQuery.i18n.prop('emailVerifiedTitle'),
+    //   message : "<h5><small>" + jQuery.i18n.prop("emailVerifiedTip2") +"</small></h5>" +
+    //     "<img class='photo w-100' src='images/points.png'>",
+    //   buttons : [{
+    //     label : jQuery.i18n.prop('redeem'),
+    //     title : jQuery.i18n.prop('redeem'),
+    //     cssClass: 'btn-primary',
+    //     action : function(dialog){
+    //       dialog.close();
+    //     }
+    //   }]
+    // });
+  }
+}
+
 function initEventHandler(){
   $('body').on('touchstart.dropdown', '.dropdown-menu', function (e) { e.stopPropagation(); });
   $(window).on('hashchange', function() { setupTabButtonAnchor();});
@@ -94,6 +117,7 @@ function initEventHandler(){
 
 function initLayout(){
   initHashTag();
+  // initQuery();
   adjustLayout();
   updateCollapseBtn(true);
 }
@@ -133,6 +157,8 @@ function setupLanguage(){
           $(this).data("match-error", jQuery.i18n.prop($(this).data("match-key")));
         }
       });
+
+      initQuery();
 
       if(typeof userBarView !== 'undefined' && userBarView){
         userBarView.clearBadges();
@@ -486,6 +512,7 @@ function setupFullPage(){
     scrollOverflow : true,
     menu: "#dishTypeMenu",
     paddingTop : '56px',
+    paddingBottom : '90px',
     afterSlideLoad : function(section, origin, destination, direction){
       fullpage_api.reBuild();
     }

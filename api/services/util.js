@@ -118,7 +118,7 @@ module.exports = {
     return mDate.local().toDate();
   },
   humanizeDate : function(date){
-    var date = moment(date);
+    var date = moment(date).hours(0);
     var dateDesc = "unknown";
     if(date.isSame(moment(),'day')){
       dateDesc = 'today';

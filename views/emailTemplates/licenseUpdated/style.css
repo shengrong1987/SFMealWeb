@@ -9368,6 +9368,10 @@ hovereffect p {
 .logo-text {
   cursor: pointer;
 }
+.icon-float {
+  width: 80px;
+  height: 80px;
+}
 .vertical-text {
   transform: rotate(270deg);
   transform-origin: left top 0;
@@ -9818,6 +9822,22 @@ label {
 }
 #toast > .toast-success:before {
   content: "\f00c";
+}
+/**
+  reward page
+ */
+#newUserRewardView {
+  background-image: url("/images/window_new@2x.png");
+  background-repeat: no-repeat;
+  background-position-x: center;
+  background-size: 380px 613px;
+  height: 613px;
+  width: 380px;
+  margin: auto;
+}
+#myModal .modal-content {
+  background-color: transparent !important;
+  border: none !important;
 }
 /*button*/
 .btn-mixitup {

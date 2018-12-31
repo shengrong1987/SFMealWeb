@@ -12,6 +12,9 @@
  *              :: -4, referral code not found
  *              :: -5, user lack of email
  *              :: -6, user email already exist
+ *              :: -7, not authenticated
+ *              :: -8, email not verified
+ *              :: -9, reward already redeemed
  */
 
 var AWS = require('aws-sdk');
@@ -417,6 +420,10 @@ module.exports = require('waterlock').actions.user({
     });
   },
 
+  emailVerificationView : function(req, res){
+    res.view('emailVerification', { layout : 'popup', user : req.session.user});
+  },
+
   sendEmailVerification : function(req, res){
     var userId = req.params.id;
     var email = req.body.email;
@@ -468,9 +475,51 @@ module.exports = require('waterlock').actions.user({
         if(err){
           return res.forbidden(err);
         }
-        res.redirect("/user/me#myinfo");
+        res.redirect("/meal?from=emailverification");
       });
     });
+  },
+
+  redeemReward : function(req, res){
+    var isLogin = req.session.authenticated;
+    if(!isLogin){
+      return res.badRequest({ code : -7, responseText: req.__('user-not-authenticated') });
+    }
+    var userId = req.params.id;
+    if(userId !== req.session.user.id){
+      return res.badRequest({ code : -7, responseText: req.__('user-not-authenticated') })
+    }
+    User.findOne(userId).exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      var emailVerified = user.emailVerified;
+      if(!emailVerified){
+        return res.badRequest({ code : -8, responseText: req.__('email-unverified') });
+      }
+      var newUserRewardIsRedeemed = user.newUserRewardIsRedeemed;
+      if(newUserRewardIsRedeemed){
+        return res.badRequest({ code : -9, responseText: req.__('user-reward-redeemed') });
+      }
+      user.points = 100;
+      user.newUserRewardIsRedeemed = true;
+      req.session.user = user;
+      user.save(function(err, u){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(u);
+      })
+    })
+  },
+
+  reward : function(req, res){
+    var type = req.params.type;
+    if(type === "newUser"){
+      return res.view("newUserReward", { layout : 'popup', user : req.session.user});
+    }else{
+      return res.ok();
+    }
   },
 
   activate : function(req, res){

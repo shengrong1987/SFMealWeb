@@ -239,7 +239,7 @@ module.exports = {
     },
 
     getDateDesc : function(date){
-      var pickupDate = moment(date);
+      var pickupDate = moment(date).hours(0);
       var dateDesc = "unknown";
       if(pickupDate.isSame(moment(),'day')){
         dateDesc = 'today';
@@ -248,7 +248,7 @@ module.exports = {
       }else if(moment.duration(pickupDate.diff(moment())).asDays() <= 7){
         dateDesc = pickupDate.format('dddd');
       }else{
-        dateDesc = pickupDate.format('[day]M-DD');
+        dateDesc = pickupDate.format('[day]M/D');
       }
       return dateDesc;
     },

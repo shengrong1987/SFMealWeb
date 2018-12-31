@@ -156,6 +156,10 @@ module.exports = {
     referrerCode : {
       type : 'string'
     },
+    newUserRewardIsRedeemed : {
+      type : 'boolean',
+      defaultsTo : false
+    },
     generateCode : function(params, cb){
       if(this.referralCode) {
         if((params.firstname && params.firstname !== this.firstname) || (params.lastname && params.lastname !== this.lastname)) {

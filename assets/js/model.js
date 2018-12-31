@@ -129,6 +129,39 @@ var LoginView = Backbone.View.extend({
   }
 });
 
+var EmailVerificationView = Backbone.View.extend({
+  events : {
+    "submit form" : "sendEmail"
+  },
+  initialize : function(){
+    var errorAlert = this.$el.find(".alert-danger");
+    var successAlert = this.$el.find(".alert-success");
+    errorAlert.removeClass("d-none").hide();
+    successAlert.removeClass("d-none").hide();
+    this.errorAlert = errorAlert;
+    this.successAlert = successAlert;
+    var userId = this.$el.data("user");
+    this.model.set({ id : userId });
+  },
+  sendEmail : function(e){
+    e.preventDefault();
+    var _this = this;
+    var email = this.$el.find("[type='email']").val();
+    this.model.action = "sendEmailVerification";
+    this.model.save({
+      email : email
+    }, {
+      success : function(){
+        _this.successAlert.html(jQuery.i18n.prop('emailVerificationSent'));
+        _this.successAlert.show();
+      },error : function(model, err){
+        _this.errorAlert.html(getMsgFromError(err));
+        _this.errorAlert.show();
+      }
+    })
+  }
+})
+
 var RegisterView = Backbone.View.extend({
   events : {
     "submit form" : "register",
@@ -783,6 +816,29 @@ var Host = Backbone.Model.extend({
 
   }
 });
+
+var NewUserRewardView = Backbone.View.extend({
+  events : {
+    "click #redeemRewardBtn" : "redeemReward"
+  },
+  redeemReward : function(){
+    var userId = this.$el.find("#redeemRewardBtn").data("user");
+    var _this = this;
+    this.model.set({ id : userId});
+    this.model.action = "redeemReward";
+    this.model.save({}, {
+      success : function(){
+        BootstrapDialog.alert(jQuery.i18n.prop("emailVerifiedTip2"));
+        _this.$el.find("#newUserRewardIcon").hide();
+        _this.$el.find("#rewardRedeemedIcon").removeClass("d-none");
+        _this.$el.find("#redeemRewardBtn").hide();
+        _this.$el.find("#rewardRedeemedBtn").removeClass("d-none");
+      },error : function(model, err){
+        BootstrapDialog.alert(err.responseJSON.responseText);
+      }
+    })
+  }
+})
 
 var User = Backbone.Model.extend({
   urlRoot : "/user",
