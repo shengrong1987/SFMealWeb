@@ -658,10 +658,10 @@ describe('UsersController', function() {
           .expect(403, done)
     })
 
-    it('should have access to resetForm view', function(){
+    it('should have access to resetForm view', function(done){
       agent
         .get('/auth/resetForm')
-        .expect(200)
+        .expect(200, done)
     })
 
     it('should request and verify wechat api', function(done){
@@ -827,6 +827,140 @@ describe('UsersController', function() {
         })
     })
   });
-  //need manual test for facebook and google login
 
+  describe("new user should be able to open reward window and take reward", function(){
+
+    var email = "aimbebe.r@gmail.com";
+    var adminEmail = "admin@sfmeal.com";
+    var password = "12345678";
+    var userId;
+
+    it('should log out user', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    });
+
+    it('should not get emailverification view if not login', function(done){
+      agent
+        .get('/user/emailVerification')
+        .expect(403)
+        .end(done)
+    });
+
+    it('should be able to get reward view', function(done){
+      agent
+        .get('/user/reward/newUser')
+        .expect(200, done)
+    });
+
+    it('should not be able to redeem reward because not login', function(done){
+      agent
+        .get('/user/' + userId + "/redeemReward")
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-7);
+          done();
+        })
+    })
+
+    it('user login in', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
+    it('should get user id', function(done){
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          userId = res.body.id;
+          done()
+        })
+    })
+
+    it('should get emailverification view', function(done){
+      agent
+        .get('/user/emailVerification')
+        .expect(200, done)
+    });
+
+    it('should not be able to redeem reward because email not verified', function(done){
+      agent
+        .get('/user/' + userId + "/redeemReward")
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-8);
+          done();
+        })
+    })
+
+    it('should log out user', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    });
+
+    it('user login in', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({email : adminEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
+    it('should verify user email', function (done) {
+      agent
+        .put('/user/' + userId)
+        .send({
+          emailVerified : true
+        })
+        .expect(200,done)
+    })
+
+    it('should be able to redeem reward', function(done){
+      agent
+        .get('/user/' + userId + "/redeemReward")
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.newUserRewardIsRedeemed.should.be.true();
+          res.body.points.should.be.equal(100);
+          done();
+        })
+    })
+
+    it('should not be able to redeem reward because reward already redeemed', function(done){
+      agent
+        .get('/user/' + userId + "/redeemReward")
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-9);
+          done();
+        })
+    })
+  })
 });

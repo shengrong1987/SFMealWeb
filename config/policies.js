@@ -63,7 +63,8 @@ module.exports.policies = {
     'clean' : 'isAdmin',
     'invite' : true,
     'join' : true,
-    'emailVerification' : 'sessionAuth'
+    'emailVerificationView' : 'sessionAuth',
+    'redeemReward' : true
   },
 
   JobController : {
