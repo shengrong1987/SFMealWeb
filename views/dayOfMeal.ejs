@@ -17,8 +17,8 @@
   <div id="dayOfMealContainer" class="mx-auto" style="max-width: 800px;" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>" data-pickup-nickname="<%= pickupNickname || ''%>">
 
     <% if(meals && meals.meals){%>
-    <div class="w-100" style="position: fixed;height: 60px;z-index: 100;top: 0;">
-      <ul id="dishDatesBar" class="nav nav-light bg-light d-flex none-padding" style="overflow-x: scroll;height: 59px;list-style: none;">
+    <div class="w-100 sticky-top" style="z-index: 200;">
+      <ul id="dishDatesBar" class="nav nav-light bg-light none-padding row" style="overflow-x: scroll;height: 59px;list-style: none;">
         <%
           var dates = Object.keys(meals.meals);
           dates = dates.sort(function(d1,d2){
