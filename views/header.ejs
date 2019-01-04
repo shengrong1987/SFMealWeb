@@ -32,7 +32,7 @@
     <ul class="nav navbar-nav">
       <% if (req.session.user && !req.session.user.host) { %>
       <li class="nav-item">
-        <a id="applyToHostBtn" class="nav-link btn-outline-dark text-white rounded cursor-pointer px-2" style="background-color: transparent;margin-right: 20px;" title="<%= __('pay-attention') %>" data-content="<%= __('login-before-apply-chef') %>">
+        <a id="applyToHostBtn" class="nav-link btn-outline border-white text-white rounded cursor-pointer px-2" style="background-color: transparent;margin-right: 20px;" title="<%= __('pay-attention') %>" data-content="<%= __('login-before-apply-chef') %>">
           <i class="fas fa-utensils fa-lg"></i><span class="ml-2"><%= __('i-cook') %></span>
         </a>
       </li>

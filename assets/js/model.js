@@ -4439,7 +4439,7 @@ function uploadThumbnail(){
 
 function wechatLogin(userInit){
   var gm_ua = navigator.userAgent.toLowerCase();
-  if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger") {
+  if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger"){
     var redirectUrl = BASE_URL + '/auth/wechatCode';
     var scope = "snsapi_userinfo";
     var appId = WECHAT_APPID;
@@ -4451,15 +4451,39 @@ function wechatLogin(userInit){
     wechatUrl = wechatUrl.replace('$STATE',state);
     location.href = wechatUrl;
   }else if(userInit){
-    redirectUrl = encodeURIComponent(BASE_URL + '/auth/wechatCodeWeb');
-    scope = "snsapi_login";
-    appId = WECHAT_APPID2;
-    state = encodeURIComponent(location.href);
-    wechatUrl = "https://open.weixin.qq.com/connect/qrconnect?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
-    wechatUrl = wechatUrl.replace('$APPID', appId);
-    wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
-    wechatUrl = wechatUrl.replace('$SCOPE',scope);
-    wechatUrl = wechatUrl.replace('$STATE',state);
-    location.href = wechatUrl;
+    if(IsPC()){
+      redirectUrl = encodeURIComponent(BASE_URL + '/auth/wechatCodeWeb');
+      scope = "snsapi_login";
+      appId = WECHAT_APPID2;
+      state = encodeURIComponent(location.href);
+      wechatUrl = "https://open.weixin.qq.com/connect/qrconnect?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
+      wechatUrl = wechatUrl.replace('$APPID', appId);
+      wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
+      wechatUrl = wechatUrl.replace('$SCOPE',scope);
+      wechatUrl = wechatUrl.replace('$STATE',state);
+      location.href = wechatUrl;
+    }else{
+      var redirectUrl = BASE_URL + '/auth/wechatCode';
+      var scope = "snsapi_userinfo";
+      var appId = WECHAT_APPID;
+      var state = location.href;
+      var wechatUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
+      wechatUrl = wechatUrl.replace('$APPID', appId);
+      wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
+      wechatUrl = wechatUrl.replace('$SCOPE',scope);
+      wechatUrl = wechatUrl.replace('$STATE',state);
+      location.href = wechatUrl;
+    }
   }
 }
+
+function IsPC(){
+  var userAgentInfo = navigator.userAgent;
+  var Agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");
+  var flag = true;
+  for (var v = 0; v < Agents.length; v++) {
+    if (userAgentInfo.indexOf(Agents[v]) > 0) { flag = false; break; }
+  }
+  return flag;
+}
+

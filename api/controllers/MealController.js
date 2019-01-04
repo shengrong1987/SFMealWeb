@@ -936,7 +936,9 @@ module.exports = {
           if(!pickup.phone || pickup.phone === 'undefined'){
             pickup.phone = host.user.phone;
           }
-          // pickup.index = index+1;
+          if(!pickup.index){
+            pickup.index = index+1;
+          }
           sails.log.info("phone is : " + pickup.phone);
           sails.log.info("county is : " + pickup.county);
           if(counties.indexOf(pickup.county) === -1){

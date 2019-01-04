@@ -41,6 +41,7 @@ module.exports.policies = {
     'wechat' : true,
     'wechatSignature' : true,
     'wechatCode' : true,
+    'wechatCodeWeb' : true,
     'update' : 'isAdmin'
   },
 
