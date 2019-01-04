@@ -4451,9 +4451,9 @@ function wechatLogin(userInit){
     wechatUrl = wechatUrl.replace('$STATE',state);
     location.href = wechatUrl;
   }else if(userInit){
-    redirectUrl = encodeURIComponent(BASE_URL + '/auth/wechatCode');
+    redirectUrl = encodeURIComponent(BASE_URL + '/auth/wechatCodeWeb');
     scope = "snsapi_login";
-    appId = WECHAT_APPID;
+    appId = WECHAT_APPID2;
     state = encodeURIComponent(location.href);
     wechatUrl = "https://open.weixin.qq.com/connect/qrconnect?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
     wechatUrl = wechatUrl.replace('$APPID', appId);

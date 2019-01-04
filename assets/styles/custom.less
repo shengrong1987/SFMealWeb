@@ -704,6 +704,7 @@ input:focus{
 @background-grey : #f2f2f2;
 @refferal-yellow : #ffd833;
 @facebook-blue: #3b5998;
+@google-blue: #4285F4;
 
 .blue{
   background-color: @blue !important;
@@ -767,6 +768,10 @@ input:focus{
 
 .facebook-blue{
   background-color: @facebook-blue !important;
+}
+
+.google-blue{
+  background-color: @google-blue !important;
 }
 
 /*text-color*/
@@ -1386,6 +1391,48 @@ fieldset[disabled] .btn-red.active {
   .text-white;
 }
 
+.btn-google {
+  .text-white;
+  .google-blue;
+  border-color: @google-blue;
+}
+.btn-google:focus,
+.btn-google.focus {
+  .text-white;
+  background-color: #7ba6ed !important;
+  border-color: #8c8c8c;
+}
+.btn-google:hover {
+  .text-white;
+  background-color: #7ba6ed !important;
+  border-color: #adadad;
+}
+.btn-google:active,
+.btn-google.active,
+.open > .dropdown-toggle.btn-google {
+  .text-white;
+  background-color: #96e2c0 !important;
+  border-color: #adadad;
+}
+.btn-google:active:hover,
+.btn-google.active:hover,
+.open > .dropdown-toggle.btn-google:hover,
+.btn-google:active:focus,
+.btn-google.active:focus,
+.open > .dropdown-toggle.btn-google:focus,
+.btn-google:active.focus,
+.btn-google.active.focus,
+.open > .dropdown-toggle.btn-google.focus {
+  .text-white;
+  background-color: #96e2c0 !important;
+  border-color: #8c8c8c;
+}
+.btn-google:active,
+.btn-google.active,
+.open > .dropdown-toggle.btn-google {
+  background-image: none;
+}
+
 .btn-blue {
   .text-white;
   .blue;
@@ -1394,12 +1441,12 @@ fieldset[disabled] .btn-red.active {
 .btn-blue:focus,
 .btn-blue.focus {
   .text-white;
-  background-color: @dark-blue !important;
+  background-color: #4a6df9 !important;
   border-color: #8c8c8c;
 }
 .btn-blue:hover {
   .text-white;
-  background-color: @dark-blue !important;
+  background-color: #4a6df9 !important;
   border-color: #adadad;
 }
 .btn-blue:active,

@@ -9455,6 +9455,9 @@ hovereffect p {
 .facebook-blue {
   background-color: #3b5998 !important;
 }
+.google-blue {
+  background-color: #4285f4 !important;
+}
 /*text-color*/
 .text-white {
   color: #ffffff !important;
@@ -10161,6 +10164,52 @@ fieldset[disabled] .btn-red.active {
   color: #fff !important;
   color: #ffffff !important;
 }
+.btn-google {
+  color: #fff !important;
+  color: #ffffff !important;
+  background-color: #4285f4 !important;
+  border-color: #4285f4;
+}
+.btn-google:focus,
+.btn-google.focus {
+  color: #fff !important;
+  color: #ffffff !important;
+  background-color: #7ba6ed !important;
+  border-color: #8c8c8c;
+}
+.btn-google:hover {
+  color: #fff !important;
+  color: #ffffff !important;
+  background-color: #7ba6ed !important;
+  border-color: #adadad;
+}
+.btn-google:active,
+.btn-google.active,
+.open > .dropdown-toggle.btn-google {
+  color: #fff !important;
+  color: #ffffff !important;
+  background-color: #96e2c0 !important;
+  border-color: #adadad;
+}
+.btn-google:active:hover,
+.btn-google.active:hover,
+.open > .dropdown-toggle.btn-google:hover,
+.btn-google:active:focus,
+.btn-google.active:focus,
+.open > .dropdown-toggle.btn-google:focus,
+.btn-google:active.focus,
+.btn-google.active.focus,
+.open > .dropdown-toggle.btn-google.focus {
+  color: #fff !important;
+  color: #ffffff !important;
+  background-color: #96e2c0 !important;
+  border-color: #8c8c8c;
+}
+.btn-google:active,
+.btn-google.active,
+.open > .dropdown-toggle.btn-google {
+  background-image: none;
+}
 .btn-blue {
   color: #fff !important;
   color: #ffffff !important;
@@ -10171,13 +10220,13 @@ fieldset[disabled] .btn-red.active {
 .btn-blue.focus {
   color: #fff !important;
   color: #ffffff !important;
-  background-color: #3f80f5 !important;
+  background-color: #4a6df9 !important;
   border-color: #8c8c8c;
 }
 .btn-blue:hover {
   color: #fff !important;
   color: #ffffff !important;
-  background-color: #3f80f5 !important;
+  background-color: #4a6df9 !important;
   border-color: #adadad;
 }
 .btn-blue:active,

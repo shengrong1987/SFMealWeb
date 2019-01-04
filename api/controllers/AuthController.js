@@ -237,14 +237,24 @@ module.exports = require('waterlock').waterlocked({
     var state = req.query.state;
     sails.log.info("wechat code:" + code);
     sails.log.info("wechat state:" + state);
-    this.exchangeToken(code, state, req, res);
+    this.exchangeToken(code, state, req, res, "mobile");
   },
 
-  exchangeToken : function(code, state, req, res){
+  wechatCodeWeb : function(req, res){
+  var code = req.query.code;
+  var state = req.query.state;
+  sails.log.info("wechat code:" + code);
+  sails.log.info("wechat state:" + state);
+  this.exchangeToken(code, state, req, res, "web");
+},
+
+  exchangeToken : function(code, state, req, res, type){
     var _this = this;
+    var appID = type === "mobile" ? process.env.WECHAT_APPID : process.env.WECHAT_APPID_WEB;
+    var appSecret = type === "mobile" ? process.env.WECHAT_SECRET : process.env.WECHAT_SECRET_WEB;
     var accessTokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$APPID&secret=$SECRET&code=$CODE&grant_type=authorization_code";
-    accessTokenUrl = accessTokenUrl.replace('$APPID', process.env.WECHAT_APPID);
-    accessTokenUrl = accessTokenUrl.replace('$SECRET',process.env.WECHAT_SECRET);
+    accessTokenUrl = accessTokenUrl.replace('$APPID', appID);
+    accessTokenUrl = accessTokenUrl.replace('$SECRET',appSecret);
     accessTokenUrl = accessTokenUrl.replace('$CODE', code);
     request.get({
       url : accessTokenUrl
