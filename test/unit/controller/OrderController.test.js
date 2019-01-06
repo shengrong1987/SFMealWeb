@@ -2097,7 +2097,7 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
-            res.body.points.should.be.equal(50);
+            res.body.points.should.be.equal(150);
             done();
           })
       });

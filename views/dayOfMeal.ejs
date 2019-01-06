@@ -64,10 +64,10 @@
     <% }%>
 
     <div class="w-100 d-flex">
-      <nav id="dishTagsBar">
+      <nav id="dishTagsBar" class="sticky-top">
         <ul class="list list-side list-unstyled" style="min-width:100px;" data-toggle="btn-set">
           <% tags.forEach(function(tag, index){%>
-            <li class="cursor-pointer border-bottom <%= index===0?'active':''%>"><a data-offset=-59 href="<%= tag%>"><%= __(tag)%></a></li>
+            <li class="cursor-pointer border-bottom <%= index===0?'active':''%>"><a style="white-space: nowrap;" data-offset=-59 href="<%= tag%>"><%= __(tag)%></a></li>
           <% })%>
         </ul>
        <% if(!user || (user && !user.newUserRewardIsRedeemed && user.points === 0)){ %>
@@ -76,13 +76,62 @@
       </nav>
       <div id="dishContentView" class="content flex-grow-1 text-left">
         <div id="order">
-          <% tags.forEach(function(tag){%>
-          <% if(tag==="limited"){%>
-            <div class="pl-4 py-3 text-center text-green" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag%>">
-              <div class="d-flex vertical-align">
-                <div class="divider none-margin">-</div>
-                <h6 class="none" style="min-width: 100px;"><%= __(tag)%></h6>
-                <div class="divider none-margin">-</div>
+          <% if(!meals.summary.orderCount && !meals.summary.preOrderCount){ hosts.forEach(function(host){ %>
+            <div class="d-flex flex-row p-2">
+              <div class="photo">
+                <img src="<%= host.picture%>" class="rounded-circle size-large" onclick="javascript:location.href='/host/public/<%= host.id%>';">
+              </div>
+              <div class="d-flex flex-column flex-grow-1 p-1">
+                <h6><%= host.shopName%>
+                  <small>
+                    <div data-toggle="tooltip" data-placement="bottom" title="<%= host.avgScore || 5%>" style="display: inline;margin-top: 5px;">
+                      <div class="rating" data-toggle="star-set" data-rate="<%= host.avgScore || 5%>">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                      </div>
+                    </div>
+                    <span style="font-size: medium;" class="text-lightgrey">(<%= host.numberOfReviews || 0 %>)</span>
+                    <br/>
+                    <%= host.shortIntro()%>
+                  </small>
+                </h6>
+              </div>
+            </div>
+          <%})}%>
+
+          <% tags.forEach(function(tag){var host; if(hosts.some(function(h){
+            if(h.shopName === tag){host = h;return true} return false;
+          })){%>
+            <div class="py-3 text-center text-green" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag%>">
+              <div class="d-flex flex-row vertical-align">
+                <div class="photo mx-auto">
+                  <img src="<%= host.picture%>" class="rounded-circle size-large cursor-pointer" onclick="javascript:location.href='/host/public/<%= host.id%>';">
+                  <div class="d-flex justify-content-center pt-2">
+                    <button data-action="like" data-host="<%= host.id%>" class="btn btn-outline-danger mr-2"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
+                    <button data-action="follow" data-host="<%= host.id%>" class="btn btn-outline-info" data-toggle="tooltip" title="<%= __('follow-tip')%>" data-followed="<%= (user && (user.follow && user.follow==host.id)) ? true : false%>"><%= (user && (user.follow && user.follow==host.id)) ? __('followed') : __('follow')%> <i class="<%= (user && (user.follow && user.follow==host.id)) ? 'fas fa-star' : 'far fa-star'%>"></i></button>
+                  </div>
+                </div>
+                <div class="d-flex flex-column flex-grow-1 mx-auto" style="max-width: 50%;">
+                  <h6><%= host.shopName%>
+                    <small>
+                      <div data-toggle="tooltip" data-placement="bottom" title="<%= host.avgScore || 5%>" style="display: inline;margin-top: 5px;">
+                        <div class="rating" data-toggle="star-set" data-rate="<%= host.avgScore || 5%>">
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                          <i class="fas fa-star"></i>
+                        </div>
+                      </div>
+                      <span style="font-size: medium;" class="text-lightgrey">(<%= host.numberOfReviews || 0 %>)</span>
+                      <br/>
+                      <%= host.shortIntro()%>
+                    </small>
+                  </h6>
+                </div>
               </div>
             </div>
           <% }else{%>
@@ -94,10 +143,9 @@
                 </div>
               </div>
           <% }%>
-          <%
-
-            var dateList = Object.keys(meals.meals);
-            dateList.forEach(function(dateKey){
+            <%
+              var dateList = Object.keys(meals.meals);
+              dateList.forEach(function(dateKey){
               var mealObj = meals.meals[dateKey];
               var actualMeals = mealObj.meals;
               var _dishes = [];
@@ -158,6 +206,7 @@
   $(document).ready(function(){
     var dayOfMealView = new DayOfMealView({ el : $("#dayOfMealContainer"), model : new Meal()});
   });
+  new HostSectionInMealView({ el : $("#dayOfMealContainer"), model : new Host()});
   var coverDishId = $("#dayOfMealContainer").data("cover");
   var user = $("#dayOfMealContainer").data("user");
   var coverDish = $("#dayOfMealContainer").find(".dish a[data-gallery='" + coverDishId + "']");

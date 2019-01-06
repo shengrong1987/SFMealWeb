@@ -641,7 +641,7 @@
           //over 0.75
           star.removeClass("fa-star").addClass("fa-star text-yellow");
         }else if(count === 2 || count===3){
-          star.removeClass("fa-star text-yellow").addClass("fa-star-half-empty text-yellow");
+          star.removeClass("fas text-yellow").addClass("fas fa-star-half-alt text-yellow");
         }else{
           star.removeClass("fa-star text-yellow").addClass("fa-star text-lightgrey");
         }

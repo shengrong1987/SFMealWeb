@@ -363,7 +363,9 @@ module.exports = {
         publicHost.shortIntro = host.shortIntro();
         publicHost.license = host.license;
         publicHost.reviews = reviews;
+        publicHost.avgScore = host.avgScore;
         publicHost.likes = host.likes;
+        publicHost.numberOfReviews = host.numberOfReviews;
         publicHost.shopNameI18n = host.shopNameI18n;
         publicHost.introI18n = host.introI18n;
         if(req.wantsJSON && process.env.NODE_ENV === "development"){
@@ -481,15 +483,14 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(user.host && user.host == hostId){
+      if(user.host && user.host === hostId){
         return res.badRequest({ code : -4, responseText : req.__('host-like-himself-error')});
       }
-
       Host.findOne(hostId).exec(function(err, host){
         if(err){
           return res.badRequest(err);
         }
-        user.follow = hostId;
+        user.follow.add(hostId);
         user.save(function(err, u){
           if(err){
             return res.badRequest(err);
@@ -516,7 +517,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        user.follow = null;
+        user.follow.remove(hostId);
         user.save(function(err, u){
           if(err){
             return res.badRequest(err);

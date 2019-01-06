@@ -947,5 +947,6 @@
   "reward-redeemed" : "10元积分已领取！立即使用",
   "new-user-reward-1" : "新用户注册即可领取",
   "new-user-reward-2" : "$10.00元积分",
-  "new-user-reward-title" : "新人豪华大礼包"
+  "new-user-reward-title" : "新人豪华大礼包",
+  "follow-tip" : "关注该厨师可以收到厨师的菜式更新，包括最新菜式和每周菜单"
 }

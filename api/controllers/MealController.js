@@ -172,6 +172,9 @@ module.exports = {
         },
         findDishTags : function(next){
           meals.forEach(function(meal){
+            if(!_tags.includes(meal.chef.shopName)){
+              _tags.push(meal.chef.shopName);
+            }
             meal.dishes.forEach(function(dish){
               if(dish.tags){
                 dish.tags.forEach(function(tag){
@@ -183,18 +186,16 @@ module.exports = {
             })
           })
           var tagOrder = {
-            "select" : 100,
-            "限时礼品" : 90,
-            "limited" : 80,
-            "frozen" : 10,
-            "dessert" : 0
+            "select" : 200,
+            "限时礼品" : 190,
+            "limited" : 180,
+            "frozen" : 170,
+            "dessert" : 150
           };
           _tags = _tags.sort(function(a,b){
-            if(tagOrder.hasOwnProperty(a) && tagOrder.hasOwnProperty(b)){
-              return tagOrder[b] - tagOrder[a];
-            }else{
-              return 0;
-            }
+            var tagOrderA = tagOrder.hasOwnProperty(a) ? tagOrder[a] : 0;
+            var tagOrderB = tagOrder.hasOwnProperty(b) ? tagOrder[b] : 0;
+            return tagOrderB - tagOrderA;
           })
           next();
         },
@@ -205,8 +206,16 @@ module.exports = {
         if(req.wantsJSON && process.env.NODE_ENV === "development"){
           return res.ok({ meals : meals, user : _u, tags: _tags });
         }
-        meals = _this.composeMealWithDate(meals);
-        res.view("dayOfMeal",{ meals : meals, user : _u, tags: _tags, pickupNickname : pickupNickname, locale : req.getLocale()});
+        Host.find({ where : { passGuide : true, intro : { '!' : ''}}, skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("dishes").exec(function(err, hosts){
+          if(err){
+            return res.badRequest(err);
+          }
+          hosts = hosts.filter(function(h){
+            return !!h.dishes.length;
+          })
+          meals = _this.composeMealWithDate(meals);
+          res.view("dayOfMeal",{ meals : meals, hosts: hosts, user : _u, tags: _tags, pickupNickname : pickupNickname, locale : req.getLocale()});
+        });
       })
     })
   },

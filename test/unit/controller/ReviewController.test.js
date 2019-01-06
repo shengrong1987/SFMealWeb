@@ -293,6 +293,8 @@ describe('ReviewController', function() {
             return done(err);
           }
           res.body.should.have.property('reviews').with.length(4);
+          // res.body.numberOfReviews.should.be.equal(4);
+          // res.body.avgScore.should.be.equal("3.75");
           done();
         })
     });

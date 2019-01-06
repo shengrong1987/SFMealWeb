@@ -942,5 +942,6 @@
   "reward-redeemed" : "Reward Redeemed!",
   "new-user-reward-1" : "New registration can redeem",
   "new-user-reward-2" : "$10.00 Points Got! Use Now",
-  "new-user-reward-title" : "New user Reward"
+  "new-user-reward-title" : "New user Reward",
+  "follow-tip" : "You will receive email updates of chef's new dishes and weekly menu."
 }

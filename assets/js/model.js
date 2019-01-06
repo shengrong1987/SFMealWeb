@@ -1142,11 +1142,52 @@ var Meal = Backbone.Model.extend({
   }
 });
 
+var HostSectionInMealView = Backbone.View.extend({
+  events : {
+    "click [data-action]" : "go"
+  },
+  go : function(e){
+    var btn = $(e.currentTarget);
+    var $this = this;
+    this.model.set({ id : btn.data("host")});
+    this.model.action = btn.data("action");
+    if(this.model.action === "like"){
+      var countView = btn.find("[data-count]");
+      var likeCount = countView.data('count');
+      this.model.save({}, {
+        success : function(){
+          likeCount++;
+          countView.data("count", likeCount);
+          countView.text(likeCount);
+        },
+        error : function(model, err){
+          makeAToast(getMsgFromError(err));
+        }
+      })
+    }else if(this.model.action === "follow"){
+      var isFollowed = btn.data("followed");
+      if(isFollowed){
+        this.model.action = "unfollow";
+      }else{
+        this.model.action = "follow";
+      }
+      $this.model.save({}, {
+        success : function(){
+
+        },
+        error : function(model, err){
+          makeAToast(getMsgFromError(err));
+        }
+      })
+    }
+  }
+});
+
 var DayOfMealView = Backbone.View.extend({
   events : {
     "click #gotoCheckoutBtn" : "gotoCheckout",
     "mixClick #dishContentView" : "selectDate",
-    "mixEnd #dishContentView" : "renderImage"
+    "mixEnd #dishContentView" : "renderImage",
   },
   initialize : function() {
     var dateDesc = decodeURI(readCookie("date"));
@@ -2800,32 +2841,15 @@ var HostPageView = Backbone.View.extend({
     }else{
       this.model.action = "follow";
     }
-    var $this = this;
-    BootstrapDialog.show({
-      title: jQuery.i18n.prop('tip'),
-      message : isFollowed ? jQuery.i18n.prop('unFollowAlert') : jQuery.i18n.prop('followAlert'),
-      buttons: [{
-        label: jQuery.i18n.prop('yes'),
-        action: function(dialog) {
-          $this.alertView.hide();
-          $this.model.save({}, {
-            success : function(){
-              location.reload();
-            },
-            error : function(model, err){
-              dialog.close();
-              $this.alertView.show();
-              $this.alertView.html(getMsgFromError(err));
-            }
-          })
-        }
-      }, {
-        label: jQuery.i18n.prop('cancel'),
-        action: function(dialog) {
-          dialog.close();
-        }
-      }]
-    });
+    this.model.save({}, {
+      success : function(){
+        location.reload();
+      },
+      error : function(model, err){
+        $this.alertView.show();
+        $this.alertView.html(getMsgFromError(err));
+      }
+    })
   }
 });
 

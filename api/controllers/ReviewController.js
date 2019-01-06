@@ -109,7 +109,7 @@ module.exports = {
               return res.badRequest(err);
             }
             sails.log.info("successfully leave a review");
-            return res.ok({ host : hostId});
+            return res.ok({ host : hostId });
           });
         }, req);
       }else{

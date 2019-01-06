@@ -60,6 +60,7 @@ module.exports = {
         if(err){
           return cb(err);
         }
+        sails.log.info("mealId: " + mealId);
         if(!mealId){
           return cb();
         }
@@ -71,7 +72,18 @@ module.exports = {
           });
           meal.score = (total_score/dishes.length).toFixed(2);
           meal.numberOfReviews += 1;
-          meal.save(cb);
+          meal.save(function(err, m){
+            Host.findOne(dishRecord.chef).exec(function(err, host){
+              host.numberOfReviews = host.numberOfReviews || 0;
+              host.numberOfReviews += 1;
+              sails.log.info("number of review: " + host.numberOfReviews);
+              host.score = host.score || 0;
+              host.score += score;
+              host.avgScore = (host.score / host.numberOfReviews).toFixed(2);
+              sails.log.info("average score of review: " + host.avgScore);
+              host.save(cb);
+            })
+          })
         });
       });
     });

@@ -489,8 +489,10 @@ describe('MealController', function() {
             }
             res.body.should.have.property('pickups').with.length(5);
             res.body.pickups[0].publicLocation.should.be.equal("Uber HQ");
+            res.body.pickups[0].index.should.be.equal(1);
             res.body.pickups[0].phone.should.be.equal("(415)802-3853");
             res.body.pickups[1].phone.should.be.equal("(415)802-3854");
+            res.body.pickups[1].index.should.be.equal(2);
             res.body.should.have.property('county');
             res.body.county.should.containEql('San Francisco County');
             res.body.county.should.containEql('San Mateo County');
@@ -608,6 +610,8 @@ describe('MealController', function() {
             return done(Error("error creating meal"));
           }
           sysDeliveryMealId = res.body.id;
+          res.body.pickups[0].index.should.be.equal(1);
+          res.body.pickups[1].index.should.be.equal(2);
           res.body.delivery_fee.should.be.equal(DELIVERY_FEE);
           res.body.county.should.be.equal("San Francisco County");
           done();
@@ -1144,7 +1148,6 @@ describe('MealController', function() {
             return done(err);
           }
           res.body.should.have.property('follow');
-          res.body.follow.should.be.equal(hostId);
           done();
         });
     })
@@ -1171,9 +1174,14 @@ describe('MealController', function() {
             return done(err);
           }
           res.body.should.have.property('follow');
-          res.body.follow.should.be.equal(hostId);
           done();
         });
+    })
+
+    it('should not be able to follow host if already follow', function(done){
+      agent
+        .post('/host/' + hostId + '/follow')
+        .expect(400,done)
     })
 
     it('should login as host', function (done) {

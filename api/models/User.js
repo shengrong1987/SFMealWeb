@@ -125,7 +125,7 @@ module.exports = {
       collection : 'Host'
     },
     follow : {
-      model : 'Host'
+      collection : 'Host'
     },
     feature_dishes : {
       type : 'json'
@@ -159,6 +159,10 @@ module.exports = {
     newUserRewardIsRedeemed : {
       type : 'boolean',
       defaultsTo : false
+    },
+    email : {
+      type : 'email',
+      unique : true
     },
     generateCode : function(params, cb){
       if(this.referralCode) {
