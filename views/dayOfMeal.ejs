@@ -76,12 +76,19 @@
       </nav>
       <div id="dishContentView" class="content flex-grow-1 text-left">
         <div id="order">
-          <% if(!meals.summary.orderCount && !meals.summary.preOrderCount){ hosts.forEach(function(host){ %>
-            <div class="d-flex flex-row p-2">
-              <div class="photo">
-                <img src="<%= host.picture%>" class="rounded-circle size-large" onclick="javascript:location.href='/host/public/<%= host.id%>';">
+          <% if(!meals.summary.orderCount && !meals.summary.preOrderCount){ %>
+            <p class="text-center mt-2"><%= __('no-meal-tip')%></p>
+            <div class="divider">-</div>
+          <%  hosts.forEach(function(host){ %>
+            <div class="d-flex flex-row vertical-align py-2">
+              <div class="photo mx-auto text-center">
+                <img src="<%= host.picture%>" class="rounded-circle size-large cursor-pointer" onclick="javascript:location.href='/host/public/<%= host.id%>';">
+                <div class="d-flex justify-content-center pt-2">
+                  <button data-action="like" data-host="<%= host.id%>" class="btn btn-outline-danger mr-2"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
+                  <button data-action="follow" data-host="<%= host.id%>" class="btn btn-outline-info" data-toggle="tooltip" title="<%= __('follow-tip')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === host.id}))) ? true : false%>"><%= (user && (user.follow && user.follow.some(function(f){ f.id === host.id}))) ? __('followed') : __('follow')%> <i class="<%= (user && (user.follow && user.follow.some(function(f){ f.id === host.id}))) ? 'fas fa-star' : 'far fa-star'%>"></i></button>
+                </div>
               </div>
-              <div class="d-flex flex-column flex-grow-1 p-1">
+              <div class="d-flex flex-column flex-grow-1 mx-auto text-center" style="max-width: 50%;">
                 <h6><%= host.shopName%>
                   <small>
                     <div data-toggle="tooltip" data-placement="bottom" title="<%= host.avgScore || 5%>" style="display: inline;margin-top: 5px;">
@@ -107,14 +114,14 @@
           })){%>
             <div class="py-3 text-center text-green" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag%>">
               <div class="d-flex flex-row vertical-align">
-                <div class="photo mx-auto">
+                <div class="photo mx-auto text-center">
                   <img src="<%= host.picture%>" class="rounded-circle size-large cursor-pointer" onclick="javascript:location.href='/host/public/<%= host.id%>';">
                   <div class="d-flex justify-content-center pt-2">
                     <button data-action="like" data-host="<%= host.id%>" class="btn btn-outline-danger mr-2"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
-                    <button data-action="follow" data-host="<%= host.id%>" class="btn btn-outline-info" data-toggle="tooltip" title="<%= __('follow-tip')%>" data-followed="<%= (user && (user.follow && user.follow==host.id)) ? true : false%>"><%= (user && (user.follow && user.follow==host.id)) ? __('followed') : __('follow')%> <i class="<%= (user && (user.follow && user.follow==host.id)) ? 'fas fa-star' : 'far fa-star'%>"></i></button>
+                    <button data-action="follow" data-host="<%= host.id%>" class="btn btn-outline-info" data-toggle="tooltip" title="<%= __('follow-tip')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ return f.id === host.id}))) ? true : false%>"><span class="text"><%= (user && (user.follow && user.follow.some(function(f){ return f.id === host.id}))) ? __('followed') : __('follow')%></span> <i class="<%= (user && (user.follow && user.follow.some(function(f){ return f.id === host.id}))) ? 'fas fa-star' : 'far fa-star'%>"></i></button>
                   </div>
                 </div>
-                <div class="d-flex flex-column flex-grow-1 mx-auto" style="max-width: 50%;">
+                <div class="d-flex flex-column flex-grow-1 mx-auto text-center" style="max-width: 50%;">
                   <h6><%= host.shopName%>
                     <small>
                       <div data-toggle="tooltip" data-placement="bottom" title="<%= host.avgScore || 5%>" style="display: inline;margin-top: 5px;">

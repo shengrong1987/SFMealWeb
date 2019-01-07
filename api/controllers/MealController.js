@@ -162,7 +162,7 @@ module.exports = {
           if(!req.session.authenticated){
             return next();
           }
-          User.findOne(req.session.user.id).exec(function(err, u){
+          User.findOne(req.session.user.id).populate("follow").exec(function(err, u){
             if(err){
               return next(err);
             }

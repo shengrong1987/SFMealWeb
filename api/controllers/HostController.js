@@ -7,6 +7,7 @@
  *                 -2 address not found
  *                 -3 Can only like one host once
  *                 -4 can not like yourself
+ *                 -5 no email, can not follow chef
  */
 
 var stripe = require("../services/stripe.js");
@@ -479,9 +480,12 @@ module.exports = {
   follow : function(req, res){
     var hostId = req.params.id;
     var userId = req.session.user.id;
-    User.findOne(userId).populate("follow").exec(function(err, user){
+    User.findOne(userId).populate("follow").populate('auth').exec(function(err, user){
       if(err){
         return res.badRequest(err);
+      }
+      if(!user.auth.email){
+        return res.badRequest({ code : -5, responseText : req.__('no-email-can-not-follow')});
       }
       if(user.host && user.host === hostId){
         return res.badRequest({ code : -4, responseText : req.__('host-like-himself-error')});

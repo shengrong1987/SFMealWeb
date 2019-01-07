@@ -948,5 +948,7 @@
   "new-user-reward-1" : "新用户注册即可领取",
   "new-user-reward-2" : "$10.00元积分",
   "new-user-reward-title" : "新人豪华大礼包",
-  "follow-tip" : "关注该厨师可以收到厨师的菜式更新，包括最新菜式和每周菜单"
+  "follow-tip" : "关注该厨师可以收到厨师的菜式更新，包括最新菜式和每周菜单",
+  "no-meal-tip" : "下周菜单还在赶来，请逛逛厨师的菜式吧，喜欢可以点个赞哦！",
+  "no-email-can-not-follow" : "你需要填写邮箱，才能接收私厨菜单"
 }

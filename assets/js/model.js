@@ -1173,7 +1173,15 @@ var HostSectionInMealView = Backbone.View.extend({
       }
       $this.model.save({}, {
         success : function(){
-
+          if(isFollowed){
+            btn.data("followed", false);
+            btn.find("i").removeClass("fas fa-star").addClass("far fa-star");
+            btn.find('.text').text(jQuery.i18n.prop('follow'));
+          }else{
+            btn.data("followed", true);
+            btn.find("i").removeClass("far fa-star").addClass("fas fa-star");
+            btn.find('.text').text(jQuery.i18n.prop('followed'));
+          }
         },
         error : function(model, err){
           makeAToast(getMsgFromError(err));
