@@ -187,6 +187,7 @@ module.exports = {
           })
           var tagOrder = {
             "select" : 200,
+            "小龙虾" : 195,
             "限时礼品" : 190,
             "limited" : 180,
             "frozen" : 170,

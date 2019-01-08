@@ -331,8 +331,8 @@
   "cover-dish-tip" : "Cover dish will display as default image in menu page.",
   "add-to-meal": "Click to include this dish",
   "stock": "In stock",
-  "how-much-for-one": "How much per order？How many orders minimal for catering?",
-  "how-many-for-one": "How many in one order? How many people serve?",
+  "how-much-for-one": "Actual Price?Discount Include?Minimal Order for Catering?",
+  "how-many-for-one": "Net weight? No.People Served?",
   "what-kind": "What kind of dish？",
   "appetizer": "Side",
   "main": "Entree",
@@ -346,6 +346,7 @@
   "fenliang": "quantity",
   "or": "Or",
   "price-incorrect": "Price wrong format（max $100, min $1）",
+  "discount-incorrect": "Discount wrong format（max $100, min $1）",
   "new-dish": "Creating new dish...",
   "new-meal": "Creating new meal...",
   "name-your-dish": "Name your dish a cheery name!",
@@ -945,5 +946,6 @@
   "new-user-reward-title" : "New user Reward",
   "follow-tip" : "You will receive email updates of chef's new dishes and weekly menu.",
   "no-meal-tip" : "Next week's menu is on the way, meanwhile you can browse our chef's dishes, leave a like if you like.",
-  "no-email-can-not-follow" : "You need to enter email to receive update from chef"
+  "no-email-can-not-follow" : "You need to enter email to receive update from chef",
+  "catering-minimal-tip" : "The minimal size required to provide food on customized date?"
 }

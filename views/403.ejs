@@ -65,21 +65,28 @@
             <% if(!login){%>
             <div class="signin">
 
-              <button id="FBBtn" class="popline btn btn-blue btn-lg light" style="margin-left: 15px;">
-                <span><i class="fab fa-facebook-f" style="padding-right: 15px;"></i>Facebook <span data-toggle="i18n" data-key="login">账号登录</span></span>
-              </button>
+              <div class="row">
+                <div class="col-12">
+                  <button id="FBBtn" class="popline btn btn-blue btn-lg light" style="min-width:250px;font-weight: lighter;">
+                    <span><i class="fab fa-facebook-f pr-3" style="padding-right: 15px;"></i>Facebook <span data-toggle="i18n" data-key="login">登录</span></span>
+                  </button>
+                </div>
+              </div>
+              <div class="row mt-1">
+                <div class="col-12">
+                  <button id="GoogleBtn" class="popline btn btn-google btn-lg text-orange white" style="min-width:250px;font-weight: lighter;">
+                    <span><i class="fab fa-google pr-3"></i>Google <span data-toggle="i18n" data-key="login">登陆</span></span>
+                  </button>
+                </div>
+              </div>
 
-              <h4></h4>
-
-              <button id="GoogleBtn" class="popline btn btn-outline-light btn-lg outline text-orange white" style="margin-left: 15px;">
-                <span><img style="width: 30px;height: 30px;margin-right: 15px;display: inline;" src="/images/g-logo.png">Google <span data-toggle="i18n" data-key="login">帐号登陆</span></span>
-              </button>
-
-              <!--<h4></h4>-->
-
-              <!--<button id="wechatBtn" class="popline btn btn-outline-light btn-lg outline round white text-orange" style="margin-left: 15px;">-->
-              <!--<span><i class="fab fa-weixin" style="padding-right:15px;"></i>微信<span data-toggle="i18n" data-key="login">帐号登陆</span></span>-->
-              <!--</button>-->
+              <div class="row mt-1">
+                <div class="col-12">
+                  <button id="wechatBtn" class="popline btn btn-green btn-lg text-white" style="min-width:250px;font-weight: lighter;">
+                    <span><i class="fab fa-weixin" style="padding-right:15px;"></i>微信<span data-toggle="i18n" data-key="login">帐号登陆</span></span>
+                  </button>
+                </div>
+              </div>
 
               <div class="divider"></div>
               <h4 class="mb-2" data-toggle="i18n" data-key="emailLogin"></h4>

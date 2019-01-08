@@ -352,21 +352,22 @@ function updateMenuView(id){
     dishItem.find(".left-amount span").html(left);
     var priceItem = dishItem.find(".price");
     var preference = localOrders[id].preference;
-    var oldPrice = priceItem.data("original-price");
+    var discount = priceItem.data("discount");
     var price = priceItem.attr("value");
+    var oldPrice = (parseFloat(price) + parseFloat(discount)).toFixed(2);
     if(preference && preference.length){
       var extra = preference.reduce(function(total, next){
         return total + next.extra;
       }, 0);
       priceItem.data("extra", extra);
       if(extra > 0){
-        if(oldPrice){
+        if(discount){
           priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s><br/>" + "$" + price + " ($" + extra + ")");
         }else{
           priceItem.html("$" + price + " ($" + extra + ")");
         }
       }else{
-        if(oldPrice){
+        if(discount){
           priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s><br/>" + "$" + price);
         }else{
           priceItem.html("$" + price);
@@ -374,7 +375,7 @@ function updateMenuView(id){
       }
     }else{
       priceItem.data("extra", 0);
-      if(oldPrice){
+      if(discount){
         priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s><br/>" + "$" + price);
       }else{
         priceItem.html("$" + price);

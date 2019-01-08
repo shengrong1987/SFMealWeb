@@ -84,7 +84,7 @@
               <div class="photo mx-auto text-center">
                 <img src="<%= host.picture%>" class="rounded-circle size-large cursor-pointer" onclick="javascript:location.href='/host/public/<%= host.id%>';">
                 <div class="d-flex justify-content-center pt-2">
-                  <button data-action="like" data-host="<%= host.id%>" class="btn btn-outline-danger mr-2"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
+                  <button data-action="like" data-host="<%= host.id%>" class="btn btn-outline-danger"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
                   <button data-action="follow" data-host="<%= host.id%>" class="btn btn-outline-info" data-toggle="tooltip" title="<%= __('follow-tip')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === host.id}))) ? true : false%>"><%= (user && (user.follow && user.follow.some(function(f){ f.id === host.id}))) ? __('followed') : __('follow')%> <i class="<%= (user && (user.follow && user.follow.some(function(f){ f.id === host.id}))) ? 'fas fa-star' : 'far fa-star'%>"></i></button>
                 </div>
               </div>
@@ -117,7 +117,7 @@
                 <div class="photo mx-auto text-center">
                   <img src="<%= host.picture%>" class="rounded-circle size-large cursor-pointer" onclick="javascript:location.href='/host/public/<%= host.id%>';">
                   <div class="d-flex justify-content-center pt-2">
-                    <button data-action="like" data-host="<%= host.id%>" class="btn btn-outline-danger mr-2"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
+                    <button data-action="like" data-host="<%= host.id%>" class="btn btn-outline-danger"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
                     <button data-action="follow" data-host="<%= host.id%>" class="btn btn-outline-info" data-toggle="tooltip" title="<%= __('follow-tip')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ return f.id === host.id}))) ? true : false%>"><span class="text"><%= (user && (user.follow && user.follow.some(function(f){ return f.id === host.id}))) ? __('followed') : __('follow')%></span> <i class="<%= (user && (user.follow && user.follow.some(function(f){ return f.id === host.id}))) ? 'fas fa-star' : 'far fa-star'%>"></i></button>
                   </div>
                 </div>
@@ -145,7 +145,7 @@
               <div class="pl-4 py-3 text-center text-green" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag%>">
                 <div class="d-flex vertical-align">
                   <div class="divider none-margin">-</div>
-                  <h6 class="none" style="min-width: 100px;"><%= __(tag)%></h6>
+                  <h6 class="none" style="min-width: 80px;"><%= __(tag)%></h6>
                   <div class="divider none-margin">-</div>
                 </div>
               </div>
@@ -160,29 +160,29 @@
               if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
               %>
               <% if(tag === "all" || dish.type === tag || meal.chef.shopName === tag || (dish.tags && dish.tags.includes(tag))){%>
-            <div style="display:none;" data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem p-2 mix item <%= meal.chef.shopName%> <%= dateKey.replace(" ",'').replace('/','')%><% if(dish.tags){ dish.tags.forEach(function(t){%>
+            <div style="display:none;" data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem py-2 mix item <%= meal.chef.shopName%> <%= dateKey.replace(" ",'').replace('/','')%><% if(dish.tags){ dish.tags.forEach(function(t){%>
               <%= " " + t%>
               <%})}%>">
-            <div class="d-flex flex-row">
-              <div class="photo text-center">
+            <div class="d-flex flex-row justify-content-around">
+              <div class="photo text-center rounded mr-2">
                 <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
                 <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
                   <img src="/images/blank.gif" data-echo="<%= index===0? photo.v : ''%>">
                 </a>
                 <% }});%>
               </div>
-              <div class="d-flex flex-column flex-grow-1">
+              <div class="d-flex flex-column">
                 <h6 class="mb-auto"><%= dish.title%>
                   <small>
                     <%= dish.quantity%><br/>
                     <span class="text-red"><%= __('ends')%> <%= meal.getTimeDiff(meal.provideTillTime, locale)%></span>
                   </small>
                 </h6>
-                <div class="d-flex">
-                  <div class="text text-price price mr-2" data-extra=0 value="<%= dish.price%>" data-original-price="<%= dish.originalPrice || ''%>">
+                <div class="d-flex vertical-align">
+                  <div class="text text-price price mr-2" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
                     $<%= dish.price.toFixed(2)%>
                   </div>
-                  <div class="input-group input-group-sm amount-input round ml-auto" style="max-width:200px;min-width:30px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
+                  <div class="input-group input-group-sm amount-input round ml-auto" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
                     <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">
                       <span class="input-group-text">-</span>
                     </div>

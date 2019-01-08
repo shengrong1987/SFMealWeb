@@ -405,7 +405,7 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-group text-left">
-                    <label>1. <%= __('upload-thumbnail')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('photo-restrition')%>"></i></label>
+                    <label>1. <%= __('upload-thumbnail')%> <i class="fal fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('photo-restrition')%>"></i></label>
                     <div class="fileinput fileinput-exists" data-provides="fileinput">
                         <div class="fileinput-new thumbnail size-large round_thumb">
                         </div>
@@ -429,7 +429,7 @@
                   </div>
 
                   <div class="form-group text-left" style="margin-top:20px;">
-                    <label>2. <%= __('user-name')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('name-instruction')%>"></i></label>
+                    <label>2. <%= __('user-name')%> <i class="fal fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('name-instruction')%>"></i></label>
                     <div class="block">
                       <div class="input-group">
                         <div class="input-group-prepend" id="basic-addon2"><span class="input-group-text"><%= __('firstname')%></span></div>
@@ -446,7 +446,7 @@
                     <div><label>3. <%= __('email-verified')%> <i class="fa fa-check text-green"></i></label></div>
                     <% }else{%>
                     <div>
-                      <label>3. <%= __('email-unverified')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i></label>
+                      <label>3. <%= __('email-unverified')%> <i class="fal fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i></label>
                     </div>
                     <div class="form-group block">
                       <label class="sr-only" for="emailInput" data-toggle="i18n" data-key="email"></label>
@@ -458,7 +458,7 @@
                   </div>
 
                   <div class="form-group text-left">
-                    <label>4. <%= __('page-color')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('color-instruction')%>"></i></label>
+                    <label>4. <%= __('page-color')%> <i class="fal fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('color-instruction')%>"></i></label>
                     <div class="block" name="template_color" data-color="<%= user.color %>">
                       <div class="color-block blue" data-color="blue"></div>
                       <div class="color-block green" data-color="green"></div>
@@ -475,7 +475,7 @@
                 <div class="col-md-6 text-left">
 
                   <div class="form-group" style="margin-top:34px;">
-                    <label>5. <%= __('my-intro')%><i class="fa fa-question-circle text-lightgrey" data-toggle="tooltip" title="<%= __('intro-instruction')%>"></i></label>
+                    <label>5. <%= __('my-intro')%><i class="fal fa-question-circle text-lightgrey" data-toggle="tooltip" title="<%= __('intro-instruction')%>"></i></label>
                     <div class="block">
                       <textarea class="form-control" name="desc" rows="6" maxlength="140"><% if(user.desc){%> <%=user.desc%> <%}%></textarea>
                     </div>

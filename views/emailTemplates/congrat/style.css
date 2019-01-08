@@ -10995,7 +10995,6 @@ select.form-control {
   font-size: 30px;
   display: inline-block;
   font-size: 25px;
-  min-width: 165px;
 }
 .rating i {
   cursor: pointer;
@@ -11130,11 +11129,15 @@ select.form-control {
     min-height: 100px;
     opacity: 1;
   }
+  .dishItem {
+    padding-right: 0.5rem !important;
+    padding-left: 0.5rem !important;
+  }
   .dishItem .photo {
-    width: 200px;
+    width: 120px;
     max-height: 100px;
   }
-  .dishItem .photo img {
+  .dishItem img {
     max-height: 100px;
   }
   .mynavbar .navbar-header {
@@ -11331,11 +11334,11 @@ select.form-control {
     display: inline;
   }
   .dishItem .photo {
-    width: 150px;
-    max-height: 80px;
+    width: 120px;
+    max-height: 100px;
   }
   .dishItem .photo img {
-    max-height: 80px;
+    max-height: 100px;
   }
   .dishItem .photo a {
     position: relative;

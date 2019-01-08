@@ -876,7 +876,10 @@ var AddressView = Backbone.View.extend({
     var _this = this;
     var target = $(event.target);
     var address_id = target.data("address-id");
+    var userId = this.$el.data("user");
+    this.model.clear();
     this.model.set({
+      id : userId,
       address : [{
         id : address_id,
         delete : true
@@ -959,6 +962,7 @@ var AddressView = Backbone.View.extend({
     if (address_form.data("host")) {
       addressView.model = new Host();
     }
+    addressView.model.clear();
     addressView.model.set({id: id});
     addressView.model.set({
       address: [{
@@ -2347,6 +2351,7 @@ var DishView = Backbone.View.extend({
     var qtyRate = form.find("#qtyRateInput").val();
     var minimalPrice = form.find("#minimalPriceInput").val();
     var dishTags = form.find("#tagInput").val();
+    var discount = form.find("#discountInput").val();
     if(isDynamicPriceOn && (!priceRate || !qtyRate || !minimalPrice)){
       this.dynamicPriceAlert.show();
       this.dynamicPriceAlert.html(jQuery.i18n.prop("dynamic-price-incomplete"));
@@ -2414,6 +2419,7 @@ var DishView = Backbone.View.extend({
             minimalPrice : minimalPrice,
             tags : dishTags,
             peopleServe : peopleServe,
+            discount : discount,
             cateringMinimalOrder : cateringMinimalOrder
           });
 

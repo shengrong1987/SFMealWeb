@@ -105,8 +105,8 @@ module.exports = {
     minimalPrice : {
       type : 'float'
     },
-    originalPrice : {
-      type : 'float'
+    discount : {
+      type : 'integer'
     },
     cateringMinimalOrder : {
       type : 'integer',
@@ -118,6 +118,10 @@ module.exports = {
     prepareDay : {
       type : 'integer',
       defaultsTo : 7
+    },
+    peopleServe : {
+      type : 'integer',
+      defaultsTo : 1
     },
     getPrice : function(orderQty, meal){
       var _this = this;

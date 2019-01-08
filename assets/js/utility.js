@@ -21,7 +21,7 @@
     if(!utility.googleMapLoaded){
       utility.googleMapLoaded = true;
       jQuery.ajax({
-        url: "https://maps.googleapis.com/maps/api/js?key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA&libraries=places",
+        url: "https://maps.googleapis.com/maps/api/js?key=AIzaSyBwSdr10kQ9xkogbE34AyzwspjaifpaFzA&libraries=places&language=en",
         dataType: 'script',
         async : true,
         defer : true,
@@ -80,7 +80,8 @@
   utility.getAutoComplete = function(){
     var options = {
       componentRestrictions: {country: 'us'},
-      type: ['address']
+      type: ['address'],
+      language : 'en'
     };
 
     var autocomplete;

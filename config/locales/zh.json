@@ -334,8 +334,8 @@
   "cover-dish-tip" : "封面款式会作为默认菜式显示在菜单上，适合放招牌菜或爆款。",
   "add-to-meal" : "点击添加想要提供的菜式和份量",
   "stock" : "供应量",
-  "how-much-for-one" : "一份卖多少钱?团餐多少份起卖?",
-  "how-many-for-one" : "一份有多少呢?一份多少人份?",
+  "how-much-for-one" : "实际售价？已打折扣？团餐起卖份数？",
+  "how-many-for-one" : "份量？可供人数？",
   "what-kind" : "属于什么类？",
   "appetizer" : "前菜",
   "main" : "主食",
@@ -349,6 +349,7 @@
   "fenliang" : "份量",
   "or" : "或",
   "price-incorrect" : "价格格式不正确（最多$100, 最少$1）",
+  "discount-incorrect" : "折扣格式不正确（最多$100, 最少$1）",
   "new-dish" : "正在新建一款新菜式",
   "new-meal" : "正在新建一个Meal",
   "name-your-dish" : "为你的菜起个响亮的名字吧！",
@@ -950,5 +951,6 @@
   "new-user-reward-title" : "新人豪华大礼包",
   "follow-tip" : "关注该厨师可以收到厨师的菜式更新，包括最新菜式和每周菜单",
   "no-meal-tip" : "下周菜单还在赶来，请逛逛厨师的菜式吧，喜欢可以点个赞哦！",
-  "no-email-can-not-follow" : "你需要填写邮箱，才能接收私厨菜单"
+  "no-email-can-not-follow" : "你需要填写邮箱，才能接收私厨菜单",
+  "catering-minimal-tip" : "如果有另外的团餐需求，最少多少份可以提供此菜式？"
 }
