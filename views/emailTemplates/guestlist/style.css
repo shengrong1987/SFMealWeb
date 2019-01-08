@@ -11183,6 +11183,14 @@ select.form-control {
 ::-webkit-scrollbar {
   display: none;
 }
+.nav-scroll {
+  overflow-x: scroll;
+  list-style: none;
+}
+.nav-scroll .nav-item {
+  min-width: 28%;
+  border-right: 1px solid #dee2e6 !important;
+}
 .dropdown-backdrop {
   position: static;
 }

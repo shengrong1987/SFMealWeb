@@ -18,7 +18,7 @@
 
     <% if(meals && meals.meals){%>
     <div class="w-100 sticky-top" style="z-index: 200;">
-      <ul id="dishDatesBar" class="nav nav-light bg-light none-padding" style="overflow-x: scroll;height: 59px;list-style: none;">
+      <ul id="dishDatesBar" class="nav nav-light nav-fill nav-scroll bg-light none-padding" style="height: 59px;">
         <%
           var dates = Object.keys(meals.meals);
           dates = dates.sort(function(d1,d2){
@@ -45,10 +45,10 @@
               if(dateObj.hasOwnProperty(d1) && dateObj.hasOwnProperty(d2)){
                 return dateObj[d2] - dateObj[d1];
               }else{
-                var month1 = d1.split("-")[0];
-                var day1 = d1.split("-")[1];
-                var month2 = d2.split("-")[0];
-                var day2 = d2.split("-")[1];
+                var month1 = d1.split("/")[0];
+                var day1 = d1.split("/")[1];
+                var month2 = d2.split("/")[0];
+                var day2 = d2.split("/")[1];
                 if(month1 === month2){
                     return day1 - day2;
                 }else{
@@ -57,7 +57,7 @@
               }
           })
         dates.forEach(function(dateKey,i){ %>
-        <li class="nav-item py-2 col-4 <%= i===0?'active':''%>"><a class="nav-link" data-mixitup-control href="javascript:void(0);" data-filter=".<%= dateKey.replace('/','').replace(" ","")%>" data-toggle="tab"><%= __(dateKey).replace("day",'')%></a></li>
+        <li class="nav-item py-2 <%= i===0?'active':''%>"><a class="nav-link" data-mixitup-control href="javascript:void(0);" data-filter=".<%= dateKey.replace('/','').replace(" ","")%>" data-toggle="tab"><%= __(dateKey).replace("day",'')%></a></li>
         <% })%>
       </ul>
     </div>
@@ -110,7 +110,7 @@
           <%})}%>
 
           <% tags.forEach(function(tag){var host; if(hosts.some(function(h){
-            if(h.shopName === tag){host = h;return true} return false;
+            if(h.shopName === tag){ host = h;return true} return false;
           })){%>
             <div class="py-3 text-center text-green" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag.replace("'","").replace(" ","")%>">
               <div class="d-flex flex-row vertical-align">
@@ -212,6 +212,7 @@
 <script>
   $(document).ready(function(){
     var dayOfMealView = new DayOfMealView({ el : $("#dayOfMealContainer"), model : new Meal()});
+
   });
   new HostSectionInMealView({ el : $("#dayOfMealContainer"), model : new Host()});
   var coverDishId = $("#dayOfMealContainer").data("cover");

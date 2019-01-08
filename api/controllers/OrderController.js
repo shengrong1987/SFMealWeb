@@ -2482,8 +2482,8 @@ module.exports = {
     });
     var isSamePickup = pickups.every(function(p){
       var p2 = pickups[0];
-      sails.log.info("from time1: " + moment(p2.pickupFromTime).format("LT") + " from time2:" + moment(p.pickupFromTime).format("LT"));
-      sails.log.info("till time1: " + moment(p2.pickupTillTime).format("LT") + " till time2:" + moment(p.pickupTillTime).format("LT"));
+      sails.log.info("from time1: " + moment(p2.pickupFromTime).format("LT") + " from time2:" + moment(p.pickupFromTime).format("LT") + " location1: " + p.location);
+      sails.log.info("till time1: " + moment(p2.pickupTillTime).format("LT") + " till time2:" + moment(p.pickupTillTime).format("LT") + " location2: " + p2.location);
       return moment(p.pickupFromTime).isSame(moment(p2.pickupFromTime), 'minute') && moment(p.pickupTillTime).isSame(moment(p2.pickupTillTime), 'minute') && p.location === p2.location;
     });
     if(!isSamePickup){
