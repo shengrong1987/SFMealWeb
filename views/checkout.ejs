@@ -516,7 +516,7 @@
                 <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span></td>
                 <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
 
-                <td class="input-group input-group-sm amount-input round ml-auto pl-0" style="max-width:200px;min-width:30px;" data-toggle="amount-input" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
+                <td class="input-group input-group-sm amount-input round ml-auto pl-0" style="max-width:200px;min-width:30px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
                   <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">
                     <span class="input-group-text">-</span>
                   </div>

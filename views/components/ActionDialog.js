@@ -25,6 +25,8 @@ var React = require('react'),
   SFMealAPI =  require('../helpers/SFMealAPI'),
   ActionCreators = require('../actions/ActionCreators'),
   SearchStore = require('../stores/SearchStore'),
+  DateTimePicker = require("react-datetime-picker/dist/entry.nostyle").default,
+  moment = require('../../assets/js/dependencies/moment'),
   _ = require('lodash');
 
 var _getStateFromStores = function(){
@@ -90,13 +92,22 @@ var ActionDialog = createReactClass({
     };
   },
 
+  _onPickerFromTimeChange : function(date){
+    var data = this.state.data;
+    data["pickupFromTime"].value = date;
+    this.setState(data);
+  },
+
+  _onPickerTillTimeChange : function(date){
+    var data = this.state.data;
+    data["pickupTillTime"].value = date;
+    this.setState(data);
+  },
+
   _inputOnChange : function(e){
     e.preventDefault();
     var target = $(e.currentTarget);
     var value = target.val();
-    if(!value){
-      return;
-    }
     var action = this.props.action;
     var fieldName = target.attr("name");
     var data = this.state.data;
@@ -211,7 +222,7 @@ var ActionDialog = createReactClass({
     )
   },
 
-  getInputFromType : function(valueObj,key, defaultValue){
+  getInputFromType : function(valueObj, key, defaultValue){
     var value = valueObj['value'];
     var readonly = !!valueObj['readonly'];
     var inputControl;
@@ -238,6 +249,13 @@ var ActionDialog = createReactClass({
         });
         inputControl = (<select name={key} value={value} onChange={this._inputOnChange}>{optionsView}</select>)
         break;
+      case "date":
+        if(key === "pickupFromTime"){
+          inputControl = (<DateTimePicker name={key} onChange={this._onPickerFromTimeChange} value={value}/>)
+        }else if(key === "pickupTillTime"){
+          inputControl = (<DateTimePicker name={key} onChange={this._onPickerTillTimeChange} value={value}/>)
+        }
+        break;
       default:
         inputControl = <Input name={key} type={valueObj["type"]} value={value||defaultValue} readOnly={readonly?'readonly':''} onChange={this._inputOnChange}/>;
     }
@@ -261,8 +279,8 @@ var ActionDialog = createReactClass({
       }else if(valueObj.type === 'date'){
         var copyValue = Object.assign({},valueObj);
         defaultValue = null;
-        copyValue.type = 'text';
-        copyValue.value = new Date(copyValue.value).toLocaleString();
+        copyValue.type = 'date';
+        copyValue.value = new Date(copyValue.value)
         return _this.getInputView(i, key, copyValue, defaultValue);
       }else if(valueObj.type === 'boolean'){
         valueObj.type = 'boolean';

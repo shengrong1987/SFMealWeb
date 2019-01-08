@@ -2654,9 +2654,7 @@ module.exports = {
       return cb(null, 0);
     }
     //verify how many points need to be redeemed
-    if(points > total * 10){
-      return cb({ code : -24, responseText : req.__('order-points-exceed')});
-    }
+    if(points > total * 10){ points = total * 10;}
     user.points = user.points || 0;
     //verify if user have enough points
     if(points > user.points){

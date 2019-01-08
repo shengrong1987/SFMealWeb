@@ -40,7 +40,13 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          res.ok(pickupOptions[0]);
+          Driver.find().exec(function(err, drivers){
+            if(err){
+              return res.badRequest(err);
+            }
+            pickupOptions[0].drivers = drivers;
+            res.ok(pickupOptions[0]);
+          })
         });
       })
     })

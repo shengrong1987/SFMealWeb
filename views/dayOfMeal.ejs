@@ -67,7 +67,7 @@
       <nav id="dishTagsBar" class="sticky-top">
         <ul class="list list-side list-unstyled" style="min-width:100px;" data-toggle="btn-set">
           <% tags.forEach(function(tag, index){%>
-            <li class="cursor-pointer border-bottom <%= index===0?'active':''%>"><a style="white-space: nowrap;" data-offset=-59 href="<%= tag%>"><%= __(tag)%></a></li>
+            <li class="cursor-pointer border-bottom <%= index===0?'active':''%>"><a style="white-space: nowrap;" data-offset=-59 href="<%= tag.replace("'","").replace(" ","")%>"><%= __(tag)%></a></li>
           <% })%>
         </ul>
        <% if(!user || (user && !user.newUserRewardIsRedeemed && user.points === 0)){ %>
@@ -112,7 +112,7 @@
           <% tags.forEach(function(tag){var host; if(hosts.some(function(h){
             if(h.shopName === tag){host = h;return true} return false;
           })){%>
-            <div class="py-3 text-center text-green" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag%>">
+            <div class="py-3 text-center text-green" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag.replace("'","").replace(" ","")%>">
               <div class="d-flex flex-row vertical-align">
                 <div class="photo mx-auto text-center">
                   <img src="<%= host.picture%>" class="rounded-circle size-large cursor-pointer" onclick="javascript:location.href='/host/public/<%= host.id%>';">
@@ -142,7 +142,7 @@
               </div>
             </div>
           <% }else{%>
-              <div class="pl-4 py-3 text-center text-green" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag%>">
+              <div class="pl-4 py-3 text-center text-green" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag.replace("'","").replace(" ","")%>">
                 <div class="d-flex vertical-align">
                   <div class="divider none-margin">-</div>
                   <h6 class="none" style="min-width: 80px;"><%= __(tag)%></h6>
@@ -160,7 +160,7 @@
               if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
               %>
               <% if(tag === "all" || dish.type === tag || meal.chef.shopName === tag || (dish.tags && dish.tags.includes(tag))){%>
-            <div style="display:none;" data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem py-2 mix item <%= meal.chef.shopName%> <%= dateKey.replace(" ",'').replace('/','')%><% if(dish.tags){ dish.tags.forEach(function(t){%>
+            <div style="display:none;" data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem py-2 mix item <%= meal.chef.shopName.replace("'","").replace(" ","")%> <%= dateKey.replace(" ",'').replace('/','')%><% if(dish.tags){ dish.tags.forEach(function(t){%>
               <%= " " + t%>
               <%})}%>">
             <div class="d-flex flex-row justify-content-around">
