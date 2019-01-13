@@ -198,7 +198,8 @@ module.exports.policies = {
 
   PickupOptionController : {
     '*' : 'isAdmin',
-    'find' : 'or(isAdmin, and(sessionAuth, isHost))'
+    'find' : 'or(isAdmin, and(sessionAuth, isHost))',
+    'updateWeek' : 'isAdmin'
   }
 
   /***************************************************************************

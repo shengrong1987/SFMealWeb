@@ -67,6 +67,10 @@ var Search = createReactClass({
     SFMealAPI.clean(this.props.model);
   },
 
+  _onUpdatePickupOption : function(){
+    SFMealAPI.updateAll(this.prop.model, "updateWeek", {});
+  },
+
   render: function () {
     var divStyle = {
       width : '100%'
@@ -74,7 +78,8 @@ var Search = createReactClass({
       return (<div className="form-check form-check-inline"><input className="form-check-input" type="radio" name="criteriaOpt" value={c}/><label key={i} className="form-check-label">{c}</label></div>);
     }, this);
     var buttonStyle = {
-      marginLeft: 5 + 'px'
+      marginLeft: 5 + 'px',
+      marginTop: 5 + 'px'
     };
     var resultContent = this.state.data.errMsg ? this.state.data.errMsg : 'Result of "' + this.state.data.criteria + '" searched as "' + decodeURI(this.state.data.search) + '"';
     return (
@@ -92,6 +97,9 @@ var Search = createReactClass({
             </div>
             <div>
               <button className="btn btn-info" onClick={this._onClean} style={buttonStyle}>Clean</button>
+            </div>
+            <div>
+              <button className="btn btn-info" onClick={this._onUpdatePickupOption} style={buttonStyle}>UpdateAll</button>
             </div>
           </div>
         </div>

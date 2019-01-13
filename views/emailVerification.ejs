@@ -6,7 +6,7 @@
     <form class="text-center" data-toggle="validator" role="form">
       <div class="form-group">
         <label class="sr-only" for="emailInput" data-toggle="i18n" data-key="email"></label>
-        <input type="email" class="form-control" id="emailInput" placeholder="email" required data-error="bad format" value="<%= user.email ? user.email : ( user.auth ? user.auth.email : '')%>">
+        <input type="email" class="form-control" id="emailInput" placeholder="email" required data-error="bad format" value="<%= user.email ? user.email : ( user.auth ? user.auth.email || '' : '')%>">
         <div class="help-block with-errors"></div>
       </div>
 

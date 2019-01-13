@@ -10818,6 +10818,7 @@ select.form-control {
 /* scrollText */
 .scrollText {
   overflow-y: scroll;
+  max-height: 250px;
 }
 /*list*/
 .selectable-list {

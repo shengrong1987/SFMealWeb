@@ -6,6 +6,7 @@
  */
 
 var async = require('async');
+var moment = require('moment');
 
 module.exports = {
 	update : function(req, res){
@@ -67,6 +68,24 @@ module.exports = {
         res.ok(options);
       })
     });
+  },
+
+  updateWeek : function(req, res){
+	  PickupOption.find().exec(function(err, options){
+	    if(err){
+	      return res.badRequest(err);
+      }
+	    async.each(options, function(option, next){
+	      option.pickupFromTime = moment(option.pickupFromTime).add(1, 'week')._d;
+        option.pickupTillTime = moment(option.pickupTillTime).add(1, 'week')._d;
+        option.save(next);
+      }, function(err){
+	      if(err){
+	        return res.badRequest(err);
+        }
+	      res.ok(options);
+      })
+    })
   }
 
 };

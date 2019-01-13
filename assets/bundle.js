@@ -68215,6 +68215,10 @@ var Search = createReactClass({
     SFMealAPI.clean(this.props.model);
   },
 
+  _onUpdatePickupOption : function(){
+    SFMealAPI.updateAll("PickupOption", "updateWeek", {});
+  },
+
   render: function () {
     var divStyle = {
       width : '100%'
@@ -68222,7 +68226,8 @@ var Search = createReactClass({
       return (React.createElement("div", {className: "form-check form-check-inline"}, React.createElement("input", {className: "form-check-input", type: "radio", name: "criteriaOpt", value: c}), React.createElement("label", {key: i, className: "form-check-label"}, c)));
     }, this);
     var buttonStyle = {
-      marginLeft: 5 + 'px'
+      marginLeft: 5 + 'px',
+      marginTop: 5 + 'px'
     };
     var resultContent = this.state.data.errMsg ? this.state.data.errMsg : 'Result of "' + this.state.data.criteria + '" searched as "' + decodeURI(this.state.data.search) + '"';
     return (
@@ -68240,6 +68245,9 @@ var Search = createReactClass({
             ), 
             React.createElement("div", null, 
               React.createElement("button", {className: "btn btn-info", onClick: this._onClean, style: buttonStyle}, "Clean")
+            ), 
+            React.createElement("div", null, 
+              React.createElement("button", {className: "btn btn-info", onClick: this._onUpdatePickupOption, style: buttonStyle}, "PickupOption")
             )
           )
         ), 
@@ -68957,9 +68965,9 @@ module.exports = {
 
   getUsers: function(criteria, value, skip) {
     if(!criteria || !value){
-      var url = "/user?skip=" + skip;
+      var url = "/user?sort=createdAt DESC&skip=" + skip;
     }else{
-      var url = "/user/search?skip=" + skip + "&" + criteria + "=" + value;
+      var url = "/user/search?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
     }
     $.ajax({
       url: url,
@@ -68988,7 +68996,7 @@ module.exports = {
     if(!criteria || !value){
       var url = "/host?skip=" + skip;
     }else{
-      var url = "/host/search?skip=" + skip + "&" + criteria + "=" + value;
+      var url = "/host/search?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
     }
     $.ajax({
       url: url,
@@ -69015,11 +69023,11 @@ module.exports = {
 
   getMeals : function(criteria, value, skip){
     if(criteria == "hostId" && value){
-      var url = "/host/" + value + "/meals?skip=" + skip;
+      var url = "/host/" + value + "/meals?sort=createdAt DESC&skip=" + skip;
     }else if(value) {
-      var url = "/meal/searchAll?skip=" + skip + "&" + criteria + "=" + value;
+      var url = "/meal/searchAll?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      var url = "/meal/searchAll?skip=" + skip;
+      var url = "/meal/searchAll?sort=createdAt DESC&skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -69046,13 +69054,13 @@ module.exports = {
 
   getDishes : function(criteria, value, skip){
     if(criteria == "hostId" && value){
-      var url = "/host/" + value + "/dishes?skip=" + skip;
+      var url = "/host/" + value + "/dishes?sort=createdAt DESC&skip=" + skip;
     }else if(criteria == "mealId" && value) {
-      var url = "/meal/" + value + "/dishes?skip=" + skip;
+      var url = "/meal/" + value + "/dishes?sort=createdAt DESC&skip=" + skip;
     }else if(value) {
-      var url = "/dish/search?skip=" + skip + "&" + criteria + "=" + value;
+      var url = "/dish/search?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      var url = "/dish?skip=" + skip;
+      var url = "/dish?sort=createdAt DESC&skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -69079,13 +69087,13 @@ module.exports = {
 
   getOrders : function(criteria, value, skip){
     if(criteria === "hostId" && value){
-      var url = "/host/" + value + "/orders?skip=" + skip;
+      var url = "/host/" + value + "/orders?sort=createdAt DESC&skip=" + skip;
     }else if(criteria === "userId" && value) {
-      url = "/user/" + value + "/orders?skip=" + skip;
+      url = "/user/" + value + "/orders?sort=createdAt DESC&skip=" + skip;
     }else if(value) {
-      url = "/order/search?skip=" + skip + "&" + criteria + "=" + value;
+      url = "/order/search?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      url = "/order?skip=" + skip;
+      url = "/order?sort=createdAt DESC&skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -69112,9 +69120,9 @@ module.exports = {
 
   getTransactions : function(criteria, value){
     if(criteria === "hostId" && value){
-      var url = "/host/" + value + "/balance";
+      var url = "/host/" + value + "/balance?sort=createdAt DESC";
     }else if(criteria === "userId" && value) {
-      var url = "/user/" + value + "/balance";
+      var url = "/user/" + value + "/balance?sort=createdAt DESC";
     }else{
       return;
     }
@@ -69143,9 +69151,9 @@ module.exports = {
 
   getJobs : function(criteria, value, skip){
     if(criteria && value){
-      var url = "/job?skip=" + skip + "&" + criteria + "=" + value;
+      var url = "/job?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      var url = "/job?skip=" + skip;
+      var url = "/job?sort=createdAt DESC&skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -69172,9 +69180,9 @@ module.exports = {
 
   getCheckLists : function(criteria, value, skip){
     if(criteria && value){
-      var url = "/checkList?skip=" + skip + "&" + criteria + "=" + value;
+      var url = "/checkList?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      var url = "/checkList?skip=" + skip;
+      var url = "/checkList?sort=createdAt DESC&skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -69201,9 +69209,9 @@ module.exports = {
 
   getCoupons : function(criteria, value, skip){
     if(criteria && value){
-      var url = "/coupon?skip=" + skip + "&" + criteria + "=" + value;
+      var url = "/coupon?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      var url = "/coupon?skip=" + skip;
+      var url = "/coupon?sort=createdAt DESC&skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -69230,15 +69238,15 @@ module.exports = {
 
   getReviews : function(criteria, value, skip){
     if(criteria === "dishId" && value){
-      var url = "/dish/" + value + "/review?skip=" + skip;
+      var url = "/dish/" + value + "/review?sort=createdAt DESC&skip=" + skip;
     }else if(criteria === "mealId"){
-      url = "/meal/" + value + "/review?skip=" + skip;
+      url = "/meal/" + value + "/review?sort=createdAt DESC&skip=" + skip;
     }else if(criteria === "hostId"){
-      url = "/host/" + value + "/review?skip=" + skip;
+      url = "/host/" + value + "/review?sort=createdAt DESC&skip=" + skip;
     }else if(value) {
-      url = "/review?skip=" + skip + "&" + criteria + "=" + value;
+      url = "/review?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      url = "/review?skip=" + skip;
+      url = "/review?sort=createdAt DESC&skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -69265,9 +69273,9 @@ module.exports = {
 
   getAccounts : function(criteria, value, skip){
    if(value) {
-      var url = "/account?skip=" + skip + "&" + criteria + "=" + value;
+      var url = "/account?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      url = "/account?skip=" + skip;
+      url = "/account?sort=createdAt DESC&skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -69294,9 +69302,9 @@ module.exports = {
 
   getDrivers : function(criteria, value, skip){
     if(value) {
-      var url = "/driver?skip=" + skip + "&" + criteria + "=" + value;
+      var url = "/driver?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      url = "/driver?skip=" + skip;
+      url = "/driver?sort=createdAt DESC&skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -69323,9 +69331,9 @@ module.exports = {
 
   getPickups : function(criteria, value, skip){
     if(value) {
-      var url = "/pickupOption?skip=" + skip + "&" + criteria + "=" + value;
+      var url = "/pickupOption?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
     }else{
-      url = "/pickupOption?skip=" + skip;
+      url = "/pickupOption?sort=createdAt DESC&skip=" + skip;
     }
     $.ajax({
       url: url,
@@ -69389,6 +69397,23 @@ module.exports = {
         case "PickupOption":
           ActionCreators.getPickups(data);
           break;
+      }
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.badRequest(jqXHR.responseText);
+    });
+  },
+
+  updateAll : function(model, action, data){
+    var httpMethod = "POST";
+    var url = "/" + model + "/" + action;
+    $.ajax({
+      url : url,
+      type : httpMethod,
+      data : data,
+      dataType : 'json'
+    }).done(function(data){
+      if(model === "PickupOption"){
+        ActionCreators.getPickups(data);
       }
     }).fail(function(jqXHR, textStatus){
       ActionCreators.badRequest(jqXHR.responseText);
