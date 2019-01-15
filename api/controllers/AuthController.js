@@ -19,6 +19,8 @@ var request = require('request');
 var async = require('async');
 var nlp = require('../services/nlp');
 
+const WECHAT_FOLLOW_AND_SIGNIN = "wechat_follow_and_signin";
+
 module.exports = require('waterlock').waterlocked({
   /* e.g.
    error
@@ -241,12 +243,48 @@ module.exports = require('waterlock').waterlocked({
   },
 
   wechatCodeWeb : function(req, res){
-  var code = req.query.code;
-  var state = req.query.state;
-  sails.log.info("wechat code:" + code);
-  sails.log.info("wechat state:" + state);
-  this.exchangeToken(code, state, req, res, "web");
-},
+    var code = req.query.code;
+    var state = req.query.state;
+    sails.log.info("wechat code:" + code);
+    sails.log.info("wechat state:" + state);
+    this.exchangeToken(code, state, req, res, "web");
+  },
+
+  getQRCodeTicket : function(req, res){
+    var url = "https://api.wechat.com/cgi-bin/token?grant_type=client_credential&appid=" + wechatAppId + "&secret=" + wechatAppSecret;
+    request.get({
+        url : url
+      }, function(err, response) {
+      if (err) {
+        return res.badRequest(err);
+      }
+      try {
+        sails.log.info("wechat access token:" + response.body);
+        var body = JSON.parse(response.body);
+        var accessToken = body.access_token;
+      } catch (err) {
+        return res.badRequest(err);
+      }
+      var getQRTicketUrl = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + accessToken;
+      request.post({
+        url : getQRTicketUrl,
+        data : {
+          action_name : "QR_LIMIT_SCENE",
+          action_info : {
+            scene : {
+              scene_str : WECHAT_FOLLOW_AND_SIGNIN
+            }
+          }
+        }
+      }, function(err, response){
+        if(err){
+          return res.badRequest(err);
+        }
+        var body = JSON.parse(response);
+        res.ok({ ticket : body.ticket });
+      })
+    });
+  },
 
   exchangeToken : function(code, state, req, res, type){
     var _this = this;

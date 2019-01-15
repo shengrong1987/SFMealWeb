@@ -67555,8 +67555,8 @@ var ActionButton = createReactClass({
         case "PickupOption":
           if(action === "create" || action === "update"){
             postData = {
-              pickupFromTime : { value : this.props.data['pickupFromTime'] || '', type : "date"},
-              pickupTillTime : { value : this.props.data['pickupTillTime'] || '', type : "date"},
+              pickupFromTime : { value : new Date(this.props.data['pickupFromTime']).toISOString() || '', type : "date"},
+              pickupTillTime : { value : new Date(this.props.data['pickupTillTime']).toISOString() || '', type : "date"},
               location : { value : this.props.data['location'] || ''},
               method : {value: this.props.data['method'] || ''},
               phone : {value: this.props.data['phone'] || '', type : 'select', options : this.props.data['drivers']},
@@ -68216,7 +68216,7 @@ var Search = createReactClass({
   },
 
   _onUpdatePickupOption : function(){
-    SFMealAPI.updateAll("PickupOption", "updateWeek", {});
+    SFMealAPI.updateAll(this.props.model, "updateWeek", {});
   },
 
   render: function () {
@@ -68247,7 +68247,7 @@ var Search = createReactClass({
               React.createElement("button", {className: "btn btn-info", onClick: this._onClean, style: buttonStyle}, "Clean")
             ), 
             React.createElement("div", null, 
-              React.createElement("button", {className: "btn btn-info", onClick: this._onUpdatePickupOption, style: buttonStyle}, "PickupOption")
+              React.createElement("button", {className: "btn btn-info", onClick: this._onUpdatePickupOption, style: buttonStyle}, "UpdateAll")
             )
           )
         ), 

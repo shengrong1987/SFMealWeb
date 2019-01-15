@@ -4490,16 +4490,28 @@ function wechatLogin(userInit){
     location.href = wechatUrl;
   }else if(userInit){
     if(IsPC()){
-      redirectUrl = encodeURIComponent(BASE_URL + '/auth/wechatCodeWeb');
-      scope = "snsapi_login";
-      appId = WECHAT_APPID2;
-      state = encodeURIComponent(location.href);
-      wechatUrl = "https://open.weixin.qq.com/connect/qrconnect?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
-      wechatUrl = wechatUrl.replace('$APPID', appId);
-      wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
-      wechatUrl = wechatUrl.replace('$SCOPE',scope);
-      wechatUrl = wechatUrl.replace('$STATE',state);
-      location.href = wechatUrl;
+      $.ajax({
+        type: 'GET',
+        url: "/auth/getQRCodeTicket",
+        success: function (res) {
+          var ticket = JSON.parse(res.body).ticket;
+          var getQRCodeUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + encodeURI(ticket);
+          $.get({
+            url: getQRCodeUrl,
+            success: function (res) {
+              $("#ImagePic").attr("src", "data:image/png;base64," + res);
+            },
+            error: function (err) {
+
+            }
+          });
+        },
+        error: function (err) {
+          var xmlResult = $($.parseXML(err.responseText));
+          var message = xmlResult.find('Message');
+          makeAToast(message);
+        }
+      });
     }else{
       var redirectUrl = BASE_URL + '/auth/wechatCode';
       var scope = "snsapi_userinfo";

@@ -30,6 +30,7 @@ module.exports = {
         async.each(meals, function(meal, next){
           var pickups = meal.pickups.map(function(pickup){
             if(pickup.id === pickupOptionId){
+              pickupOptions[0].phone = pickup.phone;
               return pickupOptions[0];
             }else{
               return pickup;
@@ -83,7 +84,45 @@ module.exports = {
 	      if(err){
 	        return res.badRequest(err);
         }
-	      res.ok(options);
+	      //update meals
+        Meal.find().exec(function(err, meals){
+          if(err){
+            return res.badRequest(err);
+          }
+          meals = meals.filter(function(meal){
+            return meal.pickups.some(function(pickup){
+              if(!pickup){
+                return false;
+              }
+              return options.some(function(o){
+                return o.id === pickup.id;
+              });
+            })
+          });
+
+          async.each(meals, function(meal, next){
+            //update meal pickup options
+            var newPickup = [];
+            meal.pickups.forEach(function(pickup){
+              options.forEach(function(option){
+                if(option.id === pickup.id){
+                  newPickup.push(option);
+                  return;
+                }
+              })
+            })
+            delete newPickup.drivers;
+            meal.pickups = newPickup;
+            meal.save(next);
+          }, function(err){
+            if(err){
+              return res.badRequest(err);
+            }
+            res.ok(options);
+          });
+        })
+
+
       })
     })
   }

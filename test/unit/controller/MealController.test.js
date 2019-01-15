@@ -457,6 +457,7 @@ describe('MealController', function() {
         })
     })
 
+    var pickupOption1;
     it('should create an preorder type meal ', function (done) {
       var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
       var now = new Date();
@@ -488,6 +489,7 @@ describe('MealController', function() {
               return done(Error("error creating meal"));
             }
             res.body.should.have.property('pickups').with.length(5);
+            pickupOption1 = res.body.pickups[0].id;
             res.body.pickups[0].publicLocation.should.be.equal("Uber HQ");
             res.body.pickups[0].index.should.be.equal(1);
             res.body.pickups[0].phone.should.be.equal("(415)802-3853");
@@ -501,6 +503,54 @@ describe('MealController', function() {
             done();
           })
     })
+
+    it('should login an account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : adminEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should update pickup options', function(done) {
+      agent
+        .put('/pickupOption/' + pickupOption1)
+        .send({
+          "publicLocation" : "Uber HQ New"
+        })
+        .expect(200, done)
+    })
+
+    it('should login an account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should get a meal', function (done) {
+      agent
+        .get('/meal/' + preorderMealId)
+        .set('Accept','application/json')
+        .expect('Content-type',/json/)
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          console.log(res.body);
+          res.body.pickups[0].publicLocation.should.be.equal("Uber HQ New");
+          res.body.pickups[0].index.should.be.equal(1);
+          res.body.pickups[0].phone.should.be.equal("(415)802-3853");
+          res.body.pickups[1].phone.should.be.equal("(415)802-3854");
+          res.body.pickups[1].index.should.be.equal(2);
+          done();
+        })
+    });
+
 
     it('should create an preorder type meal with other dishes', function (done) {
       var dishes = dish6;
@@ -538,7 +588,7 @@ describe('MealController', function() {
             return done(Error("error creating meal"));
           }
           res.body.should.have.property('pickups').with.length(5);
-          res.body.pickups[0].publicLocation.should.be.equal("Uber HQ");
+          res.body.pickups[0].publicLocation.should.be.equal("Uber HQ New");
           res.body.pickups[0].phone.should.be.equal("(415)802-3853");
           res.body.pickups[1].phone.should.be.equal("(415)802-3854");
           res.body.should.have.property('county');

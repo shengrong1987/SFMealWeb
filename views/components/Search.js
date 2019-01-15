@@ -68,7 +68,7 @@ var Search = createReactClass({
   },
 
   _onUpdatePickupOption : function(){
-    SFMealAPI.updateAll(this.prop.model, "updateWeek", {});
+    SFMealAPI.updateAll(this.props.model, "updateWeek", {});
   },
 
   render: function () {

@@ -711,7 +711,7 @@
         </div>
       </div>
 
-      <div id="myinfo" class="tab-pane middle" data-user="<%= user || ''%>">
+      <div id="myinfo" class="tab-pane middle" data-user="<%= user ? user.id : ''%>">
         <div class="box box-shadow white">
           <form class="form-horizontal text-left" data-toggle="validator" data-id="<%= user.host.id%>" data-err-container="#formAlert">
 
@@ -734,11 +734,11 @@
                         <span>
                           <input class="form-control-file" id="licenseUpload" type="file" data-wantsImage=true onchange="uploadLicense(event)" data-error-container=".license">
                         </span>
-                      <script>
-                        $(".fileinput").on("clear.bs.fileinput",function(){
-                          $("input[type='file']").data("isDelete",true);
-                        });
-                      </script>
+                        <script>
+                          $(".fileinput").on("clear.bs.fileinput",function(){
+                            $("input[type='file']").data("isDelete",true);
+                          });
+                        </script>
                       <div class="help-block with-errors"></div>
                     </div>
                   </div>
@@ -952,9 +952,9 @@
               </div>
             </div>
 
-            <div class="row" id="formAlert">
-              <div class="alert alert-danger text-center"></div>
-              <div class="alert alert-success text-center"></div>
+            <div class="my-2" id="formAlert">
+              <div class="alert alert-danger text-center w-100"></div>
+              <div class="alert alert-success text-center w-100"></div>
             </div>
 
             <div class="text-center">

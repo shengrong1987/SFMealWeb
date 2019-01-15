@@ -74,7 +74,7 @@
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
                           &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address %> </br>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -106,7 +106,7 @@
                       <tr>
                         <td class="d-none d-md-table-cell"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>
+                        <td style="max-width: 100px;">
                           $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
@@ -152,7 +152,7 @@
                             <% if(order.method == 'pickup'){%>
                               <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.contactInfo.address %>"><%= __('see-address')%></a><br/>
                             <%}%>
-                            <a href="javascript:void(0)"><%= __('Track-order')%></a><br/>
+                            <a href="javascript:void(0)"><%= __('track-order')%></a><br/>
                             <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                           <%}else if(order.status == "review"){%>
                             <% if(order.method == 'pickup'){%>
@@ -220,7 +220,7 @@
                       <tr class="warning">
                         <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-time')%></b>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span><br/>
                           &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
+                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
                       </tr>
                       <%
                         var list = Object.keys(order.orders);
@@ -252,7 +252,7 @@
                       <tr>
                         <td class="d-none d-md-table-cell"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
                         <td><%= dish.title%></td>
-                        <td>
+                        <td style="max-width: 100px;">
                           $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                           <% if(extra){%>
                           (+$<%= extra.toFixed(2)%>)<br/>
@@ -307,7 +307,7 @@
                           <div class="divider none-margin">-</div>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                           <%}else if(order.status == "ready"){%>
-                          <a href="javascript:void(0)"><%= __('Track-order')%></a><br/>
+                          <a href="javascript:void(0)"><%= __('track-order')%></a><br/>
                           <div class="divider none-margin">-</div>
                           <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                           <%}else if(order.status == "review"){%>

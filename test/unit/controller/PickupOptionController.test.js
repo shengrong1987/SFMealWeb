@@ -37,8 +37,8 @@ describe('PickupOptionController', function() {
       agent
         .post('/pickupOption')
         .send({
-          "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
-          "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
+          "pickupFromTime" : moment().add(2, 'hours')._d,
+          "pickupTillTime" : moment().add(3, 'hours')._d,
           "location" : "1455 Market St, San Francisco, CA 94124",
           "publicLocation" : "Uber HQ",
           "pickupInstruction" : "11th st and Market st",

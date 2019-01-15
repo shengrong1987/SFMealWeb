@@ -42,6 +42,7 @@ module.exports.policies = {
     'wechatSignature' : true,
     'wechatCode' : true,
     'wechatCodeWeb' : true,
+    'getQRCodeTicket' : true,
     'update' : 'isAdmin'
   },
 
