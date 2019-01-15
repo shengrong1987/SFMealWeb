@@ -271,8 +271,8 @@ var ActionButton = createReactClass({
         case "PickupOption":
           if(action === "create" || action === "update"){
             postData = {
-              pickupFromTime : { value : new Date(this.props.data['pickupFromTime']).toISOString() || '', type : "date"},
-              pickupTillTime : { value : new Date(this.props.data['pickupTillTime']).toISOString() || '', type : "date"},
+              pickupFromTime : { value : this.props.data['pickupFromTime'] || '', type : "date"},
+              pickupTillTime : { value : this.props.data['pickupTillTime'] || '', type : "date"},
               location : { value : this.props.data['location'] || ''},
               method : {value: this.props.data['method'] || ''},
               phone : {value: this.props.data['phone'] || '', type : 'select', options : this.props.data['drivers']},

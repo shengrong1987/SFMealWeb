@@ -171,6 +171,8 @@ var ActionDialog = createReactClass({
         addressObj = addressObj || {};
         addressObj[key] = keyValues[key];
         delete keyValues[key];
+      }else if(key === "pickupFromTime" || key === "pickupTillTime"){
+        keyValues[key] = new Date(keyValues[key]).toISOString();
       }
     });
     if(addressObj){
