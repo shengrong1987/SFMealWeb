@@ -34,6 +34,9 @@
             mapView.initDelivery();
             mapView.initPickups();
           }
+          if(typeof mealConfirmView !== "undefined" && mealConfirmView){
+            mealConfirmView.verifyAddress(null, true);
+          }
         },error : function(err){
           console.log(err.statusText);
         }

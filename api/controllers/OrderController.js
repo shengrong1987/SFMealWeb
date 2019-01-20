@@ -77,7 +77,6 @@ var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUt
 //-62 : Wrong payment api
 //-98 : result not found
 
-
 module.exports = {
 
   /*
@@ -258,11 +257,11 @@ module.exports = {
                 subtotal += meal.subtotal;
               });
               var ms = meals.filter(function(m){
-                sails.log.info("subtotal: " + subtotal, "minimal order amount:" + m.minimalTotal);
-                return parseFloat(subtotal) < parseFloat(m.minimalTotal);
+                sails.log.info("subtotal: " + subtotal, "minimal order amount:" + m.minimalOrder);
+                return parseFloat(subtotal) < parseFloat(m.minimalOrder);
               });
               if(ms.length){
-                return next({ code: -60, responseText : req.__('order-single-minimal-not-reach', meals[0].minimalTotal)});
+                return next({ code: -60, responseText : req.__('order-single-minimal-not-reach', meals[0].minimalOrder)});
               }
               next();
             }else{
@@ -1743,13 +1742,21 @@ module.exports = {
 
   adjust_order_form : function(req, res){
     var userId = req.session.user.id;
-    var orderId = req.params.id;
-    var params = req.body;
-    Order.findOne(orderId).populate("customer").populate("meal").populate("dishes").populate("host").exec(function(err,order){
+    var orderIds = req.params.id.split("+");
+    var orders = [];
+    async.each(orderIds, function(orderId, next) {
+      Order.findOne(orderId).populate("customer").populate("meal").populate("dishes").populate("host").exec(function (err, order) {
+        if(err){
+          return next(err);
+        }
+        orders.push(order);
+        next();
+      })
+    }, function(err){
       if(err){
         return res.badRequest(err);
       }
-      return res.view("order_adjust",{layout:false,order : order});
+      return res.view("order_adjust",{layout:false, orders : orders});
     });
   },
 
@@ -2099,7 +2106,7 @@ module.exports = {
           return res.badRequest(err);
         }
         order.tax = 0;
-        order.discount = discount;
+        order.discount = discount / 100;
         order.msg = "Order discounted by admin, amount: " + order.discount + ", order id:" + order.id;
         order.save(function (err, result) {
           if (err) {
@@ -2789,6 +2796,9 @@ module.exports = {
                  Dish.findOne(dishId).exec(function(err, d){
                    if(err){
                      return next2(err);
+                   }
+                   if(!d){
+                     return next2();
                    }
                    if(order.orders.hasOwnProperty(dishId)){
                      order[d.title] = order.orders[dishId].number;

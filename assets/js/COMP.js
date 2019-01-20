@@ -125,7 +125,7 @@
 
   Tab.prototype.click = function(e){
     e.preventDefault();
-    e.stopPropagation();
+    // e.stopPropagation();
     $(this).data("bs.tab").select($(e.currentTarget));
   }
 
@@ -628,22 +628,23 @@
     var rate = ele.data("rate");
     rate = (Math.floor(rate * 4))/4;
     //0,1,1.25,1.5,1.75,2
-    var index = 5 - rate;
-    for(var i=4; i >= 0; i--){
-      var star = ele.find("i:eq(" + i +  ")");
+    var index = rate;
+    for(var i=1; i <= 5; i++){
+      var j = i - 1;
+      var star = ele.find("i:eq(" + j +  ")");
       star.addClass("text-lightgrey");
-      if(i >= index){
-        star.removeClass("fa-star").addClass("fa-star text-yellow");
+      if(i <= index){
+        star.removeClass("text-lightgrey").addClass("text-yellow");
       }else{
-        var left = index - i;
+        var left = i-index;
         var count = left / 0.25;
         if(count===1){
           //over 0.75
-          star.removeClass("fa-star").addClass("fa-star text-yellow");
+          star.removeClass("text-lightgrey").addClass("text-yellow");
         }else if(count === 2 || count===3){
-          star.removeClass("fas text-yellow").addClass("fas fa-star-half-alt text-yellow");
+          star.removeClass("fa-star").addClass("fa-star-half").removeClass("text-lightgrey").addClass("text-yellow");
         }else{
-          star.removeClass("fa-star text-yellow").addClass("fa-star text-lightgrey");
+          star.removeClass("fas").addClass("fal");
         }
       }
     }

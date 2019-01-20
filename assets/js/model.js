@@ -125,7 +125,7 @@ var LoginView = Backbone.View.extend({
     })
   },
   gotoWechatLogin : function(e){
-    wechatLogin(true);
+    wechatLogin(true, $(e.currentTarget));
   }
 });
 
@@ -870,7 +870,6 @@ var AddressView = Backbone.View.extend({
     this.alertView.hide();
     var userId = this.$el.data("user");
     this.model.set({id: userId});
-    this.isCoolDown = true;
   },
   deleteAddress : function(e){
     var _this = this;
@@ -1199,31 +1198,62 @@ var DayOfMealView = Backbone.View.extend({
   events : {
     "click #gotoCheckoutBtn" : "gotoCheckout",
     "mixClick #dishContentView" : "selectDate",
+    "mixClick #chefDishView" : "selectChef",
     "mixEnd #dishContentView" : "renderImage",
+    "mixEnd #chefDishView" : "renderImage"
   },
   initialize : function() {
+    var dateFilter;
     var dateDesc = decodeURI(readCookie("date"));
     var currentDateControl = this.$el.find("#dishDatesBar [data-filter='." + dateDesc + "']");
     if(currentDateControl.length){
-      filter = "." + dateDesc;
+      dateFilter = "." + dateDesc;
       this.$el.find("#dishDatesBar li").removeClass("active");
       currentDateControl.parent().addClass("active");
     }else{
       var activeFilters = this.$el.find("#dishDatesBar .mixitup-control-active");
-      var filter = "";
       if(activeFilters.length){
-        filter = activeFilters.data("filter");
+        dateFilter = activeFilters.data("filter");
       }else{
-        filter = this.$el.find("#dishDatesBar nav-link").data("filter");
+        dateFilter = this.$el.find("#dishDatesBar nav-link").data("filter");
       }
     }
-    dateMixer.filter(filter);
+    dateMixer.filter(dateFilter);
+
+    var chefFilter;
+    var chefDesc = decodeURI(readCookie("chef"));
+    var currentDateControl = this.$el.find("#hostBarView [data-filter='." + chefDesc + "']");
+    if(currentDateControl.length){
+      chefFilter = "." + chefDesc;
+      this.$el.find("#hostBarView li").removeClass("active");
+      currentDateControl.parent().addClass("active");
+    }else{
+      var activeFilters = this.$el.find("#hostBarView .mixitup-control-active");
+      if(activeFilters.length){
+        chefFilter = activeFilters.data("filter");
+      }else{
+        chefFilter = this.$el.find("#hostBarView nav-link").data("filter");
+      }
+    }
+    chefMixer.setFilterGroupSelectors('date',dateFilter);
+    chefMixer.setFilterGroupSelectors('chef',chefFilter);
+    chefMixer.parseFilterGroups();
+
   },
   selectDate : function(e){
     var originalEvent = e.originalEvent.detail.originalEvent;
     var currentTarget = $(originalEvent.currentTarget);
-    var dateDesc = currentTarget.data("filter").replace(".","");
-    createCookie("date", encodeURI(dateDesc));
+    var filterValue = currentTarget.data("filter").replace(".","");
+    var filterType = currentTarget.data("filter-type");
+    createCookie(filterType, encodeURI(filterValue));
+  },
+  selectChef : function(e){
+    var originalEvent = e.originalEvent.detail.originalEvent;
+    var currentTarget = $(originalEvent.currentTarget);
+    var filterValue = currentTarget.data("filter").replace(".","");
+    var filterType = currentTarget.data("filter-type");
+    createCookie(filterType, encodeURI(filterValue));
+    jumpTo("#chef");
   },
   renderImage : function(){
     echo.render();
@@ -2820,11 +2850,6 @@ var HostPageView = Backbone.View.extend({
     "click #followBtn" : "follow"
   },
   initialize : function(){
-    var alertView = this.$el.find("#actionAlertView");
-    alertView.removeClass("d-none");
-    alertView.hide();
-    this.alertView = alertView;
-
     var hostId = this.$el.data("host");
     this.model.set("id", hostId);
   },
@@ -2842,26 +2867,35 @@ var HostPageView = Backbone.View.extend({
         countView.text(likeCount);
       },
       error : function(model, err){
-        $this.alertView.show();
-        $this.alertView.html(getMsgFromError(err));
+        makeAToast(getMsgFromError(err));
       }
     })
   },
   follow : function(e){
     e.preventDefault();
+    var btn = $(e.currentTarget);
     var isFollowed = $(e.currentTarget).data("followed");
     if(isFollowed){
       this.model.action = "unfollow";
     }else{
       this.model.action = "follow";
     }
+    var hostId = this.$el.data("host");
+    this.model.set("id", hostId);
     this.model.save({}, {
       success : function(){
-        location.reload();
+        if(isFollowed){
+          btn.data("followed", false);
+          btn.find("i").removeClass("fas fa-star").addClass("far fa-star");
+          btn.find('.text').text(jQuery.i18n.prop('follow'));
+        }else{
+          btn.data("followed", true);
+          btn.find("i").removeClass("far fa-star").addClass("fas fa-star");
+          btn.find('.text').text(jQuery.i18n.prop('followed'));
+        }
       },
       error : function(model, err){
-        $this.alertView.show();
-        $this.alertView.html(getMsgFromError(err));
+        makeAToast(getMsgFromError(err));
       }
     })
   }
@@ -3254,30 +3288,33 @@ var MapView = Backbone.View.extend({
 
 var MealConfirmView = Backbone.View.extend({
   events : {
+    "change #method" : "switchMethod",
+    "mixEnd #deliveryTab" : "switchDate",
+    "click #verifyAddressBtn" : "verifyAddress",
+    "change #deliveryTab .regular-radio" : "verifyAddress",
+    "change #pickupInfoView .deliveryInput .contactOption .regular-radio" : "verifyAddress",
     "click #applyCouponBtn" : "applyCouponCode",
     "click #applyPointsBtn" : "addPointsToOrder",
-    "change #deliveryTab .regular-radio" : "switchAddress",
-    "change #method" : "switchMethod",
     "click #createNewContactBtn" : "createNewContact",
     "click #createNewContactBtn2" : "createNewContact",
     "keydown" : "onKeyDown",
-    "click #verifyAddressBtn" : "verifyAddress",
     "click input[name='billingAddress']" : "enterBillingAddress",
-    "mixEnd #deliveryTab" : "switchDate",
     "click [data-action]" : "go"
   },
   initialize : function(){
+    this.initView();
+    this.initMethodView();
+    this.initDateFilter();
+    utility.initGoogleMapService();
+  },
+  initView : function(){
     this.alertView = this.$el.find("#orderAlertView");
     this.alertView.removeClass("d-none").hide();
-    this.isCoolDown = true;
-    var hasDelivery = this.$el.find("#pickupInfoView").data("hasdelivery");
-    if(hasDelivery){
-      this.$el.find(".pickupInput").removeClass('d-none').hide();
-    }else{
-      this.$el.find(".pickupInput").removeClass('d-none');
-      this.$el.find(".deliveryInput").hide();
-    }
-    utility.initGoogleMapService();
+    this.$el.find(".deliveryInput").removeClass('d-none').hide();
+    this.$el.find(".pickupInput").removeClass('d-none').hide();
+    this.$el.find(".shippingInput").removeClass('d-none').hide();
+  },
+  initDateFilter : function(){
     var dateDesc = decodeURI(readCookie("date"));
     if(dateDesc && dateDesc !== "undefined" && dateDesc !== "null"){
       this.$el.find("#dishDatesBar li").removeClass("active");
@@ -3288,11 +3325,66 @@ var MealConfirmView = Backbone.View.extend({
       dateDesc = this.$el.find("#dishDatesBar [data-mixitup-control]").data("filter").replace(".","");
       createCookie("date", dateDesc);
     }
+  },
+  initMethodView : function(){
+    var hasDelivery = this.$el.find("#pickupInfoView").data("hasdelivery");
+    if(hasDelivery){
+      this.$el.find(".pickupInput").removeClass('d-none').hide();
+      this.$el.find(".deliveryInput").show();
+    }else{
+      this.$el.find(".pickupInput").removeClass('d-none');
+      this.$el.find(".deliveryInput").hide();
+    }
     var method = $("#pickupMethodView #method .active").attr("value");
     if(method === "delivery"){
       $("#pickupOptionsView .step-2").hide();
     }
   },
+
+  switchMethod : function(e){
+    var value = $(e.currentTarget).find(".active").attr("value");
+    this.methodViewControl(value);
+    this.pickupOptionViewControl(value);
+    this.verifyAddress();
+    refreshCheckoutMenu();
+  },
+
+  /*
+  Public API : Verify address and delivery options
+  @params
+
+   */
+  verifyAddress : function(e, isInitializing, cb){
+    var _this = this;
+    if(this.$el.find("#method button.active").attr("value") === "pickup"){
+      if(cb){
+        return cb(true);
+      }
+      return;
+    };
+    //get current date
+    var dateDesc = decodeURI(readCookie('date'));
+
+    //get address
+    var yourAddress = this.getAddress(isInitializing);
+    if(!yourAddress){
+      return;
+    }
+
+    //get selected delivery option
+    var deliveryOption = this.getDeliveryOption(dateDesc);
+
+    //validate address and current delivery option
+    this.validateAddressAndOption(yourAddress, deliveryOption, function(err){
+      if(err){
+        if(cb){cb(false)}
+        return;
+      }
+      //validate other options
+      _this.checkOptions(yourAddress, dateDesc, cb);
+    });
+  },
+
   go : function(e){
     var action = $(e.currentTarget).data("action");
     if(action === "showMenu"){
@@ -3315,69 +3407,32 @@ var MealConfirmView = Backbone.View.extend({
   },
   createNewContact : function(e){
     e.preventDefault();
-    var value = this.$el.find("#method button.active").attr("value");
-    if(value === "pickup"){
-      $('#contactInfoView').removeClass('d-none').show();
-    }else{
-      toggleModal(e, addressView.enterAddressInfoFromOrder);
-    }
+    toggleModal(e, addressView.enterAddressInfoFromOrder);
   },
-  switchMethod : function(e){
-    var isLogin = !!this.$el.data("user");
-    var value = $(e.currentTarget).find(".active").attr("value");
-    this.$el.find(".deliveryInput").removeClass('d-none');
-    this.$el.find(".pickupInput").removeClass('d-none');
-    this.$el.find(".shippingInput").removeClass('d-none');
-    if(value === "delivery"){
+  methodViewControl : function(method){
+    if(method === "delivery"){
       this.$el.find(".pickupInput").hide();
       this.$el.find(".shippingInput").hide();
       this.$el.find(".deliveryInput").show();
-      if(this.addressVerified){
-        $("#pickupOptionsView .step-2").show();
-      }else{
-        $("#pickupOptionsView .step-2").hide();
-      }
-      if(isLogin){
-        // $('#contactInfoView').hide();
-        this.switchAddress(e);
-      }else{
-        this.verifyAddress(e);
-      }
-    }else if(value === "shipping"){
+    }else if(method === "shipping"){
       this.$el.find(".pickupInput").hide();
       this.$el.find(".deliveryInput").hide();
       this.$el.find(".shippingInput").show();
-      if(isLogin){
-        // $('#contactInfoView').hide();
-        this.switchAddress(e);
-      }else{
-        this.verifyAddress(e);
-      }
     }else{
       this.$el.find(".deliveryInput").hide();
       this.$el.find(".shippingInput").hide();
       this.$el.find(".pickupInput").show();
-      $("#pickupOptionsView .step-2").show();
-      if(isLogin){
-        // $('#contactInfoView').hide();
-      }else{
-        // $('#contactInfoView').show();
-      }
     }
-    refreshCheckoutMenu();
   },
-  verifyAddress : function(e, checkOnly){
-    var value = this.$el.find("#method button.active").attr("value");
-    if(value === "pickup"){
-      return;
+  pickupOptionViewControl : function(method){
+    if(method === "delivery"){
+      $("#pickupOptionsView .step-2").hide();
+    }else{
+      $("#pickupOptionsView .step-2").show();
     }
-    var isLogin = !!this.$el.data("user");
-    var btn = e ? $(e.currentTarget) : null;
-    var dateDesc = decodeURI(readCookie('date'));
-    if(dateDesc === "undefined" || dateDesc === "null"){
-      dateDesc = this.$el.find("#dishDateBar [data-mixitup-control]").data("filter").replace(".","");
-    }
-    if(this.$el.find("#contactInfoView").length){
+  },
+  getAddress : function(isInitializing){
+    if(this.$el.find("#contactInfoView").length && !isInitializing){
       var street = this.$el.find("input[name='street']").val();
       var city = this.$el.find("input[name='city']").val();
       var state = this.$el.find("input[name='state']").val();
@@ -3385,9 +3440,9 @@ var MealConfirmView = Backbone.View.extend({
       var form = this.$el.find("#order");
       var isPartyMode = form.data("party");
       if(!street || !city || !state || !zipcode){
-        if(btn) {btn.trigger('reset')};
         makeAToast(jQuery.i18n.prop('addressIncomplete'));
-        return false;
+        jumpTo("pickupInfoView");
+        return;
       }
       var range = 5;
       var yourAddress = street + ", " + city + ", " + state + " " + zipcode;
@@ -3395,69 +3450,59 @@ var MealConfirmView = Backbone.View.extend({
       var contactOption = this.$el.find("#pickupInfoView .contactOption:visible .regular-radio:checked");
       var contactText = contactOption.next().next().text();
       if(!contactText.split("+").length){
-        if(btn) {btn.trigger('reset')}
         makeAToast(jQuery.i18n.prop('addressIncomplete'));
-        return false;
+        return;
       }
       yourAddress = contactText.split("+")[0];
     }
-
-    if(checkOnly){
-      if(btn) {btn.trigger('reset')}
-      return yourAddress;
-    }
-
+    return yourAddress;
+  },
+  getDeliveryOption : function(dateDesc){
     var deliveryOption = this.$el.find("#deliveryTab .deliveryOption[data-date='" + dateDesc + "'] .regular-radio:checked");
     var firstOpt = this.$el.find("#deliveryTab .deliveryOption[data-date='" + dateDesc + "'] .regular-radio").first();
     if(!deliveryOption.length){
       firstOpt.prop('checked',true);
       deliveryOption = firstOpt;
     }
-
-    var lat = deliveryOption.parent().data('lat');
-    var long = deliveryOption.parent().data('long');
+    return deliveryOption;
+  },
+  validateAddressAndOption : function(address, option, cb){
+    var optionView = option.parent();
+    var lat = optionView.data('lat');
+    var long = optionView.data('long');
     if(!long || !lat){
-      if(btn){
-        btn.trigger("reset");
-      }
-      makeAToast("error reading delivery central location","error");
-      console.log("error reading delivery central location");
-      return;
+      return makeAToast("此送餐选项地址解析错误，请选择别的选项。","error");
     }
     var location = { lat : lat, long : long};
-    var range = deliveryOption.parent().data("range");
-    utility.geocoding(yourAddress, function(err, customerLoc) {
+    var range = optionView.data("range");
+    if(!utility.geocoder){
+      return;
+    }
+    utility.geocoding(address, function(err, customerLoc) {
       if (err) {
-        if(btn) {btn.trigger('reset')}
         makeAToast(err, 'error');
-        return;
+        return cb(err);
       }
-      if(btn){btn.trigger('reset');}
       var cusLocation = {
         lat : customerLoc.lat(),
         long : customerLoc.lng()
       }
       var distance = utility.getDistance(cusLocation, location, "N");
       console.log("distance: " + distance, " range:" + range);
-      if(distance > range){
-        if(!isPartyMode){
-          // makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
-          // return;
-        }else{
-          var delivery_fee = (distance - range) * MILEAGE_FEE;
-          form.find(".delivery").data("value", delivery_fee);
-          refreshCheckoutMenu();
-        }
-      }else if(isPartyMode){
-        form.find(".delivery").data("value", 0);
-        refreshCheckoutMenu();
-      }else{
+      if(distance <= range){
         makeAToast(jQuery.i18n.prop('addressValid'),'success');
       }
+      cb();
     });
-    this.checkOptions(yourAddress, dateDesc);
   },
-  checkOptions : function(address, dateDesc){
+  checkOptions : function(address, dateDesc, cb){
+    if(!utility.geocoder){
+      if(cb){
+        console.log("google geocoder not initialized");
+        return cb(false);
+      }
+      return;
+    }
     var _this = this;
     var deliveryOptions = this.$el.find("#deliveryTab .deliveryOption .regular-radio");
     $("#pickupOptionsView .step-2").show();
@@ -3465,6 +3510,7 @@ var MealConfirmView = Backbone.View.extend({
     utility.geocoding(address, function(err, cusLocation) {
       if (err) {
         makeAToast(err, "err");
+        if(cb){ cb(false) }
         return;
       }
       var newCusLocation = {
@@ -3494,88 +3540,8 @@ var MealConfirmView = Backbone.View.extend({
         emptyView.removeClass("d-none").show();
       }
       jumpTo("pickupOptionsView");
+      if(cb){cb(true)};
     });
-  },
-  switchAddress : function(e, cb, yourAddress){
-    var method = this.$el.find("#method .active").attr("value");
-    if(method !== "delivery"){
-      return cb(true);
-    }
-    var deliveryOption = this.$el.find("#deliveryTab .deliveryOption:visible .regular-radio:checked");
-    if(!deliveryOption.length){
-      makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
-      if(cb){
-        return cb(false);
-      }
-      return;
-    }
-    var btn = e ? $(e.currentTarget) : null;
-    deliveryOption.parent().addClass("spinning").addClass("is-disabled");
-    var $this = this;
-    var isLogin = !!this.$el.data("user");
-    var isFirstAddress = !this.$el.find("#contactInfoView").length;
-    var form = this.$el.find("#order");
-    var isPartyMode = form.data("party");
-    if(!yourAddress) {
-      if (isFirstAddress) {
-        var deliveryLocationOption = this.$el.find(".deliveryInput .contactOption .regular-radio:checked");
-        if (!deliveryLocationOption.length) {
-          makeAToast(jQuery.i18n.prop('deliveryOptionNotSelected'));
-          if (cb) {
-            return cb(false);
-          }
-          return;
-        }
-        yourAddress = deliveryLocationOption.next().next().text().split("+")[0];
-      } else {
-        yourAddress = $this.verifyAddress(e, true);
-      }
-    }
-
-    if (!yourAddress) {return;}
-
-    if(e && $(e.currentTarget).parent().hasClass('contactOption')){
-      this.checkOptions(yourAddress, deliveryOption.data("desc"));
-    }
-
-    var deliveryOption = this.$el.find("#deliveryTab .deliveryOption .regular-radio:checked");
-    var long = deliveryOption.parent().data('long');
-    var lat = deliveryOption.parent().data("lat");
-    if(!long || !lat){
-      if(btn) {
-        btn.trigger("reset");
-      }
-      makeAToast("error reading delivery central location", "error");
-      console.log("error reading delivery central location");
-      return;
-    }
-    var location = {
-      long : long,
-      lat : lat
-    }
-
-    utility.geocoding(yourAddress, function(err, cusLoc){
-      if(err){
-        makeAToast(err, "err");
-        return;
-      }
-      cusLoc = {
-        lat : cusLoc.lat(),
-        long : cusLoc.lng()
-      }
-      var range = deliveryOption.parent().data("range") || 5;
-      var distance = utility.getDistance(cusLoc, location, "N");
-      if(distance > range){
-        makeAToast(jQuery.i18n.prop('addressOutOfRangeError'));
-        if(cb){
-          return cb(false);
-        }
-        return;
-      }
-      deliveryOption.parent().removeClass("spinning").removeClass("is-disabled");
-      makeAToast(jQuery.i18n.prop('addressValid'),'success');
-      if(cb){return cb( true );}
-    })
   },
   applyCouponCode : function(e) {
     e.preventDefault();
@@ -3898,7 +3864,11 @@ var OrderView = Backbone.View.extend({
       }
   },
   getPickupOption : function(method){
-    var optionItem = this.$el.find("#" + method + "Tab" + " .option." + method +  "Option .regular-radio:checked");
+    var optionItem = this.$el.find("#" + method + "Tab" + " .option:visible." + method +  "Option .regular-radio:checked");
+    if(!optionItem.length) {
+      makeAToast(jQuery.i18n.prop('pickupOptionNotChoose'));
+      return null;
+    }
     var index = optionItem.data("index");
     var date = optionItem.parent().data("date");
     var meal = optionItem.parent().data("meal");
@@ -4007,7 +3977,7 @@ var OrderView = Backbone.View.extend({
         jumpTo("pickupInfoView");
         return;
       }
-      mealConfirmView.switchAddress(null, function (valid) {
+      mealConfirmView.verifyAddress(null, false, function (valid) {
         if (!valid) {
           jumpTo("pickupOptionsView");
           return;
@@ -4023,6 +3993,10 @@ var OrderView = Backbone.View.extend({
 
           //pickup option
           var pickupObj = $this.getPickupOption(method);
+          if(!pickupObj){
+            jumpTo("pickupOptionsView");
+            return;
+          }
           var pickupOption = pickupObj.index;
           var pickupDate = pickupObj.date;
           var pickupMeal = pickupObj.meal;
@@ -4124,7 +4098,7 @@ var OrderView = Backbone.View.extend({
           location.reload();
         });
       },error : function(model, err){
-        BootstrapDialog.alert(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+        BootstrapDialog.alert(getMsgFromError(err));
       }
     })
   },
@@ -4142,7 +4116,7 @@ var OrderView = Backbone.View.extend({
           reloadUrl("/host/me","#myorder");
         }
       },error : function(model, err){
-        BootstrapDialog.alert(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+        BootstrapDialog.alert(getMsgFromError(err));
       }
     })
   },
@@ -4158,7 +4132,7 @@ var OrderView = Backbone.View.extend({
         var source = result.source;
         location.href = source.redirect.url;
       },error : function(model, err){
-        BootstrapDialog.alert(err.responseJSON ? err.responseJSON.responseText : err.responseText);
+        BootstrapDialog.alert(getMsgFromError(err));
       }
     })
   },
@@ -4242,7 +4216,7 @@ var OrderView = Backbone.View.extend({
         button.trigger("reset");
         BootstrapDialog.show({
           title: jQuery.i18n.prop('error'),
-          message: err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText
+          message: getMsgFromError(err)
         });
       }
     })
@@ -4475,7 +4449,7 @@ function uploadThumbnail(){
   },0,"thumbnail",isDelete);
 }
 
-function wechatLogin(userInit){
+function wechatLogin(userInit, button){
   var gm_ua = navigator.userAgent.toLowerCase();
   if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger"){
     var redirectUrl = BASE_URL + '/auth/wechatCode';
@@ -4490,28 +4464,33 @@ function wechatLogin(userInit){
     location.href = wechatUrl;
   }else if(userInit){
     if(IsPC()){
-      $.ajax({
-        type: 'GET',
-        url: "/auth/getQRCodeTicket",
-        success: function (res) {
-          var ticket = JSON.parse(res.body).ticket;
-          var getQRCodeUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + encodeURI(ticket);
-          $.get({
-            url: getQRCodeUrl,
-            success: function (res) {
-              $("#ImagePic").attr("src", "data:image/png;base64," + res);
-            },
-            error: function (err) {
-
-            }
-          });
-        },
-        error: function (err) {
-          var xmlResult = $($.parseXML(err.responseText));
-          var message = xmlResult.find('Message');
-          makeAToast(message);
-        }
-      });
+      // button.addClass("running");
+      // $.ajax({
+      //   type: 'GET',
+      //   url: "/auth/getQRCodeTicket"
+      // }).done(function (res) {
+      //   btn.removeClass("runnning");
+      //   var ticket = res.ticket;
+      //   var QRCodeUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + encodeURI(ticket);
+      //   BootstrapDialog.show({
+      //     title : jQuery.i18n.prop("qrcodeScanTip"),
+      //     message : "<img src='" + QRCodeUrl + "'>"
+      //   });
+      // }).fail(function(err){
+      //   var xmlResult = $($.parseXML(err.responseText));
+      //   var message = xmlResult.find('Message');
+      //   makeAToast(message);
+      // })
+      redirectUrl = encodeURIComponent(BASE_URL + '/auth/wechatCodeWeb');
+      scope = "snsapi_login";
+      appId = WECHAT_APPID2;
+      state = encodeURIComponent(location.href);
+      wechatUrl = "https://open.weixin.qq.com/connect/qrconnect?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
+      wechatUrl = wechatUrl.replace('$APPID', appId);
+      wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
+      wechatUrl = wechatUrl.replace('$SCOPE',scope);
+      wechatUrl = wechatUrl.replace('$STATE',state);
+      location.href = wechatUrl;
     }else{
       var redirectUrl = BASE_URL + '/auth/wechatCode';
       var scope = "snsapi_userinfo";

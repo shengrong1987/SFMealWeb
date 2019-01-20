@@ -146,9 +146,6 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      // meals = meals.filter(function(meal){
-      //   return meal.county.split("+").indexOf(county) !== -1;
-      // });
       if(pickupNickname){
         meals = meals.filter(function(meal){
           return meal.pickups.some(function(p){
@@ -156,7 +153,7 @@ module.exports = {
           })
         })
       }
-      var _u=null,_tags=[];
+      var _u=null,_tags=['chef'], _hosts = [];
       async.auto({
         findUser : function(next){
           if(!req.session.authenticated){
@@ -170,11 +167,31 @@ module.exports = {
             next();
           })
         },
+        findHosts : function(next){
+          if(!meals.length){
+            Host.find({ where : { passGuide : true, intro : { '!' : ''}}, skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("dishes").exec(function(err, hosts) {
+              if (err) {
+                return next(err);
+              }
+              hosts = hosts.filter(function (h) {
+                return !!h.dishes.length;
+              })
+              _hosts = hosts;
+              next();
+            });
+          }else{
+            meals.forEach(function(meal){
+              if(!_hosts.some(function(host){
+                return host.id === meal.chef.id;
+              })){
+                _hosts.push(meal.chef);
+              }
+            })
+            next();
+          }
+        },
         findDishTags : function(next){
           meals.forEach(function(meal){
-            if(!_tags.includes(meal.chef.shopName)){
-              _tags.push(meal.chef.shopName);
-            }
             meal.dishes.forEach(function(dish){
               if(dish.tags){
                 dish.tags.forEach(function(tag){
@@ -186,6 +203,7 @@ module.exports = {
             })
           })
           var tagOrder = {
+            "chef" : 201,
             "select" : 200,
             "小龙虾" : 195,
             "限时礼品" : 190,
@@ -207,16 +225,8 @@ module.exports = {
         if(req.wantsJSON && process.env.NODE_ENV === "development"){
           return res.ok({ meals : meals, user : _u, tags: _tags });
         }
-        Host.find({ where : { passGuide : true, intro : { '!' : ''}}, skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("dishes").exec(function(err, hosts){
-          if(err){
-            return res.badRequest(err);
-          }
-          hosts = hosts.filter(function(h){
-            return !!h.dishes.length;
-          })
-          meals = _this.composeMealWithDate(meals);
-          res.view("dayOfMeal",{ meals : meals, hosts: hosts, user : _u, tags: _tags, pickupNickname : pickupNickname, locale : req.getLocale()});
-        });
+        meals = _this.composeMealWithDate(meals);
+        res.view("dayOfMeal",{ meals : meals, hosts: _hosts, user : _u, tags: _tags, pickupNickname : pickupNickname, locale : req.getLocale()});
       })
     })
   },

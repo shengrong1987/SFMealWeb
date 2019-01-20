@@ -99,9 +99,9 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          if(!dishIsNotActive && parseFloat(req.body.price) !== d.price){
-            return res.badRequest({ code : -2, responseText : req.__("meal-active-update-dish")});
-          }
+          // if(!dishIsNotActive && parseFloat(req.body.price) !== d.price){
+          //   return res.badRequest({ code : -2, responseText : req.__("meal-active-update-dish")});
+          // }
           sails.log.info(req.body.minimalPrice, req.body.qtyRate, req.body.priceRate);
           if(req.body.isDynamicPriceOn && (!req.body.minimalPrice || !req.body.qtyRate || !req.body.priceRate)){
             return res.badRequest({ code : -3, responseText : req.__("dish-update-dynamic-insufficient-info")});

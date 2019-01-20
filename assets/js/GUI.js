@@ -154,6 +154,41 @@ function getPosition(element){
   return [left, top];
 }
 
+function changeSelectChefUI(filter){
+  var filters = filter.split(".");
+  var chefFilter = "";
+  if(filters.length > 2){
+    chefFilter = filters[2];
+  }
+  var filterBtn = $("[data-mixitup-control][data-filter-type='chef'][data-filter='." + filter + "']");
+  if(!filterBtn.length){
+    return;
+  }
+  var container = $("#chef+div");
+  container.find("img").prop("src", filterBtn.data("picture"));
+  container.find("[data-rate]").data("rate", filterBtn.data("rate"));
+  container.find("[data-rate]").starSet("show");
+  container.find(".shopName").text(filter.replace(".",""));
+  container.find("#likeBtn [data-count]").data("count", filterBtn.data("likes"));
+  container.find("#likeBtn [data-count]").text(filterBtn.data("likes"));
+  container.find("#likeBtn").data("host", filterBtn.data("host"));
+  container.find("img").off("click");
+  container.find("img").on("click", function(e){
+    window.location.href = "/host/public/" + filterBtn.data("host");
+  })
+  var isFollowed = filterBtn.data("followed");
+  if(isFollowed){
+    container.find("#followBtn").data("host", filterBtn.data("host"));
+    container.find("#followBtn").data("followed", true);
+    container.find("#followBtn .text").text(filterBtn.data("followed-text"));
+    container.find("#followBtn i").removeClass("far").addClass("fas");
+  }else{
+    container.find("#followBtn").data("followed", false);
+    container.find("#followBtn .text").text(filterBtn.data("follow-text"));
+    container.find("#followBtn i").removeClass("fas").addClass("far");
+  }
+}
+
 function jumpTo(id, offset){
   // var coordinate = getPosition(id);
   if(!$("#" + id).length){

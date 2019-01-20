@@ -320,6 +320,46 @@ describe('OrderController', function() {
         })
     });
 
+    it('should login host account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : hostEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    });
+
+    it('should update dish price on active meal', function(done){
+      agent
+        .put('/dish/' + dishId1)
+        .send({
+          price : price1 - 1
+        })
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.price.should.be.equal(price1-1);
+          price1--;
+          done();
+        })
+    })
+
+    it('should login as guest', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect("Location","/auth/done")
+        .end(done)
+    });
+
     it('should order the dish with preference and get preference not exist error', function (done) {
       var dishObj = {};
       dishObj[dishId1] = { number : 1 , preference : [{ property : [{preftype:'spicy',property:'hot'}], extra : 0}], price : price1 };
@@ -1729,10 +1769,12 @@ describe('OrderController', function() {
               return done(err);
             }
             var o = res.body.orders[0];
+            var applicationFee = price1 * 0.2 * 100;
             o.discountAmount.should.be.equal(1);
+            o.discount.should.be.equal(1);
             o.transfer[Object.keys(o.transfer)[0]].should.be.equal(100);
             o.charges[Object.keys(o.charges)[0]].should.be.equal(Math.round((price1+SERVICE_FEE-1)*100));
-            o.application_fees[Object.keys(o.application_fees)[0]].should.be.equal(200);
+            o.application_fees[Object.keys(o.application_fees)[0]].should.be.equal(applicationFee);
             dish1LeftQty--;
             o.leftQty[dishId1].should.be.equal(dish1LeftQty);
             orderId = o.id;
@@ -1772,6 +1814,7 @@ describe('OrderController', function() {
             }
             var o = res.body.orders[0];
             o.discountAmount.should.be.equal(5);
+            o.discount.should.be.equal(5);
             o.transfer[Object.keys(o.transfer)[0]].should.be.equal(500);
             orderId = o.id;
             o.leftQty[dishId1].should.be.equal(dish1LeftQty);

@@ -38,7 +38,7 @@
 
       <div class="d-flex justify-content-center pt-2">
         <button id="likeBtn" style="width:100%;max-width:250px;" class="btn btn-grey-red btn-lg active mr-2"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
-        <button id="followBtn" style="width:100%;max-width:250px;" class="btn btn-grey-green btn-lg active ml-2" data-followed="<%= (user && (user.follow && user.follow==host.id)) ? true : false%>"><%= (user && (user.follow && user.follow==host.id)) ? __('followed') : __('follow')%> <i class="fa <%= (user && (user.follow && user.follow==host.id)) ? 'fa-star' : 'fa-star-o'%>"></i></button>
+        <button id="followBtn" style="width:100%;max-width:250px;" class="btn btn-grey-green btn-lg active ml-2" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === host.id}))) ? true : false%>"><span class="text"><%= (user && (user.follow && user.follow.some(function(f){ f.id === host.id}))) ? __('followed') : __('follow')%> </span><i class="<%= (user && (user.follow && user.follow.some(function(f){ f.id === host.id}))) ? 'fas fa-star' : 'far fa-star'%>"></i></button>
       </div>
     </div>
 

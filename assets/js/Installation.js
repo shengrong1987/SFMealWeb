@@ -30,6 +30,7 @@ function setup(){
   setupFlexScrollBar();
   setupCollapse();
   setupFullPage();
+  setupToaster();
 }
 
 function initData(){
@@ -194,7 +195,7 @@ function setupTooltip(){
   });
 }
 
-var pickupMixer, deliveryMixer, dateMixer;
+var pickupMixer, deliveryMixer, dateMixer, chefMixer;
 
 function setupMixin() {
   if($("#pickupTab").length){
@@ -244,7 +245,33 @@ function setupMixin() {
         filter : firstFilter
       },
       selectors: {
+        control : '[data-mixitup-control][data-mixitup-date]'
+      }
+    });
+  }
+  if($("#chefDishView").length){
+    var firstFilter = $("#hostBarView").find("a[data-filter]").first().data('filter');
+    chefMixer = mixitup("#chefDishView", {
+      pagination: {
+        limit: 200
+      },
+      classNames: {
+        elementPager: 'btn btn-mixitup'
+      },
+      load: {
+        filter : firstFilter
+      },
+      selectors: {
         control : '[data-mixitup-control]'
+      },
+      callbacks: {
+        onMixStart: function(state, futureState) {
+          changeSelectChefUI(futureState.activeFilter.selector);
+          jumpTo("chef", -144);
+        }
+      },
+      multifilter: {
+        enable: true // enable the multifilter extension for the mixer
       }
     });
   }
@@ -517,6 +544,10 @@ function setupFullPage(){
       fullpage_api.reBuild();
     }
   });
+}
+
+function setupToaster(){
+
 }
 
 /*

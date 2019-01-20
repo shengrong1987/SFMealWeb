@@ -641,7 +641,7 @@ describe('MealController', function() {
           delivery_fee : "4.99",
           isDelivery : true,
           isDeliveryBySystem : true,
-          minimalTotal : 31,
+          minimalOrder : 31,
           leftQty: leftQty,
           totalQty: totalQty,
           county : 'San Mateo County',
@@ -1294,22 +1294,6 @@ describe('MealController', function() {
           done();
         })
     })
-
-    it('should not update dish on active meal', function(done){
-      agent
-        .put('/dish/' + dish1)
-        .send({
-          price : 5.0
-        })
-        .expect(400)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          res.body.code.should.be.equal(-2);
-          done();
-        })
-    });
 
     it('should update the meals provideFromTime to 5 minutes later', function(done){
       var fiveMinutesLater = moment().add('5','minutes')._d;

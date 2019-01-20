@@ -268,19 +268,16 @@ module.exports = require('waterlock').waterlocked({
       var getQRTicketUrl = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + accessToken;
       request.post({
         url : getQRTicketUrl,
-        data : {
-          action_name : "QR_LIMIT_SCENE",
-          action_info : {
-            scene : {
-              scene_str : WECHAT_FOLLOW_AND_SIGNIN
-            }
-          }
-        }
-      }, function(err, response){
+        form : '{"expire_seconds": 604800, "action_name": "QR_STR_SCENE", "action_info": {"scene": {"scene_str": ' + WECHAT_FOLLOW_AND_SIGNIN + ' }}}'
+
+    }, function(err,httpResponse,body){
         if(err){
           return res.badRequest(err);
         }
-        var body = JSON.parse(response);
+        var body = JSON.parse(body);
+        if(body.errorcode){
+          return res.badRequest(body);
+        }
         res.ok({ ticket : body.ticket });
       })
     });

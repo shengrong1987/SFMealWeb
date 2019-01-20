@@ -10820,6 +10820,12 @@ select.form-control {
   overflow-y: scroll;
   max-height: 250px;
 }
+.mw-28 {
+  min-width: 28%;
+}
+.mw-19 {
+  min-width: 19%;
+}
 /*list*/
 .selectable-list {
   padding: 0;
@@ -11110,6 +11116,9 @@ select.form-control {
 .rating i:hover {
   cursor: pointer;
 }
+.small-rating i {
+  font-size: xx-small;
+}
 .color-block {
   cursor: pointer;
   width: 40px;
@@ -11188,18 +11197,15 @@ select.form-control {
   overflow-x: scroll;
   list-style: none;
 }
-.nav-scroll .nav-item {
-  min-width: 28%;
-  border-right: 1px solid #dee2e6 !important;
-}
 .dropdown-backdrop {
   position: static;
 }
 #dishTagsBar {
-  top: 50px;
+  top: 144px;
   z-index: 1;
   background-color: #eeeeee;
 }
+#hostBarView,
 #dishDatesBar {
   flex-wrap: nowrap;
   -ms-flex-wrap: nowrap;
@@ -11251,10 +11257,10 @@ select.form-control {
   }
   .dishItem .photo {
     width: 120px;
-    max-height: 100px;
+    height: 120px;
   }
   .dishItem img {
-    max-height: 100px;
+    height: 100%;
   }
   .mynavbar .navbar-header {
     margin-left: 100px;
@@ -11450,11 +11456,11 @@ select.form-control {
     display: inline;
   }
   .dishItem .photo {
-    width: 120px;
-    max-height: 100px;
+    width: 60px;
+    height: 60px;
   }
   .dishItem .photo img {
-    max-height: 100px;
+    height: 100%;
   }
   .dishItem .photo a {
     position: relative;

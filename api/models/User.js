@@ -125,7 +125,8 @@ module.exports = {
       collection : 'Host'
     },
     follow : {
-      collection : 'Host'
+      collection : 'Host',
+      via : 'followers'
     },
     feature_dishes : {
       type : 'json'
