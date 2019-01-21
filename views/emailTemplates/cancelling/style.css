@@ -10749,6 +10749,7 @@ select.form-control {
 }
 .default-container {
   margin: auto;
+  min-height: 400px;
 }
 .box-wrapper {
   margin-left: 15px;

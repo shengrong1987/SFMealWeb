@@ -157,10 +157,10 @@ function getPosition(element){
 function changeSelectChefUI(filter){
   var filters = filter.split(".");
   var chefFilter = "";
-  if(filters.length > 2){
-    chefFilter = filters[2];
+  if(filters.length){
+    chefFilter = filters[filters.length-1];
   }
-  var filterBtn = $("[data-mixitup-control][data-filter-type='chef'][data-filter='." + filter + "']");
+  var filterBtn = $("[data-mixitup-control][data-filter-type='chef'][data-filter='." + chefFilter + "']");
   if(!filterBtn.length){
     return;
   }

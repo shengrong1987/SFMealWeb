@@ -17,7 +17,7 @@
   <div id="dayOfMealContainer" class="mx-auto" style="max-width: 800px;" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>" data-pickup-nickname="<%= pickupNickname || ''%>">
 
     <% if(meals && meals.meals){%>
-    <div class="w-100 sticky-top" style="z-index: 200;">
+    <div class="w-100 sticky-top">
       <ul id="dishDatesBar" class="nav nav-light nav-fill nav-scroll bg-light none-padding" style="height: 59px;" data-filter-group="date">
         <%
           var dates = Object.keys(meals.meals);
@@ -83,7 +83,7 @@
           <a id="newUserRewardIcon" data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/user/reward/newUser"><img class="icon-float cursor-pointer" src="/images/icon_new.png"></a>
        <% }%>
       </nav>
-      <div class="content flex-grow-1 text-left px-1">
+      <div id="order" class="content flex-grow-1 text-left px-1">
         <div id="chefDishView">
           <% tags.forEach(function(tag){if(tag === "chef"){%>
             <div class="pl-4 py-2 text-center light-grey border" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag.replace("'","").replace(" ","")%>">

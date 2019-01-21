@@ -3,97 +3,102 @@
     <div id="adjustAlertView" class="alert alert-danger d-none" data-toggle="alert">
       <%= __('dish-out-tips')%>
     </div>
-    <table id="order" class="table" data-meal="<%= order.meal.id%>" data-order="<%= order.id%>" data-err-container="#adjustAlertView">
-      <thead>
-      <tr>
-        <th><%= __('order-adjust-title')%></th>
-      </tr>
-      <tr>
-        <th colspan="3"><%= __('name')%></th>
-        <td><%= __('price')%></td>
-        <td><%= __('quantity')%></td>
-      </tr>
-      </thead>
-      <tbody>
-      <%
-      var list = order.orders;
-      order.dishes.forEach(function(dish){
-        var dishId = dish.id;
-        if(list.hasOwnProperty(dishId)) {
+    <div id="order">
+      <table class="table" data-err-container="#adjustAlertView">
+        <thead>
+        <tr>
+          <th><%= __('order-adjust-title')%></th>
+        </tr>
+        <tr>
+          <th colspan="3"><%= __('name')%></th>
+          <td><%= __('price')%></td>
+          <td><%= __('quantity')%></td>
+        </tr>
+        </thead>
+        <tbody>
+        <% var ids=""; orders.forEach(function(order){
+          if(ids){
+            ids += "+";
+          }
+          ids += order.id;
+          var list = order.orders;
+          order.dishes.forEach(function(dish){
+          var dishId = dish.id;
+          if(list.hasOwnProperty(dishId)) {
           var number = list[dishId].number;
           var preference = list[dishId].preference;
-        }else{
+          }else{
           number = 0;
           preference = null;
-        }
-        var preferenceTitle = "";
-        var extra = 0;
-        if(preference && preference.length){
+          }
+          var preferenceTitle = "";
+          var extra = 0;
+          if(preference && preference.length){
           preference.forEach(function(pref){
-            if(pref.property){
-              preferenceTitle += "(" + pref.property + "x1)";
-            }
-            extra += parseInt(pref.extra);
+          if(pref.property){
+          preferenceTitle += "(" + pref.property + "x1)";
+          }
+          extra += parseInt(pref.extra);
           })
-        };
-      %>
-      <tr class="success item" data-id=<%= dish.id%> data-left-amount=<%= order.meal.leftQty[dish.id] %> data-preference="<%= JSON.stringify(preference)%>">
-        <td colspan="3"><%= dish.title%><br/><span class="preference" data-preference="<%= preferenceTitle%>"><%= preferenceTitle%></span></td>
-        <% if(!extra){%>
-        <td class="price" data-extra="<%= extra%>" value="<%= dish.price.toFixed(2)%>">$<%= dish.price%></td>
-        <%}else{%>
-        <td class="price" data-extra="<%= extra%>" value="<%= dish.price.toFixed(2)%>">$<%= dish.price %> <br/>(+$<%= extra + ")"%></td>
-        <%}%>
+          };
+        %>
+          <tr class="success item" data-id=<%= dish.id%> data-left-amount=<%= order.meal.leftQty[dish.id] %> data-preference="<%= JSON.stringify(preference)%>">
+            <td colspan="3"><%= dish.title%><br/><span class="preference" data-preference="<%= preferenceTitle%>"><%= preferenceTitle%></span></td>
+            <% if(!extra){%>
+              <td class="price" data-extra="<%= extra%>" value="<%= dish.price.toFixed(2)%>">$<%= dish.price%></td>
+            <%}else{%>
+              <td class="price" data-extra="<%= extra%>" value="<%= dish.price.toFixed(2)%>">$<%= dish.price %> <br/>(+$<%= extra + ")"%></td>
+            <%}%>
 
-        <td>
-          <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">-</button>
-          <input type="number" class="amount p-1" style="width:50px;" value="<%= number%>">
-          <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',1,true)">+</button>
-        </td>
-      </tr>
-      <%})%>
-      <tr></tr>
-      <tr>
-        <th colspan="3"></th>
-        <td></td>
-        <th class="text-right"><%= __('meal-fee')%><span class="subtotal"></span></th>
-      </tr>
-      <tr></tr>
-      <tr>
-        <th colspan="3"><%= __('pickup-method')%></th>
-        <td><%= __('estimated-time')%></td>
-        <td><%= __('delivery-fee')%></td>
-      </tr>
-      <tr></tr>
-      <tr class="info">
-        <td colspan="3"><%= __('self-pickup')%></td>
-        <td>30<%= __('min')%></td>
-        <td><%= __('free')%></td>
-      </tr>
-      <tr>
-        <th colspan="3"></th>
-        <td></td>
-        <th class="text-right"><%= __('meal-delivery-fee')%><span class="delivery" data-value="0"></span></th>
-      </tr>
-      <tr>
-        <th colspan="3"></th>
-        <td></td>
-        <th class="text-right"><%= __('tax')%>:<span class="tax" data-value="0" data-taxrate="<%= order.getTaxRate()%>"> $0.00</span></th>
-      </tr>
-      <tr></tr>
-      <tr>
-        <th colspan="3"></th>
-        <td></td>
-        <th class="text-right"><%= __('total')%><span class="total" data-value="0"></span></th>
-      </tr>
-      </tbody>
-    </table>
-
-    <div id="orderAlertView" class="form alert alert-danger d-none"></div>
-
-    <span class="divider"></span>
-
-    <button type="button" class="btn btn-danger red" data-action="adjust"><%= __('confirm-order')%></button>
+            <td>
+              <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">-</button>
+              <input type="number" class="amount p-1" style="width:50px;" value="<%= number%>">
+              <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',1,true)">+</button>
+            </td>
+          </tr>
+        <%})})%>
+        <tr></tr>
+        <tr>
+          <th colspan="3"></th>
+          <td></td>
+          <th class="text-right"><%= __('meal-fee')%><span class="subtotal"></span></th>
+        </tr>
+        <tr></tr>
+        <tr>
+          <th colspan="3"><%= __('pickup-method')%></th>
+          <td><%= __('estimated-time')%></td>
+          <td><%= __('delivery-fee')%></td>
+        </tr>
+        <tr></tr>
+        <tr class="info">
+          <td colspan="3"><%= __('self-pickup')%></td>
+          <td>30<%= __('min')%></td>
+          <td><%= __('free')%></td>
+        </tr>
+        <tr>
+          <th colspan="3"></th>
+          <td></td>
+          <th class="text-right"><%= __('meal-delivery-fee')%><span class="delivery" data-value="0"></span></th>
+        </tr>
+        <tr>
+          <th colspan="3"></th>
+          <td></td>
+          <th class="text-right"><%= __('tax')%>:<span class="tax" data-value="0" data-taxrate="<%= orders[0].getTaxRate()%>"> $0.00</span></th>
+        </tr>
+        <tr></tr>
+        <tr>
+          <th colspan="3"></th>
+          <td></td>
+          <th class="text-right"><%= __('total')%><span class="total" data-value="0"></span></th>
+        </tr>
+        </tbody>
+      </table>
+      <div class="text-center">
+        <div id="orderAlertView" class="form alert alert-danger d-none"></div>
+        <span class="divider"></span>
+        <button type="button" class="btn btn-danger red" data-orders="<%= ids%>" data-action="adjust"><%= __('confirm-order')%></button>
+      </div>
+    </div>
   </div>
 
   <script>

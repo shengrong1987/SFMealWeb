@@ -4077,8 +4077,9 @@ var OrderView = Backbone.View.extend({
     });
   },
   adjust : function(e){
-    var form = this.$el.find("#order");
-    var orderId = form.data("order");
+    var button = $(e.currentTarget);
+    var orderIds = button.data("orders");
+    var form = this.$el.find("table");
     var delivery_fee = this.$el.find("#order .delivery").data("value");
     var subtotal = form.find(".subtotal").data("value");
     if(subtotal===0){
@@ -4086,7 +4087,7 @@ var OrderView = Backbone.View.extend({
       return;
     }
     this.model.set({
-      id : orderId,
+      id : orderIds,
       orders : localOrders,
       subtotal : subtotal,
       delivery_fee : delivery_fee
