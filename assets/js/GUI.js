@@ -164,11 +164,11 @@ function changeSelectChefUI(filter){
   if(!filterBtn.length){
     return;
   }
-  var container = $("#chef+div");
+  var container = $("#chef+div").first();
   container.find("img").prop("src", filterBtn.data("picture"));
   container.find("[data-rate]").data("rate", filterBtn.data("rate"));
   container.find("[data-rate]").starSet("show");
-  container.find(".shopName").text(filter.replace(".",""));
+  container.find(".shopName").text(chefFilter.replace(".",""));
   container.find("#likeBtn [data-count]").data("count", filterBtn.data("likes"));
   container.find("#likeBtn [data-count]").text(filterBtn.data("likes"));
   container.find("#likeBtn").data("host", filterBtn.data("host"));
