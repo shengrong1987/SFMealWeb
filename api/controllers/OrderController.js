@@ -2748,7 +2748,13 @@ module.exports = {
     moment.locale('en');
     var weekWanted = req.params['numberOfWeek'];
     var yearWanted = req.query.year;
+    var type = req.query.type;
     var status = req.query.status || { '!' : ['cancel','pending-payment']};
+    var numberOfWeekNow = util.getWeekOfYear(new Date());
+    var yearNow = new Date().getFullYear();
+    if(parseInt(yearWanted) < yearNow || weekWanted < numberOfWeekNow) {
+      status = ['review', 'complete'];
+    }
     Order.find({ status : status }).populate('dishes').exec(function(err, orders){
       if(err){
         return res.badRequest(err);
@@ -2761,38 +2767,8 @@ module.exports = {
       });
       var dishIds = [];
       var newOrders = [];
-      orders.forEach(function(order){
-        var isSamePickup = newOrders.some(function(oldOrder){
-          var _isSame = moment(oldOrder.pickupInfo.pickupFromTime).isSame(moment(order.pickupInfo.pickupFromTime), 'minute') && moment(oldOrder.pickupInfo.pickupTillTime).isSame(moment(order.pickupInfo.pickupTillTime), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
-          if(_isSame){
-            Object.keys(order.orders).forEach(function(dishId){
-              if(oldOrder.orders.hasOwnProperty(dishId)){
-                oldOrder.orders[dishId].number += order.orders[dishId].number;
-              }else{
-                oldOrder.orders[dishId] = order.orders[dishId];
-              }
-            })
-            oldOrder.id += "," + order.id;
-            oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
-            oldOrder.pickupInfo.comment += order.pickupInfo.comment;
-            oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
-            if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
-              oldOrder.charges['cash'] += order.charges['cash'];
-            }
-          }
-          return _isSame;
-        })
-        if(!isSamePickup){
-          newOrders.push(order);
-        }
-      });
-      newOrders.forEach(function(order){
-        dishIds = dishIds.concat(Object.keys(order.orders));
-        dishIds = dishIds.filter(function(item, pos){
-          return dishIds.indexOf(item) === pos;
-        });
-      })
-      async.each(newOrders, function(order, cb){
+      var hostSummary = {};
+      async.each(orders, function(order, cb){
         async.auto({
           findMeal : function(next){
              if(!order.meal){
@@ -2838,6 +2814,15 @@ module.exports = {
                 return next(err);
               }
               order.shopName = host.shopName;
+              if(type === "chef"){
+                if(!hostSummary.hasOwnProperty(order.shopName)){
+                  hostSummary[order.shopName] = {
+                    income : order.subtotal
+                  }
+                }else{
+                  hostSummary[order.shopName].income += order.subtotal;
+                }
+              }
               next();
             })
           }
@@ -2898,7 +2883,14 @@ module.exports = {
         var wantsReport = req.query.report;
         var csv = req.query.csv;
         if(!wantsReport){
-          if(csv){
+          if(type === "chef"){
+            var hostIncomes = Object.keys(hostSummary);
+            hostIncomes = hostIncomes.map(function(shopName){
+              var sumObj = hostSummary[shopName];
+              return [shopName, sumObj.income];
+            });
+            return res.ok(hostIncomes);
+          }else if(csv){
             var csvStr = util.ConvertToCSV(newOrders);
             res.setHeader('Content-disposition', 'attachment; filename=orders.csv');
             res.setHeader('Content-type', 'text/plain');
@@ -2908,6 +2900,37 @@ module.exports = {
             return res.ok(newOrders);
           }
         }
+        orders.forEach(function(order){
+          var isSamePickup = newOrders.some(function(oldOrder){
+            var _isSame = moment(oldOrder.pickupInfo.pickupFromTime).isSame(moment(order.pickupInfo.pickupFromTime), 'minute') && moment(oldOrder.pickupInfo.pickupTillTime).isSame(moment(order.pickupInfo.pickupTillTime), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
+            if(_isSame){
+              Object.keys(order.orders).forEach(function(dishId){
+                if(oldOrder.orders.hasOwnProperty(dishId)){
+                  oldOrder.orders[dishId].number += order.orders[dishId].number;
+                }else{
+                  oldOrder.orders[dishId] = order.orders[dishId];
+                }
+              })
+              oldOrder.id += "," + order.id;
+              oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
+              oldOrder.pickupInfo.comment += order.pickupInfo.comment;
+              oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
+              if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
+                oldOrder.charges['cash'] += order.charges['cash'];
+              }
+            }
+            return _isSame;
+          })
+          if(!isSamePickup){
+            newOrders.push(order);
+          }
+        });
+        newOrders.forEach(function(order){
+          dishIds = dishIds.concat(Object.keys(order.orders));
+          dishIds = dishIds.filter(function(item, pos){
+            return dishIds.indexOf(item) === pos;
+          });
+        })
         var pickups,dishes = [];
         newOrders.forEach(function(order){
           if(!order.pickupInfo){
