@@ -205,9 +205,9 @@ module.exports = {
 
   getJobs : function(criteria, value, skip){
     if(criteria && value){
-      var url = "/job?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
+      var url = "/job?" + criteria + "=" + value;
     }else{
-      var url = "/job?sort=createdAt DESC&skip=" + skip;
+      var url = "/job";
     }
     $.ajax({
       url: url,

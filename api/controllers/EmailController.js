@@ -97,7 +97,7 @@ module.exports = {
               if(!meal){
                 return cb({ code : -4, responseText : "no results"});
               }
-              Order.find({ meal : mealId, status : status}).exec(function(err, orders){
+              Order.find({ meal : mealId, status : status }).exec(function(err, orders){
                 if(err){
                   return cb(err);
                 }
@@ -126,20 +126,21 @@ module.exports = {
                       var orderDetail = order.orders[dishId];
                       if(orderSummary.hasOwnProperty(dishId)){
                         if(order.orders[dishId].number){
-                          orderSummary[dishId].amount += orderDetail.number;
-                          orderDetail.preference.forEach(function(prefs){
-                            sails.log.info(prefs, prefs.property);
-                            if(prefs.property.length){
-                              prefs.property.forEach(function(prop){
-                                if(orderSummary[dishId].preference){
-                                  orderSummary[dishId].preference += ",";
-                                }
-                                if(prop.property && prop.property !== "undefined"){
-                                  orderSummary[dishId].preference += prop.property;
-                                }
-                              })
-                            }
-                          })
+                          orderSummary[dishId].amount = parseInt(orderDetail.number) + parseInt(orderSummary[dishId].amount);
+                          if(orderDetail.preference && Array.isArray(orderDetail.preference)){
+                            orderDetail.preference.forEach(function(prefs){
+                              if(prefs.property && Array.isArray(prefs.property)){
+                                prefs.property.forEach(function(prop){
+                                  if(orderSummary[dishId].preference){
+                                    orderSummary[dishId].preference += ",";
+                                  }
+                                  if(prop.property && prop.property !== "undefined"){
+                                    orderSummary[dishId].preference += prop.property;
+                                  }
+                                })
+                              }
+                            })
+                          }
                         }
                       }else if(order.orders[dishId].number){
                         var dishObj = {};
@@ -147,19 +148,20 @@ module.exports = {
                         dishObj.amount = orderDetail.number;
                         dishObj.price = orderDetail.price;
                         dishObj.preference = "";
-                        orderDetail.preference.forEach(function(prefs){
-                          sails.log.info(prefs.property);
-                          if(prefs.property.length){
-                            prefs.property.forEach(function(prop){
-                              if(dishObj.preference){
-                                dishObj.preference += ",";
-                              }
-                              if(prop.property && prop.property !== "undefined"){
-                                dishObj.preference += prop.property;
-                              }
-                            })
-                          }
-                        })
+                        if(orderDetail.preference && Array.isArray(orderDetail.preference)){
+                          orderDetail.preference.forEach(function(prefs){
+                            if(prefs.property && Array.isArray(prefs.property)){
+                              prefs.property.forEach(function(prop){
+                                if(dishObj.preference){
+                                  dishObj.preference += ",";
+                                }
+                                if(prop.property && prop.property !== "undefined"){
+                                  dishObj.preference += prop.property;
+                                }
+                              })
+                            }
+                          })
+                        }
                         orderSummary[dishId] = dishObj;
                       }
                     })
