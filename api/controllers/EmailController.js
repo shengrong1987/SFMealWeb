@@ -128,14 +128,17 @@ module.exports = {
                         if(order.orders[dishId].number){
                           orderSummary[dishId].amount += orderDetail.number;
                           orderDetail.preference.forEach(function(prefs){
-                            prefs.property.forEach(function(prop){
-                              if(orderSummary[dishId].preference){
-                                orderSummary[dishId].preference += ",";
-                              }
-                              if(prop.property && prop.property !== "undefined"){
-                                orderSummary[dishId].preference += prop.property;
-                              }
-                            })
+                            sails.log.info(prefs, prefs.property);
+                            if(prefs.property.length){
+                              prefs.property.forEach(function(prop){
+                                if(orderSummary[dishId].preference){
+                                  orderSummary[dishId].preference += ",";
+                                }
+                                if(prop.property && prop.property !== "undefined"){
+                                  orderSummary[dishId].preference += prop.property;
+                                }
+                              })
+                            }
                           })
                         }
                       }else if(order.orders[dishId].number){
@@ -145,14 +148,17 @@ module.exports = {
                         dishObj.price = orderDetail.price;
                         dishObj.preference = "";
                         orderDetail.preference.forEach(function(prefs){
-                          prefs.property.forEach(function(prop){
-                            if(dishObj.preference){
-                              dishObj.preference += ",";
-                            }
-                            if(prop.property && prop.property !== "undefined"){
-                              dishObj.preference += prop.property;
-                            }
-                          })
+                          sails.log.info(prefs.property);
+                          if(prefs.property.length){
+                            prefs.property.forEach(function(prop){
+                              if(dishObj.preference){
+                                dishObj.preference += ",";
+                              }
+                              if(prop.property && prop.property !== "undefined"){
+                                dishObj.preference += prop.property;
+                              }
+                            })
+                          }
                         })
                         orderSummary[dishId] = dishObj;
                       }
