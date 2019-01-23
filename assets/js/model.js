@@ -3329,10 +3329,10 @@ var MealConfirmView = Backbone.View.extend({
   initMethodView : function(){
     var hasDelivery = this.$el.find("#pickupInfoView").data("hasdelivery");
     if(hasDelivery){
-      this.$el.find(".pickupInput").removeClass('d-none').hide();
+      this.$el.find(".pickupInput").hide();
       this.$el.find(".deliveryInput").show();
     }else{
-      this.$el.find(".pickupInput").removeClass('d-none');
+      this.$el.find(".pickupInput").show();
       this.$el.find(".deliveryInput").hide();
     }
     var method = $("#pickupMethodView #method .active").attr("value");

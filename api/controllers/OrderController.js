@@ -2747,7 +2747,10 @@ module.exports = {
   findOrdersOfWeek : function(req, res){
     moment.locale('en');
     var weekWanted = req.params['numberOfWeek'];
+    var date = parseInt(weekWanted) *  7;
     var yearWanted = req.query.year;
+    var beginDate = moment().set('year',yearWanted).set('date',date-6).set('hour',0);
+    var endDate = moment().set('year',yearWanted).set('date',date).set('hour',0);
     var type = req.query.type;
     var status = req.query.status || { '!' : ['cancel','pending-payment']};
     var numberOfWeekNow = util.getWeekOfYear(new Date());
@@ -2755,7 +2758,7 @@ module.exports = {
     if(parseInt(yearWanted) < yearNow || weekWanted < numberOfWeekNow) {
       status = ['review', 'complete'];
     }
-    Order.find({ status : status }).populate('dishes').exec(function(err, orders){
+    Order.find({ status : status, "pickupInfo.pickupFromTime" : { '>=' : beginDate.toISOString(), '<' : endDate.toISOString()}}).populate('dishes').exec(function(err, orders){
       if(err){
         return res.badRequest(err);
       }
@@ -2902,7 +2905,7 @@ module.exports = {
         }
         orders.forEach(function(order){
           var isSamePickup = newOrders.some(function(oldOrder){
-            var _isSame = moment(oldOrder.pickupInfo.pickupFromTime).isSame(moment(order.pickupInfo.pickupFromTime), 'minute') && moment(oldOrder.pickupInfo.pickupTillTime).isSame(moment(order.pickupInfo.pickupTillTime), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
+            var _isSame = moment(new Date(oldOrder.pickupInfo.pickupFromTime).toISOString()).isSame(moment(new Date(order.pickupInfo.pickupFromTime).toISOString()), 'minute') && moment(oldOrder.pickupInfo.pickupTillTime).isSame(moment(order.pickupInfo.pickupTillTime), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
             if(_isSame){
               Object.keys(order.orders).forEach(function(dishId){
                 if(oldOrder.orders.hasOwnProperty(dishId)){
@@ -2964,6 +2967,145 @@ module.exports = {
         res.view('report', { meal : { orders : newOrders, pickups : pickups, dishes : dishes }});
       });
     });
+  },
+
+  data : function(req, res){
+    var _this = this;
+    var type = req.query.type;
+    var year = req.query.year;
+    this.getOrdersByYear(year, req.query,function(err, orders){
+      if(err){
+        return res.badRequest(err);
+      }
+      var orderList = _this.analystOrders(orders);
+      return res.ok(orderList);
+    });
+  },
+
+  getOrdersByYear : function(year, query, cb){
+    var limit = parseInt(query.limit) || 100;
+    var skip = parseInt(query.skip) || 0;
+    var beginDate = moment().set('year',year).set('month',0).set('date',1).set('hour',0);
+    var endDate = moment().set('year',parseInt(year)+1).set('month',0).set('date',1).set('hour',0);
+    if(query.weeks){
+      var startWeek = parseInt(query.weeks.split("-")[0]);
+      beginDate = moment().set('year',year).isoWeek(startWeek).isoWeekday(1).set('hour',0);
+      var endWeek = parseInt(query.weeks.split("-")[1]);
+      endDate = moment().set('year',year).isoWeek(endWeek).isoWeekday(7).set('hour',23);
+      limit = 9999;
+      skip = 0;
+    }else if(query.months){
+      var startMonth = parseInt(query.months.split("-")[0])-1;
+      beginDate = moment().set('year',year).set('month',startMonth).set('date',1).set('hour',0);
+      var endMonth = parseInt(query.months.split("-")[1])-1;
+      endDate = moment().set('year',year).set('month', endMonth).set('date',31).set('hour',0);
+      limit = 9999;
+      skip = 0;
+    }
+    Order.find( { status : ['review', 'complete'], 'pickupInfo.pickupFromTime' : { '>=' : beginDate.toISOString(), '<' : endDate.toISOString()}}).limit(limit).skip(skip).sort('createdAt ASC').exec(function(err, orders){
+      if(err){
+        return cb(err);
+      }
+      var newOrders = [], dishIds = [];
+      orders.forEach(function(order){
+        var isSamePickup = newOrders.some(function(oldOrder){
+          var _isSame = moment(new Date(oldOrder.pickupInfo.pickupFromTime).toISOString()).isSame(moment(new Date(order.pickupInfo.pickupFromTime).toISOString()), 'minute') && moment(oldOrder.pickupInfo.pickupTillTime).isSame(moment(order.pickupInfo.pickupTillTime), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
+          if(_isSame){
+            Object.keys(order.orders).forEach(function(dishId){
+              if(oldOrder.orders.hasOwnProperty(dishId)){
+                oldOrder.orders[dishId].number += order.orders[dishId].number;
+              }else{
+                oldOrder.orders[dishId] = order.orders[dishId];
+              }
+            })
+            oldOrder.id += "," + order.id;
+            oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
+            oldOrder.pickupInfo.comment += order.pickupInfo.comment;
+            oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
+            if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
+              oldOrder.charges['cash'] += order.charges['cash'];
+            }
+          }
+          return _isSame;
+        })
+        if(!isSamePickup){
+          newOrders.push(order);
+        }
+      });
+      newOrders.forEach(function(order){
+        dishIds = dishIds.concat(Object.keys(order.orders));
+        dishIds = dishIds.filter(function(item, pos){
+          return dishIds.indexOf(item) === pos;
+        });
+      })
+      cb(null, newOrders);
+    });
+  },
+
+  analystOrders : function(orders){
+    if(!orders || !orders.length){
+      return {};
+    }
+    var firstDate = moment(orders[0].pickupInfo.pickupFromTime);
+    var firstWeek = firstDate.isoWeek();
+    var firstMonth = firstDate.month();
+    var lastDate = moment(orders[orders.length-1].pickupInfo.pickupFromTime);
+    var lastWeek = lastDate.isoWeek();
+    var lastMonth = lastDate.month();
+    var orderList = {
+      weeks : [],
+      months : []
+    };
+    for(var i=firstWeek; i <= lastWeek; i++){
+      orderList.weeks[i] = { "week" : i, "wau(周活跃订单)" : this.getActiveUsersByType(i,'week',orders), "wur(周留存率)" : this.getUserRetentionByType(i, 'week', orders)};
+    }
+    for(var j=firstMonth; j <= lastMonth; j++){
+      orderList.months[j] = { "month" : j+1, "mau(月活跃订单)" : this.getActiveUsersByType(j,'month',orders), "mur(月留存率)" : this.getUserRetentionByType(j, 'month', orders)};
+    }
+    return orderList;
+  },
+
+  getActiveUsersByType : function(num, filterType, orders){
+    orders = orders.filter(function(order){
+      var pickupDate = order.pickupInfo.pickupFromTime;
+      if(filterType === "week"){
+        return num === moment(pickupDate).isoWeek();
+      }else if(filterType === "month"){
+        return num === moment(pickupDate).month();
+      }
+    })
+    return orders.length;
+  },
+
+  getUserRetentionByType : function(num, filterType, orders){
+    var ordersOfLastWeek = orders.filter(function(order){
+      var pickupDate = order.pickupInfo.pickupFromTime;
+      if(filterType === "week"){
+        return (num-1) === moment(pickupDate).isoWeek();
+      }else if(filterType === "month"){
+        return (num-1) === moment(pickupDate).month();
+      }
+    });
+    if(!ordersOfLastWeek.length){
+      return "100%";
+    }
+    var repeatOrderThisWeek = orders.filter(function(order){
+      var pickupDate = order.pickupInfo.pickupFromTime;
+      var phone = order.customerPhone;
+      var hasPhoneLastWeek = !!ordersOfLastWeek.filter(function(order){
+        return order.customerPhone === phone;
+      }).length;
+      if(filterType === "week"){
+        return num === moment(pickupDate).isoWeek() && hasPhoneLastWeek;
+      }else if(filterType === "month"){
+        return num === moment(pickupDate).month() && hasPhoneLastWeek;
+      }
+    })
+    var seen = {};
+    repeatOrderThisWeek = repeatOrderThisWeek.filter(function(order){
+      return seen.hasOwnProperty(order.customerPhone) ? false : (seen[order.customerPhone] = true);
+    })
+    return ((repeatOrderThisWeek.length / ordersOfLastWeek.length) * 100).toFixed(2) + "%";
   }
 };
 
