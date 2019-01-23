@@ -47,25 +47,25 @@ module.exports.policies = {
   },
 
   UserController : {
-    '*' : 'or(and(sessionAuth, sessionSelf),isAdmin)',
+    '*' : 'or(and(sessionAuth,localize,sessionSelf),isAdmin)',
     'create' : false,
     'calculateSignature' : 'sessionAuth',
-    'becomeHost' : 'or(and(sessionAuth, notHost),isAdmin)',
+    'becomeHost' : 'or(and(sessionAuth,localize,notHost),isAdmin)',
     'pocket' : 'or(sessionAuth,isAdmin)',
-    'me' : ['sessionAuth'],
-    'contactForm' : 'sessionAuth',
+    'me' : ['sessionAuth','localize'],
+    'contactForm' : ['sessionAuth','localize'],
     'search' : 'isAdmin',
     'deleteUserFile' : 'or(sessionAuth,isAdmin)',
     'update' : 'or(and(sessionAuth, sessionSelf, isNotFields("status","pocket","host","customerId","referralBonus","referralCode","points","emailVerified")),isAdmin)',
     'verify' : true,
     'reward' : true,
-    'sendEmailVerification' : 'or(sessionAuth,isAdmin)',
+    'sendEmailVerification' : 'or(and(sessionAuth,localize),isAdmin)',
     'activate' : 'isAdmin',
     'deactivate' : 'isAdmin',
     'clean' : 'isAdmin',
     'invite' : true,
     'join' : true,
-    'emailVerificationView' : 'sessionAuth',
+    'emailVerificationView' : ['sessionAuth','localize'],
     'redeemReward' : true
   },
 
@@ -74,20 +74,19 @@ module.exports.policies = {
   },
 
   MealController : {
-    '*' : 'or(and(sessionAuth,isHost,isOwnerOfMeal),isAdmin)',
+    '*' : 'or(and(sessionAuth,localize,isHost,isOwnerOfMeal),isAdmin)',
     'create' : 'or(and(sessionAuth,isHost),isAdmin)',
     'new_form' : ['sessionAuth','isHost'],
     'feature' : true,
-    'find' : true,
+    'find' : 'localize',
     'findOne' : true,
-    'search' : true,
-    'checkout' : true,
-    'catering' : true,
+    'search' : 'localize',
+    'checkout' : 'localize',
+    'catering' : 'localize',
     'findAll' : 'isAdmin',
     'searchAll' : 'isAdmin',
     'findReview' : 'isAdmin',
     'findOrder' : 'isAdmin',
-    'dayOfMeal' : true,
     'update' : 'or(and(sessionAuth,isHost,isOwnerOfMeal,isNotFields("isScheduled","chef","score","numberOfReviews","msg","commission")),isAdmin)'
   },
 
@@ -107,7 +106,7 @@ module.exports.policies = {
     'findReview' : 'isAdmin',
     'findMeal' : 'isAdmin',
     'findDish' : 'isAdmin',
-    'hostPage' : true
+    'hostPage' : 'localize'
   },
 
   PaymentController : {

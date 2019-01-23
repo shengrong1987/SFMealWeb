@@ -137,7 +137,7 @@ module.exports = {
 
   find : function(req,res){
     //find out meals that provide start today or ends today
-    moment.locale('zh-cn');
+    moment.locale(req.getLocale());
     var _this = this;
     var pickupNickname = req.param('pickup');
     var county = req.cookies['county'] || req.param('county') || "San Francisco County";
@@ -205,8 +205,8 @@ module.exports = {
           var tagOrder = {
             "chef" : 201,
             "select" : 200,
-            "小龙虾" : 195,
-            "限时礼品" : 190,
+            "crawfish" : 195,
+            "gift" : 190,
             "limited" : 180,
             "frozen" : 170,
             "dessert" : 150

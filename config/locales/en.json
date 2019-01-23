@@ -948,5 +948,6 @@
   "follow-tip" : "You will receive email updates of chef's new dishes and weekly menu.",
   "no-meal-tip" : "Next week's menu is on the way, meanwhile you can browse our chef's dishes, leave a like if you like.",
   "no-email-can-not-follow" : "You need to enter email to receive update from chef",
-  "catering-minimal-tip" : "The minimal size required to provide food on customized date?"
+  "catering-minimal-tip" : "The minimal size required to provide food on customized date?",
+  "crawfish" : "Crawfish"
 }

@@ -1215,7 +1215,7 @@ var DayOfMealView = Backbone.View.extend({
       if(activeFilters.length){
         dateFilter = activeFilters.data("filter");
       }else{
-        dateFilter = this.$el.find("#dishDatesBar nav-link").data("filter");
+        dateFilter = this.$el.find("#dishDatesBar .nav-link").data("filter");
       }
     }
     dateMixer.filter(dateFilter);

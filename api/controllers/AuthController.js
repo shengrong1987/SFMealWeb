@@ -137,6 +137,9 @@ module.exports = require('waterlock').waterlocked({
             u[0].auth = user.auth;
             req.session.user = u[0];
             req.session.authenticated = true;
+            req.setLocale(attrs.language);
+            sails.log.info("setting language from wechat: " + attrs.language);
+
             var host = process.env.NODE_ENV === 'production' ? process.env.BASE_URL : process.env.LOCAL_HOST;
             attrs.verificationUrl = host + "/user/verify/" + u[0].verifyToken.token;
             //notification.sendEmail("User","verification",attrs,req);

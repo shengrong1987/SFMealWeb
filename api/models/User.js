@@ -216,6 +216,7 @@ module.exports = {
         var picture = auth.picture ? auth.picture.data.url : ( auth.headimgurl || '');
         var state = auth.location ? ( auth.location.name ? auth.location.name.split(",")[1] : '') : ( auth.province || 'California');
         var gender = auth.gender || (auth.sex === 1 ? "male" : "female");
+        var language = auth.language;
         sails.log.info("code created: " + referralCode);
         var params = {
           firstname: firstName,
@@ -228,7 +229,8 @@ module.exports = {
           city: city,
           state: state,
           referralCode : referralCode,
-          emailVerified : emailVerified
+          emailVerified : emailVerified,
+          language : language
         }
         User.update(user.id, params).exec(function(err, user){
           if(err){
