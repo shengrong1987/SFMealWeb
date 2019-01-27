@@ -162,56 +162,58 @@
         </div>
         <div id="dishContentView">
             <% tags.forEach(function(tag){ if(tag !== "chef"){ %>
-              <div class="pl-4 py-2 text-center light-grey border" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag.replace("'","").replace(" ","")%>">
-                <h6 class="none" style="min-width: 80px;"><%= __(tag)%></h6>
-              </div>
-            <%
-              var dateList = Object.keys(meals.meals);
-              dateList.forEach(function(dateKey){
-              var mealObj = meals.meals[dateKey];
-              var actualMeals = mealObj.meals;
-              var _dishes = [];
-              actualMeals.forEach(function(meal){ meal.dishes.forEach(function(dish){
-              if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
-            %>
-              <% if(dish.type === tag || (dish.tags && dish.tags.includes(tag))){%>
-                <div style="display:none;" data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem py-2 mix item <%= meal.chef.shopName.replace("'","").replace(" ","")%> <%= dateKey.replace(" ",'').replace('/','')%>
-                  <% if(dish.tags){ dish.tags.forEach(function(t){%>
-                    <%= " " + t%>
-                  <%})}%>">
-                  <div class="d-flex flex-row justify-content-around">
-                    <div class="photo text-center rounded mr-2">
-                      <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
-                      <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
-                        <img src="/images/blank.gif" data-echo="<%= index===0? photo.v : ''%>">
-                      </a>
-                      <% }});%>
-                    </div>
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-auto"><%= dish.title%>
-                        <small>
-                          <%= dish.quantity%><br/>
-                          <span class="text-red"><%= __('ends')%> <%= meal.getTimeDiff(meal.provideTillTime, locale)%></span>
-                        </small>
-                      </h6>
-                      <div class="d-flex vertical-align">
-                        <div class="text text-price price mr-2" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
-                          $<%= dish.price.toFixed(2)%>
-                        </div>
-                        <div class="input-group input-group-sm amount-input round ml-auto" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
-                          <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">
-                            <span class="input-group-text">-</span>
+              <div>
+              D!W<div class="pl-4 py-2 text-center light-grey border" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag.replace("'","").replace(" ","")%>">
+                  <h6 class="none" style="min-width: 80px;"><%= __(tag)%></h6>
+                </div>
+              <%
+                var dateList = Object.keys(meals.meals);
+                dateList.forEach(function(dateKey){
+                var mealObj = meals.meals[dateKey];
+                var actualMeals = mealObj.meals;
+                var _dishes = [];
+                actualMeals.forEach(function(meal){ meal.dishes.forEach(function(dish){
+                if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
+              %>
+                <% if(dish.type === tag || (dish.tags && dish.tags.includes(tag))){ %>
+                  <div style="display:none;" data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem py-2 mix item <%= meal.chef.shopName.replace("'","").replace(" ","")%> <%= dateKey.replace(" ",'').replace('/','')%>
+                    <% if(dish.tags){ dish.tags.forEach(function(t){%>
+                      <%= " " + t%>
+                    <%})}%>">
+                    <div class="d-flex flex-row justify-content-around">
+                      <div class="photo text-center rounded mr-2">
+                        <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
+                        <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
+                          <img src="/images/blank.gif" data-echo="<%= index===0? photo.v : ''%>">
+                        </a>
+                        <% }});%>
+                      </div>
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-auto"><%= dish.title%>
+                          <small>
+                            <%= dish.quantity%><br/>
+                            <span class="text-red"><%= __('ends')%> <%= meal.getTimeDiff(meal.provideTillTime, locale)%></span>
+                          </small>
+                        </h6>
+                        <div class="d-flex vertical-align">
+                          <div class="text text-price price mr-2" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
+                            $<%= dish.price.toFixed(2)%>
                           </div>
-                          <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
-                          <div class="input-group-append add" onclick="javascript:orderFood('<%= dish.id %>',1,true)">
-                            <span class="input-group-text">+</span>
+                          <div class="input-group input-group-sm amount-input round ml-auto" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
+                            <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">
+                              <span class="input-group-text">-</span>
+                            </div>
+                            <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
+                            <div class="input-group-append add" onclick="javascript:orderFood('<%= dish.id %>',1,true)">
+                              <span class="input-group-text">+</span>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              <% }}})})})}});%>
+                <% }}})})})}});%>
+              </div>
         </div>
         <div id="shoppingCartView" class="red text-white p-2 align-middle d-block w-100" style="line-height:50px;position: fixed;bottom: 0;left: 0;z-index:90;" onclick="javascript:location.href='#order'">
           <div class="row">

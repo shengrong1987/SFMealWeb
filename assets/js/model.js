@@ -2856,7 +2856,6 @@ var HostPageView = Backbone.View.extend({
   like : function(e){
     e.preventDefault();
     this.model.action = "like";
-    this.alertView.hide();
     var countView = $(e.currentTarget).find("[data-count]");
     var likeCount = countView.data('count');
     var $this = this;

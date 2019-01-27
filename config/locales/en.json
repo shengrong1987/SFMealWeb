@@ -880,6 +880,7 @@
   "email-unverified" : "Email Unverified",
   "email-verification-tips" : "You need to verify your email to use coupon.",
   "email-verification-resend" : "Resend verification email",
+  "email-token-invalid" : "The current link you enter might not from the lastest email, please check your inbox for latest email.",
   "verify-email" : "Verify Email",
   "chicken-dinner" : "Winner Winner, Chicken Diner",
   "catering-option" : "Click here to switch between catering and normal order.",
@@ -949,5 +950,6 @@
   "no-meal-tip" : "Next week's menu is on the way, meanwhile you can browse our chef's dishes, leave a like if you like.",
   "no-email-can-not-follow" : "You need to enter email to receive update from chef",
   "catering-minimal-tip" : "The minimal size required to provide food on customized date?",
-  "crawfish" : "Crawfish"
+  "crawfish" : "Crawfish",
+  "chef-dish-empty" : "Chef don't have dish today, please switch date above."
 }

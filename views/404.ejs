@@ -42,64 +42,47 @@
     <div class="default-container">
       <div class="fourohfour text-center">
         <div class="main">
-          <h1>
-            <%= __('pageNotFoundError')%><br/>
-            <small><%= __('pageNotFoundSubtitle')%></small>
-          </h1>
+          <div class="card-body">
+            <h4 class="card-title">
+              <% if (typeof error !== 'undefined') { %>
+                <%= error %>
+              <% } else { %>
+                <%
+                  var errorMsg = __('pageNotFoundError');
+                  if(data){
+                    if(data.responseText){
+                      errorMsg = data.responseText;
+                    }else{
+                      errorMsg = data;
+                    }
+                  }
+                %>
+                <%= errorMsg%>
+              <% } %>
+            </h4>
+          </div>
+
           <div class="row vertical-align">
-            <div class="col-xs-5">
+            <div class="col-5">
               <div class="divider"></div>
             </div>
-            <div class="col-xs-2">
+            <div class="col-2">
               <%= __('today-special')%>
             </div>
-            <div class="col-xs-5">
+            <div class="col-5">
               <div class="divider"></div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-sm-4">
-              <div class="box-email white">
-                <img class="cursor-pointer" src="/images/404_1.jpg" style="width: 100%;" onclick="javascript:location.href='/meal/search?keyword=appetizer&type=order'">
-              </div>
-            </div>
-            <div class="col-sm-4">
-              <div class="box-email white">
-                <img class="cursor-pointer" src="/images/404_2.jpg" style="width: 100%;" onclick="javascript:location.href='/meal/search?keyword=entree&type=order'">
-              </div>
-            </div>
-            <div class="col-sm-4">
-              <div class="box-email white">
-                <img class="cursor-pointer" src="/images/404_3.jpg" style="width: 100%;" onclick="javascript:location.href='/meal/search?keyword=dessert&type=order'">
-              </div>
-            </div>
-          </div>
+
           <div class="row vertical-align">
-            <div class="col-xs-5">
+            <div class="col-5">
               <div class="divider"></div>
             </div>
-            <div class="col-xs-2">
+            <div class="col-2">
               <%= __('next-week-preorder')%>
             </div>
-            <div class="col-xs-5">
+            <div class="col-5">
               <div class="divider"></div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-4">
-              <div class="box-email white">
-                <img class="cursor-pointer" src="/images/404_4.jpg" style="width: 100%;" onclick="javascript:location.href='/meal/search?keyword=appetizer&type=preorder'">
-              </div>
-            </div>
-            <div class="col-sm-4">
-              <div class="box-email white">
-                <img class="cursor-pointer" src="/images/404_5.jpg" style="width: 100%;" onclick="javascript:location.href='/meal/search?keyword=entree&type=preorder'">
-              </div>
-            </div>
-            <div class="col-sm-4">
-              <div class="box-email white">
-                <img class="cursor-pointer" src="/images/404_6.jpg" style="width: 100%;" onclick="javascript:location.href='/meal/search?keyword=dessert&type=preorder'">
-              </div>
             </div>
           </div>
         </div>

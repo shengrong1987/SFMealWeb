@@ -454,7 +454,7 @@ module.exports = require('waterlock').actions.user({
         return res.forbidden(err);
       }
       if(!user){
-        return res.notFound({ code : -2, responseText : "can not find user"});
+        return res.forbidden({ code : -2, responseText : req.__('email-token-invalid')});
       }
       if(user.emailVerified){
         return res.redirect("/user/me#myinfo");
@@ -511,11 +511,16 @@ module.exports = require('waterlock').actions.user({
 
   reward : function(req, res){
     var type = req.params.type;
-    if(type === "newUser"){
-      return res.view("newUserReward", { layout : 'popup', user : req.session.user});
-    }else{
-      return res.ok();
-    }
+    User.findOne(req.session.user.id).exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(type === "newUser"){
+        return res.view("newUserReward", { layout : 'popup', user : user});
+      }else{
+        return res.ok();
+      }
+    });
   },
 
   activate : function(req, res){
