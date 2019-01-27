@@ -94,8 +94,8 @@
                 <div class="mr-2">
                   <img onclick="location.href='/host/public/<%= hosts[0].id%>'" src="<%= hosts[0].picture%>" class="size-small rounded-circle cursor-pointer">
                 </div>
-                <div data-toggle="tooltip" data-placement="right" title="<%= (hosts[0].avgScore || 5).toFixed(1)%>">
-                  <div class="rating small-rating" data-toggle="star-set" data-rate="<%= (hosts[0].avgScore || 5).toFixed(1)%>">
+                <div data-toggle="tooltip" data-placement="right" title="<%= (parseFloat(hosts[0].avgScore) || 5).toFixed(1)%>">
+                  <div class="rating small-rating" data-toggle="star-set" data-rate="<%= (parseFloat(hosts[0].avgScore) || 5).toFixed(1)%>">
                     <i class="fa fa-star d-block"></i>
                     <i class="fa fa-star d-block"></i>
                     <i class="fa fa-star d-block"></i>
@@ -162,10 +162,9 @@
         </div>
         <div id="dishContentView">
             <% tags.forEach(function(tag){ if(tag !== "chef"){ %>
-              <div>
-              D!W<div class="pl-4 py-2 text-center light-grey border" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag.replace("'","").replace(" ","")%>">
-                  <h6 class="none" style="min-width: 80px;"><%= __(tag)%></h6>
-                </div>
+              <div class="pl-4 py-2 text-center light-grey border" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag.replace("'","").replace(" ","")%>">
+                <h6 class="none" style="min-width: 80px;"><%= __(tag)%></h6>
+              </div>
               <%
                 var dateList = Object.keys(meals.meals);
                 dateList.forEach(function(dateKey){
@@ -213,7 +212,6 @@
                     </div>
                   </div>
                 <% }}})})})}});%>
-              </div>
         </div>
         <div id="shoppingCartView" class="red text-white p-2 align-middle d-block w-100" style="line-height:50px;position: fixed;bottom: 0;left: 0;z-index:90;" onclick="javascript:location.href='#order'">
           <div class="row">

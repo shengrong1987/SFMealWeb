@@ -1232,7 +1232,7 @@ var DayOfMealView = Backbone.View.extend({
       if(activeFilters.length){
         chefFilter = activeFilters.data("filter");
       }else{
-        chefFilter = this.$el.find("#hostBarView nav-link").data("filter");
+        chefFilter = this.$el.find("#hostBarView .nav-link").data("filter");
       }
     }
     chefMixer.setFilterGroupSelectors('date',dateFilter);

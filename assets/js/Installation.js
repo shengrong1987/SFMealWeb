@@ -64,6 +64,7 @@ function initHashTag(){
     var tab = $("[data-href='"+hashtag+"']");
     tab.tab('select');
     hashtag = hashtag.replace("#","");
+    hashtag = decodeURIComponent(hashtag);
     if(dateObjs.hasOwnProperty(hashtag)){
       var hashTagCN = dateObjs[hashtag];
       hashTagCN = "." + hashTagCN;
@@ -76,11 +77,17 @@ function initHashTag(){
       hashtag = hashTagCN;
     }
     if(filter && filter.length){
-      if(dateMixer){
+      var filterType = filter.data("filter-type");
+      if(filterType === "date" && dateMixer){
         dateMixer.filter(hashtag);
         createCookie("date", hashtag.replace(".",""));
         $("#dishDatesBar li").removeClass("active");
         $("#dishDatesBar [data-filter='" + hashtag + "']").parent().addClass("active");
+      }else if(filterType === "chef" && chefMixer){
+        chefMixer.filter(hashtag);
+        createCookie("chef", hashtag.replace(".",""));
+        $("#hostBarView li").removeClass("active");
+        $("#hostBarView [data-filter='" + hashtag + "']").parent().addClass("active");
       }
     }
   }
