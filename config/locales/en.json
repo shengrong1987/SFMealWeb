@@ -537,8 +537,8 @@
   "order-pickup-option-error": "The order pick-up location is incorrect",
   "order-pickup-option-invalid-error" : "The order pick-up option is not valid.",
   "order-ok": "Your order has been placed successfully and you will be transferred to the order management page. Please wait for your food to be cooked.",
-  "order-adjust-ok": "Order adjustment has completed, $%f has been deducted from the user's account",
-  "order-adjust-ok2": "Order adjustment has completed and returned $%f to foodie account",
+  "order-adjust-ok": "Order adjustment has completed, $%s has been deducted from the user's account",
+  "order-adjust-ok2": "Order adjustment has completed and returned $%s to foodie account",
   "order-adjust-ok3": "Order adjustment is complete and the amount unchanged",
   "order-adjust-request-user": "Order adjustment request has been submitted, waiting for the chef to confirm.",
   "order-adjust-request-host": "Order adjustment request has been submitted, waiting for the foodie to confirm.",
@@ -951,5 +951,6 @@
   "no-email-can-not-follow" : "You need to enter email to receive update from chef",
   "catering-minimal-tip" : "The minimal size required to provide food on customized date?",
   "crawfish" : "Crawfish",
-  "chef-dish-empty" : "Chef don't have dish today, please switch date above."
+  "chef-dish-empty" : "Chef don't have dish today, please switch date above.",
+  "festival" : "Festival"
 }

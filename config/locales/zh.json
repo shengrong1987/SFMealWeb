@@ -956,5 +956,6 @@
   "no-email-can-not-follow" : "你需要填写邮箱，才能接收私厨菜单",
   "catering-minimal-tip" : "如果有另外的团餐需求，最少多少份可以提供此菜式？",
   "crawfish" : "小龙虾",
-  "chef-dish-empty" : "厨师本日没有提供菜式，请点击上方查看其他时间。"
+  "chef-dish-empty" : "厨师本日没有提供菜式，请点击上方查看其他时间。",
+  "festival" : "节日必备"
 }
