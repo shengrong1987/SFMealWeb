@@ -646,8 +646,52 @@ describe('OrderController', function() {
     });
 
     var _multipleOrderId;
-    var _multipleOrderId2;
+    var _multipleOrderId2
     describe("take order with multiple meals", function(){
+
+      var guestId;
+
+      it('should get user info', function(done){
+        agent
+          .get('/user/me')
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            guestId = res.body.id;
+            done()
+          })
+      });
+
+      it('should login admin', function(done){
+        agent
+          .post('/auth/login?type=local')
+          .send({email : adminEmail, password: password})
+          .expect(302)
+          .expect('Location','/auth/done')
+          .end(done)
+      })
+
+      it('should update the user points', function (done) {
+        agent
+          .put('/user/' + guestId)
+          .send({
+            points : userPoints+350,
+            emailVerified : true
+          })
+          .expect(200)
+          .end(done)
+      });
+
+      it('should login as guest', function (done) {
+        agent
+          .post('/auth/login?type=local')
+          .send({email : guestEmail, password: password})
+          .expect(302)
+          .expect("Location","/auth/done")
+          .end(done)
+      });
 
       it('should take order with multiple meals', function (done) {
         var dishObj = {};
@@ -666,7 +710,8 @@ describe('OrderController', function() {
             pickupOption : 2,
             pickupMeal : mealId,
             pickupDate : 'today',
-            tip : 0
+            tip : 0,
+            points : 350
           })
           .expect(200)
           .end(function(err,res){
@@ -676,9 +721,12 @@ describe('OrderController', function() {
             res.body.orders.should.have.length(2);
             dish1LeftQty--;
             var o = res.body.orders[0];
+            var o2 = res.body.orders[1];
+            o.discountAmount.should.be.equal(price1 * 1 + price2 * 2);
             o.customer.should.be.equal(guestId);
             o.customerName.should.be.equal("sheng");
             o.pickupInfo.comment.should.be.equal("hhh");
+            o2.discountAmount.should.be.equal(35-price1-price2*2);
             _multipleOrderId = o.id;
             _multipleOrderId2 = res.body.orders[1].id;
             done();
@@ -1798,6 +1846,7 @@ describe('OrderController', function() {
             }
             var o = res.body.orders[0];
             var applicationFee = price1 * 0.2 * 100;
+            o.guestEmail.should.be.equal(guestEmail);
             o.discountAmount.should.be.equal(1);
             o.discount.should.be.equal(1);
             o.transfer[Object.keys(o.transfer)[0]].should.be.equal(100);

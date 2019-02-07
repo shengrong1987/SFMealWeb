@@ -165,7 +165,7 @@ module.exports = require('waterlock').actions.user({
       if (err) {
         return cb(err);
       }
-      if(params.email && user.auth.email && !isAdmin){
+      if(params.email && user.auth.email && !isAdmin && user.auth.email !== params.email){
         return res.badRequest({ code : -6, responseText : req.__('user-email-can-not-change')});
       }
       var email = user.auth.email || params.email;
@@ -511,6 +511,9 @@ module.exports = require('waterlock').actions.user({
 
   reward : function(req, res){
     var type = req.params.type;
+    if(!req.session.authenticated){
+      return res.view("newUserReward", { layout : 'popup', user : null});
+    }
     User.findOne(req.session.user.id).exec(function(err, user){
       if(err){
         return res.badRequest(err);

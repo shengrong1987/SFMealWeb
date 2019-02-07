@@ -152,13 +152,6 @@ module.exports = {
 
     var _this = this;
 
-    if(req.session.authenticated){
-      var userId = req.session.user.id;
-      var email = req.session.user.auth.email;
-      req.body.customer = userId;
-      req.body.guestEmail = email || process.env.ADMIN_EMAIL;
-    }
-
     var orders = req.body.orders;
     if(!orders){
       return res.badRequest({code: -54, responseText: req.__('meal-checkout-lack-of-order')});
@@ -320,7 +313,7 @@ module.exports = {
           }],
           buildOrders : ['buildOptions', function(next){
             var index = 0;
-            async.each(meals, function(meal, nextIn){
+            async.eachSeries(meals, function(meal, nextIn){
               var orderParam = {};
               orderParam.subtotal = parseFloat(meal.subtotal) || 0;
               orderParam.orders = meal.orders;
@@ -355,7 +348,7 @@ module.exports = {
                   if(!req.session.authenticated){
                     return nextIn2();
                   }
-                  User.findOne(userId).populate('payment').populate("coupons").exec(function (err, found) {
+                  User.findOne(req.session.user.id).populate('payment').populate("coupons").populate('auth').exec(function (err, found) {
                     if (err) {
                       return nextIn2(err);
                     }
@@ -370,13 +363,13 @@ module.exports = {
                     if(!found.firstname && !contactInfo.name){
                       return nextIn2({ responseText : req.__('order-lack-contact'), code : -31});
                     }
-                    orderParam.guestEmail = req.body.guestEmail;
+                    orderParam.guestEmail = found.email || found.auth.email || process.env.ADMIN_EMAIL;
                     orderParam.customerName = contactInfo.name || found.firstname;
                     orderParam.customerPhone = contactInfo.phone || found.phone;
                     orderParam.customerId = found.payment[0] ? found.payment[0].customerId : null;
                     orderParam.paymentMethod = paymentInfo.method;
                     orderParam.isExpressCheckout = false;
-                    orderParam.customer = userId;
+                    orderParam.customer = req.session.user.id;
 
                     var code = req.body.couponCode, pointsRedeem = req.body.points;
 
@@ -394,6 +387,7 @@ module.exports = {
                         if(err){
                           return nextIn2(err);
                         }
+                        req.body.points -= (discount * 10);
                         orderParam.redeemPoints = pointsRedeem;
                         //calculate total
                         _this.redeemCoupon(req, code, subtotalAfterTax, coupon, found, discount, function(err, discount){
@@ -478,7 +472,7 @@ module.exports = {
                   tip : order.tip,
                   deliveryFee : parseInt(order.delivery_fee * 100),
                   discount : order.discount * 100,
-                  email : process.env.ADMIN_EMAIL,
+                  email : order.guestEmail,
                   meal : order.meal,
                   method : order.method,
                   tax : order.tax,
@@ -486,7 +480,7 @@ module.exports = {
                     mealId : order.meal.id,
                     hostId : order.meal.chef.id,
                     orderId : order.id,
-                    userId : userId,
+                    userId : order.customer,
                     deliveryFee : parseInt(order.delivery_fee * 100),
                     tax : order.tax,
                     discount : order.discount * 100
@@ -510,7 +504,7 @@ module.exports = {
                   tip : order.tip,
                   deliveryFee : parseInt(order.delivery_fee * 100),
                   discount : order.discount * 100,
-                  email : email,
+                  email : order.guestEmail,
                   customerId : order.customerId,
                   destination : order.meal.chef.accountId,
                   meal : order.meal,
@@ -521,7 +515,7 @@ module.exports = {
                     mealId : order.meal.id,
                     hostId : order.meal.chef.id,
                     orderId : order.id,
-                    userId : userId,
+                    userId : order.customer,
                     deliveryFee : parseInt(order.delivery_fee * 100),
                     tax : order.tax
                   }
@@ -2677,6 +2671,7 @@ module.exports = {
     //verify how many points need to be redeemed
     if(points > total * 10){ points = total * 10;}
     user.points = user.points || 0;
+    sails.log.info("redeeming points:" + points);
     //verify if user have enough points
     if(points > user.points){
       return cb({ code : -25, responseText : req.__('order-points-insufficient')});
@@ -2746,11 +2741,12 @@ module.exports = {
 
   findOrdersOfWeek : function(req, res){
     moment.locale('en');
+    var _this = this;
     var weekWanted = req.params['numberOfWeek'];
     var date = parseInt(weekWanted) *  7;
     var yearWanted = req.query.year;
-    var beginDate = moment().set('year',yearWanted).set('date',date-6).set('hour',0);
-    var endDate = moment().set('year',yearWanted).set('date',date).set('hour',0);
+    var beginDate = moment().set('year',yearWanted).set('dayOfYear',date-6).set('hour',0);
+    var endDate = moment().set('year',yearWanted).set('dayOfYear',date).set('hour',0);
     var type = req.query.type;
     var status = req.query.status || { '!' : ['cancel','pending-payment']};
     var numberOfWeekNow = util.getWeekOfYear(new Date());
@@ -2785,27 +2781,7 @@ module.exports = {
                  return next();
                }
                order.mealTitle = meal.title;
-               async.each(dishIds, function(dishId, next2){
-                 Dish.findOne(dishId).exec(function(err, d){
-                   if(err){
-                     return next2(err);
-                   }
-                   if(!d){
-                     return next2();
-                   }
-                   if(order.orders.hasOwnProperty(dishId)){
-                     order[d.title] = order.orders[dishId].number;
-                   }else{
-                     order[d.title] = 0;
-                   }
-                   next2();
-                 });
-               }, function(err){
-                 if(err){
-                   return next(err);
-                 }
-                 next();
-               })
+               next();
              })
           },
           findHost : function(next){
@@ -2885,86 +2861,103 @@ module.exports = {
         }
         var wantsReport = req.query.report;
         var csv = req.query.csv;
-        if(!wantsReport){
-          if(type === "chef"){
-            var hostIncomes = Object.keys(hostSummary);
-            hostIncomes = hostIncomes.map(function(shopName){
-              var sumObj = hostSummary[shopName];
-              return [shopName, sumObj.income];
-            });
-            return res.ok(hostIncomes);
-          }else if(csv){
-            var csvStr = util.ConvertToCSV(newOrders);
-            res.setHeader('Content-disposition', 'attachment; filename=orders.csv');
-            res.setHeader('Content-type', 'text/plain');
-            res.charset = 'UTF-8';
-            return res.end(csvStr);
-          }else{
-            return res.ok(newOrders);
+        var dishIds = _this.getDishIdFromOrders(orders);
+        var pickups,dishes=[],newOrders=[];
+        async.each(orders, function(order, next) {
+          if (!order.pickupInfo) {
+            return next();
           }
-        }
-        orders.forEach(function(order){
-          var isSamePickup = newOrders.some(function(oldOrder){
-            var _isSame = moment(new Date(oldOrder.pickupInfo.pickupFromTime).toISOString()).isSame(moment(new Date(order.pickupInfo.pickupFromTime).toISOString()), 'minute') && moment(oldOrder.pickupInfo.pickupTillTime).isSame(moment(order.pickupInfo.pickupTillTime), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
-            if(_isSame){
-              Object.keys(order.orders).forEach(function(dishId){
-                if(oldOrder.orders.hasOwnProperty(dishId)){
+          //remove dish not belongs to meal
+          Object.keys(order.orders).forEach(function(dishId){
+            var hasDish = order.dishes.some(function (d) {
+              return d.id === dishId
+            });
+            if (!hasDish) {
+              delete order.orders[dishId]
+            }
+          })
+          if (!pickups) {
+            pickups = [order.pickupInfo];
+            dishes = order.dishes;
+            newOrders = [order];
+            return next();
+          }
+          var isSamePickup;
+          var isSame = newOrders.some(function (oldOrder) {
+            var from1 = moment(new Date(oldOrder.pickupInfo.pickupFromTime).toISOString());
+            var from2 = moment(new Date(order.pickupInfo.pickupFromTime).toISOString());
+            var isSamePickupOption = from1.isSame(from2, 'minute') && oldOrder.pickupInfo.location === order.pickupInfo.location && oldOrder.pickupInfo.method === order.pickupInfo.method;
+            var isSameContact = oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && (!order.contactInfo.address || order.contactInfo.address.includes(oldOrder.contactInfo.address) || oldOrder.contactInfo.address.includes(order.contactInfo.address));
+            if (isSamePickupOption && isSameContact) {
+              Object.keys(order.orders).forEach(function (dishId) {
+                if (oldOrder.orders.hasOwnProperty(dishId)) {
                   oldOrder.orders[dishId].number += order.orders[dishId].number;
-                }else{
+                } else {
                   oldOrder.orders[dishId] = order.orders[dishId];
                 }
               })
               oldOrder.id += "," + order.id;
               oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
-              oldOrder.pickupInfo.comment += order.pickupInfo.comment;
               oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
-              if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
+              if (oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges) {
                 oldOrder.charges['cash'] += order.charges['cash'];
               }
+              if (order.pickupInfo.comment !== oldOrder.pickupInfo.comment) {
+                oldOrder.pickupInfo.comment += order.pickupInfo.comment
+              }
             }
-            return _isSame;
-          })
-          if(!isSamePickup){
+            if(isSamePickupOption){
+              isSamePickup = true;
+            }
+            return isSamePickupOption && isSameContact;
+          });
+
+          if (!isSame) {
             newOrders.push(order);
           }
-        });
-        newOrders.forEach(function(order){
-          dishIds = dishIds.concat(Object.keys(order.orders));
-          dishIds = dishIds.filter(function(item, pos){
-            return dishIds.indexOf(item) === pos;
-          });
-        })
-        var pickups,dishes = [];
-        newOrders.forEach(function(order){
-          if(!order.pickupInfo){
-            return;
+          if(!isSamePickup){
+            pickups.push(order.pickupInfo);
           }
-          if(!pickups){
-            pickups = [order.pickupInfo];
-            dishes = order.dishes;
-          }
-          var isOldPickupOption = pickups.some(function(pickupInfo){
-            return (pickupInfo.pickupFromTime === order.pickupInfo.pickupFromTime && pickupInfo.pickupTillTime === order.pickupInfo.pickupTillTime)
-              &&  pickupInfo.location === order.pickupInfo.location && pickupInfo.method === order.pickupInfo.method;
-          })
-          order.dishes.forEach(function(dish){
-            var hasDish = dishes.some(function(oldDish){
+
+          order.dishes.forEach(function (dish) {
+            var hasDish = dishes.some(function (oldDish) {
               return oldDish.id === dish.id;
             })
-            if(!hasDish){
+            if (!hasDish) {
               dishes.push(dish);
             }
           })
-          if(!isOldPickupOption){
-            pickups.push(order.pickupInfo);
+          next();
+        }, function(err){
+          if(err){
+            return res.badRequest(err);
+          }
+          if(pickups){
+            pickups = pickups.sort(function(a, b){
+              return new Date(a.pickupFromTime).getTime() - new Date(b.pickupFromTime).getTime();
+            })
+          }
+          if(!wantsReport){
+            if(type === "chef"){
+              var hostIncomes = Object.keys(hostSummary);
+              hostIncomes = hostIncomes.map(function(shopName){
+                var sumObj = hostSummary[shopName];
+                return [shopName, sumObj.income];
+              });
+              return res.ok(hostIncomes);
+            }else if(csv){
+              var csvStr = util.ConvertToCSV(newOrders);
+              res.setHeader('Content-disposition', 'attachment; filename=orders.csv');
+              res.setHeader('Content-type', 'text/plain');
+              res.charset = 'UTF-8';
+              return res.end(csvStr);
+            }else{
+              return res.ok(newOrders);
+            }
+          }else{
+            res.view('report', { meal : { orders : newOrders, pickups : pickups, dishes : dishes }});
           }
         })
-        if(pickups){
-          pickups = pickups.sort(function(a, b){
-            return new Date(a.pickupFromTime).getTime() - new Date(b.pickupFromTime).getTime();
-          })
-        }
-        res.view('report', { meal : { orders : newOrders, pickups : pickups, dishes : dishes }});
       });
     });
   },
@@ -3106,6 +3099,17 @@ module.exports = {
       return seen.hasOwnProperty(order.customerPhone) ? false : (seen[order.customerPhone] = true);
     })
     return ((repeatOrderThisWeek.length / ordersOfLastWeek.length) * 100).toFixed(2) + "%";
+  },
+
+  getDishIdFromOrders : function(orders){
+    var dishIds = [];
+    orders.forEach(function(order){
+      dishIds = dishIds.concat(Object.keys(order.orders));
+      dishIds = dishIds.filter(function(item, pos){
+        return dishIds.indexOf(item) === pos;
+      });
+    })
+    return dishIds;
   }
 };
 

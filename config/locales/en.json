@@ -952,5 +952,6 @@
   "catering-minimal-tip" : "The minimal size required to provide food on customized date?",
   "crawfish" : "Crawfish",
   "chef-dish-empty" : "Chef don't have dish today, please switch date above.",
-  "festival" : "Festival"
+  "festival" : "Festival",
+  "discount" : "On Sale"
 }

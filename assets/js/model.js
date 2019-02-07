@@ -2737,7 +2737,7 @@ var UserProfileView = Backbone.View.extend({
         }
       },error : function(model, err){
         $this.sucessView.hide();
-        $this.alertView.html(jQuery.i18n.prop('saveError'))
+        $this.alertView.html(getMsgFromError(err))
         $this.alertView.show();
       }
     });
