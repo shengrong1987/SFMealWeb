@@ -610,17 +610,20 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          var o = _orders.slice(0);
+          var o = Object.assign({}, _orders);
+          var cOrders = _orders.map(function(a) {
+            return Object.assign({},a);
+          });
           var ids = "";
-          _orders.forEach(function(order){
+          Object.keys(o).forEach(function(key){
             if(ids){
               ids += ",";
             }
-            ids += order.id;
+            ids += o[key].id;
           });
-          o.id = ids;
-          notification.notificationCenter("Order", "new", o, false, false, req);
-          res.ok({ orders : _orders});
+          o[0].id = ids;
+          notification.notificationCenter("Order", "new", o[0], false, false, req);
+          res.ok({ orders : cOrders});
         })
       }
     });

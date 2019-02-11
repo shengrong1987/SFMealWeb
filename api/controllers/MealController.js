@@ -891,42 +891,62 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(meal.status === 'on'){
-        return res.badRequest({responseText : req.__('meal-active-update-dish'), code : -10});
-      }
-      if(meal.dishes.filter(function(dish){
-        return dish.id !== dishId;
-      }) === 0){
-        return res.badRequest({responseText : req.__('meal-dishes-empty'), code : -11});
-      }
-      if(meal.leftQty.hasOwnProperty(dishId)){
-        delete meal.leftQty[dishId];
-      }
-      if(meal.totalQty.hasOwnProperty(dishId)){
-        delete meal.totalQty[dishId];
-      }
-      meal.dynamicDishes.remove(dishId);
-      meal.dishes.remove(dishId);
-      meal.save(function(err, result){
+      async.auto({
+        checkMealHasActiveDish : function(next) {
+          if (meal.status !== 'on') {
+            return next();
+          }
+          Order.find({mealId: mealId, status: ['schedule', 'preparing', 'ready']}).exec(function (err, orders) {
+            if (err) {
+              return next(err);
+            }
+            var hasDishInOrder = orders.some(function(order){
+              return order.orders.hasOwnProperty(dishId) && order.orders[dishId].number > 0;
+            })
+            if(hasDishInOrder){
+              return next({responseText : req.__('meal-active-update-dish'), code : -10});
+            }
+            next();
+          });
+        }
+      }, function(err){
         if(err){
           return res.badRequest(err);
         }
-        Order.find({ $and : [{$or:[{status : "schedule"},{status : "preparing"}]},{meal:mealId}]}).populate("dynamicDishes").populate("dishes").exec(function(err, orders){
+        if(meal.dishes.filter(function(dish){
+          return dish.id !== dishId;
+        }) === 0){
+          return res.badRequest({responseText : req.__('meal-dishes-empty'), code : -11});
+        }
+        if(meal.leftQty.hasOwnProperty(dishId)){
+          delete meal.leftQty[dishId];
+        }
+        if(meal.totalQty.hasOwnProperty(dishId)){
+          delete meal.totalQty[dishId];
+        }
+        meal.dynamicDishes.remove(dishId);
+        meal.dishes.remove(dishId);
+        meal.save(function(err, result){
           if(err){
             return res.badRequest(err);
           }
-          async.each(orders, function(order, next){
-            order.dishes.remove(dishId);
-            order.dynamicDishes.remove(dishId);
-            order.save(next);
-          }, function(err){
+          Order.find({ $and : [{$or:[{status : "schedule"},{status : "preparing"}]},{meal:mealId}]}).populate("dynamicDishes").populate("dishes").exec(function(err, orders){
             if(err){
               return res.badRequest(err);
             }
-            res.ok({});
+            async.each(orders, function(order, next){
+              order.dishes.remove(dishId);
+              order.dynamicDishes.remove(dishId);
+              order.save(next);
+            }, function(err){
+              if(err){
+                return res.badRequest(err);
+              }
+              res.ok({});
+            })
           })
-        })
-      });
+        });
+      })
     });
   },
 

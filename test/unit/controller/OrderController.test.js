@@ -334,6 +334,18 @@ describe('OrderController', function() {
         })
     });
 
+    it('should be able to remove a dish from a meal with no active order', function(done){
+      agent
+        .delete('/meal/' + mealId + '/dishes/' + dishId3)
+        .expect(200, done)
+    })
+
+    it('should be able to add a dish from a meal with no active order', function(done){
+      agent
+        .post('/meal/' + mealId + '/dishes/' + dishId3)
+        .expect(200, done)
+    })
+
     it('should update dish price on active meal', function(done){
       agent
         .put('/dish/' + dishId1)

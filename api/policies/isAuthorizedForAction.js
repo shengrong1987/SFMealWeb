@@ -11,9 +11,11 @@ module.exports = function(req, res, next) {
   // User is allowed, proceed to the next policy,
   // or if this is the last policy, the controller
   var hostId = req.session.user.host ? (req.session.user.host.id ? req.session.user.host.id : req.session.user.host) : "";
+  sails.log.info("order ids:" + req.param('id'));
   var orderIds = req.param('id').split("+");
   var action = req.path.split("/").pop();
   require('async').eachSeries(orderIds, function(orderId, cb){
+    sails.log.info("policy of order:" + orderId);
     Order.findOne(orderId).populate('host').exec(function(err,order){
       if(err){
         return cb(err);
