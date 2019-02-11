@@ -411,7 +411,7 @@ var UserBarView = Backbone.View.extend({
     var userBadgeView = this.$el.find("#userActionBtn .badge");
     hostBadgeView.data("badge",0);
     userBadgeView.data("badge",0);
-    var orderBadgeView = this.$el.find("#userActionBtn").next().find("a").eq(0).find(".badge");
+    var orderBadgeView = this.$el.find("[name='myorder']").find(".badge");
     orderBadgeView.text("");
     var msgBtn = this.$el.find("#msgBtn");
     msgBtn.attr('data-original-title', "")
@@ -431,10 +431,13 @@ var UserBarView = Backbone.View.extend({
       userBadgeView.data("badge", userBadgeView.data("badge") + 1);
       switch(type.toLowerCase()){
         case "order":
-          var orderBadgeView = this.$el.find("#userActionBtn").next().find("a").eq(0).find(".badge");
-          var orderBadges =  parseInt(orderBadgeView.text() || 0);
-          orderBadges++;
-          orderBadgeView.text(orderBadges);
+          var orderBadgeViews = this.$el.find("[name='myorder']");
+          orderBadgeViews.each(function(){
+            var orderBadgeButton = $(this).find(".badge");
+            var badgesCount = parseInt(orderBadgeButton.text()) || 0;
+            badgesCount++;
+            orderBadgeButton.text(badgesCount);
+          })
           break;
       }
     }
@@ -455,7 +458,7 @@ var UserBarView = Backbone.View.extend({
 
     userBadgeView.next().find("a .badge").each(function(){
       var badgeCount = parseInt($(this).text());
-      if(badgeCount == 0){
+      if(badgeCount === 0){
         $(this).hide();
       }else{
         $(this).show();
@@ -3470,7 +3473,12 @@ var MealConfirmView = Backbone.View.extend({
     var lat = optionView.data('lat');
     var long = optionView.data('long');
     if(!long || !lat){
-      return makeAToast("此送餐选项地址解析错误，请选择别的选项。","error");
+      $("#pickupOptionsView .step-2").show();
+      var emptyView = $("#pickupOptionsView #deliveryTab .empty");
+      emptyView.html("<small>" + jQuery.i18n.prop('deliveryNotAvailable') + "</small>");
+      emptyView.removeClass("d-none").show();
+      jumpTo("pickupOptionsView");
+      return;
     }
     var location = { lat : lat, long : long};
     var range = optionView.data("range");
@@ -3533,6 +3541,7 @@ var MealConfirmView = Backbone.View.extend({
       });
       var visibleOptions = _this.$el.find("#deliveryTab .deliveryOption:visible");
       var emptyView = $("#pickupOptionsView #deliveryTab .empty");
+      emptyView.html("<small>" + jQuery.i18n.prop('deliveryOutOfRangeError') + "</small>");
       if(visibleOptions.length){
         emptyView.hide();
       }else{

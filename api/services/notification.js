@@ -62,10 +62,17 @@ var notification = {
       var userReviewUrl = process.env.BASE_URL + "/user/me#myreview";
       switch(action){
         case "new":
-          content = sails.__({
-            phrase : 'newOrderMessage',
-            locale : locale
-          }, params.meal.title);
+          if(params.isSendToHost){
+            content = sails.__({
+              phrase : 'newOrderMessageToHost',
+              locale : locale
+            }, params.meal.title);
+          }else{
+            content = sails.__({
+              phrase : 'newOrderMessageToGuest',
+              locale : locale
+            }, params.id);
+          }
           message.sendMessage(phone, content);
           break;
         case "adjust":

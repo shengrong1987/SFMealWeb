@@ -610,6 +610,16 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
+          var o = _orders.slice(0);
+          var ids = "";
+          _orders.forEach(function(order){
+            if(ids){
+              ids += ",";
+            }
+            ids += order.id;
+          });
+          o.id = ids;
+          notification.notificationCenter("Order", "new", o, false, false, req);
           res.ok({ orders : _orders});
         })
       }
@@ -2887,7 +2897,7 @@ module.exports = {
             var from1 = moment(new Date(oldOrder.pickupInfo.pickupFromTime).toISOString());
             var from2 = moment(new Date(order.pickupInfo.pickupFromTime).toISOString());
             var isSamePickupOption = from1.isSame(from2, 'minute') && oldOrder.pickupInfo.location === order.pickupInfo.location && oldOrder.pickupInfo.method === order.pickupInfo.method;
-            var isSameContact = oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && (!order.contactInfo.address || order.contactInfo.address.includes(oldOrder.contactInfo.address) || oldOrder.contactInfo.address.includes(order.contactInfo.address));
+            var isSameContact = oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && (!order.contactInfo.address || !oldOrder.contactInfo.address || order.contactInfo.address.includes(oldOrder.contactInfo.address) || oldOrder.contactInfo.address.includes(order.contactInfo.address));
             if (isSamePickupOption && isSameContact) {
               Object.keys(order.orders).forEach(function (dishId) {
                 if (oldOrder.orders.hasOwnProperty(dishId)) {
@@ -3104,10 +3114,12 @@ module.exports = {
   getDishIdFromOrders : function(orders){
     var dishIds = [];
     orders.forEach(function(order){
-      dishIds = dishIds.concat(Object.keys(order.orders));
-      dishIds = dishIds.filter(function(item, pos){
-        return dishIds.indexOf(item) === pos;
-      });
+      if(order.orders){
+        dishIds = dishIds.concat(Object.keys(order.orders));
+        dishIds = dishIds.filter(function(item, pos){
+          return dishIds.indexOf(item) === pos;
+        });
+      }
     })
     return dishIds;
   }

@@ -114,14 +114,14 @@
             <div class="form-group">
               <label for="categoryInput">5.<%= __('what-kind') %></label>
               <div class="dropdown">
-                <button class="btn btn-default dropdown-toggle btn-outline" type="button" id="categoryInput" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="entree">
+                <button class="btn btn-default dropdown-toggle btn-outline" type="button" id="categoryInput" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="entree" data-selected="true">
                   <%= __('main') %>
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                  <li class="active"><a href="javascript:void(0)" value="entree"><%= __('main') %></a></li>
-                  <li><a href="javascript:void(0)" value="appetizer"><%= __('appetizer') %></a></li>
-                  <li><a href="javascript:void(0)" value="dessert"><%= __('dessert') %></a></li>
+                  <a class="dropdown-item active" href="javascript:void(0)" value="entree"><%= __('main') %></a>
+                  <a class="dropdown-item" href="javascript:void(0)" value="appetizer"><%= __('appetizer') %></a>
+                  <a class="dropdown-item" href="javascript:void(0)" value="dessert"><%= __('dessert') %></a>
                 </ul>
               </div>
             </div>

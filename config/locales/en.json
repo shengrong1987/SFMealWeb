@@ -688,7 +688,8 @@
   "pageNotFoundSubtitle": "Or take a look at these.",
   "404Error": "The current page is not found, you mean ",
   "404Error2": "",
-  "newOrderMessage": "Your meal: '%s' received a new order, http://www.sfmeal.com/host/me#myorder",
+  "newOrderMessageToHost": "Your meal: '%s' received a new order, http://www.sfmeal.com/host/me#myorder",
+  "newOrderMessageToGuest" : "You just placed an order on SFMeal.com，here is your receipt：http://sfmeal.com/order/%s/receipt",
   "orderAdjustMessageToHost": "Foodie adjusted his orders, please prepare according to the new order here.  http://www.sfmeal.com/host/me#myorder, the order number: %s",
   "orderCancelMessageToHost": "Foodie cancelled his order, order number: %s",
   "orderAdjustRequestMessageToHost": "Foodie applied for adjustment of his order, order number: %s, please confirm or reject on the site http://www.sfmeal.com/host/me#myorder",
@@ -953,5 +954,6 @@
   "crawfish" : "Crawfish",
   "chef-dish-empty" : "Chef don't have dish today, please switch date above.",
   "festival" : "Festival",
-  "discount" : "On Sale"
+  "discount" : "On Sale",
+  "valentines" : "Valentines"
 }

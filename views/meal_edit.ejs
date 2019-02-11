@@ -466,7 +466,7 @@
                     <div class="row">
                       <div class="col-6">
                         <div class="input-group">
-                          <input id="singleOrderInput" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="999" value="<%= meal.singleOrder || 10 %>" data-error="<%= __('need-minimal-requirement')%>">
+                          <input id="singleOrderInput" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="999" value="<%= meal.minimalOrder || 10 %>" data-error="<%= __('need-minimal-requirement')%>">
                           <div class="input-group-append">
                             <span class="input-group-text"><%= __('dollar')%></span>
                           </div>
