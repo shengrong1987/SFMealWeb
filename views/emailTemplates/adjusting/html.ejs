@@ -15,7 +15,9 @@
         var lastTitle = '';
         if(lastPreference && lastPreference.length > 0) {
           lastPreference.forEach(function (pref) {
-            lastTitle += "(" + pref.property + ')';
+            if(pref.property){
+              lastTitle += "(" + pref.property.map(function(p){return p.property}).join(",") + ')';
+            }
           });
           var lastExtra = lastPreference.reduce(function (total, next) {
             return total + parseInt(next.extra);
@@ -27,7 +29,9 @@
         var title = '';
         if(preference && preference.length > 0) {
           preference.forEach(function (pref) {
-            title += "(" + pref.property + ')';
+            if(pref.property){
+              title += "(" + pref.property.map(function(p){return p.property}).join(",") + ')';
+            }
           });
           var extra = preference.reduce(function (total, next) {
             return total + parseInt(next.extra);

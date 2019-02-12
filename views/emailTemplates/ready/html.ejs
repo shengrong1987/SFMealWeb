@@ -31,7 +31,9 @@
         var extra = 0;
         if(preference && preference.length > 0) {
           preference.forEach(function (pref) {
-            title += "(" + pref.property + ')';
+            if(pref.property){
+              title += "(" + pref.property.map(function(p){return p.property}).join(",") + ')';
+            }
           });
           extra = preference.reduce(function (total, next) {
             return total + parseInt(next.extra);
