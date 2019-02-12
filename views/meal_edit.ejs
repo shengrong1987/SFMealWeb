@@ -73,14 +73,14 @@
                           var dynamicDishes = meal.dynamicDishes;
                           var cover = meal.cover;
                           var features = meal.features;
-                          var total = meal.totalQty;
+                          var total = meal.leftQty;
                           dishes.forEach(function(dish){
                             var hasCover = false;
                             var hasFeatures = false;
                             var hasDynamicDish = dynamicDishes.some(function(d){
                               return d.id === dish.id;
                             });
-                            var quantity = total[dish.id] ? total[dish.id] : 1;
+                            var quantity = total[dish.id];
                             if(dish.id == cover){ hasCover = true;}
                             if(features.indexOf(dish.id)>-1){ hasFeatures = true; }
                           %>

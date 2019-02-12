@@ -101,9 +101,11 @@
                         return total + parseInt(next.extra);
                       },0);
                       if(order.status=="adjust") {
+                        if(!order.adjusting_orders[key]){
+                          return;
+                        }
                         var adjustingNumber = order.adjusting_orders[key].number;
                       }
-
                       if(number == 0 && (adjustingNumber == 0 || !adjustingNumber)){
                         return;
                       }
@@ -124,6 +126,9 @@
                         <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
                       </td>
                       <td><% if(order.status=="adjust"){
+                          if(!order.adjusting_orders[key]){
+                            return;
+                          }
                           var adjustingNumber = order.adjusting_orders[key].number;
                         if(adjustingNumber != number){%>
                         <%= number%> to <strong><%= adjustingNumber%></strong>
@@ -243,6 +248,9 @@
                         return total + parseInt(next.extra);
                       },0);
                       if(order.status=="adjust") {
+                        if(!order.adjusting_orders[key]){
+                          return;
+                        }
                         var adjustingNumber = order.adjusting_orders[key].number;
                       }
                       if(number == 0 && (adjustingNumber == 0 || !adjustingNumber)){
@@ -263,6 +271,9 @@
                         <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
                       </td>
                       <td><% if(order.status=="adjust"){
+                          if(!order.adjusting_orders[key]){
+                            return;
+                          }
                           var adjustingNumber = order.adjusting_orders[key].number;
                         if(adjustingNumber != number){%>
                         <%= number%> to <strong><%= adjustingNumber%></strong>

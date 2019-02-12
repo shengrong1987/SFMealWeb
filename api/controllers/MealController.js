@@ -769,13 +769,11 @@ module.exports = {
                   if(status === "on"){
                     async.auto({
                       updateQty : function(cb){
-                        if(!req.body.totalQty && meal.status !== "on"){
+                        if(!req.body.totalQty){
                           return cb();
                         }
-                        req.body.leftQty = $this.updateDishQty(meal.leftQty, meal.totalQty, req.body.totalQty);
-                        if(!req.body.leftQty){
-                          return cb({responseText : req.__('meal-adjust-qty-fail'), code : -9});
-                        }
+                        sails.log.info("setting left qty: " + req.body.totalQty);
+                        req.body.leftQty = req.body.totalQty;
                         cb();
                       }
                     }, function(err){

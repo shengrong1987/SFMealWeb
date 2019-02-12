@@ -617,7 +617,7 @@ module.exports = {
           var ids = "";
           Object.keys(o).forEach(function(key){
             if(ids){
-              ids += ",";
+              ids += "+";
             }
             ids += o[key].id;
           });
@@ -2448,6 +2448,7 @@ module.exports = {
               return next2({ responseText : req.__('order-preference-not-exist'), code : -20});
             }
             var diff = qty - lastQty;
+            sails.log.info("meal: " + meal.title + " left qty: " + meal.leftQty);
             sails.log.info("order qty for the dish: " + dish.id + " is: " + diff, "dish's left qty: " + meal.leftQty[dish.id]);
             if(!isPartyMode && diff > meal.leftQty[dish.id]){
               return next2({responseText : req.__('order-dish-not-enough',dishId, qty), code : -1});
