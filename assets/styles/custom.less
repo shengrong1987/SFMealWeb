@@ -13,6 +13,7 @@
 
 body{
   min-height: 550px;
+  overflow: auto;
 }
 
 small{
@@ -673,6 +674,14 @@ input:focus{
   background-color: @white;
   .border-bottom;
 }
+
+.nav-text-highlight > .active{
+  transform: scale(1.5);
+  color: @black;
+  a{
+    .border-bottom;
+  }
+}
 /*signup*/
 
 
@@ -1202,9 +1211,10 @@ label {
   background-image: url("/images/window_new@2x.png");
   background-repeat: no-repeat;
   background-position-x : center;
-  background-size: 380px 613px;
+  background-size: 100% 613px;
   height: 613px;
   width: 380px;
+  max-width: 380px;
   margin: auto;
 }
 
@@ -2613,6 +2623,7 @@ select.form-control{
 .nav-scroll{
   overflow-x : scroll;
   list-style: none;
+  overflow-y : hidden;
 }
 
 .dropdown-backdrop{

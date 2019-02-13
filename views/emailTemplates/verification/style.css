@@ -8843,6 +8843,7 @@ a.text-dark:focus {
 }
 body {
   min-height: 550px;
+  overflow: auto;
 }
 small {
   font-size: 75%;
@@ -9395,6 +9396,13 @@ hovereffect p {
   background-color: #ffffff;
   border-bottom: 1px solid #dee2e6 !important;
 }
+.nav-text-highlight > .active {
+  transform: scale(1.5);
+  color: #000000;
+}
+.nav-text-highlight > .active a {
+  border-bottom: 1px solid #dee2e6 !important;
+}
 /*signup*/
 /*font*/
 .font-elegant {
@@ -9833,9 +9841,10 @@ label {
   background-image: url("/images/window_new@2x.png");
   background-repeat: no-repeat;
   background-position-x: center;
-  background-size: 380px 613px;
+  background-size: 100% 613px;
   height: 613px;
   width: 380px;
+  max-width: 380px;
   margin: auto;
 }
 #myModal .modal-content {
@@ -11197,6 +11206,7 @@ select.form-control {
 .nav-scroll {
   overflow-x: scroll;
   list-style: none;
+  overflow-y: hidden;
 }
 .dropdown-backdrop {
   position: static;
