@@ -340,8 +340,16 @@ function updateOrderWindow(fromCache, isTrigger){
       }
       localOrders[dishId] = localDish;
       var left = parseInt($(this).attr("data-left-amount") - parseInt(localOrders[dishId].number));
+      var number = localOrders[dishId].number;
       var dishItems = $("#order").find(".dish[data-id='" + dishId + "']");
       dishItems.each(function(){
+        if(number===0){
+          $(this).find("[name='input-group']").hide();
+          $(this).find("[name='order-btn']").show();
+        }else{
+          $(this).find("[name='input-group']").show();
+          $(this).find("[name='order-btn']").hide();
+        }
         $(this).find(".amount").val(localOrders[dishId].number);
         $(this).find(".amount").text(localOrders[dishId].number);
         _this.amountInput('update',$(this).find("[data-toggle='amount-input']"));
@@ -380,7 +388,11 @@ function updateMenuView(id){
       if(dishItem.hasClass(dateDesc)){
         dishItem.show();
       }
+      $(this).find("[name='input-group']").show();
+      $(this).find("[name='order-btn']").hide();
     }else{
+      $(this).find("[name='input-group']").hide();
+      $(this).find("[name='order-btn']").show();
       dishItem.removeClass("table-success");
     }
     dishItem.find(".left-amount span").attr("value",left);

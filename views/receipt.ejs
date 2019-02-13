@@ -119,14 +119,14 @@
     <div class="text-center pb-3">
       <h4><small><%= __('order-receipt-help')%></small></h4>
     </div>
-    <div class="d-flex justify-content-center vertical-align">
+    <div class="text-center">
       <% if(orders[0].pickupInfo.method === "shipping"){%>
       <a href="https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=<%= tracking || ''%>" class="btn btn-grey-red mr-1"><%= __('track-order')%></a>
       <% }else{%>
       <a href="http://maps.apple.com/?q=<%= orders[0].pickupInfo.method == 'pickup' ? orders[0].pickupInfo.location : orders[0].contactInfo.address%>" class="btn btn-grey-red active mr-1"><%= __('find-route')%></a>
       <% }%>
       <% orders.forEach(function(order, index){%>
-        <button class="btn btn-grey-blue active" style="margin-right: 10px;" toggle="modal" data-target="#myModal" data-href="/review/<%= order.id%>" onclick="toggleModal(event)"><%= __('review')%><%= __('dingdan')%><%= index+1%></button>
+        <button class="btn btn-grey-blue active" style="margin-right: 10px;" toggle="modal" data-target="#myModal" data-href="/review/<%= order.id%>" onclick="toggleModal(event)"><%= __('review')%> <%= __('dingdan')%><%= index+1%></button>
       <% });%>
       <i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" title="<%= __('user-benefit')%>"></i>
     </div>
