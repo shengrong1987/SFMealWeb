@@ -895,17 +895,17 @@ describe('OrderController', function() {
 
       it('should not take order not reach minimal order ', function (done) {
         var dishObj = {};
-        dishObj[dishId7] = { number : 1 , preference : [{ property : '', extra : 0}], price : price7 };
+        dishObj[dishId1] = { number : 4 , preference : [{ property : '', extra : 0}], price : price7 };
         agent
           .post('/order')
           .send({
             orders : dishObj,
-            subtotal : price7,
+            subtotal : price1 * 4,
             contactInfo : { name : "sheng", address : address, phone : phone },
             paymentInfo : { method : 'cash'},
-            method : "delivery",
-            pickupOption : 2,
-            pickupMeal : systemDeliveryMealId,
+            method : "pickup",
+            pickupOption : 4,
+            pickupMeal : mealId,
             pickupDate : 'today',
             tip : 0
           })

@@ -297,23 +297,10 @@
                     <label><strong>3.<%= __('meal-minimal-requirement-title')%> </strong><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label>
                   </div>
                   <div class="col-12 order-require" data-toggle="exclusive-input">
-                    <div class="row box-compact">
-                      <div class="col-sm-4">
-                        <div class="input-group">
-                          <input id="singleOrderInput" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="999" value=10 data-error="<%= __('need-minimal-requirement')%>">
-                          <div class="input-group-append">
-                            <span class="input-group-text"><%= __('dollar')%></span>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm-1 vertical-align" style="height: 35px;"><label class="middle"><%= __('or')%></label></div>
-                      <div class="col-sm-4">
-                        <div class="input-group">
-                          <input id="min-total" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="9999" value=1 data-error="<%= __('need-minimal-requirement')%>">
-                          <div class="input-group-append">
-                            <span class="input-group-text"><%= __('dollar')%></span>
-                          </div>
-                        </div>
+                    <div class="input-group">
+                      <input id="min-total" class="form-control normal-number-input" type="number" pattern="[0-9]*" inputmode="numeric" min="1" max="9999" value=1 data-error="<%= __('need-minimal-requirement')%>">
+                      <div class="input-group-append">
+                        <span class="input-group-text"><%= __('dollar')%></span>
                       </div>
                     </div>
                   </div>

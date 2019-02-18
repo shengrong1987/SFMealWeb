@@ -21,7 +21,7 @@ module.exports = {
     if(!reviews || !reviews.length || !orderId){
       return res.badRequest({ code : -1, responseText : req.__('review-no-available')});
     }
-    Order.findOne(orderId).exec(function(err, order){
+    Order.findOne(orderId).populate('customer').exec(function(err, order){
       if(err){
         return res.badRequest(err);
       }
@@ -340,13 +340,21 @@ module.exports = {
   },
 
   reviewPopup : function(req, res){
-    var orderId = req.params.id;
-    Order.findOne(orderId).populate('dishes').exec(function(err, order){
+    var orderIds = req.params.id.split("+");
+    var _orders = [];
+    async.eachSeries(orderIds, function(orderId, next){
+      Order.findOne(orderId).populate('dishes').exec(function(err, order){
+        if(err){
+          return next(err);
+        }
+        _orders.push(order);
+        next();
+      })
+    }, function(err){
       if(err){
         return res.badRequest(err);
       }
-      res.view('review',{ order : order, layout : 'popup' });
-
+      res.view('review',{ orders : _orders, layout : 'popup' });
     })
   }
 };

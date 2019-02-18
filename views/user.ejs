@@ -12,11 +12,11 @@
   <div>
     <div>
       <ul class="nav nav-tabs nav-fill bg-light pt-3">
-        <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder"><%= __('nav-bar-order')%><span class="badge pull-right"><%= user.orders.filter(function(order){return order.status !== "cancel" && order.status !== "review" && order.status !== "complete" && order.meal}).length || '' %></span></a></li>
+        <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder"><%= __('nav-bar-order')%><span class="badge badge-small orange pull-right" style="top: -10px;right: 5px;padding: 5px;"><%= user.orders.filter(function(order){return order.status !== "cancel" && order.status !== "review" && order.status !== "complete" && order.meal}).length || '' %></span></a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#mycollect"><%= __('user-nav-collect')%></a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#myinfo"><%= __('user-nav-info')%></a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#myaddress"><%= __('user-nav-address')%></a></li>
-        <li class="nav-item"><a class="nav-link veritcal-align" data-toggle="tab" role="tab" data-href="#myreview"><%= __('nav-bar-review')%><span class="badge pull-right"><%= user.orders.filter(function(order){return order.status == "review" && order.meal}).length || ''%></span></a></li>
+        <li class="nav-item"><a class="nav-link veritcal-align" data-toggle="tab" role="tab" data-href="#myreview"><%= __('nav-bar-review')%><span class="badge badge-small orange pull-right" style="top: -10px;right: 5px;padding: 5px;"><%= user.orders.filter(function(order){return order.status == "review" && order.meal}).length || ''%></span></a></li>
       </ul>
 
       <div class="tab-content">
@@ -24,19 +24,19 @@
           <div class="box box-shadow white">
             <div id="myorder" class="tab-pane middle active">
               <% var tabsData = [
+                { id : "all", title : "order-nav-all", status : "all"},
+                { id : "holding", title : "order-nav-waiting", status : "holding"},
                 { id : "schedule", title : "order-nav-schedule", status : "schedule"},
                 { id : "preparing", title : "order-nav-preparing", status : "preparing"},
-                { id : "holding", title : "order-nav-waiting", status : "holding"},
                 { id : "prepared", title : "order-nav-prepared", status : "ready"},
                 { id : "delivered", title : "order-nav-delivered", status : "review"},
-                { id : "reviewed", title : "order-nav-reviewed", status : "complete"},
-                { id : "all", title : "order-nav-all", status : "all"}
+                { id : "reviewed", title : "order-nav-reviewed", status : "complete"}
               ];%>
-              <ul class="nav nav-text-highlight nav-fill nav-scroll my-2" style="flex-wrap: nowrap;height: 80px;" data-toggle="nav-scroll">
+              <ul class="nav nav-text-highlight nav-fill nav-scroll my-2" style="flex-wrap: nowrap;padding-top:10px;" data-toggle="nav-scroll">
                 <% tabsData.forEach(function(tabData, i){%>
                   <li class="nav-item cursor-pointer <%= i===0?'active':''%>">
-                    <a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark"><%= __(tabData.title)%>
-                      <span class="badge pull-right"><%= user.orders.filter(function(order){return order.status === tabData.status && order.status !== "complete" && order.meal}).length || ''%></span>
+                    <a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark relative"><div><%= __(tabData.title)%></div>
+                      <span class="badge badge-small absolute orange pull-right" style="top: -10px;right: 5px;padding: 5px;"><%= user.orders.filter(function(order){return order.status === tabData.status && order.status !== "complete" && order.meal}).length || ''%></span>
                     </a>
                   </li>
                 <% });%>
@@ -253,7 +253,7 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-group text-left">
-                    <label>1. <%= __('upload-thumbnail')%> <i class="fal fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('photo-restrition')%>"></i></label>
+                    <label>1. <%= __('upload-thumbnail')%> <i class="fal fa-question-circle cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('upload-restrition')%>"></i></label>
                     <div class="fileinput fileinput-exists" data-provides="fileinput">
                         <div class="fileinput-new thumbnail size-large round_thumb">
                         </div>
@@ -270,7 +270,6 @@
                           });
                         </script>
                       </div>
-                      <h4><small><br/><br/><%= __('upload-instruction')%></small></h4>
                       <div class="alert alert-danger d-none mt-2" role="alert"></div>
                       <div class="alert alert-info d-none mt-2" role="alert"></div>
                     </div>
@@ -278,10 +277,12 @@
 
                   <div class="form-group text-left" style="margin-top:20px;">
                     <label>2. <%= __('user-name')%> <i class="fal fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('name-instruction')%>"></i></label>
-                    <div class="block">
+                    <div class="block my-4">
                       <div class="input-group">
                         <div class="input-group-prepend" id="basic-addon2"><span class="input-group-text"><%= __('firstname')%></span></div>
                         <input name="firstname" type="text" class="form-control" placeholder="<% if(!user.firstname){ __('firstname') } %>" value="<%= user.firstname?user.firstname : ""%>" aria-describedby="basic-addon2" required>
+                      </div>
+                      <div class="input-group">
                         <div class="input-group-append" id="basic-addon1"><span class="input-group-text"><%= __('lastname')%></span></div>
                         <input name="lastname" type="text" class="form-control" placeholder="<% if(!user.lastname){ __('lastname') } %>" value="<%= user.lastname? user.lastname : ""%>" aria-describedby="basic-addon1" style="margin-right: 20px;" required>
                       </div>
@@ -306,16 +307,8 @@
                   </div>
 
                   <div class="form-group text-left">
-                    <label>4. <%= __('page-color')%> <i class="fal fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('color-instruction')%>"></i></label>
-                    <div class="block" name="template_color" data-color="<%= user.color %>">
-                      <div class="color-block blue" data-color="blue"></div>
-                      <div class="color-block green" data-color="green"></div>
-                      <div class="color-block orange" data-color="orange"></div>
-                      <div class="color-block red" data-color="red"></div>
-                      <div class="color-block pink" data-color="pink"></div>
-                      <div class="color-block purple" data-color="purple"></div>
-                      <div class="color-block black" data-color="black"></div>
-                    </div>
+                    <label>4. <%= __('points')%> <i class="fal fa-question-circle cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('points-instruction')%>"></i></label>
+                    <input readonly class="form-control" value="<%= user.points || 0%>"/>
                   </div>
 
                 </div>

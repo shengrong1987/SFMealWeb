@@ -80,6 +80,7 @@ function getMsgFromError(err){
 
 //Modal open/switch
 function toggleModal(event,cb){
+  $('body').addClass("loading");
   var target = event.currentTarget ? event.currentTarget : event;
   var url = $(target).data('href');
   var modalId = $(target).data('target');
@@ -97,6 +98,7 @@ function toggleModalUrl(url, modalId, target, cb){
       modal.on('shown.bs.modal',function(){
         modal.off('shown.bs.modal');
         modal.modal('show');
+        $('body').removeClass("loading");
         if(cb){cb(target);}
       });
       $(modalId+' .modal-content').load(url);
@@ -110,6 +112,7 @@ function toggleModalUrl(url, modalId, target, cb){
         utility.map = null;
         modal.off('hidden.bs.modal');
       });
+      $('body').removeClass("loading");
       modal.modal('show');
       if(cb){cb(target);}
     });
@@ -508,12 +511,15 @@ function orderFood(id,number,initial){
   var $order = $("#order");
   var item = $order.find(".item[data-id=" + id + "]");
   var prefs = item.data('prefs');
-  orderFoodLogic(id, number, initial);
   if(prefs>0 && number>0){
     if(!$("#myModal").hasClass('show')) {
       var url = "/dish/" + id + "/preference";
-      toggleModalUrl(url, "#myModal");
+      toggleModalUrl(url, "#myModal", null, function(){
+        orderFoodLogic(id, number, initial);
+      });
     }
+  }else{
+    orderFoodLogic(id, number, initial);
   }
 }
 
@@ -577,13 +583,11 @@ function updateLocalOrders(id, number){
           var activeBtn = $(this).find("button.active");
           var prefType = $(this).data("preftype");
           var index = activeBtn.data("index");
-          if(index){
-            var p = activeBtn.data("property");
-            var e = parseFloat(activeBtn.data("extra"));
-            var t = prefType;
-            properties.push({ property : p, preftype : t});
-            extra += e;
-          }
+          var p = activeBtn.data("property");
+          var e = parseFloat(activeBtn.data("extra"));
+          var t = prefType;
+          properties.push({ property : p, preftype : t});
+          extra += e;
         })
         prefObj.property = properties;
         prefObj.extra = extra;

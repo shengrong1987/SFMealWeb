@@ -76,7 +76,8 @@ describe('PickupOptionController', function() {
           "index" : 2,
           "nickname" : "pickupSet1",
           "lat" : "37.738140",
-          "long" : "-122.397720"
+          "long" : "-122.397720",
+          "minimalOrder" : 9
         })
         .expect(201)
         .end(function(err, res){
@@ -130,7 +131,8 @@ describe('PickupOptionController', function() {
           "area" : "Sunnyvale",
           "phone" : "(415)444-4444",
           "nickname" : "pickupSet1",
-          "index" : 4
+          "index" : 4,
+          "minimalOrder" : 50
         })
         .expect(201)
         .end(function(err, res){

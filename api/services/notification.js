@@ -487,11 +487,11 @@ var notification = {
         pickup.pickupTillTime = moment(pickup.pickupTillTime).local().format('ddd, L, LT');
       });
     }
-    if(params.createdAt && moment(params.createdAt).isValid()){
-      params.createdAt = moment(params.createdAt).local().format('L, LT');
+    if(params.createdAt && moment(new Date(params.createdAt)).isValid()){
+      params.createdAt = moment(new Date(params.createdAt).toISOString()).local().format('L, LT');
     }
-    if(params.updatedAt && moment(params.updatedAt).isValid()){
-      params.updatedAt = moment(params.updatedAt).local().format('L, LT');
+    if(params.updatedAt && moment(new Date(params.updatedAt)).isValid()){
+      params.updatedAt = moment(new Date(params.updatedAt).toISOString()).local().format('L, LT');
     }
     if(params.orders && params.orders.length){
       params.orders.forEach(function(order){

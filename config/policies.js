@@ -53,6 +53,7 @@ module.exports.policies = {
     'becomeHost' : 'or(and(sessionAuth,localize,notHost),isAdmin)',
     'pocket' : 'or(sessionAuth,isAdmin)',
     'me' : ['sessionAuth','localize'],
+    'myorder' : ['sessionAuth','localize'],
     'contactForm' : ['sessionAuth','localize'],
     'search' : 'isAdmin',
     'deleteUserFile' : 'or(sessionAuth,isAdmin)',

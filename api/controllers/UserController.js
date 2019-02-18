@@ -416,6 +416,112 @@ module.exports = require('waterlock').actions.user({
     });
   },
 
+  myorder : function(req, res){
+    var userId = req.session.user.id;
+    User.findOne(userId).populate("host").populate("orders",{ sort: 'createdAt DESC' }).populate('auth').exec(function(err,found){
+      if(err){
+        return res.badRequest(err);
+      }
+      found.featureDishes = [];
+      if(found.orders.length === 0) {
+        found.locale = req.getLocale();
+        found.save(function(err, result){
+          if(err){
+            return res.badRequest(err);
+          }
+          Notification.destroy({user : userId}).exec(function(err){
+            if(err){
+              console.log(err);
+            }
+            if(req.wantsJSON && process.env.NODE_ENV === "development"){
+              return res.ok(found);
+            }
+            return res.view('myorder', {user: found});
+          });
+        })
+      }else{
+        async.each(found.orders, function(order,next){
+          Order.findOne(order.id).populate("dishes").populate("host").populate("meal").exec(function (err, result) {
+            if(err){
+              next(err);
+            }else{
+              order.dishes = result.dishes;
+              order.host = result.host;
+              order.meal = result.meal;
+              if(order.status === "review"){
+                Object.keys(order.orders).forEach(function(dishId){
+                  if(order.orders[dishId]>0){
+                    order.dishes.forEach(function(dish){
+                      if(dish.id === dishId){
+                        if(dish.isFeature()){
+                          dish.meal = order.meal;
+                          if(found.featureDishes.indexOf(dishId) === -1){
+                            found.featureDishes.push(dish);
+                          }
+                        }
+                      }
+                    });
+                  }
+                });
+              }
+              next();
+            }
+          });
+        }, function(err) {
+          if (err) {
+            return res.badRequest(err);
+          }
+          var newOrders = [], dishIds = [];
+          found.orders.forEach(function(order){
+            var isSamePickup = newOrders.some(function(oldOrder){
+              var _isSame = oldOrder.status === order.status && moment(oldOrder.pickupInfo.pickupFromTime).isSame(moment(order.pickupInfo.pickupFromTime), 'minute') && moment(oldOrder.pickupInfo.pickupTillTime).isSame(moment(order.pickupInfo.pickupTillTime), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
+              if(_isSame){
+                Object.keys(order.orders).forEach(function(dishId){
+                  oldOrder.orders[dishId] = order.orders[dishId];
+                })
+                oldOrder.id += "+" + order.id;
+                oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
+                oldOrder.tip = parseFloat(oldOrder.tip) + parseFloat(order.tip);
+                oldOrder.pickupInfo.comment += order.pickupInfo.comment;
+                oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
+                if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
+                  oldOrder.charges['cash'] += order.charges['cash'];
+                }
+              }
+              return _isSame;
+            })
+            if(!isSamePickup){
+              newOrders.push(order);
+            }
+          });
+          newOrders.forEach(function(order){
+            dishIds = dishIds.concat(Object.keys(order.orders));
+            dishIds = dishIds.filter(function(item, pos){
+              return dishIds.indexOf(item) === pos;
+            });
+          })
+          found.orders = newOrders;
+          req.session.user = found;
+          Notification.destroy({user : userId}).exec(function(err){
+            if(err){
+              console.log(err);
+            }
+          });
+          found.locale = req.getLocale();
+          found.save(function(err, result){
+            if(err){
+              return res.badRequest(err);
+            }
+            if(req.wantsJSON && process.env.NODE_ENV === "development"){
+              return res.ok(found);
+            }
+            return res.view('myorder',{user: found});
+          })
+        });
+      }
+    });
+  },
+
   emailVerificationView : function(req, res){
     res.view('emailVerification', { layout : 'popup', user : req.session.user});
   },
@@ -471,6 +577,9 @@ module.exports = require('waterlock').actions.user({
         if(err){
           return res.forbidden(err);
         }
+        var birthdayDate = new Date(user.birthday);
+        var birthday = birthdayDate.getMonth()+1+"/"+birthdayDate.getDate();
+        mailChimp.updateMember({ email : user.email, birthday : birthday }, "subscriber");
         res.redirect("/meal?from=emailverification");
       });
     });

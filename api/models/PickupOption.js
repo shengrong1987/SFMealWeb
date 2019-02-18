@@ -47,6 +47,9 @@ module.exports = {
     },
     nickname : {
       type : 'string'
+    },
+    minimalOrder : {
+      type : 'integer'
     }
   }
 };

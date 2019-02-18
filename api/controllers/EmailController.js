@@ -141,6 +141,9 @@ module.exports = {
                               }
                             })
                           }
+                          if(order.pickupInfo.comment){
+                            orderSummary[dishId].preference += "(" + order.pickupInfo.comment + ")";
+                          }
                         }
                       }else if(order.orders[dishId].number){
                         var dishObj = {};
@@ -161,6 +164,9 @@ module.exports = {
                               })
                             }
                           })
+                        }
+                        if(order.pickupInfo.comment){
+                          dishObj.preference += "(" + order.pickupInfo.comment + ")";
                         }
                         orderSummary[dishId] = dishObj;
                       }

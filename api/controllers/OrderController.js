@@ -107,6 +107,7 @@ module.exports = {
         delivery_fee = 0;
       }
       meal.pickups.forEach(function(pickup){
+        sails.log.info("pick up option: " + pickup.index);
         if(pickup.index === params.pickupOption){
           pickUpInfo = Object.assign({}, pickup);
         }
@@ -243,18 +244,21 @@ module.exports = {
               next();
             })
           }],
-          validateSubtotal : ['validateOrders', function(next){
+          buildOptions : ['validateOrders', function(next){
+            _this.buildDeliveryData(req.body, meals[0], req, function(logisticInfo){
+              _logisticInfo = logisticInfo;
+              next();
+            });
+          }],
+          validateSubtotal : ['buildOptions', function(next){
             var subtotal = 0;
             if(meals && meals.length){
               meals.forEach(function(meal){
                 subtotal += meal.subtotal;
               });
-              var ms = meals.filter(function(m){
-                sails.log.info("subtotal: " + subtotal, "minimal order amount:" + m.minimalOrder);
-                return parseFloat(subtotal) < parseFloat(m.minimalOrder);
-              });
-              if(ms.length){
-                return next({ code: -60, responseText : req.__('order-single-minimal-not-reach', meals[0].minimalOrder)});
+              sails.log.info("subtotal: " + subtotal, "minimal order amount:" + _logisticInfo.pickupInfo.minimalOrder);
+              if(parseFloat(subtotal) < parseFloat(_logisticInfo.pickupInfo.minimalOrder)){
+                return next({ code: -60, responseText : req.__('order-single-minimal-not-reach', _logisticInfo.pickupInfo.minimalOrder)});
               }
               next();
             }else{
@@ -305,13 +309,7 @@ module.exports = {
               });
             })
           }],
-          buildOptions : ['saveAddress', function(next){
-            _this.buildDeliveryData(req.body, meals[0], req, function(logisticInfo){
-              _logisticInfo = logisticInfo;
-              next();
-            });
-          }],
-          buildOrders : ['buildOptions', function(next){
+          buildOrders : ['saveAddress', function(next){
             var index = 0;
             async.eachSeries(meals, function(meal, nextIn){
               var orderParam = {};

@@ -87,10 +87,6 @@ module.exports = {
     leftQty : {
       type : 'json'
     },
-    minimalOrder : {
-      type : 'integer',
-      defaultsTo : 0
-    },
     minimalTotal : {
       type : 'float',
       defaultsTo : 0

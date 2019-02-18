@@ -676,9 +676,11 @@ input:focus{
 }
 
 .nav-text-highlight > .active{
-  transform: scale(1.5);
   color: @black;
   a{
+    div{
+      transform: scale(1.5);
+    }
     .border-bottom;
   }
 }
@@ -1221,6 +1223,12 @@ label {
 #myModal .modal-content{
   background-color : transparent !important;
   border: none !important;
+}
+
+/* badge */
+.badge-small{
+  .none-padding;
+  font-weight: 100;
 }
 /*button*/
 //.btn {

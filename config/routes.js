@@ -37,6 +37,7 @@ module.exports.routes = {
   '/auth/done' : "AuthController.loginSuccess",
   '/join' : 'UserController.join',
   '/user/me' : 'UserController.me',
+  '/user/order' : 'UserController.myorder',
   '/user/me/contact' : 'UserController.contactForm',
   '/user/:id/update' : 'UserController.update',
   '/user/:id/delete' : 'UserController.deleteUser',

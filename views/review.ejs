@@ -1,52 +1,55 @@
-<div id="orderReviewPopup" data-order="<%= order.id || ''%>" class="p-4">
+<div id="orderReviewPopup" data-order="<%= orders[0].id || ''%>" class="p-4">
   <%
-  if(order.reviewing_orders && order.reviewing_orders.length){
-  var index = 0;
-  order.reviewing_orders.forEach(function(dishId){
-  order.dishes.forEach(function(dish){
+  if(orders[0].reviewing_orders && orders[0].reviewing_orders.length){
+    var index = 0;
+  orders[0].reviewing_orders.forEach(function(dishId){
+  orders[0].dishes.forEach(function(dish){
   if(dish.id == dishId){
   %>
-  <div class="text-center <%= index!==0?'collapse collapse-review':'card'%>">
-    <div class="dish-item" data-dish="<%= dish.id%>">
-      <div class="d-flex justify-content-center vertical-align py-2">
-        <div class="mr-4">
-          <h5 class="none-margin">
-            <%= dish.title%>
-            <small>$<%= dish.price%></small>
-          </h5>
-        </div>
-        <div>
-          <div data-toggle="tooltip" data-placement="bottom">
-            <div class="rating" data-toggle="star-set">
-              <i class="fa fa-star"></i>
-              <i class="fa fa-star"></i>
-              <i class="fa fa-star"></i>
-              <i class="fa fa-star"></i>
-              <i class="fa fa-star"></i>
+    <div class="text-center white pb-4 <%= index!==0?'collapse collapse-review':''%>">
+      <div class="dish-item" data-dish="<%= dish.id%>">
+        <div class="d-flex justify-content-center vertical-align py-2">
+          <div class="mr-4">
+            <h5 class="none-margin">
+              <%= dish.title%>
+              <small>$<%= dish.price%></small>
+            </h5>
+          </div>
+          <div>
+            <div data-toggle="tooltip" data-placement="bottom">
+              <div class="rating" data-toggle="star-set">
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="d-flex mb-2 justify-content-center">
-        <div>
-          <img class="border-right-0" src="<%= dish.photos[0].v%>" style="max-height:100px;">
+        <div class="d-flex mb-2 justify-content-center">
+          <div>
+            <img class="border-right-0" src="<%= dish.photos[0].v%>" style="max-height:100px;">
+          </div>
+          <div>
+            <textarea class="form-control review border-left-0 rounded-0" placeholder="<%= dish.title%>" style="height:100px;"></textarea>
+          </div>
         </div>
-        <div>
-          <textarea class="form-control review border-left-0 rounded-0" placeholder="<%= dish.title%>" style="height:100px;"></textarea>
+        <div class="row <%= index===0?'':'d-none'%>">
+          <div class="col-12 text-right">
+            <div id="meal-review-alert" class="alert alert-danger d-none"><%= __('review-warning')%></div>
+            <button class="btn btn-success leaveReview mr-5" data-target="#orderReviewPopup" data-host="<%= orders[0].host%>" data-dish="<%= dishId%>" data-err-container="#meal-review-alert"><%= __('submit')%></button>
+          </div>
+          <div class="col-12">
+            <div class="cursor-pointer" data-toggle="collapse" data-target=".collapse-review">More<i class="fas fa-chevron-square-down ml-2"></i></div>
+          </div>
         </div>
-      </div>
-      <div class="row my-2 <%= index===0?'':'d-none'%>">
-        <div class="col-12 text-right pr-4">
-          <div id="meal-review-alert" class="alert alert-danger d-none"><%= __('review-warning')%></div>
-          <button class="btn btn-success leaveReview" data-target="#orderReviewPopup" data-host="<%= order.host%>" data-dish="<%= dishId%>" data-err-container="#meal-review-alert"><%= __('submit')%></button>
-          <button class="btn btn-info" data-toggle="collapse" data-target=".collapse-review"><i class="fas fa-chevron-square-down">  <%= __('see-more')%></i></button>
-        </div>
+
       </div>
     </div>
-  </div>
   <%
-  index++;}})})}else{%>
-    <h3 class="text-center"><small><%= order.status === "review" ? __('complete-review-tip') : __('no-review-tip')%><br/><br/><a class="btn btn-grey-red active" href="/host/public/<%= order.host%>"><%= __('see-review')%></a></small></h3>
+    index++;}})})}else{%>
+    <h3 class="text-center"><small><%= orders[0].status === "review" ? __('complete-review-tip') : __('no-review-tip')%><br/><br/><a class="btn btn-grey-red active" href="/host/public/<%= orders[0].host%>"><%= __('see-review')%></a></small></h3>
   <%}%>
 </div>
 

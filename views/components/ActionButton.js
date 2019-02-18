@@ -283,7 +283,8 @@ var ActionButton = createReactClass({
               area : {value: this.props.data['area'] || ''},
               county : {value: this.props.data['county'] || ''},
               index : {value: this.props.data['index'] || ''},
-              nickname : {value: this.props.data['nickname'] || ''}
+              nickname : {value: this.props.data['nickname'] || ''},
+              minimalOrder : {value: this.props.data["minimalOrder"] || 0}
              }
           }
           break;

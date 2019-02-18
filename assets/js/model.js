@@ -1974,11 +1974,8 @@ var MealView = Backbone.View.extend({
         return;
       }
     }
-
-    var singleOrderMinimal = form.find("#singleOrderInput").val() || 0;
     var min_total = form.find("#min-total").val() || 0;
-
-    if(!singleOrderMinimal && !min_total){
+    if(!min_total){
       form.find(".order-require .alert").show();
       form.find(".order-require .alert").html(form.find("#min-order").data("error"));
       jumpTo("min-order");
@@ -2030,7 +2027,6 @@ var MealView = Backbone.View.extend({
       type : type,
       title : title,
       title_en : title_en,
-      minimalOrder : singleOrderMinimal,
       minimalTotal : min_total,
       cover : cover,
       features : features,

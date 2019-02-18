@@ -7,6 +7,7 @@
 
     <%
     var orderSummary = {};
+    var index = 1;
     orders.forEach(function(order){
       Object.keys(order.orders).forEach(function(dishId){
         var dish = dishes.filter(function(d){
@@ -20,18 +21,27 @@
           if(order.orders[dishId].number){
             orderSummary[dishId].amount = parseInt(orderDetail.number) + parseInt(orderSummary[dishId].amount);
             if(orderDetail.preference && Array.isArray(orderDetail.preference)){
-              orderDetail.preference.forEach(function(prefs){
+              for(var i=0;i<orderDetail.preference.length;i++){
+                var prefs = orderDetail.preference[i];
+                if(!i){
+                  if(orderSummary[dishId].preference){
+                    orderSummary[dishId].preference += "  ";
+                  }
+                  orderSummary[dishId].preference += "第"+orderSummary[dishId].amount+"份:";
+                }
                 if(prefs.property && Array.isArray(prefs.property)){
                   prefs.property.forEach(function(prop){
-                    if(orderSummary[dishId].preference){
-                      orderSummary[dishId].preference += ",";
-                    }
                     if(prop.property && prop.property !== "undefined"){
                       orderSummary[dishId].preference += prop.property;
                     }
                   })
                 }
-              })
+                if(i===orderDetail.preference.length-1){
+                  if(order.pickupInfo.comment){
+                    orderSummary[dishId].preference += "(" + order.pickupInfo.comment + ")";
+                  }
+                }
+              }
             }
           }
         }else if(order.orders[dishId].number){
@@ -41,18 +51,27 @@
           dishObj.price = orderDetail.price;
           dishObj.preference = "";
           if(orderDetail.preference && Array.isArray(orderDetail.preference)){
-            orderDetail.preference.forEach(function(prefs){
+            for(i=0;i<orderDetail.preference.length;i++){
+              prefs = orderDetail.preference[i];
+              if(!i){
+                if(dishObj.preference){
+                  dishObj.preference += "  ";
+                }
+                dishObj.preference += "第1份:";
+              }
               if(prefs.property && Array.isArray(prefs.property)){
                 prefs.property.forEach(function(prop){
-                  if(dishObj.preference){
-                    dishObj.preference += ",";
-                  }
                   if(prop.property && prop.property !== "undefined"){
                     dishObj.preference += prop.property;
                   }
                 })
               }
-            })
+              if(i===orderDetail.preference.length-1){
+                if(order.pickupInfo.comment){
+                  dishObj.preference += "(" + order.pickupInfo.comment + ")";
+                }
+              }
+            }
           }
           orderSummary[dishId] = dishObj;
         }
