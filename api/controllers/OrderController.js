@@ -185,21 +185,18 @@ module.exports = {
 
       meals = meals.filter(function (meal) {
 
-        var hasSameFlag;
-        if(!targetMeal.flag && !meal.flag){
-          var hasSameFlag = true;
-        }else if(targetMeal.flag === meal.flag){
-          hasSameFlag = true;
-        }else{
-          hasSameFlag = false;
+        if(meal.id === targetMeal.id){
+          return true;
         }
+        var hasSameNickname = targetMeal.nickname !== "custom" && targetMeal.nickname === meal.nickname;
+        sails.log.info(targetMeal.nickname + " & " + meal.nickname);
         var mealHasDish = meal.dishes.some(function(d) {
           return orderedDishes.includes(d.id);
         });
-        if(mealHasDish && hasSameFlag){
+        if(mealHasDish && hasSameNickname){
           sails.log.info("meal: " + meal.title);
         }
-        return mealHasDish && hasSameFlag;
+        return mealHasDish && hasSameNickname;
       });
 
       var notInMealDish;

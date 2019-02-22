@@ -839,34 +839,7 @@ describe('OrderController', function() {
           .end(done)
       })
 
-      it('should not take order with meals of different pickup option', function (done) {
-        var dishObj = {};
-        dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
-        dishObj[dishId7] = { number : 1 , preference : [{ property : '', extra : 0}], price : price7 };
-        agent
-          .post('/order')
-          .send({
-            orders : dishObj,
-            subtotal : price1 + price7,
-            contactInfo : { name : "sheng", address : address, phone : phone },
-            paymentInfo : { method : 'online'},
-            method : "delivery",
-            pickupOption : 1,
-            pickupMeal : systemDeliveryMealId,
-            pickupDate : 'today',
-            tip : 0
-          })
-          .expect(400)
-          .end(function(err,res){
-            if(err){
-              return done(err);
-            }
-            res.body.code.should.be.equal(-51);
-            done();
-          })
-      })
-
-      it('should not take order with meals of different ', function (done) {
+      it('should not order dishes under different meals of custom pickup nickname', function (done) {
         var dishObj = {};
         dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
         dishObj[dishId7] = { number : 1 , preference : [{ property : '', extra : 0}], price : price7 };
@@ -888,7 +861,7 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
-            res.body.code.should.be.equal(-51);
+            res.body.code.should.be.equal(-57);
             done();
           })
       })

@@ -123,7 +123,9 @@
                         <% if(extra){%>
                         (+$<%= extra.toFixed(2)%>)<br/>
                         <% }%>
-                        <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                        <% if(preference && preference.length && preference[0].property && preference[0].property.length){%>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                        <% }%>
                       </td>
                       <td><% if(order.status=="adjust"){
                           if(!order.adjusting_orders[key]){
@@ -268,7 +270,9 @@
                         <% if(extra){%>
                         (+$<%= extra.toFixed(2)%>)<br/>
                         <% }%>
-                        <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                        <% if(preference && preference.length && preference[0].property && preference[0].property.length){%>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                        <% }%>
                       </td>
                       <td><% if(order.status=="adjust"){
                           if(!order.adjusting_orders[key]){

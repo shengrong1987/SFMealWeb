@@ -308,8 +308,7 @@ describe('MealController', function() {
             status : 'off',
             isDelivery : false,
             preference : preference,
-            isTaxIncluded : true,
-            flag : "order"
+            isTaxIncluded : true
           })
           .expect(200)
           .end(function(err,res){
@@ -447,7 +446,6 @@ describe('MealController', function() {
           }),
           supportPartyOrder : true,
           isTaxIncluded : true,
-          flag : "ahhhh",
           nickname: "pickupSet2"
         })
         .expect(200)
@@ -480,7 +478,6 @@ describe('MealController', function() {
             }),
             supportPartyOrder : true,
             isTaxIncluded : true,
-            flag : "ahhhh",
             nickname: "pickupSet1"
           })
           .expect(200)
@@ -579,7 +576,6 @@ describe('MealController', function() {
           }),
           supportPartyOrder : true,
           isTaxIncluded : true,
-          flag : "ahhhh",
           nickname : "pickupSet1"
         })
         .expect(200)
@@ -651,7 +647,6 @@ describe('MealController', function() {
           status : "off",
           cover : dish1,
           isTaxIncluded : true,
-          flag : "ahhhh",
           nickname : "custom"
         })
         .expect(200)

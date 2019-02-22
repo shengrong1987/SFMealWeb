@@ -1997,7 +1997,6 @@ var MealView = Backbone.View.extend({
       }
     }
 
-    var flag = form.find("#flagInput").val();
     var status = this.isActivate? "on" : "off";
     var title = form.find("#meal_title").val();
     var title_en = form.find("#meal_title_en").val();
@@ -2039,7 +2038,6 @@ var MealView = Backbone.View.extend({
       supportPartyOrder : supportPartyOrder,
       partyRequirement : partyRequirement,
       isSupportDynamicPrice : isSupportDynamicPrice,
-      flag : flag,
       nickname : storeHourNickname
 
     });

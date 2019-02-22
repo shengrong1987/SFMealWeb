@@ -890,11 +890,23 @@ function enterDishPreference(target){
   var preference = $(target).data("preference");
   var container = $("#preferenceTable").find("tbody");
   container.empty();
-  preference.forEach(function(pre, index){
-    var element = "<tr><th>$index</th><td>$extra</td><td>$preference</td></tr>";
-    element = element.replace("$index", index+1).replace("$extra", "$" + pre.extra.toFixed(2)).replace("$preference",pre.property);
-    container.append(element);
-  })
+  if(Array.isArray(preference) && preference.length){
+    preference.forEach(function(pref, index){
+      if(pref.property && Array.isArray(pref.property)){
+        var props = "";
+        pref.property.forEach(function(prop, index){
+          if(props){
+            props += ",";
+          }
+          props += prop.property;
+        })
+        var element = "<tr><th>$index</th><td>$extra</td><td>$preference</td></tr>";
+        element = element.replace("$index", index+1).replace("$extra", "$" + pref.extra.toFixed(2)).replace("$preference",props);
+        container.append(element);
+      }
+    });
+  }
+
 }
 
 function enterHostInfo(target){
