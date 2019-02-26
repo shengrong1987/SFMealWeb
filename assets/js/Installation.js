@@ -585,6 +585,6 @@ function adjustLayout(){
   }
   var dishTagsBar = $("#dishTagsBar");
   if(dishTagsBar.length){
-    dishTagsBar.height($("#dishContentView").height()/2);
+    dishTagsBar.height(window.innerHeight-148-62);
   }
 }

@@ -73,11 +73,11 @@
     <% }%>
 
     <div class="w-100 d-flex">
-      <nav id="dishTagsBar" class="sticky-top">
+      <nav id="dishTagsBar" class="sticky-top py-2" style="overflow-y: scroll;min-width: 100px;">
         <% if(!user || (user && !user.newUserRewardIsRedeemed && user.points === 0)){ %>
           <a id="newUserRewardIcon" data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/user/reward/newUser"><img class="icon-float cursor-pointer" src="/images/icon_new.png"></a>
         <% }%>
-        <ul class="list list-side list-unstyled" style="min-width:100px;" data-toggle="btn-set">
+        <ul class="list list-side list-unstyled" data-toggle="btn-set">
           <% tags.forEach(function(tag, index){%>
             <li class="cursor-pointer border-bottom <%= index===0?'active':''%>"><a style="white-space: nowrap;" data-offset=-144 href="<%= tag.replace("'","").replace(" ","")%>"><%= __(tag)%></a></li>
           <% })%>
