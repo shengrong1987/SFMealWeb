@@ -916,6 +916,7 @@ var AddressView = Backbone.View.extend({
     var city = target.data("city");
     var zip = target.data("zip");
     var phone = target.data("phone");
+    var name = target.data("name");
     var address_form = $("#addressDetailView form");
     address_form.off("submit");
     address_form.on("submit", AddressView.prototype.saveAddress);
@@ -937,6 +938,7 @@ var AddressView = Backbone.View.extend({
       address_form.find(".user").show();
       address_form.find(".host").hide();
     }
+    address_form.find("#nameInput").val(name);
     address_form.find("#streetInput").val(street);
     address_form.find("#cityInput").val(city);
     address_form.find("#postalInput").val(zip);
@@ -1463,7 +1465,6 @@ var MealSelectionView = Backbone.View.extend({
         }
         if(distance > range){
           $this.$el.find("#addressAlertView").show();
-          $this.$el.find("#addressAlertView").html(jQuery.i18n.prop('deliveryOutOfRangeError'));
         }
       } else {
         window.alert('Directions request failed due to ' + status);
@@ -2374,6 +2375,7 @@ var DishView = Backbone.View.extend({
     var descEn = form.find("#descriptionInput-en").val();
     var instagram = form.find("#instagramInput").val();
     var isDynamicPriceOn = form.find("#isDynamicPriceOn").prop("checked");
+    var isSupportShipping = form.find("#isSupportShipping").prop("checked");
     var priceRate = form.find("#priceRateInput").val();
     var qtyRate = form.find("#qtyRateInput").val();
     var minimalPrice = form.find("#minimalPriceInput").val();
@@ -2441,6 +2443,7 @@ var DishView = Backbone.View.extend({
             video : instagram,
             preference : preference,
             isDynamicPriceOn : isDynamicPriceOn,
+            isSupportShipping : isSupportShipping,
             priceRate : priceRate,
             qtyRate : qtyRate,
             minimalPrice : minimalPrice,
@@ -3288,14 +3291,16 @@ var MealConfirmView = Backbone.View.extend({
     "mixEnd #deliveryTab" : "switchDate",
     "click #verifyAddressBtn" : "verifyAddress",
     "change #deliveryTab .regular-radio" : "verifyAddress",
-    "change #pickupInfoView .deliveryInput .contactOption .regular-radio" : "verifyAddress",
+    "change #pickupInfoView .deliveryInput .contactOption .regular-radio" : "switchAddress",
     "click #applyCouponBtn" : "applyCouponCode",
     "click #applyPointsBtn" : "addPointsToOrder",
     "click #createNewContactBtn" : "createNewContact",
     "click #createNewContactBtn2" : "createNewContact",
     "keydown" : "onKeyDown",
     "click input[name='billingAddress']" : "enterBillingAddress",
-    "click [data-action]" : "go"
+    "click [data-action]" : "go",
+    "click #switchToShippingBtn" : "switchToShipping",
+    "click #switchToDeliveryBtn" : "switchToDelivery"
   },
   initialize : function(){
     this.initView();
@@ -3333,16 +3338,38 @@ var MealConfirmView = Backbone.View.extend({
     }
     var method = $("#pickupMethodView #method .active").attr("value");
     if(method === "delivery"){
-      $("#pickupOptionsView .step-2").hide();
+      $("#deliveryTab .deliveryOption").hide();
+      $("#deliveryTab .no-address").show();
     }
+  },
+
+  switchToShipping : function(e){
+    $("[data-href='#shippingTab']").tab("select");
+  },
+
+  switchToDelivery : function(e){
+    $("[data-href='#deliveryTab']").tab("select");
   },
 
   switchMethod : function(e){
     var value = $(e.currentTarget).find(".active").attr("value");
     this.methodViewControl(value);
     this.pickupOptionViewControl(value);
-    this.verifyAddress();
+    if(value==="delivery"){
+      this.verifyAddress();
+    }else{
+      jumpTo("pickupOptionsView");
+    }
     refreshCheckoutMenu();
+  },
+
+  switchAddress : function(e){
+    var method = $("#pickupMethodView #method .active").attr("value");
+    if(method!=="delivery"){
+      $("[data-href='#deliveryTab']").tab("select");
+      this.methodViewControl("delivery");
+    }
+    this.verifyAddress();
   },
 
   /*
@@ -3352,19 +3379,26 @@ var MealConfirmView = Backbone.View.extend({
    */
   verifyAddress : function(e, isInitializing, cb){
     var _this = this;
-    if(this.$el.find("#method button.active").attr("value") === "pickup"){
+    var method = this.$el.find("#method button.active").attr("value");
+    if(method === "pickup"){
+      jumpTo("pickupOptionsView");
       if(cb){
         return cb(true);
       }
       return;
-    };
+    }
     //get current date
     var dateDesc = decodeURI(readCookie('date'));
 
     //get address
     var yourAddress = this.getAddress(isInitializing);
     if(!yourAddress){
+      $("#deliveryTab .deliveryOption").hide();
+      $("#deliveryTab .no-address").show();
       return;
+    }else{
+      $("#deliveryTab .deliveryOption." + dateDesc).show();
+      $("#deliveryTab .no-address").hide();
     }
 
     //get selected delivery option
@@ -3422,9 +3456,11 @@ var MealConfirmView = Backbone.View.extend({
   },
   pickupOptionViewControl : function(method){
     if(method === "delivery"){
-      $("#pickupOptionsView .step-2").hide();
+      $("#deliveryTab .deliveryOption").hide();
+      $("#deliveryTab .no-address").show();
     }else{
-      $("#pickupOptionsView .step-2").show();
+      $("#deliveryTab .deliveryOption").show();
+      $("#deliveryTab .no-address").hide();
     }
   },
   getAddress : function(isInitializing){
@@ -3467,10 +3503,8 @@ var MealConfirmView = Backbone.View.extend({
     var lat = optionView.data('lat');
     var long = optionView.data('long');
     if(!long || !lat){
-      $("#pickupOptionsView .step-2").show();
-      var emptyView = $("#pickupOptionsView #deliveryTab .empty");
-      emptyView.html("<small>" + jQuery.i18n.prop('deliveryNotAvailable') + "</small>");
-      emptyView.removeClass("d-none").show();
+      $("#deliveryTab .deliveryOption").show();
+      $("#deliveryTab .no-address").show();
       jumpTo("pickupOptionsView");
       return;
     }
@@ -3506,7 +3540,8 @@ var MealConfirmView = Backbone.View.extend({
     }
     var _this = this;
     var deliveryOptions = this.$el.find("#deliveryTab .deliveryOption .regular-radio");
-    $("#pickupOptionsView .step-2").show();
+    $("#deliveryTab .deliveryOption." + dateDesc).show();
+    $("#deliveryTab .no-address").hide();
 
     utility.geocoding(address, function(err, cusLocation) {
       if (err) {
@@ -3535,7 +3570,6 @@ var MealConfirmView = Backbone.View.extend({
       });
       var visibleOptions = _this.$el.find("#deliveryTab .deliveryOption:visible");
       var emptyView = $("#pickupOptionsView #deliveryTab .empty");
-      emptyView.html("<small>" + jQuery.i18n.prop('deliveryOutOfRangeError') + "</small>");
       if(visibleOptions.length){
         emptyView.hide();
       }else{
@@ -3708,6 +3742,25 @@ var OrderView = Backbone.View.extend({
       }
     })
   },
+  tracking : function(e){
+    e.preventDefault();
+    var orderId = $(e.target).data("order");
+    this.model.set({ id : orderId, tracking : $("#popover_msg").val()});
+    this.model.action = "tracking";
+    this.model.save({},{
+      success : function(model,result){
+        BootstrapDialog.alert(result.responseText, function(){
+          if(location.href.indexOf("host/me")===-1){
+            reloadUrl("/user/me", "#myorder");
+          }else{
+            reloadUrl("/host/me","#myorder");
+          }
+        });
+      },error : function(model, err){
+        BootstrapDialog.alert(getMsgFromError(err));
+      }
+    })
+  },
   confirm : function(e){
     e.preventDefault();
     var orderId = $(e.target).data("order");
@@ -3788,6 +3841,7 @@ var OrderView = Backbone.View.extend({
         cb(contactObj);
         break;
       case "delivery":
+      case "shipping":
         if (contactView.find("#contactInfoView").length) {
           name = contactView.find("input[name='name']").val();
           phone = contactView.find("input[name='phone']").val();
@@ -3820,43 +3874,6 @@ var OrderView = Backbone.View.extend({
             contactObj.phone = phone;
             contactObj.name = optionView.data("username");
           } else {
-            makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'));
-            return cb(false);
-          }
-        }
-        return cb(contactObj);
-        break;
-      case "shipping":
-        if(!isLogin){
-          name = contactView.find("input[name='name']").val();
-          phone = contactView.find("input[name='phone']").val();
-          street = contactView.find("input[name='street']").val();
-          city = contactView.find("input[name='city']").val();
-          state = contactView.find("input[name='state']").val();
-          zipcode = contactView.find("input[name='zipcode']").val();
-          if(!street || !city || !state || !zipcode){
-            makeAToast(jQuery.i18n.prop('addressIncomplete'));
-            return cb(false);
-          }
-          if(!name || !phone){
-            makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
-            return cb(false);
-          }
-          contactObj.address = street + ", " + city + ", " + state + " " + zipcode;
-          contactObj.name = name;
-          contactObj.phone = phone;
-        }else{
-          t = contactView.next().next().text();
-          if(t){
-            address = t.split("+")[0];
-            phone = t.split("+")[1];
-            if(!address || !phone){
-              makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'));
-              return cb(false);
-            }
-            contactObj.address = address;
-            contactObj.phone = phone;
-          }else{
             makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'));
             return cb(false);
           }

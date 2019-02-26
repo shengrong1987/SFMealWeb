@@ -11,21 +11,21 @@
               </div>
             </div>
             <div class="col-12 my-4 text-left">
-              <ul class="btn-group btn-group-lg padding-none" role="group" aria-label="Basic example" id="method">
+              <ul class="btn-group btn-group-lg none-padding" role="group" id="method">
                 <%
                   var hasDelivery = pickups.some(function(pickup){
                     return pickup.method === "delivery";
                   });
                   if(hasDelivery){%>
-                    <button data-toggle="tab" data-href="#deliveryTab" class="btn btn-fat btn-lg active" value="delivery"><strong><%= __('delivery')%></strong></button>
-                  <%}if(pickups.some(function(pickup){
-                    return pickup.method === "shipping";
+                    <button data-toggle="tab" data-href="#deliveryTab" class="btn btn-fat btn-lg active" value="delivery"><%= __('delivery')%></button>
+                  <%}if(dishes.some(function(dish){
+                    return dish.isSupportShipping;
                   })){%>
-                <button data-toggle="tab" data-href="#shippingTab" class="btn btn-fat btn-lg" value="shipping"><strong><%= __('shipping')%></strong></button>
+                    <button data-toggle="tab" data-href="#shippingTab" class="btn btn-fat btn-lg" value="shipping"><%= __('shipping')%></button>
                 <%} if(pickups.some(function(pickup){
                     return pickup.method === "pickup";
                   })){%>
-                <button data-toggle="tab" data-href="#pickupTab" class="btn btn-fat btn-lg <%= hasDelivery?'':'active'%>" value="pickup"><strong><%= __('self-pickup')%></strong></button>
+                    <button data-toggle="tab" data-href="#pickupTab" class="btn btn-fat btn-lg <%= hasDelivery?'':'active'%>" value="pickup"><%= __('self-pickup')%></button>
                 <% }%>
               </ul>
             </div>
@@ -77,11 +77,11 @@
               </div>
             </div>
 
-            <div class="col-12 deliveryInput">
+            <div class="col-12 deliveryInput shippingInput">
               <div class="radio-box flex" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
                 <%
-                var addresses= user.address;
-                var firstname = user.firstname;
+                addresses= user.address;
+                firstname = user.firstname;
                 if(addresses){
                   var keys = Object.keys(addresses);
                 keys.forEach(function(key){
@@ -132,7 +132,7 @@
               </div>
 
               <h5>
-                <small class="text-black deliveryInput" style="font-size:0.8em;"><%= __('location-info')%></small>
+                <small class="text-black deliveryInput shippingInput" style="font-size:0.8em;"><%= __('location-info')%></small>
                 <small class="text-black pickupInput" style="font-size:0.8em;"><%= __('comment')%></small>
               </h5>
               <div class="row deliveryInput shippingInput">
@@ -175,7 +175,7 @@
             <%}%>
             <div class="col-12 deliveryInput">
               <div class="form-group text-center">
-                <button id="verifyAddressBtn" style="height: 50px;width:160px;" class="btn btn-lg btn-green form-control"><strong><%= __('calculate-delivery')%></strong></button>
+                <button id="verifyAddressBtn" style="height: 50px;" class="btn btn-lg btn-green form-control"><%= __('calculate-delivery')%></button>
               </div>
             </div>
           </div>
@@ -189,7 +189,7 @@
               <div class="light-grey py-2 text-left">
                 <div class="d-flex justify-content-between align-base">
                   <div class="mb-0 pl-2">
-                    <h5 class="deliveryInput"><%= __('delivery-option') %></h5>
+                    <h5 class="deliveryInput shippingInput"><%= __('delivery-option') %></h5>
                     <h5 class="pickupInput"><%= __('pickup-option') %></h5>
                   </div>
                   <div class="pr-5">
@@ -199,7 +199,7 @@
               </div>
             </div>
 
-            <div class="col-12 step-2">
+            <div class="col-12">
               <ul id="dishDatesBar" class="nav nav-fill nav-light nav-scroll bg-light">
                 <%
                 var dates = Object.keys(meals.meals);
@@ -244,14 +244,13 @@
               </ul>
             </div>
 
-            <div class="col-12 step-2">
+            <div class="col-12">
               <div class="tab-content">
                 <div id="pickupTab" class="tab-pane <%= hasDelivery?'':'active'%>" role="tabpanel">
                   <div class="card">
                     <div class="card-body">
                       <div class="radio-box flex" id="pickupMethod" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
                         <%
-                        var i = 0;
                         var j = i+1;
                         if(pickups){
                           var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue',];
@@ -289,14 +288,44 @@
                               </span>
                             </label>
                             <%j++;}i++;})}; %>
-                            <h5 class="empty d-none text-center"><small><%= __('delivery-out-of-range-error')%></small></h5>
+                            <h5 class="empty d-none text-center">
+                              <small><%= __('delivery-out-of-range-error')%></small><br/><br/>
+                              <small><%= __('other-area-shipping')%></small>
+                              <button id="switchToShippingBtn" class="btn btn-outline-dark"><%= __('shipping')%></button>
+                            </h5>
+                            <h5 class="no-address text-center">
+                              <small><%= __('enter-address-to-see')%></small>
+                            </h5>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-
                 </div>
+
+                <div id="shippingTab" class="tab-pane" role="tabpanel">
+                  <div class="row text-left">
+                    <div class="col-12">
+                      <div class="card">
+                        <div class="card-body">
+                          <div class="radio-box flex">
+                            <label class="btn btn-outline-light option shippingOption mix" data-meal="<%= pickups[0].meal%>">
+                              <div class="s"></div>
+                              <input type="radio" id="shipping-option" data-index="1" name="shipping-contact-set" class="regular-radio" checked="checked"><label for="shipping"></label>
+                              <span class="content">
+                                <i class="fa fa-shipping cursor-pointer mr-2 text-red" data-toggle="tooltip" title="<%= __('shipping')%>"></i><%= __('shipping')%>: <%= __('shipping-instruction')%>
+                              </span>
+                            </label>
+                            <h5 class="text-center">
+                              <button id="switchToDeliveryBtn" onclick="jumpTo('pickupInfoView')" class="btn btn-outline-dark"><%= __('reselect-address')%></button>
+                            </h5>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -322,15 +351,15 @@
                 var card = cards[j];
                 var last4 = card.last4;
               %>
-              <button class="btn btn-disable py-2 col-3 <%if(card.isDefaultPayment){%> active<%}%> disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
+              <button class="btn btn-disable py-2 col-3 deliveryInput pickupInput shippingInput <%if(card.isDefaultPayment){%> active<%}%> disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
               <%}}%>
               <button class="btn btn-disable py-2 col-3 disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
               <%}else{%>
               <button data-toggle="tab" data-href="#cardPayment" class="btn btn-disable py-2 col-3 disabled" data-method="online"><strong><i class="fa fa-credit-card fa-2x"></i></strong><br/><%= __('bank-card') %></button>
               <%}%>
-              <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable <%= (user.id && user.payment && user.payment.length) ? '' : 'active'%> py-2 col-3 disabled" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
-              <button data-toggle="tab" data-href="#venmoPayment" class="btn btn-disable  py-2 col-3 disabled" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
-              <button data-toggle="tab" data-href="#paypalPayment" class="btn btn-disable py-2 col-3 disabled" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method') %></button>
+              <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable <%= (user.id && user.payment && user.payment.length) ? '' : 'active'%> py-2 col-3 disabled deliveryInput pickupInput" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
+              <button data-toggle="tab" data-href="#venmoPayment" class="btn btn-disable  py-2 col-3 disabled deliveryInput pickupInput shippingInput" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
+              <button data-toggle="tab" data-href="#paypalPayment" class="btn btn-disable py-2 col-3 disabled deliveryInput pickupInput shippingInput" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method') %></button>
               <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg disabled" data-method="alipay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('alipay-method') %></button>-->
               <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg d-none disabled" data-method="wechatpay" style="margin-right: 10px;height: 80px;"><i class="fa fa-wechat fa-2x"></i><br/><%= __('wechatpay-method') %></button>-->
             </div>
@@ -518,12 +547,12 @@
           </tr>
           </thead>
           <tbody class="scroll">
-          <% var dishes = [];
+          <% var _dishes = [];
           var dateList = Object.keys(meals.meals);
           dateList.forEach(function(dateKey){
             var mealObj = meals.meals[dateKey];
             var actualMeals = mealObj.meals;
-            actualMeals.forEach(function(meal) {meal.dishes.forEach(function(dish) {if(!dishes.includes(dish.id)){dishes.push(dish.id);%>
+            actualMeals.forEach(function(meal) {meal.dishes.forEach(function(dish) {if(!_dishes.includes(dish.id)){_dishes.push(dish.id);%>
               <tr class="success dish item px-2" data-id=<%= dish.id %> data-left-amount=<%= meal.leftQty[dish.id]%> style="display: none;">
                 <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span></td>
                 <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
@@ -567,14 +596,14 @@
           </tr>
           <tr></tr>
           <% if(user.id){%>
-          <tr>
-            <th style="vertical-align: middle;"><i class="fal fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('coupon')%>"></i> <%= __('coupon')%>:</th>
-            <th><input class="coupon-code form-control" style="margin:0 5px 0 5px;width: 80px;" maxlength="7" data-code="" data-value="" value="<%= user.firstOrder ? '' : ''%>"></input></th>
-            <th class="text-right">
-              <button id="applyCouponBtn" class="btn btn-success"><%= __('apply-code')%></button>
-              <button id="disApplyCouponBtn" class="btn btn-danger" onclick="javascript:applyCoupon(false);"><%= __('disapply-code')%></button>
-            </th>
-          </tr>
+          <!--<tr>-->
+            <!--<th style="vertical-align: middle;"><i class="fal fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('coupon')%>"></i> <%= __('coupon')%>:</th>-->
+            <!--<th><input class="coupon-code form-control" style="margin:0 5px 0 5px;width: 80px;" maxlength="7" data-code="" data-value="" value="<%= user.firstOrder ? '' : ''%>"></input></th>-->
+            <!--<th class="text-right">-->
+              <!--<button id="applyCouponBtn" class="btn btn-success"><%= __('apply-code')%></button>-->
+              <!--<button id="disApplyCouponBtn" class="btn btn-danger" onclick="javascript:applyCoupon(false);"><%= __('disapply-code')%></button>-->
+            <!--</th>-->
+          <!--</tr>-->
           <% if(user && !user.emailVerified){%>
           <tr id="emailVerificationView">
             <th style="vertical-align: middle;"><i class="fal fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i> <%= __('email')%></th>
@@ -585,7 +614,7 @@
           </tr>
           <% }%>
           <tr>
-            <th style="vertical-align: middle;"><i class="fal fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i> <%= __('points')%>:</th>
+            <th style="vertical-align: middle;"><%= __('points')%>:<i class="fal fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i></th>
             <th><input class="points form-control" style="margin:0 5px 0 5px;width: 60px;" readonly value="<%= user?(user.points || 0):-1%>"></input></th>
             <th class="text-right">
               <button id="applyPointsBtn" class="btn btn-success"><%= __('apply-code')%></button>

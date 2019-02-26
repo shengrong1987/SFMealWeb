@@ -266,6 +266,11 @@
               <div class="alert alert-danger"></div>
             </div>
 
+            <div class="form-group">
+              <label for="isDynamicPriceOn">11.<%= __('support-shipping') %></label><br/>
+              <input class="form-control" type="checkbox" data-toggle="switch-button" id="isSupportShipping" <%= !!dish.isSupportShipping ? "checked='checked'" : ""%>>
+            </div>
+
             <div class="form-group text-center submit">
               <button type="submit" class="btn btn-grey-green btn-lg round active"><%= __('save-and-submit')%></button>
               <div class="help-block with-errors"><%= __('24hours')%></div>

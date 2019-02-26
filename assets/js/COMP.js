@@ -143,6 +143,8 @@
     button.parent().trigger('change');
   }
 
+  Tab.prototype.show = function(button){}
+
   function Plugin(option, root){
     var hasRoot = typeof root !== 'undefined';
     return this.each(function(){

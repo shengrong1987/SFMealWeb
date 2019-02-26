@@ -1597,6 +1597,138 @@ describe('OrderController', function() {
       })
     })
 
+    describe('order with shipping option', function(){
+
+      it('should login or register an account for guest', function (done) {
+        agent
+          .post('/auth/login?type=local')
+          .send({email : guestEmail, password: password})
+          .expect(302)
+          .expect('Location','/auth/done')
+          .end(done)
+      });
+
+      var mealId;
+      var dishId1;
+      var dishId2;
+      var dishId3;
+      var dishId4;
+      var price1;
+      var price2;
+      var price3;
+      var price4;
+      var dish1LeftQty;
+
+      it('should get a order meal', function (done) {
+        agent
+          .get('/meal')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err,res){
+            if(err){
+              return done(err);
+            }
+            var meal = res.body.meals.filter(function(m){
+              return m.type === "order";
+            })[0];
+            mealId = meal.id;
+            dishId1 = meal.dishes[0].id;
+            dishId2 = meal.dishes[1].id;
+            dishId3 = meal.dishes[2].id;
+            dishId4 = meal.dishes[3].id;
+            price1 = meal.dishes[0].price;
+            price2 = meal.dishes[1].price;
+            price3 = meal.dishes[2].price;
+            price4 = meal.dishes[3].price;
+            dish1LeftQty = meal.leftQty[dishId1];
+            done();
+          })
+      });
+
+      var orderId;
+      var hostId;
+      it('should order the meal with shipping with dish invalid error', function (done) {
+        var dishObj = {};
+        dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
+        dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
+        dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+        dishObj[dishId4] = { number : 4 , preference : [{ property : '', extra : 0}], price : price4 };
+        agent
+          .post('/order')
+          .send({
+            orders : dishObj,
+            subtotal : price1 * 1 + price4 * 4,
+            contactInfo : { name : "sheng", address : address, phone : phone },
+            paymentInfo : { method : 'online'},
+            method : "shipping",
+            pickupMeal : mealId,
+            pickupOption : 2,
+            tip : 0
+          })
+          .expect(400)
+          .end(function(err, res){
+            res.body.code.should.be.equal(-2);
+            done();
+          })
+      });
+
+      it('should order the meal with shipping with minimal not reach error', function (done) {
+        var dishObj = {};
+        dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}], price : price1 };
+        dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
+        dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+        dishObj[dishId4] = { number : 1 , preference : [{ property : '', extra : 0}], price : price4 };
+        agent
+          .post('/order')
+          .send({
+            orders : dishObj,
+            subtotal : price4 * 1,
+            contactInfo : { name : "sheng", address : address, phone : phone },
+            paymentInfo : { method : 'online'},
+            method : "shipping",
+            pickupMeal : mealId,
+            pickupOption : 2,
+            tip : 0
+          })
+          .expect(400)
+          .end(function(err, res){
+            res.body.code.should.be.equal(-14);
+            done();
+          })
+      })
+
+      it('should order the meal with shipping', function (done) {
+        var dishObj = {};
+        dishObj[dishId1] = { number : 0,  preference : [{ property : '', extra : 0}], price : price1 };
+        dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
+        dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+        dishObj[dishId4] = { number : 4 , preference : [{ property : '', extra : 0}], price : price4 };
+        agent
+          .post('/order')
+          .send({
+            orders : dishObj,
+            subtotal : price4 * 4,
+            contactInfo : { name : "sheng", address : address, phone : phone },
+            paymentInfo : { method : 'online'},
+            pickupOption : 2,
+            method : "shipping",
+            pickupMeal : mealId,
+            address : address,
+            tip : 0
+          })
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            var o = res.body.orders[0];
+            o.method.should.be.equal("shipping");
+            done()
+          })
+      })
+    })
+
     describe('order a meal with coupon', function() {
 
       var mealId;

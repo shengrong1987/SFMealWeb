@@ -33,6 +33,10 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
+    isSupportShipping : {
+      type : 'boolean',
+      defaultsTo : false
+    },
     description : {
       type : 'string',
       defaultsTo : "",

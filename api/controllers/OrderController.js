@@ -75,6 +75,7 @@ var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUt
 //-60 : order total is not enough
 //-61 : Alipay lack of source id
 //-62 : Wrong payment api
+//-63 : Tracking number is empty
 //-98 : result not found
 
 module.exports = {
@@ -1580,6 +1581,28 @@ module.exports = {
     });
   },
 
+  tracking : function(req, res){
+    var trackingNumber = req.body.tracking;
+    var orderId = req.params.id;
+    if(!trackingNumber){
+      return res.badRequest({ code : -63, responseText : req.__('tracking-number-empty-error')});
+    }
+    Order.findOne(orderId).exec(function(err, order){
+      if(err){
+        return res.badRequest(err);
+      }
+      order.pickupInfo.tracking = trackingNumber;
+      order.status = "ready";
+      //to-do send email notification
+      order.save(function(err, result){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(result);
+      })
+    })
+  },
+
   receipt : function(req, res){
     var orderIds = req.params.id;
     if(!orderIds){
@@ -2415,7 +2438,10 @@ module.exports = {
           if(dish.id === dishId){
             hasDish = true;
             if(!dish.isVerified){
-              return next2({responseText : req.__('order-invalid-dish',dishId), code : -2});
+              return next2({responseText : req.__('order-invalid-dish',dish.title), code : -2});
+            }
+            if(params.method === "shipping" && !dish.isSupportShipping){
+              return next2({responseText : req.__('order-dish-not-shipping',dish.title), code : -2});
             }
             var extra = 0;
             //check property exist
@@ -2582,17 +2608,13 @@ module.exports = {
         })
       }else{
         var subtotal = parseFloat(params.subtotal);
-        if(!meal.isShipping){
-          sails.log.error("meal doesn't support shipping");
-          return next({responseText : req.__('meal-no-shipping'), code : -12});
-        }
-        if(!meal.shippingPolicy || !meal.shippingPolicy.freeAmount){
-          sails.log.error("meal's shipping setup is not correct");
-          return next({responseText : req.__('meal-shipping-policy-invalid'), code : -13});
-        }
-        if(subtotal < parseFloat(meal.shippingPolicy.freeAmount)){
+        // if(!meal.isShipping){
+        //   sails.log.error("meal doesn't support shipping");
+        //   return next({responseText : req.__('meal-no-shipping'), code : -12});
+        // }
+        if(subtotal < 60){
           sails.log.error("order's amount do not reach free shipping policy");
-          return next({responseText : req.__('order-not-qualify-shipping'), code : -14});
+          return next({responseText : req.__('order-not-qualify-shipping', '60'), code : -14});
         }
         return next();
       }

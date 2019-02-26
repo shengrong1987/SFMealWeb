@@ -157,7 +157,7 @@
                                 <div class="divider none-margin">-</div>
                                 <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                               <%}else if(order.status == "ready"){%>
-                                <a href="javascript:void(0)"><%= __('track-order')%></a><br/>
+                                <a href="https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=<%= orders[0].pickupInfo.tracking || ''%>"><%= __('track-order')%></a>
                                 <div class="divider none-margin">-</div>
                                 <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                               <%}else if(order.status == "review"){%>

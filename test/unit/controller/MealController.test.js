@@ -105,6 +105,7 @@ describe('MealController', function() {
             tags : "select",
             type: 'dessert',
             chef : hostId,
+            isSupportShipping : true,
             preference : {
               sweetness : [ { property : 'super sweet', extra : 1}, { property : 'normal', extra : 0}, { property : 'ultra sweet', extra : 2} ],
               spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]

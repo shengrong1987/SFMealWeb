@@ -477,7 +477,7 @@ module.exports = {
       if(!meals.length){
         return res.badRequest({ code : -3, responseText: req.__('meal-not-found')});
       }
-      var pickups = [], u = {};
+      var pickups = [], u = {}, dishes = [];
       async.auto({
         combinePickups : function(next){
           meals.forEach(function(meal){
@@ -508,16 +508,28 @@ module.exports = {
             u = user;
             next()
           })
+        },
+        getDishes : function(next){
+          meals.forEach(function(meal){
+            meal.dishes.forEach(function(dish){
+              if(!dishes.some(function(d){
+                return d.id === dish.id
+              })){
+                dishes.push(dish);
+              }
+            })
+          });
+          next();
         }
       }, function(err){
         if(err){
           return res.badRequest(err);
         }
         if(req.wantsJSON && process.env.NODE_ENV === "development"){
-          return res.ok({ pickups : pickups, meals: meals, user : u, locale : req.getLocale()});
+          return res.ok({ pickups : pickups, meals: meals, dishes : dishes, user : u, locale : req.getLocale()});
         }
         meals = _this.composeMealWithDate(meals);
-        return res.view("checkout",{ pickups : pickups, meals: meals, user : u, locale : req.getLocale()});
+        return res.view("checkout",{ pickups : pickups, meals: meals, dishes : dishes, user : u, locale : req.getLocale()});
       })
     })
   },
