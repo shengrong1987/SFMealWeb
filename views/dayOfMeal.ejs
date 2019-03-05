@@ -18,7 +18,7 @@
 
     <% if(meals && meals.meals){%>
     <div class="w-100 sticky-top">
-      <ul id="dishDatesBar" class="nav nav-light nav-fill nav-scroll bg-light none-padding" style="height: 59px;" data-filter-group="date">
+      <ul id="dishDatesBar" class="nav nav-pills nav-pills-orange white nav-scroll px-2" data-filter-group="date">
         <%
           var dates = Object.keys(meals.meals);
           dates = dates.sort(function(d1,d2){
@@ -57,7 +57,7 @@
             }
           })
         dates.forEach(function(dateKey,i){ %>
-          <li class="nav-item py-2 mw-28 border-right <%= i===0?'active':''%>"><a class="nav-link" data-mixitup-control data-mixitup-date data-filter-type="date" data-filter=".<%= dateKey.replace(/ |\'/g,'')%>" data-toggle="tab"><span class="cursor-pointer"><%= __(dateKey).replace("day",'')%></span></a></li>
+          <li class="nav-item py-2 mw-28 <%= i===0?'active':''%>"><a class="nav-link <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-mixitup-date data-filter-type="date" data-filter=".<%= dateKey.replace(/ |\'/g,'')%>" data-toggle="tab"><span class="cursor-pointer"><%= __(dateKey).replace("day",'')%></span></a></li>
         <% })%>
       </ul>
       <ul id="hostBarView" class="nav nav-light nav-fill nav-scroll none-padding white" data-filter-group="chef">

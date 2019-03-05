@@ -8873,6 +8873,11 @@ small {
 .nav-link:hover {
   color: #ffffff;
 }
+.nav-pills-orange .nav-link.active,
+.nav-pills-orange .show > .nav-link {
+  color: #fff;
+  background-color: #ff7601;
+}
 .bg-light .nav-link:hover {
   color: rgba(0, 0, 0, 0.75);
 }
