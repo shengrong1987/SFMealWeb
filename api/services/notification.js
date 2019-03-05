@@ -36,6 +36,7 @@ var notification = {
 
     this.publishEvent(model, action, params, isSendToHost, isAdminAction, isSendToAdmin);
 
+
     if(isAdminAction){
       //send emails to both chef and guest as it's modified by admin
       params.isSendToHost = true;
@@ -204,6 +205,7 @@ var notification = {
 
   sendEmail : function(model, action, params, req){
 
+    var sendable = this.inquireSendable(params.isSendToHost, model, action);
     var basicInfo = this.inquireBasicInfo(params.isSendToHost, params.isSendToAdmin, params);
     var template = this.inquireTemplate(model,action);
 
@@ -334,6 +336,14 @@ var notification = {
     }
   },
 
+  inquireSendable : function(isSendToHost, model, action){
+    var sendable = true;
+    // if(!isSendToHost && model === "Order" && action === "new"){
+    //   sendable = false;
+    // }
+    return sendable;
+  },
+
   inquireBasicInfo : function(isSendToHost, isSendToAdmin, params){
     var info = {};
     if(isSendToHost){
@@ -383,7 +393,7 @@ var notification = {
     if(model === "Order"){
       switch(action){
         case "new":
-          i18ns = i18ns.concat(['new-order-title','new-order-context','order-time','ready-time','order','preorder']);
+          i18ns = i18ns.concat(['new-order-title-for-host','new-order-title-for-guest','new-order-context-for-host','new-order-context-for-guest','order-time','ready-time','order','preorder']);
           break;
         case "adjust":
           i18ns = i18ns.concat(['adjust-order-context','adjust-order-from-host-context','modify','de-order','order-time','adjust-time','chef']);

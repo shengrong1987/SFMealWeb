@@ -2,9 +2,9 @@
 
 <div class="green" style="padding: 25px;">
   <div class="box-email white relative middle text-left">
-    <h4 class="text-green"><%= newordertitle%>(<%= type == 'order' ? order : preorder%>)</span>!</h4>
-    <p>Hi <%= recipientName%>,</p>
-    <p><%= newordercontext%></p>
+    <h4 class="text-green"><%= isSendToHost ? newordertitleforhost : newordertitleforguest %></span></h4>
+    <p>Hi <%= recipientName %>,</p>
+    <p><%= isSendToHost ? newordercontextforhost : newordercontextforguest %></p>
     <div class="divider" style="margin-bottom: 10px;"></div>
     <p><%= ordernumber%>:<%= id%></p>
     <table class="table table-email">
@@ -69,22 +69,10 @@
         <td></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= servicefee%>: $<%= service_fee.toFixed(2)%></td>
-      </tr>
-      <tr class="border-less">
-        <td></td>
-        <td></td>
-        <td></td>
         <td style="text-align: right;"><%= total%> $<%= (subtotal * (1 + taxRate) + delivery_fee + service_fee).toFixed(2)%></td>
       </tr>
       <tr>
         <td><%= ordertime%>: <%= createdAt%></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td class="text-red"><%= readytime%>: <%= eta%></td>
         <td></td>
         <td></td>
         <td></td>

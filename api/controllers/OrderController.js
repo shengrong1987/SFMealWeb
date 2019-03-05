@@ -447,6 +447,7 @@ module.exports = {
                     return nextIn(err);
                   }
                   order.meal = meal;
+                  order.dishes = meal.dishes;
                   _orders.push(order);
                   nextIn();
                 });
@@ -592,13 +593,16 @@ module.exports = {
                 if(process.env.NODE_ENV === "development"){
                   order.meal = _m;
                 }
-                notification.notificationCenter("Order", "new", o, true, false, req);
+                order = o;
+                notification.notificationCenter("Order", "new", order, true, false, req);
                 nextIn();
               });
             }, function(err){
               if(err){
                 return next(err);
               }
+              var combinedOrder = _this.combineOrders(_orders);
+              notification.notificationCenter("Order", "new", combinedOrder, false, false, req);
               next();
             })
           }]
@@ -606,20 +610,7 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          var o = Object.assign({}, _orders);
-          var cOrders = _orders.map(function(a) {
-            return Object.assign({},a);
-          });
-          var ids = "";
-          Object.keys(o).forEach(function(key){
-            if(ids){
-              ids += "+";
-            }
-            ids += o[key].id;
-          });
-          o[0].id = ids;
-          notification.notificationCenter("Order", "new", o[0], false, false, req);
-          res.ok({ orders : cOrders});
+          res.ok({ orders : _orders});
         })
       }
     });
@@ -2472,7 +2463,7 @@ module.exports = {
             sails.log.info("meal: " + meal.title + " left qty: " + meal.leftQty);
             sails.log.info("order qty for the dish: " + dish.id + " is: " + diff, "dish's left qty: " + meal.leftQty[dish.id]);
             if(!isPartyMode && diff > meal.leftQty[dish.id]){
-              return next2({responseText : req.__('order-dish-not-enough',dishId, qty), code : -1});
+              return next2({responseText : req.__('order-dish-not-enough',dish.title, qty), code : -1});
             }
             var totalQty = meal.getDynamicDishesTotalOrder(qty);
             var price = dish.getPrice(totalQty, meal);
@@ -2920,22 +2911,7 @@ module.exports = {
             var isSamePickupOption = from1.isSame(from2, 'minute') && oldOrder.pickupInfo.location === order.pickupInfo.location && oldOrder.pickupInfo.method === order.pickupInfo.method;
             var isSameContact = oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && (!order.contactInfo.address || !oldOrder.contactInfo.address || order.contactInfo.address.includes(oldOrder.contactInfo.address) || oldOrder.contactInfo.address.includes(order.contactInfo.address));
             if (isSamePickupOption && isSameContact) {
-              Object.keys(order.orders).forEach(function (dishId) {
-                if (oldOrder.orders.hasOwnProperty(dishId)) {
-                  oldOrder.orders[dishId].number += order.orders[dishId].number;
-                } else {
-                  oldOrder.orders[dishId] = order.orders[dishId];
-                }
-              })
-              oldOrder.id += "," + order.id;
-              oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
-              oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
-              if (oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges) {
-                oldOrder.charges['cash'] += order.charges['cash'];
-              }
-              if (order.pickupInfo.comment !== oldOrder.pickupInfo.comment) {
-                oldOrder.pickupInfo.comment += order.pickupInfo.comment
-              }
+              oldOrder = _this.combineOrders(order, oldOrder);
             }
             if(isSamePickupOption){
               isSamePickup = true;
@@ -3007,6 +2983,7 @@ module.exports = {
   },
 
   getOrdersByYear : function(year, query, cb){
+    var _this = this;
     var limit = parseInt(query.limit) || 100;
     var skip = parseInt(query.skip) || 0;
     var beginDate = moment().set('year',year).set('month',0).set('date',1).set('hour',0);
@@ -3035,20 +3012,7 @@ module.exports = {
         var isSamePickup = newOrders.some(function(oldOrder){
           var _isSame = moment(new Date(oldOrder.pickupInfo.pickupFromTime).toISOString()).isSame(moment(new Date(order.pickupInfo.pickupFromTime).toISOString()), 'minute') && moment(oldOrder.pickupInfo.pickupTillTime).isSame(moment(order.pickupInfo.pickupTillTime), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
           if(_isSame){
-            Object.keys(order.orders).forEach(function(dishId){
-              if(oldOrder.orders.hasOwnProperty(dishId)){
-                oldOrder.orders[dishId].number += order.orders[dishId].number;
-              }else{
-                oldOrder.orders[dishId] = order.orders[dishId];
-              }
-            })
-            oldOrder.id += "," + order.id;
-            oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
-            oldOrder.pickupInfo.comment += order.pickupInfo.comment;
-            oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
-            if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
-              oldOrder.charges['cash'] += order.charges['cash'];
-            }
+            oldOrder = _this.combineOrders(order, oldOrder);
           }
           return _isSame;
         })
@@ -3143,6 +3107,33 @@ module.exports = {
       }
     })
     return dishIds;
+  },
+
+  combineOrders : function(orders, combinedOrder){
+    var cOrder = combinedOrder || Object.assign({}, orders[0]);
+    if(orders && !Array.isArray(orders)){
+      orders = [orders];
+    }
+    orders.forEach(function(order){
+      if(cOrder.id === order.id){
+        return;
+      }
+      Object.keys(order.orders).forEach(function(dishId){
+        if(cOrder.orders.hasOwnProperty(dishId)){
+          cOrder.orders[dishId].number += order.orders[dishId].number;
+        }else{
+          cOrder.orders[dishId] = order.orders[dishId];
+        }
+      })
+      cOrder.id += "+" + order.id;
+      cOrder.subtotal = parseFloat(cOrder.subtotal) + parseFloat(order.subtotal);
+      cOrder.pickupInfo.comment += order.pickupInfo.comment;
+      cOrder.dishes = cOrder.dishes.concat(order.dishes);
+      if(cOrder.paymentMethod === "cash" && cOrder.charges && order.charges){
+        cOrder.charges['cash'] += order.charges['cash'];
+      }
+    })
+    return cOrder;
   }
 };
 

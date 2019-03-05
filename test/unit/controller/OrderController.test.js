@@ -737,7 +737,7 @@ describe('OrderController', function() {
             o.discountAmount.should.be.equal(price1 * 1 + price2 * 2);
             o.customer.should.be.equal(guestId);
             o.customerName.should.be.equal("sheng");
-            o.pickupInfo.comment.should.be.equal("hhh");
+            o.pickupInfo.comment.should.be.equal("hhhhhh");
             o2.discountAmount.should.be.equal(35-price1-price2*2);
             _multipleOrderId = o.id;
             _multipleOrderId2 = res.body.orders[1].id;
