@@ -99,11 +99,11 @@ module.exports = require('waterlock').waterlocked({
     if(!openid){
       return res.badRequest({code : -20, responseText : req.__('user-unionid-needed')});
     }
-    waterlock.engine.findAuth({ openid : openid }, function(err, user) {
+    waterlock.engine.findAuth({ '$or' : [ { openid : openid }, { unionid : unionid }] }, function(err, user) {
       if (!user) {
         isNewUser = true;
       }
-      waterlock.engine.findOrCreateAuth({ openid : openid }, attrs, function(err, user) {
+      waterlock.engine.findOrCreateAuth({ '$or' : [ { openid : openid }, { unionid : unionid }] }, attrs, function(err, user) {
         if(err){
           return res.badRequest(err);
         }
@@ -125,6 +125,7 @@ module.exports = require('waterlock').waterlocked({
           if(err){
             return res.badRequest(err);
           }
+          attrs.id = user.id;
           User.update(user.id, attrs).exec(function(err, u){
             if(err){
               return res.badRequest(err);

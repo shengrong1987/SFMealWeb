@@ -192,8 +192,11 @@ module.exports = {
   }),
 
   beforeUpdate : function(params, cb){
-    if(params.email){
-      Auth.update({ user : params.id}, { email : params.email}).exec(cb);
+    var attrs = {};
+    if(params.email || params.unionid){
+      if(params.email){attrs.email = params.email;}
+      if(params.unionid){attrs.unionid = params.unionid;}
+      Auth.update({ user : params.id}, attrs).exec(cb);
     }else{
       cb();
     }
