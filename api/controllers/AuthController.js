@@ -94,6 +94,7 @@ module.exports = require('waterlock').waterlocked({
     var _this = this;
     var isNewUser = false;
     var openid = attrs.openid;
+    var unionid = attrs.unionid;
     sails.log.info("open id:" + openid);
     if(!openid){
       return res.badRequest({code : -20, responseText : req.__('user-unionid-needed')});

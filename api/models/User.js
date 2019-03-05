@@ -208,6 +208,7 @@ module.exports = {
         if(err){
           return cb(err);
         }
+        var email = auth.email || auth.googleEmail;
         var emailVerified = !!(auth.googleEmail || (auth.facebookId && auth.email)) ;
         var firstName = auth.firstname || ( auth.name ? auth.name.split(' ')[0] : auth.username) || auth.nickname || 'guest';
         var lastName = auth.lastname || ( auth.name ? auth.name.split(' ')[1] : '') || 'guest';
@@ -220,7 +221,7 @@ module.exports = {
         var language = auth.language;
         var typeOfUser = user.receivedEmail ? "subscriber" : "member";
         if(auth.email && process.env.NODE_ENV === "production"){
-          mailChimp.addMemberToList({ email : auth.email, firstname : firstName, lastname : lastName}, typeOfUser);
+          mailChimp.addMemberToList({ email : email, firstname : firstName, lastname : lastName}, typeOfUser);
         }else{
           //in development mode, skipping subscription
         }
