@@ -579,7 +579,7 @@ module.exports = require('waterlock').actions.user({
         }
         var birthdayDate = new Date(user.birthday);
         var birthday = birthdayDate.getMonth()+1+"/"+birthdayDate.getDate();
-        mailChimp.updateMember({ email : user.email, birthday : birthday }, "subscriber");
+        mailChimp.addMemberToList({ email : user.email, firstname : user.firstname, lastname: user.lastname, language : req.getLocale()}, "subscriber");
         res.redirect("/meal?from=emailverification");
       });
     });

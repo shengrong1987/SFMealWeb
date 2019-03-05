@@ -56,12 +56,6 @@ module.exports = require('waterlock').waterlocked({
           if(err){
             return res.badRequest(err);
           }
-          var typeOfUser = params.receivedEmail ? "subscriber" : "member";
-          if(process.env.NODE_ENV === "production"){
-            mailChimp.addMemberToList({ email : params.email, firstname : params.firstname, lastname : params.lastname, language : req.getLocale() }, typeOfUser);
-          }else{
-            //in development mode, skipping subscription
-          }
           delete params.password;
           params.verifyToken = notification.generateToken();
           user.generateCode(params, function(err, code){

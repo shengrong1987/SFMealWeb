@@ -8,6 +8,7 @@
 
 var async = require('async');
 var geocode = require('../services/geocode');
+var mailChimp = require("../services/mailchimp");
 
 module.exports = {
 
@@ -217,7 +218,12 @@ module.exports = {
         var state = auth.location ? ( auth.location.name ? auth.location.name.split(",")[1] : '') : ( auth.province || 'California');
         var gender = auth.gender || (auth.sex === 1 ? "male" : "female");
         var language = auth.language;
-        sails.log.info("code created: " + referralCode);
+        var typeOfUser = user.receivedEmail ? "subscriber" : "member";
+        if(auth.email && process.env.NODE_ENV === "production"){
+          mailChimp.addMemberToList({ email : auth.email, firstname : firstName, lastname : lastName}, typeOfUser);
+        }else{
+          //in development mode, skipping subscription
+        }
         var params = {
           firstname: firstName,
           lastname: lastName,
