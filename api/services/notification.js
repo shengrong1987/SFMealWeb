@@ -225,7 +225,7 @@ var notification = {
     params.recipientName = basicInfo.recipientName;
     params.senderName = "SFMeal.com";
 
-    // juice it using email-template
+    //juice it using email-template
     if(process.env.NODE_ENV==="development"){
       sails.log.info("sending email to: " + basicInfo.recipientEmail + " with email template: " + template);
       return;

@@ -60,12 +60,11 @@
           <li class="nav-item py-2 mw-28 <%= i===0?'active':''%>"><a class="nav-link <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-mixitup-date data-filter-type="date" data-filter=".<%= dateKey.replace(/ |\'/g,'')%>" data-toggle="tab"><span class="cursor-pointer"><%= __(dateKey).replace("day",'')%></span></a></li>
         <% })%>
       </ul>
-      <ul id="hostBarView" class="nav nav-light nav-fill nav-scroll none-padding white" data-filter-group="chef">
+      <ul id="hostBarView" class="nav nav-pills nav-scroll white px-2" data-filter-group="chef">
         <%
         hosts.forEach(function(host,i){ %>
           <li class="nav-item py-2 mw-19 <%= i===0?'active':''%>">
-            <a class="nav-link none-padding" data-mixitup-control data-filter-type="chef" data-filter=".<%= host.shopName.replace(/ |\'/g,'')%>" data-toggle="tab" data-likes="<%= host.likes || 0%>" data-picture="<%= host.picture%>" data-host="<%= host.id%>" data-follow-text="<%= __('follow')%>" data-followed-text="<%= __('followed')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? true : false%>" data-score="<%= host.averageScore || 5%>"><img class="size-small rounded-circle cursor-pointer" src="<%= host.picture%>"></a>
-            <div class="text-grey middle pt-1" style="max-width:100px;font-size: 8px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;"><%= host.shopName%></div>
+            <button class="nav-link btn-outline-info cursor-pointer" href="javascript:void(0);" data-mixitup-control data-filter-type="chef" data-filter=".<%= host.shopName.replace(/ |\'/g,'')%>" data-toggle="tab" data-likes="<%= host.likes || 0%>" data-picture="<%= host.picture%>" data-host="<%= host.id%>" data-follow-text="<%= __('follow')%>" data-followed-text="<%= __('followed')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? true : false%>" data-score="<%= host.averageScore || 5%>" style="max-width:100px;font-size: 8px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;"><%= host.shopName%></>
           </li>
         <% })%>
       </ul>

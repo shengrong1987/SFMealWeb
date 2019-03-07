@@ -1214,7 +1214,9 @@ var DayOfMealView = Backbone.View.extend({
     if(currentDateControl.length){
       dateFilter = "." + dateDesc;
       this.$el.find("#dishDatesBar li").removeClass("active");
+      this.$el.find("#dishDatesBar li a").removeClass("active");
       currentDateControl.parent().addClass("active");
+      currentDateControl.addClass("active");
     }else{
       var activeFilters = this.$el.find("#dishDatesBar .mixitup-control-active");
       if(activeFilters.length){
@@ -1227,13 +1229,13 @@ var DayOfMealView = Backbone.View.extend({
 
     var chefFilter;
     var chefDesc = decodeURI(readCookie("chef"));
-    var currentDateControl = this.$el.find("#hostBarView [data-filter='." + chefDesc + "']");
+    currentDateControl = this.$el.find("#hostBarView [data-filter='." + chefDesc + "']");
     if(currentDateControl.length){
       chefFilter = "." + chefDesc;
       this.$el.find("#hostBarView li").removeClass("active");
       currentDateControl.parent().addClass("active");
     }else{
-      var activeFilters = this.$el.find("#hostBarView .mixitup-control-active");
+      activeFilters = this.$el.find("#hostBarView .mixitup-control-active");
       if(activeFilters.length){
         chefFilter = activeFilters.data("filter");
       }else{
