@@ -11283,6 +11283,9 @@ select.form-control {
   }
   .dishItem img {
     height: 100%;
+    margin-left: 50%;
+    margin-top: 50%;
+    -webkit-transform: translateY(-50%) translateX(-50%);
   }
   .mynavbar .navbar-header {
     margin-left: 100px;
@@ -11478,15 +11481,14 @@ select.form-control {
     display: inline;
   }
   .dishItem .photo {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
   }
   .dishItem .photo img {
     height: 100%;
-  }
-  .dishItem .photo a {
-    position: relative;
-    left: -10%;
+    margin-left: 50%;
+    margin-top: 50%;
+    -webkit-transform: translateY(-50%) translateX(-50%);
   }
   .pickup-map {
     display: block;
