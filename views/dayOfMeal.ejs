@@ -14,7 +14,7 @@
     </div>
   </div>
 
-  <div id="dayOfMealContainer" class="mx-auto" style="max-width: 800px;" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>" data-pickup-nickname="<%= pickupNickname || ''%>">
+  <div id="dayOfMealContainer" style="max-width: 800px;" class="mx-auto" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>" data-pickup-nickname="<%= pickupNickname || ''%>">
 
     <% if(meals && meals.meals){%>
     <div class="w-100 sticky-top">
@@ -63,7 +63,7 @@
       <ul id="hostBarView" class="nav nav-pills nav-scroll white px-2" data-filter-group="chef">
         <%
         hosts.forEach(function(host,i){ %>
-          <li class="nav-item py-2 mw-19 <%= i===0?'active':''%>">
+          <li class="nav-item py-2 px-1 mw-19 <%= i===0?'active':''%>">
             <button class="nav-link btn-outline-info cursor-pointer" href="javascript:void(0);" data-mixitup-control data-filter-type="chef" data-filter=".<%= host.shopName.replace(/ |\'/g,'')%>" data-toggle="tab" data-likes="<%= host.likes || 0%>" data-picture="<%= host.picture%>" data-host="<%= host.id%>" data-follow-text="<%= __('follow')%>" data-followed-text="<%= __('followed')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? true : false%>" data-score="<%= host.averageScore || 5%>" style="max-width:100px;font-size: 8px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;"><%= host.shopName%></>
           </li>
         <% })%>
@@ -82,7 +82,7 @@
           <% })%>
         </ul>
       </nav>
-      <div id="order" class="content flex-grow-1 text-left px-1">
+      <div id="order" class="content container-fluid text-left">
         <div id="chefDishView">
           <% tags.forEach(function(tag){if(tag === "chef"){%>
             <div class="pl-4 py-2 text-center light-grey border" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag.replace("'","").replace(" ","")%>">
@@ -237,7 +237,6 @@
 <script>
   $(document).ready(function(){
     var dayOfMealView = new DayOfMealView({ el : $("#dayOfMealContainer"), model : new Meal()});
-
   });
   new HostSectionInMealView({ el : $("#dayOfMealContainer"), model : new Host()});
   var coverDishId = $("#dayOfMealContainer").data("cover");
