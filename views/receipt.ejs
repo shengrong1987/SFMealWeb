@@ -1,51 +1,71 @@
-<div id="receiptView" class="green" style="padding: 25px;margin-top: -25px;" data-title="Hi <%= customerName%> ," data-desc="<%= __('new-order-receipt-detail', host.shopName)%>">
+<div id="receiptView" class="green" style="padding: 25px;margin-top: -25px;" data-title="Hi <%= orders[0].customerName%> ," data-desc="<%= __('new-order-receipt-detail', orders[0].host.shopName)%>">
   <div class="box-email white relative middle text-left">
     <h4 class="text-green"><%= __('new-order-receipt-title')%></h4>
-    <p>Hi <%= customerName%>,</p>
-    <p><%= __('new-order-receipt-detail', host.shopName)%></p>
+    <p>Hi <%= orders[0].customerName%>,</p>
+    <p><%= __('new-order-receipt-detail', orders[0].host.shopName)%></p>
     <div class="divider" style="margin-bottom: 10px;"></div>
-    <p><%= __('order-number')%>:<%= id%></p>
+    <p><%= __('order-number')%>:
+      <% orders.forEach(function(order,index){%>
+        <%= index!==0?__('and'):''%><span> <%= order.id%> </span>
+      <%})%>
+    </p>
     <table class="table table-email">
-      <% Object.keys(orders).forEach(function(dishId){
-        var orderedDish = orders[dishId];
-        var amount = parseInt(orderedDish.number);
-        var preference = orderedDish.preference;
-        var title = "";
-        var extra = 0;
-        if(preference && preference.length > 0) {
-          preference.forEach(function (pref) {
-            title += "(" + pref.property + ')';
-          });
-          extra = preference.reduce(function (total, next) {
-            return total + parseInt(next.extra);
-          }, 0);
-        }
-        if(amount > 0){
-          var dish = dishes.filter(function(dish){
-            return dish.id === dishId;
-          })[0];
-          var price = parseInt(orderedDish.price);
-      %>
-      <tr>
-        <td class="xs-hide"><img class="dishImg" src="<%= dish.photos[0].v%>" style="width: 100px;"></td>
-        <td class="text-green" style="vertical-align: middle;" data-dish-id="<%= dish.id%>"><%= dish.title%><%= title%></td>
-        <td style="vertical-align: middle;"><%= amount%><%= __('fen')%></td>
-        <td style="vertical-align: middle;text-align: right;">
-          $<%= (amount * price).toFixed(2)%>
-          <% if(price !== dish.price){ %>
-          <s>$<%= (amount * dish.price).toFixed(2)%></s>
-          <% }if(extra){%>
-          (+$<%= extra.toFixed(2)%>)<br/>
-          <% }%>
-        </td>
-      </tr>
-      <%}});%>
+      <%
+        var subtotal = 0,discount = 0,delivery_fee = 0,tip = 0;
+        orders.forEach(function(o){
+          subtotal += parseFloat(o.subtotal);
+          discount += parseFloat(o.discount);
+          delivery_fee += parseFloat(o.delivery_fee);
+          tip += parseFloat(o.tip);
+          Object.keys(o.orders).forEach(function(dishId){
+            var orderedDish = o.orders[dishId];
+            var amount = parseInt(orderedDish.number);
+            var preference = orderedDish.preference;
+            var title = "";
+            var extra = 0;
+            if(preference && preference.length > 0) {
+              preference.forEach(function (pref) {
+                var dishProps = "";
+                if(pref.property){
+                  pref.property.forEach(function(pro){
+                    if(dishProps){
+                      dishProps += ",";
+                    }
+                    dishProps += pro.property;
+                  })
+                }
+                title += "(" + dishProps + ')';
+              });
+              extra = preference.reduce(function (total, next) {
+                return total + parseFloat(next.extra);
+              },0);
+            }
+            if(amount > 0){
+              var dish = o.dishes.filter(function(dish){
+                return dish.id === dishId;
+              })[0];
+              if(!dish){return}
+              var price = parseFloat(orderedDish.price);%>
+        <tr>
+          <td class="xs-hide"><img class="dishImg" src="<%= dish.photos[0].v%>" style="width: 100px;"></td>
+          <td class="text-green" style="vertical-align: middle;" data-dish-id="<%= dish.id%>"><%= dish.title%><%= title%></td>
+          <td style="vertical-align: middle;"><%= amount%><%= __('fen')%></td>
+          <td style="vertical-align: middle;text-align: right;">
+            $<%= (amount * price).toFixed(2)%>
+            <% if(price !== dish.price){ %>
+            <s>$<%= (amount * dish.price).toFixed(2)%></s>
+            <% }if(extra){%>
+            (+$<%= extra.toFixed(2)%>)<br/>
+            <% }%>
+          </td>
+        </tr>
+      <%}})})%>
       <tr>
         <td class="xs-hide"></td>
         <td></td>
         <td></td>
         <% if(discount){%>
-        <td style="text-align: right;"><%= __('dingdan')%>: <s>$<%= subtotal.toFixed(2)%></s> -> $<%= (subtotal - discount/100).toFixed(2)%></td>
+        <td style="text-align: right;"><%= __('dingdan')%>: <s>$<%= subtotal.toFixed(2)%></s> -> $<%= (subtotal - discount).toFixed(2)%></td>
         <% }else{%>
         <td style="text-align: right;"><%= __('dingdan')%>: $<%= subtotal.toFixed(2)%></td>
         <% }%>
@@ -60,7 +80,7 @@
         <td class="xs-hide"></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= __('tax')%>: $<%= ((subtotal - discount/100) * getTaxRate()).toFixed(2)%></td>
+        <td style="text-align: right;"><%= __('tax')%>: $<%= ((subtotal - discount) * orders[0].getTaxRate()).toFixed(2)%></td>
       </tr>
       <tr class="border-less">
         <td class="xs-hide"></td>
@@ -72,48 +92,46 @@
         <td class="xs-hide"></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= __('total')%> $<%= (parseFloat((subtotal - discount/100) * (1 + getTaxRate())) + parseFloat(delivery_fee) + parseFloat(tip)).toFixed(2)%></td>
+        <td style="text-align: right;"><%= __('total')%> $<%= (parseFloat((subtotal - discount) * (1 + orders[0].getTaxRate())) + parseFloat(delivery_fee) + parseFloat(tip)).toFixed(2)%></td>
       </tr>
       <tr>
-        <td><%= __('payment-method')%>: <%= __(paymentInfo.method)%></td>
+        <td><%= __('payment-method')%>: <%= __(orders[0].paymentInfo.method)%></td>
         <td></td>
         <td></td>
         <td class="xs-hide"></td>
       </tr>
       <tr>
-        <td><%= __('contact-phone')%>: <%= customerPhone%></td>
-        <td><%= __('driver-phone')%>: <%= pickupInfo.phone%></td>
+        <td><%= __('contact-phone')%>: <%= orders[0].customerPhone%></td>
+        <td><%= __('driver-phone')%>: <%= orders[0].pickupInfo.phone%></td>
         <td></td>
         <td class="xs-hide"></td>
       </tr>
       <tr>
-        <td colspan="4"><%= __('comment')%>: <%= pickupInfo.comment%></td>
+        <td colspan="4"><%= __('comment')%>: <%= orders[0].pickupInfo.comment%></td>
       </tr>
       <tr class="active">
-        <td><%= __('pickup-method')%>: <%= __(pickupInfo.method)%></td>
-        <td><%= __('pickup-time')%>: <%= pickupInfo.pickupFromTime%> - <%= pickupInfo.pickupTillTime%></td>
-        <td><%= __('pickup-location')%> : <%= pickupInfo.method == 'pickup' ? pickupInfo.location : contactInfo.address%></td>
+        <td><%= __('pickup-method')%>: <%= __(orders[0].pickupInfo.method)%></td>
+        <td><%= __('pickup-time')%>: <%= orders[0].pickupInfo.pickupFromTime%> - <%= orders[0].pickupInfo.pickupTillTime%></td>
+        <td><%= __('pickup-location')%> : <%= orders[0].pickupInfo.method == 'pickup' ? orders[0].pickupInfo.location : orders[0].contactInfo.address%></td>
         <td class="xs-hide"></td>
       </tr>
     </table>
-    <div class="text-center">
+    <div class="text-center pb-3">
       <h4><small><%= __('order-receipt-help')%></small></h4>
     </div>
-    <div class="d-flex justify-content-center vertical-align">
-      <% if(pickupInfo.method === "shipping"){%>
-      <a href="https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=<%= tracking || ''%>" class="btn btn-grey-red mr-1"><%= __('track-order')%></a>
+    <div class="text-center">
+      <% if(orders[0].pickupInfo.method === "shipping"){%>
+      <a href="https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=<%= orders[0].pickupInfo.tracking || ''%>" class="btn btn-grey-red mr-1"><%= __('track-order')%></a>
       <% }else{%>
-      <a href="http://maps.apple.com/?q=<%= pickupInfo.method == 'pickup' ? pickupInfo.location : contactInfo.address%>" class="btn btn-grey-red active mr-1"><%= __('find-route')%></a>
+      <a href="http://maps.apple.com/?q=<%= orders[0].pickupInfo.method == 'pickup' ? orders[0].pickupInfo.location : orders[0].contactInfo.address%>" class="btn btn-grey-red active mr-1"><%= __('find-route')%></a>
       <% }%>
-      <button class="btn btn-grey-blue active" style="margin-right: 10px;" toggle="modal" data-target="#myModal" data-href="/review/<%= id%>" onclick="toggleModal(event)"><%= __('review')%></button>
-      <!--<a class="btn btn-grey-blue active" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)"> <%= __('nav-bar-register') %></a>-->
+      <% orders.forEach(function(order, index){%>
+        <button class="btn btn-grey-blue active" style="margin-right: 10px;" toggle="modal" data-target="#myModal" data-href="/review/<%= order.id%>" onclick="h.toggleModal(event)"><%= __('review')%> <%= __('dingdan')%><%= index+1%></button>
+      <% });%>
       <i class="fa fa-question-circle cursor-pointer" data-toggle="tooltip" title="<%= __('user-benefit')%>"></i>
     </div>
   </div>
 
 </div>
 
-<script>
-  setupWechat($("#receiptView .dishImg:eq(0)").prop('src'),$("#receiptView").data("title"), $("#receiptView").data("desc"));
-  new receiptView({ el : $("#receiptView"), model : new Order()});
-</script>
+<link href="/assets/receipt.css" rel="stylesheet"><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script><script src="/assets/zh.receipt.bundle.js"></script>

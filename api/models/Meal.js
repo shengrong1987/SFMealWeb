@@ -87,10 +87,6 @@ module.exports = {
     leftQty : {
       type : 'json'
     },
-    minimalOrder : {
-      type : 'integer',
-      defaultsTo : 0
-    },
     minimalTotal : {
       type : 'float',
       defaultsTo : 0
@@ -164,7 +160,7 @@ module.exports = {
     },
     isTaxIncluded : {
       type : 'boolean',
-      defaultsTo : false
+      defaultsTo : true
     },
     isSupportDynamicPrice : {
       type : 'boolean',
@@ -186,10 +182,6 @@ module.exports = {
     isShipping : {
       type : 'boolean',
       defaultsTo : false
-    },
-    msg : {
-      type : 'string',
-      defaultsTo : ''
     },
     isFull : function(){
       var $this = this;
@@ -233,6 +225,26 @@ module.exports = {
 
     getTimeOfDay : function(date){
       return dateUtil.getTimeOfDay(date);
+    },
+
+    getDateDesc : function(date){
+      var pickupDate = moment(date).hours(0);
+      var dateDesc = "unknown";
+      if(pickupDate.isSame(moment(),'day')){
+        dateDesc = 'today';
+      }else if(pickupDate.isSame(moment().add(1,'days'),'day')){
+        dateDesc = 'tomorrow';
+      }else if(moment.duration(pickupDate.diff(moment())).asDays() <= 7){
+        dateDesc = pickupDate.format('dddd');
+      }else{
+        dateDesc = pickupDate.format('[day]M/D');
+      }
+      return dateDesc;
+    },
+
+    getTimeDiff : function(provideTill, locale){
+      moment.locale(locale);
+      return moment(provideTill).from(moment());
     },
 
     dateIsValid : function(params){
@@ -360,6 +372,9 @@ module.exports = {
             "pickupFromTime": values.provideFromTime,
             "pickupTillTime": values.provideTillTime,
             "deliveryCenter": host.full_address,
+            "lat" : host.lat,
+            "long" : host.long,
+            "deliveryRange": 20,
             "phone": host.user.phone,
             "method": "delivery",
             "county" : host.county,
@@ -435,6 +450,9 @@ module.exports = {
             "pickupFromTime": values.provideFromTime,
             "pickupTillTime": values.provideTillTime,
             "deliveryCenter": host.full_address,
+            "lat" : host.lat,
+            "long" : host.long,
+            "deliveryRange": 20,
             "phone": host.user.phone,
             "method": "delivery",
             "county" : host.county,

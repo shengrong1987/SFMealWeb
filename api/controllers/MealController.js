@@ -33,6 +33,12 @@ const DELIVERY_FEE = 0;
  * -16 : meal query is invalid
  * -17 : meal lack of party requirement
  * -18 : meal lack county information, unable to perform search
+ * -19 : meal lack of order information
+ * -20 : meal use custom store hour but lack of pickup options
+ * -21 : provide from time is later than provide till time
+ * -22 : provide till time is in the past
+ * -23 : provide time too short
+ * -24 : can not find any pickup options by the given nickname
  */
 
 module.exports = {
@@ -47,8 +53,250 @@ module.exports = {
       if(req.wantsJSON && process.env.NODE_ENV === "development"){
         return res.ok({ dishes : host.dishes, host : host});
       }
-      return res.view("meal_new",{dishes : host.dishes, host : host});
+      Driver.find().exec(function(err, d){
+        if(err){
+          return res.badRequest(err);
+        }
+        var _pickups = []
+        PickupOption.find().exec(function(err, pickups){
+          if(err){
+            return res.badRequest(err);
+          }
+          pickups.forEach(function(p){
+            if(!_pickups.includes(p.nickname)){
+              _pickups.push(p.nickname);
+            }
+          })
+          _pickups.push("custom");
+          return res.view("meal_new",{dishes : host.dishes, host : host, drivers : d, pickups : _pickups});
+        })
+      })
     });
+  },
+
+  catering : function(req, res){
+    Host.find({ passGuide : true }).populate("dishes").exec(function(err, hosts){
+      if(err){
+        return res.badRequest(err);
+      }
+
+      var _dishes = [],_types = [];
+      async.auto({
+        findDishes : function(next){
+          hosts.forEach(function(host){
+            var dishes = host.dishes.filter(function(dish){
+              return dish.isVerified;
+            });
+            _dishes = _dishes.concat(dishes);
+          })
+          next();
+        },
+        findDishTypes : ['findDishes', function(next){
+          _dishes.forEach(function(dish){
+            if(dish.type){
+              if(!_types.includes(dish.type)){
+                _types.push(dish.type);
+              }
+            }
+          })
+          next();
+        },
+        ]
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate("dishes").exec(function(err, meals) {
+          if (err) {
+            return res.badRequest(err);
+          }
+          meals.forEach(function (meal) {
+            meal.dishes.forEach(function (dish) {
+              _dishes = _dishes.map(function (d) {
+                if (d && dish && d.id === dish.id) {
+                  d.availableAfter = util.humanizeDate(meal.pickups[0].pickupFromTime);
+                }
+                return d;
+              })
+            })
+          })
+          _dishes = _dishes.map(function(d){
+            if(!d || d.availableAfter){
+              return d;
+            }
+            var availableDate = moment().add(d.prepareDay,'days');
+            d.availableDate = availableDate;
+            return d;
+          })
+          res.view("catering", { dishes : _dishes, types : _types});
+        });
+      })
+    })
+  },
+
+  pickup : function(req, res){
+    var _this = this, _pickups = [];
+    Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
+      if(err){
+        return res.badRequest(err);
+      }
+      var _dishes=[];
+      async.auto({
+        findPickups : function(next){
+          meals.forEach(function(meal){
+            if(!_pickups.length){
+              _pickups = meal.pickups;
+            }else{
+              meal.pickups.forEach(function(pickup){
+                if(!_pickups.some(function(p){
+                  return moment(p.pickupFromTime).isSame(pickup.pickupFromTime, 'minutes') && moment(p.pickupTillTime).isSame(pickup.pickupTillTime, 'minutes') && p.location === pickup.location && p.method === pickup.method;
+                })){
+                  _pickups.push(pickup);
+                }
+              })
+            }
+          });
+          next();
+        }
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(_pickups);
+      })
+    })
+  },
+
+  dish : function(req, res){
+    var _this = this, _meals = [];
+    var pickupNickname = req.param('pickup');
+    Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
+      if(err){
+        return res.badRequest(err);
+      }
+      _meals = meals;
+      if(pickupNickname){
+        _meals = meals.filter(function(meal){
+          return meal.pickups.some(function(p){
+            return p.nickname && p.nickname === pickupNickname;
+          })
+        })
+      }
+      var _dishes=[];
+      async.auto({
+        findDishes : function(next){
+          _meals.forEach(function(meal){
+            meal.dishes.forEach(function(dish){
+              if(!_dishes.some(function(d){
+                return d.id === dish.id;
+              })){
+                _dishes.push(dish);
+              }
+            })
+          });
+          next();
+        }
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok({ dishes : _dishes, meals : _meals} );
+      })
+    })
+  },
+
+  find : function(req,res){
+    //find out meals that provide start today or ends today
+    // moment.locale(req.getLocale());
+    var _this = this;
+    var pickupNickname = req.param('pickup');
+    Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(pickupNickname){
+        meals = meals.filter(function(meal){
+          return meal.pickups.some(function(p){
+            return p.nickname && p.nickname === pickupNickname;
+          })
+        })
+      }
+      var _u=null,_tags=['chef'], _hosts = [];
+      async.auto({
+        findUser : function(next){
+          if(!req.session.authenticated){
+            return next();
+          }
+          User.findOne(req.session.user.id).populate("follow").exec(function(err, u){
+            if(err){
+              return next(err);
+            }
+            _u = u;
+            next();
+          })
+        },
+        findHosts : function(next){
+          if(!meals.length){
+            Host.find({ where : { passGuide : true, intro : { '!' : ''}}, skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("dishes").exec(function(err, hosts) {
+              if (err) {
+                return next(err);
+              }
+              hosts = hosts.filter(function (h) {
+                return !!h.dishes.length;
+              })
+              _hosts = hosts;
+              next();
+            });
+          }else{
+            meals.forEach(function(meal){
+              if(!_hosts.some(function(host){
+                return host.id === meal.chef.id;
+              })){
+                _hosts.push(meal.chef);
+              }
+            })
+            next();
+          }
+        },
+        findDishTags : function(next){
+          meals.forEach(function(meal){
+            meal.dishes.forEach(function(dish){
+              if(dish.tags){
+                dish.tags.forEach(function(tag){
+                  if(!_tags.includes(tag) && !_tags.includes(req.__(tag))){
+                    _tags.push(tag);
+                  }
+                })
+              }
+            })
+          })
+          var tagOrder = {
+            "chef" : 201,
+            "select" : 200,
+            "crawfish" : 195,
+            "gift" : 190,
+            "limited" : 180,
+            "frozen" : 170,
+            "dessert" : 150
+          };
+          _tags = _tags.sort(function(a,b){
+            var tagOrderA = tagOrder.hasOwnProperty(a) ? tagOrder[a] : 0;
+            var tagOrderB = tagOrder.hasOwnProperty(b) ? tagOrder[b] : 0;
+            return tagOrderB - tagOrderA;
+          })
+          next();
+        }
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        if(req.wantsJSON && process.env.NODE_ENV === "development"){
+          return res.ok({ meals : meals, user : _u, tags: _tags });
+        }
+        meals = _this.composeMealWithDate(meals);
+        res.view("dayOfMeal",{ meals : meals, hosts: _hosts, user : _u, tags: _tags, pickupNickname : pickupNickname, locale : req.getLocale()});
+      })
+    })
   },
 
   feature : function(req, res){
@@ -67,13 +315,13 @@ module.exports = {
 
         User.findOne(user.id).populate("collects").exec(function(err,u){
           if(err){
-            return res.badRequest(err);
+            // return res.badRequest(err);
           }
           meals = _this.composeMealWithDate(meals);
           if(req.wantsJSON && process.env.NODE_ENV === "development"){
             return res.ok({meals : meals, user : u, county : county, locale : req.getLocale()});
           }
-          return res.view('meals',{meals : meals, user : u, county : county, locale : req.getLocale()});
+          return res.redirect('/meal');
         });
       });
     }else{
@@ -126,9 +374,12 @@ module.exports = {
         found = found.filter(function(meal){
           var dishes = meal.dishes;
           var valid = false;
+          if(meal.title === keyword){
+            return true;
+          }
           for(var i=0; i < dishes.length; i++){
             var dish = dishes[i];
-            if(meal.title.indexOf(keyword) !== -1 || dish.title.indexOf(keyword) !== -1 || dish.description.indexOf(keyword) !== -1 || dish.type.indexOf(keyword) !== -1){
+            if(dish.title.indexOf(keyword) !== -1 || dish.description.indexOf(keyword) !== -1 || dish.type.indexOf(keyword) !== -1){
               valid = true;
               break;
             }
@@ -146,7 +397,7 @@ module.exports = {
     var keyword = query['keyword'];
     var zipcode = query['zip'];
     var method = query['method'];
-    var county = req.cookies['county'] || query['county']|| "San Francisco County";
+    var county = query['county'] || req.cookies['county'] || "San Francisco County";
     var type = req.param('type');
     var now = new Date();
     var params = {
@@ -230,68 +481,125 @@ module.exports = {
     });
   },
 
-  confirm : function(req, res){
-    var mealId = req.param("id");
-    var u = req.session.user;
-    Meal.findOne(mealId).populate("dishes").populate("dynamicDishes").populate("chef").exec(function(err,m){
+  checkout : function(req, res) {
+    var _this = this;
+    var orderedDishes = req.query.dishes;
+    if (!orderedDishes){
+      return res.badRequest({code: -19, responseText: req.__('meal-checkout-lack-of-order')});
+    }
+
+    orderedDishes = orderedDishes.split(",");
+
+    var pickupNickname = req.param("pickup");
+
+    Meal.find({where: {status: "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime: {'>': moment().toDate()}}}).populate('dishes').exec(function(err, meals){
       if(err){
         return res.badRequest(err);
       }
-      if(!m){
-        return res.badRequest({ code : -3, responseText : req.__('meal-not-found')});
+      // meals = meals.filter(function(meal){
+      //   return meal.county.split("+").indexOf(county) !== -1;
+      // });
+
+      //get all meals that contain the order dishes
+      meals = meals.filter(function(meal){
+        return meal.dishes.some(function(d){
+          return orderedDishes.includes(d.id);
+        });
+      });
+
+      //remove dates of meals which can not have all the ordered dishes
+      var dateDescs = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+      dateDescs.forEach(function(dateDesc){
+        var mealsOnSameDate = meals.filter(function(meal){
+          var pickupDate = moment(meal.pickups[0].pickupFromTime).format('dddd');
+          return pickupDate === dateDesc;
+        });
+        if(!mealsOnSameDate.length){
+          return;
+        }
+        var mealHaveAllOrderedDishes = orderedDishes.every(function(orderedDishId){
+          var dishInMeal = mealsOnSameDate.some(function(m){
+            return m.dishes.some(function(d){
+              return d.id === orderedDishId;
+            });
+          });
+          return dishInMeal;
+        });
+        if(!mealHaveAllOrderedDishes){
+          meals = meals.filter(function(m){
+            var mealNeedToRemove = mealsOnSameDate.some(function(m2){
+              return m2.id === m.id;
+            })
+            return !mealNeedToRemove;
+          })
+        }
+      });
+
+      if(pickupNickname){
+        meals = meals.filter(function(meal){
+          return meal.pickups.some(function(p){
+            return p.nickname && p.nickname === pickupNickname;
+          })
+        })
       }
-      var isPartyMode = req.query['party'];
+      if(!meals.length){
+        return res.badRequest({ code : -3, responseText: req.__('meal-not-found')});
+      }
+      var pickups = [], u = {}, dishes = [];
       async.auto({
-        getPartyMeal : function(cb){
-          if(isPartyMode !== 'true'){
-            return cb();
+        combinePickups : function(next){
+          meals.forEach(function(meal){
+            var newPickups = meal.pickups.filter(function(p1){
+              if(!pickups.length){
+                return true;
+              }
+              return !pickups.some(function(p2){
+                return p1.pickupFromTime === p2.pickupFromTime && p1.pickupTillTime === p2.pickupTillTime && p1.location === p2.location;
+              })
+            });
+            newPickups = newPickups.map(function(pickup){
+              pickup.meal = meal.id;
+              return pickup;
+            });
+            pickups = pickups.concat(newPickups);
+          })
+          next();
+        },
+        getUser : function(next){
+          if(!req.session.authenticated){
+            return next();
           }
-          Dish.find({ chef : m.chef.id, isVerified : true}).exec(function(err, dishes){
+          User.findOne(req.session.user.id).populate("payment").populate("collects").exec(function(err, user){
             if(err){
-              return res.badRequest(err);
+              return next(err);
             }
-            m.isPartyMode = true;
-            m.delivery_range = m.delivery_range * stripe.PARTY_ORDER_RANGE_MULTIPLIER;
-            m.delivery_fee = 0;
-            m.dishes = dishes;
-            cb();[]
+            u = user;
+            next()
           })
         },
-        getMeal : function(cb){
-          if(!req.session.authenticated){
-            return cb();
-          }
-          User.findOne(u.id).populate('auth').populate("payment").populate("orders").exec(function(err,user){
-            if(err){
-              return cb(err);
-            }
-            if(!user){
-              return cb({ code : -99, responseText : "can not find user"});
-            }
-            user.firstOrder = true;
-            user.firstOrder = user.orders.every(function(order){
-              return order.status === "cancel";
-            });
-            user.orders = user.orders.filter(function(order){
-              return order.status === "schedule" || order.status === "preparing";
-            });
-            u = user;
-            cb();
+        getDishes : function(next){
+          meals.forEach(function(meal){
+            meal.dishes.forEach(function(dish){
+              if(!dishes.some(function(d){
+                return d.id === dish.id
+              })){
+                dishes.push(dish);
+              }
+            })
           });
+          next();
         }
       }, function(err){
         if(err){
           return res.badRequest(err);
         }
         if(req.wantsJSON && process.env.NODE_ENV === "development"){
-          return res.ok({meal : m, user : u, locale : req.getLocale()});
+          return res.ok({ pickups : pickups, meals: meals, dishes : dishes, user : u, locale : req.getLocale()});
         }
-        if(!req.session.authenticated){
-          u = {}
-        }
-        return res.view("confirm",{meal : m, user : u, locale : req.getLocale()});
-      });
-    });
+        meals = _this.composeMealWithDate(meals);
+        return res.view("checkout",{ pickups : pickups, meals: meals, dishes : dishes, user : u, locale : req.getLocale()});
+      })
+    })
   },
 
   off : function(req, res){
@@ -342,7 +650,7 @@ module.exports = {
               if(isAdmin) {
                 return res.ok(meal[0]);
               }
-              return res.redirect("/host/me#mymeal");
+              return res.ok(meal[0]);
             });
           });
         });
@@ -370,10 +678,7 @@ module.exports = {
             return res.badRequest(err);
           }
           if(!host.passGuide || !host.dishVerifying){
-            if(isAdmin){
-              return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
-            }
-            return res.redirect("/apply");
+            return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
           }
           if(!meal.dateIsValid()){
             console.log("Date format of meal is not valid");
@@ -393,10 +698,7 @@ module.exports = {
                 if(err){
                   return res.badRequest(err);
                 }
-                if(isAdmin || (req.wantsJSON && process.env.NODE_ENV === "development")){
-                  return res.ok(meal);
-                }
-                return res.redirect("/host/me#mymeal");
+                res.ok(meal);
               });
             })
           });
@@ -405,7 +707,7 @@ module.exports = {
     });
   },
 
-  find : function(req, res){
+  oldmeals : function(req, res){
     var county = req.query['county'] || req.cookies['county'] || req.param('county') || "San Francisco County";
     var now = new Date();
     var _this = this;
@@ -416,11 +718,11 @@ module.exports = {
       found = found.filter(function(meal){
         return meal.county.split("+").indexOf(county) !== -1;
       });
-      found = _this.composeMealWithDate(found);
       //test only
       if(req.wantsJSON && process.env.NODE_ENV === "development"){
         return res.ok({meals : found});
       }
+      found = _this.composeMealWithDate(found);
       return res.view("meals",{ meals : found, user : req.session.user, county : county});
     });
   },
@@ -430,15 +732,21 @@ module.exports = {
     req.body.chef = hostId;
     var $this = this;
 
-    if(this.dateIsValid(req.body)){
-      this.requirementIsValid(req.body, null, req, function(err){
+    this.dateIsValid(req.body, req, function(err){
+      if(err){
+        return res.badRequest(err);
+      }
+      sails.log.info("pass date check");
+      $this.requirementIsValid(req.body, null, req, function(err){
         if(err){
           return res.badRequest(err);
         }
+        sails.log.info("pass meal requirement check");
         $this.dishIsValid(req.body, req, function(err){
           if(err){
             return res.badRequest(err);
           }
+          sails.log.info("pass dish check");
           Host.findOne(hostId).populate("meals").populate("dishes").populate("user").exec(function(err, host){
             if(err){
               return res.badRequest(err);
@@ -477,10 +785,7 @@ module.exports = {
           });
         });
       });
-    }else{
-      console.log("Date format of meal is not valid");
-      return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
-    }
+    });
   },
 
   update : function(req, res){
@@ -516,7 +821,10 @@ module.exports = {
         return res.badRequest(err);
       }
       sails.log.info("chef id: " + hostId);
-      if($this.dateIsValid(req.body)){
+      $this.dateIsValid(req.body, req, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
         Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err,meal){
           if(err){
             return res.badRequest(err);
@@ -541,13 +849,11 @@ module.exports = {
                   if(status === "on"){
                     async.auto({
                       updateQty : function(cb){
-                        if(!req.body.totalQty && meal.status !== "on"){
+                        if(!req.body.totalQty){
                           return cb();
                         }
-                        req.body.leftQty = $this.updateDishQty(meal.leftQty, meal.totalQty, req.body.totalQty);
-                        if(!req.body.leftQty){
-                          return cb({responseText : req.__('meal-adjust-qty-fail'), code : -9});
-                        }
+                        sails.log.info("setting left qty: " + req.body.totalQty);
+                        req.body.leftQty = req.body.totalQty;
                         cb();
                       }
                     }, function(err){
@@ -605,10 +911,7 @@ module.exports = {
             });
           });
         });
-      }else{
-        console.log("Date format of meal is not valid");
-        return res.badRequest({responseText : req.__('meal-invalid-date'), code : -5});
-      }
+      })
     });
   },
 
@@ -666,43 +969,85 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(meal.status === 'on'){
-        return res.badRequest({responseText : req.__('meal-active-update-dish'), code : -10});
-      }
-      if(meal.dishes.filter(function(dish){
-        return dish.id !== dishId;
-      }) === 0){
-        return res.badRequest({responseText : req.__('meal-dishes-empty'), code : -11});
-      }
-      if(meal.leftQty.hasOwnProperty(dishId)){
-        delete meal.leftQty[dishId];
-      }
-      if(meal.totalQty.hasOwnProperty(dishId)){
-        delete meal.totalQty[dishId];
-      }
-      meal.dynamicDishes.remove(dishId);
-      meal.dishes.remove(dishId);
-      meal.save(function(err, result){
+      async.auto({
+        checkMealHasActiveDish : function(next) {
+          if (meal.status !== 'on') {
+            return next();
+          }
+          Order.find({mealId: mealId, status: ['schedule', 'preparing', 'ready']}).exec(function (err, orders) {
+            if (err) {
+              return next(err);
+            }
+            var hasDishInOrder = orders.some(function(order){
+              return order.orders.hasOwnProperty(dishId) && order.orders[dishId].number > 0;
+            })
+            if(hasDishInOrder){
+              return next({responseText : req.__('meal-active-update-dish'), code : -10});
+            }
+            next();
+          });
+        }
+      }, function(err){
         if(err){
           return res.badRequest(err);
         }
-        Order.find({ $and : [{$or:[{status : "schedule"},{status : "preparing"}]},{meal:mealId}]}).populate("dynamicDishes").populate("dishes").exec(function(err, orders){
+        if(meal.dishes.filter(function(dish){
+          return dish.id !== dishId;
+        }) === 0){
+          return res.badRequest({responseText : req.__('meal-dishes-empty'), code : -11});
+        }
+        if(meal.leftQty.hasOwnProperty(dishId)){
+          delete meal.leftQty[dishId];
+        }
+        if(meal.totalQty.hasOwnProperty(dishId)){
+          delete meal.totalQty[dishId];
+        }
+        meal.dynamicDishes.remove(dishId);
+        meal.dishes.remove(dishId);
+        meal.save(function(err, result){
           if(err){
             return res.badRequest(err);
           }
-          async.each(orders, function(order, next){
-            order.dishes.remove(dishId);
-            order.dynamicDishes.remove(dishId);
-            order.save(next);
-          }, function(err){
+          Order.find({ $and : [{$or:[{status : "schedule"},{status : "preparing"}]},{meal:mealId}]}).populate("dynamicDishes").populate("dishes").exec(function(err, orders){
             if(err){
               return res.badRequest(err);
             }
-            res.ok({});
+            async.each(orders, function(order, next){
+              order.dishes.remove(dishId);
+              order.dynamicDishes.remove(dishId);
+              order.save(next);
+            }, function(err){
+              if(err){
+                return res.badRequest(err);
+              }
+              res.ok({});
+            })
           })
-        })
-      });
+        });
+      })
     });
+  },
+
+  updateDishQtyAPI : function(req, res){
+    var leftQty = req.body.leftQty;
+    var mealId = req.param("id");
+    var _this = this;
+    Meal.findOne(mealId).exec(function(err, meal){
+      if(err){
+        return res.badRequest(err);
+      }
+      Object.keys(meal.leftQty).forEach(function(dishId){
+        if(leftQty.hasOwnProperty(dishId)){
+          meal.leftQty[dishId] = leftQty[dishId];
+        }
+      })
+      meal.save(function(err, m){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(m);
+      })
+    })
   },
 
   updateDelivery : function(params, host, req, cb){
@@ -711,7 +1056,7 @@ module.exports = {
       params.delivery_fee = DELIVERY_FEE;
     }
 
-    if(params.isDelivery && params.type === "preorder" && (!params.pickups || (params.pickups && !JSON.parse(params.pickups).some(function(pickup){
+    if(params.isDelivery && params.isDelivery !== 'false' && params.type === "preorder" && (!params.pickups || (params.pickups && !params.pickups.some(function(pickup){
       return pickup.method === "delivery";
     })))){
       return cb({ responseText : req.__('meal-delivery-on-option'), code : -15})
@@ -723,7 +1068,7 @@ module.exports = {
         if(!params.pickups){
           return cb();
         }
-        var pickupArrays = JSON.parse(params.pickups);
+        var pickupArrays = params.pickups;
         pickupArrays.forEach(function(pickup, index){
           if(!pickup.county){
             return;
@@ -731,7 +1076,9 @@ module.exports = {
           if(!pickup.phone || pickup.phone === 'undefined'){
             pickup.phone = host.user.phone;
           }
-          pickup.index = index+1;
+          if(!pickup.index){
+            pickup.index = index+1;
+          }
           sails.log.info("phone is : " + pickup.phone);
           sails.log.info("county is : " + pickup.county);
           if(counties.indexOf(pickup.county) === -1){
@@ -790,14 +1137,14 @@ module.exports = {
     //   return cb({ code : -6, responseText : req.__('')});
     // }
     var type = params.type;
-    if(params.isDelivery && type === 'preorder' && !JSON.parse(params.pickups).some(function(pickup){
+    if(params.isDelivery == 'true' && type === 'preorder' && !params.pickups.some(function(pickup){
         return pickup.method === 'delivery';
       })){
       sails.log.debug("support delivery but no delivery time was added");
       return cb({ code : -13, responseText : req.__('meal-delivery-lack-of-method')});
     }
 
-    if(!params.isDelivery && params.isDeliveryBySystem){
+    if(params.isDelivery == "false" && params.isDeliveryBySystem){
       sails.log.debug("system delivery provided but delivery option is off");
       return cb({ code : -12, responseText : req.__('meal-delivery-conflict')});
     }
@@ -806,7 +1153,11 @@ module.exports = {
       return cb({ code : -17, responseText : req.__('meal-lack-of-party-requirement')});
     }
 
-    if(!params.isDelivery && params.pickups && JSON.parse(params.pickups).some(function(pickup){
+    if(params.nickname === "custom" && !params.pickups && type !== 'order'){
+      return cb({ code : -20, responseText : req.__('meal-custom-hour-lack-of-pickup-options')})
+    }
+
+    if(!params.isDelivery && params.pickups && params.pickups.some(function(pickup){
       return pickup.method === "delivery";})
     ){
       return cb({ code : -12, responseText : req.__('meal-delivery-conflict')});
@@ -840,7 +1191,7 @@ module.exports = {
     });
   },
 
-  dateIsValid : function(params){
+  dateIsValid : function(params, req, cb){
     var provideFromTime = params.provideFromTime;
     var provideTillTime = params.provideTillTime;
     var now = new Date();
@@ -848,35 +1199,71 @@ module.exports = {
     sails.log.info("start: " + provideFromTime, " end: " + provideTillTime);
 
     if(provideFromTime >= provideTillTime){
-      sails.log.warn("provide from time is later than provide till time");
-      return false;
+      return cb({ code : -21, responseText : req.__('provide-from-time-is-later-than-provide-till-time')});
     }else if(new Date(provideTillTime) < now){
-      sails.log.warn("provide till time should be in the future");
-      return false;
+      return cb({ code : -22, responseText : req.__('provide-till-time-is-in-the-past')});
     }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
-      sails.log.warn("provide from time and provide till time is too short");
-      return false;
+      return cb({ code : -23, responseText : req.__('provide-time-too-short')});
     }
-    var valid = true;
-    if(params.pickups){
-      JSON.parse(params.pickups).forEach(function(pickup){
-        if(!pickup.isDateCustomized){
-          var pickupFromTime = pickup.pickupFromTime;
-          var pickupTillTime = pickup.pickupTillTime;
-          if(pickupFromTime >= pickupTillTime){
-            console.log("pickup time not valid");
-            valid = false;
-          }else if(moment.duration(moment(pickupTillTime).diff(moment(pickupFromTime))).asMinutes() < 30){
-            console.log("pickup time too short");
-            valid = false;
-          }else if(pickupFromTime <= provideTillTime && params.type === "preorder"){
-            console.log("pickup time too early");
-            valid = false;
+
+    sails.log.info("provide time checked");
+    async.auto({
+      findPickups : function(next){
+        if(params.type === "order"){
+          return next();
+        }else{
+          if(params.pickups){
+            try{
+              params.pickups = JSON.parse(params.pickups);
+              next();
+            }catch(e){
+              return next(e);
+            }
+          }else if(params.nickname && params.nickname !== "custom"){
+            PickupOption.find({ nickname: params.nickname}).exec(function(err, options){
+              if(err){
+                return next(err);
+              }
+              if(!options || !options.length){
+                return next({code: -24, responseText : req.__('meal-nickname-empty')});
+              }
+              sails.log.info("pickup options: " + options);
+              params.pickups = options;
+              next();
+            })
+          }else{
+            return next({ code : -20, responseText : req.__('meal-custom-hour-lack-of-pickup-options')});
           }
         }
-      });
-    }
-    return valid;
+      }
+    }, function(err){
+      if(err){
+        return cb(err);
+      }
+      var valid = true;
+      if(params.pickups){
+        params.pickups.forEach(function(pickup){
+          if(!pickup.isDateCustomized){
+            var pickupFromTime = pickup.pickupFromTime;
+            var pickupTillTime = pickup.pickupTillTime;
+            if(pickupFromTime >= pickupTillTime){
+              console.log("pickup time not valid");
+              valid = false;
+            }else if(moment.duration(moment(pickupTillTime).diff(moment(pickupFromTime))).asMinutes() < 30){
+              console.log("pickup time too short");
+              valid = false;
+            }else if(pickupFromTime <= provideTillTime && params.type === "preorder"){
+              console.log("pickup time too early");
+              valid = false;
+            }
+          }
+        });
+      }
+      if(!valid){
+        return cb({ code : -5, responseText : req.__('meal-invalid-date')});
+      }
+      cb();
+    })
   },
 
   mealActiveCheck : function(params, meal, req, cb){
@@ -887,11 +1274,12 @@ module.exports = {
 
       if (orders.length > 0) {
         if(params.status === "on"){
-          if(params.pickups || params.type){
-            cb({ code : -14, responseText : req.__("meal-modify-active-error")});
-          }else{
-            cb();
-          }
+          // if(params.pickups){
+          //   cb({ code : -14, responseText : req.__("meal-modify-active-error")});
+          // }else{
+          //   cb();
+          // }
+          cb();
         }else{
           return cb({code: -4, responseText: req.__('meal-active-error')});
         }
@@ -938,7 +1326,6 @@ module.exports = {
   },
 
   findOne : function(req, res){
-
     var mealId = req.param('id');
     if(!mealId){
       return res.badRequest({ code : -3, responseText : req.__('meal-not-found')})
@@ -968,8 +1355,7 @@ module.exports = {
       if(!meal){
         return res.notFound();
       }
-      var _orders;
-      var _user;
+      var _orders,_user,_drivers,_pickups=[];
       async.auto({
         isEditMode : function(cb){
           if(!isEditMode){
@@ -1000,8 +1386,36 @@ module.exports = {
             cb();
           });
         },
+        getDrivers : function(cb){
+          if(!isEditMode){
+            return cb();
+          }
+          Driver.find().exec(function(err, drivers){
+            if(err){
+              return cb(err);
+            }
+            _drivers = drivers;
+            cb();
+          })
+        },
+        getStoreHours : function(cb){
+          if(!isEditMode){
+            return cb();
+          }
+          PickupOption.find().exec(function(err, pickups){
+            if(err){
+              return cb(err);
+            }
+            pickups.forEach(function(p){
+              if(!_pickups.includes(p.nickname)){
+                _pickups.push(p.nickname);
+              }
+            })
+            _pickups.push("custom");
+            cb();
+          })
+        },
         getMealExtraInfo : ['isPartyMode', function(cb){
-
           Order.find({meal : meal.id, status : ["schedule","preparing"]}).exec(function(err, orders){
             if(err){
               return res.badRequest(err);
@@ -1028,7 +1442,7 @@ module.exports = {
           return res.ok(meal);
         }
         if(isEditMode){
-          res.view('meal_edit',{ meal : meal});
+          res.view('meal_edit',{ meal : meal, drivers: _drivers, pickups : _pickups });
         }else if(req.session.authenticated){
           res.view('meal',{ meal : meal, locale : req.getLocale(), user : _user, orders : _orders});
         }else{
@@ -1066,29 +1480,16 @@ module.exports = {
     var preOrderCount = 0;
     var orderCount = 0;
     meals.forEach(function(meal){
-      if(meal.type === "order"){
-        if(mealDateObj.meals.hasOwnProperty("orders")){
-          mealDateObj.meals["orders"].meals.push(meal);
-        }else{
-          mealDateObj.meals["orders"] = {};
-          mealDateObj.meals["orders"].meals = [meal];
-        }
+      var dateDesc = util.humanizeDate(meal.pickups[0].pickupFromTime);
+      if(mealDateObj.meals.hasOwnProperty(dateDesc)){
+        mealDateObj.meals[dateDesc].meals.push(meal);
+      }else{
+        mealDateObj.meals[dateDesc] = {};
+        mealDateObj.meals[dateDesc].meals = [meal];
+      }
+      if(meal.type==="order"){
         orderCount++;
       }else{
-        var pickupDate = meal.pickups[0].pickupFromTime;
-        var dayOfWeek = util.getWeekFromDate(pickupDate);
-        var month = util.getMonthFromDate(pickupDate);
-        var date = util.getDayOfMonth(pickupDate);
-        var key = month + date;
-        if(mealDateObj.meals.hasOwnProperty(key)){
-          mealDateObj.meals[key].meals.push(meal);
-        }else{
-          mealDateObj.meals[key] = {};
-          mealDateObj.meals[key].meals = [meal];
-        }
-        mealDateObj.meals[key].dayOfWeek = dayOfWeek;
-        mealDateObj.meals[key].month = month;
-        mealDateObj.meals[key].date = date;
         preOrderCount++;
       }
     });

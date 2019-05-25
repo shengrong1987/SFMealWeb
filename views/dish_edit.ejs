@@ -1,22 +1,10 @@
-
 <div>
-  <div class="row">
-    <div class="pure-banner green">
-      <div class="middle banner-text py-3">
-        <div class="row vertical-align">
-          <div class="col-lg-2"></div>
-          <div class="col-5 col-lg-3">
-            <img src="/images/welcome-1.png" style="width: 100%;">
-          </div>
-          <div class="col-2 col-lg-2">
-            <a href="/" class="logo-slogan"></a>
-          </div>
-          <div class="col-5 col-lg-3">
-            <img src="/images/welcome-2.png" style="width: 100%;">
-          </div>
-          <div class="col-lg-2"></div>
-        </div>
-      </div>
+  <div class="d-flex justify-content-center pure-banner vertical-align red p-4">
+    <div class="cursor-pointer mr-4">
+      <a href="/" class="logo" style="left: 0;"></a>
+    </div>
+    <div>
+      <h3 class="text-white text-left none-margin"><strong><%= __('nav-bar-dish')%></strong></h3>
     </div>
   </div>
 
@@ -34,7 +22,10 @@
 
           <form data-id="<%= dish.userId%>" data-dish-id="<%= dish.id%>" data-err-container=".submit" data-toggle="validator">
             <div class="form-group">
-              <label for="mealTitleInput">1.<%= __('dish-name') %></label><button class="btn btn-default" data-toggle="input-toggle" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i></button>
+              <label for="mealTitleInput">1.<%= __('dish-name') %></label>
+              <button class="btn btn-info m-2" data-toggle="input-toggle" title="<%= __('toggle-language')%>">
+                <i class="fas fa-retweet-alt"></i> <%= __('switch-lan')%>
+              </button>
               <input id="mealTitleInput" class="form-control" type="text" placeholder="<%= __('full-name') %>" maxlength="7" data-error="<%= __('full-name') %>" required value="<%= dish.title%>">
               <input id="mealTitleInput-en" class="form-control" type="text" placeholder="Dish title" maxlength="40" data-error="<%= __('full-name') %>" value="<%= dish['title-en'] || ''%>">
               <div class="help-block with-errors"></div>
@@ -59,12 +50,6 @@
                     <input id="photoInput-<%= i%>" class="form-control" type="file" data-strictImage=true name="image">
                   </div>
                   <a href='javascript:void(0)' class="btn btn-default fileinput-exists dimiss" data-dismiss="fileinput"><%= __('remove')%></a>
-                  <script>
-                    $(".fileinput").on("clear.bs.fileinput",function(){
-                      var index = $(this).data("index");
-                      $("#photoInput-" + index).data("isDelete",true);
-                    });
-                  </script>
                 </div>
                 <div class="help-block with-errors"></div>
               </div>
@@ -85,24 +70,40 @@
             </div>
 
             <div class="form-group">
-              <label for="priceInput">3.<%= __('how-much-for-one') %></label>
-              <div class="input-group" style="width: 250px;">
+              <label for="priceInput">3.<%= __('how-much-for-one') %><i class="fal fa-question-circle text-lightgrey" data-toggle="tooltip" title="<%= __('catering-minimal-tip')%>"></i></label>
+              <div class="input-group">
+
                 <div class="input-group-prepend">
                   <span class="input-group-text">$</span>
                 </div>
-                <input type="text" class="form-control" id="priceInput" placeholder="<%= __('dollar') %>" min="1" max="100" data-error="<%= __('price-incorrect') %>" required value="<%= dish.price%>">
-                <div class="input-group-append">
-                  <span class="input-group-text">.00</span>
+                <input type="text" class="form-control" id="priceInput" min="1" max="100" data-error="<%= __('price-incorrect') %>" required value="<%= dish.price || 0%>">
+
+                <div class="input-group-prepend">
+                  <span class="input-group-text">$</span>
                 </div>
+                <input type="text" class="form-control" id="discountInput" min="1" max="100" data-error="<%= __('discount-incorrect') %>" required value="<%= dish.discount || 0%>">
+
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><%= __('fen')%></span>
+                </div>
+                <input type="text" class="form-control" id="cateringMinimalOrderInput" required value="<%= dish.cateringMinimalOrder || 0%>">
               </div>
-              <div class="help-block with-errors"></div>
+              <div class="help-block with-errors text-red"></div>
             </div>
 
             <div class="form-group">
               <label for="priceInput">4.<%= __('how-many-for-one') %></label>
-              <div class="input-group" style="width: 250px;">
-                <input type="text" class="form-control" id="quantityInput" placeholder="<%= __('fenliang') %>" value="<%= dish.quantity || ''%>">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><%= __('fenliang')%></span>
+                </div>
+                <input type="text" class="form-control" id="quantityInput" placeholder="<%= __('fenliang') %>" value="<%= dish.quantity || ''%>" required>
+                <div class="input-group-append">
+                  <span class="input-group-text"><%= __('people')%></span>
+                </div>
+                <input type="number" class="form-control" id="peopleServeInput" placeholder="<%= __('people') %>" value="<%= dish.peopleServe || 0%>" required>
               </div>
+              <div class="help-block with-errors text-red"></div>
             </div>
 
             <div class="form-group">
@@ -130,7 +131,10 @@
             </div>
 
             <div class="form-group">
-              <label for="desciptionInput">6.<%= __('dish-description') %></label><button class="btn btn-default" data-toggle="input-toggle" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i></button>
+              <label for="desciptionInput">6.<%= __('dish-description') %></label>
+              <button class="btn btn-info m-2" data-toggle="input-toggle" title="<%= __('toggle-language')%>">
+                <i class="fas fa-retweet-alt"></i> <%= __('switch-lan')%>
+              </button>
               <textarea class="form-control" id="descriptionInput" maxlength="200" style="height: 150px;" placeholder="输入描述"><%= dish.description || ''%></textarea>
               <textarea class="form-control" id="descriptionInput-en" maxlength="800" style="height: 150px;" placeholder="Dish description"><%= dish["description-en"] || ''%></textarea>
             </div>
@@ -221,7 +225,12 @@
             </div>
 
             <div class="form-group">
-              <label for="instagramInput">9.<%= __('is-dynamic') %></label><br/>
+              <label for="tagInput">9.<%= __('dish-tag')%></label>
+              <input type="text" id="tagInput" class="form-control" value="<%= dish.tags ? dish.tags.join(",") : ''%>">
+            </div>
+
+            <div class="form-group">
+              <label for="instagramInput">10.<%= __('is-dynamic') %></label><br/>
               <input class="form-control" type="checkbox" data-toggle="switch-button" id="isDynamicPriceOn" <%= !!dish.isDynamicPriceOn?"checked='checked'":""%>>
               <div id="dynamicDishSettingView" class="form-group form-inline <%= !!dish.isDynamicPriceOn?"":"d-none"%>" style="margin-top:20px;">
                 <div class="card">
@@ -250,6 +259,11 @@
               <div class="alert alert-danger"></div>
             </div>
 
+            <div class="form-group">
+              <label for="isDynamicPriceOn">11.<%= __('support-shipping') %></label><br/>
+              <input class="form-control" type="checkbox" data-toggle="switch-button" id="isSupportShipping" <%= !!dish.isSupportShipping ? "checked='checked'" : ""%>>
+            </div>
+
             <div class="form-group text-center submit">
               <button type="submit" class="btn btn-grey-green btn-lg round active"><%= __('save-and-submit')%></button>
               <div class="help-block with-errors"><%= __('24hours')%></div>
@@ -266,6 +280,4 @@
   </div>
 </div>
 
-<script>
-  var dishView = new DishView({ el : $("#dishEditView"), model : new Dish()})
-</script>
+<link href="/assets/editDish.css" rel="stylesheet"><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script><script src="/assets/zh.editDish.bundle.js"></script>

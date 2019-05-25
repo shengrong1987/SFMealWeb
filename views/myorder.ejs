@@ -1,0 +1,83 @@
+<div>
+  <div class="d-flex justify-content-center pure-banner vertical-align red p-4">
+    <div class="cursor-pointer mr-4">
+      <a href="/" class="logo" style="left: 0;"></a>
+    </div>
+    <div>
+      <h3 class="text-white text-left none-margin"><strong><%= __('nav-bar-user')%></strong></h3>
+    </div>
+  </div>
+
+  <div id="myorder" class="pb-4" style="min-height: 400px;">
+    <div class="py-2 light-grey">
+      <h4 class="text-center white none-margin py-2"><%= __('nav-bar-order')%></h4>
+      <div id="myorder" class="tab-pane middle active">
+        <% var tabsData = [
+          { id : "all", title : "order-nav-all", status : "all"},
+          { id : "holding", title : "order-nav-waiting", status : "holding"},
+          { id : "schedule", title : "order-nav-schedule", status : "schedule"},
+          { id : "preparing", title : "order-nav-preparing", status : "preparing"},
+          { id : "prepared", title : "order-nav-prepared", status : "ready"},
+          { id : "delivered", title : "order-nav-delivered", status : "review"},
+          { id : "reviewed", title : "order-nav-reviewed", status : "complete"}
+        ];%>
+        <ul class="nav nav-text-highlight nav-fill nav-scroll white pt-3 mb-2" style="flex-wrap: nowrap;" data-toggle="nav-scroll">
+          <% tabsData.forEach(function(tabData, i){%>
+            <li class="nav-item cursor-pointer <%= i===0?'active':''%>">
+              <a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark relative">
+                <div><%= __(tabData.title)%></div>
+                <span class="badge badge-small orange pull-right absolute" style="top: -10px;right: 5px;padding: 5px;"><%= user.orders.filter(function(order){return order.status === tabData.status && order.status !== "complete" && order.meal}).length || ''%></span>
+              </a>
+            </li>
+          <% });%>
+        </ul>
+        <div class="tab-content">
+          <% tabsData.forEach(function(tabData, i){%>
+            <div id="<%= tabData.id%>" class="tab-pane middle <%= i===0?'active':''%>">
+              <% var orders = user.orders;orders.forEach(function(order){if((tabData.status === "holding" && (order.status === "pending-payment" || (order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")))) || order.status===tabData.status || tabData.status === "all"){ %>
+                <div class="white p-2 mb-4 border-bottom">
+                  <div class="d-flex justify-content-between">
+                    <div><%= __('time')%> <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span></div>
+                    <div><b><%= order.method%></b></div>
+                  </div>
+                  <div class="vertical-align pt-2">
+                    <div class="w-75" style="float: left;">
+                      <ul class="d-flex none-margin none-padding vertical-align" style="overflow: scroll hidden;list-style: none;height: 100px;">
+                        <% for(var i=0; i < order.dishes.length; i++ ){ var dish = order.dishes[i];%>
+                        <li class="col-md-4 col-6"><img class="w-100" src="<%= dish.photos[0].v%>"/></li>
+                        <% }%>
+                      </ul>
+                    </div>
+                    <div class="w-25" style="float: left;">
+                      <div class="d-flex vertical-align justify-content-start">
+                        <span><%= order.dishes.length%><%= __('fen')%><%= __('items')%></span>
+                        <a href="/order/<%= order.id%>/receipt" target="__blank" class="btn btn-light ml-2">></a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="divider mb-0">-</div>
+                  <div class="d-flex vertical-align">
+                    <% if(!order.isPaid && ( order.status === "schedule" || order.status === "preparing")){%>
+                      <a class="btn btn-outline-info" data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/payment"><%= __('pay')%></a>
+                    <% }if(order.status === "schedule"){%>
+                      <a class="btn btn-outline-success" data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a>
+                      <a class="btn btn-outline-danger" href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a>
+                    <%}if(order.status === "review"){%>
+                      <button class="btn btn-success" style="margin-right: 10px;" toggle="modal" data-target="#myModal" data-href="/review/popup/<%= order.id%>" onclick="toggleModal(event)"><%= __('review')%></button>
+                    <% }%>
+                    <div class="ml-auto" style="text-decoration: <%= order.status === "cancel" ? "line-through" : ""%>"><%= __('total')%> <b>$<%= order.subtotal.toFixed(2)%></b></div>
+                  </div>
+                </div>
+              <% }})%>
+              <nav>
+                <ul class="pagination pagination-red pagination-sm" data-trigger="pagination" data-target="#<%= tabData.id%>"></ul>
+              </nav>
+            </div>
+          <% });%>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<link href="/assets/myorder.css" rel="stylesheet"><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script><script src="/assets/zh.myorder.bundle.js"></script>

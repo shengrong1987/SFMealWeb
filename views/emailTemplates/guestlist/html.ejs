@@ -1,146 +1,116 @@
-<div class="email-banner vertical-align dark">
-  <div style="width: 600px;" class="middle banner-text">
-    <div class="row vertical-align" style="margin-bottom: 5px;">
-      <div class="col-xs-3 cursor-pointer" onclick="location.href='/'">
-        <a href="/" class="logo-remote"></a>
-      </div>
-      <div class="col-xs-9 text-right">
-        <a class="btn btn-red btn-inline" href='http://www.sfmeal.com'>进入网站</a>
-      </div>
-    </div>
-  </div>
-</div>
+<%- include ../email_header %>
 
 <div class="green" style="padding: 25px;">
   <div class="box-email white relative middle text-left">
     <h4 class="text-green"><%= orders.length == 0 ? guestlistnotitle : guestlisttitle%></h4>
     <p>Hi <%= recipientName%>,</p>
-    <p><%= orders.length == 0 ? guestlistnocontext : guestlistcontext%></p>
 
-    <% if(orders.length == 0){%>
-      <h3 class="text-green"><u><%= title%></u> <small><%= guestlistnotips%></small></h3>
-    <%}else{%>
-      <h3 class="text-green"><u><%= title%></u></h3>
-    <%}%>
-
-    <% if(orders.length != 0){ if(isDelivery){
-    pickups.forEach(function(pickup){if(pickup.method == "delivery"){%>
-
-    <p><%= deliverytime%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%></p>
-    <table class="table table-bordered">
-      <thead>
-      <tr>
-        <td><%= user%></td>
-        <td><%= ordernumber%></td>
-        <td><%= content%></td>
-        <td><%= contact%></td>
-        <td><%= deliverylocation%></td>
-        <td><%= amountowe%></td>
-        <td><%= comment%></td>
-      </tr>
-      </thead>
-      <%}})%>
-      <% orders.forEach(function(order){
-      if(order.method === 'delivery'){%>
-      <tbody>
-        <tr>
-          <td><%= order.customerName %></td>
-          <td><%= order.id%></td>
-          <td>
-            <% Object.keys(order.orders).forEach(function(dishId){
-              var amount = order.orders[dishId].number;
-              var preference = order.orders[dishId].preference;
-              if(amount > 0){
-                var dish;
-                dishes.forEach(function(d){
-                  if(d.id == dishId){
-                    dish = d;
+    <%
+    var orderSummary = {};
+    var index = 1;
+    orders.forEach(function(order){
+      Object.keys(order.orders).forEach(function(dishId){
+        var dish = dishes.filter(function(d){
+          return d.id === dishId;
+        })[0];
+        if(!dish){
+          return;
+        }
+        var orderDetail = order.orders[dishId];
+        if(orderSummary.hasOwnProperty(dishId)){
+          if(order.orders[dishId].number){
+            orderSummary[dishId].amount = parseInt(orderDetail.number) + parseInt(orderSummary[dishId].amount);
+            if(orderDetail.preference && Array.isArray(orderDetail.preference)){
+              for(var i=0;i<orderDetail.preference.length;i++){
+                var prefs = orderDetail.preference[i];
+                if(!i){
+                  if(orderSummary[dishId].preference){
+                    orderSummary[dishId].preference += "  ";
+                  }
+                  orderSummary[dishId].preference += "第"+orderSummary[dishId].amount+"份:";
+                }
+                if(prefs.property && Array.isArray(prefs.property)){
+                  prefs.property.forEach(function(prop){
+                    if(prop.property && prop.property !== "undefined"){
+                      orderSummary[dishId].preference += prop.property;
+                    }
+                  })
+                }
+                if(i===orderDetail.preference.length-1){
+                  if(order.pickupInfo.comment){
+                    orderSummary[dishId].preference += "(" + order.pickupInfo.comment + ")";
+                  }
+                }
+              }
+            }
+          }
+        }else if(order.orders[dishId].number){
+          var dishObj = {};
+          dishObj.title = dish.title;
+          dishObj.amount = orderDetail.number;
+          dishObj.price = orderDetail.price;
+          dishObj.preference = "";
+          if(orderDetail.preference && Array.isArray(orderDetail.preference)){
+            for(i=0;i<orderDetail.preference.length;i++){
+              prefs = orderDetail.preference[i];
+              if(!i){
+                if(dishObj.preference){
+                  dishObj.preference += "  ";
+                }
+                dishObj.preference += "第1份:";
+              }
+              if(prefs.property && Array.isArray(prefs.property)){
+                prefs.property.forEach(function(prop){
+                  if(prop.property && prop.property !== "undefined"){
+                    dishObj.preference += prop.property;
                   }
                 })
-            %>
-            <% if(preference && preference.length > 0){
-              var title = '';
-              preference.forEach(function(pref){
-                title += "(" + pref.property + ')';
-              });
-            %>
-            <%= dish.title%>(<%= amount%>)<%= title%>
-            <% }else{%>
-            <%= dish.title%>(<%= amount%>)
-            <% }%>
-            <%}});%>
-          </td>
-          <td><%= order.customerPhone%></td>
-          <td><%= order.contactInfo.address%></td>
-          <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
-          <td><%= order.pickupInfo.comment || ''%></td>
-        </tr>
-      </tbody>
-      <%}})%>
-    </table>
-    <%} pickups.forEach(function(pickup, index){if(pickup.method == "pickup"){%>
-    <p>
-      <%= pickuptime%>: <%= pickup.pickupFromTime%> - <%= pickup.pickupTillTime%><br/>
-      <%= pickuplocation%>: <%= pickup.location%>
-    </p>
-    <table class="table table-bordered">
-      <thead>
-      <tr>
-        <td><%= user%></td>
-        <td><%= ordernumber%></td>
-        <td><%= content%></td>
-        <td><%= contact%></td>
-        <td><%= deliverylocation%></td>
-        <td><%= amountowe%></td>
-        <td><%= comment%></td>
-      </tr>
-      </thead>
-      <tbody>
-      <% orders.forEach(function(order){if(order.pickupOption-1 == index){%>
-      <tr>
-        <td><%= order.customerName%></td>
-        <td><%= order.id%></td>
-        <td>
-          <% Object.keys(order.orders).forEach(function(dishId){
-            var amount = order.orders[dishId].number;
-            var preference = order.orders[dishId].preference;
-            if(amount > 0){
-              var dish;
-              dishes.forEach(function(d){
-                if(d.id == dishId){
-                  dish = d;
-                  return;
+              }
+              if(i===orderDetail.preference.length-1){
+                if(order.pickupInfo.comment){
+                  dishObj.preference += "(" + order.pickupInfo.comment + ")";
                 }
-              })%>
-          <% if(preference && preference.length > 0){
-            var title = '';
-            preference.forEach(function(pref){
-              title += "(" + pref.property + ')';
-            });
-          %>
-          <%= dish.title%>(<%= amount%>)<%= title%>
-          <% }else{%>
-          <%= dish.title%>(<%= amount%>)
-          <% }%>
-          <%}});%>
-        </td>
-        <td><%= order.customerPhone%></td>
-        <td>N/A</td>
-        <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
-        <td><%= order.pickupInfo.comment || ''%></td>
-      </tr>
-      <%}})%>
-      </tbody>
-    </table>
-    <%}});} %>
+              }
+            }
+          }
+          orderSummary[dishId] = dishObj;
+        }
+      })
+    })
+      var orderSummaryKey = Object.keys(orderSummary);
+    %>
+    <p><%= orderSummaryKey.length == 0 ? guestlistnocontext : guestlistcontext%></p>
+
+    <% if(orderSummaryKey.length){ %>
+      <table class="table table-email">
+        <thead>
+        <tr>
+          <td><%= title%></td>
+          <td><%= price%></td>
+          <td><%= quantity%></td>
+          <td><%= comment%></td>
+        </tr>
+        </thead>
+        <tbody>
+        <% orderSummaryKey.forEach(function(dishId){ var dishObj = orderSummary[dishId]; %>
+          <tr>
+            <td><%= dishObj.title %></td>
+            <td><%= dishObj.price%></td>
+            <td><%= dishObj.amount%></td>
+            <td><%= dishObj.preference%></td>
+          </tr>
+        <% })%>
+        </tbody>
+      </table>
+    <% };%>
 
     <div class="divider"></div>
 
     <div class="row text-center">
-      <% if(orders.length == 0){%>
-        <a class="btn btn-green btn-inline" href="http://www.sfmeal.com/meal/<%= id%>?edit=true"><%= openmeal%></a>
+      <% if(orderSummaryKey.length == 0){%>
+        <a class="btn btn-outline-primary" style="border:1px solid #007bff;" href="http://www.sfmeal.com/meal/<%= id%>?edit=true"><%= openmeal%></a>
       <%}else{%>
-        <a class="btn btn-green btn-inline" href="http://www.sfmeal.com/meal/<%= id%>/report"><%= printlist%></a>
+        <a class="btn btn-outline-primary" style="border:1px solid #007bff;" href="http://www.sfmeal.com/meal/<%= id%>/report"><%= printlist%></a>
       <%}%>
 
     </div>

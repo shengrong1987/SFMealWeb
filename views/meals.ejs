@@ -33,7 +33,14 @@
     </div>
   </div>
 
-  <h2></h2>
+  <% if(meals && meals.meals){%>
+  <ul class="nav nav-light nav-fill justify-content-center bg-light">
+    <li class="nav-item py-4 active"><a class="nav-link" href="javascript:void(0);" data-filter="all" data-toggle="tab"><%= __('all')%></a></li>
+    <% Object.keys(meals.meals).forEach(function(dateKey,i){ %>
+    <li class="nav-item py-4"><a class="nav-link" href="javascript:void(0);" data-filter=".<%= dateKey%>" data-toggle="tab"><%= __(dateKey)%></a></li>
+    <% })%>
+  </ul>
+  <% }%>
 
   <div class="container-fluid pt-3">
     <% if (typeof search != 'undefined' && search ){ %>
@@ -42,74 +49,41 @@
 
     <div id="meal-container" class="text-center">
 
-      <div>
-        <% var dateList = Object.keys(meals.meals); dateList.forEach(function(dateKey){var mealObj = meals.meals[dateKey]; var actualMeals = mealObj.meals; %>
-        <div class="d-flex flex-row justify-content-between vertical-align" data-toggle="flex-scrollbar">
-          <div><a class="control" href="javascipt:void(0);" data-target="#<%= dateKey%>" data-way="left"><i class="fal fa-chevron-left"></i></a></div>
-          <div style="line-height: 46px;">
-            <label class="text-red font-medium">
-              <% if(dateKey === "orders"){ %>
-              <%= __('chicken-dinner')%>
-              <% }else{ %>
-              <%= __(mealObj.dayOfWeek)%> / <%= __('month-and-date',mealObj.month,mealObj.date)%>
-              <% }%>
-            </label>
-          </div>
-          <div><a class="control" href="javascipt:void(0);" data-target="#<%= dateKey%>" data-way="right"><i class="fal fa-chevron-right"></i></a></div>
-        </div>
+        <%
+          var dateList = Object.keys(meals.meals);
+          dateList.forEach(function(dateKey){
+            var mealObj = meals.meals[dateKey];
+            var actualMeals = mealObj.meals;
+            actualMeals.forEach(function(meal){
+              var dish = meal.dishes.filter(function(d){
+                  return d.id === meal.cover;
+              })[0];
+        %>
+            <div class="box-compact meal-box col-12 col-md-6 meal mix appetizer text-left item middle <%= dateKey %>">
 
-        <div class="d-flex flex-row" id="<%= dateKey%>" style="overflow-x:scroll;">
-          <% actualMeals.forEach(function(meal){var dish = meal.dishes.filter(function(d){ return d.id === meal.cover })[0]; if(dish){%>
-          <div class="box-compact meal-box col-12 col-md-4 meal mix appetizer item <%= meal.type %>">
-            <div class="box-grid white relative" style="overflow: hidden;">
-              <div class="relative item-image">
-                <i class="fa fa-heart fa-2x fav text-white <% if(user && user.collects) user.collects.forEach(function(m){if(meal.id == m.id){%>
-                  text-red
-                  <%}})%>" data-toggle="collect-item" data-meal="<%= meal.id%>" data-user="<%= user?user.id:user%>"></i>
-                <img class="photo" src= <%= meal.coverString %> data-meal="<%= meal.id %>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
-                <div class="hoverLayer">
-                  <div class="text">
-                    <% meal.dishes.forEach(function(_d, index){%>
-                    <% if(index === 4){%>
-                    <p>...</p>
-                    <% }else if(index > 4){%>
-
-                    <% }else{ %>
-                    <p><%= _d.title %></p>
-                    <% }});%>
-                  </div>
+              <div class="d-flex align-items-start">
+                <%
+                  var dishesTitle = "";
+                  meal.dishes.forEach(function(_d, index){
+                    if(index>0){
+                      dishesTitle += ",";
+                    }
+                    dishesTitle += _d.title;
+                  });
+                %>
+                <img class="rounded-circle photo" src="<%= meal.coverString%>" data-meal="<%= meal.id%>" onclick="javascript:location.href='/meal/' + $(this).data('meal')">
+                <div class="content ml-4">
+                  <h5 class="mt-0"><%= meal.title%></h5>
+                  <p class="text-grey"><%= dishesTitle%></p>
+                  <h6 class="text-primary menu-price">$<%= dish.price%></h6>
                 </div>
               </div>
-              <% if(meal.isSupportDynamicPrice && dish.isDynamicPriceOn && meal.dynamicDishes.some(function(d){
-                  return d.id === dish.id;
-                })) {
-                var orderAmount = meal.getDynamicDishesTotalOrder(0);
-                var newPrice = dish.getPrice(orderAmount, meal);
-              if(newPrice !== dish.price){
-              %>
-              <div class="box-float-top red"><h3 class="text-white" style="margin-top: 10px;"><%= __('dish-dynamic-price-success', (dish.price - newPrice).toFixed(2))%></h3></div>
-              <%}else{ var amountNeed = dish.qtyRate - orderAmount;%>
-              <div class="box-float-top red"><h3 class="text-white" style="margin-top: 10px;"><%= __('dish-dynamic-price-pending', amountNeed, (dish.price - dish.getPrice(dish.qtyRate, meal)).toFixed(2))%></h3></div>
-              <%}}%>
-              <!--<div class="box-float-bottom red"><h3 class="text-white" style="margin-top: 10px;"><%= dish.title %></h3></div>-->
-            </div>
-            <div class="row">
-              <div class="col-sm-3 xs-hide">
-                <img class="round_thumb size-small" onclick="location.href='/host/public/<%= meal.chef.id%>'" src=<%= meal.chef.picture || "/images/profile_man.png" %>>
-              </div>
-              <div class="col-sm-9 col-xs-12">
-                <h4 class="text-left text-dark"><%= meal.title %><br><small><%= __('enter-meal') %></small></h4>
-              </div>
-            </div>
-          </div>
 
-          <%}});%>
-        </div>
-
-        <%}); %>
+            </div>
+        <%})}); %>
 
       </div>
-    </div>
+    </ul>
   </div>
 
   <nav>

@@ -41,24 +41,30 @@ module.exports = function(agenda) {
           if(!user.follow){
             return next();
           }
-          var hostId = user.follow.id;
           var now = new Date();
           var nextMon = moment().day(7)._d;
-          Meal.find({ chef : hostId, status : 'on', provideFromTime : { '>=' : now}, provideTillTime : { '<' : nextMon }}).exec(function(err, meals){
+          var hosts = user.follow;
+          async.each(hosts, function(host, next){
+            Meal.find({ chef : host.id, status : 'on', provideFromTime : { '>=' : now}, provideTillTime : { '<' : nextMon }}).exec(function(err, meals){
+              if(err){
+                return next(err);
+              }
+              if(meals.length === 0){
+                return next();
+              }
+              var params = {
+                meals : meals,
+                host : host.id,
+                guestEmail : user.auth.email,
+                customer : user
+              }
+              notification.notificationCenter("Meal","chefSelect", params);
+              next();
+            });
+          }, function(err){
             if(err){
-              return next(err);
+              return done(err);
             }
-            if(meals.length === 0){
-              return next();
-            }
-            var params = {
-              meals : meals,
-              host : user.follow,
-              guestEmail : user.auth.email,
-              customer : user
-            }
-            notification.notificationCenter("Meal","chefSelect",params);
-            next();
           });
         }, function(err){
           if(err){

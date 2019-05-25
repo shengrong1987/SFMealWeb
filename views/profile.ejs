@@ -1,3 +1,4 @@
+<link href="/assets/chefProfile.css" rel="stylesheet">
 <div class="default-container text-center relative">
 
   <div class="pure-banner red py-4">
@@ -13,13 +14,13 @@
     </div>
   </div>
 
-  <div id="hostProfileView" data-host="<%= host.id%>" class="box" data-title="<%= host.shopNameI18n(locale)%>" data-desc="<%= host.introI18n(locale)%>" data-user="<%= user || ''%>">
+  <div id="hostProfileView" data-host="<%= host.id%>" class="box" data-title="<%= host.shopNameI18n(locale)%>" data-desc="<%= host.introI18n(locale)%>" data-user="<%= user.id || ''%>">
 
     <div class="box white">
 
       <div class="row">
         <div class="col-12">
-          <img src="<%= host.picture|| "/images/profile_man.png"%>" class="round_thumb" style="width: 150px;height: 150px;">
+          <img data-src="<%= host.picture || "../../images/profile_man.png"%>" src="<%= host.picture || ''%>" class="round_thumb" style="width: 150px;height: 150px;">
         </div>
       </div>
 
@@ -38,7 +39,7 @@
 
       <div class="d-flex justify-content-center pt-2">
         <button id="likeBtn" style="width:100%;max-width:250px;" class="btn btn-grey-red btn-lg active mr-2"><i class="fa fa-thumbs-up"></i> <span data-count="<%= host.likes%>"><%= host.likes%></span></button>
-        <button id="followBtn" style="width:100%;max-width:250px;" class="btn btn-grey-green btn-lg active ml-2" data-followed="<%= (user && (user.follow && user.follow==host.id)) ? true : false%>"><%= (user && (user.follow && user.follow==host.id)) ? __('followed') : __('follow')%> <i class="fa <%= (user && (user.follow && user.follow==host.id)) ? 'fa-star' : 'fa-star-o'%>"></i></button>
+        <button id="followBtn" style="width:100%;max-width:250px;" class="btn btn-grey-green btn-lg active ml-2" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === host.id}))) ? true : false%>"><span class="text"><%= (user && (user.follow && user.follow.some(function(f){ f.id === host.id}))) ? __('followed') : __('follow')%> </span><i class="<%= (user && (user.follow && user.follow.some(function(f){ f.id === host.id}))) ? 'fas fa-star' : 'far fa-star'%>"></i></button>
       </div>
     </div>
 
@@ -51,14 +52,14 @@
 
     <ul id="nextMealView" class="d-flex relative p-0" style="overflow-x: scroll;overflow-y: hidden;list-style: none;">
       <% host.meals.forEach(function(meal){%>
-      <li class="relative col-10 col-md-5 p-0" style="flex-shrink: 0;" data-start="09:00" data-end="10:15" data-content="event-restorative-yoga" data-event="event-4">
+      <li class="relative col-10 col-md-5 p-0" style="flex-shrink: 0;">
         <div class="absolute d-block m-auto" style="left:0;top:0;height: 80px;background-color:rgba(0, 0, 0, 0.5);">
           <div class="p-2">
             <h6 class="text-white"><%= meal.provideDate()%></h6>
             <h5 class="text-white"><%= meal.title%></h5>
           </div>
         </div>
-        <img src="<%= meal.coverString%>" class="w-100 cursor-pointer" onclick="javascript:location.href='/meal/<%= meal.id%>'">
+        <img src="<%= meal.coverString%>" class="w-100 cursor-pointer" onclick="javascript:location.href='/meal#<%= meal.getDateDesc(meal.pickups[0].pickupFromTime)%>'">
       </li>
       <% })%>
     </ul>
@@ -107,13 +108,4 @@
   </div>
 </div>
 
-<script>
-  var title = $("#hostProfileView").data("title");
-  var desc = $("#hostProfileView").data("desc");
-  new HostPageView({ el : $("#hostProfileView"), model : new Host()})
-  setupWechat($("#hostProfileView .round_thumb").prop("src"), title , title + ":" + desc);
-  var user = $("#hostProfileView").data("user");
-  if(!user){
-    wechatLogin();
-  }
-</script>
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script><script src="/assets/zh.chefProfile.bundle.js"></script>

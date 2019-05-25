@@ -27,9 +27,13 @@
         <td><%= __('user')%></td>
         <td><%= __('order-number')%></td>
         <td><%= __('content')%></td>
+        <td></td>
+        <td></td>
         <td><%= __('contact')%></td>
         <td><%= __('delivery-location')%></td>
+        <td><%= __('payment-method')%></td>
         <td><%= __('amount-owe')%></td>
+        <td><%= __('is-paid')%></td>
         <td><%= __('comment')%></td>
       </tr>
       </thead>
@@ -44,7 +48,7 @@
               <span class="dbClick" data-trigger="dblclick" data-toggle="popupTooltip" data-popupText="copied" data-copy-text="<%= id%>"><%= id.slice(-4)%></span>
               <% })%>
             </td>
-            <td>
+            <td colspan="3">
               <% Object.keys(order.orders).forEach(function(dishId){
                 var amount = order.orders[dishId].number;
                 var preference = order.orders[dishId].preference;
@@ -59,7 +63,16 @@
               <% if(dish && preference && preference.length > 0){
                 var title = '';
                 preference.forEach(function(pref){
-                  title += "(" + pref.property + ')';
+                  var dishProps = "";
+                  if(pref.property && Array.isArray(pref.property)){
+                    pref.property.forEach(function(pro){
+                      if(dishProps){
+                        dishProps += ",";
+                      }
+                      dishProps += pro.property;
+                    })
+                  }
+                  title += "(" + dishProps + ')';
                 });
               %>
               <%= dish.title%>(<%= amount%>)<%= title%>
@@ -72,7 +85,9 @@
             </td>
             <td><%= order.customerPhone%></td>
             <td><%= order.contactInfo.address || '自取'%></td>
-            <td><%= order.paymentMethod == 'cash' ? ( '$' + order.charges['cash']/100) : ''%></td>
+            <td><%= order.paymentMethod%></td>
+            <td><%= "$" + (parseFloat(order.subtotal)-parseFloat(order.discount)).toFixed(2) + "（" + order.tip +"）" %></td>
+            <td><%= order.isPaid ? "已付" : "未付"%></td>
             <td><%= order.pickupInfo.comment || ''%></td>
           </tr>
         <%}})%>
@@ -110,7 +125,7 @@
           var infoRows = $(this).find("td");
           if(infoRows.length){
             var phone = infoRows[3].innerText.replace(/\D/g, "");
-            var content = "送餐序号:" + pickupIndexTitle + index + "; " + infoRows[0].innerText + " : " + infoRows[2].innerText + "(" + infoRows[6].innerText + ") ; " + infoRows[4].innerText + " ; （" + phone + "） ; 应收: " + infoRows[5].innerText;
+            var content = "送餐序号:" + pickupIndexTitle + index + "; " + infoRows[0].innerText + " : " + infoRows[2].innerText + "(" + infoRows[8].innerText + ") ; " + infoRows[4].innerText + " ; （" + phone + "） ; 应收: " + infoRows[6].innerText + "; 支付方式: " + infoRows[5].innerText + "； 已付:" + infoRows[7].innerText;
             text += "\n\n" + content + "\n";
           }
       });

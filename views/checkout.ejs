@@ -1,0 +1,616 @@
+<div id="meal-confirm-container" data-user="<%= user.id || null%>" class="container mt-2 text-center">
+  <% var meal = meals.meals[Object.keys(meals.meals)[0]].meals[0]; %>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="white">
+        <div id="pickupMethodView">
+          <div class="row">
+            <div class="col-12 my-2">
+              <div class="light-grey py-2 text-left">
+                <h5 class="mb-0 pl-2"><%= __('pickup-method') %></h5>
+              </div>
+            </div>
+            <div class="col-12 my-4 text-left">
+              <ul class="btn-group btn-group-lg none-padding" role="group" id="method">
+                <%
+                  var hasDelivery = pickups.some(function(pickup){
+                    return pickup.method === "delivery";
+                  });
+                  if(hasDelivery){%>
+                    <button data-toggle="tab" data-href="#deliveryTab" class="btn btn-fat btn-lg active" value="delivery"><%= __('delivery')%></button>
+                  <%}if(dishes.some(function(dish){
+                    return dish.isSupportShipping;
+                  })){%>
+                    <button data-toggle="tab" data-href="#shippingTab" class="btn btn-fat btn-lg" value="shipping"><%= __('shipping')%></button>
+                <%} if(pickups.some(function(pickup){
+                    return pickup.method === "pickup";
+                  })){%>
+                    <button data-toggle="tab" data-href="#pickupTab" class="btn btn-fat btn-lg <%= hasDelivery?'':'active'%>" value="pickup"><%= __('self-pickup')%></button>
+                <% }%>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div id="pickupInfoView" class="text-left" data-hasDelivery="<%= hasDelivery%>">
+          <div class="row">
+            <div class="col-12">
+              <div class="light-grey py-2">
+                <div class="d-flex justify-content-between vertical-align">
+                  <div>
+                    <h5 class="mb-0 pl-2"><%= __('pickup-info') %></h5>
+                  </div>
+                  <div class="pr-5">
+                    <h5 class="mb-0"><% if(!user || Object.keys(user).length == 0){%>
+                      <small>
+                        <!--<a class="text-orange cursor-pointer" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html"><u><%= __('signup-tips')%></u></a>-->
+                        <a class="text-green cursor-pointer" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;" href="javascript:void(0)" onclick="h.toggleModal(event)" toggle="modal" data-target="#myModal" data-model="user" data-action="signin" title="<%= __('login-tips')%>%>"><u><%= __('already-signup')%></u></a>
+                      </small>
+                      <% }%>
+                    </h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 pickupInput d-none">
+              <div class="radio-box flex">
+                <%
+                var firstname = user.firstname;
+                var addresses = user.address;
+                if(addresses && addresses.length != 0){
+                  keys = Object.keys(addresses);
+                for(var i=0; i < keys.length; i++){
+                  var key = keys[i];
+                  var addressObj = addresses[key];
+                  var phone = addressObj.phone;
+                %>
+                <label class="btn btn-default fixed-label vertical-align option contactOption">
+                  <input type="radio" id="pickup-2-<%= i%>" name="pickup-contact-set" data-color="red" data-index="<%= i%>" class="regular-radio" <%= phone == user.phone ? "checked=''" : ''%>><label for="pickup-2-<%= i%>"></label>
+                  <span style="margin-left: 10px;"><%= firstname + "+" + phone %></span>
+                </label>
+                <%}}else{phone = user.phone;if(phone){ %>
+                <label class="btn btn-default fixed-label vertical-align option contactOption">
+                  <input type="radio" id="pickup-2-<%= i%>" name="pickup-contact-set" data-index="<%= i%>" class="regular-radio" checked=''><label for="pickup-2-<%= i%>"></label>
+                  <span style="margin-left: 10px;"><%= firstname + "+" + phone %></span>
+                </label>
+                <%}} %>
+              </div>
+            </div>
+
+            <div class="col-12 deliveryInput shippingInput">
+              <div class="radio-box flex" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
+                <%
+                addresses= user.address;
+                firstname = user.firstname;
+                if(addresses){
+                  var keys = Object.keys(addresses);
+                keys.forEach(function(key){
+                  var addressObj = addresses[key];
+                  var address = addressObj.street + ", " + addressObj.city + ", CA " + addressObj.zip + ", +" + addressObj.phone;
+                %>
+                <label class="btn btn-default vertical-inline option contactOption">
+                  <input type="radio" id="delivery-1-<%= i%>" data-username="<%= firstname%>" name="delivery-location-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="delivery-1-<%= i%>"></label>
+                  <span style="margin-left: 10px;"><%= address %></span>
+                </label>
+                <%i++;})}; %>
+              </div>
+            </div>
+
+            <% if(user && Object.keys(user).length !== 0 && user.address && user.address.length){%>
+            <div class="col-12 text-left">
+              <div class="radio-box">
+                <label class="btn btn-default vertical-inline option">
+                  <input type="radio" id="createNewContactBtn" data-id="<%= user.id%>" data-target="#myModal" data-model="user" data-action="address" class="regular-radio"><label for="createNewContactBtn"></label>
+                  <span style="margin-left: 10px;"><%=  __('enter-new-contact')%></span>
+                </label>
+              </div>
+
+              <div class="col">
+                <div class="form-group">
+                  <input class="form-control" name="comment" placeholder="<%= __('comment')%>">
+                </div>
+              </div>
+              <!--<u><a id="createNewContactBtn" class="text-orange cursor-pointer" toggle="modal" data-id="<%= user.id%>" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0)"><%= __('enter-new-contact')%></a></u>-->
+            </div>
+            <%}else{%>
+
+            <form class="col-12 pt-4" id="contactInfoView" data-user="<%= user.id || null%>" data-toggle="validator" role="form">
+
+              <h5><small class="text-black" style="font-size:0.8em;"><%= __('contact-info')%></small></h5>
+              <div class="row">
+                <div class="col-6">
+                  <div class="form-group">
+                    <input class="form-control" name="name" placeholder="<%= __('name')%>" value="<%= user.firstname || ''%>">
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="form-group">
+                    <input class="form-control" placeholder="<%= __('phone')%>" name="phone" type="tel" minlength="13" data-error="<%= __('phone-bad-format')%>" value="<%= user.phone || ''%>">
+                    <div class="help-block with-errors"></div>
+                  </div>
+                </div>
+              </div>
+
+              <h5>
+                <small class="text-black deliveryInput shippingInput" style="font-size:0.8em;"><%= __('location-info')%></small>
+                <small class="text-black pickupInput" style="font-size:0.8em;"><%= __('comment')%></small>
+              </h5>
+              <div class="row deliveryInput shippingInput">
+                <div class="col-12">
+                  <div class="form-group">
+                    <input class="form-control" name="street" placeholder="<%= __('street')%>">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row deliveryInput shippingInput">
+                <div class="col-12">
+                  <div class="form-group">
+                    <input class="form-control" name="city" placeholder="<%= __('city')%>">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row deliveryInput shippingInput">
+                <div class="col-6">
+                  <div class="form-group">
+                    <input class="form-control" name="state" placeholder="<%= __('state')%>">
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="form-group">
+                    <input class="form-control" name="zipcode" placeholder="<%= __('zipcode')%>">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col">
+                  <div class="form-group">
+                    <input class="form-control" name="comment" placeholder="<%= __('comment')%>">
+                  </div>
+                </div>
+              </div>
+            </form>
+            <%}%>
+            <div class="col-12 deliveryInput">
+              <div class="form-group text-center">
+                <button id="verifyAddressBtn" style="height: 50px;" class="btn btn-lg btn-green form-control"><%= __('calculate-delivery')%></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="pickupOptionsView">
+
+          <div class="row my-4 text-left">
+
+            <div class="col-12">
+              <div class="light-grey py-2 text-left">
+                <div class="d-flex justify-content-between align-base">
+                  <div class="mb-0 pl-2">
+                    <h5 class="deliveryInput shippingInput"><%= __('delivery-option') %></h5>
+                    <h5 class="pickupInput"><%= __('pickup-option') %></h5>
+                  </div>
+                  <div class="pr-5">
+                    <h5><small><a toggle="modal" data-target="#myModal" data-model="meal" data-action="map" href="javascript:void(0)" onclick="h.toggleModal(event)"><i class="fas fa-map-marker-alt"></i> <%= __('show-map') %></a></small></h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <ul id="dishDatesBar" class="nav nav-fill nav-light nav-scroll bg-light">
+                <%
+                var dates = Object.keys(meals.meals);
+                dates = dates.sort(function(d1,d2){
+                  var dateObj = {
+                    "today" : 8,
+                    "tomorrow" : 7,
+                    "Monday" : 6,
+                    "Tuesday" : 5,
+                    "Wednesday" : 4,
+                    "Thursday" : 3,
+                    "Friday" : 2,
+                    "Saturday" : 1,
+                    "Sunday" : 0,
+                    "今天" : 8,
+                    "明天" : 7,
+                    "星期一" : 6,
+                    "星期二" : 5,
+                    "星期三" : 4,
+                    "星期四" : 3,
+                    "星期五" : 2,
+                    "星期六" : 1,
+                    "星期天" : 0
+                  }
+                  if(dateObj.hasOwnProperty(d1) && dateObj.hasOwnProperty(d2)){
+                    return dateObj[d2] - dateObj[d1];
+                  }else{
+                    var month1 = d1.split("/")[0];
+                    var day1 = d1.split("/")[1];
+                    var month2 = d2.split("/")[0];
+                    var day2 = d2.split("/")[1];
+                    if(month1 === month2){
+                      return day1 - day2;
+                    }else{
+                      return month1 - month2;
+                    }
+                  }
+                })
+                dates.forEach(function(dateKey,i){ %>
+                <li class="nav-item text-center py-4 <%= i===0?'active':''%>"><a class="nav-link" href="javascript:void(0);" data-mixitup-control data-filter=".<%= dateKey.replace('/','').replace(" ","")%>" data-toggle="tab"><%= __(dateKey).replace("day",'')%></a></li>
+                <% })%>
+              </ul>
+            </div>
+
+            <div class="col-12">
+              <div class="tab-content">
+                <div id="pickupTab" class="tab-pane <%= hasDelivery?'':'active'%>" role="tabpanel">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="radio-box flex" id="pickupMethod" data-user-lat="<%= user.lat%>" data-user-long="<%= user.long%>">
+                        <%
+                        var j = i+1;
+                        if(pickups){
+                          var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue',];
+                          pickups.forEach(function(pickup){ if(pickup.method!=='pickup'){return;}
+                        %>
+                        <label class="btn btn-outline-light vertical-inline option pickupOption mix <%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-meal="<%= pickup.meal%>" data-date="<%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-color="<%= colors[i]%>" data-location="<%= pickup.publicLocation || pickup.location%>">
+                          <input type="radio" id="pickup-1-<%= i%>" data-index="<%= pickup.index%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
+                          <span class="content">
+                          <i class="fa fa-hand-paper-o cursor-pointer mr-2 text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i><span><%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%></span><br/>
+                            <span class="location" data-value="<%= pickup.location%>"> <%= pickup.location%></span><br/>
+                            <span class="pickupInstruction" data-value="<%= pickup.comment%>"><strong><%= __('pickup-instruction') %></strong>:&nbsp; <%= pickup.comment || ''%></span>
+                        </span>
+                        </label>
+                        <%i++;j++;})}; %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="deliveryTab" class="tab-pane <%= hasDelivery?'active':''%>" role="tabpanel">
+                  <div class="row text-left">
+                    <div class="col-12">
+                      <div class="card">
+                        <div class="card-body">
+                          <div class="radio-box flex" id="deliveryMethod">
+                            <%
+                            colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue',];
+                            i= 0;j = 0;
+                            if(pickups){ pickups.forEach(function(pickup){ if(pickup.method == 'delivery'){ %>
+                            <label class="btn btn-outline-light option deliveryOption mix <%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-meal="<%= pickup.meal%>" data-date="<%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-range="<%= pickup.deliveryRange%>" data-lat="<%= pickup.lat || ''%>" data-long="<%= pickup.long || ''%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-area="<%= pickup.area || '' %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
+                              <div class="s"></div>
+                              <input type="radio" id="delivery-2-<%= i%>" data-index="<%= pickup.index%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>
+                              <span class="content">
+                                <i class="fa fa-truck cursor-pointer mr-2 text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i><%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>
+                              </span>
+                            </label>
+                            <%j++;}i++;})}; %>
+                            <h5 class="empty d-none text-center">
+                              <small class="text-red"><%= __('delivery-out-of-range-error')%></small><br/><br/>
+                              <small class="text-red"><%= __('other-area-shipping')%></small>
+                              <button id="switchToShippingBtn" class="btn btn-outline-dark"><%= __('shipping')%></button>
+                            </h5>
+                            <h5 class="no-address text-center">
+                              <small><%= __('enter-address-to-see')%></small>
+                            </h5>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="shippingTab" class="tab-pane" role="tabpanel">
+                  <div class="row text-left">
+                    <div class="col-12">
+                      <div class="card">
+                        <div class="card-body">
+                          <div class="radio-box flex">
+                            <label class="btn btn-outline-light option shippingOption mix" data-meal="<%= pickups[0].meal%>">
+                              <div class="s"></div>
+                              <input type="radio" id="shipping-option" data-index="1" name="shipping-contact-set" class="regular-radio" checked="checked"><label for="shipping"></label>
+                              <span class="content">
+                                <i class="fa fa-shipping cursor-pointer mr-2 text-red" data-toggle="tooltip" title="<%= __('shipping')%>"></i><%= __('shipping')%>: <%= __('shipping-instruction')%>
+                              </span>
+                            </label>
+                            <h5 class="text-center">
+                              <button id="switchToDeliveryBtn" onclick="jumpTo('pickupInfoView')" class="btn btn-outline-dark"><%= __('reselect-address')%></button>
+                            </h5>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row my-2">
+          <div class="col-12">
+            <div class="light-grey py-2 text-left">
+              <h5 class="pl-2 mb-0"><%= __('payment-method') %></h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <div id="payment-cards" class="btn-group text-left pt-2 w-100 row" style="margin: 0;">
+              <%
+              var userId = user.id;
+              if(userId){
+                var cards = user.payment;
+              if(cards){
+              for(var j=0; j < cards.length; j++){
+                var card = cards[j];
+                var last4 = card.last4;
+              %>
+              <button class="btn btn-disable py-2 col-3 deliveryInput pickupInput shippingInput <%if(card.isDefaultPayment){%> active<%}%> disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
+              <%}}%>
+              <button class="btn btn-disable py-2 col-3 disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
+              <%}else{%>
+              <button data-toggle="tab" data-href="#cardPayment" class="btn btn-disable py-2 col-3 disabled" data-method="online"><strong><i class="fa fa-credit-card fa-2x"></i></strong><br/><%= __('bank-card') %></button>
+              <%}%>
+              <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable <%= (user.id && user.payment && user.payment.length) ? '' : 'active'%> py-2 col-3 disabled deliveryInput pickupInput" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
+              <button data-toggle="tab" data-href="#venmoPayment" class="btn btn-disable  py-2 col-3 disabled deliveryInput pickupInput shippingInput" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
+              <button data-toggle="tab" data-href="#paypalPayment" class="btn btn-disable py-2 col-3 disabled deliveryInput pickupInput shippingInput" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method') %></button>
+              <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg disabled" data-method="alipay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('alipay-method') %></button>-->
+              <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg d-none disabled" data-method="wechatpay" style="margin-right: 10px;height: 80px;"><i class="fa fa-wechat fa-2x"></i><br/><%= __('wechatpay-method') %></button>-->
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="row">
+          <div class="col-12">
+            <div class="tab-content pt-4">
+
+              <% if(!user.id){%>
+              <form id="cardPayment" class="text-left tab-pane">
+
+                <div class="row">
+                  <div class="col-12 text-left">
+                    <h4 style="display: inline-block;"><strong><%= __('billing-address') %></strong></h4>
+                    <a class="text-orange cursor-pointer" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html"><%= __('login-tips-payment')%></a>
+                  </div>
+                </div>
+
+                <div class="row deliveryInput shippingInput d-none">
+                  <div class="col-12 text-left">
+                    <div class="form-check form-group">
+                      <label class="form-check-label">
+                        <input class="form-check-input checkbox-inline" name="billingAddress" type="checkbox">
+                        <%= __('same-as-delivery-address')%>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="control-label"><%= __('street')%> *</label>
+                  <input class="form-control required" name="street">
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <div class="form-group">
+                      <label class="control-label"><%= __('city')%> *</label>
+                      <input class="form-control required" name="city">
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="form-group">
+                      <label class="control-label"><%= __('state')%> *</label>
+                      <input class="form-control required" name="state">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <div class="form-group">
+                      <label class="control-label"><%= __('zipcode')%> *</label>
+                      <input class="form-control required" name="zipcode">
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="form-group">
+                      <label class="control-label"><%= __('country')%> *</label>
+                      <div class="flagstrap" name="country" data-input-name="country" data-selected-country="US"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12 text-left">
+                    <h4><strong><%= __('card-info') %></strong></h4>
+                  </div>
+                </div>
+
+                <h3></h3>
+
+                <div class="form-group">
+                  <label><%= __('card-holder')%> *</label>
+                  <input class="form-control required" name="card-holder">
+                </div>
+
+                <div class="form-group">
+                  <label class="control-label" for="textinput"><%= __('card-number')%> *</label>
+                  <input class="form-control required" name="card-number">
+                </div>
+
+                <div class="form-group">
+                  <label class="control-label" for="textinput"><%= __('card-exp')%> *</label>
+                  <div class="form-inline">
+                    <select name="month" data-toggle="select" data-stripe="exp-month" class="card-expiry-month stripe-sensitive required form-control" value=<%= typeof payment != 'undefined' ? payment.exp_month : '1'%>>
+                      <option value="1" selected="selected">01</option>
+                      <option value="2">02</option>
+                      <option value="3">03</option>
+                      <option value="4">04</option>
+                      <option value="5">05</option>
+                      <option value="6">06</option>
+                      <option value="7">07</option>
+                      <option value="8">08</option>
+                      <option value="9">09</option>
+                      <option value="10">10</option>
+                      <option value="11">11</option>
+                      <option value="12">12</option>
+                    </select>
+                    <span> / </span>
+                    <select name="year" data-toggle="select" data-stripe="exp-year" class="card-expiry-year stripe-sensitive required form-control" value=<%= typeof payment != 'undefined' ? payment.exp_year : '2017'%>>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- CVV -->
+                <div class="form-group">
+                  <label class="control-label" for="textinput">CVV/CVV2</label>
+                  <div>
+                    <input name="cvv" placeholder="CVV" maxlength="4" class="card-cvc form-control" required data-error="<%= __('cvv-wrong-format')%>">
+                    <div class="help-block with-errors"></div>
+                  </div>
+                </div>
+              </form>
+              <%}%>
+
+              <div id="cashPayment" class="tab-pane active">
+                <p><%= __('pay-cash-instruction')%></p>
+              </div>
+              <div id="venmoPayment" class="tab-pane">
+                <div>
+                  <!--<a class="venmo-qr"></a>-->
+                  <p><%= __('venmo-instruction')%></p>
+                </div>
+              </div>
+              <div id="paypalPayment" class="tab-pane">
+                <p>https://www.paypal.me/sfmeal</p>
+                <p><%= __('paypal-instruction')%></p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <h4 class="text-right"><%= __('total')%><span class="total"></span></h4>
+        <div class="divider"></div>
+
+        <button type="button" class="btn btn-green btn-lg mb-4" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
+        <div id="orderAlertView" class="alert alert-danger d-none mt-2"></div>
+
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="white floater static-floater py-4">
+        <div id="alert-order" class="alert alert-danger d-none" role="alert">
+          <%= __('no-dish-left') %>
+        </div>
+
+        <button type="button" data-action="showMenu" class="btn btn-outline-dark w-100">
+          <%= __('toggleMenu') %>
+          <span><i class="fas fa-arrow-down"></i></span>
+        </button>
+
+        <table id="order" class="table tableBodyScroll" data-err-container="#alert-order">
+          <thead>
+          <tr>
+            <th><%= __('name') %></th>
+            <td><%= __('price') %></td>
+            <td><%= __('quantity') %></td>
+          </tr>
+          </thead>
+          <tbody class="scroll">
+          <% var _dishes = [];
+          var dateList = Object.keys(meals.meals);
+          dateList.forEach(function(dateKey){
+            var mealObj = meals.meals[dateKey];
+            var actualMeals = mealObj.meals;
+            actualMeals.forEach(function(meal) {meal.dishes.forEach(function(dish) {if(!_dishes.includes(dish.id)){_dishes.push(dish.id);%>
+              <tr class="success dish item px-2" data-id=<%= dish.id %> data-left-amount=<%= meal.leftQty[dish.id]%> style="display: none;">
+                <td><%= dish.titleI18n(locale) %><br/><span class="preference"></span></td>
+                <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
+
+                <td class="input-group input-group-sm amount-input round ml-auto pl-0" style="max-width:200px;min-width:30px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
+                  <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
+                    <span class="input-group-text">-</span>
+                  </div>
+                  <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
+                  <div class="input-group-append add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
+                    <span class="input-group-text">+</span>
+                  </div>
+                </td>
+              </tr>
+          <% }});})});%>
+
+          </tbody>
+          <tbody>
+          <tr></tr>
+          <tr>
+            <th></th>
+            <td></td>
+            <th class="text-right"><%= __('meal-fee') %> <span class="subtotal">0.00</span></th>
+          </tr>
+          <tr></tr>
+          <tr>
+            <th><%= __('pickup-method') %></th>
+            <td><%= __('estimated-time') %></td>
+            <td><%= __('delivery-fee') %></td>
+          </tr>
+          <tr></tr>
+          <tr class="pickupInput info d-none">
+            <td><%= __('self-pickup') %></td>
+            <td><%= meal.prepareTime%><%= __('min') %></td>
+            <td><%= __('free') %></td>
+          </tr>
+          <tr class="deliveryInput info">
+            <td><%= __('delivery') %></td>
+            <td> > <%= meal.prepareTime%> <%= __('min') %></td>
+            <td class="delivery" data-value="<%= meal.delivery_fee%>">$ <%= meal.delivery_fee%></td>
+          </tr>
+          <tr></tr>
+          <% if(user.id){%>
+          <!--<tr>-->
+            <!--<th style="vertical-align: middle;"><i class="fal fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('coupon')%>"></i> <%= __('coupon')%>:</th>-->
+            <!--<th><input class="coupon-code form-control" style="margin:0 5px 0 5px;width: 80px;" maxlength="7" data-code="" data-value="" value="<%= user.firstOrder ? '' : ''%>"></input></th>-->
+            <!--<th class="text-right">-->
+              <!--<button id="applyCouponBtn" class="btn btn-success"><%= __('apply-code')%></button>-->
+              <!--<button id="disApplyCouponBtn" class="btn btn-danger" onclick="javascript:applyCoupon(false);"><%= __('disapply-code')%></button>-->
+            <!--</th>-->
+          <!--</tr>-->
+          <% if(user && !user.emailVerified){%>
+          <tr id="emailVerificationView">
+            <th style="vertical-align: middle;"><i class="fal fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i> <%= __('email')%></th>
+            <th><input class="form-control" name="email" style="width:170px;" type="email" value="<%= user.auth ? (user.auth.email || '') : ''%>"></th>
+          </tr>
+          <tr>
+            <th class="text-right"><button id="emailVerifyBtn" class="btn btn-grey-green active"><%= __('verify-email')%></button></th>
+          </tr>
+          <% }%>
+          <tr>
+            <th style="vertical-align: middle;"><%= __('points')%>:<i class="fal fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i></th>
+            <th><input class="points form-control" style="margin:0 5px 0 5px;width: 60px;" readonly value="<%= user?(user.points || 0):-1%>"></input></th>
+            <th class="text-right">
+              <button id="applyPointsBtn" class="btn btn-success"><%= __('apply-code')%></button>
+              <button id="disApplyPointsBtn" class="btn btn-danger"><%= __('disapply-code')%></button>
+            </th>
+          </tr>
+          <%}%>
+          <tr>
+            <th class="text-right"><%= __('total') %><span class="total"></span></th>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+<link href="/assets/checkout.css" rel="stylesheet">
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script>
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script>
+<script src="/assets/zh.checkout.bundle.js"></script>

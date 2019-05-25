@@ -42,7 +42,7 @@ module.exports = {
   create : function(req, res){
     var userId = req.session.user.id;
     var params = req.body;
-    var email = req.session.user.email || params.email;
+    var email = req.session.user.email || req.session.user.auth.email || params.email;
     if(!email){
       return res.badRequest({ code : -3, responseText : req.__('payment-lackof-email')})
     }

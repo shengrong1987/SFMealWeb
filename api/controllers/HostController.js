@@ -7,6 +7,8 @@
  *                 -2 address not found
  *                 -3 Can only like one host once
  *                 -4 can not like yourself
+ *                 -5 no email, can not follow chef
+ *                 -99 no chef found
  */
 
 var stripe = require("../services/stripe.js");
@@ -24,7 +26,7 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      Host.findOne(hostId).populate("dishes",{ sort: 'createdAt DESC' }).populate("meals",{ sort: 'createdAt DESC' }).populate('orders',{ sort: 'createdAt DESC' }).exec(function(err,host){
+      Host.findOne(hostId).populate("dishes",{ sort: 'createdAt DESC' }).populate("meals",{ sort: 'createdAt DESC' }).populate('orders', { sort: 'createdAt DESC', limit: 100 }).exec(function(err,host){
         if(err){
           return res.badRequest(err);
         }
@@ -34,33 +36,21 @@ module.exports = {
             return res.badRequest(err);
           }
           //construct orders for host
-          var fullOrders = [];
-          async.each(host.orders,function(order, next){
-            Order.findOne(order.id).populate("meal").populate('customer').populate("host").exec(function(err, o){
-              if(err){
-                return next(err);
-              }
-              fullOrders.push(o);
-              next();
-            });
-          },function(err){
+          host.host_orders = host.orders.sort(function(a,b){
+            return new Date(b.pickupInfo.pickupTillTime).getTime() - new Date(a.pickupInfo.pickupTillTime).getTime();
+          })
+          host.host_dishes = host.dishes;
+          Notification.destroy({host : hostId}).exec(function(err){
             if(err){
-              return res.badRequest(err);
+              console.log(err);
             }
-            host.host_orders = fullOrders;
-            host.host_dishes = host.dishes;
-            Notification.destroy({host : hostId}).exec(function(err){
-              if(err){
-                console.log(err);
-              }
-            });
-            var u = user[0];
-            u.host = host;
-            if(req.wantsJSON && process.env.NODE_ENV === "development"){
-              return res.ok(u);
-            }
-            return res.view('host',{user: u});
           });
+          var u = user[0];
+          u.host = host;
+          if(req.wantsJSON && process.env.NODE_ENV === "development"){
+            return res.ok(u);
+          }
+          return res.view('host',{user: u});
         })
       });
     });
@@ -211,7 +201,9 @@ module.exports = {
           host = host[0];
           async.auto({
             uploadDocument : function(cb){
-              req.file("image").upload(function(err, files){
+              req.file("image").upload({
+                dirname: require('path').resolve(sails.config.appPath, 'assets/images/uploads')
+              },function(err, files){
                 if(err){
                   return cb(err);
                 }
@@ -343,7 +335,7 @@ module.exports = {
       if(!host){
         return res.notFound();
       }
-      Review.find({ where : { host : hostId }, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req) }).exec(function(err, reviews){
+      Review.find({ where : { host : hostId }, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req)}).sort("createdAt DESC").exec(function(err, reviews){
         if(err){
           return res.badRequest(err);
         }
@@ -360,7 +352,9 @@ module.exports = {
         publicHost.shortIntro = host.shortIntro();
         publicHost.license = host.license;
         publicHost.reviews = reviews;
+        publicHost.avgScore = host.avgScore;
         publicHost.likes = host.likes;
+        publicHost.numberOfReviews = host.numberOfReviews;
         publicHost.shopNameI18n = host.shopNameI18n;
         publicHost.introI18n = host.introI18n;
         if(req.wantsJSON && process.env.NODE_ENV === "development"){
@@ -436,13 +430,13 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(user.host && user.host == hostId){
+      if(user.host && user.host === hostId){
         return res.badRequest({ code : -4, responseText : req.__('host-like-himself-error')});
       }
       var alreadyLike = false;
       if(user.likes){
         alreadyLike = user.likes.some(function(host){
-          return host.id == hostId;
+          return host.id === hostId;
         })
       }
       if(alreadyLike){
@@ -452,6 +446,9 @@ module.exports = {
       Host.findOne(hostId).exec(function(err, host){
         if(err){
           return res.badRequest(err);
+        }
+        if(!host){
+          return res.badRequest({ code : -99, responseText : req.__('chef-not-found')});
         }
         host.likes = host.likes || 0;
         host.likes++;
@@ -474,19 +471,21 @@ module.exports = {
   follow : function(req, res){
     var hostId = req.params.id;
     var userId = req.session.user.id;
-    User.findOne(userId).populate("follow").exec(function(err, user){
+    User.findOne(userId).populate("follow").populate('auth').exec(function(err, user){
       if(err){
         return res.badRequest(err);
       }
-      if(user.host && user.host == hostId){
+      if(!user.auth.email){
+        return res.badRequest({ code : -5, responseText : req.__('no-email-can-not-follow')});
+      }
+      if(user.host && user.host === hostId){
         return res.badRequest({ code : -4, responseText : req.__('host-like-himself-error')});
       }
-
       Host.findOne(hostId).exec(function(err, host){
         if(err){
           return res.badRequest(err);
         }
-        user.follow = hostId;
+        user.follow.add(hostId);
         user.save(function(err, u){
           if(err){
             return res.badRequest(err);
@@ -513,7 +512,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        user.follow = null;
+        user.follow.remove(hostId);
         user.save(function(err, u){
           if(err){
             return res.badRequest(err);

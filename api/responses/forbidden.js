@@ -68,9 +68,9 @@ module.exports = function forbidden (data, options) {
         sails.log.warn('res.forbidden() :: When attempting to render error page view, an error occured (sending JSON instead).  Details: ', err);
       }
       return res.jsonx(data);
+    }else{
+      return res.send(html);
     }
-
-    return res.send(html);
   });
 
 };

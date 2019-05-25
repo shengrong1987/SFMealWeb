@@ -136,6 +136,7 @@ module.exports = {
   },
 
   chargeCash : function(attr, cb){
+    var _this = this;
     if(attr.metadata.application_fee === 0){
       return cb(null, { id : 'cash', status : 'succeeded', amount : attr.metadata.total, application_fee : attr.metadata.application_fee}, { amount : 0, application_fee : 0});
     }
@@ -182,7 +183,12 @@ module.exports = {
       if(err){
         return cb(err);
       }
-      cb(null, { id : charge.id, status : charge.status, amount : attr.metadata.total, application_fee : charge.amount}, transfer);
+      _this.handlePoint(attr.metadata.total, attr.metadata.userId, function(err, user){
+        if(err){
+          return cb(err);
+        }
+        cb(null, { id : charge.id, status : charge.status, amount : attr.metadata.total, application_fee : charge.amount}, transfer);
+      });
     });
   },
 
@@ -394,7 +400,11 @@ module.exports = {
     sails.log.info("tip is: " + tip);
 
     //calculate application fee
-    var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee;
+    if(attr.paymentMethod === "online"){
+      var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee + tip;
+    }else{
+      application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee;
+    }
 
     sails.log.info("application fee is: " + application_fee);
 
@@ -410,13 +420,13 @@ module.exports = {
     attr.metadata.total = originalTotal - discount;
     attr.metadata.application_fee = application_fee;
     attr.metadata.total = attr.metadata.total < 0 ? 0 : attr.metadata.total;
-    attr.metadata.tip = attr.tip;
+    attr.metadata.tip = attr.tip || 0;
 
     sails.log.info("charge total: " + attr.metadata.total);
   },
 
   charge : function(attr, cb){
-    if(attr.paymentMethod === "cash"){
+    if(attr.paymentMethod === "cash" || attr.paymentMethod === "venmo" || attr.paymentMethod === "paypal"){
       this.calculateTotal(attr);
       this.chargeCash(attr, cb);
     }else if(attr.paymentMethod === "online"){
@@ -436,7 +446,7 @@ module.exports = {
         return cb(err);
       }
       var points = user.points || 0;
-      var earnedPoints = Math.floor(amount/100);
+      var earnedPoints = Math.floor(amount/200);
       var newPoints = points + earnedPoints;
       sails.log.info("user old points: " + points);
       sails.log.info("points difference: " + earnedPoints);
@@ -559,7 +569,7 @@ module.exports = {
     var _this = this;
     var transferIds = Object.keys(transfers);
     var amount = metadata.amount;
-    sails.log.info("total money to transfer: $" + amount/100);
+    sails.log.info("total money to transfer: $" + amount/100 + "& transfers: " + transferIds);
     var refundingAmount;
     async.each(transferIds, function(transferId, next){
       var thisAmount = transfers[transferId];
@@ -586,6 +596,7 @@ module.exports = {
         if(err){
           return next(err);
         }
+        sails.log.info("refunded amount: " + refund.amount, "transfer left: " + transfers[transferId]);
         transfers[transferId] -= refund.amount;
         next();
       });

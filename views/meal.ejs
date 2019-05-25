@@ -39,7 +39,7 @@
               </div>
 
               <div class="col-12 mx-auto">
-                <div data-toggle="tooltip" data-placement="bottom" title="<%= meal.score.toFixed(2)%>" style="display: inline;margin-top: 5px;">
+                <div data-toggle="tooltip" data-placement="bottom" title="<%= host.score.toFixed(2)%>" style="display: inline;margin-top: 5px;">
                   <div class="rating" data-toggle="star-set" data-rate="<%= meal.score.toFixed(2)%>">
                     <i class="fa fa-star"></i>
                     <i class="fa fa-star"></i>
@@ -90,7 +90,7 @@
                     <%}else if(pickup.method === "delivery"){if(pickup.isDateCustomized && !meal.isPartyMode){return}%>
                     <div class="row">
                       <div class="col">
-                        <div class="option deliveryOption mt-1" data-area="<%= pickup.area%>" data-location="<%= pickup.deliveryCenter%>" data-color="<%= colors[count]%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>">
+                        <div class="option deliveryOption mt-1" data-range="<%= pickup.deliveryRange%>" data-area="<%= pickup.area%>" data-location="<%= pickup.deliveryCenter%>" data-color="<%= colors[count]%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>">
                           <label>
                             <i class="fa fa-truck cursor-pointer text-<%= colors[count]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i>
                             <span> <%= pickup.area || pickup.deliveryCenter%> <%= __('nearby')%></span>

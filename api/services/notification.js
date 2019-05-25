@@ -36,6 +36,7 @@ var notification = {
 
     this.publishEvent(model, action, params, isSendToHost, isAdminAction, isSendToAdmin);
 
+
     if(isAdminAction){
       //send emails to both chef and guest as it's modified by admin
       params.isSendToHost = true;
@@ -62,10 +63,17 @@ var notification = {
       var userReviewUrl = process.env.BASE_URL + "/user/me#myreview";
       switch(action){
         case "new":
-          content = sails.__({
-            phrase : 'newOrderMessage',
-            locale : locale
-          }, params.meal.title);
+          if(params.isSendToHost){
+            content = sails.__({
+              phrase : 'newOrderMessageToHost',
+              locale : locale
+            }, params.meal.title);
+          }else{
+            content = sails.__({
+              phrase : 'newOrderMessageToGuest',
+              locale : locale
+            }, params.id);
+          }
           message.sendMessage(phone, content);
           break;
         case "adjust":
@@ -197,6 +205,7 @@ var notification = {
 
   sendEmail : function(model, action, params, req){
 
+    var sendable = this.inquireSendable(params.isSendToHost, model, action);
     var basicInfo = this.inquireBasicInfo(params.isSendToHost, params.isSendToAdmin, params);
     var template = this.inquireTemplate(model,action);
 
@@ -221,6 +230,7 @@ var notification = {
       sails.log.info("sending email to: " + basicInfo.recipientEmail + " with email template: " + template);
       return;
     }
+
     sails.hooks.email.send(template, params,{
       to : basicInfo.recipientEmail,
       subject : "SFMeal support"
@@ -326,6 +336,14 @@ var notification = {
     }
   },
 
+  inquireSendable : function(isSendToHost, model, action){
+    var sendable = true;
+    // if(!isSendToHost && model === "Order" && action === "new"){
+    //   sendable = false;
+    // }
+    return sendable;
+  },
+
   inquireBasicInfo : function(isSendToHost, isSendToAdmin, params){
     var info = {};
     if(isSendToHost){
@@ -371,11 +389,11 @@ var notification = {
   },
 
   mergeI18N : function(model, action, req, locale, params){
-    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','our-mailing-address','tax','service-fee','question-email','click-enter-info','click-upload-info','click-apply','comment'];
+    var i18ns = ['enter-website','open-order','fen','order','order-number','dingdan','user','delivery-fee','total','footer-send-by','our-mailing-address','tax','service-fee','question-email','click-enter-info','click-upload-info','click-apply','comment','about-us','contact-us','privacy','step1','footer-bar-info'];
     if(model === "Order"){
       switch(action){
         case "new":
-          i18ns = i18ns.concat(['new-order-title','new-order-context','order-time','ready-time','order','preorder']);
+          i18ns = i18ns.concat(['new-order-title-for-host','new-order-title-for-guest','new-order-context-for-host','new-order-context-for-guest','order-time','ready-time','order','preorder']);
           break;
         case "adjust":
           i18ns = i18ns.concat(['adjust-order-context','adjust-order-from-host-context','modify','de-order','order-time','adjust-time','chef']);
@@ -411,7 +429,7 @@ var notification = {
     }else if(model === "Meal"){
       switch(action){
         case "mealScheduleEnd":
-          i18ns = i18ns.concat(['guest-list-title','guest-list-context','guest-list-no-title','guest-list-no-context','guest-list-no-tips','delivery-location','delivery-time','pickup-time','pickup-location','print-list','content','contact','amount-owe','open-meal']);
+          i18ns = i18ns.concat(['guest-list-title','guest-list-context','guest-list-no-title','guest-list-no-context','guest-list-no-tips','delivery-location','delivery-time','pickup-time','pickup-location','print-list','content','contact','amount-owe','open-meal','price','quantity']);
           break;
         case "start":
           i18ns = i18ns.concat(['meal-name','meal-number','meal-order-start-title','meal-order-start-context','step2','provide-time','ready-time','min']);
@@ -420,7 +438,7 @@ var notification = {
           i18ns = i18ns.concat(['pity','cancel','de-order','cancel-meal-title','meal-create-time','preorder-start-time','preorder-end-time','cancel-meal-context','meal-fail-requirement','open-meal','preorder-end-time','cancel-time','meal-number',"qty","left","cancel-reason"]);
           break;
         case "chefSelect":
-          i18ns = i18ns.concat(['search','searching-tips','yourfollowedchef','menuoftheweek','hometaste1','see-more']);
+          i18ns = i18ns.concat(['search','searching-tips','delivery-time','yourfollowedchef','menuoftheweek','hometaste1','see-more']);
           break;
       }
     }else if(model === "Host"){
@@ -479,9 +497,17 @@ var notification = {
         pickup.pickupTillTime = moment(pickup.pickupTillTime).local().format('ddd, L, LT');
       });
     }
-    if(params.createdAt && params.updatedAt){
-      params.createdAt = moment(params.createdAt).local().format('L, LT');
-      params.updatedAt = moment(params.updatedAt).local().format('L, LT');
+    if(params.createdAt && moment(new Date(params.createdAt)).isValid()){
+      params.createdAt = moment(new Date(params.createdAt).toISOString()).local().format('L, LT');
+    }
+    if(params.updatedAt && moment(new Date(params.updatedAt)).isValid()){
+      params.updatedAt = moment(new Date(params.updatedAt).toISOString()).local().format('L, LT');
+    }
+    if(params.orders && params.orders.length){
+      params.orders.forEach(function(order){
+        order.pickupInfo.pickupFromTime = moment(order.pickupInfo.pickupFromTime).local().format('ddd, L, LT');
+        order.pickupInfo.pickupTillTime = moment(order.pickupInfo.pickupTillTime).local().format('ddd, L, LT');
+      });
     }
   }
 }

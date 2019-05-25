@@ -35,9 +35,15 @@ module.exports = function(agenda) {
           return done();
         }
         sails.log.info("your meal will be online in 10 minutes");
+        meal.status = "on";
         meal.hostEmail = meal.chef.email;
         notification.notificationCenter("Meal","start",meal,true,false,null);
-        done();
+        meal.save(function(err, m){
+          if(err){
+            return done();
+          }
+          done();
+        })
       })
     }
   };

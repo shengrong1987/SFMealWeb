@@ -32,7 +32,7 @@ module.exports = function(agenda) {
           return done();
         }
         order.status = "ready";
-        order.service_fee = order.meal.serviceFee;
+        order.service_fee = order.meal ? order.meal.serviceFee : 0.2;
         order.save(function(err, o){
           if(err){
             return done(err);

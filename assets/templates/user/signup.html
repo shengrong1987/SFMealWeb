@@ -1,36 +1,40 @@
 <div id="registerView" class="step-container">
-  <div class="alert alert-warning hide" data-toggle="i18n" data-key="userRegisterExistError"></div>
+  <div class="alert alert-warning hide">${__('user-exist-error')}</div>
   <div id="step1" class="text-center step">
     <div class="card m-auto w-100" style="min-width:300px;">
 
       <div class="card-body">
         <div class="card-title">
           <h3>
-            <small data-toggle="i18n" data-key="login">账号登录</small>
-            <button aria-label="close" class="close" onclick="javascript:dismissModal()">
+            <button aria-label="close" class="close" onclick="javascript:h.dismissModal()">
               <span aria-hidden="true">&times;</span>
             </button>
           </h3>
         </div>
-        <div class="my-2 w-50 mx-auto" style="min-width:200px;">
-          <button id="FBBtn" class="popline btn btn-blue btn-lg light w-100">
-            <span><i class="fab fa-facebook-f" style="padding-right: 15px;"></i>Facebook <span data-toggle="i18n" data-key="login">账号登录</span></span>
+        <div class="my-2 w-50 mx-auto" style="min-width:250px;">
+          <button id="FBBtn" class="popline btn btn-blue btn-lg light w-100" style="font-weight: lighter;">
+            <span><i class="fab fa-facebook-f pr-3"></i>Facebook <span>${__('nav-bar-login')}</span></span>
           </button>
         </div>
-        <div class="my-2 w-50 mx-auto" style="min-width:200px;">
-          <button id="GoogleBtn" class="popline btn btn-outline-light btn-lg outline white text-orange w-100">
-            <span><img style="width: 30px;height: 30px;margin-right: 15px;" src="/images/g-logo.png">Google <span data-toggle="i18n" data-key="login">帐号登录</span></span>
+        <div class="my-2 w-50 mx-auto" style="min-width:250px;">
+          <button id="GoogleBtn" class="popline btn btn-google btn-lg outline white text-orange w-100" style="font-weight: lighter;">
+            <span><i class="fab fa-google pr-3"></i>Google <span>${__('nav-bar-login')}</span></span>
           </button>
         </div>
-        <div class="my-2 w-50 mx-auto" style="min-width:200px;">
-          <button class="popline btn btn-lg btn-danger light next-step mb-4 w-100" data-step="1" onclick="stepContainer.nextStep(event)" data-toggle="i18n" data-key="emailRegister">邮箱注册</button>
+        <div class="my-2 w-50 mx-auto" style="min-width:250px;">
+          <button id="wechatBtn" class="popline btn btn-green btn-lg outline text-white w-100" style="font-weight: lighter;">
+            <span><i class="fab fa-weixin" style="padding-right:15px;"></i>${__('wechat')}<span>${__('nav-bar-login')}</span></span>
+          </button>
+        </div>
+        <div class="my-2 w-50 mx-auto" style="min-width:250px;">
+          <button class="popline btn btn-lg btn-danger light next-step mb-4 w-100" data-step="1" onclick="h.nextStep(event)" style="font-weight: lighter;">${__('register-with-email')}</button>
         </div>
 
-        <h6><span data-toggle="i18n" data-key="registerAgreement"></span><a href="/help#terms" data-toggle="i18n" data-key="terms"></a></h6>
+        <h6><span>${__('registerAgreement')}</span><a href="/help#terms"> ${__('terms')}</a></h6>
       </div>
 
       <div class="card-footer">
-        <h6><span data-toggle="i18n" data-key="alreadyMember"></span><a toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)"><span data-toggle="i18n" data-key="login"></span></a></h6>
+        <h6>${__('user-exist-error')}<a toggle="modal" data-target="#myModal" data-model="user" data-action="signin" href="javascript:void(0)" onclick="h.toggleModal(event)"><span>${__('nav-bar-login')}</span></a></h6>
       </div>
     </div>
   </div>
@@ -42,9 +46,9 @@
         <div class="card-title">
           <h3>
             <small>
-              <a href="#" class="last-step" data-step="2" onclick="stepContainer.lastStep(event)">Facebook </a><span data-toggle="i18n" data-key="register"></span> <span data-toggle="i18n" data-key="or"></span> <a href="#" class="last-step" data-step="2" onclick="stepContainer.lastStep(event)">Google </a></span><span data-toggle="i18n" data-key="register"></span>
+              <a href="#" class="last-step" data-step="2" onclick="h.lastStep(event)">Facebook </a><span>${__('nav-bar-register')}</span> <span>${__('or')}</span> <a href="#" class="last-step" data-step="2" onclick="h.lastStep(event)">Google </a></span><span>${__('nav-bar-register')}</span>
             </small>
-            <button aria-label="close" class="close"><span aria-hidden="true">&times;</span></button>
+            <button aria-label="close" class="close" onclick="javascript:h.dismissModal()"><span aria-hidden="true">&times;</span></button>
           </h3>
         </div>
 
@@ -52,44 +56,44 @@
 
         <form class="text-center" data-toggle="validator" role="form" autocomplete="off">
 
-          <div class="form-group has-feedback">
-            <label class="sr-only" for="emailInput" data-toggle="i18n" data-key="email"></label>
-            <input type="email" class="form-control" id="emailInput" placeholder="邮箱 (Email)" data-toggle="i18n" data-pattern-key="emailBadFormat" data-pattern-error="bad format" required>
-            <span class="glyphicon form-control-feedback" aria-hidden="true" style="top: 10px;"></span>
-            <div class="help-block with-errors"></div>
+          <div class="form-group has-feedback relative">
+            <label class="sr-only" for="emailInput">${__('email')}</label>
+            <input type="email" class="form-control" id="emailInput" placeholder="邮箱 (Email)" data-pattern-error="${__('invalid-email')}" required>
+            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+            <div class="help-block with-errors text-red"></div>
           </div>
 
-          <div class="form-group has-feedback">
-            <label class="sr-only" for="passwordInput" data-toggle="i18n" data-key="password"></label>
-            <input type="password" pattern="^[_A-z0-9]{8,}$" class="form-control" id="passwordInput" placeholder="密码 (Password)" data-toggle="i18n" data-pattern-key="passwordRequirement" data-pattern-error="bad format" required>
-            <span class="form-control-feedback" aria-hidden="true" style="top: 10px;"></span>
-            <span class="help-block with-errors"></span>
+          <div class="form-group has-feedback relative">
+            <label class="sr-only" for="passwordInput">${__('password')}</label>
+            <input type="password" pattern="^[_A-z0-9]{8,}$" class="form-control" id="passwordInput" placeholder="密码 (Password)" data-pattern-error="${__('password-requirement')}" required>
+            <span class="form-control-feedback" aria-hidden="true"></span>
+            <span class="help-block with-errors text-red"></span>
           </div>
 
-          <div class="form-group has-feedback">
-            <label class="sr-only" for="passwordInput" data-toggle="i18n" data-key="password"></label>
-            <input type="password" pattern="^[_A-z0-9]{8,}$" class="form-control" id="passwordConfirmInput" data-toggle="i18n" data-pattern-key="passwordRequirement" data-pattern-error="bad format" data-match="#passwordInput" data-match-key="passwordNotMatch" data-match-error="not match" placeholder="请再次输入密码 (password confirm)" required>
-            <span class="glyphicon form-control-feedback" aria-hidden="true" style="top: 10px;"></span>
-            <div class="help-block with-errors"></div>
+          <div class="form-group has-feedback relative">
+            <label class="sr-only" for="passwordInput">${__('password')}</label>
+            <input type="password" pattern="^[_A-z0-9]{8,}$" class="form-control" id="passwordConfirmInput" data-pattern-error="${__('password-requirement')}" data-match="#passwordInput" data-match-error="${__('unmatched-password')}" placeholder="请再次输入密码 (password confirm)" required>
+            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+            <div class="help-block with-errors text-red"></div>
           </div>
 
-          <div class="form-group has-feedback">
-            <label class="sr-only" for="firstnameInput" data-toggle="i18n" data-key="firstname"></label>
-            <input type="text" pattern="^([A-z\s]{1,15})$" maxlength="15" data-pattern-key="nameRequirement" data-pattern-error="bad format" class="form-control" data-toggle="i18n" id="firstnameInput" placeholder="名字 (Firstname)" required>
-            <span class="form-control-feedback" aria-hidden="true" style="top: 10px;"></span>
-            <div class="help-block with-errors"></div>
+          <div class="form-group has-feedback relative">
+            <label class="sr-only" for="firstnameInput">${__('firstname')}</label>
+            <input type="text" pattern="^([A-z\s]{1,15})$" maxlength="15" data-pattern-error="${__('invalid-name')}" class="form-control" id="firstnameInput" placeholder="名字 (Firstname)" required>
+            <span class="form-control-feedback" aria-hidden="true"></span>
+            <div class="help-block with-errors text-red"></div>
           </div>
 
-          <div class="form-group has-feedback">
-            <label class="sr-only" for="lastnameInput" data-toggle="i18n" data-key="lastname"></label>
-            <input type="text" pattern="^([A-z\s]{1,15})$" maxlength="15" data-pattern-key="nameRequirement" data-pattern-error="bad format" class="form-control" data-toggle="i18n" id="lastnameInput" placeholder="贵姓 (Lastname)" required>
-            <span class="form-control-feedback" aria-hidden="true" style="top: 10px;"></span>
-            <div class="help-block with-errors"></div>
+          <div class="form-group has-feedback relative">
+            <label class="sr-only" for="lastnameInput">${__('lastname')}</label>
+            <input type="text" pattern="^([A-z\s]{1,15})$" maxlength="15" data-pattern-error="${__('invalid-name')}" class="form-control" id="lastnameInput" placeholder="贵姓 (Lastname)" required>
+            <span class="form-control-feedback" aria-hidden="true"></span>
+            <div class="help-block with-errors text-red"></div>
           </div>
 
           <div class="form-group">
-            <label class="sr-only" for="phoneInput" data-toggle="i18n" data-key="phone" type="tel"></label>
-            <input type="tel" class="form-control" data-minlength="10" id="phoneInput" placeholder="电话 (Phone)" data-toggle="i18n" data-key="needPhone" data-error="need phone" data-pattern-key="phoneNotValid" data-pattern-error="bad format" required>
+            <label class="sr-only" for="phoneInput" type="tel">${__('phone')}</label>
+            <input type="tel" class="form-control" data-minlength="13" id="phoneInput" placeholder="电话 (Phone)" data-error="${__('enter-phone')}" data-pattern-error="${__('phone-bad-format')}" required>
             <div class="help-block with-errors"></div>
           </div>
 
@@ -97,31 +101,34 @@
             <div class="checkbox">
               <label>
                 <input type="checkbox" id="receivedEmailInput">
-                <span data-toggle="i18n" data-key="receiveCoupon"></span>
+                <span>${__('receiveCoupon')}</span>
               </label>
             </div>
           </div>
 
           <div class="form-group">
-            <button id="register-btn" type="submit" class="btn btn-danger btn-lg round red popline" data-toggle="i18n" data-key="register"></button>
+            <button id="register-btn" type="submit" class="btn btn-danger btn-lg red popline">${__('nav-bar-register')}</button>
           </div>
         </form>
 
-        <h6 class="text-center"><span data-toggle="i18n" data-key="registerAgreement"></span><a href="/terms#terms" data-toggle="i18n" data-key="terms"></a></h6>
+        <h6 class="text-center"><span>${__('registerAgreement')}</span><a href="/terms#terms">${__('terms')}</a></h6>
 
       </div>
 
       <div class="card-footer">
-        <h6><span data-toggle="i18n" data-key="alreadyMember">已经是我们一员?请点击这里,</span><a toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)" data-toggle="i18n" data-key="login">账号登录</a></h6>
+        <h6><span>${__('user-exist-error')} </span><a toggle="modal" data-target="#myModal" data-model="user" data-action="signin" href="javascript:void(0)" onclick="h.toggleModal(event)"> ${__('nav-bar-login')}</a></h6>
       </div>
     </div>
 
   </div>
 </div>
 
-<script>
-  new RegisterView({el : $("#registerView"), model : new Auth()});
-  var stepContainer = setupStepContainer();
-  if(browserVersion()==="uiwebview"){$("#GoogleBtn").hide();}
-  setup();
-</script>
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~420a7fe4.bundle.js"></script>
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~b0befe2f.bundle.js"></script>
+<script src="/assets/endors~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMeal~help~37f74159.bundle.js"></script>
+<script src="/assets/vendors~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMeal~host~250cd2f8.bundle.js"></script>
+<script src="/assets/apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMeal~help~host~jo~9557e0fe.bundle.js"></script>
+<script src="/assets/apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMeal~help~host~jo~33be8c5d.bundle.js"></script>
+<script src="/assets/admin~apply~badge~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMeal~help~host~j~8ae13fb5.bundle.js"></script>
+<script src="/assets/apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMeal~host~join~my~a98d19e5.bundle.js"></script>
+<script src="/assets/zh.signup.bundle.js"></script>

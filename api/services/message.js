@@ -22,7 +22,7 @@ module.exports = {
       body : content
     }, function (err, message) {
       if(err){
-        sails.log.info("sent text: " + err);
+        sails.log.info("sent text: " + err.message);
         return;
       }
       sails.log.info("sent text: " + message);

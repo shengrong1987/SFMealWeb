@@ -1,22 +1,10 @@
-
 <div>
-  <div class="row">
-    <div class="pure-banner green">
-      <div class="middle banner-text py-3">
-        <div class="row vertical-align">
-          <div class="col-lg-2"></div>
-          <div class="col-5 col-lg-3">
-            <img src="/images/welcome-1.png" style="width: 100%;">
-          </div>
-          <div class="col-2 col-lg-2">
-            <a href="/" class="logo-slogan"></a>
-          </div>
-          <div class="col-5 col-lg-3">
-            <img src="/images/welcome-2.png" style="width: 100%;">
-          </div>
-          <div class="col-lg-2"></div>
-        </div>
-      </div>
+  <div class="d-flex justify-content-center pure-banner vertical-align red p-4">
+    <div class="cursor-pointer mr-4">
+      <a href="/" class="logo" style="left: 0;"></a>
+    </div>
+    <div>
+      <h3 class="text-white text-left none-margin"><strong><%= __('nav-bar-dish')%></strong></h3>
     </div>
   </div>
 
@@ -36,7 +24,9 @@
           <form data-id="<%= user.id %>" data-toggle="validator" data-err-container=".submit">
             <div class="form-group">
               <label for="mealTitleInput">1.<%= __('dish-name') %></label>
-              <a data-toggle="input-toggle" title="<%= __('toggle-language')%>"><i class="fa fa-refresh"></i></a>
+              <button class="btn btn-info m-2" data-toggle="input-toggle" title="<%= __('toggle-language')%>">
+                <i class="fas fa-retweet-alt"></i> <%= __('switch-lan')%>
+              </button>
               <input id="mealTitleInput" class="form-control" type="text" placeholder="<%= __('full-name') %>" maxlength="7" data-error="<%= __('full-name') %>" required>
               <input id="mealTitleInput-en" class="form-control" type="text" placeholder="<%= __('full-name-en') %>" maxlength="40" data-error="<%= __('full-name') %>">
               <div class="help-block with-errors"></div>
@@ -47,7 +37,7 @@
               <div class="fileinput fileinput-new form-group" data-provides="fileinput">
                 <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
                 </div>
-                <div class="fileinput-preview fileinput-exists thumbnail" style="width: 200px; height: 150px;"></div>
+                <div class="fileinput-preview fileinput-exists thumbnail" style="width: 200px; height: 150px;max-width: 200px;"></div>
                 <div>
                   <span class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
                     <input id="photoInput-1" type="file" data-strictImage=true name="...">
@@ -59,7 +49,7 @@
               <div class="fileinput fileinput-new form-group" data-provides="fileinput">
                 <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
                 </div>
-                <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px;"></div>
+                <div class="fileinput-preview fileinput-exists thumbnail" style="width: 200px; height: 150px;max-width: 200px;"></div>
                 <div>
                   <span class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
                     <input id="photoInput-2" type="file" data-strictImage=true name="...">
@@ -71,7 +61,7 @@
               <div class="fileinput fileinput-new form-group" data-provides="fileinput">
                 <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
                 </div>
-                <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px;"></div>
+                <div class="fileinput-preview fileinput-exists thumbnail" style="width: 200px; height: 150px;max-width: 200px;"></div>
                 <div>
                   <span class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
                     <input id="photoInput-3" type="file" data-strictImage=true name="...">
@@ -84,37 +74,53 @@
             </div>
 
             <div class="form-group">
-              <label for="priceInput">3.<%= __('how-much-for-one') %></label>
-              <div class="input-group" style="width: 250px;">
+              <label for="priceInput">3.<%= __('how-much-for-one') %><i class="fal fa-question-circle text-lightgrey" data-toggle="tooltip" title="<%= __('catering-minimal-tip')%>"></i></label>
+              <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text">$</span>
                 </div>
-                <input type="text" class="form-control" id="priceInput" placeholder="<%= __('dollar') %>" min="1" max="100" data-error="<%= __('price-incorrect') %>" required>
-                <div class="input-group-append">
-                  <span class="input-group-text">.00</span>
+                <input type="text" class="form-control" id="priceInput" min="1" max="100" data-error="<%= __('price-incorrect') %>" required>
+
+                <div class="input-group-prepend">
+                  <span class="input-group-text">$</span>
                 </div>
+
+                <input type="text" class="form-control" id="discountInput" min="1" max="100" data-error="<%= __('discount-incorrect') %>" value="0" required>
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><%= __('fen')%></span>
+                </div>
+                <input type="text" class="form-control" id="cateringMinimalOrderInput" placeholder="10" required>
               </div>
-              <div class="help-block with-errors"></div>
+
+              <div class="help-block with-errors text-red"></div>
             </div>
 
             <div class="form-group">
               <label for="priceInput">4.<%= __('how-many-for-one') %></label>
-              <div class="input-group" style="width: 250px;">
-                <input type="text" class="form-control" id="quantityInput" placeholder="<%= __('fenliang') %>">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><%= __('fenliang')%></span>
+                </div>
+                <input type="text" class="form-control" id="quantityInput" placeholder="<%= __('fenliang') %>" required>
+                <div class="input-group-append">
+                  <span class="input-group-text"><%= __('people')%></span>
+                </div>
+                <input type="text" class="form-control" id="peopleServeInput" placeholder="<%= __('people') %>" required>
               </div>
+              <div class="help-block with-errors text-red"></div>
             </div>
 
             <div class="form-group">
               <label for="categoryInput">5.<%= __('what-kind') %></label>
               <div class="dropdown">
-                <button class="btn btn-default dropdown-toggle btn-outline" type="button" id="categoryInput" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="entree">
+                <button class="btn btn-default dropdown-toggle btn-outline" type="button" id="categoryInput" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="entree" data-selected="true">
                   <%= __('main') %>
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                  <li class="active"><a href="javascript:void(0)" value="entree"><%= __('main') %></a></li>
-                  <li><a href="javascript:void(0)" value="appetizer"><%= __('appetizer') %></a></li>
-                  <li><a href="javascript:void(0)" value="dessert"><%= __('dessert') %></a></li>
+                  <a class="dropdown-item active" href="javascript:void(0)" value="entree"><%= __('main') %></a>
+                  <a class="dropdown-item" href="javascript:void(0)" value="appetizer"><%= __('appetizer') %></a>
+                  <a class="dropdown-item" href="javascript:void(0)" value="dessert"><%= __('dessert') %></a>
                 </ul>
               </div>
             </div>
@@ -154,7 +160,12 @@
             </div>
 
             <div class="form-group">
-              <label for="isDynamicPriceOn">9.<%= __('is-dynamic') %></label><br/>
+              <label for="tagInput">9.<%= __('dish-tag')%></label>
+              <input type="text" id="tagInput" class="form-control" placeholder="<%= __('dish-tag-default')%>">
+            </div>
+
+            <div class="form-group">
+              <label for="isDynamicPriceOn">10.<%= __('is-dynamic') %></label><br/>
               <input class="form-control" type="checkbox" data-toggle="switch-button" id="isDynamicPriceOn">
 
               <div id="dynamicDishSettingView" class="form-group form-inline d-none">
@@ -185,6 +196,11 @@
               <div class="alert alert-danger"></div>
             </div>
 
+            <div class="form-group">
+              <label for="isDynamicPriceOn">11.<%= __('support-shipping') %></label><br/>
+              <input class="form-control" type="checkbox" data-toggle="switch-button" id="isSupportShipping">
+            </div>
+
             <div class="form-group text-center submit">
               <button type="submit" class="btn btn-grey-green btn-lg round active"><%= __('save-and-submit') %></button>
               <div class="help-block with-errors"><%= __('24hours') %></div>
@@ -197,11 +213,7 @@
         </div>
       </div>
     </div>
-
   </div>
-
 </div>
 
-<script>
-  new DishView({ el : $("#dishNewView"), model : new Dish()})
-</script>
+<link href="/assets/createDish.css" rel="stylesheet"><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script><script src="/assets/zh.createDish.bundle.js"></script>

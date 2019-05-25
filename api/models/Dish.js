@@ -33,6 +33,10 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
+    isSupportShipping : {
+      type : 'boolean',
+      defaultsTo : false
+    },
     description : {
       type : 'string',
       defaultsTo : "",
@@ -95,7 +99,7 @@ module.exports = {
     },
     type : {
       type : 'string',
-      enum : ['appetizer','entree','dessert'],
+      enum : ['snack','appetizer','rice&noodle','dimsum','pastry','entree','dessert','soup','frozen'],
       defaultsTo : 'entree'
     },
     isVerified : {
@@ -104,6 +108,24 @@ module.exports = {
     },
     minimalPrice : {
       type : 'float'
+    },
+    discount : {
+      type : 'integer'
+    },
+    cateringMinimalOrder : {
+      type : 'integer',
+      defaultsTo : 10
+    },
+    availableAfter : {
+      type : 'string'
+    },
+    prepareDay : {
+      type : 'integer',
+      defaultsTo : 7
+    },
+    peopleServe : {
+      type : 'integer',
+      defaultsTo : 1
     },
     getPrice : function(orderQty, meal){
       var _this = this;

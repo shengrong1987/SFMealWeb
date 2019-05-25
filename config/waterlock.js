@@ -45,10 +45,10 @@ module.exports.waterlock = {
       redirectUri : process.env.NODE_ENV === 'production' ? process.env.BASE_URL + '/auth/google_oauth2' : 'http://localhost:1337/auth/google_oauth2',
       allow: ['*'],
       fieldMap : {
-        'email' : 'email',
         'firstname': 'given_name',
         'lastname': 'family_name',
-        'gender': 'gender'
+        'gender': 'gender',
+        'googleEmail' : 'email'
       }
     },
     {

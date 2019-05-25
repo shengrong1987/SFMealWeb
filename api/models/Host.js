@@ -129,6 +129,15 @@ module.exports = {
       defaultsTo : 0.2,
       decimal2 : true
     },
+    numberOfReviews : {
+      type : 'integer'
+    },
+    score : {
+      type : 'float'
+    },
+    avgScore : {
+      type : 'string'
+    },
     //check stripe verification, return verification object if not there's field_needed
     checkVerification : function(cb){
       var host = this;

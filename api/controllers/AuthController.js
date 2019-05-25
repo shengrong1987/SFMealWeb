@@ -19,6 +19,8 @@ var request = require('request');
 var async = require('async');
 var nlp = require('../services/nlp');
 
+const WECHAT_FOLLOW_AND_SIGNIN = "wechat_follow_and_signin";
+
 module.exports = require('waterlock').waterlocked({
   /* e.g.
    error
@@ -53,12 +55,6 @@ module.exports = require('waterlock').waterlocked({
         waterlock.engine.findOrCreateAuth(criteria, attr, function(err, user) {
           if(err){
             return res.badRequest(err);
-          }
-          var typeOfUser = params.receivedEmail ? "subscriber" : "member";
-          if(process.env.NODE_ENV === "production"){
-            mailChimp.addMemberToList({ email : params.email, firstname : params.firstname, lastname : params.lastname, language : req.getLocale() }, typeOfUser);
-          }else{
-            //in development mode, skipping subscription
           }
           delete params.password;
           params.verifyToken = notification.generateToken();
@@ -98,14 +94,16 @@ module.exports = require('waterlock').waterlocked({
     var _this = this;
     var isNewUser = false;
     var openid = attrs.openid;
+    var unionid = attrs.unionid;
+    sails.log.info("open id:" + openid);
     if(!openid){
       return res.badRequest({code : -20, responseText : req.__('user-unionid-needed')});
     }
-    waterlock.engine.findAuth({ openid : openid }, function(err, user) {
+    waterlock.engine.findAuth({ '$or' : [ { openid : openid }, { unionid : unionid }] }, function(err, user) {
       if (!user) {
         isNewUser = true;
       }
-      waterlock.engine.findOrCreateAuth({ openid : openid }, attrs, function(err, user) {
+      waterlock.engine.findOrCreateAuth({ '$or' : [ { openid : openid }, { unionid : unionid }] }, attrs, function(err, user) {
         if(err){
           return res.badRequest(err);
         }
@@ -127,6 +125,7 @@ module.exports = require('waterlock').waterlocked({
           if(err){
             return res.badRequest(err);
           }
+          attrs.id = user.id;
           User.update(user.id, attrs).exec(function(err, u){
             if(err){
               return res.badRequest(err);
@@ -134,6 +133,9 @@ module.exports = require('waterlock').waterlocked({
             u[0].auth = user.auth;
             req.session.user = u[0];
             req.session.authenticated = true;
+            req.setLocale(attrs.language);
+            sails.log.info("setting language from wechat: " + attrs.language);
+
             var host = process.env.NODE_ENV === 'production' ? process.env.BASE_URL : process.env.LOCAL_HOST;
             attrs.verificationUrl = host + "/user/verify/" + u[0].verifyToken.token;
             //notification.sendEmail("User","verification",attrs,req);
@@ -222,7 +224,7 @@ module.exports = require('waterlock').waterlocked({
   },
 
   admin : function(req, res){
-    return res.view('admin/hello',{
+    return res.view('admin',{
       layout : 'admin_layout'
     });
   },
@@ -236,14 +238,57 @@ module.exports = require('waterlock').waterlocked({
     var state = req.query.state;
     sails.log.info("wechat code:" + code);
     sails.log.info("wechat state:" + state);
-    this.exchangeToken(code, state, req, res);
+    this.exchangeToken(code, state, req, res, "mobile");
   },
 
-  exchangeToken : function(code, state, req, res){
+  wechatCodeWeb : function(req, res){
+    var code = req.query.code;
+    var state = req.query.state;
+    sails.log.info("wechat code:" + code);
+    sails.log.info("wechat state:" + state);
+    this.exchangeToken(code, state, req, res, "web");
+  },
+
+  getQRCodeTicket : function(req, res){
+    var url = "https://api.wechat.com/cgi-bin/token?grant_type=client_credential&appid=" + wechatAppId + "&secret=" + wechatAppSecret;
+    request.get({
+        url : url
+      }, function(err, response) {
+      if (err) {
+        return res.badRequest(err);
+      }
+      try {
+        sails.log.info("wechat access token:" + response.body);
+        var body = JSON.parse(response.body);
+        var accessToken = body.access_token;
+      } catch (err) {
+        return res.badRequest(err);
+      }
+      var getQRTicketUrl = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + accessToken;
+      request.post({
+        url : getQRTicketUrl,
+        form : '{"expire_seconds": 604800, "action_name": "QR_STR_SCENE", "action_info": {"scene": {"scene_str": ' + WECHAT_FOLLOW_AND_SIGNIN + ' }}}'
+
+    }, function(err,httpResponse,body){
+        if(err){
+          return res.badRequest(err);
+        }
+        var body = JSON.parse(body);
+        if(body.errorcode){
+          return res.badRequest(body);
+        }
+        res.ok({ ticket : body.ticket });
+      })
+    });
+  },
+
+  exchangeToken : function(code, state, req, res, type){
     var _this = this;
+    var appID = type === "mobile" ? process.env.WECHAT_APPID : process.env.WECHAT_APPID_WEB;
+    var appSecret = type === "mobile" ? process.env.WECHAT_SECRET : process.env.WECHAT_SECRET_WEB;
     var accessTokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$APPID&secret=$SECRET&code=$CODE&grant_type=authorization_code";
-    accessTokenUrl = accessTokenUrl.replace('$APPID', process.env.WECHAT_APPID);
-    accessTokenUrl = accessTokenUrl.replace('$SECRET',process.env.WECHAT_SECRET);
+    accessTokenUrl = accessTokenUrl.replace('$APPID', appID);
+    accessTokenUrl = accessTokenUrl.replace('$SECRET',appSecret);
     accessTokenUrl = accessTokenUrl.replace('$CODE', code);
     request.get({
       url : accessTokenUrl

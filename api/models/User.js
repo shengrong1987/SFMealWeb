@@ -8,6 +8,7 @@
 
 var async = require('async');
 var geocode = require('../services/geocode');
+var mailChimp = require("../services/mailchimp");
 
 module.exports = {
 
@@ -85,7 +86,7 @@ module.exports = {
     },
     county : {
       type : 'string',
-      enum : ["San Francisco County", "Sacramento County", "San Mateo County", "Santa Clara County"]
+      enum : ["San Francisco County", "Sacramento County", "San Mateo County", "Santa Clara County","Alameda County"]
     },
     zip : {
       type : 'string',
@@ -125,7 +126,8 @@ module.exports = {
       collection : 'Host'
     },
     follow : {
-      model : 'Host'
+      collection : 'Host',
+      via : 'followers'
     },
     feature_dishes : {
       type : 'json'
@@ -140,7 +142,6 @@ module.exports = {
     },
     points : {
       type : 'integer',
-      at1000Max : true,
       defaultsTo : 0
     },
     emailVerified : {
@@ -156,6 +157,14 @@ module.exports = {
     },
     referrerCode : {
       type : 'string'
+    },
+    newUserRewardIsRedeemed : {
+      type : 'boolean',
+      defaultsTo : false
+    },
+    email : {
+      type : 'email',
+      unique : true
     },
     generateCode : function(params, cb){
       if(this.referralCode) {
@@ -183,8 +192,11 @@ module.exports = {
   }),
 
   beforeUpdate : function(params, cb){
-    if(params.email){
-      Auth.update({ user : params.id}, { email : params.email}).exec(cb);
+    var attrs = {};
+    if(params.email || params.unionid){
+      if(params.email){attrs.email = params.email;}
+      if(params.unionid){attrs.unionid = params.unionid;}
+      Auth.update({ user : params.id}, attrs).exec(cb);
     }else{
       cb();
     }
@@ -199,6 +211,7 @@ module.exports = {
         if(err){
           return cb(err);
         }
+        var email = auth.email || auth.googleEmail;
         var emailVerified = !!(auth.googleEmail || (auth.facebookId && auth.email)) ;
         var firstName = auth.firstname || ( auth.name ? auth.name.split(' ')[0] : auth.username) || auth.nickname || 'guest';
         var lastName = auth.lastname || ( auth.name ? auth.name.split(' ')[1] : '') || 'guest';
@@ -208,7 +221,13 @@ module.exports = {
         var picture = auth.picture ? auth.picture.data.url : ( auth.headimgurl || '');
         var state = auth.location ? ( auth.location.name ? auth.location.name.split(",")[1] : '') : ( auth.province || 'California');
         var gender = auth.gender || (auth.sex === 1 ? "male" : "female");
-        sails.log.info("code created: " + referralCode);
+        var language = auth.language;
+        var typeOfUser = user.receivedEmail ? "subscriber" : "member";
+        if(auth.email && process.env.NODE_ENV === "production"){
+          mailChimp.addMemberToList({ email : email, firstname : firstName, lastname : lastName}, typeOfUser);
+        }else{
+          //in development mode, skipping subscription
+        }
         var params = {
           firstname: firstName,
           lastname: lastName,
@@ -220,7 +239,8 @@ module.exports = {
           city: city,
           state: state,
           referralCode : referralCode,
-          emailVerified : emailVerified
+          emailVerified : emailVerified,
+          language : language
         }
         User.update(user.id, params).exec(function(err, user){
           if(err){

@@ -16,6 +16,16 @@ module.exports = {
     return res.view("dish_new",{user : user});
   },
 
+  preference : function(req, res){
+	  var dishId = req.params.id;
+	  Dish.findOne(dishId).exec(function(err, dish){
+	    if(err){
+	      return res.badRequest(err);
+      }
+      res.view('preference', { layout : "popup", dish : dish });
+    })
+  },
+
   verify : function(req, res){
     var dishId = req.params.id;
     Dish.findOne(dishId).populate("chef").exec(function(err, dish){
@@ -89,12 +99,15 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          if(!dishIsNotActive && parseFloat(req.body.price) !== d.price){
-            return res.badRequest({ code : -2, responseText : req.__("meal-active-update-dish")});
-          }
+          // if(!dishIsNotActive && parseFloat(req.body.price) !== d.price){
+          //   return res.badRequest({ code : -2, responseText : req.__("meal-active-update-dish")});
+          // }
           sails.log.info(req.body.minimalPrice, req.body.qtyRate, req.body.priceRate);
           if(req.body.isDynamicPriceOn && (!req.body.minimalPrice || !req.body.qtyRate || !req.body.priceRate)){
             return res.badRequest({ code : -3, responseText : req.__("dish-update-dynamic-insufficient-info")});
+          }
+          if(req.body.tags){
+            req.body.tags = req.body.tags.split(",");
           }
           Dish.update(dishId, req.body).exec(function(err, dish){
             if(err){
@@ -135,6 +148,9 @@ module.exports = {
     var hostId = req.session.user.host.id ? req.session.user.host.id : req.session.user.host;
     var params = req.body;
     params.chef = hostId;
+    if(params.tags){
+      params.tags = params.tags.split(",");
+    }
     Dish.create(params).exec(function(err, dish){
       if(err){
         return res.badRequest(err);

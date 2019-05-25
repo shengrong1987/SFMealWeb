@@ -1,202 +1,50 @@
-
+<link href="/assets/user.css" rel="stylesheet">
 <div>
-  <div class="pure-banner red">
-    <div class="middle banner-text py-3">
-      <div class="row vertical-align">
-        <div class="col-lg-2"></div>
-        <div class="col-5 col-lg-3">
-          <img src="/images/welcome-1.png" style="width: 100%;">
-        </div>
-        <div class="col-2 col-lg-2">
-          <a href="/" class="logo-slogan"></a>
-        </div>
-        <div class="col-5 col-lg-3">
-          <img src="/images/welcome-2.png" style="width: 100%;">
-        </div>
-        <div class="col-lg-2"></div>
-      </div>
+  <div class="d-flex justify-content-center pure-banner vertical-align red p-4">
+    <div class="cursor-pointer mr-4">
+      <a href="/" class="logo" style="left: 0;"></a>
+    </div>
+    <div>
+      <h3 class="text-white text-left none-margin"><strong><%= __('nav-bar-user')%></strong></h3>
     </div>
   </div>
 
-  <div class="row">
-
-    <div class="col-12">
+  <div>
+    <div>
       <ul class="nav nav-tabs nav-fill bg-light pt-3">
-        <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder"><%= __('nav-bar-order')%></a></li>
+        <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder"><%= __('nav-bar-order')%><span class="badge orange ml-1 pull-right text-white" style="top: -10px;right: 5px;padding: 5px;"><%= user.orders.filter(function(order){return order.status !== "cancel" && order.status !== "review" && order.status !== "complete" && order.meal}).length || '' %></span></a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#mycollect"><%= __('user-nav-collect')%></a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#myinfo"><%= __('user-nav-info')%></a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#myaddress"><%= __('user-nav-address')%></a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#myreview"><%= __('nav-bar-review')%></a></li>
+        <li class="nav-item"><a class="nav-link veritcal-align" data-toggle="tab" role="tab" data-href="#myreview"><%= __('nav-bar-review')%><span class="badge ml-1 orange pull-right text-white" style="top: -10px;right: 5px;padding: 5px;"><%= user.orders.filter(function(order){return order.status == "review" && order.meal}).length || ''%></span></a></li>
       </ul>
 
       <div class="tab-content">
         <div id="myorder" class="tab-pane middle active pb-4" style="min-height: 400px;">
           <div class="box box-shadow white">
-            <% var orders = user.orders; if(orders.length == 0){%>
-            <h4 class="text-center mt-2"><small><%= __('no-order-tip')%><br/><a href="/meal"><%= __('browse')%></a></small></h4>
-            <div class="divider"></div>
-            <%}else{%>
-            <ul class="nav nav-pills nav-justified p-3">
-              <li class="nav-item"><a class="nav-link" data-toggle="tab" data-href="#myorder-order"><h4><strong><%= __('order-nav-order')%></strong></h4></a></li>
-              <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder-preorder"><h4><strong><%= __('order-nav-preorder')%></strong></h4></a></li>
-            </ul>
-            <div class="tab-content">
-              <div id="myorder-order" class="tab-pane middle pb-4">
-                <% var tabsData = [
-                  { id : "order-preparing", title : "order-nav-preparing", status : "preparing", type : "order"},
-                  { id : "order-holding", title : "order-nav-waiting", status : "holding", type : "order"},
-                  { id : "order-prepared", title : "order-nav-prepared", status : "ready", type : "order"},
-                  { id : "order-delivered", title : "order-nav-delivered", status : "review", type : "order"},
-                  { id : "order-reviewed", title : "order-nav-reviewed", status : "complete", type : "order"},
-                  { id : "order-all", title : "order-nav-all", status : "all", type : "order"}
-                ];%>
-                <ul class="nav nav-tabs my-2">
-                  <% tabsData.forEach(function(tabData, i){%>
-                  <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark <%= i===0?'active':''%>"><%= __(tabData.title)%></a></li>
-                  <% });%>
-                </ul>
-                <div class="tab-content box-scroll">
-                  <% tabsData.forEach(function(tabData, i){%>
-                  <div id="<%= tabData.id%>" class="tab-pane middle <%= i===0?'active':''%>">
-                    <table class="table table-bordered table-vertical-middle table-striped" style="width: 100%;">
-                      <thead>
-                      <tr>
-                        <td class="d-none d-md-table-cell"><%= __('photos')%></td>
-                        <td><%= __('meal')%></td>
-                        <td><%= __('price')%></td>
-                        <td><%= __('quantity')%></td>
-                        <td><%= __('paid-amount')%></td>
-                        <td><%= __('status')%></td>
-                        <td><%= __('trade-action')%></td>
-                      </tr>
-                      </thead>
-                      <%
-                      var orders = user.orders;
-                      orders.forEach(function(order){
-                      if(order.type===tabData.type && (
-                        (tabData.status === "holding" &&
-                          (order.status === "pending-payment" ||
-                          (!order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")))
-                        )
-                        || order.status===tabData.status || tabData.status === "all")){
-                      %>
-                      <tbody class="item" style="vertical-align: middle;">
-                      <tr class="warning">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address %> </br>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>:<%= order.id%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>: <%= order.customerPhone%></td>
-                      </tr>
-                      <%
-                        var list = Object.keys(order.orders);
-                        var dishes = order.dishes;
-                        var index = -1;
-                          list.forEach(function(key){
-                            var dishOrdered = order.orders[key];
-                            var price = parseFloat(dishOrdered.price);
-                            var number = dishOrdered.number;
-                            var preference = dishOrdered.preference || [];
-                            if(!preference.length){preference = [preference];}
-                            var extra = preference.reduce(function(total,next){
-                              return total + parseInt(next.extra);
-                            },0);
-
-                            if(order.status=="adjust") {
-                              var adjustingNumber = order.adjusting_orders[key].number;
-                            }
-
-                            if(number == 0 && (adjustingNumber == 0 || !adjustingNumber)){
-                              return;
-                            }
-                            dishes.forEach(function(dish){
-                              if(dish.id == key){
-                                index++;
-                      %>
-                      <tr>
-                        <td class="d-none d-md-table-cell"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
-                        <td><%= dish.title%></td>
-                        <td>
-                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
-                          <% if(extra){%>
-                          (+$<%= extra.toFixed(2)%>)<br/>
-                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
-                          <% }%>
-                        </td>
-                        <td><% if(order.status==="adjust"){
-                            var adjustingNumber = order.adjusting_orders[key].number;
-                          if(adjustingNumber != number){%>
-                          <%= number%> to <strong><%= adjustingNumber%></strong>
-                          <%}else{%>
-                          <%= number%>
-                          <%}}else{%>
-                          <%= number%>
-                          <%}%>
-                          <br/>
-                          <span class="preference"><%= preference.property || ""%></span>
-                        </td>
-                        <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>"><% if(order.status==="adjust"){%><s>$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount/100 + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)%></s>  ->  <%}%>$<%= (order.adjusting_subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount/100 + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : "0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= (order.discount/100).toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
-                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="/order/<%= order.id%>/receipt" target="__blank"><%= __('view-receipt')%></a><br/>
-                          <% if(order.status == "schedule" || order.status == "preparing"){ %>
-                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
-                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
-                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
-                          <%}else if(order.status === "pending-payment"){%>
-                          <a href="javascript:void(0)" data-action="pay" data-order="<%= order.id%>"><%= __('pay')%></a>
-                          <%}else if(order.status == "adjust" || order.status == "cancelling") {%>
-                            <% if(!order.isSendToHost){%>
-                              <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
-                              <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-order"><%= __('reject')%></a><br/>
-                            <%}%>
-                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
-                          <%}else if(order.status == "ready"){%>
-                            <% if(order.method == 'pickup'){%>
-                              <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.contactInfo.address %>"><%= __('see-address')%></a><br/>
-                            <%}%>
-                            <a href="javascript:void(0)"><%= __('Track-order')%></a><br/>
-                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
-                          <%}else if(order.status == "review"){%>
-                            <% if(order.method == 'pickup'){%>
-                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.contactInfo.address%>"><%= __('see-address')%></a><br/>
-                            <%}%>
-                            <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a><br/>
-                            <a href="#myreview"><%= __('review')%></a>
-                          <%}%>
-                        </td>
-                      </tr>
-                      <%}}})})%>
-                      </tbody>
-                      <%}})%>
-
-                    </table>
-                    <nav>
-                      <ul class="pagination pagination-red pagination-sm" data-trigger="pagination" data-target="#<%= tabData.id%>"></ul>
-                    </nav>
-                  </div>
-                  <% });%>
-                </div>
-              </div>
-
-              <div id="myorder-preorder" class="tab-pane middle active">
-                <% tabsData = [
-                  { id : "preorder-schedule", title : "order-nav-schedule", status : "schedule", type : "preorder"},
-                  { id : "preorder-preparing", title : "order-nav-preparing", status : "preparing", type : "preorder"},
-                  { id : "preorder-holding", title : "order-nav-waiting", status : "holding", type : "preorder"},
-                  { id : "preorder-prepared", title : "order-nav-prepared", status : "ready", type : "preorder"},
-                  { id : "preorder-delivered", title : "order-nav-delivered", status : "review", type : "preorder"},
-                  { id : "preorder-reviewed", title : "order-nav-reviewed", status : "complete", type : "preorder"},
-                  { id : "preorder-all", title : "order-nav-all", status : "all", type : "preorder"}
-                ];%>
-                <ul class="nav nav-tabs my-2">
-                  <% tabsData.forEach(function(tabData, i){%>
-                  <li class="nav-item"><a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link <%= i===0?'active':''%> text-dark"><%= __(tabData.title)%></a></li>
-                  <% });%>
-                </ul>
-                <div class="tab-content">
-                  <% tabsData.forEach(function(tabData, i){%>
-                  <div id="<%= tabData.id%>" class="tab-pane middle <%= i===0?'active':''%>">
-                    <table class="table table-bordered table-vertical-middle table-striped" style="width: 100%;">
+            <div id="myorder" class="tab-pane middle active">
+              <% var tabsData = [
+                { id : "all", title : "order-nav-all", status : "all"},
+                { id : "holding", title : "order-nav-waiting", status : "holding"},
+                { id : "schedule", title : "order-nav-schedule", status : "schedule"},
+                { id : "preparing", title : "order-nav-preparing", status : "preparing"},
+                { id : "prepared", title : "order-nav-prepared", status : "ready"},
+                { id : "delivered", title : "order-nav-delivered", status : "review"},
+                { id : "reviewed", title : "order-nav-reviewed", status : "complete"}
+              ];%>
+              <ul class="nav nav-text-highlight nav-fill nav-scroll my-2" style="flex-wrap: nowrap;padding-top:10px;" data-toggle="nav-scroll">
+                <% tabsData.forEach(function(tabData, i){%>
+                  <li class="nav-item cursor-pointer <%= i===0?'active':''%>">
+                    <a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark relative"><div><%= __(tabData.title)%></div>
+                      <span class="badge text-white ml-1 absolute orange pull-right" style="top: -10px;right: 5px;padding: 5px;"><%= user.orders.filter(function(order){return order.status === tabData.status && order.status !== "complete" && order.meal}).length || ''%></span>
+                    </a>
+                  </li>
+                <% });%>
+              </ul>
+              <div class="tab-content">
+                <% tabsData.forEach(function(tabData, i){%>
+                  <div id="<%= tabData.id%>" class="tab-pane middle <%= i===0?'active':''%>" style="overflow-x: scroll;">
+                    <table class="table table-bordered table-vertical-middle" style="width: 100%;">
                       <thead class="item">
                       <tr>
                         <td class="d-none d-md-table-cell"><%= __('photos')%></td>
@@ -211,110 +59,125 @@
                       <%
                         var orders = user.orders;
                       orders.forEach(function(order){
-                      if(order.type===tabData.type && (
+                      if(
                         (tabData.status === "holding" &&
                           (order.status === "pending-payment" ||
-                          (order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")))
+                            (order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")))
                         )
-                        || order.status===tabData.status || tabData.status === "all")){
+                        || order.status===tabData.status || tabData.status === "all"){
                       %>
-                      <tbody class="item" style="vertical-align: middle;">
-                      <tr class="warning">
-                        <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-time')%></b>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
-                          &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('order-number')%></b>: <%= order.id%><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('user')%></b>: <%= order.customerName || __('user')%> &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('contact')%></b>:<%= order.customerPhone%></td>
-                      </tr>
-                      <%
-                        var list = Object.keys(order.orders);
-                        var dishes = order.dishes;
-                        var index = -1;
-                      list.forEach(function(key){
-                        var dishOrdered = order.orders[key];
-                        var price = parseFloat(dishOrdered.price);
-                        var number = dishOrdered.number;
-                        var preference = dishOrdered.preference || [];
-                        if(!preference.length){preference = [preference];}
-                        var extra = preference.reduce(function(total,next){
-                          return total + parseInt(next.extra);
-                        },0);
+                        <tbody class="item" style="vertical-align: middle;">
+                        <tr class="table-info">
+                          <td align="left" colspan="7">&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-time')%></b>: <span data-toggle="time-span" data-format="date" data-from="<%= order.pickupInfo.pickupFromTime%>" data-to="<%= order.pickupInfo.pickupTillTime%>"></span><br/>
+                            &nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-location')%></b>: <%= order.method == 'pickup' ? order.pickupInfo.location : order.contactInfo.address %><br/>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('pickup-method')%></b>: <%= __(order.method)%>&nbsp&nbsp&nbsp&nbsp&nbsp<b><%= __('payment-method')%></b>: <%= order.paymentMethod ? __(order.paymentMethod) : ''%><br/>
+                          </td>
+                        </tr>
+                        <%
+                          var list = Object.keys(order.orders);
+                          var dishes = order.dishes;
+                          var index = -1;
+                        list.forEach(function(key){
+                          var dishOrdered = order.orders[key];
+                          var price = parseFloat(dishOrdered.price);
+                          var number = dishOrdered.number;
+                          var preference = dishOrdered.preference || [];
+                          if(!preference.length){preference = [preference];}
+                          var extra = preference.reduce(function(total,next){
+                            return total + parseInt(next.extra);
+                          },0);
+                          var oldTotal = (order.subtotal * (1 + order.getTaxRate()) + order.tip + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
 
-                        if(order.status=="adjust") {
-                          var adjustingNumber = order.adjusting_orders[key].number;
-                        }
-
-                        if(number == 0 && (adjustingNumber == 0 || !adjustingNumber)){
-                          return;
-                        }
-                      dishes.forEach(function(dish){
-                      if(dish.id == key){
-                        index++;
-                      %>
-                      <tr>
-                        <td class="d-none d-md-table-cell"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
-                        <td><%= dish.title%></td>
-                        <td>
-                          $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
-                          <% if(extra){%>
-                          (+$<%= extra.toFixed(2)%>)<br/>
-                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
-                          <% }%>
-                        </td>
-                        <td><% if(order.status=="adjust"){
+                          if(order.status=="adjust") {
                             var adjustingNumber = order.adjusting_orders[key].number;
-                          if(adjustingNumber != number){%>
+                            var newTotal = (order.adjusting_subtotal * (1 + order.getTaxRate()) + order.tip + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
+                          }
 
-                          <%= number%> to <strong><%= adjustingNumber%></strong>
-                          <%}else{%>
-                          <%= number%>
-                          <%}}else{%>
-                          <%= number%>
-                          <%}%>
-                          <br/>
-                          <span class="preference"><%= preference.property || ""%></span>
-                        </td>
-                        <% if(index==0){%>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>"><% if(order.status==="adjust"){%><s>$<%= (order.subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount/100 + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)%></s>  ->  <%}%>$<%= (order.adjusting_subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount/100 + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.meal ? order.meal.serviceFee : "0.00"%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= (order.discount/100).toFixed(2)%>)</td>
-                        <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
-                        <td class="minWid50" rowspan="<%= list.length%>" style="vertical-align: middle;">
-                          <a href="/order/<%= order.id%>/receipt" target="__blank"><%= __('view-receipt')%></a><br/>
-                          <% if(order.status == "schedule" || order.status == "preparing"){ %>
-                          <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a><br/>
-                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
-                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
-                          <%}else if(order.status === "pending-payment"){%>
-                          <a href="javascript:void(0)" data-action="pay" data-order="<%= order.id%>"><%= __('pay')%></a>
-                          <%}else if(!order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")) {%>
-                          <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
-                          <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('reject')%></a><br/>
-                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
-                          <%}else if(order.status == "ready"){%>
-                          <% if(order.method == 'pickup'){%>
-                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.contactInfo.address%>"><%= __('see-address')%></a><br/>
-                          <%}%>
-                          <a href="javascript:void(0)"><%= __('Track-order')%></a><br/>
-                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
-                          <%}else if(order.status == "review"){%>
-                          <% if(order.method == 'pickup'){%>
-                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="top" data-content="<%= order.pickupInfo ? order.pickupInfo.location : order.contactInfo.address%>"><%= __('see-address')%></a><br/>
-                          <%}%>
-                          <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a><br/>
-                          <a href="#myreview"><%= __('review')%></a>
-                          <%}%>
-                        </td>
-                      </tr>
-                      <%}}})})%>
-                      </tbody>
+                          if(number == 0 && (adjustingNumber == 0 || !adjustingNumber)){
+                            return;
+                          }
+                        dishes.forEach(function(dish){
+                        if(dish.id == key){
+                          index++;
+                        %>
+                        <tr>
+                          <td class="d-none d-md-table-cell"><img src="<%= dish.photos[0].v%>" style="width: 150px;"></td>
+                          <td><%= dish.title%></td>
+                          <td style="max-width: 100px;">
+                            $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
+                            <% if(extra){%>
+                              (+$<%= extra.toFixed(2)%>)<br/>
+                              <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event, appObj.orderView.enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-model="dish" data-action="preference"><%= __('preference')%></a>
+                            <% }%>
+                          </td>
+                          <td><%
+
+
+
+                            if(order.status=="adjust"){
+                              var adjustingNumber = order.adjusting_orders[key].number;
+                              var newTotal = (order.adjusting_subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
+                            if(adjustingNumber != number){%>
+
+                              <%= number%> to <strong><%= adjustingNumber%></strong>
+                            <%}else{%>
+                              <%= number%>
+                            <%}}else{%>
+                              <%= number%>
+                            <%}%>
+                            <br/>
+                            <span class="preference"><%= preference.property || ""%></span>
+                          </td>
+                          <% if(index==0){%>
+                            <td rowspan="<%= list.length%>" style="vertical-align: middle;">
+                              <% if(order.status==="adjust"){%>
+                                <s>$<%= oldTotal%></s> -> $<%= newTotal%>
+                              <% }else{%>
+                                <b><%= oldTotal%></b>(<%= __('tip')%>: $<%= order.tip%> + <%= __('tax')%>: $<%= (order.subtotal * order.getTaxRate()).toFixed(2)%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
+                            <% }%>
+                            <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
+                            <td class="minWid50 vetical-align" rowspan="<%= list.length%>">
+                              <% if(!order.isPaid){%>
+                                <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event)" data-href="/order/<%= order.id%>/payment"><%= __('pay')%></a>
+                              <% }else if(order.status === "pending-payment"){%>
+                                <a href="javascript:void(0)" data-action="pay" data-payment-method="<%= order.paymentMethod%>" data-order="<%= order.id%>"><%= __('pay')%></a>
+                              <%}%>
+                              <div class="divider none-margin">-</div>
+                              <a href="/order/<%= order.id%>/receipt" target="__blank"><%= __('view-receipt')%></a>
+                              <div class="divider none-margin">-</div>
+                              <% if(order.status == "schedule" || order.status == "preparing"){ %>
+                                <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a>
+                                <div class="divider none-margin">-</div>
+                                <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a>
+                                <div class="divider none-margin">-</div>
+                                <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
+                              <%}else if(!order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")) {%>
+                                <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
+                                <div class="divider none-margin">-</div>
+                                <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('reject')%></a>
+                                <div class="divider none-margin">-</div>
+                                <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
+                              <%}else if(order.status == "ready"){%>
+                                <a href="https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=<%= orders[0].pickupInfo.tracking || ''%>"><%= __('track-order')%></a>
+                                <div class="divider none-margin">-</div>
+                                <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
+                              <%}else if(order.status == "review"){%>
+                                <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
+                                <div class="divider none-margin">-</div>
+                                <a href="#myreview"><%= __('review')%></a>
+                              <%}%>
+                            </td>
+                        </tr>
+                        <%}}})})%>
+                        </tbody>
                       <%}})%>
                     </table>
                     <nav>
                       <ul class="pagination pagination-red pagination-sm" data-trigger="pagination" data-target="#<%= tabData.id%>"></ul>
                     </nav>
                   </div>
-                  <% });%>
-                </div>
+                <% });%>
               </div>
             </div>
-            <%}%>
           </div>
         </div>
 
@@ -355,7 +218,7 @@
               <div class="col-5">
                 <div class="row vertical-align">
                   <div class="col-md-2">
-                    <img src="<%= host.picture || '/images/profile_man.png'%>" class="round_thumb size-small text-center">
+                    <img data-src="<%= host.picture || '/images/profile_man.png'%>" src="<%= host.picture || ''%>" class="round_thumb size-small text-center">
                   </div>
                   <div class="col-md-10">
                     <h4 class="text-left" style="margin-top: 15px;"><%= host.shopName%><br><small><%= host.shortIntro()%></small></h4>
@@ -390,35 +253,31 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-group text-left">
-                    <label>1. <%= __('upload-thumbnail')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('photo-restrition')%>"></i></label>
+                    <label>1. <%= __('upload-thumbnail')%> <i class="fal fa-question-circle cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('upload-restrition')%>"></i></label>
                     <div class="fileinput fileinput-exists" data-provides="fileinput">
                         <div class="fileinput-new thumbnail size-large round_thumb">
                         </div>
                         <div class="fileinput-preview fileinput-exists size-large round_thumb" data-src="<%= user.picture || ''%>">
-                          <img src="<%= user.picture || '/images/profile_man.png'%>" onclick="$('#thumbnailUpload').trigger('click')">
+                          <img data-src="<%= user.picture || '/images/profile_man.png'%>" src="<%= user.picture || ''%>" onclick="$('#thumbnailUpload').trigger('click')">
                         </div>
                       <div>
                       <span class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
-                        <input id="thumbnailUpload" type="file" data-wantsImage=true onchange="uploadThumbnail()">
+                        <input id="thumbnailUpload" type="file" data-wantsImage=true onchange="appObj.userProfileView.uploadThumbnail()">
                       </span>
-                        <script>
-                          $(".fileinput").on("clear.bs.fileinput",function(){
-                            $("input[type='file']").data("isDelete",true);
-                          });
-                        </script>
                       </div>
-                      <h4><small><br/><br/><%= __('upload-instruction')%></small></h4>
                       <div class="alert alert-danger d-none mt-2" role="alert"></div>
                       <div class="alert alert-info d-none mt-2" role="alert"></div>
                     </div>
                   </div>
 
                   <div class="form-group text-left" style="margin-top:20px;">
-                    <label>2. <%= __('user-name')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('name-instruction')%>"></i></label>
-                    <div class="block">
+                    <label>2. <%= __('user-name')%> <i class="fal fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('name-instruction')%>"></i></label>
+                    <div class="block my-4">
                       <div class="input-group">
                         <div class="input-group-prepend" id="basic-addon2"><span class="input-group-text"><%= __('firstname')%></span></div>
                         <input name="firstname" type="text" class="form-control" placeholder="<% if(!user.firstname){ __('firstname') } %>" value="<%= user.firstname?user.firstname : ""%>" aria-describedby="basic-addon2" required>
+                      </div>
+                      <div class="input-group">
                         <div class="input-group-append" id="basic-addon1"><span class="input-group-text"><%= __('lastname')%></span></div>
                         <input name="lastname" type="text" class="form-control" placeholder="<% if(!user.lastname){ __('lastname') } %>" value="<%= user.lastname? user.lastname : ""%>" aria-describedby="basic-addon1" style="margin-right: 20px;" required>
                       </div>
@@ -430,29 +289,21 @@
                     <% if(user.emailVerified){%>
                     <div><label>3. <%= __('email-verified')%> <i class="fa fa-check text-green"></i></label></div>
                     <% }else{%>
-                    <div><label>3. <%= __('email-unverified')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i></label></div>
-                    <% if(!user.auth.email){%>
+                    <div>
+                      <label>3. <%= __('email-unverified')%> <i class="fal fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i></label>
+                    </div>
                     <div class="form-group block">
                       <label class="sr-only" for="emailInput" data-toggle="i18n" data-key="email"></label>
-                      <input type="email" class="form-control" id="emailInput" data-toggle="i18n" data-pattern-key="emailBadFormat" data-pattern-error="bad format" placeholder="邮箱 (Email)" required>
+                      <input type="email" class="form-control" id="emailInput" data-toggle="i18n" data-pattern-key="emailBadFormat" data-pattern-error="bad format" placeholder="邮箱 (Email)" required value="<%= user.email || user.auth ? user.auth.email : ''%>">
                       <div class="help-block with-errors"></div>
                     </div>
-                    <% }%>
                     <div class="block"><button id="sendEmailVerificationBtn" class="btn btn-info"><%= __('email-verification-resend')%></button></div>
                     <% }%>
                   </div>
 
                   <div class="form-group text-left">
-                    <label>4. <%= __('page-color')%> <i class="fa fa-question-circle text-lightgrey cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('color-instruction')%>"></i></label>
-                    <div class="block" name="template_color" data-color="<%= user.color %>">
-                      <div class="color-block blue" data-color="blue"></div>
-                      <div class="color-block green" data-color="green"></div>
-                      <div class="color-block orange" data-color="orange"></div>
-                      <div class="color-block red" data-color="red"></div>
-                      <div class="color-block pink" data-color="pink"></div>
-                      <div class="color-block purple" data-color="purple"></div>
-                      <div class="color-block black" data-color="black"></div>
-                    </div>
+                    <label>4. <%= __('points')%> <i class="fal fa-question-circle cursor-pointer" data-placement="right" data-toggle="tooltip" title="<%= __('points-instruction')%>"></i></label>
+                    <input readonly class="form-control" value="<%= user.points || 0%>"/>
                   </div>
 
                 </div>
@@ -460,7 +311,7 @@
                 <div class="col-md-6 text-left">
 
                   <div class="form-group" style="margin-top:34px;">
-                    <label>5. <%= __('my-intro')%><i class="fa fa-question-circle text-lightgrey" data-toggle="tooltip" title="<%= __('intro-instruction')%>"></i></label>
+                    <label>5. <%= __('my-intro')%><i class="fal fa-question-circle text-lightgrey" data-toggle="tooltip" title="<%= __('intro-instruction')%>"></i></label>
                     <div class="block">
                       <textarea class="form-control" name="desc" rows="6" maxlength="140"><% if(user.desc){%> <%=user.desc%> <%}%></textarea>
                     </div>
@@ -542,7 +393,7 @@
                   keys.forEach(function(key){
                     var address= addresses[key];
                   %>
-                  <div class="text-left box-grid">
+                  <div class="text-left box-grid addressItem">
                     <div class="address_block">
                       <div class="row vertical-align">
                         <div class="col-2 text-center">
@@ -554,7 +405,7 @@
                           <label class="actual_address"><%= address.street%>, &nbsp;<%= address.city%> <%= address.zip%> <br/>+<%= address.phone%></label>
                         </div>
                         <div class="col-4">
-                          <a class="text-red cursor-pointer" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>" data-address-id="<%= address.id%>" data-id="<%= user.id %>" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0);" onclick="toggleModal(this, addressView.enterAddressInfo)">&nbsp;&nbsp;<%= __('modify')%></a>
+                          <a class="text-red cursor-pointer" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>" data-name="<%= address.name || ''%>" data-address-id="<%= address.id%>" data-id="<%= user.id %>" toggle="modal" data-target="#myModal" data-model="user" data-action="address" href="javascript:void(0);" onclick="h.toggleModal(this, appObj.addressView.enterAddressInfo)">&nbsp;&nbsp;<%= __('modify')%></a>
                           <a class="text-red cursor-pointer deleteBtn" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>" data-address-id="<%= address.id%>" data-id="<%= user.id %>" style="margin-left: 5px;" href="javascript:void(0)">&nbsp;<%= __('delete')%></a>
                         </div>
                       </div>
@@ -564,7 +415,7 @@
                 </div>
 
                 <div class="text-left address_block">
-                  <button style="margin: 10px 0 10px 0;" class="btn btn-grey-red round active" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0);" onclick="toggleModal(this, addressView.enterAddressInfo)" data-id="<%= user.id%>"><%= __('new-location-phone')%></button>
+                  <button style="margin: 10px 0 10px 0;" class="btn btn-grey-red round active" toggle="modal" data-target="#myModal" data-model="user" data-action="address" href="javascript:void(0);" onclick="h.toggleModal(this, appObj.addressView.enterAddressInfo)" data-id="<%= user.id%>"><%= __('new-location-phone')%></button>
                 </div>
               </div>
             </div>
@@ -585,7 +436,7 @@
                       <label><%= user.host.full_address || __('need-kitchen-location') %><br/> +<%= user.phone || __('need-phone-number') %></label>
                     </div>
                     <div class="col-4">
-                      <a class="text-green cursor-pointer" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street || ""%>" data-city="<%= user.host.city || ""%>" data-zip="<%= user.host.zip || ""%>" data-phone="<%=user.phone || ""%>" style="margin-left:10px;" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0)" onclick="toggleModal(this, addressView.enterAddressInfo)"><%= __('modify')%></a>
+                      <a class="text-green cursor-pointer" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street || ""%>" data-city="<%= user.host.city || ""%>" data-name="<%= user.host.shopName || ''%>" data-zip="<%= user.host.zip || ""%>" data-phone="<%=user.phone || ""%>" style="margin-left:10px;" toggle="modal" data-target="#myModal" data-model="user" data-action="address" href="javascript:void(0)" onclick="h.toggleModal(this, appObj.addressView.enterAddressInfo)"><%= __('modify')%></a>
                     </div>
                   </div>
                 </div>
@@ -727,8 +578,8 @@
             <%}})})%>
                 <div class="row" style="margin-top:10px;">
                   <div class="col-12 text-right">
-                    <div id="meal-review-<%= j%>" class="alert alert-danger d-none"><%= __('review-warning')%></div>
-                    <div class="btn btn-grey-red leaveReview active" data-target="#meal-review-<%= j%>" data-host="<%= order.host.id%>" data-meal="<%= order.meal.id%>" data-err-container="#meal-review-<%= j%>" style="margin-right:20px;"><%= __('submit')%></div>
+                    <div id="meal-review-alert-<%= j%>" class="alert alert-danger d-none"><%= __('review-warning')%></div>
+                    <div class="btn btn-grey-red leaveReview active" data-target="#meal-review-<%= j%>" data-order="<%= order.id%>" data-host="<%= order.host.id%>" data-meal="<%= order.meal.id%>" data-err-container="#meal-review-alert-<%= j%>" style="margin-right:20px;"><%= __('submit')%></div>
                   </div>
                 </div>
               </div>
@@ -748,10 +599,4 @@
     </div>
   </div>
 </div>
-
-<script>
-  var addressView = new AddressView({ el : $("#myaddress"), model : new User()})
-  var userProfileView = new UserProfileView( { el: $("#myinfo"), model : new User()})
-  new ReviewView({ el : $("#myreview"), model : new Review()})
-  var orderView = new OrderView({ el : $("#myorder"), model : new Order()});
-</script>
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script><script src="/assets/zh.user.bundle.js"></script>

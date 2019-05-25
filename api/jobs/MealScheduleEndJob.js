@@ -83,11 +83,23 @@ module.exports = function(agenda) {
             return cb(err);
           }
           meal.leftQty = meal.totalQty;
+          meal.status = "off";
           meal.save(function(err, m){
             if(err){
               return cb(err);
             }
             m.orders = orders;
+            var pickups = [];
+            m.pickups.forEach(function(p){
+              var isOldPickupOption = pickups.some(function(pickupInfo){
+                return (pickupInfo.pickupFromTime === p.pickupFromTime && pickupInfo.pickupTillTime === p.pickupTillTime)
+                  &&  pickupInfo.location === p.location && pickupInfo.method === p.method;
+              })
+              if(!isOldPickupOption){
+                pickups.push(p);
+              }
+            })
+            m.pickups = pickups;
             notification.notificationCenter("Meal","mealScheduleEnd",m,true);
             console.log("sending guest list to host");
             cb();
@@ -304,7 +316,7 @@ module.exports = function(agenda) {
           }
           if(orders.length === 0){
             meal.orders = [];
-            notification.notificationCenter("Meal","mealScheduleEnd",meal,true);
+            // notification.notificationCenter("Meal","mealScheduleEnd", meal ,true);
             return done();
           }
           async.each(orders, function(order, next){
@@ -330,13 +342,14 @@ module.exports = function(agenda) {
             orders.forEach(function(order){
               total += order.subtotal;
             });
-            if(orders.length < meal.minimalOrder || total < meal.minimalTotal){
+            if(total < meal.minimalTotal){
               notification.notificationCenter("Meal","cancel",meal,true,false,null);
               _this.cancelOrders(mealId, function(err){
                 if(err){
                   return done(err);
                 }
                 meal.leftQty = meal.totalQty;
+                meal.status = "off";
                 meal.save(done);
               });
             }else{

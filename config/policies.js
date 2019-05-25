@@ -41,27 +41,34 @@ module.exports.policies = {
     'wechat' : true,
     'wechatSignature' : true,
     'wechatCode' : true,
+    'wechatCodeWeb' : true,
+    'getQRCodeTicket' : true,
     'update' : 'isAdmin'
   },
 
   UserController : {
-    '*' : 'or(and(sessionAuth, sessionSelf),isAdmin)',
+    '*' : 'or(and(sessionAuth,localize,sessionSelf),isAdmin)',
     'create' : false,
     'calculateSignature' : 'sessionAuth',
-    'becomeHost' : 'or(and(sessionAuth, notHost),isAdmin)',
+    'becomeHost' : 'or(and(sessionAuth,localize,notHost),isAdmin)',
     'pocket' : 'or(sessionAuth,isAdmin)',
-    'me' : ['sessionAuth'],
-    'contactForm' : 'sessionAuth',
+    'me' : ['sessionAuth','localize'],
+    'myorder' : ['sessionAuth','localize'],
+    'contactForm' : ['sessionAuth','localize'],
     'search' : 'isAdmin',
     'deleteUserFile' : 'or(sessionAuth,isAdmin)',
     'update' : 'or(and(sessionAuth, sessionSelf, isNotFields("status","pocket","host","customerId","referralBonus","referralCode","points","emailVerified")),isAdmin)',
     'verify' : true,
-    'sendEmailVerification' : 'or(sessionAuth,isAdmin)',
+    'reward' : true,
+    'sendEmailVerification' : 'or(and(sessionAuth,localize),isAdmin)',
     'activate' : 'isAdmin',
     'deactivate' : 'isAdmin',
     'clean' : 'isAdmin',
     'invite' : true,
-    'join' : true
+    'join' : true,
+    'emailVerificationView' : ['sessionAuth','localize'],
+    'redeemReward' : true,
+    'verifyEmail' : 'isAdmin'
   },
 
   JobController : {
@@ -69,18 +76,22 @@ module.exports.policies = {
   },
 
   MealController : {
-    '*' : 'or(and(sessionAuth,isHost,isOwnerOfMeal),isAdmin)',
+    '*' : 'or(and(sessionAuth,localize,isHost,isOwnerOfMeal),isAdmin)',
     'create' : 'or(and(sessionAuth,isHost),isAdmin)',
     'new_form' : ['sessionAuth','isHost'],
     'feature' : true,
-    'find' : true,
+    'find' : 'localize',
     'findOne' : true,
-    'search' : true,
-    'confirm' : true,
+    'search' : 'localize',
+    'checkout' : 'localize',
+    'catering' : 'localize',
     'findAll' : 'isAdmin',
     'searchAll' : 'isAdmin',
     'findReview' : 'isAdmin',
     'findOrder' : 'isAdmin',
+    'updateDishQty' : 'isAdmin',
+    'dish' : 'isAdmin',
+    'pickup' : 'isAdmin',
     'update' : 'or(and(sessionAuth,isHost,isOwnerOfMeal,isNotFields("isScheduled","chef","score","numberOfReviews","msg","commission")),isAdmin)'
   },
 
@@ -100,7 +111,7 @@ module.exports.policies = {
     'findReview' : 'isAdmin',
     'findMeal' : 'isAdmin',
     'findDish' : 'isAdmin',
-    'hostPage' : true
+    'hostPage' : 'localize'
   },
 
   PaymentController : {
@@ -119,13 +130,16 @@ module.exports.policies = {
     'refund' : 'isAdmin',
     'update' : 'isAdmin',
     'discount' : 'isAdmin',
+    'paid' : "isAdmin",
     'receipt' : true,
     'downloadReceipt' : true,
     'process' : true,
     'verifyOrder' : true,
     'adjustAdmin' : 'isAdmin',
     'updatePickupInfo' : 'isAdmin',
-    'findOrdersOfWeek' : true
+    'findOrdersOfWeek' : true,
+    'adjust_order_form' : true,
+    'data' : true
   },
 
   DishController : {
@@ -134,7 +148,8 @@ module.exports.policies = {
     'fail' : 'isAdmin',
     'destroy' : 'or(and(sessionAuth, isHost, isOwnerOfDish), isAdmin)',
     'update' : 'or(and(sessionAuth, isHost, isOwnerOfDish, isNotFields("sold","numberOfReviews","score","chef", "isFeature", "isVerified","dynamicPrice")), isAdmin)',
-    'findReview' : 'isAdmin'
+    'findReview' : 'isAdmin',
+    'preference' : true
   },
 
   NotificationController : {
@@ -181,6 +196,22 @@ module.exports.policies = {
 
   AccountController : {
     '*' : 'isAdmin'
+  },
+
+  DriverController : {
+    '*' : 'isAdmin',
+    'find' : 'or(isAdmin, and(sessionAuth, isHost))'
+  },
+
+  PickupOptionController : {
+    '*' : 'isAdmin',
+    'find' : 'or(isAdmin, and(sessionAuth, isHost))',
+    'updateWeek' : 'isAdmin'
+  },
+
+  BadgeController : {
+    '*' : 'isAdmin',
+    'findBadgeWindow' : true
   }
 
   /***************************************************************************

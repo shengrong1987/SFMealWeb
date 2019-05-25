@@ -1,14 +1,16 @@
-//! moment.js locale configuration
-//! locale : Bengali (bn)
-//! author : Kaushik Gandhi : https://github.com/kaushikgandhi
+// moment.js locale configuration
+// locale : Bengali (bn)
+// author : Kaushik Gandhi : https://github.com/kaushikgandhi
 
-(function (global, factory) {
-   typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('../moment')) :
-   typeof define === 'function' && define.amd ? define(['moment'], factory) :
-   factory(global.moment)
-}(this, function (moment) { 'use strict';
-
-
+(function (factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(['moment'], factory); // AMD
+    } else if (typeof exports === 'object') {
+        module.exports = factory(require('../moment')); // Node
+    } else {
+        factory((typeof global !== 'undefined' ? global : this).moment); // node or other global
+    }
+}(function (moment) {
     var symbolMap = {
         '1': '১',
         '2': '২',
@@ -34,7 +36,7 @@
         '০': '0'
     };
 
-    var bn = moment.defineLocale('bn', {
+    return moment.defineLocale('bn', {
         months : 'জানুয়ারী_ফেবুয়ারী_মার্চ_এপ্রিল_মে_জুন_জুলাই_অগাস্ট_সেপ্টেম্বর_অক্টোবর_নভেম্বর_ডিসেম্বর'.split('_'),
         monthsShort : 'জানু_ফেব_মার্চ_এপর_মে_জুন_জুল_অগ_সেপ্ট_অক্টো_নভ_ডিসেম্'.split('_'),
         weekdays : 'রবিবার_সোমবার_মঙ্গলবার_বুধবার_বৃহস্পত্তিবার_শুক্রুবার_শনিবার'.split('_'),
@@ -45,8 +47,8 @@
             LTS : 'A h:mm:ss সময়',
             L : 'DD/MM/YYYY',
             LL : 'D MMMM YYYY',
-            LLL : 'D MMMM YYYY, A h:mm সময়',
-            LLLL : 'dddd, D MMMM YYYY, A h:mm সময়'
+            LLL : 'D MMMM YYYY, LT',
+            LLLL : 'dddd, D MMMM YYYY, LT'
         },
         calendar : {
             sameDay : '[আজ] LT',
@@ -81,7 +83,7 @@
                 return symbolMap[match];
             });
         },
-        meridiemParse: /রাত|সকাল|দুপুর|বিকেল|রাত/,
+        meridiemParse: /রাত|শকাল|দুপুর|বিকেল|রাত/,
         isPM: function (input) {
             return /^(দুপুর|বিকেল|রাত)$/.test(input);
         },
@@ -92,7 +94,7 @@
             if (hour < 4) {
                 return 'রাত';
             } else if (hour < 10) {
-                return 'সকাল';
+                return 'শকাল';
             } else if (hour < 17) {
                 return 'দুপুর';
             } else if (hour < 20) {
@@ -106,7 +108,4 @@
             doy : 6  // The week that contains Jan 1st is the first week of the year.
         }
     });
-
-    return bn;
-
 }));

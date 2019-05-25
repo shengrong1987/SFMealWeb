@@ -26,7 +26,7 @@ module.exports = {
     },
     paymentMethod : {
       type : 'string',
-      enum : ['cash','online','alipay','wechatpay'],
+      enum : ['cash','online','venmo','paypal','alipay','wechatpay'],
       defaultsTo : 'online'
     },
     dishes: {
@@ -144,8 +144,8 @@ module.exports = {
     getTaxRate : function(){
       if(this.meal && this.meal.isTaxIncluded){
         return 0;
-      }else if(!this.meal){
-        return this.tax;
+      }else if(!this.meal || !this.meal.id){
+        return this.tax / 100;
       }
       return util.getTaxRate(this.host.county);
     },
@@ -179,6 +179,9 @@ module.exports = {
     },
     clientSecret : {
       type : 'string'
+    },
+    isClear : {
+      type : 'boolean'
     }
   }
 };

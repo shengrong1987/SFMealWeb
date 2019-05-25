@@ -117,6 +117,20 @@ module.exports = {
     var mDate = moment(new Date(date).toISOString()).subtract(minutes, 'minute');
     return mDate.local().toDate();
   },
+  humanizeDate : function(date){
+    var date = moment(date).hours(0);
+    var dateDesc = "unknown";
+    if(date.isSame(moment(),'day')){
+      dateDesc = 'today';
+    }else if(date.isSame(moment().add(1,'days'),'day')){
+      dateDesc = 'tomorrow';
+    }else if(moment.duration(date.diff(moment())).asDays() <= 7){
+      dateDesc = date.format('dddd');
+    }else{
+      dateDesc = date.format('[day]M/D');
+    }
+    return dateDesc;
+  },
   getTaxRate : function(county){
     var tax = 0.08;
     switch(county){

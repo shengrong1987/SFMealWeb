@@ -20,6 +20,7 @@ describe('MealController', function() {
 
   describe('build a meal with dishes', function() {
 
+
     var hostId;
     var userId;
     var email = 'aimbebe.r@gmail.com';
@@ -32,6 +33,7 @@ describe('MealController', function() {
     var invalidAddress = {"street" : "", "city" : '', "zip" : -1, "phone" : ""};
     var guestEmail = 'enjoymyself1987@gmail.com';
     var tempPhone = "(415)609-2357";
+    var shopName;
 
     it('should login an account', function (done) {
       agent
@@ -64,72 +66,106 @@ describe('MealController', function() {
     var dish3;
     var dish4;
     var dish5;
+    var dish6;
+    var dish7;
     it('should create couple dishes', function (done) {
       agent
           .post('/dish')
-          .send({title : '韭菜盒子',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
+          .send({title : '韭菜盒子',price: 10, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', tags : "select", type: 'appetizer', chef : hostId})
           .expect(200)
           .end(function(err,res){
             should.exist(res.body.id);
-            dish1 = res.body.id;
+            dish1 = res.body.id
+            agent
+              .post('/dish')
+              .send({title : '猪肉馅饼',price: 10, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', tags : "select", type: 'appetizer', chef : hostId})
+              .expect(200)
+              .end(function(err,res){
+                should.exist(res.body.id);
+                dish2 = res.body.id;
+                agent
+                  .post('/dish')
+                  .send({title : '五彩面',price: 16, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', tags : "select,frozen", type: 'entree', chef : hostId})
+                  .expect(200)
+                  .end(function(err,res){
+                    should.exist(res.body.id);
+                    dish3 = res.body.id;
+                    agent
+                      .post('/dish')
+                      .send({
+                        title : '糖水',
+                        price: 16,
+                        photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
+                        tags : "select",
+                        type: 'dessert',
+                        chef : hostId,
+                        isSupportShipping : true,
+                        preference : {
+                          sweetness : [ { property : 'super sweet', extra : 1}, { property : 'normal', extra : 0}, { property : 'ultra sweet', extra : 2} ],
+                          spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
+                        }
+                      })
+                      .expect(200)
+                      .end(function(err,res){
+                        should.exist(res.body.id);
+                        dish4 = res.body.id;
+                        agent
+                          .post('/dish')
+                          .send({
+                            title : '隐藏菜式',
+                            price: 10,
+                            photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
+                            tags : "select",
+                            type: 'dessert',
+                            chef : hostId,
+                            preference : {
+                              sweetness : [ { property : 'super sweet', extra : 1}, { property : 'normal', extra : 0}, { property : 'ultra sweet', extra : 2} ],
+                              spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
+                            }
+                          })
+                          .expect(200)
+                          .end(function(err,res){
+                            should.exist(res.body.id);
+                            dish5 = res.body.id;
+                            agent
+                              .post('/dish')
+                              .send({
+                                title : '麻辣小龙虾',
+                                price: 30,
+                                photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
+                                type: 'entree',
+                                tags : "select,limited",
+                                chef : hostId,
+                                preference : {
+                                  spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
+                                }
+                              })
+                              .expect(200)
+                              .end(function(err,res){
+                                should.exist(res.body.id);
+                                dish6 = res.body.id;
+                                agent
+                                  .post('/dish')
+                                  .send({
+                                    title : '蒜泥小龙虾',
+                                    price: 30,
+                                    photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
+                                    type: 'entree',
+                                    tags : "limited",
+                                    chef : hostId
+                                  })
+                                  .expect(200)
+                                  .end(function(err,res){
+                                    should.exist(res.body.id);
+                                    dish7 = res.body.id;
+                                    done();
+                                  })
+                              })
+                          })
+                      })
+                  })
+              })
           })
-
-      agent
-          .post('/dish')
-          .send({title : '猪肉馅饼',price: 4, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'appetizer', chef : hostId})
-          .expect(200)
-          .end(function(err,res){
-            should.exist(res.body.id);
-            dish2 = res.body.id;
-          })
-
-      agent
-          .post('/dish')
-          .send({title : '五彩面',price: 8, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', type: 'entree', chef : hostId})
-          .expect(200)
-          .end(function(err,res){
-            should.exist(res.body.id);
-            dish3 = res.body.id;
-          })
-
-      agent
-          .post('/dish')
-          .send({
-            title : '糖水',
-            price: 8,
-            photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
-            type: 'dessert',
-            chef : hostId,
-            preference : {
-              sweetness : [ { property : 'super sweet', extra : 1}, { property : 'normal', extra : 0}, { property : 'ultra sweet', extra : 2} ],
-              spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
-            }
-          })
-          .expect(200)
-          .end(function(err,res){
-            should.exist(res.body.id);
-            dish4 = res.body.id;
-          })
-
-      agent
-        .post('/dish')
-        .send({
-          title : '隐藏菜式',
-          price: 10,
-          photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
-          type: 'dessert',
-          chef : hostId,
-          preference : {
-            sweetness : [ { property : 'super sweet', extra : 1}, { property : 'normal', extra : 0}, { property : 'ultra sweet', extra : 2} ],
-            spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
-          }
-        })
-        .expect(200)
-        .end(function(err,res){
-          should.exist(res.body.id);
-          dish5 = res.body.id;
-          done();
-        })
     });
 
     it('should update a dish with preference', function(done){
@@ -147,6 +183,7 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
+          res.body.tags.should.have.length(1);
           res.body.id.should.be.equal(dish1);
           done();
         })
@@ -203,7 +240,7 @@ describe('MealController', function() {
     });
 
     var mealId;
-    var preorderMealId;
+    var preorderMealId, preorderMealId2;
     var sysDeliveryMealId;
     var leftQty = {};
     var totalQty = {};
@@ -218,7 +255,7 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.property('dishes').with.length(5);
+          res.body.should.have.property('dishes').with.length(7);
           res.body.host.id.should.be.equal(hostId);
           done();
         })
@@ -279,6 +316,7 @@ describe('MealController', function() {
             res.body.county.should.be.equal("San Francisco County");
             res.body.commission.should.be.equal(0.2);
             mealId = res.body.id;
+            shopName = res.body.chef.shopName;
             done();
           })
     })
@@ -294,7 +332,9 @@ describe('MealController', function() {
         "pickupInstruction" : "11th st and Market st",
         "method" : "pickup",
         "area" : "Market & Downtown",
-        "county" : "San Francisco County"
+        "county" : "San Francisco County",
+        "lat" : "37.772640",
+        "long" : "-122.415000"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
@@ -302,7 +342,9 @@ describe('MealController', function() {
         "deliveryCenter" : "1974 Palou Ave, San Francisco, CA 94124, USA",
         "area" : "Bay View",
         "county" : "San Francisco County",
-        "phone" : "(415)222-2222"
+        "phone" : "(415)222-2222",
+        "lat" : "37.738140",
+        "long" : "-122.397720"
       },{
         "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
         "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
@@ -339,7 +381,8 @@ describe('MealController', function() {
           status : "off",
           cover : dish1,
           minimalOrder : 1,
-          supportPartyOrder : true
+          supportPartyOrder : true,
+          nickname : "custom"
         })
         .expect(400)
         .end(function(err,res){
@@ -348,54 +391,74 @@ describe('MealController', function() {
         })
     })
 
+    it('should not create an preorder type meal with lack of pickup options', function (done) {
+      var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
+      var now = new Date();
+      agent
+        .post('/meal')
+        .send({
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          nickname : "custom",
+          isDelivery : true,
+          leftQty: leftQty,
+          totalQty: totalQty,
+          title : "私房面馆",
+          type : "preorder",
+          dishes : dishes,
+          status : "off",
+          cover : dish1,
+          minimalOrder : 1,
+          supportPartyOrder : true
+        })
+        .expect(400)
+        .end(function(err,res){
+          res.body.code.should.be.equal(-20)
+          done();
+        })
+    })
+
+    it('should not create an preorder type meal with empty store hour nickname', function (done) {
+      var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
+      var now = new Date();
+      agent
+        .post('/meal')
+        .send({
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 7200),
+          isDelivery : true,
+          leftQty: leftQty,
+          totalQty: totalQty,
+          title : "预定订单四点",
+          type : "preorder",
+          dishes : dishes,
+          status : "off",
+          cover : dish1,
+          minimalOrder : 1,
+          partyRequirement : JSON.stringify({
+            "minimal" : 50,
+            "delivery_center" : "1974 Palou Ave, San Francisco, CA 94124"
+          }),
+          supportPartyOrder : true,
+          isTaxIncluded : true,
+          nickname: "pickupSet2"
+        })
+        .expect(200)
+        .end(function(err,res){
+          res.body.code.should.be.equal(-24);
+          done();
+        })
+    })
+
+    var pickupOption1;
     it('should create an preorder type meal ', function (done) {
       var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
       var now = new Date();
-      var pickups = [{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
-        "location" : "1455 Market St, San Francisco, CA 94124",
-        "publicLocation" : "Uber HQ",
-        "pickupInstruction" : "11th st and Market st",
-        "method" : "pickup",
-        "area" : "Market & Downtown",
-        "county" : "San Francisco County",
-        "phone" : "(415)802-3853"
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
-        "method" : "delivery",
-        "deliveryCenter" : "1974 Palou Ave, San Francisco, CA 94124, USA",
-        "area" : "Bay View",
-        "county" : "San Francisco County",
-        "phone" : "(415)802-3854"
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
-        "location" : "25 Washington St, Daly City",
-        "publicLocation" : "John Daly Blvd",
-        "pickupInstruction" : "John Daly Blvd",
-        "method" : "pickup",
-        "county" : "San Mateo County",
-        "area" : "Daly City",
-        "phone" : "(415)802-3853"
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 4),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 5),
-        "location" : "665 W Olive Ave, Sunnyvale, CA 94086",
-        "publicLocation" : "Sunnyvalue",
-        "pickupInstruction" : "Sunnyvalue library",
-        "method" : "pickup",
-        "county" : "Santa Clara County",
-        "area" : "Sunnyvale",
-        "phone" : "(415)802-3853"
-      }];
       agent
           .post('/meal')
           .send({
             provideFromTime: now,
-            provideTillTime: new Date(now.getTime() + 1000 * 3600),
-            pickups : JSON.stringify(pickups),
+            provideTillTime: new Date(now.getTime() + 1000 * 7200),
             isDelivery : true,
             leftQty: leftQty,
             totalQty: totalQty,
@@ -404,13 +467,13 @@ describe('MealController', function() {
             dishes : dishes,
             status : "off",
             cover : dish1,
-            minimalOrder : 1,
             partyRequirement : JSON.stringify({
               "minimal" : 50,
               "delivery_center" : "1974 Palou Ave, San Francisco, CA 94124"
             }),
             supportPartyOrder : true,
-            isTaxIncluded : true
+            isTaxIncluded : true,
+            nickname: "pickupSet1"
           })
           .expect(200)
           .end(function(err,res){
@@ -418,9 +481,12 @@ describe('MealController', function() {
               return done(Error("error creating meal"));
             }
             res.body.should.have.property('pickups').with.length(5);
+            pickupOption1 = res.body.pickups[0].id;
             res.body.pickups[0].publicLocation.should.be.equal("Uber HQ");
+            res.body.pickups[0].index.should.be.equal(1);
             res.body.pickups[0].phone.should.be.equal("(415)802-3853");
             res.body.pickups[1].phone.should.be.equal("(415)802-3854");
+            res.body.pickups[1].index.should.be.equal(2);
             res.body.should.have.property('county');
             res.body.county.should.containEql('San Francisco County');
             res.body.county.should.containEql('San Mateo County');
@@ -430,35 +496,153 @@ describe('MealController', function() {
           })
     })
 
-    it('should create an preorder type meal with system delivery', function (done) {
-      var dishes = dish1 + "," + dish2 + "," + dish3 + "," + dish4;
+    it('should login an account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : adminEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should update pickup options', function(done) {
+      agent
+        .put('/pickupOption/' + pickupOption1)
+        .send({
+          "publicLocation" : "Uber HQ New"
+        })
+        .expect(200, done)
+    })
+
+    it('should login an account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    });
+
+    it('should get a meal', function (done) {
+      agent
+        .get('/meal/' + preorderMealId)
+        .set('Accept','application/json')
+        .expect('Content-type',/json/)
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          console.log(res.body);
+          res.body.pickups[0].publicLocation.should.be.equal("Uber HQ New");
+          res.body.pickups[0].index.should.be.equal(1);
+          res.body.pickups[0].phone.should.be.equal("(415)802-3853");
+          res.body.pickups[1].phone.should.be.equal("(415)802-3854");
+          res.body.pickups[1].index.should.be.equal(2);
+          done();
+        })
+    });
+
+
+    it('should create an preorder type meal with other dishes', function (done) {
+      var dishes = dish6;
+      var leftQty = {};
+      leftQty[dish6] = 5;
+      var totalQty = {};
+      totalQty[dish6] = 5;
       var now = new Date();
-      var pickups = [{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
-        "method" : "delivery",
-        "deliveryCenter" : "455 Post St, San Francisco",
-        "county" : "San Francisco County"
-      }];
       agent
         .post('/meal')
         .send({
           provideFromTime: now,
           provideTillTime: new Date(now.getTime() + 1000 * 3600),
+          isDelivery : true,
+          leftQty: leftQty,
+          totalQty: totalQty,
+          title : "预定订单四点2",
+          type : "preorder",
+          dishes : dishes,
+          status : "off",
+          cover : dish6,
+          minimalOrder : 1,
+          partyRequirement : JSON.stringify({
+            "minimal" : 50,
+            "delivery_center" : "1974 Palou Ave, San Francisco, CA 94124"
+          }),
+          supportPartyOrder : true,
+          isTaxIncluded : true,
+          nickname : "pickupSet1"
+        })
+        .expect(200)
+        .end(function(err,res){
+          if(res.body.chef !== hostId){
+            return done(Error("error creating meal"));
+          }
+          res.body.should.have.property('pickups').with.length(5);
+          res.body.pickups[0].publicLocation.should.be.equal("Uber HQ New");
+          res.body.pickups[0].phone.should.be.equal("(415)802-3853");
+          res.body.pickups[1].phone.should.be.equal("(415)802-3854");
+          res.body.should.have.property('county');
+          res.body.county.should.containEql('San Francisco County');
+          res.body.county.should.containEql('San Mateo County');
+          res.body.county.should.containEql('Santa Clara County');
+          preorderMealId2 = res.body.id;
+          done();
+        })
+    })
+
+    it('should create an preorder type meal with system delivery', function (done) {
+      var dishes = dish7;
+      var now = new Date();
+      var leftQty = {};
+      leftQty[dish7] = 5;
+      var totalQty = {};
+      totalQty[dish7] = 5;
+      var pickups = [{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 2),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 3),
+        "method" : "delivery",
+        "deliveryCenter" : "455 Post St, San Francisco",
+        "location" : "455 Post St, San Francisco",
+        "county" : "San Francisco County",
+        "index" : 1,
+        "deliveryRange" : 20,
+        "lat" : "37.787710",
+        "long" : "-122.409320"
+      },{
+        "pickupFromTime" : new Date(now.getTime() + 1000 * 7200 * 4),
+        "pickupTillTime" : new Date(now.getTime() + 1000 * 7200 * 5),
+        "method" : "delivery",
+        "deliveryCenter" : "1974 Palou Ave, San Francisco, CA 94124, USA",
+        "location" : "1974 Palou Ave, San Francisco, CA 94124, USA",
+        "area" : "Bay View",
+        "county" : "San Francisco County",
+        "phone" : "(415)802-3854",
+        "deliveryRange" : 10,
+        "index" : 2,
+        "lat" : "37.738140",
+        "long" : "-122.397720"
+      }];
+      agent
+        .post('/meal')
+        .send({
+          provideFromTime: now,
+          provideTillTime: new Date(now.getTime() + 1000 * 7200),
           pickups : JSON.stringify(pickups),
           delivery_fee : "4.99",
           isDelivery : true,
           isDeliveryBySystem : true,
+          minimalOrder : 31,
           leftQty: leftQty,
           totalQty: totalQty,
           county : 'San Mateo County',
-          title : "私房面馆2",
+          title : "预定系统配送",
           type : "preorder",
           dishes : dishes,
           status : "off",
           cover : dish1,
-          minimalOrder : 1,
-          isTaxIncluded : true
+          isTaxIncluded : true,
+          nickname : "custom"
         })
         .expect(200)
         .end(function(err,res){
@@ -466,6 +650,8 @@ describe('MealController', function() {
             return done(Error("error creating meal"));
           }
           sysDeliveryMealId = res.body.id;
+          res.body.pickups[0].index.should.be.equal(1);
+          res.body.pickups[1].index.should.be.equal(2);
           res.body.delivery_fee.should.be.equal(DELIVERY_FEE);
           res.body.county.should.be.equal("San Francisco County");
           done();
@@ -499,7 +685,8 @@ describe('MealController', function() {
           dishes : dishes,
           status : "off",
           cover : dish1,
-          minimalOrder : 1
+          minimalOrder : 1,
+          nickname : "custom"
         })
         .expect(400)
         .end(function(err,res){
@@ -539,7 +726,8 @@ describe('MealController', function() {
           dishes : dishes,
           status : "on",
           cover : dish1,
-          minimalOrder : 1
+          minimalOrder : 1,
+          nickname : "custom"
         })
         .expect(400)
         .end(function(err,res){
@@ -581,51 +769,11 @@ describe('MealController', function() {
 
     it('should be able to update meals with no orders', function(done){
       var now = new Date();
-      var pickups = [{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
-        "location" : "1455 Market St, San Francisco, CA 94124",
-        "publicLocation" : "Uber HQ",
-        "pickupInstruction" : "11th st and Market st",
-        "method" : "pickup",
-        "area" : "Market & Downtown",
-        "county" : "San Francisco County",
-        "phone" : "(415)123-1234"
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 3),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 4),
-        "method" : "delivery",
-        "deliveryCenter" : "1974 Palou Ave, San Francisco, CA 94124, USA",
-        "area" : "Bay View",
-        "county" : "San Francisco County",
-        "phone" : "(415)123-1234"
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 2),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 3),
-        "location" : "25 Washington St, Daly City",
-        "publicLocation" : "John Daly Blvd",
-        "pickupInstruction" : "John Daly Blvd",
-        "method" : "pickup",
-        "county" : "San Mateo County",
-        "area" : "Daly City",
-        "phone" : "(415)123-1234"
-      },{
-        "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 4),
-        "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 5),
-        "location" : "665 W Olive Ave, Sunnyvale, CA 94086",
-        "publicLocation" : "Sunnyvalue",
-        "pickupInstruction" : "Sunnyvalue library",
-        "method" : "pickup",
-        "county" : "Santa Clara County",
-        "area" : "Sunnyvale",
-        "phone" : "(415)123-1234"
-      }];
       agent
         .put('/meal/' + preorderMealId)
         .send({
           provideFromTime: now,
           provideTillTime: new Date(now.getTime() + 1000 * 3600),
-          pickups : JSON.stringify(pickups),
           isDelivery : true,
           minimalTotal : 1,
           supportPartyOrder : true,
@@ -633,7 +781,9 @@ describe('MealController', function() {
             "minimal" : 50,
             "delivery_center" : "1974 Palou Ave, San Francisco, CA 94124"
           }),
-          status : 'off'
+          status : 'off',
+          type : "preorder",
+          nickname : "pickupSet1"
         })
         .expect(200)
         .end(done)
@@ -650,7 +800,7 @@ describe('MealController', function() {
             return done(err);
           }
           res.body.meals.should.have.property("meals");
-          res.body.meals.meals.should.not.have.property("orders");
+          res.body.meals.meals.should.not.have.property("today");
           res.body.meals.summary.preOrderCount.should.be.equal(0);
           done();
         })
@@ -713,8 +863,14 @@ describe('MealController', function() {
     it('should not turn one meal on because missing account verifications', function (done) {
       agent
         .post('/meal/' + mealId + "/on")
-        .expect(302)
-        .end(done)
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-7);
+          done();
+        })
     })
 
     it('should update host legal_entity', function(done){
@@ -798,8 +954,14 @@ describe('MealController', function() {
     it('should not turn meal on for invalid host because none dish is verified', function(done){
       agent
         .post('/meal/' + mealId + "/on")
-        .expect(302)
-        .end(done)
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-7);
+          done();
+        })
     });
 
     it('should login as administrator', function (done) {
@@ -935,6 +1097,32 @@ describe('MealController', function() {
         })
     });
 
+    it('should verify dish6', function(done){
+      agent
+        .post('/dish/' + dish6 + '/verify')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.isVerified.should.be.true();
+          done();
+        })
+    });
+
+    it('should verify dish7', function(done){
+      agent
+        .post('/dish/' + dish7 + '/verify')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.isVerified.should.be.true();
+          done();
+        })
+    });
+
     it('should register as guest', function (done) {
       agent
         .post('/auth/register')
@@ -1000,7 +1188,6 @@ describe('MealController', function() {
             return done(err);
           }
           res.body.should.have.property('follow');
-          res.body.follow.should.be.equal(hostId);
           done();
         });
     })
@@ -1027,9 +1214,14 @@ describe('MealController', function() {
             return done(err);
           }
           res.body.should.have.property('follow');
-          res.body.follow.should.be.equal(hostId);
           done();
         });
+    })
+
+    it('should not be able to follow host if already follow', function(done){
+      agent
+        .post('/host/' + hostId + '/follow')
+        .expect(400,done)
     })
 
     it('should login as host', function (done) {
@@ -1093,22 +1285,6 @@ describe('MealController', function() {
         })
     })
 
-    it('should not update dish on active meal', function(done){
-      agent
-        .put('/dish/' + dish1)
-        .send({
-          price : 5.0
-        })
-        .expect(400)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          res.body.code.should.be.equal(-2);
-          done();
-        })
-    });
-
     it('should update the meals provideFromTime to 5 minutes later', function(done){
       var fiveMinutesLater = moment().add('5','minutes')._d;
       var twoHourLater = moment().add('2','hours')._d;
@@ -1118,7 +1294,9 @@ describe('MealController', function() {
           status : 'on',
           provideFromTime : fiveMinutesLater,
           provideTillTime : twoHourLater,
-          minimalOrder : 1
+          minimalOrder : 1,
+          nickname : "custom",
+          type : "order"
         })
         .expect(200)
         .end(done)
@@ -1151,14 +1329,15 @@ describe('MealController', function() {
 
     it('should update the meals provideFromTime to now and appear in the search results', function(done){
       var now = moment()._d;
-      var twoHourLater = moment().add('2','hours')._d;
+      var tenHourLater = moment().add('10','hours')._d;
       agent
         .put('/meal/' + mealId)
         .send({
           status : 'on',
           provideFromTime : now,
-          provideTillTime : twoHourLater,
-          minimalOrder : 1
+          provideTillTime : tenHourLater,
+          minimalOrder : 1,
+          type : "order"
         })
         .expect(200)
         .toPromise()
@@ -1200,6 +1379,8 @@ describe('MealController', function() {
     it('should update the meal and appear in the search results of San Mateo County', function(done){
       agent
         .put('/meal/' + mealId + '/on')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
         .expect(200)
         .toPromise()
         .then(function(res){
@@ -1274,13 +1455,12 @@ describe('MealController', function() {
             res.body.meals.summary.orderCount.should.be.equal(1);
             res.body.meals.summary.preOrderCount.should.be.equal(1);
             res.body.meals.should.have.property("meals");
-            res.body.meals.meals.should.have.property("orders");
-            Object.keys(res.body.meals.meals).should.have.length(2);
+            res.body.meals.meals.should.have.property("today");
             done();
           })
     })
 
-    it('should search the meals in San Francisco with keyword,county and zipcode', function (done) {
+    it('should search the meals in San Francisco with keyword, county and zipcode', function (done) {
       agent
         .get(encodeURI('/meal/search?keyword=猪肉馅饼&county=San Francisco County&zipcode=94124'))
         .set('Accept', 'application/json')
@@ -1290,8 +1470,7 @@ describe('MealController', function() {
           res.body.meals.summary.orderCount.should.be.equal(1);
           res.body.meals.summary.preOrderCount.should.be.equal(1);
           res.body.meals.should.have.property("meals");
-          res.body.meals.meals.should.have.property("orders");
-          Object.keys(res.body.meals.meals).should.have.length(2);
+          res.body.meals.meals.should.have.property("today");
           done();
         })
     })
@@ -1299,7 +1478,7 @@ describe('MealController', function() {
     it('should turn another meal off and cancel meal job', function (done) {
       agent
         .post('/meal/' + preorderMealId + "/off")
-        .expect(302)
+        .expect(200)
         .end(done)
     })
 
@@ -1313,8 +1492,8 @@ describe('MealController', function() {
           res.body.meals.summary.orderCount.should.be.equal(1);
           res.body.meals.summary.preOrderCount.should.be.equal(0);
           res.body.meals.should.have.property("meals");
-          res.body.meals.meals.should.have.property("orders");
-          res.body.meals.meals["orders"].meals.should.have.length(1);
+          res.body.meals.meals.should.have.property("today");
+          res.body.meals.meals["today"].meals.should.have.length(1);
           done();
         })
     })
@@ -1422,9 +1601,22 @@ describe('MealController', function() {
         .end(done)
     });
 
+    it('should not get meal checkout without dishes query', function(done){
+      agent
+        .get('/meal/checkout')
+        .expect(400)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-19);
+          done();
+        })
+    })
+
     it('should get meal confirmation view', function(done){
       agent
-        .get('/meal/' + mealId + "/confirm")
+        .get('/meal/checkout?dishes=' + dish1)
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
         .expect(200)
@@ -1432,25 +1624,51 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          res.body.meal.id.should.be.equal(mealId);
+          res.body.meals.should.have.length(2);
+          res.body.pickups.should.have.length(6);
+          res.body.pickups[0].meal.should.be.equalOneOf([mealId,preorderMealId]);
+          res.body.pickups[1].meal.should.be.equalOneOf([mealId,preorderMealId]);
+          res.body.pickups[2].meal.should.be.equalOneOf([mealId,preorderMealId]);
+          res.body.pickups[3].meal.should.be.equalOneOf([mealId,preorderMealId]);
+          res.body.pickups[4].meal.should.be.equalOneOf([mealId,preorderMealId]);
+          res.body.pickups[5].meal.should.be.equalOneOf([mealId,preorderMealId]);
           done();
         })
     })
 
-    it('should not find a meal', function(done){
+    it('should get dish tags of menu page', function(done){
       agent
-        .get('/meal/' + "123" + "/confirm")
+        .get('/meal')
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
-        .expect(400)
+        .expect(200)
         .end(function(err, res){
           if(err){
             return done(err);
           }
-          res.body.code.should.be.equal(-3);
+          res.body.tags.should.containDeep([]);
           done();
         })
     })
+
+    it('should turn one meal on', function (done) {
+      agent
+        .post('/meal/' + preorderMealId2 + "/on")
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(done)
+    })
+
+    it('should turn one meal on', function (done) {
+      agent
+        .post('/meal/' + sysDeliveryMealId + "/on")
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(done)
+    })
+
   });
 
 });

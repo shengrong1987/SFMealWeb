@@ -1,39 +1,46 @@
 
 <div id="addressDetailView" class="address">
   <div class="alert alert-danger d-none">
-    <p data-toggle="i18n" data-key="error"></p>
+    <p>${__('error')}</p>
   </div>
   <div class="popup box middle">
     <form data-toggle="validator" role="form">
-      <h4 id="new_title" class="d-none text-left" data-toggle="i18n" data-key="newAddress" style="margin-bottom:20px;"><strong></strong></h4>
-      <h4 id="exist_title" class="d-none text-left" data-toggle="i18n" data-key="editAddress" style="margin-bottom:20px;"><strong class="guest"></strong><strong class="host" data-i18n="enterKitchenAddress"></strong></h4>
+      <h4 id="new_title" class="d-none text-left" style="margin-bottom:20px;"><strong>${__("newAddress")}</strong></h4>
+      <h4 id="exist_title" class="d-none text-left" style="margin-bottom:20px;"><strong class="guest"></strong>${__('editAddress')}<strong class="host">${__('enterKitchenAddress')}</strong></h4>
+
       <div class="form-group" role="form">
-        <label for="streetInput"><span data-toggle="i18n" data-key="street"></span><span>* </span>:</label>
-        <input type="text" class="form-control" id="streetInput" placeholder="No., Street name" required>
-        <div class="help-block with-errors"></div>
+        <label for="nameInput">${__('name')}<span> * </span>:</label>
+        <input type="text" class="form-control" id="nameInput" placeholder="姓名" data-error="${__('cannot-empty')}" required>
+        <div class="help-block with-errors text-red"></div>
       </div>
 
       <div class="form-group" role="form">
-        <label for="cityInput"><span data-toggle="i18n" data-key="city"></span><span>* </span>:</label>
-        <input type="text" class="form-control" id="cityInput" placeholder="(San Francisco)" required data-error="不能为空" required>
-        <div class="help-block with-errors"></div>
+        <label for="streetInput">${__('street')}<span> * </span>:</label>
+        <input type="text" class="form-control" id="streetInput" placeholder="No., Street name" data-error="${__('cannot-empty')}" required>
+        <div class="help-block with-errors text-red"></div>
       </div>
 
       <div class="form-group" role="form">
-        <label for="postalInput"><span data-toggle="i18n" data-key="zipcode"></span><span>* </span>:</label>
-        <input type="text" class="form-control" id="postalInput" pattern="^\s?\d{5}(?:[-\s]\d{4})?$" data-toggle="i18n" data-pattern-key="zipcodeBadFormat" data-pattern-error="bad format" placeholder="(zip-code)" required>
-        <div class="help-block with-errors"></div>
+        <label for="cityInput">${__('city')}<span> * </span>:</label>
+        <input type="text" class="form-control" id="cityInput" placeholder="(San Francisco)" required data-error="${__('cannot-empty')}" required>
+        <div class="help-block with-errors text-red"></div>
       </div>
 
       <div class="form-group" role="form">
-        <label for="phoneInput"><span data-toggle="i18n" data-key="phone"></span><span>* </span>:</label>
-        <input type="tel" class="form-control" id="phoneInput" data-toggle="i18n" data-key="needPhone" data-error="电话格式不对" required>
-        <div class="help-block with-errors"></div>
+        <label for="postalInput">${__('zipcode')}<span> * </span>:</label>
+        <input type="text" class="form-control" id="postalInput" data-error="${__('cannot-empty')}" placeholder="(zip-code)" required>
+        <div class="help-block with-errors text-red"></div>
+      </div>
+
+      <div class="form-group" role="form">
+        <label for="phoneInput">${__('phone')}<span>* </span>:</label>
+        <input type="tel" class="form-control" id="phoneInput" data-error="${__('needPhone')}" required>
+        <div class="help-block with-errors text-red"></div>
       </div>
 
       <div class="form-group guest" role="form">
         <input id="isDefault" type="checkbox" checked="checked" aria-label="...">
-        <label aria-label="..." data-toggle="i18n" data-key="setAsDefault"></label>
+        <label aria-label="...">${__('setAsDefault')}</label>
       </div>
 
       <div class="alert alert-danger d-none"></div>
@@ -41,8 +48,8 @@
       <div class="col-12 form-group mt-2">
         <div class="control-group">
           <div class="controls">
-            <button type="submit" class="btn btn-danger red" data-loading-text="Saving" data-toggle="i18n" data-key="save"></button>
-            <button type="button" name="cancel" class="btn btn-disable" data-toggle="i18n" data-key="cancel"></button>
+            <button type="submit" class="btn btn-danger red" data-loading-text="Saving">${__('save')}</button>
+            <button type="button" name="cancel" class="btn btn-disable">${__('cancel')}</button>
           </div>
         </div>
       </div>
@@ -51,6 +58,7 @@
 </div>
 
 <script>
-  setup();
-  utility.initAutoComplete();
+  appObj.utility.initAutoComplete();
+  appObj.setupObj.setupValidator();
+  appObj.setupObj.setupInputMask();
 </script>

@@ -12,6 +12,9 @@
  *              :: -4, referral code not found
  *              :: -5, user lack of email
  *              :: -6, user email already exist
+ *              :: -7, not authenticated
+ *              :: -8, email not verified
+ *              :: -9, reward already redeemed
  */
 
 var AWS = require('aws-sdk');
@@ -162,7 +165,7 @@ module.exports = require('waterlock').actions.user({
       if (err) {
         return cb(err);
       }
-      if(params.email && user.auth.email && !isAdmin){
+      if(params.email && user.auth.email && !isAdmin && user.auth.email !== params.email){
         return res.badRequest({ code : -6, responseText : req.__('user-email-can-not-change')});
       }
       var email = user.auth.email || params.email;
@@ -316,6 +319,7 @@ module.exports = require('waterlock').actions.user({
           });
         })
       }else{
+        //combine dishes and get feature dishes
         async.each(found.orders, function(order,next){
           Order.findOne(order.id).populate("dishes").populate("host").populate("meal").exec(function (err, result) {
             if(err){
@@ -343,10 +347,40 @@ module.exports = require('waterlock').actions.user({
               next();
             }
           });
-        },function(err){
+        }, function(err){
           if(err){
             return res.badRequest(err);
           }
+          var newOrders = [], dishIds = [];
+          found.orders.forEach(function(order){
+            var isSamePickup = newOrders.some(function(oldOrder){
+              var _isSame = oldOrder.status === order.status && moment(new Date(oldOrder.pickupInfo.pickupFromTime).toISOString()).isSame(moment(new Date(order.pickupInfo.pickupFromTime).toISOString()), 'minute') && moment(new Date(oldOrder.pickupInfo.pickupTillTime).toISOString()).isSame(moment(new Date(order.pickupInfo.pickupTillTime).toISOString()), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
+              if(_isSame){
+                Object.keys(order.orders).forEach(function(dishId){
+                  oldOrder.orders[dishId] = order.orders[dishId];
+                })
+                oldOrder.id += "+" + order.id;
+                oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
+                oldOrder.tip = parseFloat(oldOrder.tip) + parseFloat(order.tip);
+                oldOrder.pickupInfo.comment += order.pickupInfo.comment;
+                oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
+                if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
+                  oldOrder.charges['cash'] += order.charges['cash'];
+                }
+              }
+              return _isSame;
+            })
+            if(!isSamePickup){
+              newOrders.push(order);
+            }
+          });
+          newOrders.forEach(function(order){
+            dishIds = dishIds.concat(Object.keys(order.orders));
+            dishIds = dishIds.filter(function(item, pos){
+              return dishIds.indexOf(item) === pos;
+            });
+          })
+          found.orders = newOrders;
           async.each(found.collects, function(collect,next){
             Meal.findOne(collect.id).populate("chef").exec(function(err, meal){
               if(err){
@@ -377,15 +411,129 @@ module.exports = require('waterlock').actions.user({
               return res.view('user',{user: found});
             })
           });
+        })
+      }
+    });
+  },
+
+  myorder : function(req, res){
+    var userId = req.session.user.id;
+    User.findOne(userId).populate("host").populate("orders",{ sort: 'createdAt DESC' }).populate('auth').exec(function(err,found){
+      if(err){
+        return res.badRequest(err);
+      }
+      found.featureDishes = [];
+      if(found.orders.length === 0) {
+        found.locale = req.getLocale();
+        found.save(function(err, result){
+          if(err){
+            return res.badRequest(err);
+          }
+          Notification.destroy({user : userId}).exec(function(err){
+            if(err){
+              console.log(err);
+            }
+            if(req.wantsJSON && process.env.NODE_ENV === "development"){
+              return res.ok(found);
+            }
+            return res.view('myorder', {user: found});
+          });
+        })
+      }else{
+        async.each(found.orders, function(order,next){
+          Order.findOne(order.id).populate("dishes").populate("host").populate("meal").exec(function (err, result) {
+            if(err){
+              next(err);
+            }else{
+              order.dishes = result.dishes;
+              order.host = result.host;
+              order.meal = result.meal;
+              if(order.status === "review"){
+                Object.keys(order.orders).forEach(function(dishId){
+                  if(order.orders[dishId]>0){
+                    order.dishes.forEach(function(dish){
+                      if(dish.id === dishId){
+                        if(dish.isFeature()){
+                          dish.meal = order.meal;
+                          if(found.featureDishes.indexOf(dishId) === -1){
+                            found.featureDishes.push(dish);
+                          }
+                        }
+                      }
+                    });
+                  }
+                });
+              }
+              next();
+            }
+          });
+        }, function(err) {
+          if (err) {
+            return res.badRequest(err);
+          }
+          var newOrders = [], dishIds = [];
+          found.orders.forEach(function(order){
+            var isSamePickup = newOrders.some(function(oldOrder){
+              var _isSame = oldOrder.status === order.status && moment(oldOrder.pickupInfo.pickupFromTime).isSame(moment(order.pickupInfo.pickupFromTime), 'minute') && moment(oldOrder.pickupInfo.pickupTillTime).isSame(moment(order.pickupInfo.pickupTillTime), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
+              if(_isSame){
+                Object.keys(order.orders).forEach(function(dishId){
+                  oldOrder.orders[dishId] = order.orders[dishId];
+                })
+                oldOrder.id += "+" + order.id;
+                oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
+                oldOrder.tip = parseFloat(oldOrder.tip) + parseFloat(order.tip);
+                oldOrder.pickupInfo.comment += order.pickupInfo.comment;
+                oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
+                if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
+                  oldOrder.charges['cash'] += order.charges['cash'];
+                }
+              }
+              return _isSame;
+            })
+            if(!isSamePickup){
+              newOrders.push(order);
+            }
+          });
+          newOrders.forEach(function(order){
+            dishIds = dishIds.concat(Object.keys(order.orders));
+            dishIds = dishIds.filter(function(item, pos){
+              return dishIds.indexOf(item) === pos;
+            });
+          })
+          found.orders = newOrders;
+          req.session.user = found;
+          Notification.destroy({user : userId}).exec(function(err){
+            if(err){
+              console.log(err);
+            }
+          });
+          found.locale = req.getLocale();
+          found.save(function(err, result){
+            if(err){
+              return res.badRequest(err);
+            }
+            if(req.wantsJSON && process.env.NODE_ENV === "development"){
+              return res.ok(found);
+            }
+            return res.view('myorder',{user: found});
+          })
         });
       }
     });
   },
 
+  emailVerificationView : function(req, res){
+    res.view('emailVerification', { layout : 'popup', user : req.session.user});
+  },
+
   sendEmailVerification : function(req, res){
     var userId = req.params.id;
+    var email = req.body.email;
+    if(!email){
+      return res.badRequest({ code : -5, responseText : req.__('user-lack-of-email')});
+    }
     var verifyToken = notification.generateToken();
-    User.update(userId, { verifyToken : verifyToken}).exec(function(err, users){
+    User.update(userId, { verifyToken : verifyToken, email : email }).exec(function(err, users){
       if(err){
         return res.badRequest(err);
       }
@@ -394,6 +542,9 @@ module.exports = require('waterlock').actions.user({
       User.findOne(userId).populate('auth').exec(function(err, u){
         if(err){
           return res.badRequest(err);
+        }
+        if(u.emailVerified){
+          return res.ok(u);
         }
         u.verificationUrl = host + "/user/verify/" + verifyToken.token;
         notification.sendEmail("User","verification",u,req);
@@ -409,7 +560,7 @@ module.exports = require('waterlock').actions.user({
         return res.forbidden(err);
       }
       if(!user){
-        return res.notFound({ code : -2, responseText : "can not find user"});
+        return res.forbidden({ code : -2, responseText : req.__('email-token-invalid')});
       }
       if(user.emailVerified){
         return res.redirect("/user/me#myinfo");
@@ -426,8 +577,81 @@ module.exports = require('waterlock').actions.user({
         if(err){
           return res.forbidden(err);
         }
-        res.redirect("/user/me#myinfo");
+        var birthdayDate = new Date(user.birthday);
+        var birthday = birthdayDate.getMonth()+1+"/"+birthdayDate.getDate();
+        mailChimp.addMemberToList({ email : user.email, firstname : user.firstname, lastname: user.lastname, language : req.getLocale()}, "subscriber");
+        res.redirect("/meal?from=emailverification");
       });
+    });
+  },
+
+  verifyEmail : function(req, res){
+    var userId = req.params.id;
+    User.update(userId, { emailVerified : true}).exec(function (err, user) {
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(user);
+    })
+  },
+
+  unverifyEmail : function(req, res){
+    var userId = req.params.id;
+    User.update(userId, { emailVerified : false}).exec(function (err, user) {
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(user);
+    })
+  },
+
+  redeemReward : function(req, res){
+    var isLogin = req.session.authenticated;
+    if(!isLogin){
+      return res.badRequest({ code : -7, responseText: req.__('user-not-authenticated') });
+    }
+    var userId = req.params.id;
+    if(userId !== req.session.user.id){
+      return res.badRequest({ code : -7, responseText: req.__('user-not-authenticated') })
+    }
+    User.findOne(userId).exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      var emailVerified = user.emailVerified;
+      if(!emailVerified){
+        return res.badRequest({ code : -8, responseText: req.__('email-unverified') });
+      }
+      var newUserRewardIsRedeemed = user.newUserRewardIsRedeemed;
+      if(newUserRewardIsRedeemed){
+        return res.badRequest({ code : -9, responseText: req.__('user-reward-redeemed') });
+      }
+      user.points = 100;
+      user.newUserRewardIsRedeemed = true;
+      req.session.user = user;
+      user.save(function(err, u){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(u);
+      })
+    })
+  },
+
+  reward : function(req, res){
+    var type = req.params.type;
+    if(!req.session.authenticated){
+      return res.view("newUserReward", { layout : 'popup', user : null});
+    }
+    User.findOne(req.session.user.id).exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      if(type === "newUser"){
+        return res.view("newUserReward", { layout : 'popup', user : user});
+      }else{
+        return res.ok();
+      }
     });
   },
 

@@ -9,6 +9,7 @@ module.exports = function(grunt) {
 				'test/bootstrap.test.js',
 				'test/**/**/UserController.test.js',
         'test/**/**/HostController.test.js',
+        'test/**/**/PickupOptionController.test.js',
 				'test/**/**/MealController.test.js',
 				'test/**/**/PaymentController.test.js',
 				'test/**/**/OrderController.test.js',

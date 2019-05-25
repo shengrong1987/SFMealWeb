@@ -21,7 +21,7 @@ module.exports = {
     if(!reviews || !reviews.length || !orderId){
       return res.badRequest({ code : -1, responseText : req.__('review-no-available')});
     }
-    Order.findOne(orderId).exec(function(err, order){
+    Order.findOne(orderId).populate('customer').exec(function(err, order){
       if(err){
         return res.badRequest(err);
       }
@@ -55,7 +55,7 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          return res.redirect('/host/public/' + order.host);
+          return res.ok(order);
         })
       })
     });
@@ -80,16 +80,19 @@ module.exports = {
         return res.badRequest({ code : -1, responseText : req.__('review-no-available')});
       }
       if(reviews && reviews.length > 0){
+        var hostId;
         async.each(reviews, function(r, next){
           var dishId = r.dish;
           var score = r.score;
           var review = r.content;
+          sails.log.info("dishId: " + dishId, " score: " + score, " content: " + review);
           $this.reviewForDish(dishId, mealId, user, orders, score, review, function(err, results){
             if(err){
               return next(err);
             }
+            hostId = results.host.id;
             next();
-          });
+          }, req);
         },function(err){
           if(err){
             return res.badRequest(err);
@@ -106,7 +109,7 @@ module.exports = {
               return res.badRequest(err);
             }
             sails.log.info("successfully leave a review");
-            return res.ok({});
+            return res.ok({ host : hostId });
           });
         }, req);
       }else{
@@ -337,13 +340,21 @@ module.exports = {
   },
 
   reviewPopup : function(req, res){
-    var orderId = req.params.id;
-    Order.findOne(orderId).populate('dishes').exec(function(err, order){
+    var orderIds = req.params.id.split("+");
+    var _orders = [];
+    async.eachSeries(orderIds, function(orderId, next){
+      Order.findOne(orderId).populate('dishes').exec(function(err, order){
+        if(err){
+          return next(err);
+        }
+        _orders.push(order);
+        next();
+      })
+    }, function(err){
       if(err){
         return res.badRequest(err);
       }
-      res.view('review',{ order : order, layout : 'popup' });
-
+      res.view('review',{ orders : _orders, layout : 'popup' });
     })
   }
 };

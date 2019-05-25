@@ -1,0 +1,24 @@
+
+<div id="emailVerificationView" data-user="<%= user.id%>">
+  <div class="popup box middle signin" style="width: 350px;">
+    <h4 data-toggle="i18n" data-key="enterEmail"></h4>
+
+    <form class="text-center" data-toggle="validator" role="form">
+      <div class="form-group">
+        <label class="sr-only" for="emailInput" data-toggle="i18n" data-key="email"></label>
+        <input type="email" class="form-control" id="emailInput" placeholder="email" required data-error="bad format" value="<%= user.email ? user.email : ( user.auth ? user.auth.email || '' : '')%>">
+        <div class="help-block with-errors"></div>
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-danger btn-lg round red popline"><%= __('email-verification')%></button>
+      </div>
+      <div class="alert alert-success d-none"></div>
+      <div class="alert alert-danger d-none" data-toggle="i18n" data-key="emailNotExistError"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+  new EmailVerificationView({model : new User(), el: $("#emailVerificationView")});
+</script>

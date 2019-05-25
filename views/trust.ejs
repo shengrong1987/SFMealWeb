@@ -1,93 +1,92 @@
-<div class="container container-elegant text-center relative" style="margin-top:-20px;">
-
-  <div class="row">
-    <div class="pure-banner red">
-      <div class="middle banner-text vertical-align">
-        <div class="col-lg-3"></div>
-        <div class="col-xs-4 col-lg-2">
-          <img src="/images/welcome-1.png" style="width: 100%;margin-left: 40px;">
-        </div>
-        <div class="col-xs-4 col-lg-2">
-          <a href="/" class="logo-slogan"></a>
-        </div>
-        <div class="col-xs-4 col-lg-2">
-          <img src="/images/welcome-2.png" style="width: 100%;margin-left: -80px;">
-        </div>
-        <div class="col-lg-3"></div>
-      </div>
-      <div class="absolute logo-container">
-
-        <div class="relative text-left search-container">
-          <!--<h4 class="text-white"><strong>今天吃什么好呢?</strong></h4>-->
-          <div class="btn-group search-btn-group">
-            <input name="keyword" type="text" class="btn round keyword light input" style="max-width: 150px;" placeholder="输入牛扒看看">
-            <input name="zipcode" type="number" class="btn btn-default zipCode" placeholder="邮编" value="">
-            <button class="btn btn-warning round orange text-white searchBtn" onclick="javascript:search(this)">
-              <i class="fa fa-search"></i>
-              搜索
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+<div class="d-flex justify-content-center pure-banner vertical-align red p-4">
+  <div class="cursor-pointer mr-4">
+    <a href="/" class="logo" style="left: 0;"></a>
   </div>
-
   <div>
-    <h1 style="margin-top: 50px;"></h1>
-    <div class="row">
-      <h1>用美食传递家的亲切和温暖。</h1>
-    </div>
-    <div class="box row">
-      <h2>心安, 从用心制作开始。</h2>
-      <h3><small class="text-grey">每家米其林抖有自己的标准规范, SFMeal也不例外。我们设立了一系列<a href="/help#trust">标准和期望</a>,诣在确保我们私厨的卫生环境及食品安全, 也让所有用户能够更放心地通过SFMeal平台分享和发现美食。</small></h3>
-    </div>
-    <div class="row">
-      <img src="images/trust01.jpg" style="width:100%;"/>
-    </div>
-    <div class="box row">
-      <h2>心安, 从我们的标准开始。</h2>
-      <h3><small class="text-grey">每家米其林抖有自己的标准规范, SFMeal也不例外。我们设立了一系列<a class="text-red" href="/help#trust">标准和期望</a>,诣在确保我们私厨的卫生环境及食品安全, 也让所有用户能够更放心地通过SFMeal平台分享和发现美食。</small></h3>
-    </div>
-    <div class="row">
-      <img src="images/trust02.png" style="width:100%;"/>
-    </div>
-    <div class="box">
-      <h3></h3>
-      <div class="row">
-         <div class="col-md-2"></div>
-         <div class="col-sm-3 col-md-2 text-left">
-           <i class="fa fa-check fa-2x"></i>
-           <p>已验证身份</p>
-           <p class="text-grey">厨师通过扫描官方身份证件并且确认个人信息来验证身份。</br><a class="text-red" href="/apply#step6">验证您的身份</a></p>
-         </div>
-         <div class="col-sm-3 col-md-2 text-left">
-         <i class="fa fa-check fa-2x"></i>
-           <p>食物制作执照</p>
-           <p class="text-grey">厨师通过上传官方发布的食物制作执照, 通过SFMeal的审核, 获得已验证的显示标签。</br><a class="text-red" href="/host#myinfo">上传您的食品操作安全证书</a></p>
-         </div>
-         <div class="col-sm-3 col-md-2 text-left">
-           <i class="fa fa-check fa-2x"></i>
-           <p>菜单点评</p>
-           <p class="text-grey">吃货在点餐前可以看到其他吃货发表的点评, 让您更容易找到符合自己的口味。</br><a class="text-red" href="/help#review">了解更多</a></p>
-         </div>
-         <div class="col-sm-3 col-md-2 text-left">
-           <i class="fa fa-check fa-2x"></i>
-           <p>即时消息</p>
-           <p class="text-grey">厨师和吃货能沟通订单的当前状态, 并收到短信提示, 不同一直守候在电脑旁边。</br><a class="text-red" href="/help#notification">了解更多</a></p>
-        </div>
-        <div class="col-md-2"></div>
-      </div>
-    </div>
-    <div class="row">
-             <img src="images/trust03.png" style="width:100%;"/>
-          </div>
-          <div class="box row">
-           <h2>安全的平台</h2>
-           <h3><small class="text-grey">下单点菜时, 吃货将通过SFMeal支付金额。厨师将会在每周二收到上个星期的订单款项。 所有交易将会得到妥善处理, 因此您需要做的, 只是好好分享/品尝食物。<a class="text-red" href="/help#trust">了解更多</a></small></h3>
-          </div>
-          <div class="well">
-            <h3>还有疑问?</h3>
-            <h3>请访问我们的<a class="text-red" href="/help">帮助中心</a>了解更多内容。</h3>
-          </div>
+    <h3 class="text-white text-left none-margin"><strong><%= __('nav-bar-trust')%></strong></h3>
   </div>
 </div>
+
+<div class="container container-elegant relative">
+  <div class="row pt-5">
+    <div class="col text-center">
+      <h1>用美食传递家的亲切和温暖。</h1>
+    </div>
+  </div>
+  <div class="divider">-</div>
+  <div class="box row">
+    <h5>心安, 从用心制作开始。<br/><br/>
+      <small class="text-grey">每家米其林抖有自己的标准规范, SFMeal也不例外。我们设立了一系列<a href="/help#trust">标准和期望</a>,诣在确保我们私厨的卫生环境及食品安全, 也让所有用户能够更放心地通过SFMeal平台分享和发现美食。</small>
+    </h5>
+  </div>
+  <div style="margin-left: -15px; margin-right: -15px;">
+    <img src="images/trust01.jpg" style="width:100%;"/>
+  </div>
+  <div class="box py-5">
+    <h5>心安, 从我们的标准开始。<br/><br/>
+      <small class="text-grey">每家米其林抖有自己的标准规范, SFMeal也不例外。我们设立了一系列<a class="text-red" href="/help#trust">标准和期望</a>,诣在确保我们私厨的卫生环境及食品安全, 也让所有用户能够更放心地通过SFMeal平台分享和发现美食。</small>
+    </h5>
+  </div>
+  <div style="margin-left: -15px; margin-right: -15px;">
+    <img src="images/trust02.png" style="width:100%;"/>
+  </div>
+  <div class="box text-center py-4">
+    <div class="row">
+      <div class="col-sm-3">
+        <div class="card my-1">
+          <div class="card-body">
+            <i class="fa fa-check fa-2x text-green"></i>
+            <p>已验证身份</p>
+            <p class="text-grey mb-4">厨师通过扫描官方身份证件并且确认个人信息来验证身份。</p>
+            <button class="btn btn-light" onclick="javascript:location.href='/apply#step6'">验证您的身份</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <div class="card my-1">
+          <div class="card-body">
+            <i class="fa fa-check fa-2x text-green"></i>
+            <p>食物制作执照</p>
+            <p class="text-grey mb-4">厨师通过上传官方发布的食物制作执照, 通过SFMeal的审核, 获得已验证的显示标签。</p>
+            <button class="btn btn-light" onclick="javascript:location.href='/host#myinfo'">上传您的食品操作安全证书</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <div class="card my-1">
+          <div class="card-body">
+            <i class="fa fa-check fa-2x text-green"></i>
+            <p>菜单点评</p>
+            <p class="text-grey mb-4">吃货在点餐前可以看到其他吃货发表的点评, 让您更容易找到符合自己的口味。</p>
+            <button class="btn btn-light" onclick="javascript:location.href='/help#review'">了解更多</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <div class="card my-1">
+          <div class="card-body">
+            <i class="fa fa-check fa-2x text-green"></i>
+            <p>即时消息</p>
+            <p class="text-grey mb-4">厨师和吃货能沟通订单的当前状态, 并收到短信提示, 不同一直守候在电脑旁边。</p>
+            <button class="btn btn-light" onclick="javascript:location.href='/help#notification'">即时消息</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-left: -15px; margin-right: -15px;">
+    <img src="images/trust03.png" style="width:100%;"/>
+  </div>
+  <div class="box py-5">
+    <h5>安全的平台<br/><br/>
+      <small class="text-grey">下单点菜时, 吃货将通过SFMeal支付金额。厨师将会在每周二收到上个星期的订单款项。 所有交易将会得到妥善处理, 因此您需要做的, 只是好好分享/品尝食物。<a class="text-red" href="/help#trust">了解更多</a></small>
+    </h5>
+  </div>
+  <div class="card mb-5">
+    <div class="card-body">
+      <h4 class="card-title">还有疑问?</h4>
+      <span>请访问我们的<a class="text-red" href="/help">帮助中心</a>了解更多内容。</span>
+    </div>
+  </div>
+</div>
+<link href="/assets/trust.css" rel="stylesheet"><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script><script src="/assets/zh.trust.bundle.js"></script>
