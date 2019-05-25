@@ -184,3 +184,6 @@ node_modules/react-dom 2/lib/
 node_modules/react-dom 2/node_modules/fbjs/
 node_modules/react-dom 2/node_modules/prop-types/lib/
 node_modules/react-dom 2/node_modules/prop-types/node_modules/loose-envify/
+# ignore node_modules symlink
+node_modules
+node_modules.nosync

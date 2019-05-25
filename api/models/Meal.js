@@ -170,9 +170,6 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
-    flag : {
-      type : 'string'
-    },
     /*
       type : "fixed/custom",
       price : "5.00",
@@ -185,10 +182,6 @@ module.exports = {
     isShipping : {
       type : 'boolean',
       defaultsTo : false
-    },
-    msg : {
-      type : 'string',
-      defaultsTo : ''
     },
     isFull : function(){
       var $this = this;

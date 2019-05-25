@@ -1,6 +1,11 @@
 /**
  * Created by shengrong on 3/7/16.
  */
+import 'backbone';
+import { helperMethod, localOrderObj } from "./utils/helper";
+import { utility } from "./utils/utility";
+import { dateMixer, chefMixer, deliveryMixer, pickupMixer, setupObj } from "./installation";
+
 var Auth = Backbone.Model.extend({
   urlRoot : "/auth",
   url : function(){
@@ -56,7 +61,7 @@ var LoginView = Backbone.View.extend({
           location.reload();
         }
       },error : function(model,err){
-        $this.errorView.html(getMsgFromError(err));
+        $this.errorView.html(helperMethod.getMsgFromError(err));
         $this.errorView.show();
       }
     });
@@ -89,10 +94,10 @@ var LoginView = Backbone.View.extend({
     this.model.save({},{
       success : function(model, result){
         $this.successView.show();
-        $this.successView.html(jQuery.i18n.prop('emailSent'))
+        $this.successView.html(__('emailSent'))
       },error : function(model, err){
         $this.errorView.show();
-        $this.errorView.html(getMsgFromError(err));
+        $this.errorView.html(helperMethod.getMsgFromError(err));
       }
     })
   },
@@ -112,20 +117,20 @@ var LoginView = Backbone.View.extend({
     this.model.save({},{
       success : function(model, result){
         if(result !== "404") {
-          BootstrapDialog.alert(jQuery.i18n.prop('resetPasswordSuccess'), function(){
+          BootstrapDialog.alert(__('resetPasswordSuccess'), function(){
             location.href = "/";
           });
         }else{
           $this.errorView.show();
         }
       },error : function(model, err){
-        $this.errorView.html(getMsgFromError(err));
+        $this.errorView.html(helperMethod.getMsgFromError(err));
         $this.errorView.show();
       }
     })
   },
   gotoWechatLogin : function(e){
-    wechatLogin(true, $(e.currentTarget));
+    helperMethod.wechatLogin(true, $(e.currentTarget));
   }
 });
 
@@ -152,10 +157,10 @@ var EmailVerificationView = Backbone.View.extend({
       email : email
     }, {
       success : function(){
-        _this.successAlert.html(jQuery.i18n.prop('emailVerificationSent'));
+        _this.successAlert.html(__('emailVerificationSent'));
         _this.successAlert.show();
       },error : function(model, err){
-        _this.errorAlert.html(getMsgFromError(err));
+        _this.errorAlert.html(helperMethod.getMsgFromError(err));
         _this.errorAlert.show();
       }
     })
@@ -224,14 +229,14 @@ var RegisterView = Backbone.View.extend({
         var buttons = [];
         if(url){
           buttons = [{
-            label: jQuery.i18n.prop('newUserCheckEmailButton'),
+            label: __('newUserCheckEmailButton'),
             action: function(dialog) {
               window.open(url);
             }
           }]
         }
         buttons.push({
-          label: jQuery.i18n.prop('yes'),
+          label: __('yes'),
           action: function(dialog) {
             if(location.href.indexOf('oauth2') !== -1){
               location.href = '/';
@@ -241,12 +246,12 @@ var RegisterView = Backbone.View.extend({
           }
         });
         BootstrapDialog.show({
-          title: jQuery.i18n.prop('newUserCheckEmailTitle'),
-          message: jQuery.i18n.prop('newUserCheckEmailContent'),
+          title: __('newUserCheckEmailTitle'),
+          message: __('newUserCheckEmailContent'),
           buttons: buttons
         });
       },error : function(model,err){
-        alertView.html(getMsgFromError(err));
+        alertView.html(helperMethod.getMsgFromError(err));
         alertView.show();
       }
     })
@@ -266,7 +271,7 @@ var RegisterView = Backbone.View.extend({
     location.href = this.model.url();
   },
   gotoWechatLogin : function () {
-    wechatLogin(true);
+    helperMethod.wechatLogin(true);
   }
 });
 
@@ -276,7 +281,7 @@ var UserBarView = Backbone.View.extend({
     "mouseover #msgBtn" : "clearMsgBadges",
     "change #citySelector" : "switchCounty"
   },
-  initialize : function(){
+  initialize : async function(){
     var userId = this.$el.data("user");
     var hostId = this.$el.data("host");
     this.$el.find("#msgBtn .badge").hide();
@@ -286,6 +291,10 @@ var UserBarView = Backbone.View.extend({
     userBadgeView.data("badge", 0);
     var $this = this;
     if(hostId){
+      const { default: socketIOClient } = await import(/* webpackChunkName: 'socketIO' */ 'socket.io-client')
+      const { default: sailsIOClient } = await import(/* webpackChunkName: 'sailsIO' */ 'sails.io.js');
+      let io = sailsIOClient(socketIOClient);
+      io.sails.url = 'http://localhost:1337';
       io.socket.get("/host/" + hostId +  "/orders");
       io.socket.get("/user/" + userId + "/orders");
       io.socket.get("/user/" + userId + "/meals");
@@ -310,29 +319,30 @@ var UserBarView = Backbone.View.extend({
           }
         }
       });
-    }else if(userId){
-      io.socket.get("/user/" + userId + "/orders");
-      io.socket.get("/user/" + userId + "/meals");
-      io.socket.get("/user/" + userId);
-      io.socket.on("order", function(result){
-        // if(result.data){
-        //   $this.handleNotification(result.verb, result.data.action, result.id, "order");
-        // }
-        $this.handleBadge(false, "order");
-      });
-      io.socket.on("meal", function(result){
-        // if(result.data){
-        //   $this.handleNotification(result.verb, result.data.action, result.id, "meal");
-        // }
-        $this.handleBadge(false, "meal");
-      });
-      io.socket.on("user", function(result){
-        // if(result.data){
-        //   $this.handleNotification(result.verb, result.data.action, result.data.id, "user");
-        // }
-        $this.handleBadge(false, "user");
-      })
     }
+    // }else if(userId){
+    //   io.socket.get("/user/" + userId + "/orders");
+    //   io.socket.get("/user/" + userId + "/meals");
+    //   io.socket.get("/user/" + userId);
+    //   io.socket.on("order", function(result){
+    //     // if(result.data){
+    //     //   $this.handleNotification(result.verb, result.data.action, result.id, "order");
+    //     // }
+    //     $this.handleBadge(false, "order");
+    //   });
+    //   io.socket.on("meal", function(result){
+    //     // if(result.data){
+    //     //   $this.handleNotification(result.verb, result.data.action, result.id, "meal");
+    //     // }
+    //     $this.handleBadge(false, "meal");
+    //   });
+    //   io.socket.on("user", function(result){
+    //     // if(result.data){
+    //     //   $this.handleNotification(result.verb, result.data.action, result.data.id, "user");
+    //     // }
+    //     $this.handleBadge(false, "user");
+    //   })
+    // }
     this.getNotification();
   },
   applyForHost : function(e){
@@ -340,11 +350,11 @@ var UserBarView = Backbone.View.extend({
   },
   switchCounty : function(e){
     e.preventDefault();
-    var currentCountyValue = readCookie('county');
+    var currentCountyValue = helperMethod.readCookie('county');
     if(!$(e.currentTarget).attr("value") || currentCountyValue === $(e.currentTarget).attr("value")){
       return;
     }
-    createCookie("county",$(e.currentTarget).attr("value"),30);
+    helperMethod.createCookie("county",$(e.currentTarget).attr("value"),30);
     if(location.href.indexOf('search') !== -1){
       search($(".search-container .searchBtn")[0], true);
     }else{
@@ -358,18 +368,18 @@ var UserBarView = Backbone.View.extend({
     switch(verb){
       case "updated":
         if(model === "order"){
-          msg = jQuery.i18n.prop('orderUpdatedNotification',id, jQuery.i18n.prop(action));
+          msg = __('orderUpdatedNotification',id, __(action));
         }else if(model === "meal"){
-          msg = jQuery.i18n.prop('mealUpdatedNotification',id, jQuery.i18n.prop(action));
+          msg = __('mealUpdatedNotification',id, __(action));
         }else if(model === "user"){
-          msg = jQuery.i18n.prop('userUpdatedNotification',id, jQuery.i18n.prop(action));
+          msg = __('userUpdatedNotification',id, __(action));
         }
         break;
       case "destroyed":
-        msg = jQuery.i18n.prop('orderCancelNotification',id);
+        msg = __('orderCancelNotification');
             break;
       case "created":
-        msg = jQuery.i18n.prop('newOrderNotification',id);
+        msg = __('newOrderNotification');
             break;
     }
     var msgBtn = this.$el.find("#msgBtn");
@@ -515,12 +525,11 @@ var ApplyView = Backbone.View.extend({
       }
     });
     $('[href="#step'+curStep+'"]').tab('show');
-    loadStripeJS(function(err){
+    helperMethod.loadStripeJS(function(err){
       if(err){
         console.log("error loading stripe.js");
       }
     })
-
   },
   handleAdditional : function(e){
     e.preventDefault();
@@ -607,9 +616,9 @@ var ApplyView = Backbone.View.extend({
       cache: false,
       contentType: false,
       success : function(){
-        reloadUrl("/apply","#step6");
+        h.reloadUrl("/apply","#step6");
       },error : function(model,err){
-        $this.alertView.html(getMsgFromError(err));
+        $this.alertView.html(helperMethod.getMsgFromError(err));
         $this.alertView.show();
       }
     })
@@ -618,32 +627,32 @@ var ApplyView = Backbone.View.extend({
     if($(e.currentTarget).attr('disabled')){
       return;
     }
-    toggleModal(e, addressView.enterAddressInfo);
+    h.toggleModal(e, appObj.addressView.enterAddressInfo);
   },
   applyForHost : function(e){
     e.preventDefault();
     var shopName = this.$el.find("input[name='shopName']").val();
     if(!shopName){
       var alert1 = this.$el.find("#step1 .alert");
-      alert1.text(jQuery.i18n.prop('shopnameEmptyError'));
+      alert1.text(__('shopnameEmptyError'));
       alert1.show();
       return;
     }
     var phone = this.$el.find("input[name='phone']").val();
     if(!phone){
       var alert1 = this.$el.find("#step1 .alert");
-      alert1.text(jQuery.i18n.prop('phoneEmptyError'));
+      alert1.text(__('phoneEmptyError'));
       alert1.show();
       return;
     }
     var btn = $(e.currentTarget);
-    btn.addClass("running");
+    $('body').addClass("loading");
     this.model.url = "/user/becomeHost?shopName=" + shopName + '&phone=' + phone;
     this.model.fetch({
       success : function(){
         location.reload();
       },error : function(model,err){
-        btn.removeClass("running");
+        $('body').removeClass("loading");
         BootstrapDialog.alert(err.responseJSON ? (err.responseJSON.responseText || err.responseJSON.summary) : err.responseText);
       }
     });
@@ -670,7 +679,7 @@ var PaymentView = Backbone.View.extend({
     if(payment_form.data("id")){
       this.model.set({id: payment_form.data("id")});
     }
-    loadStripeJS(function(err){
+    helperMethod.loadStripeJS(function(err){
       if(err){
         console.log("error loading stripe.js");
       }
@@ -685,6 +694,8 @@ var PaymentView = Backbone.View.extend({
       this.$el.find("#cvv").next().html($("#cvv").data("error"));
       return;
     }
+
+    $('body').addClass("loading");
 
     var $this = this;
     var paymentId = this.$el.find("form").data("id");
@@ -704,8 +715,9 @@ var PaymentView = Backbone.View.extend({
         address_country: this.$el.find(".flagstrap").data('selected-country')
       }, function(status, response){
         if (response.error) {
+          $('body').removeClass("loading");
           btn.html(btn.data('original-text'));
-          $this.alertView.html(jQuery.i18n.prop(response.error.code));
+          $this.alertView.html(response.error.message);
           $this.alertView.show();
         } else {
           var form = $this.$el.find("form");
@@ -735,12 +747,11 @@ var PaymentView = Backbone.View.extend({
     this.model.destroy({
       success : function(model, response){
         location.reload();
-        // reloadUrl('/pocket/me','#mypayment');
       },error : function(model,err){
         if(err.status === 200){
           location.reload();
         }else{
-          $this.alertView.html(getMsgFromError(err));
+          $this.alertView.html(helperMethod.getMsgFromError(err));
           $this.alertView.show();
         }
       }
@@ -771,13 +782,13 @@ var PaymentView = Backbone.View.extend({
     this.model.save({}, {
       success: function () {
         if(location.href.indexOf('/pocket/me') !== -1){
-          reloadUrl('/pocket/me','#mypayment');
+          h.reloadUrl('/pocket/me','#mypayment');
         }else{
           location.reload();
         }
       }, error: function (model, err) {
-        button.button('reset');
-        $this.alertView.html(getMsgFromError(err));
+        $('body').removeClass("loading");
+        $this.alertView.html(helperMethod.getMsgFromError(err));
         $this.alertView.show();
       }
     });
@@ -798,7 +809,7 @@ var PaymentView = Backbone.View.extend({
         location.reload();
       }, error: function (model, err) {
         button.button('reset');
-        $this.alertView.html(getMsgFromError(err));
+        $this.alertView.html(helperMethod.getMsgFromError(err));
         $this.alertView.show();
       }
     });
@@ -831,7 +842,7 @@ var NewUserRewardView = Backbone.View.extend({
     this.model.action = "redeemReward";
     this.model.save({}, {
       success : function(){
-        BootstrapDialog.alert(jQuery.i18n.prop("emailVerifiedTip2"));
+        BootstrapDialog.alert(__("emailVerifiedTip2"));
         _this.$el.find("#newUserRewardIcon").hide();
         _this.$el.find("#rewardRedeemedIcon").removeClass("d-none");
         _this.$el.find("#redeemRewardBtn").hide();
@@ -906,7 +917,7 @@ var AddressView = Backbone.View.extend({
     address_form.off("submit");
     address_form.on("submit", AddressView.prototype.saveAddress);
     address_form.find("button[name='cancel']").off("click");
-    address_form.find("button[name='cancel']").on("click",dismissModal);
+    address_form.find("button[name='cancel']").on("click",helperMethod.dismissModal);
   },
   enterAddressInfo : function(target){
     var target = $(target);
@@ -921,7 +932,7 @@ var AddressView = Backbone.View.extend({
     address_form.off("submit");
     address_form.on("submit", AddressView.prototype.saveAddress);
     address_form.find("button[name='cancel']").off("click");
-    address_form.find("button[name='cancel']").on("click",dismissModal);
+    address_form.find("button[name='cancel']").on("click",helperMethod.dismissModal);
     address_form.attr("data-id",id);
     address_form.attr("data-address-id",address_id);
     if(street){
@@ -960,36 +971,39 @@ var AddressView = Backbone.View.extend({
     var street = address_form.find("#streetInput").val();
     var city = address_form.find("#cityInput").val();
     var zip = address_form.find("#postalInput").val();
-    var phone = address_form.find("#phoneInput").val();
+    var name = address_form.find("#nameInput").val();
     var isDefault = address_form.find("#isDefault").prop("checked");
     var url = "";
     if (address_form.data("host")) {
-      addressView.model = new Host();
+      appObj.addressView.model = new Host();
+    }else{
+      appObj.addressView.model = new User();
     }
-    addressView.model.clear();
-    addressView.model.set({id: id});
-    addressView.model.set({
+    appObj.addressView.model.clear();
+    appObj.addressView.model.set({id: id});
+    appObj.addressView.model.set({
       address: [{
         id: address_id,
         street: street,
         city: city,
         zip: zip,
         phone: phone,
+        name : name,
         isDefault: isDefault
       }]
     });
-    addressView.model.save({}, {
+    appObj.addressView.model.save({}, {
       success: function () {
         location.reload();
       }, error: function (model, err) {
         if(err && err.responseJSON && err.responseJSON.invalidAttributes){
           if(err.responseJSON.invalidAttributes.county && err.responseJSON.invalidAttributes.county.length > 0){
-            alert_block.html(jQuery.i18n.prop('countyNotInServiceError'));
+            alert_block.html(__('countyNotInServiceError'));
           }else if(err.responseJSON.invalidAttributes.phone && err.responseJSON.invalidAttributes.phone.length > 0){
-            alert_block.html(jQuery.i18n.prop('phoneNotValid'));
+            alert_block.html(__('phone-bad-format'));
           }
         }else{
-          alert_block.html(getMsgFromError(err));
+          alert_block.html(helperMethod.getMsgFromError(err));
         }
         alert_block.show();
         submit_btn.html(submit_btn.data('original-text'));
@@ -1000,7 +1014,7 @@ var AddressView = Backbone.View.extend({
     e.preventDefault();
     var email = this.$el.find("#emailVerificationView input[name='email']").val();
     if(!email){
-      makeAToast(jQuery.i18n.prop('emailEmptyError'));
+      helperMethod.makeAToast(__('emailEmptyError'));
       return;
     }
     this.model.action = "sendEmailVerification";
@@ -1011,12 +1025,12 @@ var AddressView = Backbone.View.extend({
     this.model.save({}, {
       success : function(){
         BootstrapDialog.show({
-          title : jQuery.i18n.prop('tip'),
-          message : jQuery.i18n.prop('emailVerificationSent'),
+          title : __('tip'),
+          message : __('emailVerificationSent'),
           buttons : [{
-            label : jQuery.i18n.prop('emailVerificationCheck'),
+            label : __('emailVerificationCheck'),
             action : function(dialog){
-              BootstrapDialog.alert(jQuery.i18n.prop('emailVerificationSent'), function(){
+              BootstrapDialog.alert(__('emailVerificationSent'), function(){
                 var email = $this.model.get("email");
                 if(!email){
                   return;
@@ -1077,7 +1091,7 @@ var CheckListView = Backbone.View.extend({
     var id = this.$el.data("id");
     var file = target.find("input[type='file']")[0].files[0];
     var $this = this;
-    imageHandler("checklist",file,this.successView,function(url){
+    helperMethod.imageHandler("checklist",file,this.successView,function(url){
       if(id){
         $this.model.set({ id : id});
       }
@@ -1089,7 +1103,7 @@ var CheckListView = Backbone.View.extend({
         success : function (model) {
           location.reload();
         }, error: function (model, err) {
-          $this.errorView.html(getMsgFromError(err));
+          $this.errorView.html(helperMethod.getMsgFromError(err));
           $this.errorView.show();
         }
       });
@@ -1105,7 +1119,7 @@ var CheckListView = Backbone.View.extend({
     var name = target.data("key");
     var id = this.$el.data("id");
     var $this = this;
-    imageHandler("checklist",null,this.successView,function(url){
+    helperMethod.imageHandler("checklist",null,this.successView,function(url){
       if(id){
         $this.model.set({ id : id});
       }
@@ -1117,12 +1131,12 @@ var CheckListView = Backbone.View.extend({
         success : function (model) {
           location.reload();
         }, error: function (model, err) {
-          $this.errorView.html(getMsgFromError(err));
+          $this.errorView.html(helperMethod.getMsgFromError(err));
           $this.errorView.show();
         }
       });
     }, function(err){
-      $this.errorView.html(getMsgFromError(err));
+      $this.errorView.html(helperMethod.getMsgFromError(err));
       $this.errorView.show();
       return;
     },0,name,true);
@@ -1169,7 +1183,7 @@ var HostSectionInMealView = Backbone.View.extend({
           countView.text(likeCount);
         },
         error : function(model, err){
-          makeAToast(getMsgFromError(err));
+          helperMethod.makeAToast(helperMethod.getMsgFromError(err));
         }
       })
     }else if(this.model.action === "follow"){
@@ -1184,15 +1198,15 @@ var HostSectionInMealView = Backbone.View.extend({
           if(isFollowed){
             btn.data("followed", false);
             btn.find("i").removeClass("fas fa-star").addClass("far fa-star");
-            btn.find('.text').text(jQuery.i18n.prop('follow'));
+            btn.find('.text').text(__('follow'));
           }else{
             btn.data("followed", true);
             btn.find("i").removeClass("far fa-star").addClass("fas fa-star");
-            btn.find('.text').text(jQuery.i18n.prop('followed'));
+            btn.find('.text').text(__('followed'));
           }
         },
         error : function(model, err){
-          makeAToast(getMsgFromError(err));
+          helperMethod.makeAToast(helperMethod.getMsgFromError(err));
         }
       })
     }
@@ -1209,7 +1223,7 @@ var DayOfMealView = Backbone.View.extend({
   },
   initialize : function() {
     var dateFilter;
-    var dateDesc = decodeURI(readCookie("date"));
+    var dateDesc = decodeURI(helperMethod.readCookie("date"));
     var currentDateControl = this.$el.find("#dishDatesBar [data-filter='." + dateDesc + "']");
     if(currentDateControl.length){
       dateFilter = "." + dateDesc;
@@ -1225,10 +1239,13 @@ var DayOfMealView = Backbone.View.extend({
         dateFilter = this.$el.find("#dishDatesBar .nav-link").data("filter");
       }
     }
-    dateMixer.filter(dateFilter);
+
+    if(dateMixer){
+      dateMixer.filter(dateFilter);
+    }
 
     var chefFilter;
-    var chefDesc = decodeURI(readCookie("chef"));
+    var chefDesc = decodeURI(helperMethod.readCookie("chef"));
     currentDateControl = this.$el.find("#hostBarView [data-filter='." + chefDesc + "']");
     if(currentDateControl.length){
       chefFilter = "." + chefDesc;
@@ -1242,38 +1259,39 @@ var DayOfMealView = Backbone.View.extend({
         chefFilter = this.$el.find("#hostBarView .nav-link").data("filter");
       }
     }
-    chefMixer.setFilterGroupSelectors('date',dateFilter);
-    chefMixer.setFilterGroupSelectors('chef',chefFilter);
-    chefMixer.parseFilterGroups();
-
+    if(chefMixer){
+      chefMixer.setFilterGroupSelectors('date',dateFilter);
+      chefMixer.setFilterGroupSelectors('chef',chefFilter);
+      chefMixer.parseFilterGroups();
+    }
   },
   selectDate : function(e){
     var originalEvent = e.originalEvent.detail.originalEvent;
     var currentTarget = $(originalEvent.currentTarget);
     var filterValue = currentTarget.data("filter").replace(".","");
     var filterType = currentTarget.data("filter-type");
-    createCookie(filterType, encodeURI(filterValue));
+    helperMethod.createCookie(filterType, encodeURI(filterValue));
   },
   selectChef : function(e){
     var originalEvent = e.originalEvent.detail.originalEvent;
     var currentTarget = $(originalEvent.currentTarget);
     var filterValue = currentTarget.data("filter").replace(".","");
     var filterType = currentTarget.data("filter-type");
-    createCookie(filterType, encodeURI(filterValue));
-    jumpTo("#chef");
+    helperMethod.createCookie(filterType, encodeURI(filterValue));
+    helperMethod.jumpTo("#chef");
   },
   renderImage : function(){
     echo.render();
   },
   gotoCheckout : function(e){
     var orderedDishes = []
-    Object.keys(localOrders).forEach(function(dishId){
-      if(localOrders[dishId].number>0){
+    Object.keys(localOrderObj.localOrders).forEach(function(dishId){
+      if(localOrderObj.localOrders[dishId].number>0){
         orderedDishes.push(dishId);
       }
     });
     if(!orderedDishes.length){
-      makeAToast(jQuery.i18n.prop('noOrderTaken'));
+      helperMethod.makeAToast(__('noOrderTaken'));
       return;
     }
     var pickupNickname = this.$el.data("pickup-nickname");
@@ -1314,12 +1332,12 @@ var MealSelectionView = Backbone.View.extend({
       var range = $(this).data("range");
       utility.geocoding(location, function(err, center){
         if(err){
-          makeAToast(err, 'error');
+          helperMethod.makeAToast(err, 'error');
           return;
         }
         utility.initMap($this.$el.find("#googlemap")[0], center, function(err, map){
           if(err){
-            makeAToast(err, 'error');
+            helperMethod.makeAToast(err, 'error');
             return;
           }
           var colors = { red : '#ff4001', blue : '#3fa9f5', green : '#22b571', pink : '#ff7bac', yellow : '#ffd65a', orange : '#ff931e', 'dark-blue' : '#3f80f5'};
@@ -1345,11 +1363,10 @@ var MealSelectionView = Backbone.View.extend({
             icon: image
           });
           var deliveryInfo = new google.maps.InfoWindow({
-            content : "<h4><small><span data-toggle='i18n' data-key='deliveryRange'></span>:" + area + "<br/><span data-toggle='i18n' data-key='deliveryTime'></span>:" + time + "</small></h4>"
+            content : "<h4><small>" + __("deliveryRange") + ":" + area + "<br/>" + __("deliveryTime") + ":" + time + "</small></h4>"
           })
           deliveryMarker.addListener('click', function(){
             deliveryInfo.open(map, deliveryMarker);
-            setupLanguage();
           })
         });
       })
@@ -1365,23 +1382,23 @@ var MealSelectionView = Backbone.View.extend({
     }
     utility.geocoding(mapCenter, function(err, center){
       if(err){
-        makeAToast(err);
+        helperMethod.makeAToast(err);
         return;
       }
       $this.$el.find(".pickupOption").each(function () {
         var location = $(this).data("location");
-        var title = '<div><h4><small><span data-toggle="i18n" data-key="pickup"></span>:' + location + '</small></h4></div>';
+        var title = '<div><h4><small>' + __("pickup") + ':' + location + '</small></h4></div>';
         var infowindow = new google.maps.InfoWindow({
           content: title
         });
         utility.initMap($this.$el.find("#googlemap")[0], center, function(err, map) {
           if (err) {
-            makeAToast(err, 'error');
+            helperMethod.makeAToast(err, 'error');
             return;
           }
           utility.geocoding(location, function(err, center){
             if(err){
-              makeAToast(err);
+              helperMethod.makeAToast(err);
               return;
             }
             var marker = new google.maps.Marker({
@@ -1390,7 +1407,6 @@ var MealSelectionView = Backbone.View.extend({
             });
             marker.addListener('click', function () {
               infowindow.open(map, marker);
-              setupLanguage();
             })
             marker.setMap(map);
           });
@@ -1418,11 +1434,11 @@ var MealSelectionView = Backbone.View.extend({
     };
     var dishId = $(e.currentTarget).data("dish");
     this.saveOption(orderIndex, option, dishId);
-    updateMenuView(dishId);
-    refreshCheckoutMenu();
+    localOrderObj.updateMenuView(dishId);
+    localOrderObj.refreshCheckoutMenu();
   },
   saveOption : function(index, option, dishId){
-    var localDish = readCookie(dishId);
+    var localDish = helperMethod.readCookie(dishId);
     if(localDish){
       var localDishObj = JSON.parse(localDish);
       var options = localDishObj.preference;
@@ -1430,8 +1446,8 @@ var MealSelectionView = Backbone.View.extend({
       options = [];
     }
     options[index] = option;
-    localOrders[dishId] = localDishObj;
-    createCookie(dishId, JSON.stringify(localDishObj), 1);
+    localOrderObj.localOrders[dishId] = localDishObj;
+    helperMethod.createCookie(dishId, JSON.stringify(localDishObj), 1);
   },
   calculateDelivery : function(e){
     var $this = this;
@@ -1492,7 +1508,7 @@ var MealSelectionView = Backbone.View.extend({
     var code = this.$el.find(".coupon-code").val();
     if(!code){
       this.alertView.show();
-      this.alertView.html(jQuery.i18n.prop('couponCodeEmpty'));
+      this.alertView.html(__('couponCodeEmpty'));
       return;
     }
     var mealId = this.$el.data("meal");
@@ -1504,14 +1520,14 @@ var MealSelectionView = Backbone.View.extend({
     success : function( model, res){
       var discount = res.amount;
       var code = res.code;
-      applyCoupon(true, discount, code);
+      localOrderObj.applyCoupon(true, discount, code);
     },
     error : function(model, err){
       if(err['responseJSON'].code === -48){
-        jumpTo("emailVerificationView");
+        helperMethod.jumpTo("emailVerificationView");
       }
       $this.alertView.show();
-      $this.alertView.html(getMsgFromError(err));
+      $this.alertView.html(helperMethod.getMsgFromError(err));
     }});
   },
   addPointsToOrder : function(e){
@@ -1522,13 +1538,13 @@ var MealSelectionView = Backbone.View.extend({
     var subtotalAfterTax = parseFloat(subtotal + tax);
     if(subtotalAfterTax === 0){
       this.alertView.show();
-      this.alertView.html(jQuery.i18n.prop('orderEmptyError'));
+      this.alertView.html(__('orderEmptyError'));
       return;
     }
     var point = parseFloat(this.$el.find(".points").val());
     if(point===-1){
       this.alertView.show();
-      this.alertView.html(jQuery.i18n.prop('notAuthorize'));
+      this.alertView.html(__('notAuthorize'));
       return;
     }
     var pointRedeem;
@@ -1539,7 +1555,7 @@ var MealSelectionView = Backbone.View.extend({
     }
     if(pointRedeem < 10){
       this.alertView.show();
-      this.alertView.html(jQuery.i18n.prop('pointsTooLittle'));
+      this.alertView.html(__('pointsTooLittle'));
       return;
     }
     applyPoints(true, pointRedeem);
@@ -1553,10 +1569,10 @@ var MealView = Backbone.View.extend({
     "click button[name='save']" : "off",
     "click #addNewPickupBtn" : "addNewPickup",
     "click .close" : "removePickup",
-    "switchChange.bootstrapSwitch #isShipping" : "toggleShipping",
-    "switchChange.bootstrapSwitch #isDelivery" : "toggleDelivery",
-    "switchChange.bootstrapSwitch #isDeliveryBySystem" : "toggleDelivery",
-    "switchChange.bootstrapSwitch #supportParty" : "togglePartyOrder",
+    "change #isShipping" : "toggleShipping",
+    "change #isDelivery" : "toggleDelivery",
+    "change #isDeliveryBySystem" : "toggleDelivery",
+    "change #supportParty" : "togglePartyOrder",
     "click #freeShippingOption" : "toggleFreeShippingOpt",
     "change #shippingTypeOpt" : "changeTypeOfShippingFee",
     "change .method select" : "changeMethod",
@@ -1605,7 +1621,7 @@ var MealView = Backbone.View.extend({
     var dishItem = $(e.currentTarget);
     var isFireOn = dishItem.data("fire");
     if(isFireOn){
-      this.$el.find("#isSupportDynamicPrice").bootstrapSwitch('state',true);
+      this.$el.find("#isSupportDynamicPrice").bootstrapToggle('on');
     }
   },
   switchMealType : function(e){
@@ -1705,42 +1721,28 @@ var MealView = Backbone.View.extend({
     this.$el.find("#pickupAlert").hide();
     var pickupView = '<div class="pickup autoCompleteTarget py-2"> ' +
       '<div class="card"><div class="card-body"><h5 class="card-title text-right"><button type="button" class="close" aria-label="Close"> <span aria-hidden="true">&times;</span> </button></h5> ' +
-      '<label><span data-toggle="i18n" data-key="pickupTime"></span><i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> ' +
+      '<label>' + __("pickupTime") + '<i class="fa fa-question-circle text-lightgrey cursor-pointer"></i></label> ' +
       '<div class="row">' +
-      '<div class="col-12 col-sm-6"> <div class="form-group start-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <div class="input-group-prepend"><span class="input-group-text" data-toggle="i18n" data-key="from"></span></div> <input type="text" class="form-control" readonly="true"/> <div class="input-group-append"><span class="input-group-text datepickerbutton"> <i class="far fa-clock"></i> </span></span> </div></div></div> </div>' +
-      '<div class="col-12 col-sm-6"> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <div class="input-group-prepend"><span class="input-group-text" data-toggle="i18n" data-key="end"></span></div> <input type="text" class="form-control" readonly="true"/> <div class="input-group-append"><span class="input-group-text datepickerbutton"><i class="far fa-clock"></i></span> </div> </div></div></div>' +
+      '<div class="col-12 col-sm-6"> <div class="form-group start-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <div class="input-group-prepend"><span class="input-group-text">' + __("from") + '</span></div> <input type="text" class="form-control" readonly="true"/> <div class="input-group-append"><button type="button" class="btn btn-outline-secondary datepickerbutton"><i class="far fa-clock"></i></button></div></div></div> </div>' +
+      '<div class="col-12 col-sm-6"> <div class="form-group end-pickup"> <div class="input-group date" data-toggle="dateTimePicker"> <div class="input-group-prepend"><span class="input-group-text"">' + __("end") + '</span></div> <input type="text" class="form-control" readonly="true"/> <div class="input-group-append"><button type="button" class="btn btn-outline-secondary datepickerbutton"><i class="far fa-clock"></i></button></div> </div></div></div>' +
       '</div>' +
-      '<div class="form-group location pickup-item"> <label data-toggle="i18n" data-key="pickupAddress"></label> <input type="text" class="form-control"> </div>' +
-      '<div class="form-group delivery-center delivery-item" style="display: none;"> <label data-toggle="i18n" data-key="deliveryCenter"></label> <input type="text" class="form-control"></div>' +
-      '<div class="form-group public-location pickup-item"> <label data-toggle="i18n" data-key="publicLocation"></label> <input type="text" class="form-control"> </div>' +
-      '<div class="form-group instruction pickup-item"><label data-toggle="i18n" data-key="pickupInstruction"></label> <input type="text" class="form-control"> </div>' +
+      '<div class="form-group location pickup-item"> <label>' + __("pickupAddress") + '</label> <input type="text" class="form-control"> </div>' +
+      '<div class="form-group delivery-center delivery-item" style="display: none;"> <label>' + __("deliveryCenter") +'</label> <input type="text" class="form-control"></div>' +
+      '<div class="form-group public-location pickup-item"> <label>' + __("publicLocation") + '</label> <input type="text" class="form-control"> </div>' +
+      '<div class="form-group instruction pickup-item"><label>' + __("pickupInstruction") + '</label> <input type="text" class="form-control"> </div>' +
       '<div class="row">' +
-      '<div class="col-12 col-sm-6"><div class="form-group area" data-county="' + county + '"> <label data-toggle="i18n" data-key="area"></label> <input class="form-control" type="text" readonly="readonly" value=""> </div></div>' +
-      '<div class="col-12 col-sm-6"><div class="form-group method"> <label data-toggle="i18n" data-key="pickupMethod"></label> <select class="form-control" style="height: 38px;"> <option value="delivery" data-toggle="i18n" data-key="delivery"></option> <option value="pickup" selected="true" data-toggle="i18n" data-key="pickup"></option> </select> </div></div>' +
+      '<div class="col-12 col-sm-6"><div class="form-group area" data-county="' + county + '"> <label>' + __("area") + '</label> <input class="form-control" type="text" readonly="readonly" value=""> </div></div>' +
+      '<div class="col-12 col-sm-6"><div class="form-group method"> <label>' + __("pickupMethod") +'</label> <select class="form-control" style="height: 38px;"> <option value="delivery">' + __("delivery") + '</option> <option value="pickup" selected="true">' + __("delivery") + '</option> </select> </div></div>' +
       '</div>' +
       '<div class="row">' +
-      '<div class="col-12 col-sm-6"><div class="form-group deliveryRange"><label data-toggle="i18n" data-key="deliveryRange"></label><input class="form-control" type="text" placeholder="5" value=""></div></div>'+
-      '<div class="col-12 col-sm-6"><div class="dropdown phone"><label data-toggle="i18n" data-key="driver"></label><button class="btn btn-secondary dropdown-toggle form-control" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="false" value="' + phone + '">' + phone + '<span class="caret"></span></button><div class="dropdown-menu"></div></div>'
+      '<div class="col-12 col-sm-6"><div class="form-group deliveryRange"><label>' + __("deliveryRange") + '</label><input class="form-control" type="text" placeholder="5" value=""></div></div>'+
+      '<div class="col-12 col-sm-6"><div class="dropdown phone"><label>' + __("driver") + '</label><button class="btn btn-secondary dropdown-toggle form-control" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="false" value="' + phone + '">' + phone + '<span class="caret"></span></button><div class="dropdown-menu"></div></div>'
       '</div>' +
       '</div></div> </div> </div>';
     this.$el.find(".pickup_container").append(pickupView);
     var phoneMenu = this.$el.find(".pickup_container .pickup").last().find(".phone .dropdown-menu").append(driversOption);
-    this.$el.find("[data-toggle='dateTimePicker']").datetimepicker({
-      icons:{
-        time: "fal fa-clock",
-        date: "fal fa-calendar",
-        up: "fas fa-arrow-up",
-        down: "fas fa-arrow-down",
-        previous : "fas fa-arrow-left",
-        next : "fas fa-arrow-right",
-        today : "far fa-calendar-alt"
-      },
-      stepping : 30,
-      showTodayButton : true,
-      date : new Date()
-    });
-    setupLanguage();
-    setupInputMask();
+    setupObj.setupDateTimePicker();
+    setupObj.setupInputMask();
     utility.initAutoComplete();
   },
   removePickup : function(e){
@@ -1780,7 +1782,7 @@ var MealView = Backbone.View.extend({
     if(dishesItems.length === 0){
       this.dishAlert.html(form.find("#dishSelected").data("error"));
       this.dishAlert.show();
-      jumpTo("dishList");
+      helperMethod.jumpTo("dishList");
       return;
     }
 
@@ -1818,14 +1820,14 @@ var MealView = Backbone.View.extend({
     }
 
     var isDelivery = form.find("#isDelivery").prop("checked");
-    if(isDelivery){
+    var isDeliveryBySystem = this.$el.find("#isDeliveryBySystem").prop("checked");
+    if(isDelivery && !isDeliveryBySystem){
       var deliveryFee = form.find("#deliveryFeeInput").val();
       var areaInput = form.find("#areaInput").val();
-      var isDeliveryBySystem = this.$el.find("#isDeliveryBySystem").prop("checked");
-      if(!deliveryFee || !deliveryRange){
+      if(!deliveryFee){
         this.formAlert.show();
-        this.formAlert.html(jQuery.i18n.prop("deliveryOptionError"));
-        jumpTo("deliverySettingView");
+        this.formAlert.html(__("deliveryOptionError"));
+        helperMethod.jumpTo("deliverySettingView");
         return;
       }
     }
@@ -1871,7 +1873,6 @@ var MealView = Backbone.View.extend({
           var publicLocation = $(this).find(".public-location input").val();
           var pickupInstruction = $(this).find(".instruction input").val();
           var deliveryCenter = $(this).find(".delivery-center input").val();
-          var deliveryRange = $(this).find(".deliveryRange input").val();
           var area = $(this).find(".area input").val();
           var county = $(this).find(".area").data("county");
           if(!publicLocation){
@@ -1882,33 +1883,33 @@ var MealView = Backbone.View.extend({
           if(method === "pickup" && !location){
             pickupValid = false;
             $this.scheduleAlert.show();
-            $this.scheduleAlert.html(jQuery.i18n.prop('pickupLocationEmptyError'));
-            jumpTo("preorder");
+            $this.scheduleAlert.html(__('pickupLocationEmptyError'));
+            helperMethod.jumpTo("preorder");
             return;
           }
           if(!pickupFromTime || !pickupTillTime){
             pickupValid = false;
             $this.scheduleAlert.show();
-            $this.scheduleAlert.html(jQuery.i18n.prop('pickupTimeEmptyError'));
-            jumpTo("preorder");
+            $this.scheduleAlert.html(__('pickupTimeEmptyError'));
+            helperMethod.jumpTo("preorder");
             return;
           }else if(pickupFromTime.isSame(pickupTillTime)){
             pickupValid = false;
             $this.scheduleAlert.show();
-            $this.scheduleAlert.html(jQuery.i18n.prop('provideTimeError'));
-            jumpTo("preorder");
+            $this.scheduleAlert.html(__('provideTimeError'));
+            helperMethod.jumpTo("preorder");
             return;
           }else if(pickupFromTime.isAfter(pickupTillTime)){
             pickupValid = false;
             $this.scheduleAlert.show();
-            $this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeInvalidError'));
-            jumpTo("preorder");
+            $this.scheduleAlert.html(__('bookingTimeInvalidError'));
+            helperMethod.jumpTo("preorder");
             return;
           }else if(moment.duration(pickupTillTime.diff(pickupFromTime)).asMinutes() < 30){
             pickupValid = false;
             $this.scheduleAlert.show();
-            $this.scheduleAlert.html(jQuery.i18n.prop('pickupTimeError'));
-            jumpTo("preorder");
+            $this.scheduleAlert.html(__('pickupTimeError'));
+            helperMethod.jumpTo("preorder");
             return;
           }
           pickupObj.pickupFromTime = pickupFromTime._d;
@@ -1925,25 +1926,25 @@ var MealView = Backbone.View.extend({
           pickups.push(pickupObj);
         });
         if(!pickupValid){
-          jumpTo("preorder");
+          helperMethod.jumpTo("preorder");
           return;
         }
       }
 
       if(!startBookingDate || !endBookingDate){
         this.scheduleAlert.show();
-        this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeError'));
-        jumpTo("preorder");
+        this.scheduleAlert.html(__('bookingTimeError'));
+        helperMethod.jumpTo("preorder");
         return;
       }else if(startBookingDate.isSame(endBookingDate)){
         this.scheduleAlert.show();
-        this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeSameError'));
-        jumpTo("preorder");
+        this.scheduleAlert.html(__('bookingTimeSameError'));
+        helperMethod.jumpTo("preorder");
         return;
       }else if(moment.duration(endBookingDate.diff(startBookingDate)).asMinutes() < 60){
         this.scheduleAlert.show();
-        this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeTooShortError'));
-        jumpTo("preorder");
+        this.scheduleAlert.html(__('bookingTimeTooShortError'));
+        helperMethod.jumpTo("preorder");
         return;
       }
 
@@ -1957,23 +1958,23 @@ var MealView = Backbone.View.extend({
 
       if(!startBookingDate || !endBookingDate){
         this.scheduleAlert.show();
-        this.scheduleAlert.html(jQuery.i18n.prop('provideTimeNotError'));
-        jumpTo("order");
+        this.scheduleAlert.html(__('provideTimeNotError'));
+        helperMethod.jumpTo("order");
         return
       }else if(startBookingDate.isSame(endBookingDate)){
         this.scheduleAlert.show();
-        this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeSameError'));
-        jumpTo("order");
+        this.scheduleAlert.html(__('bookingTimeSameError'));
+        helperMethod.jumpTo("order");
         return;
       }else if(startBookingDate.isAfter(endBookingDate)){
         this.scheduleAlert.show();
-        this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeInvalidError'));
-        jumpTo("order");
+        this.scheduleAlert.html(__('bookingTimeInvalidError'));
+        helperMethod.jumpTo("order");
         return;
       }else if(moment.duration(endBookingDate.diff(startBookingDate)).asMinutes() < 60){
         this.scheduleAlert.show();
-        this.scheduleAlert.html(jQuery.i18n.prop('bookingTimeTooShortError'));
-        jumpTo("order");
+        this.scheduleAlert.html(__('bookingTimeTooShortError'));
+        helperMethod.jumpTo("order");
         return;
       }
     }
@@ -1981,7 +1982,7 @@ var MealView = Backbone.View.extend({
     if(!min_total){
       form.find(".order-require .alert").show();
       form.find(".order-require .alert").html(form.find("#min-order").data("error"));
-      jumpTo("min-order");
+      helperMethod.jumpTo("min-order");
       return;
     }
 
@@ -1992,7 +1993,7 @@ var MealView = Backbone.View.extend({
       if(!minimal){
         form.find(".order-require .alert").show();
         form.find(".order-require .alert").html(form.find("#min-order").data("error"));
-        jumpTo("cateringMinimal");
+        helperMethod.jumpTo("cateringMinimal");
         return;
       }
       var partyRequirement = {
@@ -2005,7 +2006,7 @@ var MealView = Backbone.View.extend({
     var title_en = form.find("#meal_title_en").val();
 
     if(!title && !title_en){
-      jumpTo("meal_title");
+      helperMethod.jumpTo("meal_title");
       return;
     }
 
@@ -2016,7 +2017,7 @@ var MealView = Backbone.View.extend({
     }
 
     this.successAlert.show();
-    this.successAlert.html(jQuery.i18n.prop('saving'));
+    this.successAlert.html(__('saving'));
 
     this.model.unset("chef");
     this.model.set({
@@ -2048,16 +2049,16 @@ var MealView = Backbone.View.extend({
     this.model.save({},{
       success : function(){
         if(mealId) {
-          $this.successAlert.html("Meal" + jQuery.i18n.prop('updatedComplete'));
+          $this.successAlert.html("Meal" + __('updatedComplete'));
         }else{
-          BootstrapDialog.alert("Meal" + jQuery.i18n.prop('createdComplete'), function(){
-            reloadUrl("/host/me#","mymeal");
+          BootstrapDialog.alert("Meal" + __('createdComplete'), function(){
+            h.reloadUrl("/host/me","#mymeal");
           })
         }
       },error : function(model, err){
         $this.successAlert.hide();
         $this.formAlert.show();
-        $this.formAlert.html(getMsgFromError(err));
+        $this.formAlert.html(helperMethod.getMsgFromError(err));
       }
     });
   }
@@ -2115,7 +2116,6 @@ var DishView = Backbone.View.extend({
       btn.removeClass('disabled');
     }
     this.addPropertyView(property,variation,extra);
-    setupLanguage();
   },
   addCustomVariation : function(e){
     e.preventDefault();
@@ -2128,8 +2128,7 @@ var DishView = Backbone.View.extend({
       btn.removeClass('disabled');
     }
     this.addOptionView(variation,variation);
-    setupLanguage();
-    setupDropdownMenu();
+    setupObj.setupDropdownMenu();
   },
   resetCustomProperty : function(e){
     e.preventDefault();
@@ -2166,8 +2165,7 @@ var DishView = Backbone.View.extend({
     }else{
       this.addOptionView(variation, variationText);
     }
-    setupDropdownMenu();
-    setupLanguage();
+    setupObj.setupDropdownMenu();
   },
   addProperty : function(e){
     e.preventDefault();
@@ -2188,14 +2186,13 @@ var DishView = Backbone.View.extend({
     }else{
       this.addPropertyView(propertyText, variation, extra);
     }
-    setupLanguage();
   },
   addCustomInput : function(){
     var container = this.$el.find(".variation .customVar");
     var section = '<div class="row vertical-align"><div class="col-sm-3 col-5">'
     +  '<input name="variation" class="form-control" type="text" placeholder="Property name" required></div> <div class="col-sm-2 col-5">'
-    +  '<button class="btn btn-default btn-outline continue" data-toggle="i18n" data-key="continueBtn"></button> </div> <div class="col-sm-1 col-2">'
-    +  '<a class="reset" href="javascript:void(0)" data-toggle="i18n" data-key="resetBtn"></a> </div> </div>';
+    +  '<button class="btn btn-default btn-outline continue">' + __("continueBtn") + '</button> </div> <div class="col-sm-1 col-2">'
+    +  '<a class="reset" href="javascript:void(0)">' + __("resetBtn") + '</a> </div> </div>';
     container.append(section);
   },
   addCustomPropertyInput : function(variation){
@@ -2203,8 +2200,8 @@ var DishView = Backbone.View.extend({
     var section = '<tr class="customProperty"><td>'
       + '<input name="property" class="form-control" type="text" placeholder="Property name" required></td> '
       + '<td><input name="extra" class="form-control" type="number" value="0"></td>'
-      + '<td><button class="btn btn-default btn-outline continue" data-toggle="i18n" data-key="continueBtn"></button>'
-      + '<a class="reset" style="margin-left:10px;" href="javascript:void(0)" data-toggle="i18n" data-key="resetBtn"></a></td></tr>';
+      + '<td><button class="btn btn-default btn-outline continue">' + __("continueBtn") + '</button>'
+      + '<a class="reset" style="margin-left:10px;" href="javascript:void(0)">' + __("resetBtn") + '</a></td></tr>';
     container.append(section);
   },
   addPropertyView : function(property, variation, extra){
@@ -2226,23 +2223,23 @@ var DishView = Backbone.View.extend({
     var container = this.$el.find(".variation .currentVar");
     var section = '<div class="row option" data-value="' + variation + '"> <div class="col-3">'
       + '<h3>' + text + '</h3>'
-      + '<a class="deleteBtn" href="javascript:void(0);" data-value="' + variation + '" data-toggle="i18n" data-key="deleteBtn"></a>'
+      + '<a class="deleteBtn" href="javascript:void(0);" data-value="' + variation + '">' + __("deleteBtn") + '</a>'
       + '</div> <div class="col-9"><table class="table table-bordered"> <thead>'
-      + '<tr class="active"> <td data-toggle="i18n" data-key="property"></td> <td data-toggle="i18n" data-key="extra"></td> <td data-toggle="i18n" data-key="action"></td> </tr> </thead>'
+      + '<tr class="active"> <td>' + __("property") + '</td> <td>' + __("extra") + '</td> <td>' + __("action") + '</td> </tr> </thead>'
       + '<tbody> <tr> <td> <div class="dropdown">'
       + '<a class="btn btn-default btn-outline dropdown-toggle property" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="">'
-      + '<span data-toggle="i18n" data-key="addVariation"></span> <span class="caret"></span> </a>'
+      + '<span>' + __("addVariation") +'</span> <span class="caret"></span> </a>'
       + '<div class="dropdown-menu" aria-labelledby="dLabel">'
       + '</div> </div> </td> <td><input name="extra" class="form-control" type="number" value="0"></td><td></td> </tr> </tbody> </table> </div> </div>';
     container.append(section);
     var dropDownMenu = container.find(".option[data-value='" + variation + "'] .dropdown-menu");
     if(varSets[variation] && varSets[variation].length > 0 ){
       varSets[variation].forEach(function(option){
-        dropDownMenu.append('<a class="dropdown-item" href="javascript:void(0);" data-toggle="i18n" data-key="' + option + '" value="' + option + '"></a>');
+        dropDownMenu.append('<a class="dropdown-item" href="javascript:void(0);" value="' + option + '">' + __(option) + '</a>');
       });
-      dropDownMenu.append('<a class="dropdown-item disabled" href="javascript:void(0);" data-toggle="i18n" data-key="noOption"></a>');
+      dropDownMenu.append('<a class="dropdown-item disabled" href="javascript:void(0);">' + __("noOption") +'</a>');
     }
-    dropDownMenu.append('<a class="dropdown-item" href="javascript:void(0);" data-toggle="i18n" data-key="customizedOption" value="custom"></a>');
+    dropDownMenu.append('<a class="dropdown-item" href="javascript:void(0);" value="custom">' + __("customizedOption") + '</a>');
   },
   removeProperty : function(e){
     var target = $(e.currentTarget).closest(".option");
@@ -2298,7 +2295,7 @@ var DishView = Backbone.View.extend({
         if (exist) {
           if (delete1) {
             filename1 = exist;
-            form.find("#photoError").html(jQuery.i18n.prop('needPhoto'));
+            form.find("#photoError").html(__('needPhoto'));
             return;
           } else {
             oldname1 = exist;
@@ -2314,7 +2311,7 @@ var DishView = Backbone.View.extend({
         }
       }
     }else{
-      form.find("#photoError").html(jQuery.i18n.prop('needPhoto'));
+      form.find("#photoError").html(__('needPhoto'));
       return;
     }
 
@@ -2385,7 +2382,7 @@ var DishView = Backbone.View.extend({
     var discount = form.find("#discountInput").val();
     if(isDynamicPriceOn && (!priceRate || !qtyRate || !minimalPrice)){
       this.dynamicPriceAlert.show();
-      this.dynamicPriceAlert.html(jQuery.i18n.prop("dynamic-price-incomplete"));
+      this.dynamicPriceAlert.html(__("dynamic-price-incomplete"));
       return;
     }
     var preference = {};
@@ -2407,9 +2404,9 @@ var DishView = Backbone.View.extend({
       this.model.set({id: dishId});
     }
     //update dish
-    imageHandler('dish',file1,$this.progressAlert,function(filename1){
-      imageHandler('dish',file2,$this.progressAlert,function(filename2){
-        imageHandler('dish',file3,$this.progressAlert,function(filename3){
+    helperMethod.imageHandler('dish',file1,$this.progressAlert,function(filename1){
+      helperMethod.imageHandler('dish',file2,$this.progressAlert,function(filename2){
+        helperMethod.imageHandler('dish',file3,$this.progressAlert,function(filename3){
           var photos = [];
           if(file1){
             photos[0] = {v:filename1};
@@ -2458,39 +2455,39 @@ var DishView = Backbone.View.extend({
           $this.model.save({},{
             success : function(model, response){
               if(dishId){
-                $this.progressAlert.html("Dish" + jQuery.i18n.prop('updatedComplete'));
+                $this.progressAlert.html("Dish" + __('updatedComplete'));
                 $this.progressAlert.show();
               }else{
                 if(!response.host.passGuide){
                   BootstrapDialog.show({
-                    title: jQuery.i18n.prop('tip'),
-                    message : jQuery.i18n.prop('createdComplete'),
+                    title: __('tip'),
+                    message : __('createdComplete'),
                     buttons: [{
-                      label: jQuery.i18n.prop('backToGuide'),
+                      label: __('backToGuide'),
                       action: function(dialog) {
-                        reloadUrl("/apply",'');
+                        h.reloadUrl("/apply",'');
                       }
                     }, {
-                      label: jQuery.i18n.prop('backToList'),
+                      label: __('backToList'),
                       action: function(dialog) {
-                        reloadUrl("/host/me#","mydish");
+                        h.reloadUrl("/host/me","#mydish");
                       }
                     }, {
-                      label: jQuery.i18n.prop('continueCreateDish'),
+                      label: __('continueCreateDish'),
                       action: function(dialog) {
-                        reloadUrl("/host/me/createDish","");
+                        h.reloadUrl("/host/me/createDish","");
                       }
                     }]
                   });
                 }else{
-                  BootstrapDialog.alert("Dish" + jQuery.i18n.prop('createdComplete'), function(){
-                    reloadUrl("/host/me#","mydish");
+                  BootstrapDialog.alert("Dish" + __('createdComplete'), function(){
+                    h.reloadUrl("/host/me","#mydish");
                   });
                 }
               }
             },error : function(model, err){
               $this.progressAlert.hide();
-              $this.formAlert.html(getMsgFromError(err));
+              $this.formAlert.html(helperMethod.getMsgFromError(err));
               $this.formAlert.show();
             }
           });
@@ -2519,7 +2516,7 @@ var Bank = Backbone.Model.extend({
 var BankView = Backbone.View.extend({
   events : {
     "submit form" : "saveBank",
-    "click button[name='cancel']" : dismissModal
+    "click button[name='cancel']" : helperMethod.dismissModal
   },
   initialize : function(){
     var form = this.$el.find("form");
@@ -2527,7 +2524,7 @@ var BankView = Backbone.View.extend({
     alertForm.removeClass("d-none");
     alertForm.hide();
     this.alertForm = alertForm;
-    loadStripeJS(function(err){
+    helperMethod.loadStripeJS(function(err){
       if(err){
         console.log("error loading stripe.js");
       }
@@ -2563,24 +2560,24 @@ var BankView = Backbone.View.extend({
         });
         $this.model.save({},{
           success : function(model, response){
-            dismissModal();
+            helperMethod.dismissModal();
             if(form.data("updating")){
-              BootstrapDialog.alert(jQuery.i18n.prop('bankUpdated'), function(){
-                reloadUrl("/pocket/user/me","#mypurse");
+              BootstrapDialog.alert(__('bankUpdated'), function(){
+                h.reloadUrl("/pocket/user/me","#mypurse");
               });
             }else{
               if(response.passGuide){
-                BootstrapDialog.alert(jQuery.i18n.prop('bankCreated'), function(){
-                  reloadUrl("/pocket/user/,e","#mypurse");
+                BootstrapDialog.alert(__('bankCreated'), function(){
+                  h.reloadUrl("/pocket/user/,e","#mypurse");
                 });
               }else{
                 BootstrapDialog.show({
-                  title: jQuery.i18n.prop('tip'),
-                  message : jQuery.i18n.prop('createdComplete'),
+                  title: __('tip'),
+                  message : __('createdComplete'),
                   buttons: [{
-                    label: jQuery.i18n.prop('backToGuide'),
+                    label: __('backToGuide'),
                     action: function(dialog) {
-                      reloadUrl("/apply",'');
+                      h.reloadUrl("/apply",'');
                     }
                   }]
                 });
@@ -2588,7 +2585,7 @@ var BankView = Backbone.View.extend({
 
             }
           },error : function(model, err){
-            $this.alertForm.html(getMsgFromError(err));
+            $this.alertForm.html(helperMethod.getMsgFromError(err));
             $this.alertForm.show();
           }
         });
@@ -2657,7 +2654,7 @@ var UserProfileView = Backbone.View.extend({
     var $this = this;
     this.model.save({}, {
       success : function(){
-        BootstrapDialog.alert(jQuery.i18n.prop('emailVerificationSent'), function(){
+        BootstrapDialog.alert(__('emailVerificationSent'), function(){
           var email = $this.model.get("email");
           if(!email){
             return;
@@ -2694,7 +2691,7 @@ var UserProfileView = Backbone.View.extend({
       return;
     }
     this.alertView.hide();
-    this.sucessView.html(jQuery.i18n.prop('saving'));
+    this.sucessView.html(__('saving'));
     this.sucessView.show();
     var lastname = this.$el.find("input[name='lastname']").val();
     var firstname = this.$el.find("input[name='firstname']").val();
@@ -2731,18 +2728,50 @@ var UserProfileView = Backbone.View.extend({
     this.model.save({},{
       success : function(){
         if(e.data && e.data.update){
-          BootstrapDialog.alert(jQuery.i18n.prop('profileUpdated'), function(){
-            reloadUrl("/user/me","myinfo");
+          BootstrapDialog.alert(__('profileUpdated'), function(){
+            h.reloadUrl("/user/me","#myinfo");
           });
         }else{
-          $this.sucessView.html(jQuery.i18n.prop('profileUpdated'));
+          $this.sucessView.html(__('profileUpdated'));
         }
       },error : function(model, err){
         $this.sucessView.hide();
-        $this.alertView.html(getMsgFromError(err))
+        $this.alertView.html(helperMethod.getMsgFromError(err))
         $this.alertView.show();
       }
     });
+  },
+  uploadThumbnail : function(){
+    $("#myinfo .alert").hide();
+    var files = $("#myinfo input[type='file']")[0].files;
+    var errorAlert = $("#myinfo .thumbnail .alert.alert-danger");
+    errorAlert.removeClass('hide').hide();
+    var progressView = $("#myinfo .thumbnail .alert.alert-info");
+    var file = files[0];
+    if(!files || files.length==0){
+      errorAlert.html(__('fileNotExistedError'));
+      errorAlert.show();
+      return;
+    }
+    var isDelete = $("#myinfo input[type='file']").data("isDelete");
+    helperMethod.imageHandler("thumbnail",file,progressView,function(url){
+      if(!isDelete){
+        $("#myinfo .fileinput-preview").data("src", url);
+        var e = jQuery.Event("click");
+        e.data = {update : true};
+        appObj.userProfileView.saveProfile(e);
+        progressView.html(__('imageUploadComplete'));
+        progressView.show();
+      }else{
+        $("#myinfo .fileinput-preview").data("src", '');
+        progressView.html(__('imageRemoveComplete'));
+        progressView.show();
+      }
+    },function(err){
+      progressView.hide();
+      errorAlert.html(err);
+      errorAlert.show();
+    },0,"thumbnail",isDelete);
   }
 });
 
@@ -2767,7 +2796,7 @@ var MyMealView = Backbone.View.extend({
         }else if(action === "off"){
           target.parent().find("[data-action='on']").removeClass("d-none");
         }else{
-          reloadUrl('/host/me','#mymeal');
+          h.reloadUrl('/host/me','#mymeal');
         }
       },
       error : function(model, err){
@@ -2780,6 +2809,16 @@ var MyMealView = Backbone.View.extend({
         });
       }
     })
+  },
+
+  deleteMeal : function (event){
+    var options = $(event.target).data();
+    helperMethod.deleteHandler(options["order"], "meal", $(options["errorContainer"]));
+  },
+
+  deleteDish : function (event){
+    var options = $(event.target).data();
+    helperMethod.deleteHandler(options["order"], "dish", $(options["errorContainer"]));
   }
 });
 
@@ -2817,7 +2856,7 @@ var HostProfileView = Backbone.View.extend({
       feature_dish_obj["dish" + index] = {"id": $(this).data("value"), "title" : $(this).text()};
       feature_dishes.push(feature_dish_obj);
     });
-    this.successView.html(jQuery.i18n.prop('saving'));
+    this.successView.html(__('saving'));
     this.successView.show();
     this.alertView.hide();
     this.model.set({
@@ -2836,15 +2875,66 @@ var HostProfileView = Backbone.View.extend({
     this.model.save({},{
       success : function(){
         $this.alertView.hide();
-        $this.successView.html(jQuery.i18n.prop('profileUpdated'));
+        $this.successView.html(__('profileUpdated'));
       },error : function(model, err){
         $this.alertView.show();
         $this.successView.hide();
-        $this.alertView.html(jQuery.i18n.prop('saveError'));
+        $this.alertView.html(__('saveError'));
       }
     });
+  },
+  uploadHostPhoto : function(e){
+    var _this = this;
+    var $this = $(e.currentTarget);
+    var error_container = $($this.data("error-container"));
+    var alertView = error_container.find(".alert.alert-danger");
+    var progressView = error_container.find(".alert.alert-info");
+    alertView.hide();
+    progressView.hide();
+    var files = $("#myinfo input[name='story-pic']")[0].files;
+    var file = files[0];
+    if(!files || files.length===0){
+      alertView.html(__('fileNotExistedError'));
+      alertView.show();
+      return;
+    }
+    helperMethod.uploadImage("story",file,progressView,function(url){
+      $("#myinfo .story .fileinput-preview").data("src", url);
+      progressView.html(__('imageUploadComplete'));
+      progressView.show();
+      _this.saveHostProfile(new Event("click"));
+    },function(err){
+      progressView.hide();
+      alertView.html(err);
+      alertView.show();
+    });
+  },
+  uploadLicense : function(e){
+    var $this = $(e.currentTarget);
+    var error_container = $($this.data("error-container"));
+    var progressView = error_container.find(".alert.alert-info");
+    var alertView = error_container.find(".alert.alert-danger");
+    alertView.hide();
+    progressView.hide();
+    var files = $("#myinfo .license input[type='file']")[0].files;
+    var file = files[0];
+    if(!files || files.length===0){
+      alertView.html(__('fileNotExistedError'));
+      alertView.show();
+      return;
+    }
+    helperMethod.uploadImage("license",file,progressView,function(url){
+      $("#myinfo .license .fileinput-preview").data("src",url);
+      appObj.hostProfileView.saveHostProfile(new Event("click"));
+      progressView.html(__('imageUploadComplete'));
+      progressView.show();
+    },function(err){
+      progressView.hide();
+      alertView.html(err);
+      alertView.show();
+    });
   }
-});
+})
 
 var HostPageView = Backbone.View.extend({
   events : {
@@ -2868,7 +2958,7 @@ var HostPageView = Backbone.View.extend({
         countView.text(likeCount);
       },
       error : function(model, err){
-        makeAToast(getMsgFromError(err));
+        helperMethod.makeAToast(helperMethod.getMsgFromError(err));
       }
     })
   },
@@ -2888,15 +2978,15 @@ var HostPageView = Backbone.View.extend({
         if(isFollowed){
           btn.data("followed", false);
           btn.find("i").removeClass("fas fa-star").addClass("far fa-star");
-          btn.find('.text').text(jQuery.i18n.prop('follow'));
+          btn.find('.text').text(__('follow'));
         }else{
           btn.data("followed", true);
           btn.find("i").removeClass("far fa-star").addClass("fas fa-star");
-          btn.find('.text').text(jQuery.i18n.prop('followed'));
+          btn.find('.text').text(__('followed'));
         }
       },
       error : function(model, err){
-        makeAToast(getMsgFromError(err));
+        helperMethod.makeAToast(helperMethod.getMsgFromError(err));
       }
     })
   }
@@ -2914,9 +3004,6 @@ var Review = Backbone.Model.extend({
 var ReviewView = Backbone.View.extend({
   events : {
     "click .leaveReview" : "leaveReview"
-  },
-  initialize : function(){
-    this.$el.find('[data-toggle="star-set"]').starSet();
   },
   leaveReview : function(e){
     e.preventDefault();
@@ -2972,15 +3059,15 @@ var ReviewView = Backbone.View.extend({
     }
     var $this = this;
     if((!score || score === 0) && scoreNotRated){
-      makeAToast(jQuery.i18n.prop('reviewScoreEmpty'));
+      helperMethod.makeAToast(__('reviewScoreEmpty'));
       return;
     }
     if(hasNegativeReivew){
       BootstrapDialog.show({
-        title: jQuery.i18n.prop('tip'),
-        message : jQuery.i18n.prop('reviewPrivate'),
+        title: __('tip'),
+        message : __('reviewPrivate'),
         buttons: [{
-          label: jQuery.i18n.prop('submitReview'),
+          label: __('submitReview'),
           action: function() {
             $this.model.set({
               meal : mealId,
@@ -2991,19 +3078,19 @@ var ReviewView = Backbone.View.extend({
             });
             $this.model.save({},{
               success : function(model, result){
-                BootstrapDialog.alert(jQuery.i18n.prop("privateReviewSent"), function(){
-                  reloadUrl('/user/me','#myreview');
+                BootstrapDialog.alert(__("privateReviewSent"), function(){
+                  h.reloadUrl('/user/me','#myreview');
                   $this.$el.find(".item[data-id='" + ele.data("order") +"']").remove();
                   BootstrapDialog.closeAll();
                 });
               },error : function(model, err){
-                alertView.html(getMsgFromError(err));
+                alertView.html(helperMethod.getMsgFromError(err));
                 alertView.show();
               }
             })
           }
         }, {
-          label: jQuery.i18n.prop('cancel'),
+          label: __('cancel'),
           action: function(dialog) {
             dialog.close();
           }
@@ -3020,11 +3107,11 @@ var ReviewView = Backbone.View.extend({
     });
     this.model.save({},{
       success : function(model, result){
-        BootstrapDialog.alert(jQuery.i18n.prop("reviewSuccessTip"), function(){
+        BootstrapDialog.alert(__("reviewSuccessTip"), function(){
           location.href = "/host/public/" + result.host;
         })
       },error : function(model, err){
-        alertView.html(getMsgFromError(err));
+        alertView.html(helperMethod.getMsgFromError(err));
         alertView.show();
       }
     })
@@ -3052,6 +3139,13 @@ var TransactionView = Backbone.View.extend({
     "click #searchBtn" : 'advanced',
     "click #durationBtn" : 'filter'
   },
+  enterHostInfo : function(target){
+    var hostId = $(target).data("host");
+    var isUpdating = $(target).data("updating");
+    var bank_form = $("#bankView").find("form");
+    bank_form.data("host",hostId);
+    bank_form.data("updating",isUpdating);
+  },
   advanced : function(e){
     var btn = $(e.currentTarget);
     var container = $(btn.data('target'));
@@ -3075,11 +3169,9 @@ var TransactionView = Backbone.View.extend({
     this.search(container);
   },
   search : function(container){
-
     var searchTitle = this.model.title;
     var from = this.model.from;
     var to = this.model.to;
-
     container.find(".mix").each(function() {
       var title = $(this).data("title").toLowerCase();
       var date = $(this).data("created");
@@ -3095,11 +3187,14 @@ var TransactionView = Backbone.View.extend({
 var DishPreferenceView = Backbone.View.extend({
   events : {
     "change .btn-set[data-prefType]" : "updatePreferences",
-    "submit form" : 'savePreference'
+    "click [name='submitBtn']" : 'savePreference'
+  },
+  initialize : function(){
+    localOrderObj.loadPreference();
   },
   updatePreferences : function(e){
     var dishId = this.$el.data("id");
-    var prefList = localOrders[dishId].preference;
+    var prefList = localOrderObj.localOrders[dishId].preference;
     var btnsets = this.$el.find("[data-preftype]");
     var amount = parseInt(this.$el.find(".amount").text());
     var properties = [], extra = 0;
@@ -3115,14 +3210,14 @@ var DishPreferenceView = Backbone.View.extend({
       }
     })
     prefList[amount-1] = { property : properties, extra : extra };
-    refreshPreference(dishId);
-    updateMenuView(dishId);
-    updateOrderPreview();
-    createCookie(dishId,JSON.stringify(localOrders[dishId]),1);
+    localOrderObj.refreshPreference(dishId);
+    localOrderObj.updateMenuView(dishId);
+    localOrderObj.updateOrderPreview();
+    helperMethod.createCookie(dishId,JSON.stringify(localOrderObj.localOrders[dishId]),1);
   },
   savePreference : function(e){
     e.preventDefault();
-    dismissModal();
+    helperMethod.dismissModal();
   }
 });
 
@@ -3139,7 +3234,7 @@ var ContactInfoView = Backbone.View.extend({
       return;
     }
     if(form.find("has-error").length){
-      makeAToast(jQuery.prop.i18n('phoneNotValid'));
+      helperMethod.makeAToast(jQuery.prop.i18n('phoneNotValid'));
       return;
     }
     var phone = this.$el.find("input[name='phone']").val();
@@ -3156,9 +3251,9 @@ var ContactInfoView = Backbone.View.extend({
     var $this = this;
     this.model.save({},{
       success : function(){
-        makeAToast(jQuery.i18n.prop('saveSuccess'))
+        helperMethod.makeAToast(__('saveSuccess'))
       },error : function(model, err){
-        makeAToast(jQuery.i18n.prop('saveError'))
+        helperMethod.makeAToast(__('saveError'))
       }
     });
   }
@@ -3194,12 +3289,12 @@ var MapView = Backbone.View.extend({
       spots.push({location: location, time: time});
       utility.geocoding(location, function(err, center){
         if(err){
-          makeAToast(err);
+          helperMethod.makeAToast(err);
           return;
         }
         utility.initMap($this.$el.find("#googlemap")[0], center, function(err, map){
           if(err){
-            makeAToast(err);
+            helperMethod.makeAToast(err);
             return;
           }
           var colors = { red : '#ff4001', blue : '#3fa9f5', green : '#22b571', pink : '#ff7bac', yellow : '#ffd65a', orange : '#ff931e', 'dark-blue' : '#3f80f5'};
@@ -3225,11 +3320,10 @@ var MapView = Backbone.View.extend({
             icon: image
           });
           var deliveryInfo = new google.maps.InfoWindow({
-            content : "<h4><small><span data-toggle='i18n' data-key='deliveryRange'></span>:" + area + "<br/><span data-toggle='i18n' data-key='deliveryTime'></span>:" + time + "</small></h4>"
+            content : "<h4><small>" + __("deliveryRange") + ":" + area + "<br/>" + __("deliveryTime") + ":" + time + "</small></h4>"
           })
           deliveryMarker.addListener('click', function(){
             deliveryInfo.open(map, deliveryMarker);
-            setupLanguage();
           })
         })
       })
@@ -3245,7 +3339,7 @@ var MapView = Backbone.View.extend({
     }
     utility.geocoding(mapCenter, function(err, center, map){
       if(err){
-        makeAToast(err);
+        helperMethod.makeAToast(err);
         return;
       }
       var spots = [];
@@ -3257,18 +3351,18 @@ var MapView = Backbone.View.extend({
           return;
         }
         spots.push({location: location});
-        var title = '<div><h4><small><span data-toggle="i18n" data-key="pickup"></span>:' + location + '</small></h4></div>';
+        var title = '<div><h4><small>' + __("pickup") + ':' + location + '</small></h4></div>';
         var infowindow = new google.maps.InfoWindow({
           content: title
         });
         utility.initMap($this.$el.find("#googlemap")[0], center, function(err, map) {
           if (err) {
-            makeAToast(err, 'error');
+            helperMethod.makeAToast(err, 'error');
             return;
           }
           utility.geocoding(location, function(err, center){
             if(err){
-              makeAToast(err);
+              helperMethod.makeAToast(err);
               return;
             }
             var marker = new google.maps.Marker({
@@ -3277,7 +3371,6 @@ var MapView = Backbone.View.extend({
             });
             marker.addListener('click', function () {
               infowindow.open(map, marker);
-              setupLanguage();
             })
             marker.setMap(map);
           });
@@ -3318,15 +3411,19 @@ var MealConfirmView = Backbone.View.extend({
     this.$el.find(".shippingInput").removeClass('d-none').hide();
   },
   initDateFilter : function(){
-    var dateDesc = decodeURI(readCookie("date"));
+    var dateDesc = decodeURI(helperMethod.readCookie("date"));
     if(dateDesc && dateDesc !== "undefined" && dateDesc !== "null"){
       this.$el.find("#dishDatesBar li").removeClass("active");
       this.$el.find("#dishDatesBar [data-filter='." + dateDesc + "']").parent().addClass("active");
-      deliveryMixer.filter("." + dateDesc);
-      pickupMixer.filter("." + dateDesc);
+      if(deliveryMixer){
+        deliveryMixer.filter("." + dateDesc);
+      }
+      if(pickupMixer){
+        pickupMixer.filter("." + dateDesc);
+      }
     }else{
       dateDesc = this.$el.find("#dishDatesBar [data-mixitup-control]").data("filter").replace(".","");
-      createCookie("date", dateDesc);
+      helperMethod.createCookie("date", dateDesc);
     }
   },
   initMethodView : function(){
@@ -3360,9 +3457,9 @@ var MealConfirmView = Backbone.View.extend({
     if(value==="delivery"){
       this.verifyAddress();
     }else{
-      jumpTo("pickupOptionsView");
+      helperMethod.jumpTo("pickupOptionsView");
     }
-    refreshCheckoutMenu();
+    localOrderObj.refreshCheckoutMenu();
   },
 
   switchAddress : function(e){
@@ -3383,14 +3480,14 @@ var MealConfirmView = Backbone.View.extend({
     var _this = this;
     var method = this.$el.find("#method button.active").attr("value");
     if(method === "pickup"){
-      jumpTo("pickupOptionsView");
+      helperMethod.jumpTo("pickupOptionsView");
       if(cb){
         return cb(true);
       }
       return;
     }
     //get current date
-    var dateDesc = decodeURI(readCookie('date'));
+    var dateDesc = decodeURI(helperMethod.readCookie('date'));
 
     //get address
     var yourAddress = this.getAddress(isInitializing);
@@ -3439,7 +3536,7 @@ var MealConfirmView = Backbone.View.extend({
   },
   createNewContact : function(e){
     e.preventDefault();
-    toggleModal(e, addressView.enterAddressInfoFromOrder);
+    h.toggleModal(e, appObj.addressView.enterAddressInfoFromOrder);
   },
   methodViewControl : function(method){
     if(method === "delivery"){
@@ -3474,8 +3571,8 @@ var MealConfirmView = Backbone.View.extend({
       var form = this.$el.find("#order");
       var isPartyMode = form.data("party");
       if(!street || !city || !state || !zipcode){
-        makeAToast(jQuery.i18n.prop('addressIncomplete'));
-        jumpTo("pickupInfoView");
+        helperMethod.makeAToast(__('addressIncomplete'));
+        helperMethod.jumpTo("pickupInfoView");
         return;
       }
       var range = 5;
@@ -3484,7 +3581,7 @@ var MealConfirmView = Backbone.View.extend({
       var contactOption = this.$el.find("#pickupInfoView .contactOption:visible .regular-radio:checked");
       var contactText = contactOption.next().next().text();
       if(!contactText.split("+").length){
-        makeAToast(jQuery.i18n.prop('addressIncomplete'));
+        helperMethod.makeAToast(__('addressIncomplete'));
         return;
       }
       yourAddress = contactText.split("+")[0];
@@ -3507,7 +3604,7 @@ var MealConfirmView = Backbone.View.extend({
     if(!long || !lat){
       $("#deliveryTab .deliveryOption").show();
       $("#deliveryTab .no-address").show();
-      jumpTo("pickupOptionsView");
+      helperMethod.jumpTo("pickupOptionsView");
       return;
     }
     var location = { lat : lat, long : long};
@@ -3517,7 +3614,7 @@ var MealConfirmView = Backbone.View.extend({
     }
     utility.geocoding(address, function(err, customerLoc) {
       if (err) {
-        makeAToast(err, 'error');
+        helperMethod.makeAToast(err, 'error');
         return cb(err);
       }
       var cusLocation = {
@@ -3527,7 +3624,7 @@ var MealConfirmView = Backbone.View.extend({
       var distance = utility.getDistance(cusLocation, location, "N");
       console.log("distance: " + distance, " range:" + range);
       if(distance <= range){
-        makeAToast(jQuery.i18n.prop('addressValid'),'success');
+        helperMethod.makeAToast(__('addressValid'),'success');
       }
       cb();
     });
@@ -3547,7 +3644,7 @@ var MealConfirmView = Backbone.View.extend({
 
     utility.geocoding(address, function(err, cusLocation) {
       if (err) {
-        makeAToast(err, "err");
+        helperMethod.makeAToast(err, "err");
         if(cb){ cb(false) }
         return;
       }
@@ -3577,7 +3674,7 @@ var MealConfirmView = Backbone.View.extend({
       }else{
         emptyView.removeClass("d-none").show();
       }
-      jumpTo("pickupOptionsView");
+      helperMethod.jumpTo("pickupOptionsView");
       if(cb){cb(true)};
     });
   },
@@ -3586,7 +3683,7 @@ var MealConfirmView = Backbone.View.extend({
     this.alertView.hide();
     var code = this.$el.find(".coupon-code").val();
     if (!code) {
-      makeAToast(jQuery.i18n.prop('couponCodeEmpty'));
+      helperMethod.makeAToast(__('couponCodeEmpty'));
       return;
     }
     var mealId = this.$el.find("[data-meal]").data("meal");
@@ -3598,14 +3695,14 @@ var MealConfirmView = Backbone.View.extend({
       success: function (model, res) {
         var discount = res.amount;
         var code = res.code;
-        applyCoupon(true, discount, code);
+        localOrderObj.applyCoupon(true, discount, code);
       },
       error: function (model, err) {
         if(err['responseJSON'].code === -48){
-          jumpTo("emailVerificationView");
+          helperMethod.jumpTo("emailVerificationView");
         }
         $this.alertView.show();
-        $this.alertView.html(getMsgFromError(err));
+        $this.alertView.html(helperMethod.getMsgFromError(err));
       }
     });
   },
@@ -3616,12 +3713,12 @@ var MealConfirmView = Backbone.View.extend({
     var tax = this.$el.find(".tax").data("value");
     var subtotalAfterTax = parseFloat(subtotal + tax);
     if(subtotalAfterTax === 0){
-      makeAToast(jQuery.i18n.prop('orderEmptyError'));
+      helperMethod.makeAToast(__('orderEmptyError'));
       return;
     }
     var point = parseFloat(this.$el.find(".points").val());
     if(point===-1){
-      makeAToast(jQuery.i18n.prop('notAuthorize'));
+      helperMethod.makeAToast(__('notAuthorize'));
       return;
     }
     var pointRedeem;
@@ -3631,7 +3728,7 @@ var MealConfirmView = Backbone.View.extend({
       pointRedeem = point;
     }
     if(pointRedeem < 10){
-      makeAToast(jQuery.i18n.prop('pointsTooLittle'));
+      helperMethod.makeAToast(__('pointsTooLittle'));
       return;
     }
     applyPoints(true, pointRedeem);
@@ -3643,12 +3740,12 @@ var MealConfirmView = Backbone.View.extend({
     }else{
       dateDesc = this.$el.find("#dishDatesBar [data-mixitup-control]").data("filter").replace(".","");
     }
-    createCookie("date", dateDesc);
+    helperMethod.createCookie("date", dateDesc);
     this.verifyAddress();
   }
 })
 
-var receiptView = Backbone.View.extend({
+var ReceiptView = Backbone.View.extend({
   events : {
     "click [data-action='review']" : "review"
   },
@@ -3661,12 +3758,12 @@ var receiptView = Backbone.View.extend({
     this.model.save({}, {
       success : function(model, result){
         var hostId = result.host;
-        BootstrapDialog.alert(jQuery.i18n.prop('reviewSuccessTip'), function(){
+        BootstrapDialog.alert(__('reviewSuccessTip'), function(){
           location.href = "/host/public/" + hostId;
         });
       },
       error : function(model, err){
-        BootstrapDialog.alert(getMsgFromError(err));
+        BootstrapDialog.alert(helperMethod.getMsgFromError(err));
       }
     })
   }
@@ -3685,11 +3782,32 @@ var OrderView = Backbone.View.extend({
     "click [data-action='takeOrder']" : "takeOrder"
   },
   initialize : function(){
-    loadStripeJS(function(err){
+    helperMethod.loadStripeJS(function(err){
       if(err){
         console.log("error loading stripe.js");
       }
     })
+  },
+  enterDishPreference : function(target){
+    var preference = $(target).data("preference");
+    var container = $("#preferenceTable").find("tbody");
+    container.empty();
+    if(Array.isArray(preference) && preference.length){
+      preference.forEach(function(pref, index){
+        if(pref.property && Array.isArray(pref.property)){
+          var props = "";
+          pref.property.forEach(function(prop, index){
+            if(props){
+              props += ",";
+            }
+            props += prop.property;
+          });
+          var element = "<tr><th>$index</th><td>$extra</td><td>$preference</td></tr>";
+          element = element.replace("$index", index+1).replace("$extra", "$" + pref.extra.toFixed(2)).replace("$preference",props);
+          container.append(element);
+        }
+      });
+    }
   },
   receive : function(e){
     e.preventDefault();
@@ -3704,7 +3822,7 @@ var OrderView = Backbone.View.extend({
           target.addClass("not-active");
         });
       },error : function(model, err){
-        BootstrapDialog.alert(getMsgFromError(err));
+        BootstrapDialog.alert(helperMethod.getMsgFromError(err));
       }
     })
   },
@@ -3721,7 +3839,7 @@ var OrderView = Backbone.View.extend({
           target.addClass("not-active");
         });
       },error : function(model, err){
-        BootstrapDialog.alert(getMsgFromError(err));
+        BootstrapDialog.alert(helperMethod.getMsgFromError(err));
       }
     })
   },
@@ -3734,13 +3852,13 @@ var OrderView = Backbone.View.extend({
       success : function(model,result){
         BootstrapDialog.alert(result.responseText, function(){
           if(location.href.indexOf("host/me")===-1){
-            reloadUrl("/user/me", "#myorder");
+            h.reloadUrl("/user/me", "#myorder");
           }else{
-            reloadUrl("/host/me","#myorder");
+            h.reloadUrl("/host/me","#myorder");
           }
         });
       },error : function(model, err){
-        BootstrapDialog.alert(getMsgFromError(err));
+        BootstrapDialog.alert(helperMethod.getMsgFromError(err));
       }
     })
   },
@@ -3753,13 +3871,13 @@ var OrderView = Backbone.View.extend({
       success : function(model,result){
         BootstrapDialog.alert(result.responseText, function(){
           if(location.href.indexOf("host/me")===-1){
-            reloadUrl("/user/me", "#myorder");
+            h.reloadUrl("/user/me", "#myorder");
           }else{
-            reloadUrl("/host/me","#myorder");
+            h.reloadUrl("/host/me","#myorder");
           }
         });
       },error : function(model, err){
-        BootstrapDialog.alert(getMsgFromError(err));
+        BootstrapDialog.alert(helperMethod.getMsgFromError(err));
       }
     })
   },
@@ -3772,13 +3890,13 @@ var OrderView = Backbone.View.extend({
       success : function(model,result){
         BootstrapDialog.alert(result.responseText, function(){
           if(location.href.indexOf("host/me")===-1){
-            reloadUrl("/user/me", "#myorder");
+            h.reloadUrl("/user/me", "#myorder");
           }else{
-            reloadUrl("/host/me","#myorder");
+            h.reloadUrl("/host/me","#myorder");
           }
         });
       },error : function(model, err){
-        BootstrapDialog.alert(getMsgFromError(err));
+        BootstrapDialog.alert(helperMethod.getMsgFromError(err));
       }
     })
   },
@@ -3793,7 +3911,7 @@ var OrderView = Backbone.View.extend({
           location.reload();
         });
       },error : function(model, err){
-        BootstrapDialog.alert(getMsgFromError(err));
+        BootstrapDialog.alert(helperMethod.getMsgFromError(err));
       }
     })
   },
@@ -3806,7 +3924,7 @@ var OrderView = Backbone.View.extend({
           var name = contactView.find("input[name='name']").val();
           var phone = contactView.find("input[name='phone']").val();
           if (!name || !phone) {
-            makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
+            helperMethod.makeAToast(__('nameAndPhoneEmptyError'));
             return cb(false);
           }
           contactObj.name = name;
@@ -3817,7 +3935,7 @@ var OrderView = Backbone.View.extend({
             name = t.split("+")[0];
             phone = t.split("+")[1];
             if (!name || !phone) {
-              makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
+              helperMethod.makeAToast(__('nameAndPhoneEmptyError'));
               return cb(false);
             }
             contactObj.name = name;
@@ -3833,7 +3951,7 @@ var OrderView = Backbone.View.extend({
           //   name = contactView.find("input[name='name']").val();
           //   phone = contactView.find("input[name='phone']").val();
           //   if (!name || !phone) {
-          //     makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
+          //     makeAToast(__('nameAndPhoneEmptyError'));
           //     return cb(false);
           //   }
           //   contactObj.name = name;
@@ -3852,11 +3970,11 @@ var OrderView = Backbone.View.extend({
           var state = contactView.find("input[name='state']").val();
           var zipcode = contactView.find("input[name='zipcode']").val();
           if (!street || !city || !state || !zipcode) {
-            makeAToast(jQuery.i18n.prop('addressIncomplete'));
+            helperMethod.makeAToast(__('addressIncomplete'));
             return cb(false);
           }
           if (!name || !phone) {
-            makeAToast(jQuery.i18n.prop('nameAndPhoneEmptyError'));
+            helperMethod.makeAToast(__('nameAndPhoneEmptyError'));
             return cb(false);
           }
           contactObj.address = street + ", " + city + ", " + state + " " + zipcode;
@@ -3869,14 +3987,14 @@ var OrderView = Backbone.View.extend({
             var address = t.split("+")[0];
             phone = t.split("+")[1];
             if (!address || !phone) {
-              makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'));
+              helperMethod.makeAToast(__('contactAndAddressEmptyError'));
               return cb(false);
             }
             contactObj.address = address;
             contactObj.phone = phone;
             contactObj.name = optionView.data("username");
           } else {
-            makeAToast(jQuery.i18n.prop('contactAndAddressEmptyError'));
+            helperMethod.makeAToast(__('contactAndAddressEmptyError'));
             return cb(false);
           }
         }
@@ -3887,7 +4005,7 @@ var OrderView = Backbone.View.extend({
   getPickupOption : function(method){
     var optionItem = this.$el.find("#" + method + "Tab" + " .option:visible." + method +  "Option .regular-radio:checked");
     if(!optionItem.length) {
-      makeAToast(jQuery.i18n.prop('pickupOptionNotChoose'));
+      helperMethod.makeAToast(__('pickupOptionNotChoose'));
       return null;
     }
     var index = optionItem.data("index");
@@ -3905,7 +4023,7 @@ var OrderView = Backbone.View.extend({
       customDate = customDate.date();
     }
     if(!customDate){
-      makeAToast(jQuery.i18n.prop('deliveryAddressEmptyError'));
+      helperMethod.makeAToast(__('deliveryAddressEmptyError'));
       return cb(false);
     }
     // var comment = this.$el.find("#commentView [name='comment']").val();
@@ -3920,7 +4038,7 @@ var OrderView = Backbone.View.extend({
     var paymentInfo = {};
     if(isLogin){
       if(!cards.length){
-        makeAToast(jQuery.i18n.prop('paymentEmptyError'));
+        helperMethod.makeAToast(__('paymentEmptyError'));
         return cb(false);
       }
       paymentInfo.method = paymentMethod;
@@ -3939,15 +4057,15 @@ var OrderView = Backbone.View.extend({
         var zipcode = paymentInfoView.find("input[name='zipcode']").val();
         var country = paymentInfoView.find(".flagstrap").data('selected-country');
         if(!cardholder || !cardnumber || !expMonth || !expMonth || !cvv){
-          makeAToast(jQuery.i18n.prop('cardInfoIncomplete'));
+          helperMethod.makeAToast(__('cardInfoIncomplete'));
           return cb(false);
         }
         if(!street || !city || !state || !zipcode || !country){
-          makeAToast(jQuery.i18n.prop('billingAddressIncomplete'));
+          helperMethod.makeAToast(__('billingAddressIncomplete'));
           return cb(false);
         }
         if (!Stripe.card.validateCVC(cvv)) {
-          makeAToast(jQuery.i18n.prop('invalid_cvc'));
+          helperMethod.makeAToast(__('invalid_cvc'));
           return cb(false);
         }
         Stripe.card.createToken({
@@ -3963,7 +4081,7 @@ var OrderView = Backbone.View.extend({
           address_country: country
         }, function(status, response){
           if (response.error) {
-            BootstrapDialog.alert(jQuery.i18n.prop(response.error.code));
+            BootstrapDialog.alert(__(response.error.code));
             return cb(false);
           }
           paymentInfo.token = response['id'];
@@ -3977,12 +4095,12 @@ var OrderView = Backbone.View.extend({
     }
   },
   clear : function(){
-    Object.keys(localOrders).forEach(function (dishId) {
-      eraseCookie(dishId);
+    Object.keys(localOrderObj.localOrders).forEach(function (dishId) {
+      helperMethod.eraseCookie(dishId);
     });
-    eraseCookie('points');
-    localOrders = {};
-    localPoints = 0;
+    helperMethod.eraseCookie('points');
+    localOrderObj.localOrders = {};
+    localOrderObj.localPoints = 0;
   },
   takeOrder : function(e){
     e.preventDefault();
@@ -3995,17 +4113,17 @@ var OrderView = Backbone.View.extend({
 
     this.getContactInfo(method, isLogin, function(contactInfo){
       if(!contactInfo){
-        jumpTo("pickupInfoView");
+        helperMethod.jumpTo("pickupInfoView");
         return;
       }
-      mealConfirmView.verifyAddress(null, false, function (valid) {
+      appObj.mealConfirmView.verifyAddress(null, false, function (valid) {
         if (!valid) {
-          jumpTo("pickupOptionsView");
+          helperMethod.jumpTo("pickupOptionsView");
           return;
         }
         $this.getPaymentInfo(isLogin, function(paymentInfo) {
           if (!paymentInfo) {
-            jumpTo("payment-cards");
+            helperMethod.jumpTo("payment-cards");
             button.trigger("reset");
             return;
           }
@@ -4015,7 +4133,7 @@ var OrderView = Backbone.View.extend({
           //pickup option
           var pickupObj = $this.getPickupOption(method);
           if(!pickupObj){
-            jumpTo("pickupOptionsView");
+            helperMethod.jumpTo("pickupOptionsView");
             return;
           }
           var pickupOption = pickupObj.index;
@@ -4023,17 +4141,17 @@ var OrderView = Backbone.View.extend({
           var pickupMeal = pickupObj.meal;
           $this.getCustomizedInfo(partyMode, function(customInfo){
             if(!customInfo){
-              jumpTo("pickupInfoView");
+              helperMethod.jumpTo("pickupInfoView");
               button.trigger("reset");
               return;
             }
-            var currentOrder = localOrders;
+            var currentOrder = localOrderObj.localOrders;
 
             //subtotal
             var subtotal = parseFloat(form.find(".subtotal").data("value"));
             if (subtotal === 0) {
               button.trigger("reset");
-              makeAToast(jQuery.i18n.prop('orderEmptyError'));
+              helperMethod.makeAToast(__('orderEmptyError'));
               return;
             }
 
@@ -4041,51 +4159,53 @@ var OrderView = Backbone.View.extend({
               var minimal = form.data("minimal");
               if(subtotal < minimal){
                 button.trigger("reset");
-                makeAToast(jQuery.i18n.prop('orderAmountInsufficient', minimal));
+                helperMethod.makeAToast(__('orderAmountInsufficient', minimal));
                 return;
               }
             }
 
             //coupon & points
-            var points = localPoints;
-            var couponValue = localCoupon;
+            var points = localOrderObj.localPoints;
+            var couponValue = localOrderObj.localCoupon;
             if (couponValue) {
               var code = Object.keys(couponValue)[0];
             }
 
             BootstrapDialog.show({
-              title : jQuery.i18n.prop("tipTitle"),
-              message : "<h5>" + jQuery.i18n.prop('selectTip') + "</h5>" +
-              "<form id='customTip' class='d-none'>" +
-              "<div class='input-group'>" +
-              "<div class='input-group-prepend'><span class='input-group-text'>$</span></div>" +
-              "<input name='tip' type='number' class='form-control' require>" + "</div>" +
-              "</div>" +
-              "<button class='form-control btn btn-info' type='submit'>Confirm</button>" +
-              "</form>",
+              title : __("tipTitle"),
+              message : __("selectTip"),
               buttons : [{
                 label : "15%",
                 title : subtotal * 0.15,
-                cssClass: 'btn-primary',
+                cssClass: 'btn-outline-primary btn-sm',
                 action : function(dialog){
                   $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, subtotal * 0.15, $this, button);
                 }
               },{
-                label : jQuery.i18n.prop('customTip'),
-                title : jQuery.i18n.prop('customTip'),
-                cssClass: 'btn-primary',
+                label : __('customTip'),
+                title : __('customTip'),
+                cssClass: 'btn-primary btn-sm',
                 action : function(dialog){
-                  $("#customTip").removeClass("d-none").show();
-                  $("#customTip").submit(function(e){
-                    e.preventDefault();
-                    var tip = $(e.currentTarget).find("[name='tip']").val();
-                    $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, tip, $this, button);
-                  });
+                  BootstrapDialog.show({
+                    title : __('customTip'),
+                    message : "<div class='input-group'>" +
+                      "<div class='input-group-prepend'><span class='input-group-text'>$</span></div>" +
+                      "<input name='tip' type='number' class='form-control' value='5'>" + "</div>" +
+                      "</div>",
+                    buttons: [{
+                      label: __('confirm'),
+                      cssClass: 'btn-outline-primary',
+                      action: function(dialog) {
+                        var tip = $(dialog.getModalBody()).find("[name='tip']").val();
+                        $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, tip, $this, button);
+                      }
+                    }]
+                  })
                 }
               }, {
-                label : jQuery.i18n.prop('noTip'),
-                title : jQuery.i18n.prop('noTip'),
-                cssClass: 'btn-light',
+                label : __('noTip'),
+                title : __('noTip'),
+                cssClass: 'btn-outline-dark btn-sm',
                 action : function(dialog){
                   $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, 0, $this, button);
                 }
@@ -4104,12 +4224,12 @@ var OrderView = Backbone.View.extend({
     var delivery_fee = this.$el.find("#order .delivery").data("value");
     var subtotal = form.find(".subtotal").data("value");
     if(subtotal===0){
-      makeAToast(jQuery.i18n.prop('orderAdjustZeroError'));
+      helperMethod.makeAToast(__('orderAdjustZeroError'));
       return;
     }
     this.model.set({
       id : orderIds,
-      orders : localOrders,
+      orders : localOrderObj.localOrders,
       subtotal : subtotal,
       delivery_fee : delivery_fee
     });
@@ -4120,7 +4240,7 @@ var OrderView = Backbone.View.extend({
           location.reload();
         });
       },error : function(model, err){
-        BootstrapDialog.alert(getMsgFromError(err));
+        BootstrapDialog.alert(helperMethod.getMsgFromError(err));
       }
     })
   },
@@ -4133,12 +4253,12 @@ var OrderView = Backbone.View.extend({
     this.model.save({},{
       success : function(model,result){
         if(location.href.indexOf("host/me")===-1){
-          reloadUrl("/user/me", "#myorder");
+          h.reloadUrl("/user/me", "#myorder");
         }else{
-          reloadUrl("/host/me","#myorder");
+          h.reloadUrl("/host/me","#myorder");
         }
       },error : function(model, err){
-        BootstrapDialog.alert(getMsgFromError(err));
+        BootstrapDialog.alert(helperMethod.getMsgFromError(err));
       }
     })
   },
@@ -4154,7 +4274,7 @@ var OrderView = Backbone.View.extend({
         var source = result.source;
         location.href = source.redirect.url;
       },error : function(model, err){
-        BootstrapDialog.alert(getMsgFromError(err));
+        BootstrapDialog.alert(helperMethod.getMsgFromError(err));
       }
     })
   },
@@ -4193,18 +4313,18 @@ var OrderView = Backbone.View.extend({
           var orderId = source.metadata.orderId;
           var mealId = source.metadata.mealId;
           BootstrapDialog.show({
-            title: jQuery.i18n.prop('pendingPaymentTitle'),
-            message : jQuery.i18n.prop('pendingPaymentContent'),
+            title: __('pendingPaymentTitle'),
+            message : __('pendingPaymentContent'),
             buttons: [
               {
-                label: jQuery.i18n.prop('confirmPayment'),
+                label: __('confirmPayment'),
                 action: function(dialog) {
                   $.get(
                     '/order/' + orderIds + '/verifyOrder'
                   ).done(function(){
                     $this.clear();
                     if(isLogin){
-                      reloadUrl("/user/me", "#myorder");
+                      h.reloadUrl("/user/me", "#myorder");
                     }else{
                       location.href = "/order/" + orderIds + '/receipt';
                     }
@@ -4215,7 +4335,7 @@ var OrderView = Backbone.View.extend({
                 }
               },
               {
-                label: jQuery.i18n.prop('cancelPayment'),
+                label: __('cancelPayment'),
                 action: function(dialog) {
                   dialog.close();
                 }
@@ -4225,9 +4345,9 @@ var OrderView = Backbone.View.extend({
           location.href = redirectUrl;
         }else{
           $this.clear();
-          BootstrapDialog.alert(jQuery.i18n.prop('newOrderTakenSuccessfully',orderIds), function () {
+          BootstrapDialog.alert(__('newOrderTakenSuccessfully'), function () {
             if(isLogin){
-              reloadUrl("/user/me", "#myorder");
+              h.reloadUrl("/user/me", "#myorder");
             }else{
               location.href = "/order/" + orderIds + '/receipt';
             }
@@ -4237,304 +4357,78 @@ var OrderView = Backbone.View.extend({
         $('body').removeClass("loading");
         button.trigger("reset");
         BootstrapDialog.show({
-          title: jQuery.i18n.prop('error'),
-          message: getMsgFromError(err)
+          title: __('error'),
+          message: helperMethod.getMsgFromError(err)
         });
       }
     })
   }
 });
 
-function deleteMeal(event){
-  var options = $(event.target).data();
-  deleteHandler(options["order"], "meal", $(options["errorContainer"]));
-}
+var Badge = Backbone.Model.extend({
+  urlRoot : "/badge"
+});
 
-function deleteDish(event){
-  var options = $(event.target).data();
-  deleteHandler(options["order"], "dish", $(options["errorContainer"]));
-}
+var BadgeView = Backbone.View.extend({
+  initialize : function(){
+    let successView = this.$el.find(".alert.alert-success");
+    let errorView = this.$el.find(".alert.alert-danger");
+    let infoView = this.$el.find(".alert.alert-info");
+    successView.removeClass("d-none").hide();
+    errorView.removeClass("d-none").hide();
+    infoView.removeClass("d-none").hide();
+    this.sucessView = successView;
+    this.errorView = errorView;
+    this.infoView = infoView;
+    this.model.set({
+      id : this.$el.data("id")
+    })
+  },
+  uploadBadgeImage : function(){
+    let $this = this;
+    this.sucessView.hide();
+    this.errorView.hide();
+    this.infoView.hide();
 
-function deleteHandler(id, module, alertView){
-  alertView.hide();
-  var url = "/" + module + "/destroy/" + id;
-  $.ajax({
-    url : url,
-    success : function(){
-      location.reload();
-    },error : function(err){
-      alertView.show();
-      alertView.html(getMsgFromError(err));
+    var files = this.$el.find("input[type='file']")[0].files;
+
+    var file = files[0];
+    if(!files || !files.length){
+      this.errorView.html(__('fileNotExistedError'));
+      this.errorView.show();
+      return;
     }
-  })
-}
 
-function imageHandler(modual,file,progressBar,cb,error,index,name,isDelete){
-  if(isDelete){
-    deleteImage(name,modual,function(){
-      return cb();
-    },function(){
-      return error();
-    });
-  }else{
-    uploadImage(modual,file,progressBar,function(url){
-      cb(url);
+    helperMethod.imageHandler("badge",file,this.infoView,function(url){
+      $this.$el.find(".fileinput-preview").data("src", url);
+      $this.saveProfile(e);
+      $this.sucessView.html(__('imageUploadComplete'));
+      $this.sucessView.show();
     },function(err){
-      error(err);
-    },index,name);
-  }
-}
-
-function deleteImage(filename,modual,cb,error){
-  $.ajax({
-    url : '/user/me/deleteFile',
-    data : {
-      name : filename,
-      modual : modual
-    },
-    type : 'POST',
-    success : function(result){
-      cb();
-    },
-    error : function(err){
-      console.log("some thing went wrong:" + err.responseText);
-      error();
-    }
-  });
-}
-
-function uploadImage(modual,file,progressBar,cb,error,index,name){
-  if(!file){
-    return cb();
-  }
-  var filename = "";
-  var fileType = file.name.split('.').pop();
-  switch(modual){
-    case "thumbnail":
-      filename = "thumbnail." + fileType
-      break;
-    case "license":
-      filename = "license." + fileType;
-      break;
-    case "story":
-      filename = "story." + fileType;
-      break;
-    case "dish":
-      if(name && name!==""){
-        filename = name;
+      $this.errorView.html(err);
+      $this.errorView.show();
+    },0,this.model.get("id") ,false);
+  },
+  saveProfile : function(){
+    let $this = this;
+    this.sucessView.hide();
+    this.errorView.hide();
+    this.model.set({
+      id : this.$el.data("id"),
+      customImage : this.$el.find(".fileinput-preview").data("src")
+    });
+    this.model.save({},{
+      success : function(){
+        $this.sucessView.show();
+        $this.sucessView.html(__('profileUpdated'));
+      },error : function(model, err){
+        $this.errorView.html(helperMethod.getMsgFromError(err))
+        $this.errorView.show();
       }
-      break;
-    case "checklist":
-      filename = name + "." + fileType;
-      break;
-    default :
-      break;
+    });
   }
-  $.ajax({
-    url : '/user/getSignedUrl',
-    data : {
-      name : filename,
-      type : file.type,
-      module : modual
-    },
-    type : 'POST',
-    success : function(result){
-      var opts = result.opts;
-      var fd = new FormData();
-      fd.append('key', result.key);
-      fd.append('acl', 'public-read');
-      fd.append('content-type', file.type);
-      fd.append('policy', result.policy);
-      fd.append('AWSAccessKeyId',result.AWSAccessKeyId);
-      fd.append('success_action_status','201');
-      fd.append('signature', result.signature);
-      fd.append("file", file);
-      $.ajax({
-        xhr: function() {
-          var xhr = new window.XMLHttpRequest();
+});
 
-          // Upload progress
-          progressBar.show();
-          xhr.upload.addEventListener("progress", function(evt){
-            if (evt.lengthComputable) {
-              var percentComplete = ((evt.loaded / evt.total) * 100).toFixed(2);
-              //Do something with upload progress
-              progressBar.html(jQuery.i18n.prop('fileUploading') + percentComplete + "%");
-            }
-          }, false);
-
-          return xhr;
-        },
-        type : 'POST',
-        url : result.url,
-        data : fd,
-        processData: false,
-        contentType: false,
-        success : function(){
-          cb(result.url + result.key);
-        },
-        error : function(err){
-          var xmlResult = $($.parseXML(err.responseText));
-          var message = xmlResult.find('Message');
-          error(message);
-        }
-      })
-    },
-    error : function(err){
-      console.log("some thing went wrong:" + err.responseText);
-    }
-  });
-}
-
-function uploadHostPhoto(e){
-  var $this = $(e.currentTarget);
-  var error_container = $($this.data("error-container"));
-  var alertView = error_container.find(".alert.alert-danger");
-  var progressView = error_container.find(".alert.alert-info");
-  alertView.hide();
-  progressView.hide();
-  var files = $("#myinfo input[name='story-pic']")[0].files;
-  var file = files[0];
-  if(!files || files.length==0){
-    alertView.html(jQuery.i18n.prop('fileNotExistedError'));
-    alertView.show();
-    return;
-  }
-  uploadImage("story",file,progressView,function(url){
-    $("#myinfo .story .fileinput-preview").data("src", url);
-    progressView.html(jQuery.i18n.prop('imageUploadComplete'));
-    progressView.show();
-    hostProfileView.saveHostProfile(new Event("click"));
-  },function(err){
-    progressView.hide();
-    alertView.html(err);
-    alertView.show();
-  });
-}
-
-function uploadLicense(e){
-  var $this = $(e.currentTarget);
-  var error_container = $($this.data("error-container"));
-  var progressView = error_container.find(".alert.alert-info");
-  var alertView = error_container.find(".alert.alert-danger");
-  alertView.hide();
-  progressView.hide();
-  var files = $("#myinfo .license input[type='file']")[0].files;
-  var file = files[0];
-  if(!files || files.length==0){
-    alertView.html(jQuery.i18n.prop('fileNotExistedError'));
-    alertView.show();
-    return;
-  }
-  uploadImage("license",file,progressView,function(url){
-    $("#myinfo .license .fileinput-preview").data("src",url);
-    hostProfileView.saveHostProfile(new Event("click"));
-    progressView.html(jQuery.i18n.prop('imageUploadComplete'));
-    progressView.show();
-  },function(err){
-    progressView.hide();
-    alertView.html(err);
-    alertView.show();
-  });
-}
-
-function uploadThumbnail(){
-  $("#myinfo .alert").hide();
-  var files = $("#myinfo input[type='file']")[0].files;
-  var errorAlert = $("#myinfo .thumbnail .alert.alert-danger");
-  errorAlert.removeClass('hide').hide();
-  var progressView = $("#myinfo .thumbnail .alert.alert-info");
-  var file = files[0];
-  if(!files || files.length==0){
-    errorAlert.html(jQuery.i18n.prop('fileNotExistedError'));
-    errorAlert.show();
-    return;
-  }
-  var isDelete = $("#myinfo input[type='file']").data("isDelete");
-  imageHandler("thumbnail",file,progressView,function(url){
-    if(!isDelete){
-      $("#myinfo .fileinput-preview").data("src", url);
-      var e = jQuery.Event("click");
-      e.data = {update : true};
-      userProfileView.saveProfile(e);
-      progressView.html(jQuery.i18n.prop('imageUploadComplete'));
-      progressView.show();
-    }else{
-      $("#myinfo .fileinput-preview").data("src", '');
-      progressView.html(jQuery.i18n.prop('imageRemoveComplete'));
-      progressView.show();
-    }
-  },function(err){
-    progressView.hide();
-    errorAlert.html(err);
-    errorAlert.show();
-  },0,"thumbnail",isDelete);
-}
-
-function wechatLogin(userInit, button){
-  var gm_ua = navigator.userAgent.toLowerCase();
-  if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger"){
-    var redirectUrl = BASE_URL + '/auth/wechatCode';
-    var scope = "snsapi_userinfo";
-    var appId = WECHAT_APPID;
-    var state = location.href;
-    var wechatUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
-    wechatUrl = wechatUrl.replace('$APPID', appId);
-    wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
-    wechatUrl = wechatUrl.replace('$SCOPE',scope);
-    wechatUrl = wechatUrl.replace('$STATE',state);
-    location.href = wechatUrl;
-  }else if(userInit){
-    if(IsPC()){
-      // button.addClass("running");
-      // $.ajax({
-      //   type: 'GET',
-      //   url: "/auth/getQRCodeTicket"
-      // }).done(function (res) {
-      //   btn.removeClass("runnning");
-      //   var ticket = res.ticket;
-      //   var QRCodeUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + encodeURI(ticket);
-      //   BootstrapDialog.show({
-      //     title : jQuery.i18n.prop("qrcodeScanTip"),
-      //     message : "<img src='" + QRCodeUrl + "'>"
-      //   });
-      // }).fail(function(err){
-      //   var xmlResult = $($.parseXML(err.responseText));
-      //   var message = xmlResult.find('Message');
-      //   makeAToast(message);
-      // })
-      redirectUrl = encodeURIComponent(BASE_URL + '/auth/wechatCodeWeb');
-      scope = "snsapi_login";
-      appId = WECHAT_APPID2;
-      state = encodeURIComponent(location.href);
-      wechatUrl = "https://open.weixin.qq.com/connect/qrconnect?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
-      wechatUrl = wechatUrl.replace('$APPID', appId);
-      wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
-      wechatUrl = wechatUrl.replace('$SCOPE',scope);
-      wechatUrl = wechatUrl.replace('$STATE',state);
-      location.href = wechatUrl;
-    }else{
-      var redirectUrl = BASE_URL + '/auth/wechatCode';
-      var scope = "snsapi_userinfo";
-      var appId = WECHAT_APPID;
-      var state = location.href;
-      var wechatUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
-      wechatUrl = wechatUrl.replace('$APPID', appId);
-      wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
-      wechatUrl = wechatUrl.replace('$SCOPE',scope);
-      wechatUrl = wechatUrl.replace('$STATE',state);
-      location.href = wechatUrl;
-    }
-  }
-}
-
-function IsPC(){
-  var userAgentInfo = navigator.userAgent;
-  var Agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");
-  var flag = true;
-  for (var v = 0; v < Agents.length; v++) {
-    if (userAgentInfo.indexOf(Agents[v]) > 0) { flag = false; break; }
-  }
-  return flag;
-}
+export { Auth, Payment, Host, User, Checklist, Meal, Dish, Bank, Review, Transaction, Order, Badge }
+export { LoginView, EmailVerificationView, RegisterView, UserBarView, ApplyView, PaymentView, NewUserRewardView, AddressView, CheckListView, HostSectionInMealView, DayOfMealView, MealSelectionView, MealView, DishView, BankView, UserProfileView, MyMealView, HostProfileView, HostPageView, ReviewView, TransactionView, DishPreferenceView, ContactInfoView, MapView, MealConfirmView, ReceiptView, OrderView, BadgeView }
 

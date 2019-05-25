@@ -18,7 +18,7 @@
 						contentEl.style.opacity = 1;
 						anime({
 							targets: contentEl,
-							duration: 000,
+							duration: 0,
 							delay: 0,
 							easing: 'easeOutExpo',
 							opacity: [0, 1]
@@ -37,7 +37,7 @@
 						contentEl.style.opacity = 1;
 						anime({
 							targets: contentEl,
-							duration: 000,
+							duration: 0,
 							delay: 0,
 							easing: 'easeOutExpo',
 							opacity: [0, 1]
@@ -57,7 +57,7 @@
 						contentEl.style.opacity = 1;
 						anime({
 							targets: contentEl,
-							duration: 000,
+							duration: 0,
 							delay: 0,
 							easing: 'easeOutExpo',
 							opacity: [0, 1]

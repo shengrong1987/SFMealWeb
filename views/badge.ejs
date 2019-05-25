@@ -1,0 +1,33 @@
+
+<div id="badgeDetailView" class="position-relative text-center p-4" style="min-height: 500px;" data-id="<%= id%>">
+
+  <div class="fileinput fileinput-new text-center" data-provides="fileinput">
+    <div class="fileinput-new thumbnail img-raised">
+      <img class="w-100" style="max-width: 178px;" data-src="../../images/fa-ribbon.png">
+    </div>
+    <div class="fileinput-preview fileinput-exists thumbnail img-raised w-100">
+    </div>
+    <div>
+      <span class="btn btn-raised btn-round btn-default btn-file position-absolute" style="top: 15px;right: 25px;">
+        <span class="fileinput-new"><i class="fa fa-camera cursor-pointer"></i></span>
+        <span class="fileinput-exists"><%= __('change')%></span>
+        <input type="file" name="badgeInput" onchange="appObj.badgeView.uploadBadgeImage()" />
+        <a href="#pablo" class="btn btn-danger btn-round fileinput-exists" data-dismiss="fileinput"><i class="fa fa-times"></i> <%= __('remove')%></a>
+      </span>
+    </div>
+  </div>
+
+  <div>
+    <h4>
+      <small>July 12, 2017</small></br>
+      1K Points<br/>
+      <small>Earn 1K Points in total</small>
+    </h4>
+    <div class="sharethis-inline-share-buttons mt-4" style="z-index: 0;"></div>
+  </div>
+
+  <div class="alert alert-success d-none"></div>
+  <div class="alert alert-info d-none"></div>
+  <div class="alert alert-danger d-none"></div>
+</div>
+<link href="/assets/badge.css" rel="stylesheet"><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script><script src="/assets/zh.badge.bundle.js"></script>

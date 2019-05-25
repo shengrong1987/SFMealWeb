@@ -67,7 +67,8 @@ module.exports.policies = {
     'invite' : true,
     'join' : true,
     'emailVerificationView' : ['sessionAuth','localize'],
-    'redeemReward' : true
+    'redeemReward' : true,
+    'verifyEmail' : 'isAdmin'
   },
 
   JobController : {
@@ -88,6 +89,9 @@ module.exports.policies = {
     'searchAll' : 'isAdmin',
     'findReview' : 'isAdmin',
     'findOrder' : 'isAdmin',
+    'updateDishQty' : 'isAdmin',
+    'dish' : 'isAdmin',
+    'pickup' : 'isAdmin',
     'update' : 'or(and(sessionAuth,isHost,isOwnerOfMeal,isNotFields("isScheduled","chef","score","numberOfReviews","msg","commission")),isAdmin)'
   },
 
@@ -203,6 +207,11 @@ module.exports.policies = {
     '*' : 'isAdmin',
     'find' : 'or(isAdmin, and(sessionAuth, isHost))',
     'updateWeek' : 'isAdmin'
+  },
+
+  BadgeController : {
+    '*' : 'isAdmin',
+    'findBadgeWindow' : true
   }
 
   /***************************************************************************

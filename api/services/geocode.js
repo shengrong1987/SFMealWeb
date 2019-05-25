@@ -58,7 +58,7 @@ module.exports = {
           return cb("cannot connect to Internet");
         }
         var deliveryLoc = {lat : res[0].latitude, long: res[0].longitude};
-        var distance = $this.getDistance(deliveryLoc, userLoc, "N");
+        var distance = $this.getDistance(userLoc, deliveryLoc, "N");
         cb(null, distance);
       });
     })

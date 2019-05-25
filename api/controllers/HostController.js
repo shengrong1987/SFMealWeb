@@ -8,6 +8,7 @@
  *                 -3 Can only like one host once
  *                 -4 can not like yourself
  *                 -5 no email, can not follow chef
+ *                 -99 no chef found
  */
 
 var stripe = require("../services/stripe.js");
@@ -25,7 +26,7 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      Host.findOne(hostId).populate("dishes",{ sort: 'createdAt DESC' }).populate("meals",{ sort: 'createdAt DESC' }).populate('orders').exec(function(err,host){
+      Host.findOne(hostId).populate("dishes",{ sort: 'createdAt DESC' }).populate("meals",{ sort: 'createdAt DESC' }).populate('orders', { sort: 'createdAt DESC', limit: 100 }).exec(function(err,host){
         if(err){
           return res.badRequest(err);
         }
@@ -35,20 +36,7 @@ module.exports = {
             return res.badRequest(err);
           }
           //construct orders for host
-          host.host_orders = host.orders.map(function(o){
-            if(!o){
-              return;
-            }
-            var meal = host.meals.filter(function(m){
-              return m.id === o.meal;
-            })[0];
-            if(!meal){
-              return;
-            }
-            o.serviceFee = meal.serviceFee;
-            return o;
-          });
-          host.host_orders = host.host_orders.sort(function(a,b){
+          host.host_orders = host.orders.sort(function(a,b){
             return new Date(b.pickupInfo.pickupTillTime).getTime() - new Date(a.pickupInfo.pickupTillTime).getTime();
           })
           host.host_dishes = host.dishes;
@@ -442,13 +430,13 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      if(user.host && user.host == hostId){
+      if(user.host && user.host === hostId){
         return res.badRequest({ code : -4, responseText : req.__('host-like-himself-error')});
       }
       var alreadyLike = false;
       if(user.likes){
         alreadyLike = user.likes.some(function(host){
-          return host.id == hostId;
+          return host.id === hostId;
         })
       }
       if(alreadyLike){
@@ -458,6 +446,9 @@ module.exports = {
       Host.findOne(hostId).exec(function(err, host){
         if(err){
           return res.badRequest(err);
+        }
+        if(!host){
+          return res.badRequest({ code : -99, responseText : req.__('chef-not-found')});
         }
         host.likes = host.likes || 0;
         host.likes++;

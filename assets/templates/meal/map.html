@@ -7,5 +7,6 @@
 </div>
 
 <script>
-  var mapView = new MapView({ el : $("#googlemapContainer"), attributes : { target : "#meal-confirm-container"}})
+  var mapView = new appObj.MapView({ el : $("#googlemapContainer"), attributes : { target : "#meal-confirm-container"}})
+  window.appObj.mapView = mapView;
 </script>

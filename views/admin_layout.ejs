@@ -30,69 +30,6 @@
 
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
-    <!--STYLES-->
-    <link rel="stylesheet" href="/styles/bootstrap-dialog.min.css">
-    <link rel="stylesheet" href="/styles/css/bootstrap-dialog.css">
-    <link rel="stylesheet" href="/styles/css/bootstrap-grid.css">
-    <link rel="stylesheet" href="/styles/css/bootstrap-grid.min.css">
-    <link rel="stylesheet" href="/styles/css/bootstrap-reboot.css">
-    <link rel="stylesheet" href="/styles/css/bootstrap-reboot.min.css">
-    <link rel="stylesheet" href="/styles/css/bootstrap-switch.css">
-    <link rel="stylesheet" href="/styles/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/styles/css/ekko-lightbox.min.css">
-    <link rel="stylesheet" href="/styles/css/fullpage.css">
-    <link rel="stylesheet" href="/styles/css/fullpage.min.css">
-    <link rel="stylesheet" href="/styles/css/grumble.min.css">
-    <link rel="stylesheet" href="/styles/css/jquery.mmenu.all.css">
-    <link rel="stylesheet" href="/styles/css/loading-btn.css">
-    <link rel="stylesheet" href="/styles/css/loading.css">
-    <link rel="stylesheet" href="/styles/css/simple-sidebar.css">
-    <link rel="stylesheet" href="/styles/css/toastr.min.css">
-    <link rel="stylesheet" href="/styles/importer.css">
-    <!--STYLES END-->
-
-    <!--SCRIPTS-->
-    <script src="/js/dependencies/sails.io.js"></script>
-    <script src="/js/dependencies/jquery/jquery-2.1.4.min.js"></script>
-    <script src="/js/dependencies/popper.js"></script>
-    <script src="/js/bootstrap/bootstrap.js"></script>
-    <script src="/js/dependencies/mixitup/jquery.mixitup.js"></script>
-    <script src="/js/dependencies/mixitup/jquery.mixitup.min.js"></script>
-    <script src="/js/dependencies/bootstrap-toolkit-1.5.0.js"></script>
-    <script src="/js/dependencies/jquery.i18n.properties.js"></script>
-    <script src="/js/dependencies/jquery.mixitup-pagination.min.js"></script>
-    <script src="/js/dependencies/jquery.toaster.js"></script>
-    <script src="/js/dependencies/lodash.core.js"></script>
-    <script src="/js/dependencies/mixitup-multifilter.js"></script>
-    <script src="/js/dependencies/moment.js"></script>
-    <script src="/js/dependencies/scrolloverflow.js"></script>
-    <script src="/js/dependencies/scrolloverflow.min.js"></script>
-    <script src="/js/dependencies/underscore-min.js"></script>
-    <script src="/js/utils/Bubble.js"></script>
-    <script src="/js/utils/backbone-min.js"></script>
-    <script src="/js/utils/echo.js"></script>
-    <script src="/js/utils/fullpage.js"></script>
-    <script src="/js/utils/jquery.crumble.js"></script>
-    <script src="/js/utils/jquery.grumble.js"></script>
-    <script src="/js/utils/jquery.mask.js"></script>
-    <script src="/js/utils/jweixin-1.0.0.js"></script>
-    <script src="/js/utils/moment-timezone.min.js"></script>
-    <script src="/js/utils/validator.min.js"></script>
-    <script src="/js/COMP.js"></script>
-    <script src="/js/GUI.js"></script>
-    <script src="/js/Installation.js"></script>
-    <script src="/js/assan.custom.js"></script>
-    <script src="/js/bootstrap/bootstrap-datetimepicker.js"></script>
-    <script src="/js/bootstrap/bootstrap-dialog.min.js"></script>
-    <script src="/js/bootstrap/bootstrap-formhelpers-min.js"></script>
-    <script src="/js/bootstrap/bootstrap-submenu.js"></script>
-    <script src="/js/bootstrap/bootstrap-switch.js"></script>
-    <script src="/js/bootstrap/ekko-lightbox.js"></script>
-    <script src="/js/bootstrap/jasny-bootstrap.js"></script>
-    <script src="/js/bootstrap/jquery.share.min.js"></script>
-    <script src="/js/const.js"></script>
-    <script src="/js/model.js"></script>
-    <script src="/js/utility.js"></script>
     <!--SCRIPTS END-->
     <!--TEMPLATES-->
     
@@ -101,63 +38,19 @@
 
   <body style="min-width: 600px;">
 
-  <div id="container"></div>
+  <%- body %>
 
-    <div class="modal" id="myModal" role="dialog">
-      <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
+  <div class="modal" id="myModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"></h5>
         </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer"></div>
+      </div>
     </div>
-
-    <!--
-        Client-side Templates
-        ========================
-
-        HTML templates are important prerequisites of modern, rich client applications.
-        To work their magic, frameworks like Backbone, Angular, Ember, and Knockout require
-        that you load these templates client-side.
-
-        By default, your Gruntfile is configured to automatically load and precompile
-        client-side JST templates in your `assets/templates` folder, then
-        include them here automatically (between TEMPLATES and TEMPLATES END).
-
-        To customize this behavior to fit your needs, just edit `tasks/pipeline.js`.
-        For example, here are a few things you could do:
-
-            + Import templates from other directories
-            + Use a different template engine (handlebars, jade, dust, etc.)
-            + Internationalize your client-side templates using a server-side
-              stringfile before they're served.
-    -->
-
-
-
-
-    <!--
-
-      Client-side Javascript
-      ========================
-
-      You can always bring in JS files manually with `script` tags, or asynchronously
-      on the client using a solution like AMD (RequireJS).  Or, if you like, you can
-      take advantage of Sails' conventional asset pipeline (boilerplate Gruntfile).
-
-      By default, files in your `assets/js` folder are included here
-      automatically (between SCRIPTS and SCRIPTS END).  Both JavaScript (.js) and
-      CoffeeScript (.coffee) are supported. In production, your scripts will be minified
-      and concatenated into a single file.
-
-      To customize any part of the built-in behavior, just edit `tasks/pipeline.js`.
-      For example, here are a few things you could do:
-
-          + Change the order of your scripts
-          + Import scripts from other directories
-          + Use a different preprocessor, like TypeScript
-
-    -->
-      <script src="/bundle.js"></script>
-      <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+  </div>
   </body>
 </html>

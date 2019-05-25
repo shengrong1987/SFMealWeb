@@ -30,7 +30,6 @@ module.exports = {
         async.each(meals, function(meal, next){
           var pickups = meal.pickups.map(function(pickup){
             if(pickup.id === pickupOptionId){
-              pickupOptions[0].phone = pickup.phone;
               return pickupOptions[0];
             }else{
               return pickup;

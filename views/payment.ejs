@@ -1,12 +1,12 @@
 <div id="paymentView">
   <div class="popup box middle">
 
-    <form class="form-horizontal" data-id="<%if(typeof id !='undefined'){%><%=id%><%}%>" data-url="<%if(typeof id != 'undefined'){%>/payment/<%=id%><%}else{%>/payment<%}%>">
+    <form class="form-horizontal" data-toggle="validator" data-id="<%if(typeof id !='undefined'){%><%=id%><%}%>" data-url="<%if(typeof id != 'undefined'){%>/payment/<%=id%><%}else{%>/payment<%}%>">
       <div class="row row-centered">
         <div class="col">
           <div class="page-header">
             <h2 class="gdfg"><%= __('address-info')%>
-              <button class="close" type="button" aria-label="Close" onclick="javascript:dismissModal();">
+              <button class="close" type="button" aria-label="Close" onclick="javascript:h.dismissModal();">
                 <span aria-hidden="true">&times;</span>
               </button>
             </h2>
@@ -84,28 +84,6 @@
                 <span> / </span>
                 <select name="year" data-toggle="select" data-stripe="exp-year" class="card-expiry-year stripe-sensitive required form-control" value=<%= typeof payment != 'undefined' ? payment.exp_year : '2017'%>>
                 </select>
-                <script type="text/javascript">
-                  var select = $(".card-expiry-year"),
-                    year = new Date().getFullYear();
-
-                  for (var i = 0; i < 12; i++) {
-                    select.append($("<option value='"+(i + year)+"' "+(i === 0 ? "selected" : "")+">"+(i + year)+"</option>"))
-                  }
-
-                  var month = $(".card-expiry-month").attr("value");
-                  $(".card-expiry-month option").each(function(){
-                    if($(this).attr("value")==month){
-                      $(this).attr("selected","selected");
-                    }
-                  });
-
-                  var year = $(".card-expiry-year").attr("value");
-                  $(".card-expiry-year option").each(function(){
-                    if($(this).attr("value")===year){
-                      $(this).attr("selected","selected");
-                    }
-                  });
-                </script>
               </div>
             </div>
 
@@ -148,14 +126,36 @@
     <span class="divider popline"></span>
 
     <% if( typeof payment != 'undefined'){%>
-    <h6 class="text-center"><%= __('create-new-card?')%><a href="javascript:void(0)" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><%= __('create-new-card')%></a></h6>
+    <h6 class="text-center"><%= __('create-new-card?')%><a href="javascript:void(0)" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="h.toggleModal(event)"><%= __('create-new-card')%></a></h6>
     <%}%>
-
   </div>
 </div>
 
 <script>
-  new PaymentView({ el : $("#paymentView"), model : new Payment()})
-  setup();
-  utility.initAutoComplete();
+  new appObj.PaymentView({ el : $("#paymentView"), model : new appObj.Payment()})
+  appObj.setupObj.setupValidator();
+  appObj.setupObj.setupSelector();
+  appObj.utility.initAutoComplete();
+
+  var select = $(".card-expiry-year"),
+    year = new Date().getFullYear();
+
+  for (var i = 0; i < 12; i++) {
+    select.append($("<option value='"+(i + year)+"' "+(i === 0 ? "selected" : "")+">"+(i + year)+"</option>"))
+  }
+
+  var month = $(".card-expiry-month").attr("value");
+  $(".card-expiry-month option").each(function(){
+    if($(this).attr("value")==month){
+      $(this).attr("selected","selected");
+    }
+  });
+
+  var year = $(".card-expiry-year").attr("value");
+  $(".card-expiry-year option").each(function(){
+    if($(this).attr("value")===year){
+      $(this).attr("selected","selected");
+    }
+  });
+
 </script>

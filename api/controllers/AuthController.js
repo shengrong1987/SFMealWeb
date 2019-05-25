@@ -224,7 +224,7 @@ module.exports = require('waterlock').waterlocked({
   },
 
   admin : function(req, res){
-    return res.view('admin/hello',{
+    return res.view('admin',{
       layout : 'admin_layout'
     });
   },

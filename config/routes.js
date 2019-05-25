@@ -77,6 +77,9 @@ module.exports.routes = {
   '/meal/checkout' : "MealController.checkout",
   '/meal/:pickup/checkout' : "MealController.checkout",
   "/meal/catering" : "MealController.catering",
+  "/meal/:id/updateDishQty" : "MealController.updateDishQtyAPI",
+  "/meal/dish" : "MealController.dish",
+  "/meal/pickup" : "MealController.pickup",
   '/dish/:id/verify' : 'DishController.verify',
   '/dish/:id/fail' : 'DishController.fail',
   '/dish/:id/review' : 'DishController.findReview',
@@ -106,7 +109,8 @@ module.exports.routes = {
   '/order/:id/updatePickupInfo' : 'OrderController.updatePickupInfo',
   '/order/week/:numberOfWeek' : 'OrderController.findOrdersOfWeek',
   '/order/:id/review' : 'ReviewController.orderReview',
-  '/review/:id' : 'ReviewController.reviewPopup',
+  '/order/:id/newOrder' : 'OrderController.create',
+  '/review/popup/:id' : 'ReviewController.reviewPopup',
   '/job/:name/run' : 'JobController.run',
   '/job/:id/delete' : 'JobController.deleteJob',
   '/job/clean' : 'JobController.cleanJobs',
@@ -129,7 +133,8 @@ module.exports.routes = {
   '/terms' : {view : 'terms'},
   "/apply" : "HostController.apply",
   "/pickup/:pickup" : "MealController.find",
-  "/pickupoption/:id/update" : "PickupOptionController.update"
+  "/pickupoption/:id/update" : "PickupOptionController.update",
+  "/badge/me/:id" : "BadgeController.findBadgeWindow"
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

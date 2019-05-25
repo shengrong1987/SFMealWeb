@@ -1,17 +1,16 @@
-
 <div>
   <div class="pure-banner green">
     <div class="middle banner-text py-3">
       <div class="row vertical-align">
         <div class="col-lg-2"></div>
         <div class="col-5 col-lg-3">
-          <img src="/images/welcome-1.png" style="width: 100%;">
+          <img data-src="../../images/welcome-1.png" style="width: 100%;">
         </div>
         <div class="col-2 col-lg-2">
           <a href="/" class="logo-slogan"></a>
         </div>
         <div class="col-5 col-lg-3">
-          <img src="/images/welcome-2.png" style="width: 100%;">
+          <img data-src="../../images/welcome-2.png" style="width: 100%;">
         </div>
         <div class="col-lg-2"></div>
       </div>
@@ -91,11 +90,11 @@
                                     <%= __('from')%>
                                   </span>
                                 </div>
-                                <input type='text' class="form-control" readonly="true"/>
+                                <input type='text' class="form-control"/>
                                 <div class="input-group-append">
-                                <span class="input-group-text datepickerbutton">
-                                  <i class="fa fa-calendar"></i>
-                                </span>
+                                  <button type="button" class="btn btn-outline-secondary datepickerbutton">
+                                    <i class="far fa-clock"></i>
+                                  </button>
                                 </div>
                               </div>
                             </div>
@@ -108,11 +107,11 @@
                                     <%= __('end')%>
                                   </span>
                                 </div>
-                                <input type='text' class="form-control" readonly="true"/>
+                                <input type='text' class="form-control"/>
                                 <div class="input-group-append">
-                                <span class="input-group-text datepickerbutton">
-                                  <i class="fa fa-calendar"></i>
-                                </span>
+                                  <button type="button" class="btn btn-outline-secondary datepickerbutton">
+                                    <i class="far fa-clock"></i>
+                                  </button>
                                 </div>
                               </div>
                             </div>
@@ -133,11 +132,11 @@
                                 <div class="input-group-prepend">
                                   <span class="input-group-text"><%= __('from')%></span>
                                 </div>
-                                <input type='text' class="form-control" readonly="true"/>
+                                <input type='text' class="form-control"/>
                                 <div class="input-group-append">
-                                    <span class="input-group-text datepickerbutton">
-                                        <i class="fa fa-clock"></i>
-                                      </span>
+                                  <button type="button" class="btn btn-outline-secondary datepickerbutton">
+                                    <i class="far fa-clock"></i>
+                                  </button>
                                 </div>
                               </div>
                             </div>
@@ -148,11 +147,11 @@
                                 <div class="input-group-prepend">
                                   <span class="input-group-text"><%= __('end')%></span>
                                 </div>
-                                <input type='text' class="form-control" readonly="true"/>
+                                <input type='text' class="form-control"/>
                                 <div class="input-group-append">
-                                    <span class="input-group-text datepickerbutton">
-                                        <i class="fa fa-clock"></i>
-                                      </span>
+                                  <button type="button" class="btn btn-outline-secondary datepickerbutton">
+                                    <i class="far fa-clock"></i>
+                                  </button>
                                 </div>
                               </div>
                             </div>
@@ -190,11 +189,11 @@
                                     <span class="input-group-prepend">
                                       <span class="input-group-text"><%= __('from')%></span>
                                     </span>
-                                      <input type='text' class="form-control" readonly="true"/>
+                                      <input type='text' class="form-control"/>
                                       <div class="input-group-append">
-                                      <span class="input-group-text datepickerbutton">
-                                        <i class="fa fa-clock"></i>
-                                      </span>
+                                        <button type="button" class="btn btn-outline-secondary datepickerbutton">
+                                          <i class="far fa-clock"></i>
+                                        </button>
                                       </div>
                                     </div>
                                   </div>
@@ -206,11 +205,11 @@
                                       <div class="input-group-prepend">
                                         <span class="input-group-text"><%= __('end')%></span>
                                       </div>
-                                      <input type='text' class="form-control" readonly="true"/>
+                                      <input type='text' class="form-control"/>
                                       <div class="input-group-append">
-                                        <span class="input-group-text datepickerbutton">
-                                          <i class="fa fa-clock"></i>
-                                        </span>
+                                        <button type="button" class="btn btn-outline-secondary datepickerbutton">
+                                          <i class="far fa-clock"></i>
+                                        </button>
                                       </div>
                                     </div>
                                   </div>
@@ -282,7 +281,7 @@
                           </div>
                         </div>
                         <div id="pickupAlert" class="alert alert-danger" data-toggle="alert"><%= __('need-one-pickup-location')%></div>
-                        <button id="addNewPickupBtn" class="btn btn-info pull-right"><%= __('add-new-pickup')%></button>
+                        <button id="addNewPickupBtn" type="button" class="btn btn-info pull-right"><%= __('add-new-pickup')%></button>
                       </div>
 
                     </div>
@@ -338,17 +337,6 @@
                               <span class="input-group-text"><%= __('delivery-fee')%>: $</span>
                             </div>
                             <input id="deliveryFeeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="0" value="0">
-                          </div>
-                        </div>
-                        <div class=col-sm-6>
-                          <div class="input-group">
-                            <div class="input-group-prepend">
-                              <span class="input-group-text"><%= __('delivery-range')%>:</span>
-                            </div>
-                            <input id="deliveryRangeInput" class="form-control" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="3" value="3">
-                            <div class="input-group-append">
-                              <span class="input-group-text"><%= __('miles')%></span>
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -470,11 +458,7 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
-<script>
-  new MealView({ el : "#mealCreatingView", model : new Meal()});
-  utility.initAutoComplete();
-</script>
+<link href="/assets/createMeal.css" rel="stylesheet"><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script><script src="/assets/zh.createMeal.bundle.js"></script>

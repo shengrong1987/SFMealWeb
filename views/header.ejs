@@ -2,7 +2,7 @@
 
   <div class="nav-brand dropdown">
     <% if(req.session.authenticated){ %>
-      <button class="btn" name="myorder" onclick="location.href='/user/order'"><%= __('nav-bar-order') %><span class="badge pull-right"></span></button>
+      <button class="btn btn-outline-light" name="myorder" onclick="location.href='/user/me'"><%= __('nav-bar-order') %><span class="badge badge-light ml-1 pull-right"></span></button>
     <% }%>
     <!--<button id="citySelector" class="btn nav-item dropdown-toggle" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="San Francisco County">-->
       <!--<span><%= __('location-san-francisco') %></span>-->
@@ -47,12 +47,12 @@
       <li class="nav-item"><a href="javascript:void(0)" class="seperator-compact nav-link"><i class="icon-dot text-red"></i></a> </li>
       <li class="nav-item"><a href="/user/me#mycollect" class="nav-link"><i class="fas fa-heart"></i> <%= __('favourite') %></a></li>
       <li class="nav-item"><a href="javascript:void(0)" class="seperator-compact nav-link"><i class="icon-dot text-red"></i></a> </li>
-      <li class="nav-item"><a id="msgBtn" class="nav-link" data-toggle="tooltip" data-html="true" data-placement="bottom" href="javascript:void(0)"><i class="fal fa-envelope"></i> <%= __('notification') %> <span class="badge">New</span></a></li>
+      <li class="nav-item"><a id="msgBtn" class="nav-link" data-toggle="tooltip" data-html="true" data-placement="bottom" href="javascript:void(0)"><i class="fal fa-envelope"></i> <%= __('notification') %> <span class="badge badge-light">New</span></a></li>
       <li class="nav-item dropdown">
         <a id="userActionBtn" data-badge="0" href='/user/me' class="text-center dropdown-toggle nav-link" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <img class="extra-small round_thumb" style="display:inline-block;" src=<%= req.session.user.picture || "/images/profile_man.png"%>>
+          <img class="extra-small round_thumb" style="display:inline-block;" data-src="<%= req.session.user.picture || '../../images/profile_man.png'%>" src=<%= req.session.user.picture || ''%>>
           Hi, <%= req.session.user.firstname || (req.session.user.host ? __('chef') : __('visitor')) %>
-          <span class="badge"></span>
+          <span class="badge badge-light"></span>
           <span class="caret"></span>
         </a>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
@@ -76,14 +76,10 @@
       <li class="nav-item"><a href="javascript:void(0)" class="seperator-compact nav-link"><i class="icon-dot text-red"></i></a> </li>
       <li class="nav-item"><a class="nav-link" href="/help"><i class="fas fa-question"></i> <%= __('nav-bar-help') %></a></li>
       <li class="nav-item"><a href="javascript:void(0)" class="seperator-compact nav-link"><i class="icon-dot text-red"></i></a> </li>
-      <li class="nav-item"><a class="nav-link" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fas fa-user"></i> <%= __('nav-bar-register') %></a></li>
+      <li class="nav-item"><a class="nav-link" toggle="modal" data-target="#myModal" data-model="user" data-action="signup" href="javascript:void(0)" onclick="h.toggleModal(event)"><i class="fas fa-user"></i> <%= __('nav-bar-register') %></a></li>
       <li class="nav-item"><a href="javascript:void(0)" class="seperator-compact nav-link"><i class="icon-dot text-red"></i></a> </li>
-      <li class="nav-item"><a class="nav-link" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fal fa-sign-in"></i> <%= __('nav-bar-login') %></a></li>
+      <li class="nav-item"><a class="nav-link" toggle="modal" data-target="#myModal" data-model="user" data-action="signin" href="javascript:void(0)" onclick="h.toggleModal(event)"><i class="fal fa-sign-in"></i> <%= __('nav-bar-login') %></a></li>
       <%}%>
     </ul>
   </div>
 </nav>
-
-<script>
-  var userBarView = new UserBarView({el : $("#myUserBar"), model : new Host()})
-</script>

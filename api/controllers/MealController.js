@@ -132,16 +132,84 @@ module.exports = {
         });
       })
     })
+  },
 
+  pickup : function(req, res){
+    var _this = this, _pickups = [];
+    Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
+      if(err){
+        return res.badRequest(err);
+      }
+      var _dishes=[];
+      async.auto({
+        findPickups : function(next){
+          meals.forEach(function(meal){
+            if(!_pickups.length){
+              _pickups = meal.pickups;
+            }else{
+              meal.pickups.forEach(function(pickup){
+                if(!_pickups.some(function(p){
+                  return moment(p.pickupFromTime).isSame(pickup.pickupFromTime, 'minutes') && moment(p.pickupTillTime).isSame(pickup.pickupTillTime, 'minutes') && p.location === pickup.location && p.method === pickup.method;
+                })){
+                  _pickups.push(pickup);
+                }
+              })
+            }
+          });
+          next();
+        }
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(_pickups);
+      })
+    })
+  },
+
+  dish : function(req, res){
+    var _this = this, _meals = [];
+    var pickupNickname = req.param('pickup');
+    Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
+      if(err){
+        return res.badRequest(err);
+      }
+      _meals = meals;
+      if(pickupNickname){
+        _meals = meals.filter(function(meal){
+          return meal.pickups.some(function(p){
+            return p.nickname && p.nickname === pickupNickname;
+          })
+        })
+      }
+      var _dishes=[];
+      async.auto({
+        findDishes : function(next){
+          _meals.forEach(function(meal){
+            meal.dishes.forEach(function(dish){
+              if(!_dishes.some(function(d){
+                return d.id === dish.id;
+              })){
+                _dishes.push(dish);
+              }
+            })
+          });
+          next();
+        }
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok({ dishes : _dishes, meals : _meals} );
+      })
+    })
   },
 
   find : function(req,res){
     //find out meals that provide start today or ends today
-    moment.locale(req.getLocale());
+    // moment.locale(req.getLocale());
     var _this = this;
     var pickupNickname = req.param('pickup');
-    var county = req.cookies['county'] || req.param('county') || "San Francisco County";
-    var withinSevenDay = moment().add(7,'days');
     Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
       if(err){
         return res.badRequest(err);
@@ -217,7 +285,7 @@ module.exports = {
             return tagOrderB - tagOrderA;
           })
           next();
-        },
+        }
       }, function(err){
         if(err){
           return res.badRequest(err);
@@ -960,13 +1028,35 @@ module.exports = {
     });
   },
 
+  updateDishQtyAPI : function(req, res){
+    var leftQty = req.body.leftQty;
+    var mealId = req.param("id");
+    var _this = this;
+    Meal.findOne(mealId).exec(function(err, meal){
+      if(err){
+        return res.badRequest(err);
+      }
+      Object.keys(meal.leftQty).forEach(function(dishId){
+        if(leftQty.hasOwnProperty(dishId)){
+          meal.leftQty[dishId] = leftQty[dishId];
+        }
+      })
+      meal.save(function(err, m){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(m);
+      })
+    })
+  },
+
   updateDelivery : function(params, host, req, cb){
 
     if(params.isDeliveryBySystem){
       params.delivery_fee = DELIVERY_FEE;
     }
 
-    if(params.isDelivery && params.type === "preorder" && (!params.pickups || (params.pickups && !params.pickups.some(function(pickup){
+    if(params.isDelivery && params.isDelivery !== 'false' && params.type === "preorder" && (!params.pickups || (params.pickups && !params.pickups.some(function(pickup){
       return pickup.method === "delivery";
     })))){
       return cb({ responseText : req.__('meal-delivery-on-option'), code : -15})
@@ -1047,14 +1137,14 @@ module.exports = {
     //   return cb({ code : -6, responseText : req.__('')});
     // }
     var type = params.type;
-    if(params.isDelivery && type === 'preorder' && !params.pickups.some(function(pickup){
+    if(params.isDelivery == 'true' && type === 'preorder' && !params.pickups.some(function(pickup){
         return pickup.method === 'delivery';
       })){
       sails.log.debug("support delivery but no delivery time was added");
       return cb({ code : -13, responseText : req.__('meal-delivery-lack-of-method')});
     }
 
-    if(!params.isDelivery && params.isDeliveryBySystem){
+    if(params.isDelivery == "false" && params.isDeliveryBySystem){
       sails.log.debug("system delivery provided but delivery option is off");
       return cb({ code : -12, responseText : req.__('meal-delivery-conflict')});
     }
@@ -1063,7 +1153,7 @@ module.exports = {
       return cb({ code : -17, responseText : req.__('meal-lack-of-party-requirement')});
     }
 
-    if(params.storeHourNickname === "custom" && !params.pickups){
+    if(params.nickname === "custom" && !params.pickups && type !== 'order'){
       return cb({ code : -20, responseText : req.__('meal-custom-hour-lack-of-pickup-options')})
     }
 

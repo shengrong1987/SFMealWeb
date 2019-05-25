@@ -585,6 +585,26 @@ module.exports = require('waterlock').actions.user({
     });
   },
 
+  verifyEmail : function(req, res){
+    var userId = req.params.id;
+    User.update(userId, { emailVerified : true}).exec(function (err, user) {
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(user);
+    })
+  },
+
+  unverifyEmail : function(req, res){
+    var userId = req.params.id;
+    User.update(userId, { emailVerified : false}).exec(function (err, user) {
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(user);
+    })
+  },
+
   redeemReward : function(req, res){
     var isLogin = req.session.authenticated;
     if(!isLogin){

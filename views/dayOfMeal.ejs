@@ -1,24 +1,10 @@
 <div class="default-container text-center relative">
 
-  <div class="compact-banner w-100 d-none">
-    <div class="img-wrapper">
-      <img src="/images/blank.gif" data-echo="/images/home-cover-1.jpg" class="relative middle">
-    </div>
-
-    <div class="absolute">
-      <div class="logo-container row">
-        <div class="col-lg-3 col-sm-4 col relative text-left">
-          <a href="/" class="logo-slogan"></a>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div id="dayOfMealContainer" style="max-width: 800px;" class="mx-auto" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>" data-pickup-nickname="<%= pickupNickname || ''%>">
 
     <% if(meals && meals.meals){%>
     <div class="w-100 sticky-top">
-      <ul id="dishDatesBar" class="nav nav-pills nav-pills-orange white nav-scroll px-2" data-filter-group="date">
+      <ul id="dishDatesBar" class="nav nav-pills nav-pills-orange white nav-scroll px-2 bg-light" data-filter-group="date">
         <%
           var dates = Object.keys(meals.meals);
           dates = dates.sort(function(d1,d2){
@@ -57,14 +43,14 @@
             }
           })
         dates.forEach(function(dateKey,i){ %>
-          <li class="nav-item py-2 mw-28 <%= i===0?'active':''%>"><a class="nav-link <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-mixitup-date data-filter-type="date" data-filter=".<%= dateKey.replace(/ |\'/g,'')%>" data-toggle="tab"><span class="cursor-pointer"><%= __(dateKey).replace("day",'')%></span></a></li>
+          <li class="nav-item py-1 mw-28 <%= i===0?'active':''%>"><a class="nav-link <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-mixitup-date data-filter-type="date" data-filter=".<%= dateKey.replace(/\/|\'/g,'')%>" data-toggle="tab"><span class="cursor-pointer"><%= __(dateKey).replace("day",'')%></span></a></li>
         <% })%>
       </ul>
-      <ul id="hostBarView" class="nav nav-pills nav-scroll white px-2" data-filter-group="chef">
+      <ul id="hostBarView" class="nav nav-pills nav-scroll justify-content-md-center" data-filter-group="chef">
         <%
         hosts.forEach(function(host,i){ %>
-          <li class="nav-item py-2 px-1 mw-19 <%= i===0?'active':''%>">
-            <button class="nav-link btn-outline-info cursor-pointer" href="javascript:void(0);" data-mixitup-control data-filter-type="chef" data-filter=".<%= host.shopName.replace(/ |\'/g,'')%>" data-toggle="tab" data-likes="<%= host.likes || 0%>" data-picture="<%= host.picture%>" data-host="<%= host.id%>" data-follow-text="<%= __('follow')%>" data-followed-text="<%= __('followed')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? true : false%>" data-score="<%= host.averageScore || 5%>" style="max-width:100px;font-size: 8px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;"><%= host.shopName%></>
+          <li class="nav-item py-1 px-1 <%= i===0?'active':''%>">
+            <button class="nav-link btn-light cursor-pointer <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-filter-type="chef" data-filter=".<%= host.shopName.replace(/ |\'/g,'')%>" data-toggle="tab" data-likes="<%= host.likes || 0%>" data-picture="<%= host.picture%>" data-host="<%= host.id%>" data-follow-text="<%= __('follow')%>" data-followed-text="<%= __('followed')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? true : false%>" data-score="<%= host.averageScore || 5%>" style="max-width:100px;font-size: 8px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;"><%= host.shopName%></>
           </li>
         <% })%>
       </ul>
@@ -74,11 +60,11 @@
     <div class="w-100 d-flex">
       <nav id="dishTagsBar" class="sticky-top py-2" style="overflow-y: scroll;min-width: 100px;">
         <% if(!user || (user && !user.newUserRewardIsRedeemed && user.points === 0)){ %>
-          <a id="newUserRewardIcon" data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/user/reward/newUser"><img class="icon-float cursor-pointer" src="/images/icon_new.png"></a>
+          <a id="newUserRewardIcon" data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event)" data-href="/user/reward/newUser"><img class="icon-float cursor-pointer" data-src="../../images/icon_new.png"></a>
         <% }%>
         <ul class="list list-side list-unstyled" data-toggle="btn-set">
           <% tags.forEach(function(tag, index){%>
-            <li class="cursor-pointer border-bottom <%= index===0?'active':''%>"><a style="white-space: nowrap;" data-offset=-144 href="<%= tag.replace("'","").replace(" ","")%>"><%= __(tag)%></a></li>
+            <li class="cursor-pointer border-bottom <%= index===0?'active':''%>"><a style="white-space: nowrap;" data-offset=-108 href="<%= tag.replace("'","").replace(" ","")%>"><%= __(tag)%></a></li>
           <% })%>
         </ul>
       </nav>
@@ -88,7 +74,7 @@
             <div class="pl-4 py-2 text-center light-grey border" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag.replace("'","").replace(" ","")%>">
               <h6 class="none" style="min-width: 80px;"><%= __(tag)%></h6>
             </div>
-            <div class="d-flex justify-content-around py-3" id="<%= tag%>">
+            <div class="d-flex justify-content-around py-3 mix" id="<%= tag%>">
               <div class="d-flex flex-row vertical-align">
                 <div class="mr-2">
                   <img onclick="location.href='/host/public/<%= hosts[0].id%>'" src="<%= hosts[0].picture%>" class="size-small rounded-circle cursor-pointer">
@@ -121,7 +107,7 @@
             if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
             %>
             <% if(tag === "chef"){%>
-              <div style="display:none;" data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem py-2 mix item <%= meal.chef.shopName.replace(/ |\'/g,'')%> <%= dateKey.replace(" ",'').replace('/','')%>
+              <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-cover-string="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem py-2 mix item <%= meal.chef.shopName.replace(/ |\'/g,'')%> <%= dateKey.replace(" ",'').replace('/','')%>
                   <% if(dish.tags){ dish.tags.forEach(function(t){%>
                     <%= " " + t%>
                   <%})}%>">
@@ -130,7 +116,7 @@
                     <div class="photo middle rounded">
                       <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
                         <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
-                          <img src="/images/blank.gif" data-echo="<%= index===0? photo.v : ''%>">
+                          <img data-src="../../images/blank.gif" data-echo="<%= index===0? photo.v : ''%>">
                         </a>
                       <% }});%>
                     </div>
@@ -147,13 +133,13 @@
                         <div class="text text-price price mr-auto" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
                           $<%= dish.price.toFixed(2)%>
                         </div>
-                        <button name="order-btn" class="btn rounded-circle orange text-white font-weight-bold cursor-pointer" onclick="javascript:orderFood('<%= dish.id %>',1,true)">+</button>
+                        <button name="order-btn" style="width: 38px;height: 38px;" class="btn orange rounded-circle text-white font-weight-bold cursor-pointer" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
                         <div name="input-group" class="input-group input-group-sm amount-input round ml-2" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
-                          <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">
+                          <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
                             <span class="input-group-text">-</span>
                           </div>
                           <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
-                          <div class="input-group-append add" onclick="javascript:orderFood('<%= dish.id %>',1,true)">
+                          <div class="input-group-append add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
                             <span class="input-group-text">+</span>
                           </div>
                         </div>
@@ -179,7 +165,7 @@
                 if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
               %>
                 <% if(dish.type === tag || (dish.tags && dish.tags.includes(tag))){ %>
-                  <div style="display:none;" data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem py-2 mix item <%= meal.chef.shopName.replace("'","").replace(" ","")%> <%= dateKey.replace(" ",'').replace('/','')%>
+                  <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem py-2 mix item <%= meal.chef.shopName.replace("'","").replace(" ","")%> <%= dateKey.replace(" ",'').replace('/','')%>
                     <% if(dish.tags){ dish.tags.forEach(function(t){%>
                       <%= " " + t%>
                     <%})}%>">
@@ -188,7 +174,7 @@
                         <div class="photo middle rounded">
                           <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
                             <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
-                              <img src="/images/blank.gif" data-echo="<%= index===0? photo.v : ''%>">
+                              <img data-src="/images/blank.gif" data-echo="<%= index===0? photo.v : ''%>">
                             </a>
                           <% }});%>
                         </div>
@@ -205,13 +191,13 @@
                             <div class="text text-price price mr-auto" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
                               $<%= dish.price.toFixed(2)%>
                             </div>
-                            <button name="order-btn" class="btn rounded-circle orange text-white font-weight-bold cursor-pointer" onclick="javascript:orderFood('<%= dish.id %>',1,true)">+</button>
+                            <button name="order-btn" style="width: 38px;height: 38px;" class="btn rounded-circle orange text-white font-weight-bold cursor-pointer" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
                             <div name="input-group" class="input-group input-group-sm amount-input round ml-2" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
-                              <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">
+                              <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
                                 <span class="input-group-text">-</span>
                               </div>
                               <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
-                              <div class="input-group-append add" onclick="javascript:orderFood('<%= dish.id %>',1,true)">
+                              <div class="input-group-append add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
                                 <span class="input-group-text">+</span>
                               </div>
                             </div>
@@ -225,8 +211,8 @@
         <div id="shoppingCartView" class="red text-white p-2 align-middle d-block w-100" style="line-height:50px;position: fixed;bottom: 0;left: 0;z-index:90;" onclick="javascript:location.href='#order'">
           <div class="row">
             <div class="col-3"><span style="left: 10px;" class="total-preview relative" data-subtotal=""></span></div>
-            <div class="col-6 middle text-center"><button class="btn btn-outline-light" id="gotoCheckoutBtn" class="mr-1"><%= __('go-to-check-out-btn')%></button></div>
-            <div class="col-3 text-right"><div id="orderPreviewBtn" style="right: 10px;" class="btn btn-outline-white order-preview relative" data-toggle="tooltip"></div></div>
+            <div class="col-6 middle text-center"><button type="button" class="btn btn-outline-light" id="gotoCheckoutBtn" class="mr-1"><%= __('go-to-check-out-btn')%></button></div>
+            <div class="col-3 text-right"><div id="orderPreviewBtn" style="right: 10px;" class="btn btn-outline-white order-preview relative text-white" data-toggle="tooltip"></div></div>
           </div>
         </div>
       </div>
@@ -234,20 +220,8 @@
   </div>
 </div>
 
-<script>
-  $(document).ready(function(){
-    var dayOfMealView = new DayOfMealView({ el : $("#dayOfMealContainer"), model : new Meal()});
-  });
-  new HostSectionInMealView({ el : $("#dayOfMealContainer"), model : new Host()});
-  var coverDishId = $("#dayOfMealContainer").data("cover");
-  var user = $("#dayOfMealContainer").data("user");
-  var coverDish = $("#dayOfMealContainer").find(".dish a[data-gallery='" + coverDishId + "']");
-  var dishTitle = coverDish.data("title");
-  var desc = coverDish.data("footer");
-  setupWechat($("#dayOfMealContainer [data-coverstring]").data("coverstring"),"SFMeal本周菜单", "小龙虾，冷串串，麻辣干锅，冰粉");
-  if(!user){
-    wechatLogin();
-  }
-</script>
+<link href="/assets/dayOfMeal.css" rel="stylesheet">
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script>
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script>
+<script src="/assets/zh.dayOfMeal.bundle.js"></script>
 
-<script src="/js/utils/jweixin-1.0.0.js"></script>

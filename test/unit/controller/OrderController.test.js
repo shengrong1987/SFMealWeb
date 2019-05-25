@@ -866,6 +866,13 @@ describe('OrderController', function() {
           })
       })
 
+      it('should log out user', function(done){
+        agent
+          .get('/auth/logout')
+          .expect(302)
+          .end(done)
+      });
+
       it('should not take order not reach minimal order ', function (done) {
         var dishObj = {};
         dishObj[dishId1] = { number : 4 , preference : [{ property : '', extra : 0}], price : price7 };
@@ -894,13 +901,6 @@ describe('OrderController', function() {
     })
 
     describe('order meal with points', function(){
-
-      it('should log out user', function(done){
-        agent
-          .get('/auth/logout')
-          .expect(302)
-          .end(done)
-      });
 
       it('should not order the meal again with points', function (done) {
         var dishObj = {};

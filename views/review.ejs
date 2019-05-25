@@ -1,4 +1,4 @@
-<div id="orderReviewPopup" data-order="<%= orders[0].id || ''%>" class="p-4">
+<div id="orderReviewPopup" data-order="<%= orders[0].id || ''%>" class="p-4 white">
   <%
   if(orders[0].reviewing_orders && orders[0].reviewing_orders.length){
     var index = 0;
@@ -49,11 +49,8 @@
     </div>
   <%
     index++;}})})}else{%>
-    <h3 class="text-center"><small><%= orders[0].status === "review" ? __('complete-review-tip') : __('no-review-tip')%><br/><br/><a class="btn btn-grey-red active" href="/host/public/<%= orders[0].host%>"><%= __('see-review')%></a></small></h3>
+    <h4 class="text-center"><small><%= orders[0].status === "review" ? __('complete-review-tip') : __('no-review-tip')%><br/><br/><a class="btn btn-grey-red active" href="/host/public/<%= orders[0].host%>"><%= __('see-review')%></a></small></h4>
   <%}%>
 </div>
 
-<script>
-  setup();
-  new ReviewView({ el : $("#orderReviewPopup"), model : new Order()})
-</script>
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script><script src="/assets/zh.review.bundle.js"></script>

@@ -83,7 +83,7 @@ module.exports = {
   /*
   Build pick-up info
    */
-  buildDeliveryData : function(params, meal, req, cb){
+  buildDeliveryData : function(params, meal, pickups, req, cb){
     //check meals both have the same pickupOption
     var pickUpInfo,delivery_fee = 0;
     if(params.method === "shipping"){
@@ -107,9 +107,19 @@ module.exports = {
       }else{
         delivery_fee = 0;
       }
-      meal.pickups.forEach(function(pickup){
+      params.pickupOption = params.pickupOption.toString();
+      var pickupInfos = params.pickupOption.split(":");
+      var pickupIndex;
+      var pickupNickname;
+      if(pickupInfos.length > 1){
+        pickupIndex = parseInt(pickupInfos[1]);
+        pickupNickname = pickupInfos[0];
+      }else{
+        pickupIndex = parseInt(params.pickupOption);
+      }
+      pickups.forEach(function(pickup){
         sails.log.info("pick up option: " + pickup.index);
-        if(pickup.index === params.pickupOption){
+        if(pickup.index == pickupIndex && (!pickupNickname || pickup.nickname === pickupNickname)){
           pickUpInfo = Object.assign({}, pickup);
         }
       });
@@ -138,8 +148,6 @@ module.exports = {
       orders : detail key to value order list
       subtotal : dishes subtotal
       method : ['pickup','delivery','shipping']
-      mealId : meal's id
-      delivery_fee : delivery fee
       couponCode : coupon code
       points : points to apply
       isLogin : whether the checkout is login
@@ -154,6 +162,7 @@ module.exports = {
 
     var _this = this;
 
+    var isAdmin = req.session.authenticated && req.session.user.auth.email === "admin@sfmeal.com";
     var orders = req.body.orders;
     if(!orders){
       return res.badRequest({code: -54, responseText: req.__('meal-checkout-lack-of-order')});
@@ -243,7 +252,7 @@ module.exports = {
             })
           }],
           buildOptions : ['validateOrders', function(next){
-            _this.buildDeliveryData(req.body, meals[0], req, function(logisticInfo){
+            _this.buildDeliveryData(req.body, meals[0], meals[0].pickups, req, function(logisticInfo){
               _logisticInfo = logisticInfo;
               next();
             });
@@ -255,7 +264,7 @@ module.exports = {
                 subtotal += meal.subtotal;
               });
               sails.log.info("subtotal: " + subtotal, "minimal order amount:" + _logisticInfo.pickupInfo.minimalOrder);
-              if(parseFloat(subtotal) < parseFloat(_logisticInfo.pickupInfo.minimalOrder)){
+              if(parseFloat(subtotal) < parseFloat(_logisticInfo.pickupInfo.minimalOrder) && !isAdmin){
                 return next({ code: -60, responseText : req.__('order-single-minimal-not-reach', _logisticInfo.pickupInfo.minimalOrder)});
               }
               next();
@@ -1869,7 +1878,6 @@ module.exports = {
 
   updatePickupInfo : function(req, res){
     var orderId = req.params["id"];
-    req.body.pickupOption = parseInt(req.body.pickupOption);
     var address = req.body.address;
     var method = req.body.method;
     var mealId = req.body.mealId;
@@ -1894,7 +1902,7 @@ module.exports = {
       if(req.body.comment){
         req.body.customInfo.comment = req.body.comment;
       }
-      Meal.findOne(mealId).populate("chef").exec(function(err, meal){
+      Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err, meal){
         if(err){
           return res.badRequest(err);
         }
@@ -1902,26 +1910,54 @@ module.exports = {
           if(err){
             return res.badRequest(err);
           }
-          _this.buildDeliveryData(req.body, meal, req, function(_logisticInfo){
-            req.body.pickupInfo = _logisticInfo.pickupInfo;
-            req.body.delivery_fee = _logisticInfo.delivery_fee;
-            _this.cancelOrderJob(orderId, '', function(err){
+          let _pickups = [];
+          Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
+            if(err){
+              return res.badRequest(err);
+            }
+            var _dishes=[];
+            async.auto({
+              findPickups : function(next){
+                meals.forEach(function(meal){
+                  if(!_pickups.length){
+                    _pickups = meal.pickups;
+                  }else{
+                    meal.pickups.forEach(function(pickup){
+                      if(!_pickups.some(function(p){
+                        return moment(p.pickupFromTime).isSame(pickup.pickupFromTime, 'minutes') && moment(p.pickupTillTime).isSame(pickup.pickupTillTime, 'minutes') && p.location === pickup.location && p.method === pickup.method;
+                      })){
+                        _pickups.push(pickup);
+                      }
+                    })
+                  }
+                });
+                next();
+              }
+            }, function(err){
               if(err){
                 return res.badRequest(err);
               }
-              req.body.isScheduled = false;
-              Order.update(order.id, req.body).exec(function(err, result){
-                if(err){
-                  return res.badRequest(err);
-                }
-                result.meal = meal;
-                result.host = order.host;
-                res.ok(result);
+              _this.buildDeliveryData(req.body, meal, _pickups, req, function(_logisticInfo){
+                req.body.pickupInfo = _logisticInfo.pickupInfo;
+                req.body.delivery_fee = _logisticInfo.delivery_fee;
+                _this.cancelOrderJob(orderId, '', function(err){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  req.body.pickupOption = _logisticInfo.pickupInfo.index;
+                  req.body.isScheduled = false;
+                  Order.update(order.id, req.body).exec(function(err, result){
+                    if(err){
+                      return res.badRequest(err);
+                    }
+                    result[0].meal = meal;
+                    result[0].host = order.host;
+                    res.ok(result[0]);
+                  });
+                });
               });
-            });
-          });
-
-
+            })
+          })
         });
       })
     });
@@ -2177,9 +2213,6 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      // if(order.coupon){
-      //   return res.badRequest({ code : -18, responseText : req.__('adjust-with-coupon-error')});
-      // }
       if(order.status === "cancel"){
         return res.badRequest({ code : -43, responseText : req.__('order-manipulate-wrong-status')});
       }
@@ -2511,11 +2544,22 @@ module.exports = {
    check if parameters are valid
    */
   validateOption : function(params, meals, req, cb){
+    if(!params.pickupOption){
+      return cb({responseText : req.__('order-pickup-option-empty-error'), code : -20});
+    }
+    params.pickupOption = params.pickupOption.toString();
+    var pickupOptions = params.pickupOption.split(":");
+    if(pickupOptions.length > 1){
+      var pickupOption = parseInt(pickupOptions[1]);
+      var pickupNickname = pickupOptions[0];
+    }else{
+      pickupOption = parseInt(params.pickupOption);
+    }
     var pickups = [];
     var existInMeals = meals.forEach(function(meal){
       var pickup = meal.pickups.filter(function(pickup){
-        sails.log.info("pickup index: " + pickup.index + " pickup option: " + params.pickupOption);
-        return pickup.index === params.pickupOption;
+        sails.log.info("pickup index: " + pickup.index + " pickup option: " + pickup.pickupOption);
+        return pickup.index === pickupOption && ( !pickupNickname && pickup.nickname === pickupNickname);
       })[0];
       if(pickup){
         pickups.push(pickup);
@@ -2530,6 +2574,8 @@ module.exports = {
     if(!isSamePickup){
       return cb({ code : -51, responseText : req.__('meal-not-same-pickup-option')});
     }
+
+
 
     async.each(meals, function(meal, next){
       var method = params.method;
@@ -2549,7 +2595,6 @@ module.exports = {
           return next({responseText: req.__('order-invalid-method'), code: -11});
         }
         var range = params.isPartyMode ? meal.delivery_range * stripe.PARTY_ORDER_RANGE_MULTIPLIER : meal.delivery_range;
-        var pickupOption = params.pickupOption;
         if(!pickupOption){
           return next({responseText : req.__('order-pickup-option-empty-error'), code : -20});
         }else if(pickupOption > meal.pickups.length+1){
@@ -2557,7 +2602,7 @@ module.exports = {
         }
         var pickupInfo;
         meal.pickups.forEach(function(pickup){
-          if(pickup.index === pickupOption){
+          if(pickup.index == pickupOption){
             pickupInfo = Object.assign({}, pickup);
           }
         });
@@ -2853,9 +2898,9 @@ module.exports = {
             delete order.customer;
             delete order.meal;
             delete order.host;
-            delete order.orders;
-            delete order.contactInfo;
-            delete order.pickupInfo;
+            // delete order.orders;
+            // delete order.contactInfo;
+            // delete order.pickupInfo;
             delete order.eta;
             delete order.isScheduled;
             delete order.isSendToHost;
@@ -2870,10 +2915,10 @@ module.exports = {
             delete order.charges;
             delete order.feeCharges;
             delete order.customInfo;
-            order.dishes = []
+            order.dishes = [];
             order.dynamicDishes = [];
-            delete order.dishes;
-            delete order.dynamicDishes;
+            // delete order.dishes;
+            // delete order.dynamicDishes;
           }
           cb();
         });
@@ -2929,11 +2974,11 @@ module.exports = {
           order.dishes.forEach(function (dish) {
             var hasDish = dishes.some(function (oldDish) {
               return oldDish.id === dish.id;
-            })
+            });
             if (!hasDish) {
               dishes.push(dish);
             }
-          })
+          });
           next();
         }, function(err){
           if(err){

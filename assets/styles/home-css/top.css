@@ -394,7 +394,7 @@
   .topPlan .planBoxWrap .planBox.hokende {
     background-color: #151F45; }
     .topPlan .planBoxWrap .planBox.hokende .img {
-      background: url(/images/img_plan_01.png) center center no-repeat;
+      background: url(../../images/img_plan_01.png) center center no-repeat;
       background-size: cover; }
     .topPlan .planBoxWrap .planBox.hokende .ja:before {
       background-size: cover;
@@ -408,7 +408,7 @@
     -ms-flex-direction: row-reverse;
     flex-direction: row-reverse; }
     .topPlan .planBoxWrap .planBox.jihide .img {
-      background: url(/images/img_plan_02.png) center center no-repeat;
+      background: url(../../images/img_plan_02.png) center center no-repeat;
       background-size: cover; }
     .topPlan .planBoxWrap .planBox.jihide .ja:before {
       background-size: cover;
@@ -418,7 +418,7 @@
   .topPlan .planBoxWrap .planBox.jibunmo {
     background-color: #151F45; }
     .topPlan .planBoxWrap .planBox.jibunmo .img {
-      background: url(/images/img_plan_03.png) center center no-repeat;
+      background: url(../../images/img_plan_03.png) center center no-repeat;
       background-size: cover; }
     .topPlan .planBoxWrap .planBox.jibunmo .ja:before {
       background-size: cover;

@@ -44,7 +44,7 @@
                     <h5 class="mb-0"><% if(!user || Object.keys(user).length == 0){%>
                       <small>
                         <!--<a class="text-orange cursor-pointer" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html"><u><%= __('signup-tips')%></u></a>-->
-                        <a class="text-green cursor-pointer" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" title="<%= __('login-tips')%>%>"><u><%= __('already-signup')%></u></a>
+                        <a class="text-green cursor-pointer" style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;" href="javascript:void(0)" onclick="h.toggleModal(event)" toggle="modal" data-target="#myModal" data-model="user" data-action="signin" title="<%= __('login-tips')%>%>"><u><%= __('already-signup')%></u></a>
                       </small>
                       <% }%>
                     </h5>
@@ -100,7 +100,7 @@
             <div class="col-12 text-left">
               <div class="radio-box">
                 <label class="btn btn-default vertical-inline option">
-                  <input type="radio" id="createNewContactBtn" data-id="<%= user.id%>" data-target="#myModal" data-href="/templates/user/address.html" class="regular-radio"><label for="createNewContactBtn"></label>
+                  <input type="radio" id="createNewContactBtn" data-id="<%= user.id%>" data-target="#myModal" data-model="user" data-action="address" class="regular-radio"><label for="createNewContactBtn"></label>
                   <span style="margin-left: 10px;"><%=  __('enter-new-contact')%></span>
                 </label>
               </div>
@@ -193,7 +193,7 @@
                     <h5 class="pickupInput"><%= __('pickup-option') %></h5>
                   </div>
                   <div class="pr-5">
-                    <h5><small><a toggle="modal" data-target="#myModal" data-href="/templates/meal/map.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fas fa-map-marker-alt"></i> <%= __('show-map') %></a></small></h5>
+                    <h5><small><a toggle="modal" data-target="#myModal" data-model="meal" data-action="map" href="javascript:void(0)" onclick="h.toggleModal(event)"><i class="fas fa-map-marker-alt"></i> <%= __('show-map') %></a></small></h5>
                   </div>
                 </div>
               </div>
@@ -289,8 +289,8 @@
                             </label>
                             <%j++;}i++;})}; %>
                             <h5 class="empty d-none text-center">
-                              <small><%= __('delivery-out-of-range-error')%></small><br/><br/>
-                              <small><%= __('other-area-shipping')%></small>
+                              <small class="text-red"><%= __('delivery-out-of-range-error')%></small><br/><br/>
+                              <small class="text-red"><%= __('other-area-shipping')%></small>
                               <button id="switchToShippingBtn" class="btn btn-outline-dark"><%= __('shipping')%></button>
                             </h5>
                             <h5 class="no-address text-center">
@@ -464,28 +464,6 @@
                     <span> / </span>
                     <select name="year" data-toggle="select" data-stripe="exp-year" class="card-expiry-year stripe-sensitive required form-control" value=<%= typeof payment != 'undefined' ? payment.exp_year : '2017'%>>
                     </select>
-                    <script type="text/javascript">
-                      var select = $(".card-expiry-year"),
-                        year = new Date().getFullYear();
-
-                      for (var i = 0; i < 12; i++) {
-                        select.append($("<option value='"+(i + year)+"' "+(i === 0 ? "selected" : "")+">"+(i + year)+"</option>"))
-                      }
-
-                      var month = $(".card-expiry-month").attr("value");
-                      $(".card-expiry-month option").each(function(){
-                        if($(this).attr("value")==month){
-                          $(this).attr("selected","selected");
-                        }
-                      });
-
-                      var year = $(".card-expiry-year").attr("value");
-                      $(".card-expiry-year option").each(function(){
-                        if($(this).attr("value")==year){
-                          $(this).attr("selected","selected");
-                        }
-                      });
-                    </script>
                   </div>
                 </div>
 
@@ -558,11 +536,11 @@
                 <td class="price" value=<%= dish.price %> data-extra=0>$<%= dish.price %></td>
 
                 <td class="input-group input-group-sm amount-input round ml-auto pl-0" style="max-width:200px;min-width:30px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
-                  <div class="input-group-prepend minus" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">
+                  <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
                     <span class="input-group-text">-</span>
                   </div>
                   <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
-                  <div class="input-group-append add" onclick="javascript:orderFood('<%= dish.id %>',1,true)">
+                  <div class="input-group-append add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
                     <span class="input-group-text">+</span>
                   </div>
                 </td>
@@ -618,7 +596,7 @@
             <th><input class="points form-control" style="margin:0 5px 0 5px;width: 60px;" readonly value="<%= user?(user.points || 0):-1%>"></input></th>
             <th class="text-right">
               <button id="applyPointsBtn" class="btn btn-success"><%= __('apply-code')%></button>
-              <button id="disApplyPointsBtn" class="btn btn-danger" onclick="javascript:applyPoints(false);"><%= __('disapply-code')%></button>
+              <button id="disApplyPointsBtn" class="btn btn-danger"><%= __('disapply-code')%></button>
             </th>
           </tr>
           <%}%>
@@ -631,17 +609,8 @@
     </div>
 
   </div>
-
-  <h1></h1>
-
 </div>
-
-<script>
-  var addressView, mealConfirmationView;
-  $(document).ready(function(){
-    new OrderView({ el : $("#meal-confirm-container"), model : new Order()})
-    addressView = new AddressView({ el : $("#meal-confirm-container"), model : new User()})
-    mealConfirmView = new MealConfirmView( { el : $("#meal-confirm-container"), model : new Meal()})
-    new ContactInfoView({ el : $("#contactInfoView"), model : new User()});
-  })
-</script>
+<link href="/assets/checkout.css" rel="stylesheet">
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script>
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script>
+<script src="/assets/zh.checkout.bundle.js"></script>

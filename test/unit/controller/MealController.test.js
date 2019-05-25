@@ -76,102 +76,96 @@ describe('MealController', function() {
           .end(function(err,res){
             should.exist(res.body.id);
             dish1 = res.body.id
+            agent
+              .post('/dish')
+              .send({title : '猪肉馅饼',price: 10, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', tags : "select", type: 'appetizer', chef : hostId})
+              .expect(200)
+              .end(function(err,res){
+                should.exist(res.body.id);
+                dish2 = res.body.id;
+                agent
+                  .post('/dish')
+                  .send({title : '五彩面',price: 16, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', tags : "select,frozen", type: 'entree', chef : hostId})
+                  .expect(200)
+                  .end(function(err,res){
+                    should.exist(res.body.id);
+                    dish3 = res.body.id;
+                    agent
+                      .post('/dish')
+                      .send({
+                        title : '糖水',
+                        price: 16,
+                        photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
+                        tags : "select",
+                        type: 'dessert',
+                        chef : hostId,
+                        isSupportShipping : true,
+                        preference : {
+                          sweetness : [ { property : 'super sweet', extra : 1}, { property : 'normal', extra : 0}, { property : 'ultra sweet', extra : 2} ],
+                          spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
+                        }
+                      })
+                      .expect(200)
+                      .end(function(err,res){
+                        should.exist(res.body.id);
+                        dish4 = res.body.id;
+                        agent
+                          .post('/dish')
+                          .send({
+                            title : '隐藏菜式',
+                            price: 10,
+                            photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
+                            tags : "select",
+                            type: 'dessert',
+                            chef : hostId,
+                            preference : {
+                              sweetness : [ { property : 'super sweet', extra : 1}, { property : 'normal', extra : 0}, { property : 'ultra sweet', extra : 2} ],
+                              spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
+                            }
+                          })
+                          .expect(200)
+                          .end(function(err,res){
+                            should.exist(res.body.id);
+                            dish5 = res.body.id;
+                            agent
+                              .post('/dish')
+                              .send({
+                                title : '麻辣小龙虾',
+                                price: 30,
+                                photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
+                                type: 'entree',
+                                tags : "select,limited",
+                                chef : hostId,
+                                preference : {
+                                  spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
+                                }
+                              })
+                              .expect(200)
+                              .end(function(err,res){
+                                should.exist(res.body.id);
+                                dish6 = res.body.id;
+                                agent
+                                  .post('/dish')
+                                  .send({
+                                    title : '蒜泥小龙虾',
+                                    price: 30,
+                                    photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
+                                    type: 'entree',
+                                    tags : "limited",
+                                    chef : hostId
+                                  })
+                                  .expect(200)
+                                  .end(function(err,res){
+                                    should.exist(res.body.id);
+                                    dish7 = res.body.id;
+                                    done();
+                                  })
+                              })
+                          })
+                      })
+                  })
+              })
           })
-
-      agent
-          .post('/dish')
-          .send({title : '猪肉馅饼',price: 10, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', tags : "select", type: 'appetizer', chef : hostId})
-          .expect(200)
-          .end(function(err,res){
-            should.exist(res.body.id);
-            dish2 = res.body.id;
-          })
-
-      agent
-          .post('/dish')
-          .send({title : '五彩面',price: 16, photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]', tags : "select,frozen", type: 'entree', chef : hostId})
-          .expect(200)
-          .end(function(err,res){
-            should.exist(res.body.id);
-            dish3 = res.body.id;
-          })
-
-      agent
-          .post('/dish')
-          .send({
-            title : '糖水',
-            price: 16,
-            photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
-            tags : "select",
-            type: 'dessert',
-            chef : hostId,
-            isSupportShipping : true,
-            preference : {
-              sweetness : [ { property : 'super sweet', extra : 1}, { property : 'normal', extra : 0}, { property : 'ultra sweet', extra : 2} ],
-              spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
-            }
-          })
-          .expect(200)
-          .end(function(err,res){
-            should.exist(res.body.id);
-            dish4 = res.body.id;
-          })
-
-      agent
-        .post('/dish')
-        .send({
-          title : '隐藏菜式',
-          price: 10,
-          photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
-          tags : "select",
-          type: 'dessert',
-          chef : hostId,
-          preference : {
-            sweetness : [ { property : 'super sweet', extra : 1}, { property : 'normal', extra : 0}, { property : 'ultra sweet', extra : 2} ],
-            spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
-          }
-        })
-        .expect(200)
-        .end(function(err,res){
-          should.exist(res.body.id);
-          dish5 = res.body.id;
-        })
-
-      agent
-        .post('/dish')
-        .send({
-          title : '麻辣小龙虾',
-          price: 30,
-          photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
-          type: 'entree',
-          tags : "select,limited",
-          chef : hostId,
-          preference : {
-            spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
-          }
-        })
-        .expect(200)
-        .end(function(err,res){
-          should.exist(res.body.id);
-          dish6 = res.body.id;
-        })
-
-      agent
-        .post('/dish')
-        .send({
-          title : '蒜泥小龙虾',
-          price: 30,
-          photos:'[{"v":"/images/dumplings.jpg"},{"v":"/images/dumplings.jpg"}]',
-          type: 'entree',
-          tags : "limited",
-          chef : hostId
-        })
-        .expect(200)
-        .end(function(err,res){
-          should.exist(res.body.id);
-          dish7 = res.body.id;
-          done();
-        })
     });
 
     it('should update a dish with preference', function(done){

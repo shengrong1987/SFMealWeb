@@ -1,3 +1,4 @@
+<link href="/assets/chefProfile.css" rel="stylesheet">
 <div class="default-container text-center relative">
 
   <div class="pure-banner red py-4">
@@ -13,13 +14,13 @@
     </div>
   </div>
 
-  <div id="hostProfileView" data-host="<%= host.id%>" class="box" data-title="<%= host.shopNameI18n(locale)%>" data-desc="<%= host.introI18n(locale)%>" data-user="<%= user || ''%>">
+  <div id="hostProfileView" data-host="<%= host.id%>" class="box" data-title="<%= host.shopNameI18n(locale)%>" data-desc="<%= host.introI18n(locale)%>" data-user="<%= user.id || ''%>">
 
     <div class="box white">
 
       <div class="row">
         <div class="col-12">
-          <img src="<%= host.picture|| "/images/profile_man.png"%>" class="round_thumb" style="width: 150px;height: 150px;">
+          <img data-src="<%= host.picture || "../../images/profile_man.png"%>" src="<%= host.picture || ''%>" class="round_thumb" style="width: 150px;height: 150px;">
         </div>
       </div>
 
@@ -107,13 +108,4 @@
   </div>
 </div>
 
-<script>
-  var title = $("#hostProfileView").data("title");
-  var desc = $("#hostProfileView").data("desc");
-  new HostPageView({ el : $("#hostProfileView"), model : new Host()})
-  setupWechat($("#hostProfileView .round_thumb").prop("src"), title , title + ":" + desc);
-  var user = $("#hostProfileView").data("user");
-  if(!user){
-    wechatLogin();
-  }
-</script>
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script><script src="/assets/zh.chefProfile.bundle.js"></script>

@@ -29,17 +29,6 @@
   -->
 
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="/styles/home-css/component.css">
-  <link rel="stylesheet" href="/styles/home-css/base.css">
-  <link rel="stylesheet" href="/styles/home-css/slick-theme.css">
-  <link rel="stylesheet" href="/styles/home-css/slick.css">
-  <link rel="stylesheet" href="/styles/home-css/sp.css">
-  <link rel="stylesheet" href="/styles/home-css/top.css">
-  <link rel="stylesheet" href="/styles/home-css/uniq.css">
-  <link rel="stylesheet" href="/styles/home-css/www-player-2x-webp-vflKKub0K.css">
-  <link rel="stylesheet" href="/styles/home-css/yakuhanjp.min.css">
-  <script src="/js/dependencies/jquery/jquery-2.1.4.min.js"></script>
-
   <!--TEMPLATES-->
   
   <!--TEMPLATES END-->
@@ -55,13 +44,14 @@
     ga('create', 'UA-90950313-1', 'auto');
     ga('send', 'pageview');
   </script>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Overexposure - Slider Revolution</title>
-  <meta name="description" content="Slider Revolution Example" />
-  <meta name="keywords" content="fullscreen image, grid layout, flexbox grid, transition" />
-  <meta name="author" content="ThemePunch" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:title" content="SFMeal私房菜平台，喂饱思乡的你" />
+  <meta property="og:url" content="http://sfmeal.com/meal" />
+  <meta property="og:type" content="website" />
+  <meta property="og:fb:app_id" content="556466254501032" />
+  <meta property="og:description" content="十三香小龙虾，葱油拌面，千里香小馄饨，重庆酸辣粉...欢迎回家吃饭。" />
+  <meta property="og:image" content="http://sfmeal.com/images/sfmeal_logo_slogan.png" />
 
 </head>
 
@@ -75,73 +65,19 @@
 
 <%- body %>
 
-<div class="modal fade" id="myModal" role="dialog">
+<div class="modal" id="myModal" role="dialog">
   <div class="modal-dialog">
-
-    <!-- Modal content-->
-    <div class="modal-content"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"></h5>
+      </div>
+      <div class="modal-body">
+      </div>
+    </div>
   </div>
 </div>
 
 <div class="modal-loading"><!-- Place at bottom of page --></div>
-<div id="placeServiceHelper"></div>
-
-
-
-<!--
-    Client-side Templates
-    ========================
-
-    HTML templates are important prerequisites of modern, rich client applications.
-    To work their magic, frameworks like Backbone, Angular, Ember, and Knockout require
-    that you load these templates client-side.
-
-    By default, your Gruntfile is configured to automatically load and precompile
-    client-side JST templates in your `assets/templates` folder, then
-    include them here automatically (between TEMPLATES and TEMPLATES END).
-
-    To customize this behavior to fit your needs, just edit `tasks/pipeline.js`.
-    For example, here are a few things you could do:
-
-        + Import templates from other directories
-        + Use a different template engine (handlebars, jade, dust, etc.)
-        + Internationalize your client-side templates using a server-side
-          stringfile before they're served.
--->
-
-
-
-
-<!--
-
-  Client-side Javascript
-  ========================
-
-  You can always bring in JS files manually with `script` tags, or asynchronously
-  on the client using a solution like AMD (RequireJS).  Or, if you like, you can
-  take advantage of Sails' conventional asset pipeline (boilerplate Gruntfile).
-
-  By default, files in your `assets/js` folder are included here
-  automatically (between SCRIPTS and SCRIPTS END).  Both JavaScript (.js) and
-  CoffeeScript (.coffee) are supported. In production, your scripts will be minified
-  and concatenated into a single file.
-
-  To customize any part of the built-in behavior, just edit `tasks/pipeline.js`.
-  For example, here are a few things you could do:
-
-      + Change the order of your scripts
-      + Import scripts from other directories
-      + Use a different preprocessor, like TypeScript
-
--->
-
-
-</body>
-</html>
- preprocessor, like TypeScript
-
--->
-
 
 </body>
 </html>

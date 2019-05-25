@@ -45,6 +45,7 @@ describe('PickupOptionController', function() {
           "method" : "pickup",
           "area" : "Market & Downtown",
           "county" : "San Francisco County",
+          "phone" : "(415)802-3853",
           "nickname" : "pickupSet1",
           "index" : 1
         })

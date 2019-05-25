@@ -6,8 +6,8 @@
   font-family: 'Font Awesome 5 Pro';
   font-style: normal;
   font-weight: 900;
-  src: url("../../styles/webfonts/fa-solid-900.eot");
-  src: url("../../styles/webfonts/fa-solid-900.eot?#iefix") format("embedded-opentype"), url("../../styles/webfonts/fa-solid-900.woff2") format("woff2"), url("../../styles/webfonts/fa-solid-900.woff") format("woff"), url("../../styles/webfonts/fa-solid-900.ttf") format("truetype"), url("../../styles/webfonts/fa-solid-900.svg#fontawesome") format("svg"); }
+  src: url("../../styles/fonts/fa-solid-900.eot");
+  src: url("../../styles/fonts/fa-solid-900.eot?#iefix") format("embedded-opentype"), url("../../styles/fonts/fa-solid-900.woff2") format("woff2"), url("../../styles/fonts/fa-solid-900.woff") format("woff"), url("../../styles/fonts/fa-solid-900.ttf") format("truetype"), url("../../styles/fonts/fa-solid-900.svg#fontawesome") format("svg"); }
 
 .fa,
 .fas {

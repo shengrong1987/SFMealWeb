@@ -1,25 +1,29 @@
 
 <div id="sendEmailView">
   <div class="popup box middle signin" style="width: 350px;">
-    <h4 data-toggle="i18n" data-key="enterEmail"></h4>
+    <h4>${__('enterEmail')}</h4>
 
     <form class="text-center" data-toggle="validator" role="form">
-      <div class="form-group" data-toggle="validator" role="form">
-        <label class="sr-only" for="emailInput" data-toggle="i18n" data-key="email"></label>
+      <div class="form-group">
+        <label class="sr-only" for="emailInput">${__('email')}</label>
         <input type="email" class="form-control" id="emailInput" placeholder="email" required data-error="bad format">
-        <div class="help-block with-errors"></div>
+        <div class="help-block with-errors text-red"></div>
       </div>
 
       <div class="form-group">
-        <button id="sendEmailBtn" type="button" class="btn btn-danger btn-lg round red popline" data-toggle="i18n" data-key="sendResetEmail"></button>
+        <button id="sendEmailBtn" type="button" class="btn btn-danger btn-lg round red popline">${__('sendResetEmail')}</button>
       </div>
       <div class="alert alert-success d-none"></div>
-      <div class="alert alert-danger d-none" data-toggle="i18n" data-key="emailNotExistError"></div>
+      <div class="alert alert-danger d-none">${__('emailNotExistError')}</div>
     </form>
   </div>
 </div>
 
-<script>
-  setup();
-  new LoginView({model : new Auth(), el: $("#sendEmailView")});
-</script>
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~420a7fe4.bundle.js"></script>
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~b0befe2f.bundle.js"></script>
+<script src="/assets/vendors~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMeal~help~37f74159.bundle.js"></script>
+<script src="/assets/vendors~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMeal~host~250cd2f8.bundle.js"></script>
+<script src="/assets/apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMeal~help~host~jo~9557e0fe.bundle.js"></script>
+<script src="/assets/apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMeal~help~host~jo~33be8c5d.bundle.js"></script>
+<script src="/assets/sendEmail~tab.bundle.js"></script>
+<script src="/assets/zh.sendEmail.bundle.js"></script>

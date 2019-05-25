@@ -1,4 +1,4 @@
-
+<link href="/assets/user.css" rel="stylesheet">
 <div>
   <div class="d-flex justify-content-center pure-banner vertical-align red p-4">
     <div class="cursor-pointer mr-4">
@@ -12,11 +12,11 @@
   <div>
     <div>
       <ul class="nav nav-tabs nav-fill bg-light pt-3">
-        <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder"><%= __('nav-bar-order')%><span class="badge badge-small orange pull-right" style="top: -10px;right: 5px;padding: 5px;"><%= user.orders.filter(function(order){return order.status !== "cancel" && order.status !== "review" && order.status !== "complete" && order.meal}).length || '' %></span></a></li>
+        <li class="nav-item"><a class="nav-link active" data-toggle="tab" data-href="#myorder"><%= __('nav-bar-order')%><span class="badge orange ml-1 pull-right text-white" style="top: -10px;right: 5px;padding: 5px;"><%= user.orders.filter(function(order){return order.status !== "cancel" && order.status !== "review" && order.status !== "complete" && order.meal}).length || '' %></span></a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#mycollect"><%= __('user-nav-collect')%></a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#myinfo"><%= __('user-nav-info')%></a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" data-href="#myaddress"><%= __('user-nav-address')%></a></li>
-        <li class="nav-item"><a class="nav-link veritcal-align" data-toggle="tab" role="tab" data-href="#myreview"><%= __('nav-bar-review')%><span class="badge badge-small orange pull-right" style="top: -10px;right: 5px;padding: 5px;"><%= user.orders.filter(function(order){return order.status == "review" && order.meal}).length || ''%></span></a></li>
+        <li class="nav-item"><a class="nav-link veritcal-align" data-toggle="tab" role="tab" data-href="#myreview"><%= __('nav-bar-review')%><span class="badge ml-1 orange pull-right text-white" style="top: -10px;right: 5px;padding: 5px;"><%= user.orders.filter(function(order){return order.status == "review" && order.meal}).length || ''%></span></a></li>
       </ul>
 
       <div class="tab-content">
@@ -36,7 +36,7 @@
                 <% tabsData.forEach(function(tabData, i){%>
                   <li class="nav-item cursor-pointer <%= i===0?'active':''%>">
                     <a data-toggle="tab" data-href="#<%= tabData.id%>" class="nav-link text-dark relative"><div><%= __(tabData.title)%></div>
-                      <span class="badge badge-small absolute orange pull-right" style="top: -10px;right: 5px;padding: 5px;"><%= user.orders.filter(function(order){return order.status === tabData.status && order.status !== "complete" && order.meal}).length || ''%></span>
+                      <span class="badge text-white ml-1 absolute orange pull-right" style="top: -10px;right: 5px;padding: 5px;"><%= user.orders.filter(function(order){return order.status === tabData.status && order.status !== "complete" && order.meal}).length || ''%></span>
                     </a>
                   </li>
                 <% });%>
@@ -106,7 +106,7 @@
                             $<%= price ? price.toFixed(2) : dish.price.toFixed(2)%><br/>
                             <% if(extra){%>
                               (+$<%= extra.toFixed(2)%>)<br/>
-                              <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                              <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event, appObj.orderView.enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-model="dish" data-action="preference"><%= __('preference')%></a>
                             <% }%>
                           </td>
                           <td><%
@@ -137,7 +137,7 @@
                             <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
                             <td class="minWid50 vetical-align" rowspan="<%= list.length%>">
                               <% if(!order.isPaid){%>
-                                <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/payment"><%= __('pay')%></a>
+                                <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event)" data-href="/order/<%= order.id%>/payment"><%= __('pay')%></a>
                               <% }else if(order.status === "pending-payment"){%>
                                 <a href="javascript:void(0)" data-action="pay" data-payment-method="<%= order.paymentMethod%>" data-order="<%= order.id%>"><%= __('pay')%></a>
                               <%}%>
@@ -147,7 +147,7 @@
                               <% if(order.status == "schedule" || order.status == "preparing"){ %>
                                 <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a>
                                 <div class="divider none-margin">-</div>
-                                <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a>
+                                <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a>
                                 <div class="divider none-margin">-</div>
                                 <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                               <%}else if(!order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")) {%>
@@ -218,7 +218,7 @@
               <div class="col-5">
                 <div class="row vertical-align">
                   <div class="col-md-2">
-                    <img src="<%= host.picture || '/images/profile_man.png'%>" class="round_thumb size-small text-center">
+                    <img data-src="<%= host.picture || '/images/profile_man.png'%>" src="<%= host.picture || ''%>" class="round_thumb size-small text-center">
                   </div>
                   <div class="col-md-10">
                     <h4 class="text-left" style="margin-top: 15px;"><%= host.shopName%><br><small><%= host.shortIntro()%></small></h4>
@@ -258,17 +258,12 @@
                         <div class="fileinput-new thumbnail size-large round_thumb">
                         </div>
                         <div class="fileinput-preview fileinput-exists size-large round_thumb" data-src="<%= user.picture || ''%>">
-                          <img src="<%= user.picture || '/images/profile_man.png'%>" onclick="$('#thumbnailUpload').trigger('click')">
+                          <img data-src="<%= user.picture || '/images/profile_man.png'%>" src="<%= user.picture || ''%>" onclick="$('#thumbnailUpload').trigger('click')">
                         </div>
                       <div>
                       <span class="btn btn-default btn-file"><span class="fileinput-new"><%= __('select-image')%></span><span class="fileinput-exists"><%= __('change')%></span>
-                        <input id="thumbnailUpload" type="file" data-wantsImage=true onchange="uploadThumbnail()">
+                        <input id="thumbnailUpload" type="file" data-wantsImage=true onchange="appObj.userProfileView.uploadThumbnail()">
                       </span>
-                        <script>
-                          $(".fileinput").on("clear.bs.fileinput",function(){
-                            $("input[type='file']").data("isDelete",true);
-                          });
-                        </script>
                       </div>
                       <div class="alert alert-danger d-none mt-2" role="alert"></div>
                       <div class="alert alert-info d-none mt-2" role="alert"></div>
@@ -410,7 +405,7 @@
                           <label class="actual_address"><%= address.street%>, &nbsp;<%= address.city%> <%= address.zip%> <br/>+<%= address.phone%></label>
                         </div>
                         <div class="col-4">
-                          <a class="text-red cursor-pointer" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>" data-address-id="<%= address.id%>" data-id="<%= user.id %>" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0);" onclick="toggleModal(this, addressView.enterAddressInfo)">&nbsp;&nbsp;<%= __('modify')%></a>
+                          <a class="text-red cursor-pointer" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>" data-name="<%= address.name || ''%>" data-address-id="<%= address.id%>" data-id="<%= user.id %>" toggle="modal" data-target="#myModal" data-model="user" data-action="address" href="javascript:void(0);" onclick="h.toggleModal(this, appObj.addressView.enterAddressInfo)">&nbsp;&nbsp;<%= __('modify')%></a>
                           <a class="text-red cursor-pointer deleteBtn" data-street="<%= address.street || ""%>" data-city="<%= address.city || ""%>" data-zip="<%= address.zip || ""%>" data-phone="<%= address.phone || ""%>" data-address-id="<%= address.id%>" data-id="<%= user.id %>" style="margin-left: 5px;" href="javascript:void(0)">&nbsp;<%= __('delete')%></a>
                         </div>
                       </div>
@@ -420,7 +415,7 @@
                 </div>
 
                 <div class="text-left address_block">
-                  <button style="margin: 10px 0 10px 0;" class="btn btn-grey-red round active" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0);" onclick="toggleModal(this, addressView.enterAddressInfo)" data-id="<%= user.id%>"><%= __('new-location-phone')%></button>
+                  <button style="margin: 10px 0 10px 0;" class="btn btn-grey-red round active" toggle="modal" data-target="#myModal" data-model="user" data-action="address" href="javascript:void(0);" onclick="h.toggleModal(this, appObj.addressView.enterAddressInfo)" data-id="<%= user.id%>"><%= __('new-location-phone')%></button>
                 </div>
               </div>
             </div>
@@ -441,7 +436,7 @@
                       <label><%= user.host.full_address || __('need-kitchen-location') %><br/> +<%= user.phone || __('need-phone-number') %></label>
                     </div>
                     <div class="col-4">
-                      <a class="text-green cursor-pointer" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street || ""%>" data-city="<%= user.host.city || ""%>" data-zip="<%= user.host.zip || ""%>" data-phone="<%=user.phone || ""%>" style="margin-left:10px;" toggle="modal" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0)" onclick="toggleModal(this, addressView.enterAddressInfo)"><%= __('modify')%></a>
+                      <a class="text-green cursor-pointer" data-host="true" data-id="<%= user.host.id%>" data-street="<%= user.host.street || ""%>" data-city="<%= user.host.city || ""%>" data-name="<%= user.host.shopName || ''%>" data-zip="<%= user.host.zip || ""%>" data-phone="<%=user.phone || ""%>" style="margin-left:10px;" toggle="modal" data-target="#myModal" data-model="user" data-action="address" href="javascript:void(0)" onclick="h.toggleModal(this, appObj.addressView.enterAddressInfo)"><%= __('modify')%></a>
                     </div>
                   </div>
                 </div>
@@ -604,10 +599,4 @@
     </div>
   </div>
 </div>
-
-<script>
-  var addressView = new AddressView({ el : $("#myaddress"), model : new User()})
-  var userProfileView = new UserProfileView( { el: $("#myinfo"), model : new User()})
-  new ReviewView({ el : $("#myreview"), model : new Review()})
-  var orderView = new OrderView({ el : $("#myorder"), model : new Order()});
-</script>
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~6a20c648.bundle.js"></script><script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~a5c6e9d5.bundle.js"></script><script src="/assets/zh.user.bundle.js"></script>

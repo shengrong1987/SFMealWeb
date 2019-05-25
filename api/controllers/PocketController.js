@@ -83,7 +83,7 @@ module.exports = {
       orderId : order.id,
       deliveryFee : order.delivery_fee,
       tax : order.tax,
-      total : fee.metadata.total
+      total : fee.total
     }
     return fee;
   },
@@ -219,8 +219,9 @@ module.exports = {
       return res.forbidden();
     }
     var isAdmin = req.session.user.auth.email === "admin@sfmeal.com" && (req.session.user.emailVerified || process.env.NODE_ENV === "development");
-    var hostId = isAdmin ? req.params.id : (req.session.user.host.id ? req.session.user.host.id : req.session.user.host);
-    Host.findOne(hostId).populate("orders").populate('user').populate('pocket').exec(function(err, host){
+    var hostId = isAdmin ? req.params.id : (typeof req.session.user.host.id !== 'undefined' ? req.session.user.host.id : req.session.user.host);
+    console.log(isAdmin, req.session.user.host);
+    Host.findOne(hostId).populate("orders", { limit : 50, sort : 'createdAt DESC'}).populate('user').populate('pocket').exec(function(err, host){
       if(err || !host){
         return res.badRequest(err);
       }
@@ -268,7 +269,7 @@ module.exports = {
                       order.application_fees =  order.application_fees || {};
                       if(chargeId === "cash"){
                         charge.application_fee = order.application_fees['cash'];
-                      }else{
+                      }else if(fee){
                         charge.application_fee = fee.amount - fee.amount_refunded;
                       }
                       transactions.push(charge);
@@ -352,6 +353,9 @@ module.exports = {
                 return res.badRequest(err);
               }
               async.each(user.orders, function (order, cb) {
+                if(!order.charges){
+                  return cb();
+                }
                 var charges = Object.keys(order.charges);
                 var transfer = order.transfer;
                 async.each(charges, function (chargeId, next) {
@@ -379,7 +383,7 @@ module.exports = {
                 if(err){
                   return res.badRequest(err);
                 }
-                if(req.wantsJSON && process.env.NODE_ENV === "development"){
+                if(isAdmin || (req.wantsJSON && process.env.NODE_ENV === "development")){
                   return res.ok({pocket : pocket});
                 }
 
