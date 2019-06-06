@@ -11,7 +11,7 @@ let installation = function() {
     initEventHandler();
     initLayout();
   });
-}
+};
 
 function initData(){
   getCountyInfo();
@@ -241,6 +241,7 @@ let setupObj = {
             control : '[data-mixitup-control][data-mixitup-date]'
           }
         });
+        appObj.dayOfMealView.initDate();
       }
       if($("#chefDishView").length){
         console.log("setting up chef mixitup...");

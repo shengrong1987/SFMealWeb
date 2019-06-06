@@ -233,7 +233,7 @@ module.exports = {
         if(!meals.length){
           return res.badRequest({ code: -52, responseText: req.__('meal-not-found')})
         }
-        var _logisticInfo, _orders = [];
+        var _logisticInfo, _orders = [], _user;
         async.auto({
           /*
            * Check parameters pass from client are correct
@@ -357,6 +357,7 @@ module.exports = {
                     if (err) {
                       return nextIn2(err);
                     }
+                    _user = found;
                     var contactInfo = req.body.contactInfo;
                     var paymentInfo = req.body.paymentInfo;
                     if(paymentInfo.method === 'online' && (!found.payment || found.payment.length === 0)){
@@ -591,7 +592,48 @@ module.exports = {
               next();
             })
           }],
-          finalizeOrder : ['addPoints', function(next){
+          checkBadges : [ 'addPoints', function(next){
+            if(!_user){
+              return next();
+            }
+            Badge.find().exec(function(err, badges){
+              if(err){
+                return next(err);
+              }
+              badges = badges.filter(function(badge){
+                return !_user.badgeInfo || !_user.badgeInfo.hasOwnProperty(badge.id) || !_user.badgeInfo[badge.id].isAchieved;
+              });
+              async.each(badges, function(badge, nextIn){
+                var model = badge.model;
+                badge.rule.id = badge.rule.id.replace("${userId}",_user.id);
+                _this.sails.models[model].find(badge.rule).exec(function(err, modelData){
+                  if(err){
+                    return nextIn(err);
+                  }
+                  if(!modelData || !modelData.length){
+                    return nextIn();
+                  }
+                  _user.badgeInfo = _user.badgeInfo || {};
+                  _user.badgeInfo[badge.id] = _user.badgeInfo[badge.id] || {};
+                  _user.badgeInfo[badge.id].isAchieved = true;
+                  _user.badgeInfo[badge.id].achievedDate = moment().format("ll");
+                  notification.notificationCenter("Badge", "new", badge, false, false, req);
+                  nextIn();
+                });
+              }, function(err){
+                if(err){
+                  return next(err);
+                }
+                _user.save(function(err, u){
+                  if(err){
+                    return next(err);
+                  }
+                  next();
+                })
+              })
+            });
+          }],
+          finalizeOrder : ['checkBadges', function(next){
             async.each(_orders, function(order, nextIn){
               var _m = order.meal;
               order.meal = order.meal.id;

@@ -1161,6 +1161,9 @@
   "invite-title-1" : "Give your friends $5 points",
   "invite-title-2" : "When they take orders, you get $5 points",
   "invite-main-1" : "Your friend: %s invite you to join SFMeal.com",
-  "invite-main-2" : "Join to now to earn $5 points!"
-
+  "invite-main-2" : "Join to now to earn $5 points!",
+  "badge-congrat-title" : "Congratulations, You earn a badge!",
+  "view-all-badges" : "View Badges",
+  "badge" : "badge",
+  "my-badges" : "My Badges"
 }

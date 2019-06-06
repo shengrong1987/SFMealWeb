@@ -32,3 +32,5 @@ window.appObj.addressView = addressView;
 window.appObj.hostProfileView = hostProfileView;
 window.appObj.utility = utility;
 window.appObj.setupObj = setupObj;
+window.appObj.Order = Order;
+window.appObj.OrderView = OrderView;

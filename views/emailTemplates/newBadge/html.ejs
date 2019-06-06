@@ -1,0 +1,25 @@
+<%- include ../email_header %>
+
+<div class="green" style="padding: 25px;">
+  <div class="box-email white relative middle text-left">
+    <h4 class="text-green"><%= badgecongrattitle%></h4>
+    <h4 class="text-center">
+      <small><%= achievedDate %></small></br>
+      <%= title %><br/>
+    </h4>
+    <div class="text-center">
+      <a class="mt-2 thumbnail" href='http://sfmeal.com/badge/me/<%= id%>'>
+        <img class="w-100" style="max-width: 178px;" src="<%= largeImage %>">
+      </a>
+    </div>
+    <div class="text-center">
+      <h4><small><%= badge%><%= desc %></small></h4>
+      <div class="sharethis-inline-share-buttons mt-4" style="z-index: 0;" ></div>
+    </div>
+    <div class="row text-center">
+      <a class="btn btn-outline-primary middle" style="border:1px solid #007bff;" href="http://www.sfmeal.com/user/me#mypocket"><%= viewallbadges%></a>
+    </div>
+  </div>
+</div>
+
+<%- include ../email_footer %>

@@ -180,11 +180,31 @@ module.exports = {
             return res.badRequest(err);
           }
           pocket.transactions = transactions;
-          if(req.wantsJSON && process.env.NODE_ENV === "development"){
-            return res.ok({pocket : pocket});
-          }
           user.pocket = pocket;
-          res.view('pocket', {user : user});
+          Badge.find().exec(function(err, badges){
+            if(err){
+              return res.badRequest(err);
+            }
+            if(user.badgeInfo){
+              Object.keys(user.badgeInfo).forEach(function(key){
+                badges = badges.filter(function(b){
+                  return b.id === key;
+                });
+                if(!badges.length){
+                  return;
+                }
+                var badge = badges[0];
+                var userBadgeInfo = user.badgeInfo[key];
+                badge.isAchieved = userBadgeInfo.isAchieved;
+                badge.achievedDate = userBadgeInfo.achievedDate;
+                badge.customImage = userBadgeInfo.customImage;
+              })
+            }
+            if(req.wantsJSON && process.env.NODE_ENV === "development"){
+              return res.ok({pocket : pocket, badges: badges});
+            }
+            res.view('pocket', {user : user, badges : badges });
+          });
         });
       })
     });
@@ -389,7 +409,29 @@ module.exports = {
 
                 host.user.pocket = pocket;
                 host.user.payment = user.payment;
-                res.view('pocket', {user : host.user, host : host});
+                Badge.find().exec(function(err, badges){
+                  if(err){
+                    return res.badRequest(err);
+                  }
+                  if(user.badgeInfo){
+                    Object.keys(user.badgeInfo).forEach(function(key){
+                      badges = badges.filter(function(b){
+                        return b.id === key;
+                      });
+                      if(!badges.length){
+                        return;
+                      }
+                      var badge = badges[0];
+                      var userBadgeInfo = user.badgeInfo[key];
+                      badge.isAchieved = userBadgeInfo.isAchieved;
+                      badge.achievedDate = userBadgeInfo.achievedDate;
+                    })
+                  }
+                  if(req.wantsJSON && process.env.NODE_ENV === "development"){
+                    return res.ok({pocket : pocket, badges: badges});
+                  }
+                  res.view('pocket', {user : host.user, host : host});
+                })
               });
             })
           });

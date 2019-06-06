@@ -134,7 +134,9 @@ module.exports.routes = {
   "/apply" : "HostController.apply",
   "/pickup/:pickup" : "MealController.find",
   "/pickupoption/:id/update" : "PickupOptionController.update",
-  "/badge/me/:id" : "BadgeController.findBadgeWindow"
+  "/user/:userId/badge/:id" : "BadgeController.findBadgeWindow",
+  "/badge/me/:id" : "BadgeController.updateUserBadge",
+  "/badge/:id/update" : "BadgeController.update"
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

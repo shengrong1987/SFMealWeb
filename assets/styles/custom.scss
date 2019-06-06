@@ -95,14 +95,6 @@ small{
   z-index: 101;
 }
 
-.modal-backdrop{
-  z-index : 950 !important;
-}
-
-.modal{
-  z-index : 980 !important;
-}
-
 .nav-link{
   color : #9d9d9d;
 }
@@ -131,6 +123,11 @@ small{
 
 .nav.bg-light .nav-link.highlight.active{
   text-decoration: underline;
+}
+
+.filter-grey{
+  -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+  filter: grayscale(100%);
 }
 
 //gallery style

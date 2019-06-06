@@ -365,10 +365,9 @@ class ActionButton extends React.Component{
             postData = {
               title : { value : this.props.data['title'] || ''},
               desc : { value : this.props.data['desc'] || ''},
-              achievedDate : { value : this.props.data['achievedDate'] || '', type : "Date"},
-              isAchieved : {value: this.props.data['isAchieved'] || false, type : "boolean"},
-              iconClass : {value: this.props.data['iconClass']},
-              rule : {value: this.props.data['rule'] || ''}
+              largeImage : { value: this.props.data['largeImage'] },
+              rule : { value: this.props.data['rule'], type : "json" },
+              model : { value: this.props.data['model']}
             }
           }
           return cb(postData);

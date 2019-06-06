@@ -190,6 +190,9 @@ class ActionDialog extends React.Component{
     if(keyValues.hasOwnProperty('paymentInfo')){
       keyValues['paymentInfo'] = JSON.parse(keyValues['paymentInfo']);
     }
+    if(keyValues.hasOwnProperty('rule')){
+      keyValues['rule'] = JSON.stringify(keyValues['rule']);
+    }
   }
 
   renderView(view){

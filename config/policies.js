@@ -211,7 +211,9 @@ module.exports.policies = {
 
   BadgeController : {
     '*' : 'isAdmin',
-    'findBadgeWindow' : true
+    'findBadgeWindow' : true,
+    'updateUserBadge' : 'and(sessionAuth, sessionSelf)',
+    'update' : 'isAdmin'
   }
 
   /***************************************************************************

@@ -52,6 +52,30 @@ module.exports = {
           return cb({ code : -1, responseText : "Can not find 'orderId'"});
         }
           break;
+      case "Badge":
+        var badgeId = metaData.badgeId;
+        var userId = metaData.userId;
+        if(badgeId && userId){
+          Badge.findOne(badgeId).exec(function(err, badge){
+            if(err){
+              return cb(err);
+            }
+            User.findOne(userId).exec(function(err, user){
+              if(err){
+                return cb(err);
+              }
+              if(user.badgeInfo && user.badgeInfo[badge.id]){
+                badge.isAchieved = user.badgeInfo[badge.id].isAchieved;
+                badge.achievedDate = user.badgeInfo[badge.id].achievedDate;
+                badge.largeImage = user.badgeInfo[badge.id].customImage ? user.badgeInfo[badge.id].customImage : badge.largeImage;
+              }
+              cb(null, badge);
+            });
+          })
+        }else{
+          return cb({ code : -1, responseText : "need 'badgeId & userId'"});
+        }
+        break;
       case "Meal":
         switch(action){
           case "chefSelect":

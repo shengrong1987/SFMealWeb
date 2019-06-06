@@ -834,7 +834,6 @@ let btnSet = function($){
   'user strict'
 
   let BtnSet = function(element, options){
-    console.log("ddd");
     this.element = element;
     this.options = options;
     this.element.children().off("click");

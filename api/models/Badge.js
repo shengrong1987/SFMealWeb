@@ -15,21 +15,13 @@ module.exports = {
     desc : {
       type : 'String'
     },
-    achievedDate : {
-      type : 'Date'
-    },
-    isAchieved : {
-      type : 'boolean',
-      defaultsTo : false
-    },
-    iconClass : {
-      type : 'string',
-      defaultsTo : 'fa fa-ribbon fa-2x'
-    },
     rule : {
+      type : 'json'
+    },
+    largeImage : {
       type : 'string'
     },
-    customImage : {
+    model : {
       type : 'string'
     }
   }

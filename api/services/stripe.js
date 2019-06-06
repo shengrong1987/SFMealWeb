@@ -446,12 +446,16 @@ module.exports = {
         return cb(err);
       }
       var points = user.points || 0;
+      user.historyPoints = user.historyPoints || points;
       var earnedPoints = Math.floor(amount/200);
       var newPoints = points + earnedPoints;
       sails.log.info("user old points: " + points);
       sails.log.info("points difference: " + earnedPoints);
       sails.log.info("user total points: " + newPoints);
       user.points = newPoints;
+      if(earnedPoints > 0){
+        user.historyPoints += earnedPoints;
+      }
       user.save(cb);
     });
   },

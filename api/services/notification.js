@@ -226,10 +226,10 @@ var notification = {
     params.senderName = "SFMeal.com";
 
     //juice it using email-template
-    if(process.env.NODE_ENV==="development"){
-      sails.log.info("sending email to: " + basicInfo.recipientEmail + " with email template: " + template);
-      return;
-    }
+    // if(process.env.NODE_ENV==="development"){
+    //   sails.log.info("sending email to: " + basicInfo.recipientEmail + " with email template: " + template);
+    //   return;
+    // }
 
     sails.hooks.email.send(template, params,{
       to : basicInfo.recipientEmail,
@@ -298,8 +298,14 @@ var notification = {
           User.publishUpdate( params.admin, { id : params.id, action: "licenseUpdated"});
           break;
       }
+    }else if(model === "Badge"){
+      switch(action){
+        case "new":
+          Badge.publishCreate({id : params.id, action: action});
+          verb = "created";
+          break;
+      }
     }
-
     if(isAdminAction){
       Notification.create({ recordId : params.id, host : params.host, action : action, model : model, verb : verb }).exec(function(err, noti){
         if(err){
@@ -384,6 +390,8 @@ var notification = {
       template = action;
     }else if(model === "User"){
       template = action;
+    }else if(model === "Badge"){
+      template = action + model;
     }
     return template;
   },
@@ -460,6 +468,12 @@ var notification = {
           break;
         case "verification":
           i18ns = i18ns.concat(['email-verification','email-verification-instruction','email-verification-unknown','email-verification-link-expire','verify-email']);
+          break;
+      }
+    }else if(model === "Badge"){
+      switch (action){
+        case "new":
+          i18ns = i18ns.concat(['badge-congrat-title','view-all-badges','badge']);
           break;
       }
     }

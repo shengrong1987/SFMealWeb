@@ -10,7 +10,7 @@ module.exports = {
   attributes: {
     model : {
       type : 'string',
-      enum : ['Host','Meal','Order','Pocket','User','Review']
+      enum : ['Host','Meal','Order','Pocket','User','Review','Badge']
     },
     action : {
       type : 'string'

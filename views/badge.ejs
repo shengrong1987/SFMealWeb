@@ -1,9 +1,15 @@
 
-<div id="badgeDetailView" class="position-relative text-center p-4" style="min-height: 500px;" data-id="<%= id%>">
+<div id="badgeDetailView" class="position-relative text-center p-4" style="min-height: 500px;" data-id="<%= badge.id%>">
 
-  <div class="fileinput fileinput-new text-center" data-provides="fileinput">
+  <% if(user && user.id !== badgeUser.id || !user){%>
+    <h4>你的朋友<%= badgeUser.firstname%> 获得了一个勋章！</h4>
+  <% }else{%>
+    <h4>恭喜你，获得了一个勋章！</h4>
+  <% } %>
+
+  <div class="fileinput fileinput-new text-center mt-2" data-provides="fileinput">
     <div class="fileinput-new thumbnail img-raised">
-      <img class="w-100" style="max-width: 178px;" data-src="../../images/fa-ribbon.png">
+      <img class="w-100" style="max-width: 178px;" src="<%= badge.customImage || badge.largeImage || ''%>" data-src="<%= badge.customImage || badge.largeImage || '../../images/fa-ribbon.png'%>">
     </div>
     <div class="fileinput-preview fileinput-exists thumbnail img-raised w-100">
     </div>
@@ -19,9 +25,9 @@
 
   <div>
     <h4>
-      <small>July 12, 2017</small></br>
-      1K Points<br/>
-      <small>Earn 1K Points in total</small>
+      <small><%= badge.achievedDate %></small></br>
+      <%= badge.title %><br/>
+      <small><%= badge.desc %></small>
     </h4>
     <div class="sharethis-inline-share-buttons mt-4" style="z-index: 0;"></div>
   </div>

@@ -1173,5 +1173,9 @@
   "invite-title-1" : "送朋友5元积分",
   "invite-title-2" : "朋友下单后，您会获得5元积分",
   "invite-main-1" : "你的朋友 %s 邀请你加入SFMeal",
-  "invite-main-2" : "立即加入来获得5元现金券！"
+  "invite-main-2" : "立即加入来获得5元现金券！",
+  "badge-congrat-title" : "恭喜你，获得一个勋章！",
+  "view-all-badges" : "查看勋章",
+  "badge" : "勋章",
+  "my-badges" : "我的勋章"
 }

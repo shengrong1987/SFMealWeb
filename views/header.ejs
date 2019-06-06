@@ -35,7 +35,7 @@
     <ul class="nav navbar-nav">
       <% if (req.session.user && !req.session.user.host) { %>
       <li class="nav-item">
-        <a id="applyToHostBtn" class="nav-link btn-outline border-white text-white rounded cursor-pointer px-2" style="background-color: transparent;margin-right: 20px;" title="<%= __('pay-attention') %>" data-content="<%= __('login-before-apply-chef') %>">
+        <a id="applyToHostBtn" class="nav-link border-white active rounded cursor-pointer px-2" style="background-color: transparent;margin-right: 20px;" title="<%= __('pay-attention') %>" data-content="<%= __('login-before-apply-chef') %>">
           <i class="fas fa-utensils fa-lg"></i><span class="ml-2"><%= __('i-cook') %></span>
         </a>
       </li>
@@ -78,7 +78,7 @@
       <li class="nav-item"><a href="javascript:void(0)" class="seperator-compact nav-link"><i class="icon-dot text-red"></i></a> </li>
       <li class="nav-item"><a class="nav-link" toggle="modal" data-target="#myModal" data-model="user" data-action="signup" href="javascript:void(0)" onclick="h.toggleModal(event)"><i class="fas fa-user"></i> <%= __('nav-bar-register') %></a></li>
       <li class="nav-item"><a href="javascript:void(0)" class="seperator-compact nav-link"><i class="icon-dot text-red"></i></a> </li>
-      <li class="nav-item"><a class="nav-link" toggle="modal" data-target="#myModal" data-model="user" data-action="signin" href="javascript:void(0)" onclick="h.toggleModal(event)"><i class="fal fa-sign-in"></i> <%= __('nav-bar-login') %></a></li>
+      <li class="nav-item"><a class="nav-link" toggle="modal" data-target="#myModal" data-model="user" data-action="signin" href="javascript:void(0)" onclick="h.toggleModal(event)"><i class="fal fa-sign-in-alt"></i> <%= __('nav-bar-login') %></a></li>
       <%}%>
     </ul>
   </div>

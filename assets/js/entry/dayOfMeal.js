@@ -35,3 +35,4 @@ window.appObj.Dish = Dish;
 window.appObj.User = User;
 window.appObj.NewUserRewardView = NewUserRewardView;
 window.appObj.setupObj = setupObj;
+window.appObj.dayOfMealView = dayOfMealView;

@@ -1,6 +1,6 @@
 import '../../styles/importer.scss';
 import '../library/jasny-bootstrap';
-import { helperMethod } from "../utils/helper";
+import { helperMethod, localOrderObj } from "../utils/helper";
 import { AddressView, UserProfileView, ReviewView, OrderView, User, Order, Review, Host, UserBarView} from "../model";
 import { installation } from "../installation";
 import { setupObj } from "../installation";
@@ -23,6 +23,7 @@ $(document).ready(function(){
 })
 
 window.h = helperMethod;
+window.l = localOrderObj;
 window.appObj = window.appObj || {};
 window.appObj.utility = utility;
 window.appObj.addressView = addressView;
@@ -31,4 +32,6 @@ window.appObj.orderView = orderView;
 window.appObj.User = User;
 window.appObj.userProfileView = userProfileView;
 window.appObj.setupObj = setupObj;
+window.appObj.Order = Order;
+window.appObj.OrderView = OrderView;
 window.$ = $;

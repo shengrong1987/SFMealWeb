@@ -21,3 +21,4 @@ window.appObj.Payment = Payment;
 window.appObj.setupObj = setupObj;
 window.appObj.utility = utility;
 window.$ = $;
+

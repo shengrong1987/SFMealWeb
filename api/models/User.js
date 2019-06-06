@@ -166,6 +166,16 @@ module.exports = {
       type : 'email',
       unique : true
     },
+    badgeInfo : {
+      /*
+      badgeId : {
+        isAchieved : true/false
+        achievedDate : Date
+        customImage : String
+      }
+       */
+      type : 'json'
+    },
     generateCode : function(params, cb){
       if(this.referralCode) {
         if((params.firstname && params.firstname !== this.firstname) || (params.lastname && params.lastname !== this.lastname)) {

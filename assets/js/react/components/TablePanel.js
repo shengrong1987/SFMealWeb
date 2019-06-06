@@ -116,8 +116,8 @@ class TablePanel extends React.Component{
         criterias = ["id","nickname", "phone"];
         break;
       case "Badge":
-        headers =  {id : "ID", title : "title", desc : "desc", isAchieved : "isAchieved", achievedDate : "achievedDate", iconClass : "iconClass", rule : "rule", customImage : "customImage", command : "Command"}
-        details =  {id : "ID", title : "title", desc : "desc", isAchieved : "isAchieved", achievedDate : "achievedDate", iconClass : "iconClass", rule : "rule", customImage : "customImage", command : "Command"}
+        headers =  {id : "ID", title : "title", desc : "desc", model : "model", rule : "rule", largeImage : "largeImage", command : "Command"}
+        details =  {id : "ID", title : "title", desc : "desc", model : "model", rule : "rule", largeImage : "largeImage", command : "Command"}
         criterias = ["id","title", "isAchieved"];
         break;
     }

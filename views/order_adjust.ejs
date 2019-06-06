@@ -51,9 +51,9 @@
             <%}%>
 
             <td>
-              <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',-1,true)">-</button>
+              <button type="button" class="btn btn-default btn-xs" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">-</button>
               <input type="number" class="amount p-1" style="width:50px;" value="<%= number%>">
-              <button type="button" class="btn btn-default btn-xs" onclick="javascript:orderFood('<%= dish.id %>',1,true)">+</button>
+              <button type="button" class="btn btn-default btn-xs" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
             </td>
           </tr>
         <%})})%>
@@ -102,7 +102,7 @@
   </div>
 
   <script>
-    loadOrder(false);
-    new OrderView({ el : $("#adjustOrderView"), model : new Order()})
+    l.loadOrder(false);
+    new appObj.OrderView({ el : $("#adjustOrderView"), model : new appObj.Order()})
   </script>
 

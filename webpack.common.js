@@ -115,7 +115,7 @@ module.exports = {
     }),
     new PurgecssPlugin({
       paths: glob.sync([`${path.resolve(__dirname,'views')}/*.ejs`,`${path.resolve(__dirname,'assets/templates')}/**/*.html`,`${path.resolve(__dirname,'assets/js')}/entry/*.js`,`${path.resolve(__dirname,'assets/js')}/react/**/*.js`], { nodir: true }),
-      whitelist: ['modal-backdrop','/*bootstrap-dialog/','running']
+      whitelist: ['modal-backdrop','/*bootstrap-dialog/','running','btn-primary','btn-outline-primary','btn-sm']
     }),
     new HtmlWebpackPlugin({
       inject: true,

@@ -317,7 +317,7 @@
                               </span>
                             </label>
                             <h5 class="text-center">
-                              <button id="switchToDeliveryBtn" onclick="jumpTo('pickupInfoView')" class="btn btn-outline-dark"><%= __('reselect-address')%></button>
+                              <button id="switchToDeliveryBtn" onclick="h.jumpTo('pickupInfoView')" class="btn btn-outline-dark"><%= __('reselect-address')%></button>
                             </h5>
                           </div>
                         </div>
@@ -351,15 +351,15 @@
                 var card = cards[j];
                 var last4 = card.last4;
               %>
-              <button class="btn btn-disable py-2 col-3 deliveryInput pickupInput shippingInput <%if(card.isDefaultPayment){%> active<%}%> disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
+              <button class="btn btn-disable py-2 col-3 <%if(card.isDefaultPayment){%> active<%}%> disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="h.toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
               <%}}%>
-              <button class="btn btn-disable py-2 col-3 disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
+              <button class="btn btn-disable py-2 col-3 disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="h.toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
               <%}else{%>
               <button data-toggle="tab" data-href="#cardPayment" class="btn btn-disable py-2 col-3 disabled" data-method="online"><strong><i class="fa fa-credit-card fa-2x"></i></strong><br/><%= __('bank-card') %></button>
               <%}%>
               <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable <%= (user.id && user.payment && user.payment.length) ? '' : 'active'%> py-2 col-3 disabled deliveryInput pickupInput" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
-              <button data-toggle="tab" data-href="#venmoPayment" class="btn btn-disable  py-2 col-3 disabled deliveryInput pickupInput shippingInput" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
-              <button data-toggle="tab" data-href="#paypalPayment" class="btn btn-disable py-2 col-3 disabled deliveryInput pickupInput shippingInput" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method') %></button>
+              <button data-toggle="tab" data-href="#venmoPayment" class="btn btn-disable  py-2 col-3 disabled" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
+              <button data-toggle="tab" data-href="#paypalPayment" class="btn btn-disable py-2 col-3 disabled" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method') %></button>
               <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg disabled" data-method="alipay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('alipay-method') %></button>-->
               <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg d-none disabled" data-method="wechatpay" style="margin-right: 10px;height: 80px;"><i class="fa fa-wechat fa-2x"></i><br/><%= __('wechatpay-method') %></button>-->
             </div>
@@ -378,7 +378,7 @@
                 <div class="row">
                   <div class="col-12 text-left">
                     <h4 style="display: inline-block;"><strong><%= __('billing-address') %></strong></h4>
-                    <a class="text-orange cursor-pointer" href="javascript:void(0)" onclick="toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html"><%= __('login-tips-payment')%></a>
+                    <a class="text-orange cursor-pointer" href="javascript:void(0)" onclick="h.toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html"><%= __('login-tips-payment')%></a>
                   </div>
                 </div>
 
@@ -575,7 +575,7 @@
           <tr></tr>
           <% if(user.id){%>
           <!--<tr>-->
-            <!--<th style="vertical-align: middle;"><i class="fal fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('coupon')%>"></i> <%= __('coupon')%>:</th>-->
+            <!--<th style="vertical-align: middle;"><i class="fas fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('coupon')%>"></i> <%= __('coupon')%>:</th>-->
             <!--<th><input class="coupon-code form-control" style="margin:0 5px 0 5px;width: 80px;" maxlength="7" data-code="" data-value="" value="<%= user.firstOrder ? '' : ''%>"></input></th>-->
             <!--<th class="text-right">-->
               <!--<button id="applyCouponBtn" class="btn btn-success"><%= __('apply-code')%></button>-->
@@ -584,7 +584,7 @@
           <!--</tr>-->
           <% if(user && !user.emailVerified){%>
           <tr id="emailVerificationView">
-            <th style="vertical-align: middle;"><i class="fal fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i> <%= __('email')%></th>
+            <th style="vertical-align: middle;"><i class="fas fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i> <%= __('email')%></th>
             <th><input class="form-control" name="email" style="width:170px;" type="email" value="<%= user.auth ? (user.auth.email || '') : ''%>"></th>
           </tr>
           <tr>
@@ -592,7 +592,7 @@
           </tr>
           <% }%>
           <tr>
-            <th style="vertical-align: middle;"><%= __('points')%>:<i class="fal fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i></th>
+            <th style="vertical-align: middle;"><%= __('points')%>:<i class="fas fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i></th>
             <th><input class="points form-control" style="margin:0 5px 0 5px;width: 60px;" readonly value="<%= user?(user.points || 0):-1%>"></input></th>
             <th class="text-right">
               <button id="applyPointsBtn" class="btn btn-success"><%= __('apply-code')%></button>

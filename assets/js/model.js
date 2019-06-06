@@ -447,7 +447,16 @@ var UserBarView = Backbone.View.extend({
             var badgesCount = parseInt(orderBadgeButton.text()) || 0;
             badgesCount++;
             orderBadgeButton.text(badgesCount);
-          })
+          });
+          break;
+        case "badge":
+          orderBadgeViews = this.$el.find("[name='mypocket']");
+          orderBadgeViews.each(function(){
+            var orderBadgeButton = $(this).find(".badge");
+            var badgesCount = parseInt(orderBadgeButton.text()) || 0;
+            badgesCount++;
+            orderBadgeButton.text(badgesCount);
+          });
           break;
       }
     }
@@ -1222,28 +1231,9 @@ var DayOfMealView = Backbone.View.extend({
     "mixEnd #chefDishView" : "renderImage"
   },
   initialize : function() {
-    var dateFilter;
     var dateDesc = decodeURI(helperMethod.readCookie("date"));
     var currentDateControl = this.$el.find("#dishDatesBar [data-filter='." + dateDesc + "']");
-    if(currentDateControl.length){
-      dateFilter = "." + dateDesc;
-      this.$el.find("#dishDatesBar li").removeClass("active");
-      this.$el.find("#dishDatesBar li a").removeClass("active");
-      currentDateControl.parent().addClass("active");
-      currentDateControl.addClass("active");
-    }else{
-      var activeFilters = this.$el.find("#dishDatesBar .mixitup-control-active");
-      if(activeFilters.length){
-        dateFilter = activeFilters.data("filter");
-      }else{
-        dateFilter = this.$el.find("#dishDatesBar .nav-link").data("filter");
-      }
-    }
-
-    if(dateMixer){
-      dateMixer.filter(dateFilter);
-    }
-
+    var dateFilter = this.initDate(currentDateControl);
     var chefFilter;
     var chefDesc = decodeURI(helperMethod.readCookie("chef"));
     currentDateControl = this.$el.find("#hostBarView [data-filter='." + chefDesc + "']");
@@ -1252,7 +1242,7 @@ var DayOfMealView = Backbone.View.extend({
       this.$el.find("#hostBarView li").removeClass("active");
       currentDateControl.parent().addClass("active");
     }else{
-      activeFilters = this.$el.find("#hostBarView .mixitup-control-active");
+      var activeFilters = this.$el.find("#hostBarView .mixitup-control-active");
       if(activeFilters.length){
         chefFilter = activeFilters.data("filter");
       }else{
@@ -1264,6 +1254,31 @@ var DayOfMealView = Backbone.View.extend({
       chefMixer.setFilterGroupSelectors('chef',chefFilter);
       chefMixer.parseFilterGroups();
     }
+  },
+  initDate : function(){
+    console.log("init date filter");
+    var dateDesc = decodeURI(helperMethod.readCookie("date"));
+    var currentDateControl = this.$el.find("#dishDatesBar [data-filter='." + dateDesc + "']");
+    var dateFilter,activeFilters;
+    if(currentDateControl.length){
+      dateFilter = "." + dateDesc;
+      this.$el.find("#dishDatesBar li").removeClass("active");
+      this.$el.find("#dishDatesBar li a").removeClass("active");
+      currentDateControl.parent().addClass("active");
+      currentDateControl.addClass("active");
+    }else{
+      activeFilters = this.$el.find("#dishDatesBar .mixitup-control-active");
+      if(activeFilters.length){
+        dateFilter = activeFilters.data("filter");
+      }else{
+        dateFilter = this.$el.find("#dishDatesBar .nav-link").data("filter");
+      }
+    }
+
+    if(dateMixer){
+      dateMixer.filter(dateFilter);
+    }
+    return dateFilter;
   },
   selectDate : function(e){
     var originalEvent = e.originalEvent.detail.originalEvent;
@@ -1875,6 +1890,7 @@ var MealView = Backbone.View.extend({
           var deliveryCenter = $(this).find(".delivery-center input").val();
           var area = $(this).find(".area input").val();
           var county = $(this).find(".area").data("county");
+          var deliveryRange = $(this).find(".deliveryRange input").val();
           if(!publicLocation){
             publicLocation = location;
           }
@@ -3384,6 +3400,7 @@ var MealConfirmView = Backbone.View.extend({
   events : {
     "change #method" : "switchMethod",
     "mixEnd #deliveryTab" : "switchDate",
+    "mixEnd #pickupTab" : "switchDate",
     "click #verifyAddressBtn" : "verifyAddress",
     "change #deliveryTab .regular-radio" : "verifyAddress",
     "change #pickupInfoView .deliveryInput .contactOption .regular-radio" : "switchAddress",
@@ -3411,6 +3428,7 @@ var MealConfirmView = Backbone.View.extend({
     this.$el.find(".shippingInput").removeClass('d-none').hide();
   },
   initDateFilter : function(){
+    console.log("init date filter");
     var dateDesc = decodeURI(helperMethod.readCookie("date"));
     if(dateDesc && dateDesc !== "undefined" && dateDesc !== "null"){
       this.$el.find("#dishDatesBar li").removeClass("active");
@@ -3432,8 +3450,8 @@ var MealConfirmView = Backbone.View.extend({
       this.$el.find(".pickupInput").hide();
       this.$el.find(".deliveryInput").show();
     }else{
-      this.$el.find(".pickupInput").show();
       this.$el.find(".deliveryInput").hide();
+      this.$el.find(".pickupInput").show();
     }
     var method = $("#pickupMethodView #method .active").attr("value");
     if(method === "delivery"){
@@ -3479,7 +3497,7 @@ var MealConfirmView = Backbone.View.extend({
   verifyAddress : function(e, isInitializing, cb){
     var _this = this;
     var method = this.$el.find("#method button.active").attr("value");
-    if(method === "pickup"){
+    if(method === "pickup" || method === "shipping"){
       helperMethod.jumpTo("pickupOptionsView");
       if(cb){
         return cb(true);
@@ -4177,8 +4195,9 @@ var OrderView = Backbone.View.extend({
               buttons : [{
                 label : "15%",
                 title : subtotal * 0.15,
-                cssClass: 'btn-outline-primary btn-sm',
+                cssClass: 'btn-outline-primary btn-sm mr-1',
                 action : function(dialog){
+                  dialog.close();
                   $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, subtotal * 0.15, $this, button);
                 }
               },{
@@ -4194,8 +4213,9 @@ var OrderView = Backbone.View.extend({
                       "</div>",
                     buttons: [{
                       label: __('confirm'),
-                      cssClass: 'btn-outline-primary',
+                      cssClass: 'btn-outline-primary mr-1',
                       action: function(dialog) {
+                        dialog.close();
                         var tip = $(dialog.getModalBody()).find("[name='tip']").val();
                         $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, tip, $this, button);
                       }
@@ -4207,6 +4227,7 @@ var OrderView = Backbone.View.extend({
                 title : __('noTip'),
                 cssClass: 'btn-outline-dark btn-sm',
                 action : function(dialog){
+                  dialog.close();
                   $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, 0, $this, button);
                 }
               }
@@ -4366,7 +4387,14 @@ var OrderView = Backbone.View.extend({
 });
 
 var Badge = Backbone.Model.extend({
-  urlRoot : "/badge"
+  urlRoot : "/badge",
+  url : function(){
+    if(this.action){
+      return this.urlRoot + "/" + this.action + "/" + this.get("id");
+    }else{
+      return this.urlRoot + "/" + this.get("id");
+    }
+  }
 });
 
 var BadgeView = Backbone.View.extend({
@@ -4401,7 +4429,7 @@ var BadgeView = Backbone.View.extend({
 
     helperMethod.imageHandler("badge",file,this.infoView,function(url){
       $this.$el.find(".fileinput-preview").data("src", url);
-      $this.saveProfile(e);
+      $this.saveProfile();
       $this.sucessView.html(__('imageUploadComplete'));
       $this.sucessView.show();
     },function(err){
@@ -4413,6 +4441,7 @@ var BadgeView = Backbone.View.extend({
     let $this = this;
     this.sucessView.hide();
     this.errorView.hide();
+    this.model.action = "me";
     this.model.set({
       id : this.$el.data("id"),
       customImage : this.$el.find(".fileinput-preview").data("src")

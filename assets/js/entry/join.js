@@ -13,6 +13,9 @@ $("#wechatOverlay").click(function(){
   $("#wechatOverlay").toggle();
 })
 
+$(document).ready(function(){
+  helperMethod.lazyLoadImage('referral@2x.png');
+});
 // $('.social-share').share({
 //   title : "SFMeal私房菜平台，喂想家的你，加入即可领取5元现金券吧！",
 //   sites : ['wechat','qq','weibo','facebook'],
