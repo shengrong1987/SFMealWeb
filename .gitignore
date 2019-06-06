@@ -66,13 +66,15 @@ config/local.js
 # (credit Addy Osmani, @addyosmani)
 #
 ################################################
-node_modules
+node_modules/**
+!node_modules/*/
 /secret
 bower_components
 
-!node_modules/sails-hook-email
-!node_modules/waterlock-facebook-auth
-!node_modules/waterlock-google-auth
+!node_modules/sails-hook-email/**
+!node_modules/waterlock-facebook-auth/**
+!node_modules/waterlock-google-auth/**
+!node_modules/bootstrap3-dialog/**
 
 ################################################
 # Sails.js / Waterline / Grunt
