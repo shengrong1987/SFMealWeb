@@ -66,13 +66,13 @@ config/local.js
 # (credit Addy Osmani, @addyosmani)
 #
 ################################################
-
 node_modules
 /secret
 bower_components
 
-
-
+!node_modules/sails-hook-email
+!node_modules/waterlock-facebook-auth
+!node_modules/waterlock-google-auth
 
 ################################################
 # Sails.js / Waterline / Grunt
@@ -82,10 +82,6 @@ bower_components
 ################################################
 .tmp
 dump.rdb
-
-
-
-
 
 ################################################
 # Node.js / NPM
@@ -127,63 +123,3 @@ nbproject
 *.pem
 .env
 .icloud
-
-
-
-assets/revolution/assets/gridimages/
-assets/revolution/assets/videos/
-node_modules/@mapbox/geojsonhint/node_modules/readable-stream/lib/
-node_modules/ambi/node_modules/typechecker/es2015/fixtures/
-node_modules/ambi/node_modules/typechecker/source/fixtures/
-node_modules/babel-runtime/core-js/array/
-node_modules/babel-runtime/core-js/error/
-node_modules/babel-runtime/core-js/json/
-node_modules/babel-runtime/core-js/math/
-node_modules/babel-runtime/core-js/number/
-node_modules/babel-runtime/core-js/object/
-node_modules/babel-runtime/core-js/reflect/
-node_modules/babel-runtime/core-js/regexp/
-node_modules/babel-runtime/core-js/string/
-node_modules/babel-runtime/core-js/symbol/
-node_modules/babel-runtime/core-js/system/
-node_modules/babel-runtime/node_modules/
-node_modules/cron/node_modules/
-node_modules/extendr/node_modules/typechecker/out/
-node_modules/extract-opts/node_modules/typechecker/out/
-node_modules/grunt-contrib-less/node_modules/less/projectFilesBackup/
-node_modules/is-fullwidth-code-point/node_modules/
-node_modules/juice/tmp/
-node_modules/lcid/node_modules/
-node_modules/messageformat/example/en/sub/
-node_modules/messageformat/example/fr/sub/
-node_modules/os-locale/node_modules/
-node_modules/react-popper/demo/
-node_modules/sails-hook-jobs/node_modules/agenda/node_modules/
-node_modules/sails-hook-orm/node_modules/anchor/lib/
-node_modules/sails-hook-orm/node_modules/bluebird/js/
-node_modules/sails-hook-orm/node_modules/switchback/node_modules/
-node_modules/sails-hook-orm/node_modules/waterline-criteria/lib/aggregations/
-node_modules/sails-hook-orm/node_modules/waterline-criteria/lib/filters/
-node_modules/sails-hook-orm/node_modules/waterline-criteria/lib/projections/
-node_modules/sails-hook-orm/node_modules/waterline-criteria/node_modules/
-node_modules/sails-hook-orm/node_modules/waterline-schema/lib/waterline-schema/
-node_modules/sails-hook-orm/node_modules/waterline-schema/test/fixtures/
-node_modules/sails-hook-orm/node_modules/waterline/lib/waterline/adapter/ddl/alter/
-node_modules/sails-hook-orm/node_modules/waterline/lib/waterline/adapter/sync/strategies/
-node_modules/sails-hook-orm/node_modules/waterline/lib/waterline/model/lib/associationMethods/
-node_modules/sails-hook-orm/node_modules/waterline/lib/waterline/model/lib/defaultMethods/
-node_modules/sails-hook-orm/node_modules/waterline/lib/waterline/model/lib/internalMethods/
-node_modules/setimmediate 2/
-node_modules/websocket-driver/lib/websocket/driver/hybi/
-node_modules/winston/test/fixtures/keys/
-*.icloud
-node_modules/component-emitter 2/
-node_modules/react 2/
-node_modules/react-dom 2/dist/
-node_modules/react-dom 2/lib/
-node_modules/react-dom 2/node_modules/fbjs/
-node_modules/react-dom 2/node_modules/prop-types/lib/
-node_modules/react-dom 2/node_modules/prop-types/node_modules/loose-envify/
-# ignore node_modules symlink
-node_modules
-node_modules.nosync
