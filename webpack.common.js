@@ -36,7 +36,8 @@ module.exports = {
     bank : "./assets/js/entry/bank.js",
     pocket : "./assets/js/entry/pocket.js",
     badge : "./assets/js/entry/badge.js",
-    trust : "./assets/js/entry/trust"
+    trust : "./assets/js/entry/trust.js",
+    resetPassword : "./assets/js/entry/resetPassword.js"
   },
   output: {
     path: path.resolve(__dirname, '.tmp/public/assets/'),
@@ -251,6 +252,11 @@ module.exports = {
       inject: true,
       chunks: ['trust'],
       filename : 'views/trust.html'
+    }),
+    new HtmlWebpackPlugin({
+      inject: true,
+      chunks: ['resetPassword'],
+      filename : 'views/resetPassword.html'
     }),
     new ResourceHintWebpackPlugin(),
   ]

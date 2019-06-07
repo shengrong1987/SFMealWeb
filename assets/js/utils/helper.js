@@ -269,7 +269,7 @@ let helperMethod = {
     if(!imageView.length){
       return;
     }
-    let image = await  import(
+    let image = await import(
       /* webpackMode: "lazy-once" */
       `../../images/${imageName}`
       )

@@ -69,7 +69,7 @@ module.exports.waterlock = {
           forwardUrl: '/auth/resetForm'
         },
         template:{
-          file: '/views/emailTemplates/reset/html.jade',
+          file: 'views/emailTemplates/reset/html.jade',
           vars:{}
         }
       },
