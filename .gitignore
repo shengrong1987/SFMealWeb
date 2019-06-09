@@ -76,6 +76,7 @@ bower_components
 !node_modules/waterlock-google-auth/**
 !node_modules/waterlock-local-auth/**
 !node_modules/bootstrap3-dialog/**
+!node_modules/bootstrap4-toggle/**
 
 ################################################
 # Sails.js / Waterline / Grunt
