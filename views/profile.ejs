@@ -14,7 +14,7 @@
     </div>
   </div>
 
-  <div id="hostProfileView" data-host="<%= host.id%>" class="box" data-title="<%= host.shopNameI18n(locale)%>" data-desc="<%= host.introI18n(locale)%>" data-user="<%= user.id || ''%>">
+  <div id="hostProfileView" data-host="<%= host.id%>" class="box" data-title="<%= host.shopNameI18n(locale)%>" data-desc="<%= host.introI18n(locale)%>" data-user="<%= user ? user.id : ''%>">
 
     <div class="box white">
 
@@ -29,7 +29,7 @@
           <h5 class="text-dark">
             <%= host.shopNameI18n(locale) %><br/>
             <small>
-            <% if(!host.license || !host.license.valid){%><i class="fal fa-check text-yellow mr-2"></i><%= __('has-foodhandler-license')%> <%}%>
+            <% if(!host.license || !host.license.valid){%><i class="fa fa-check text-yellow mr-2"></i><%= __('has-foodhandler-license')%> <%}%>
               <br/><br/><br/>
               <span class="text-left"><%= host.introI18n(locale) %></span>
             </small>

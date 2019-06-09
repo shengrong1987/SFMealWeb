@@ -40,7 +40,7 @@
       <li class="nav-item"><a href="javascript:void(0)" class="seperator-compact nav-link"><i class="icon-dot text-red"></i></a> </li>
       <li class="nav-item"><a href="/user/me#mycollect"><i class="fas fa-heart"></i> <%= __('favourite') %></a></li>
       <li class="nav-item"><a href="javascript:void(0)" class="seperator-compact nav-link"><i class="icon-dot text-red"></i></a> </li>
-      <li class="nav-item"><a id="msgBtn" class="nav-link" data-toggle="tooltip" data-html="true" data-placement="bottom" href="javascript:void(0)"><i class="fal fa-envelope-o"></i> <%= __('notification') %> <span class="badge">New</span></a></li>
+      <li class="nav-item"><a id="msgBtn" class="nav-link" data-toggle="tooltip" data-html="true" data-placement="bottom" href="javascript:void(0)"><i class="fa fa-envelope-o"></i> <%= __('notification') %> <span class="badge">New</span></a></li>
       <li class="nav-item">
         <a id="userActionBtn" data-badge="0" href='/user/me' class="text-center dropdown-toggle nav-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <img class="extra-small round_thumb" style="display:inline-block;" src=<%= req.session.user.picture || "/images/profile_man.png"%>>
@@ -71,7 +71,7 @@
       <li class="nav-item"><a href="javascript:void(0)" class="seperator-compact nav-link"><i class="icon-dot text-red"></i></a> </li>
       <li class="nav-item"><a class="nav-link" toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fas fa-user"></i> <%= __('nav-bar-register') %></a></li>
       <li class="nav-item"><a href="javascript:void(0)" class="seperator-compact nav-link"><i class="icon-dot text-red"></i></a> </li>
-      <li class="nav-item"><a class="nav-link" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fal fa-sign-in"></i> <%= __('nav-bar-login') %></a></li>
+      <li class="nav-item"><a class="nav-link" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html" href="javascript:void(0)" onclick="toggleModal(event)"><i class="fa fa-sign-in"></i> <%= __('nav-bar-login') %></a></li>
       <%}%>
     </ul>
   </div>

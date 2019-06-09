@@ -7,6 +7,7 @@
  *
  * http://waterlock.ninja/documentation
  */
+
 module.exports.waterlock = {
 
   // Base URL

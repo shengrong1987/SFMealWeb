@@ -5,6 +5,7 @@ import 'backbone';
 import { helperMethod, localOrderObj } from "./utils/helper";
 import { utility } from "./utils/utility";
 import { dateMixer, chefMixer, deliveryMixer, pickupMixer, setupObj } from "./installation";
+import { VAR } from './variable';
 
 var Auth = Backbone.Model.extend({
   urlRoot : "/auth",
@@ -71,7 +72,7 @@ var LoginView = Backbone.View.extend({
     this.errorView.hide();
     this.model.type = "login";
     this.model.method = "facebook";
-    this.model.originUrl = location.href.indexOf('oauth2') !== -1 ? 'https://sfmeal.com' : location.href;
+    this.model.originUrl = location.href.indexOf('oauth2') !== -1 ? VAR.BASE_URL : location.href;
     location.href = this.model.url();
   },
   GoogleLogin : function(e){
@@ -79,7 +80,7 @@ var LoginView = Backbone.View.extend({
     this.errorView.hide();
     this.model.type = "login";
     this.model.method = "google";
-    this.model.originUrl = location.href.indexOf('oauth2') !== -1 ? 'https://sfmeal.com' : location.href;
+    this.model.originUrl = location.href.indexOf('oauth2') !== -1 ? VAR.BASE_URL : location.href;
     var $this = this;
     location.href = this.model.url();
   },
@@ -294,7 +295,7 @@ var UserBarView = Backbone.View.extend({
       const { default: socketIOClient } = await import(/* webpackChunkName: 'socketIO' */ 'socket.io-client')
       const { default: sailsIOClient } = await import(/* webpackChunkName: 'sailsIO' */ 'sails.io.js');
       let io = sailsIOClient(socketIOClient);
-      io.sails.url = 'http://localhost:1337';
+      io.sails.url = VAR.BASE_URL;
       io.socket.get("/host/" + hostId +  "/orders");
       io.socket.get("/user/" + userId + "/orders");
       io.socket.get("/user/" + userId + "/meals");

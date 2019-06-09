@@ -123,5 +123,6 @@ nbproject
 .idea
 .node_history
 *.pem
+*.key
 .env
 .icloud
