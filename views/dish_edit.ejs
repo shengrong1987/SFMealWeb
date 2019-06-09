@@ -163,7 +163,7 @@
                         <td>
                           <div class="dropdown">
                             <a class="btn btn-default btn-outline dropdown-toggle property" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="">
-                              <span data-toggle="i18n" data-key="addVariation"></span>
+                              <%= __('addVariation')%>
                               <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="dLabel">
@@ -176,7 +176,7 @@
                                   "wellness" : ['rare','mediumRare','medium','mediumWell', 'wellDone']
                                 }
                               if(varSets[variation] && varSets[variation].length > 0 ) { varSets[variation].forEach(function (option) { %>
-                              <a class="dropdown-item" href="javascript:void(0);" data-toggle="i18n" data-key="<%= option%>" value="<%= option%>"></a>
+                              <a class="dropdown-item" href="javascript:void(0);" value="<%= option%>"><%= __(option)%></a>
                               <%});} %>
                               <a class="dropdown-item disabled"><%= __('noOption')%></a>
                               <a class="dropdown-item" href="javascript:void(0);" value="custom"><%= __('customizedOption')%></a>

@@ -5,7 +5,7 @@ import 'backbone';
 import { helperMethod, localOrderObj } from "./utils/helper";
 import { utility } from "./utils/utility";
 import { dateMixer, chefMixer, deliveryMixer, pickupMixer, setupObj } from "./installation";
-import { VAR } from './variable';
+import VAR from './variable';
 
 var Auth = Backbone.Model.extend({
   urlRoot : "/auth",
