@@ -2252,7 +2252,7 @@ var DishView = Backbone.View.extend({
     var dropDownMenu = container.find(".option[data-value='" + variation + "'] .dropdown-menu");
     if(varSets[variation] && varSets[variation].length > 0 ){
       varSets[variation].forEach(function(option){
-        dropDownMenu.append('<a class="dropdown-item" href="javascript:void(0);" value="' + option + '">' + __(option) + '</a>');
+        dropDownMenu.append('<a class="dropdown-item" href="javascript:void(0);" value="' + option + '">' + option + '</a>');
       });
       dropDownMenu.append('<a class="dropdown-item disabled" href="javascript:void(0);">' + __("noOption") +'</a>');
     }
