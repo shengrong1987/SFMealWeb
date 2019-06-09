@@ -29,7 +29,7 @@
         <div class="signin">
 
           <button id="FBBtn" class="popline btn btn-blue btn-lg light" style="min-width:250px;font-weight: lighter;">
-            <span><i class="fa fa-facebook-f fa" style="padding-right: 15px;"></i>Facebook <%= __('login')%></span>
+            <span><i class="fab fa-facebook-f fa" style="padding-right: 15px;"></i>Facebook <%= __('login')%></span>
           </button>
 
           <button id="GoogleBtn" class="popline btn btn-google btn-lg outline text-orange white mt-1" style="min-width:250px;font-weight: lighter;">
@@ -37,7 +37,7 @@
           </button>
 
           <button id="wechatBtn" class="popline btn btn-green btn-lg outline white text-orange mt-1" style="min-width:250px;font-weight: lighter;">
-            <span><i class="fa fa-wechat fa-lg" style="padding-right: 15px;"></i>微信 <%= __('login')%></span>
+            <span><i class="fab fa-weixin fa-lg" style="padding-right: 15px;"></i>微信 <%= __('login')%></span>
           </button>
 
           <div class="divider"></div>
@@ -65,8 +65,8 @@
 
           <span class="divider popline"></span>
 
-          <h6 class="text-center"><%= __('newlyJoin')%><a toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="h.toggleModal(event)"><%= __('register')%></a></h6>
-          <h6 class="text-center"><%= __('forgetPassword')%>?<a toggle="modal" data-target="#myModal" data-href="/templates/user/sendEmail.html" href="javascript:void(0)" onclick="h.toggleModal(event)"><%= __('reset')%></a></h6>
+          <h6 class="text-center"><%= __('newlyJoin')%><a toggle="modal" data-target="#myModal" data-model="user" data-action="signup" href="javascript:void(0)" onclick="h.toggleModal(event)"><%= __('register')%></a></h6>
+          <h6 class="text-center"><%= __('forgetPassword')%>?<a toggle="modal" data-target="#myModal" data-model="user" data-action="sendEmail" href="javascript:void(0)" onclick="h.toggleModal(event)"><%= __('reset')%></a></h6>
 
         </div>
       </div>
