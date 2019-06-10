@@ -22,6 +22,7 @@
  */
 
 import { utility } from './utility.js';
+import VAR from '../variable';
 
 let googleAPILoaded;
 let helperMethod = {
@@ -399,9 +400,9 @@ let helperMethod = {
   wechatLogin : function(userInit, button){
     var gm_ua = navigator.userAgent.toLowerCase();
     if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger"){
-      let redirectUrl = BASE_URL + '/auth/wechatCode';
+      let redirectUrl = VAR.BASE_URL + '/auth/wechatCode';
       let scope = "snsapi_userinfo";
-      let appId = WECHAT_APPID;
+      let appId = VAR.WECHAT_APPID;
       let state = location.href;
       let wechatUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
       wechatUrl = wechatUrl.replace('$APPID', appId);
@@ -411,9 +412,9 @@ let helperMethod = {
       location.href = wechatUrl;
     }else if(userInit){
       if(helperMethod.isPc()){
-        let redirectUrl = encodeURIComponent(BASE_URL + '/auth/wechatCodeWeb');
+        let redirectUrl = encodeURIComponent(VAR.BASE_URL + '/auth/wechatCodeWeb');
         let scope = "snsapi_login";
-        let appId = WECHAT_APPID2;
+        let appId = VAR.WECHAT_APPID2;
         let state = encodeURIComponent(location.href);
         let wechatUrl = "https://open.weixin.qq.com/connect/qrconnect?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
         wechatUrl = wechatUrl.replace('$APPID', appId);
@@ -422,9 +423,9 @@ let helperMethod = {
         wechatUrl = wechatUrl.replace('$STATE',state);
         location.href = wechatUrl;
       }else{
-        let redirectUrl = BASE_URL + '/auth/wechatCode';
+        let redirectUrl = VAR.BASE_URL + '/auth/wechatCode';
         let scope = "snsapi_userinfo";
-        let appId = WECHAT_APPID;
+        let appId = VAR.WECHAT_APPID;
         let state = location.href;
         let wechatUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
         wechatUrl = wechatUrl.replace('$APPID', appId);
