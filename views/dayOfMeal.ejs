@@ -47,7 +47,7 @@
           <li class="nav-item py-1 mw-28 <%= i===0?'active':''%>"><a class="nav-link <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-mixitup-date data-filter-type="date" data-filter=".<%= dateKey.replace(/\/|\'/g,'')%>" data-toggle="tab"><span class="cursor-pointer"><%= __(dateKey).replace("day",'')%></span></a></li>
         <% })%>
       </ul>
-      <ul id="hostBarView" class="nav nav-pills nav-scroll justify-content-md-center" data-filter-group="chef">
+      <ul id="hostBarView" class="nav nav-pills nav-scroll justify-content-md-center white" data-filter-group="chef">
         <%
         hosts.forEach(function(host,i){ %>
           <li class="nav-item py-1 px-1 <%= i===0?'active':''%>">
