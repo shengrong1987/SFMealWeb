@@ -438,7 +438,7 @@ let helperMethod = {
   },
 
   setupWechat : async function(imgSrc, title, desc){
-    await import (/* webpackChunkName: "weixin-js" */ 'weixin-js-sdk');
+    const { default: wx } = await import (/* webpackChunkName: "weixin-js" */ 'weixin-js-sdk');
     var gm_ua = navigator.userAgent.toLowerCase();
     if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger") {
       if(imgSrc){
