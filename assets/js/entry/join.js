@@ -15,12 +15,8 @@ $("#wechatOverlay").click(function(){
 
 $(document).ready(function(){
   helperMethod.lazyLoadImage('referral@2x.png');
+  helperMethod.setupWechat('', "十三香小龙虾，乐山冷串串，千里香小馄饨，成都纸包鱼...欢迎回家吃饭。", "立即加入获得5元优惠");
 });
-// $('.social-share').share({
-//   title : "SFMeal私房菜平台，喂想家的你，加入即可领取5元现金券吧！",
-//   sites : ['wechat','qq','weibo','facebook'],
-//   description : "十三香小龙虾，葱油拌面，千里香小馄饨，重庆酸辣粉...欢迎回家吃饭。"
-// });
 
 var user = $("#joinView").data("user");
 if(!user){

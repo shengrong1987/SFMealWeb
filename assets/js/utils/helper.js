@@ -441,6 +441,7 @@ let helperMethod = {
     const { default: wx } = await import (/* webpackChunkName: "weixin-js" */ 'weixin-js-sdk');
     var gm_ua = navigator.userAgent.toLowerCase();
     if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger") {
+      imgSrc = imgSrc || "https://s3.us-west-1.amazonaws.com/sfmeal/images/logo.png";
       if(imgSrc){
         $('body').prepend('<div style="overflow:hidden;width:0px;height:0px;margin:0 auto;position:absolute;top:-800px;"><img src="' + imgSrc + '"></div>');
       }
