@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="/assets/report.css">
 <div class="green p-4" style="margin-top: -20px;">
-  <div class="box-email white relative middle text-left">
+  <div class="box-email white relative middle text-left" style="overflow: scroll;">
 
     <% if(meal.orders.length == 0){%>
     <h3 class="text-green"><u><%= meal.chef ? meal.chef.shopName : __('weekly-orders')%></u> <small><%= __('guest-list-no-tips')%></small></h3>
