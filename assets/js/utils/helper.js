@@ -1135,21 +1135,21 @@ let localOrderObj = {
     if(!!isApply){
       this.localCoupon = this.localCoupon || {};
       this.localCoupon[code] = amount;
-      this.createCookie('coupon',JSON.stringify(this.localCoupon),5);
+      helperMethod.createCookie('coupon',JSON.stringify(this.localCoupon),5);
     }else{
       $(".coupon-code").val('');
       this.localCoupon = {};
-      this.eraseCookie('coupon');
+      helperMethod.eraseCookie('coupon');
     }
     this.refreshCheckoutMenu();
   },
   applyPoints : function(isApply, amount){
     if(!!isApply){
       this.localPoints = amount;
-      this.createCookie('points',this.localPoints,5);
+      helperMethod.createCookie('points',this.localPoints,5);
     }else{
       this.localPoints = 0;
-      this.eraseCookie('points');
+      helperMethod.eraseCookie('points');
     }
     this.refreshCheckoutMenu();
   }
