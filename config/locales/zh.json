@@ -1150,7 +1150,7 @@
   "emailVerificationComplete" : "验证完成",
   "emailVerificationCheck" : "去邮箱验证",
   "newUserCheckEmailTitle" : "注册完成",
-  "newUserCheckEmailContent" : "请立刻前往邮箱认证你的邮箱，成功认证可使用5元积分",
+  "newUserCheckEmailContent" : "请立刻前往邮箱认证你的邮箱，成功认证可获得10元积分",
   "newUserCheckEmailButton" : "前往邮箱",
   "tipTitle" : "选择小费",
   "selectTip" : "小费全额归司机所有",

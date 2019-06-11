@@ -3,6 +3,7 @@ import { helperMethod } from "../utils/helper";
 import { LoginView, Auth } from "../model";
 import { setupObj } from "../installation";
 setupObj.setupTooltip();
+setupObj.setupBootstrapDialog();
 
 $("#wechatBtn").click(function(){
   $("#wechatOverlay").removeClass('hide');

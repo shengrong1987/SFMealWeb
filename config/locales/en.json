@@ -1140,7 +1140,7 @@
   "emailVerificationComplete" : "Verification Complete",
   "emailVerificationCheck" : "Check Mailbox",
   "newUserCheckEmailTitle" : "Registration Complete",
-  "newUserCheckEmailContent" : "Please goto mailbox to verify your email now, you can redeem $5 worth of points after successful verification.",
+  "newUserCheckEmailContent" : "Please goto mailbox to verify your email now, you can redeem $10 worth of points after successful verification.",
   "newUserCheckEmailButton" : "Check Email",
   "tipTitle" : "Choose Tip",
   "selectTip" : "100% of tip goes to drivers",
