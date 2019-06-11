@@ -37,7 +37,8 @@ module.exports = {
     pocket : "./assets/js/entry/pocket.js",
     badge : "./assets/js/entry/badge.js",
     trust : "./assets/js/entry/trust.js",
-    resetPassword : "./assets/js/entry/resetPassword.js"
+    resetPassword : "./assets/js/entry/resetPassword.js",
+    report : "./assets/js/entry/report.js"
   },
   output: {
     path: path.resolve(__dirname, '.tmp/public/assets/'),
