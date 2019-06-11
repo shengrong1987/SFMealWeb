@@ -1574,7 +1574,7 @@ var MealSelectionView = Backbone.View.extend({
       this.alertView.html(__('pointsTooLittle'));
       return;
     }
-    applyPoints(true, pointRedeem);
+    localOrderObj.applyPoints(true, pointRedeem);
   }
 });
 
@@ -3750,7 +3750,7 @@ var MealConfirmView = Backbone.View.extend({
       helperMethod.makeAToast(__('pointsTooLittle'));
       return;
     }
-    applyPoints(true, pointRedeem);
+    localOrderObj.applyPoints(true, pointRedeem);
   },
   switchDate : function(e){
     var activeDate = $("#dishDatesBar .mixitup-control-active");
