@@ -430,7 +430,7 @@ module.exports = {
                   if(req.wantsJSON && process.env.NODE_ENV === "development"){
                     return res.ok({pocket : pocket, badges: badges});
                   }
-                  res.view('pocket', {user : host.user, host : host});
+                  res.view('pocket', {user : host.user, host : host, badges: badges});
                 })
               });
             })

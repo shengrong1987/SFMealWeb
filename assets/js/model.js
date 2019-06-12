@@ -1232,6 +1232,7 @@ var DayOfMealView = Backbone.View.extend({
     "mixEnd #chefDishView" : "renderImage"
   },
   initialize : function() {
+    console.group('开始初始化菜单Filter...');
     var dateDesc = decodeURI(helperMethod.readCookie("date"));
     var currentDateControl = this.$el.find("#dishDatesBar [data-filter='." + dateDesc + "']");
     var dateFilter = this.initDate(currentDateControl);
@@ -1255,9 +1256,11 @@ var DayOfMealView = Backbone.View.extend({
       chefMixer.setFilterGroupSelectors('chef',chefFilter);
       chefMixer.parseFilterGroups();
     }
+    console.info("选中厨师: %s", chefFilter);
+    console.groupEnd();
   },
   initDate : function(){
-    console.log("init date filter");
+    console.group('开始初始化菜单日期...');
     var dateDesc = decodeURI(helperMethod.readCookie("date"));
     var currentDateControl = this.$el.find("#dishDatesBar [data-filter='." + dateDesc + "']");
     var dateFilter,activeFilters;
@@ -1275,10 +1278,11 @@ var DayOfMealView = Backbone.View.extend({
         dateFilter = this.$el.find("#dishDatesBar .nav-link").data("filter");
       }
     }
-
+    console.info("初始化日期:'%s'", dateFilter);
     if(dateMixer){
       dateMixer.filter(dateFilter);
     }
+    console.groupEnd();
     return dateFilter;
   },
   selectDate : function(e){
@@ -3429,7 +3433,7 @@ var MealConfirmView = Backbone.View.extend({
     this.$el.find(".shippingInput").removeClass('d-none').hide();
   },
   initDateFilter : function(){
-    console.log("init date filter");
+    console.group('开始初始化Checktout日期...');
     var dateDesc = decodeURI(helperMethod.readCookie("date"));
     if(dateDesc && dateDesc !== "undefined" && dateDesc !== "null"){
       this.$el.find("#dishDatesBar li").removeClass("active");
@@ -3444,6 +3448,8 @@ var MealConfirmView = Backbone.View.extend({
       dateDesc = this.$el.find("#dishDatesBar [data-mixitup-control]").data("filter").replace(".","");
       helperMethod.createCookie("date", dateDesc);
     }
+    console.info("日期是%s", dateDesc);
+    console.groupEnd();
   },
   initMethodView : function(){
     var hasDelivery = this.$el.find("#pickupInfoView").data("hasdelivery");

@@ -593,7 +593,7 @@ let helperMethod = {
 
   jumpTo : function (id, offset, target){
   // var coordinate = getPosition(id);
-    console.log("offset target:" + target);
+    console.info("跳转到：%s, 偏移量: %d, 偏移目标：%s", id, offset, target);
     if(!$("#" + id).length){
       return;
     }

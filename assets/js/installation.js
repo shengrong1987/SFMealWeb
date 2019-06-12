@@ -61,6 +61,7 @@ function setup(){
 }
 
 async function initHashTag(){
+  console.group("初始化Anchor");
   var hashtag = window.location.hash;
   if (hashtag === '#_=_' || (window.location.href.indexOf("#") !== -1 && window.location.href.split("#")[1] === "")){
 
@@ -84,6 +85,7 @@ async function initHashTag(){
     if(tabItem.length){
       const { default : tab } = await import(/* webpackChunkName:"tab" */ './library/sfmeal-components.js');
       tabItem.tab('select');
+      console.info("选择Tab: %s", hashtag);
     }
     hashtag = hashtag.replace("#","");
     hashtag = decodeURIComponent(hashtag);
@@ -95,7 +97,8 @@ async function initHashTag(){
           hashTagCN = "." + hashTagCN;
         }
         h = "." + h;
-        if($("[data-filter='" + h + "']").length){
+        let cFilter = $("[data-filter='" + h + "']");
+        if(cFilter.length){
           var filter = $("[data-filter='" + h + "']");
         }else if($("[data-filter='" + hashTagCN + "']").length){
           filter = $("[data-filter='" + hashTagCN + "']");
@@ -103,21 +106,23 @@ async function initHashTag(){
         }
         if(filter && filter.length){
           var filterType = filter.data("filter-type");
+          console.info("已找到filter: %s, 类型：%s 准备过滤", h, filterType);
           if(filterType === "date" && dateMixer){
             dateMixer.filter(h);
             helperMethod.createCookie("date", h.replace(".",""));
-            $("#dishDatesBar li").removeClass("active");
-            $("#dishDatesBar [data-filter='" + h + "']").parent().addClass("active");
+            $("#dishDatesBar [data-filter]").removeClass("active");
+            $("#dishDatesBar [data-filter='" + h + "']").addClass("active");
           }else if(filterType === "chef" && chefMixer){
             chefMixer.filter(h);
             helperMethod.createCookie("chef", h.replace(".",""));
-            $("#hostBarView li").removeClass("active");
-            $("#hostBarView [data-filter='" + h + "']").parent().addClass("active");
+            $("#hostBarView [data-filter]").removeClass("active");
+            $("#hostBarView [data-filter='" + h + "']").addClass("active");
           }
         }
       })
     }
   }
+  console.groupEnd();
 }
 
 function initQuery(){
@@ -182,7 +187,7 @@ let setupObj = {
 
   setupMixitup : async function () {
 
-    console.log("setting up mixitup...");
+    console.group("开始安装Mixitup组件");
     if($("#pickupTab .mix").length || $("#deliveryTab .mix").length || $("#dishContentView .mix").length || $("#chefDishView .mix").length || $("#transaction_container .mix").length){
       const { default: mixitup } = await import(/* webpackChunkName: "mixitup" */ 'mixitup');
       window.mixitup = mixitup;
@@ -193,6 +198,7 @@ let setupObj = {
         const { default: mixitupMultifilter } = await import(/* webpackChunkName: "mixitupMultifilter" */ './library/mixitup-multifilter.js');
       }
       if($("#pickupTab .mix").length){
+        console.info("初始化自取选项卡Mixitup组件...");
         pickupMixer = mixitup("#pickupTab", {
           pagination: {
             limit: 10
@@ -210,6 +216,7 @@ let setupObj = {
         appObj.mealConfirmView.initDateFilter();
       }
       if($("#deliveryTab .mix").length){
+        console.info("初始化送餐选项卡Mixitup组件...");
         deliveryMixer = mixitup("#deliveryTab", {
           pagination: {
             limit: 10
@@ -227,6 +234,7 @@ let setupObj = {
         appObj.mealConfirmView.initDateFilter();
       }
       if($("#dishContentView .mix").length){
+        console.info("初始化Main Menu Mixitup组件...");
         dateMixer = mixitup("#dishContentView", {
           pagination: {
             limit: 200
@@ -242,9 +250,11 @@ let setupObj = {
           }
         });
         appObj.dayOfMealView.initDate();
+        initHashTag();
+
       }
       if($("#chefDishView").length){
-        console.log("setting up chef mixitup...");
+        console.info("初始化Chef Menu Mixitup组件...");
         chefMixer = mixitup("#chefDishView", {
           pagination: {
             limit: 200
@@ -277,8 +287,11 @@ let setupObj = {
             enable: true
           }
         });
+        appObj.dayOfMealView.initialize();
+        initHashTag();
       }
       if($("#transaction_container").length){
+        console.info("初始化 Transaction Mixitup组件...");
         mixitup('#transaction_container', {
           pagination: {
             limit: 50,
@@ -293,6 +306,7 @@ let setupObj = {
         })
       }
     }
+    console.groupEnd();
   },
 
   setupDropdownMenu : function (){

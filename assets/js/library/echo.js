@@ -1,7 +1,6 @@
 /*! echo-js v1.7.3 | (c) 2016 @toddmotto | https://github.com/toddmotto/echo */
 (function (root, factory) {
   root = root || self;
-  console.log(root);
   if (typeof define === 'function' && define.amd) {
     define(function() {
       return factory(root);
