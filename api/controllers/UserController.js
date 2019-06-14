@@ -364,6 +364,7 @@ module.exports = require('waterlock').actions.user({
                 oldOrder.tip = parseFloat(oldOrder.tip) + parseFloat(order.tip);
                 oldOrder.pickupInfo.comment += order.pickupInfo.comment;
                 oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
+                oldOrder.discount += order.discount;
                 if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
                   oldOrder.charges['cash'] += order.charges['cash'];
                 }

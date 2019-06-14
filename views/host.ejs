@@ -124,7 +124,7 @@
                         (+$<%= extra.toFixed(2)%>)<br/>
                         <% }%>
                         <% if(preference && preference.length && preference[0].property && preference[0].property.length){%>
-                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, orderView.enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event, appObj.orderView.enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-model="dish" data-action="preference"><%= __('preference')%></a>
                         <% }%>
                       </td>
                       <td><% if(order.status=="adjust"){
@@ -149,18 +149,18 @@
                         <a href="javascript:void(0)" data-action="deleteOrder" data-order="<%= order.id%>"><%= __('deleteOrder')%></a>
                         <%}else if(order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")) {%>
                         <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
-                        <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-order"><%= __('reject')%></a><br/>
+                        <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:appObj.orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-order"><%= __('reject')%></a><br/>
                         <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customerName || __('user')%>" data-placement="bottom" data-content="<%= order.customerPhone %>"><%= __('contact-user')%></a>
                         <%}else if(order.status == "preparing"){%>
                         <a href="javascript:void(0)" data-action="ready" data-order="<%= order.id%>"><%= __('complete')%></a><br/>
-                        <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
+                        <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
                         <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customerName || __('user')%>" data-placement="bottom" data-content="<%= order.customerPhone %>"><%= __('contact-user')%></a>
                         <%}else if(order.status == "ready"){%>
                         <a href="javascript:void(0)" data-action="receive" data-order="<%= order.id%>"><%= __('confirm-pickup')%></a><br/>
                         <% if(order.method == 'delivery'){%>
                         <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customerName || __('user')%>" data-placement="top" data-content="<%= order.contactInfo.address%>"><%= __('see-address')%></a><br/>
                         <%}else if(order.method === 'shipping'){%>
-                        <a href="javascript:void(0)" data-toggle="alert-button" data-action="tracking" data-title="<%= __('tracking')%>" data-content="<%= __('tracking')%>" data-actionFn="javascript:orderView.tracking" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('Enter-tracking')%></a>
+                        <a href="javascript:void(0)" data-toggle="alert-button" data-action="tracking" data-title="<%= __('tracking')%>" data-content="<%= __('tracking')%>" data-actionFn="javascript:appObj.orderView.tracking" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('Enter-tracking')%></a>
                         <%}%>
                         <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customerName || __('user')%>" data-placement="bottom" data-content="<%= order.customerPhone %>"><%= __('contact-user')%></a>
                         <%}else if(order.status == "review"){%>
@@ -272,7 +272,7 @@
                         (+$<%= extra.toFixed(2)%>)<br/>
                         <% }%>
                         <% if(preference && preference.length && preference[0].property && preference[0].property.length){%>
-                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event, orderView.enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-href="/templates/dish/preference.html"><%= __('preference')%></a>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event, appObj.orderView.enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-model="dish" data-action="preference"><%= __('preference')%></a>
                         <% }%>
                       </td>
                       <td><% if(order.status=="adjust"){
@@ -297,18 +297,18 @@
                         <a href="javascript:void(0)" data-action="deleteOrder" data-order="<%= order.id%>"><%= __('deleteOrder')%></a>
                         <%}else if(order.isSendToHost && (order.status == "adjust" || order.status == "cancelling")) {%>
                         <a href="javascript:void(0)" data-action="confirm" data-order="<%= order.id%>"><%= __('confirm')%></a><br/>
-                        <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('reject')%></a><br/>
+                        <a href="javascript:void(0)" data-toggle="alert-button" data-title="<%= __('reject-reason')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:appObj.orderView.reject" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('reject')%></a><br/>
                         <a href="#"><%= __('contact-user')%></a>
                         <%}else if(order.status == "preparing"){%>
                         <a href="javascript:void(0)" data-action="ready" data-success-text="<%= __('readied')%>" data-order="<%= order.id%>"><%= __('complete')%></a><br/>
-                        <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
+                        <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a><br/>
                         <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customerName || __('user')%>" data-placement="bottom" data-content="<%= order.customerPhone %>"><%= __('contact-user')%></a>
                         <%}else if(order.status == "ready"){%>
                         <a href="javascript:void(0)" data-action="receive" data-success-text="<%= __('received')%>" data-order="<%= order.id%>"><%= __('confirm-pickup')%></a><br/>
                         <% if(order.method == 'delivery'){%>
                         <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customerName || __('user')%>" data-placement="top" data-content="<%= order.contactInfo.address%>"><%= __('see-address')%></a><br/>
                         <%}else if(order.method === "shipping"){%>
-                              <a href="javascript:void(0)" data-toggle="alert-button" data-action="tracking" data-title="<%= __('tracking')%>" data-content="<%= __('tracking')%>" data-actionFn="javascript:orderView.tracking" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('Enter-tracking')%></a>
+                              <a href="javascript:void(0)" data-toggle="alert-button" data-action="tracking" data-title="<%= __('tracking')%>" data-content="<%= __('tracking')%>" data-actionFn="javascript:appObj.orderView.tracking" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('Enter-tracking')%></a>
                         <% }%>
                         <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.customerName || __('user')%>" data-placement="bottom" data-content="<%= order.customerPhone %>"><%= __('contact-user')%></a>
                         <%}else if(order.status == "review"){%>

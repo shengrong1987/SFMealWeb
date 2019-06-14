@@ -34,3 +34,4 @@ window.appObj.utility = utility;
 window.appObj.setupObj = setupObj;
 window.appObj.Order = Order;
 window.appObj.OrderView = OrderView;
+window.appObj.orderView = orderView;

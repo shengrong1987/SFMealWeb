@@ -95,7 +95,6 @@ module.exports = {
       };
       delivery_fee = 0;
     }else{
-      sails.log.info("method: " + params.method, " party mode: " + params.isPartyMode);
       if(params.method === "delivery" && !params.isPartyMode){
         if(params.isDeliveryBySystem){
           delivery_fee = stripe.SYSTEM_DELIVERY_FEE;
@@ -118,7 +117,6 @@ module.exports = {
         pickupIndex = parseInt(params.pickupOption);
       }
       pickups.forEach(function(pickup){
-        sails.log.info("pick up option: " + pickup.index);
         if(pickup.index == pickupIndex && (!pickupNickname || pickup.nickname === pickupNickname)){
           pickUpInfo = Object.assign({}, pickup);
         }
@@ -160,6 +158,7 @@ module.exports = {
    */
 	create : function(req, res){
 
+	  sails.log.group("---Order Processing---");
     var _this = this;
 
     var isAdmin = req.session.authenticated && req.session.user.auth.email === "admin@sfmeal.com";
@@ -180,7 +179,6 @@ module.exports = {
       var orderedDishes = [];
       Object.keys(orders).forEach(function(dishId){
         if(orders[dishId].number > 0){
-          sails.log.info("ordered dish:" + dishId);
           orderedDishes.push(dishId);
         }
       });
@@ -199,13 +197,9 @@ module.exports = {
           return true;
         }
         var hasSameNickname = targetMeal.nickname !== "custom" && targetMeal.nickname === meal.nickname;
-        sails.log.info(targetMeal.nickname + " & " + meal.nickname);
         var mealHasDish = meal.dishes.some(function(d) {
           return orderedDishes.includes(d.id);
         });
-        if(mealHasDish && hasSameNickname){
-          sails.log.info("meal: " + meal.title);
-        }
         return mealHasDish && hasSameNickname;
       });
 
@@ -216,11 +210,13 @@ module.exports = {
             return d.id === orderedDishId;
           })
         });
+
+        sails.log.assert(dishInMeal, "Dish(%s) not in meal error, please check your url.", orderedDishId);
         if(!dishInMeal){
           notInMealDish = orderedDishId;
         }
         return dishInMeal;
-      })
+      });
 
       if(!orderedDishInMeal){
         Dish.findOne(notInMealDish).exec(function(err, dish){
@@ -239,20 +235,22 @@ module.exports = {
            * Check parameters pass from client are correct
            */
           validateParams : function(next){
-            _this.validateOption(req.body, meals, req, next);
+            _this.validateOption(req.body, meals, req, function(err){
+              sails.log.assert(!err, "#1/11 - Error in validate params");
+              next(err);
+            });
           },
           validateOrders : ['validateParams', function(next){
             async.each(meals, function(meal, nextIn){
               _this.validateMeal(meal, orders, null, req, null, nextIn);
             }, function(err){
-              if(err){
-                return next(err);
-              }
-              next();
+              sails.log.assert(!err, "#2/11 - Error in validate orders");
+              next(err);
             })
           }],
           buildOptions : ['validateOrders', function(next){
             _this.buildDeliveryData(req.body, meals[0], meals[0].pickups, req, function(logisticInfo){
+              sails.log.info("#3/11 - building logistic info: %o", logisticInfo);
               _logisticInfo = logisticInfo;
               next();
             });
@@ -263,7 +261,7 @@ module.exports = {
               meals.forEach(function(meal){
                 subtotal += meal.subtotal;
               });
-              sails.log.info("subtotal: " + subtotal, "minimal order amount:" + _logisticInfo.pickupInfo.minimalOrder);
+              sails.log.info("#4/11 - validate subtotal: %f with a minimal of %f", subtotal, _logisticInfo.pickupInfo.minimalOrder);
               if(parseFloat(subtotal) < parseFloat(_logisticInfo.pickupInfo.minimalOrder) && !isAdmin){
                 return next({ code: -60, responseText : req.__('order-single-minimal-not-reach', _logisticInfo.pickupInfo.minimalOrder)});
               }
@@ -279,6 +277,7 @@ module.exports = {
             var method = req.body.method;
             var address = req.body.contactInfo.address;
             var phone = req.body.contactInfo.phone;
+            sails.log.info("#5/11 - saving address: %s and phone no. %s", address, phone);
             if(method !== "delivery" && !address){
               return next();
             }
@@ -290,11 +289,12 @@ module.exports = {
                 return next();
               }
               require('../services/geocode').geocode(address, function (err, result) {
+                sails.log.assert(!err, "Error in geocoding user address %s", address);
+                sails.log.assert(result, "Error looking for address %s", address);
                 if (err) {
-                  sails.log.debug(err);
                   return next(req.__('meal-error-address'));
                 }
-                sails.log.debug("geocoded result: " + result);
+                sails.log.table(result);
                 if (result.length === 0) {
                   return next(req.__('meal-error-address2'));
                 }
@@ -452,10 +452,12 @@ module.exports = {
                 if(err){
                   return nextIn(err);
                 }
+                sails.log.info("#6/11 - Building order");
                 Order.create(orderParam).exec(function (err, order) {
                   if (err) {
                     return nextIn(err);
                   }
+                  sails.log.info("Order id: %s", order.id);
                   order.meal = meal;
                   order.dishes = meal.dishes;
                   _orders.push(order);
@@ -2780,6 +2782,7 @@ module.exports = {
     //verify how many points need to be redeemed
     if(points > total * 10){ points = total * 10;}
     user.points = user.points || 0;
+    sails.log.info()
     sails.log.info("redeeming points:" + points);
     //verify if user have enough points
     if(points > user.points){
