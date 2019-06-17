@@ -70,6 +70,15 @@ module.exports = {
     });
   },
 
+  drivers : function(req, res){
+    Driver.find().exec(function(err, drivers){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(drivers);
+    })
+  },
+
   updateWeek : function(req, res){
 	  PickupOption.find().exec(function(err, options){
 	    if(err){

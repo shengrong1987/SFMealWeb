@@ -134,6 +134,7 @@ module.exports.routes = {
   "/apply" : "HostController.apply",
   "/pickup/:pickup" : "MealController.find",
   "/pickupoption/:id/update" : "PickupOptionController.update",
+  "/pickupoption/drivers" : "PickupOptionController.drivers",
   "/user/:userId/badge/:id" : "BadgeController.findBadgeWindow",
   "/badge/me/:id" : "BadgeController.updateUserBadge",
   "/badge/:id/update" : "BadgeController.update"

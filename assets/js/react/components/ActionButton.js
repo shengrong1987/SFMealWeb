@@ -59,6 +59,7 @@ class ActionButton extends React.Component{
       var model = dataset["model"];
       var isShowDetail = action === "view" ? true : _this.props.detail;
       var data = {};
+      console.log("model:" + model + "doing action: " + action);
       _this.getPostData(_this.props.model, action, $(target), function(postData){
         var additionalData = _this.getAdditionalData(_this.props.model, action);
         if(postData){
@@ -244,7 +245,7 @@ class ActionButton extends React.Component{
               title : { value : _this.props.data['title'] },
               type : { value : _this.props.data['type'] },
               cover : { value : _this.props.data['cover'] },
-              delivery_fee : { value : _this.props.data['delivery_fee'] },
+              delivery_fee : { value : _this.props.data['delivery_fee'] || 0 },
               isDelivery : { value : _this.props.data['isDelivery'], type : 'boolean'},
               county : { value : _this.props.data['county'] },
               provideFromTime : { value : moment(provideFromTime.toISOString()).format('YYYY-MM-DD[T]HH:mm'), type : 'date'},
@@ -341,25 +342,46 @@ class ActionButton extends React.Component{
           }
           return cb(postData);
         case "PickupOption":
-          if(action === "create" || action === "update"){
+          if(action === "create"){
+            $.get('/pickupoption/drivers', function(drivers){
+              postData = {
+                pickupFromTime : { value : _this.props.data['pickupFromTime'] || new Date(), type : "date"},
+                pickupTillTime : { value : _this.props.data['pickupTillTime'] || new Date(), type : "date"},
+                location : { value : _this.props.data['location'] || ''},
+                method : {value: _this.props.data['method'] || ''},
+                phone : {value: _this.props.data['phone'] || '', type : 'select', options : drivers},
+                publicLocation : {value: _this.props.data['publicLocation'] || ''},
+                comment : {value: _this.props.data['comment'] || ''},
+                deliveryCenter : {value: _this.props.data['deliveryCenter'] || ''},
+                deliveryRange : {value: _this.props.data['deliveryRange'] || 0 },
+                area : {value: _this.props.data['area'] || ''},
+                county : {value: _this.props.data['county'] || ''},
+                index : {value: _this.props.data['index'] || ''},
+                nickname : {value: _this.props.data['nickname'] || ''},
+                minimalOrder : {value: _this.props.data["minimalOrder"] || 0 }
+              }
+              return cb(postData);
+            });
+          }else if(action === "update"){
             postData = {
-              pickupFromTime : { value : this.props.data['pickupFromTime'] || '', type : "date"},
-              pickupTillTime : { value : this.props.data['pickupTillTime'] || '', type : "date"},
+              pickupFromTime : { value : this.props.data['pickupFromTime'] || new Date(), type : "date"},
+              pickupTillTime : { value : this.props.data['pickupTillTime'] || new Date(), type : "date"},
               location : { value : this.props.data['location'] || ''},
               method : {value: this.props.data['method'] || ''},
               phone : {value: this.props.data['phone'] || '', type : 'select', options : this.props.data['drivers']},
               publicLocation : {value: this.props.data['publicLocation'] || ''},
               comment : {value: this.props.data['comment'] || ''},
               deliveryCenter : {value: this.props.data['deliveryCenter'] || ''},
-              deliveryRange : {value: this.props.data['deliveryRange'] || ''},
+              deliveryRange : {value: this.props.data['deliveryRange'] || 0 },
               area : {value: this.props.data['area'] || ''},
               county : {value: this.props.data['county'] || ''},
               index : {value: this.props.data['index'] || ''},
               nickname : {value: this.props.data['nickname'] || ''},
-              minimalOrder : {value: this.props.data["minimalOrder"] || 0}
-             }
+              minimalOrder : {value: this.props.data["minimalOrder"] || 0 }
+            }
+            return cb(postData);
           }
-          return cb(postData);
+          break;
         case "Badge":
           if(action === "create" || action === "update"){
             postData = {

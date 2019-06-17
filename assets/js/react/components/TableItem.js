@@ -37,9 +37,14 @@ class TableItem extends React.Component{
     }else if(typeof rowContent === "boolean"){
       rowContent = !!rowContent;
     }else if(typeof rowContent === "object"){
-      rowContent = JSON.stringify(rowContent);
+      console.log(rowContent);
+      rowContent = JSON.stringify(rowContent, null, 2);
     }else if(this._isDate(rowContent)){
-      rowContent = new Date(rowContent).toLocaleString();
+      if(key === 'nextRunAt' && new Date(rowContent).getTime() <= new Date().getTime()){
+        rowContent = 'null';
+      }else{
+        rowContent = new Date(rowContent).toLocaleString();
+      }
     }
     return rowContent;
   }
@@ -55,53 +60,16 @@ class TableItem extends React.Component{
           rowContent = <input type="text" name={col}></input>
         }
       }
-    }
-    else if((typeof rowContent !== 'boolean' && rowContent) || typeof rowContent === 'boolean' || col === 'command'){
-      if(col === 'command'){
-        rowContent = <ActionButton model={this.props.model} data={rowData} detail={this.props.detail}></ActionButton>
-      }else if(this._isImage(rowContent)){
-        rowContent = <img src={rowContent} width="100"/>
-      }else if(Array.isArray(rowContent)){
-        rowContent = rowContent.map(function(ele, i){
-          return _this.getContent(ele, i) + '\n';
-        });
-      }else if(typeof rowContent === "boolean"){
-        rowContent = rowContent.toString();
-      }else if(typeof rowContent === 'object'){
-        rowContent = Object.keys(rowContent).map(function(key,i){
-          let title = key;
-          if(_this.props.model==="Order"){
-            if(rowContent[key].hasOwnProperty('number') && !rowContent[key].number){
-              return;
-            }
-            let dishes = rowData["dishes"];
-            if(dishes){
-              let dish = dishes.filter(function(d){
-                return d.id === key;
-              })[0];
-              title = dish ? dish.title : key;
-            }else{
-              title = key;
-            }
-          }
-          return (<div key={i} className="form-group">
-            <label>{title}</label>
-            <input className="form-control" readOnly type="text" value={_this.getContent(rowContent[key])}></input>
-          </div>);
-        });
-      }else if(this._isDate(rowContent)){
-        if(col === 'nextRunAt' && new Date(rowContent).getTime() <= new Date().getTime()){
-          rowContent = 'null';
-        }else{
-          rowContent = new Date(rowContent).toLocaleString();
-        }
+    }else if(col === "command"){
+      rowContent = <ActionButton model={this.props.model} data={rowData} detail={this.props.detail}></ActionButton>
+    }else{
+      if(this.props.detail){
+        rowContent = <pre>{_this.getContent(rowContent, col)}</pre>
+      }else{
+        rowContent = <div className="scrollText"><pre>{_this.getContent(rowContent, col)}</pre></div>;
       }
     }
-    if(col !== "command"){
-      return <div className="scrollText">{rowContent}</div>;
-    }else{
-      return rowContent;
-    }
+    return rowContent;
   }
 
   render() {

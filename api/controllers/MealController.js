@@ -1212,7 +1212,7 @@ module.exports = {
         if(params.type === "order"){
           return next();
         }else{
-          if(params.pickups){
+          if(params.pickups && params.nickname === "custom"){
             try{
               params.pickups = JSON.parse(params.pickups);
               next();

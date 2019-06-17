@@ -158,7 +158,7 @@ module.exports = {
    */
 	create : function(req, res){
 
-	  sails.log.group("---Order Processing---");
+	  //sails.log.group("---Order Processing---");
     var _this = this;
 
     var isAdmin = req.session.authenticated && req.session.user.auth.email === "admin@sfmeal.com";
@@ -211,8 +211,8 @@ module.exports = {
           })
         });
 
-        sails.log.assert(dishInMeal, "Dish(%s) not in meal error, please check your url.", orderedDishId);
         if(!dishInMeal){
+          sails.log.warning("Dish(%s) not in meal error, please check your url.", orderedDishId);
           notInMealDish = orderedDishId;
         }
         return dishInMeal;
@@ -236,7 +236,7 @@ module.exports = {
            */
           validateParams : function(next){
             _this.validateOption(req.body, meals, req, function(err){
-              sails.log.assert(!err, "#1/11 - Error in validate params");
+              //sails.log.assert(!err, "#1/11 - Error in validate params");
               next(err);
             });
           },
@@ -244,13 +244,15 @@ module.exports = {
             async.each(meals, function(meal, nextIn){
               _this.validateMeal(meal, orders, null, req, null, nextIn);
             }, function(err){
-              sails.log.assert(!err, "#2/11 - Error in validate orders");
+              if(err){
+                sails.log.warning("#2/11 - Error in validate orders");
+              }
               next(err);
             })
           }],
           buildOptions : ['validateOrders', function(next){
             _this.buildDeliveryData(req.body, meals[0], meals[0].pickups, req, function(logisticInfo){
-              sails.log.info("#3/11 - building logistic info: %o", logisticInfo);
+              sails.log.info("#3/11 - building logistic info: " + logisticInfo);
               _logisticInfo = logisticInfo;
               next();
             });
@@ -261,7 +263,7 @@ module.exports = {
               meals.forEach(function(meal){
                 subtotal += meal.subtotal;
               });
-              sails.log.info("#4/11 - validate subtotal: %f with a minimal of %f", subtotal, _logisticInfo.pickupInfo.minimalOrder);
+              sails.log.info("#4/11 - validate subtotal: " + subtotal + " with a minimal of " + _logisticInfo.pickupInfo.minimalOrder);
               if(parseFloat(subtotal) < parseFloat(_logisticInfo.pickupInfo.minimalOrder) && !isAdmin){
                 return next({ code: -60, responseText : req.__('order-single-minimal-not-reach', _logisticInfo.pickupInfo.minimalOrder)});
               }
@@ -277,7 +279,7 @@ module.exports = {
             var method = req.body.method;
             var address = req.body.contactInfo.address;
             var phone = req.body.contactInfo.phone;
-            sails.log.info("#5/11 - saving address: %s and phone no. %s", address, phone);
+            sails.log.info("#5/11 - saving address: " + address + "and phone no.: " + phone);
             if(method !== "delivery" && !address){
               return next();
             }
@@ -289,13 +291,13 @@ module.exports = {
                 return next();
               }
               require('../services/geocode').geocode(address, function (err, result) {
-                sails.log.assert(!err, "Error in geocoding user address %s", address);
-                sails.log.assert(result, "Error looking for address %s", address);
                 if (err) {
+                  sails.log.warning("Error in geocoding user address: " + address);
                   return next(req.__('meal-error-address'));
                 }
-                sails.log.table(result);
+
                 if (result.length === 0) {
+                  sails.log.warning("Error looking for address: " + address);
                   return next(req.__('meal-error-address2'));
                 }
                 var administration = result[0].administrativeLevels;
@@ -457,7 +459,7 @@ module.exports = {
                   if (err) {
                     return nextIn(err);
                   }
-                  sails.log.info("Order id: %s", order.id);
+                  sails.log.info("Order id: " + order.id);
                   order.meal = meal;
                   order.dishes = meal.dishes;
                   _orders.push(order);
@@ -472,6 +474,7 @@ module.exports = {
             })
           }],
           makePayments : [ 'buildOrders', function(next){
+            sails.log.info("#7/11 - Make payment of orders");
             async.eachSeries(_orders, function(order, nextIn){
               if(order.paymentMethod === "alipay" || order.paymentMethod === "wechatpay"){
                 stripe.newSource({
