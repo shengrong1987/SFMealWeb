@@ -1331,6 +1331,7 @@ module.exports = {
       return res.badRequest({ code : -3, responseText : req.__('meal-not-found')})
     }
 
+    var isAdmin = req.session.user.auth.email === 'admin@sfmeal.com' && (req.session.user.emailVerified || process.env.NODE_ENV === "development");
     var isEditMode = req.query["edit"];
     if(isEditMode === 'true'){
       var user = req.session.user;
@@ -1438,7 +1439,7 @@ module.exports = {
         if(err){
           return res.badRequest(err);
         }
-        if(req.wantsJSON && process.env.NODE_ENV === "development"){
+        if(req.wantsJSON && (process.env.NODE_ENV === "development" || isAdmin)){
           return res.ok(meal);
         }
         if(isEditMode){

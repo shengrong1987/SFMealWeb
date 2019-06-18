@@ -3405,7 +3405,7 @@ var MealConfirmView = Backbone.View.extend({
   events : {
     "change #method" : "switchMethod",
     "mixEnd #deliveryTab" : "switchDate",
-    "mixEnd #pickupTab" : "switchDate",
+    // "mixEnd #pickupTab" : "switchDate",
     "click #verifyAddressBtn" : "verifyAddress",
     "change #deliveryTab .regular-radio" : "verifyAddress",
     "change #pickupInfoView .deliveryInput .contactOption .regular-radio" : "switchAddress",
