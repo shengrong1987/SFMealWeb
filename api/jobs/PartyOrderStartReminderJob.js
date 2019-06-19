@@ -28,19 +28,16 @@ module.exports = function(agenda) {
     run: function(job, done) {
 
       var orderId = job.attrs.data.orderId;
-
-      sails.log.info("running party order start reminder with order id: " + orderId);
-
       Order.findOne(orderId).populate('host').populate('dishes').populate("customer").exec(function(err, order){
         if(err || !order){
           return done();
         }
-        sails.log.info("order found");
         order.status = 'preparing';
         order.save(function(err, o){
           if(err){
             return done();
           }
+          sails.log.debug("JOBS - Type: PartyORderStartReminder, Model: Order, Action: StartReminder To: Host");
           notification.notificationCenter("Order","startReminder",o,true,false);
           done();
         })

@@ -54,7 +54,7 @@ var notification = {
   },
 
   sendMsg : function(model, action, params, req){
-    sails.log.info("start to send msg with action:" + action);
+    sails.log.info("Notification: Sending Message, action: " + action);
     var locale = req ? (params.isSendToHost ? params.host.locale : ( params.customer ? params.customer.locale : params.locale)) : '';
     var phone = params.isSendToHost ? (params.host ? params.host.phone : params.chef.phone) : params.customerPhone;
     var content = "";
@@ -226,10 +226,10 @@ var notification = {
     params.senderName = "SFMeal.com";
 
     //juice it using email-template
-    // if(process.env.NODE_ENV==="development"){
-    //   sails.log.info("sending email to: " + basicInfo.recipientEmail + " with email template: " + template);
-    //   return;
-    // }
+    if(process.env.NODE_ENV==="development"){
+      sails.log.info("Email Sent: " + basicInfo.recipientEmail + " Email template: " + template);
+      return;
+    }
 
     sails.hooks.email.send(template, params,{
       to : basicInfo.recipientEmail,

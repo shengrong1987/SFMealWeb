@@ -31,8 +31,6 @@ module.exports = function(agenda) {
 
     // execute job
     run: function (job, done) {
-      sails.log.info("Sending followed chef's meals");
-
       User.find({follow: {'!': null}}).populate("follow").populate("auth").exec(function (err, users) {
         if(err){
           return done();
@@ -58,6 +56,7 @@ module.exports = function(agenda) {
                 guestEmail : user.auth.email,
                 customer : user
               }
+              sails.log.debug("JOBS - Type: FollowedChefPushingJob, Model: Meal, Action: ChefSelect, For Host: " + host.id + "To: Guest" + user.auth.email);
               notification.notificationCenter("Meal","chefSelect", params);
               next();
             });

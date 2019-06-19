@@ -60,14 +60,17 @@
 
     <div class="w-100 d-flex">
       <nav id="dishTagsBar" class="sticky-top py-2" style="overflow-y: scroll;min-width: 100px;">
-        <% if(!user || (user && !user.newUserRewardIsRedeemed && user.points === 0)){ %>
-          <a id="newUserRewardIcon" data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event)" data-href="/user/reward/newUser"><img class="icon-float cursor-pointer" data-src="../../images/icon_new.png"></a>
-        <% }%>
         <ul class="list list-side list-unstyled" data-toggle="btn-set">
           <% tags.forEach(function(tag, index){%>
             <li class="cursor-pointer border-bottom <%= index===0?'active':''%>"><a style="white-space: nowrap;" data-offset=-94 href="<%= tag.replace("'","").replace(" ","")%>"><%= __(tag)%></a></li>
           <% })%>
         </ul>
+        <% if(!user || (user && !user.newUserRewardIsRedeemed && user.points === 0)){ %>
+          <div><a id="newUserRewardIcon" data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event)" data-href="/user/reward/newUser"><img class="icon-float cursor-pointer" data-src="../../images/icon_new.png"></a></div>
+        <% }%>
+        <% if(user){ %>
+          <div><a id="userReferralBtn" href="/join"><img class="icon-float cursor-pointer" data-src="../../images/icon_share.png"></a></div>
+        <% }%>
       </nav>
       <div id="order" class="content container-fluid text-left">
         <div id="chefDishView">
@@ -93,8 +96,8 @@
               <div class="flex-column text-center vertical-align">
                 <h5 class="shopName"><%= hosts[0].shopName%></h5>
                 <div>
-                  <button id="likeBtn" class="btn btn-outline-success mr-2" data-action="like" data-host="<%= hosts[0].id%>"><i class="fa fa-thumbs-up"></i> <span data-count="<%= hosts[0].likes%>"><%= hosts[0].likes%></span></button>
-                  <button id="followBtn" class="btn btn-outline-success ml-2" data-action="follow" data-host="<%= hosts[0].id%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? true : false%>"><span class="text"><%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? __('followed') : __('follow')%> </span><i class="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? 'fas fa-star' : 'far fa-star'%>"></i></button>
+                  <button id="likeBtn" class="btn btn-outline-success mr-lg-2" data-action="like" data-host="<%= hosts[0].id%>"><i class="fa fa-thumbs-up"></i> <span data-count="<%= hosts[0].likes%>"><%= hosts[0].likes%></span></button>
+                  <button id="followBtn" class="btn btn-outline-success ml-lg-2" data-action="follow" data-host="<%= hosts[0].id%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? true : false%>"><span class="text"><%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? __('followed') : __('follow')%> </span><i class="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? 'fas fa-star' : 'far fa-star'%>"></i></button>
                 </div>
               </div>
             </div>

@@ -11,11 +11,9 @@ module.exports = function(req, res, next) {
   // User is allowed, proceed to the next policy,
   // or if this is the last policy, the controller
   var hostId = req.session.user.host ? (req.session.user.host.id ? req.session.user.host.id : req.session.user.host) : "";
-  sails.log.info("order ids:" + req.param('id'));
   var orderIds = req.param('id').split("+");
   var action = req.path.split("/").pop();
   require('async').eachSeries(orderIds, function(orderId, cb){
-    sails.log.info("policy of order:" + orderId);
     Order.findOne(orderId).populate('host').exec(function(err,order){
       if(err){
         return cb(err);
@@ -26,12 +24,12 @@ module.exports = function(req, res, next) {
         }else if(!order.isSendToHost && (!hostId || hostId !== order.host.id)){
           return cb();
         }else{
-          sails.log.warn("You are not the right party to perform this action");
+          sails.log.error("You are not the right party to perform this action");
           return cb('You are not permitted to perform this action.');
         }
       }else if(action === "adjust" || action === "cancel" || action === "adjust-form"){
         if(order.status !== "schedule" && order.status !== "preparing"){
-          sails.log.warn("order can only be adjusted at schedule or preparing");
+          sails.log.error("order can only be adjusted at schedule or preparing");
           return cb('order can only be adjusted at schedule or preparing');
         }
         if(order.status === "schedule" && hostId && hostId === order.host.id){
@@ -40,7 +38,7 @@ module.exports = function(req, res, next) {
         return cb();
       }else if(action === "ready"){
         if(order.status !== "preparing"){
-          sails.log.warn("order can only be ready at preparing");
+          sails.log.error("order can only be ready at preparing");
           return cb("order can only be ready at preparing");
         }else if(!hostId || hostId !== order.host.id){
           return cb("you are not permitted to perform this action");

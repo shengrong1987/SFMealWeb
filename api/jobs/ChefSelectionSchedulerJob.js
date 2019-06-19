@@ -25,7 +25,7 @@ module.exports = function(agenda) {
 
     // execute job
     run: function (job, done) {
-      sails.log.info("scheduling chef selection email job");
+      sails.log.debug("JOBS Created! - Type: FollowedChefPushingJob");
       agenda.every('week','FollowedChefPushingJob');
       done();
     }

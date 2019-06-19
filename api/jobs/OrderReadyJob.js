@@ -26,7 +26,6 @@ module.exports = function(agenda) {
 
     // execute job
     run: function(job, done) {
-      sails.log.info("running order ready notification");
       var orderId = job.attrs.data.orderId;
       Order.findOne(orderId).populate("customer").populate("host").populate("meal").exec(function(err,order){
         if(err || !order){
@@ -38,7 +37,7 @@ module.exports = function(agenda) {
           if(err){
             return done(err);
           }
-          sails.log.info("sending order ready reminder to guests");
+          sails.log.debug("JOBS - Type: OrderReadyJob, Model: Order, Action: Ready To: Guest");
           notification.notificationCenter("Order", "ready", result, false, false, null);
           done();
         });

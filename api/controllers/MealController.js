@@ -736,17 +736,17 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      sails.log.info("pass date check");
+      sails.log.debug("#1/6 - Success in checking date");
       $this.requirementIsValid(req.body, null, req, function(err){
         if(err){
           return res.badRequest(err);
         }
-        sails.log.info("pass meal requirement check");
+        sails.log.debug("#2/6 - Success in checking requirement");
         $this.dishIsValid(req.body, req, function(err){
           if(err){
             return res.badRequest(err);
           }
-          sails.log.info("pass dish check");
+          sails.log.debug("#3/6 - Success in checking dish");
           Host.findOne(hostId).populate("meals").populate("dishes").populate("user").exec(function(err, host){
             if(err){
               return res.badRequest(err);
@@ -755,6 +755,7 @@ module.exports = {
               if(err){
                 return res.badRequest(err);
               }
+              sails.log.debug("#4/6 - Success in updating logistic info");
               req.body = params;
               req.body.commission = host.commission;
               req.body.chef = host.id;
@@ -766,6 +767,7 @@ module.exports = {
                   if(!host.passGuide || !host.dishVerifying){
                     return res.badRequest({responseText : req.__('meal-chef-incomplete'), code : -7});
                   }
+                  sails.log.debug("#5/6 (optional) - Success in checking host");
                   Meal.create(req.body).exec(function(err,meal){
                     if(err){
                       return res.badRequest(err);
@@ -778,6 +780,7 @@ module.exports = {
                   if(err){
                     return res.badRequest(err);
                   }
+                  sails.log.debug("#6/6 - Meal Created: " + meal.id);
                   return res.ok(meal);
                 });
               }

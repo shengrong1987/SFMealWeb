@@ -37,7 +37,7 @@ module.exports = function(agenda) {
           if(err){
             return done(err);
           }
-          sails.log.info("sending arrive reminder email to guest");
+          sails.log.debug("JOBS - Type: OrderDeliveringReminderJob, Model: Order, Action: Reminder, To: Guest");
           notification.notificationCenter("Order","reminder", o, false, false, null);
           done();
         })

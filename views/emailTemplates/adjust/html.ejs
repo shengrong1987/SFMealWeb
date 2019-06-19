@@ -9,6 +9,9 @@
     <p><%= ordernumber%>: <%= id%></p>
     <table class="table table-email">
       <% Object.keys(orders).forEach(function(dishId){
+        if(!orders[dishId]){
+          return;
+        }
         var preference = orders[dishId].preference;
         var price = orders[dishId].price;
         var title = '';

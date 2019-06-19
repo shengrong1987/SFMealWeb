@@ -3,6 +3,7 @@
  */
 var async = require('async');
 var util = require('../services/util');
+var moment = require('moment');
 module.exports = function(agenda) {
   var job = {
 
@@ -27,7 +28,6 @@ module.exports = function(agenda) {
 
     // execute job
     run: function(job, done) {
-      sails.log.info("Meal check executed");
       var now = new Date();
 
       Meal.find({ status : 'on', isScheduled : false }).exec(function(err, meals){
@@ -42,7 +42,7 @@ module.exports = function(agenda) {
               if(err){
                 return cb(err);
               }
-              sails.log.info("scheduling meal book end Job at: " + meal.provideTillTime);
+              sails.log.debug("JOBS Created! - Type: MealScheduleEndJob on" + moment(meal.provideTillTime).format("LLL"));
               Jobs.schedule(meal.provideTillTime, 'MealScheduleEndJob', { mealId : meal.id });
               cb();
             });
@@ -54,7 +54,7 @@ module.exports = function(agenda) {
                 if(err){
                   return cb(err);
                 }
-                sails.log.info("scheduling meal start reminder Job at: " + util.minutesBefore(meal.provideFromTime,10));
+                sails.log.debug("JOBS Created! - Type: MealStartJob on" + moment(util.minutesBefore(meal.provideFromTime,10)).format("LLL"));
                 Jobs.schedule(util.minutesBefore(meal.provideFromTime,10), 'MealStartJob', { mealId : result.id });
                 cb();
               });

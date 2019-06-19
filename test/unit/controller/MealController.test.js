@@ -533,7 +533,6 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          console.log(res.body);
           res.body.pickups[0].publicLocation.should.be.equal("Uber HQ New");
           res.body.pickups[0].index.should.be.equal(1);
           res.body.pickups[0].phone.should.be.equal("(415)802-3853");

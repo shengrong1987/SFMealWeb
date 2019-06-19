@@ -148,15 +148,19 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
-    referralBonus : {
-      type : 'boolean',
-      defaultsTo : false
-    },
     referralCode : {
       type : 'string'
     },
     referrerCode : {
       type : 'string'
+    },
+    usedReferralBonus : {
+      type : 'boolean',
+      defaultsTo : false
+    },
+    referralBonus : {
+      type : 'boolean',
+      defaultsTo : false
     },
     newUserRewardIsRedeemed : {
       type : 'boolean',
@@ -182,7 +186,6 @@ module.exports = {
           var code = this.referralCode;
           var parts = code.split(".");
           var newCode = (params.firstname || this.firstname) + "." + (params.lastname || this.lastname) + "." + parts[2];
-          sails.log.info("code updated: " + code);
           cb(null, newCode);
         }else{
           cb(null, this.referralCode);
@@ -194,7 +197,6 @@ module.exports = {
             return cb(err);
           }
           var code = (params.firstname || _this.firstname || params.nickname || 'chi') + "." + (params.lastname || _this.lastname || 'huo') + "." + number;
-          sails.log.info("code created: " + code);
           cb(null, code);
         })
       }

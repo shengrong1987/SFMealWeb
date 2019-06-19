@@ -31,7 +31,6 @@ module.exports = function(agenda) {
 
     // execute job
     run: function (job, done) {
-      sails.log.info("Sending host income summary");
       Host.find({ passGuide: true }).populate("orders").populate('meals').exec(function (err, hosts) {
         if (err) {
           sails.log.error(err);
@@ -186,6 +185,7 @@ module.exports = function(agenda) {
               host.otherPayments = otherPayments;
               host.transactions = transactions;
               host.showDates = showDates;
+              sails.log.debug("JOBS - Type: HostPaymentSummaryJob, Model: Host, Action: Summary, To: Host " + host.email);
               notification.sendEmail("Host", "summary", {host: host, hostEmail: host.email, isSendToHost: true});
               next();
             });

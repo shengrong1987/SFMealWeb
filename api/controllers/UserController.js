@@ -168,6 +168,7 @@ module.exports = require('waterlock').actions.user({
       if(params.email && user.auth.email && !isAdmin && user.auth.email !== params.email){
         return res.badRequest({ code : -6, responseText : req.__('user-email-can-not-change')});
       }
+      sails.log.debug("UPDATING User Info for: " + user.id);
       var email = user.auth.email || params.email;
 
       async.auto({
@@ -207,15 +208,14 @@ module.exports = require('waterlock').actions.user({
                 sails.log.debug(err);
                 return next(req.__('meal-error-address'));
               }
-              sails.log.debug("geocoded result: " + result);
               if(result.length===0){
                 return next(req.__('meal-error-address2'));
               }
+              sails.log.debug("Success in Geocoding address: " + actualAddress);
               if(addObj.isDefault){
                 updatingAddress.forEach(function (one) {
                   one.isDefault = false;
                 });
-                sails.log.info("default address: " + actualAddress);
                 var administration = result[0].administrativeLevels;
                 params.county = administration.level2long;
                 params.city = result[0].city;
@@ -255,7 +255,7 @@ module.exports = require('waterlock').actions.user({
               return cb(err);
             }
             params.referralCode = code;
-            sails.log.info("code is: " + code);
+            sails.log.debug("Success in generating Referral Code: " + code);
             cb();
           })
         },
@@ -265,7 +265,9 @@ module.exports = require('waterlock').actions.user({
           }
           var birthdayDate = new Date(params.birthday);
           var birthday = birthdayDate.getMonth()+1+"/"+birthdayDate.getDate();
-          mailChimp.updateMember({ email : email, birthday : birthday }, "member");
+          if(email){
+            mailChimp.updateMember({ email : email, birthday : birthday }, "member");
+          }
           cb();
         }}, function(err){
         if(err){
@@ -279,7 +281,7 @@ module.exports = require('waterlock').actions.user({
             var hostId = user[0].host.id || user[0].host;
             Host.update(hostId, {phone : user[0].phone}).exec(function(err, host){
               if(err){
-                return cb(err);
+                return res.badRequest(err);
               }
               user[0].auth = req.session.user.auth;
               req.session.user = user[0];
@@ -310,7 +312,7 @@ module.exports = require('waterlock').actions.user({
           }
           Notification.destroy({user : userId}).exec(function(err){
             if(err){
-              console.log(err);
+              sails.log.error(err);
             }
             if(req.wantsJSON && process.env.NODE_ENV === "development"){
               return res.ok(found);
@@ -398,7 +400,7 @@ module.exports = require('waterlock').actions.user({
             req.session.user = found;
             Notification.destroy({user : userId}).exec(function(err){
               if(err){
-                console.log(err);
+                sails.log.error(err);
               }
             });
             found.locale = req.getLocale();
@@ -690,7 +692,15 @@ module.exports = require('waterlock').actions.user({
         if(!code){
           return res.redirect('/join?code=' + encodeURIComponent(user.referralCode));
         }
-        return res.view('join', { user : user, baseUrl : baseUrl });
+        User.find({ referrerCode : user.referralCode}).exec(function (err, referrals) {
+          if(err){
+            return res.badRequest(err);
+          }
+          if(req.wantsJSON && process.env.NODE_ENV === "development"){
+            return res.ok({ user : user, baseUrl : baseUrl, referrals : referrals });
+          }
+          return res.view('join', { user : user, baseUrl : baseUrl, referrals : referrals });
+        })
       })
     }else{
       User.find({ referralCode : code }).exec(function(err, users){
@@ -765,7 +775,6 @@ module.exports = require('waterlock').actions.user({
     //  secretAccessKey: s3.key,
     //  accessKeyId: s3.id
     //})
-    //console.log(opts);
     var hmac = crypto.createHmac("sha1", s3.key);
     var hash2 = hmac.update(policy);
     var signature = hmac.digest("base64");
@@ -879,7 +888,6 @@ module.exports = require('waterlock').actions.user({
           }
           if(number === 0){
             deleteObjects.push({ Key : object.Prefix });
-            sails.log.info("user id: " + userId + " does not exist, deleting : " + object.Prefix);
             s3.listObjects({
               Prefix : object.Prefix,
               Delimiter : '/',
@@ -892,7 +900,6 @@ module.exports = require('waterlock').actions.user({
                 if(!userObj){
                   return next2();
                 }
-                sails.log.info("user id: " + userId + " does not exist, deleting : " + userObj.Key);
                 deleteObjects.push({ Key : userObj.Key});
                 next2();
               }, function(err){

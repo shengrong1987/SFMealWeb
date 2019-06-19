@@ -269,7 +269,6 @@ module.exports = {
             var charges = order.charges;
             var transfer = order.transfer;
             var feeCharges = order.feeCharges;
-            sails.log.info("begin retrieving order: " + order.id);
             async.auto({
               retrieveCharge : function(next){
                 if(!charges){
@@ -357,7 +356,6 @@ module.exports = {
               if(err){
                 return cb(err);
               }
-              sails.log.info("finish retrieving an order: " + order.id);
               cb();
             })
           },function(err){

@@ -1,0 +1,128 @@
+<div id="registerView" class="step-container">
+  <div class="alert alert-warning hide">${__('user-exist-error')}</div>
+  <div id="step1" class="text-center step">
+    <div class="card m-auto w-100" style="min-width:300px;">
+
+      <div class="card-body">
+        <div class="card-title">
+          <h3>
+            <button aria-label="close" class="close" onclick="javascript:h.dismissModal()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </h3>
+        </div>
+        <div class="my-2 w-50 mx-auto" style="min-width:250px;">
+          <button id="FBBtn" class="popline btn btn-blue btn-lg light w-100" style="font-weight: lighter;">
+            <span><i class="fab fa-facebook-f pr-3"></i>Facebook <span>${__('nav-bar-login')}</span></span>
+          </button>
+        </div>
+        <div class="my-2 w-50 mx-auto" style="min-width:250px;">
+          <button id="GoogleBtn" class="popline btn btn-google btn-lg outline white text-orange w-100" style="font-weight: lighter;">
+            <span><i class="fab fa-google pr-3"></i>Google <span>${__('nav-bar-login')}</span></span>
+          </button>
+        </div>
+        <div class="my-2 w-50 mx-auto" style="min-width:250px;">
+          <button id="wechatBtn" class="popline btn btn-green btn-lg outline text-white w-100" style="font-weight: lighter;">
+            <span><i class="fab fa-weixin" style="padding-right:15px;"></i>${__('wechat')}<span>${__('nav-bar-login')}</span></span>
+          </button>
+        </div>
+        <div class="my-2 w-50 mx-auto" style="min-width:250px;">
+          <button class="popline btn btn-lg btn-danger light next-step mb-4 w-100" data-step="1" onclick="h.nextStep(event)" style="font-weight: lighter;">${__('register-with-email')}</button>
+        </div>
+
+        <h6><span>${__('registerAgreement')}</span><a href="/help#terms"> ${__('terms')}</a></h6>
+      </div>
+
+      <div class="card-footer">
+        <h6>${__('user-exist-error')}<a toggle="modal" data-target="#myModal" data-model="user" data-action="signin" href="javascript:void(0)" onclick="h.toggleModal(event)"><span>${__('nav-bar-login')}</span></a></h6>
+      </div>
+    </div>
+  </div>
+
+  <div id="step2" class="text-center d-none step" >
+    <div class="card m-auto w-100" style="min-width: 300px;">
+
+      <div class="card-body">
+        <div class="card-title">
+          <h3>
+            <small>
+              <a href="#" class="last-step" data-step="2" onclick="h.lastStep(event)">Facebook </a><span>${__('nav-bar-register')}</span> <span>${__('or')}</span> <a href="#" class="last-step" data-step="2" onclick="h.lastStep(event)">Google </a></span><span>${__('nav-bar-register')}</span>
+            </small>
+            <button aria-label="close" class="close" onclick="javascript:h.dismissModal()"><span aria-hidden="true">&times;</span></button>
+          </h3>
+        </div>
+
+        <div class="divider"></div>
+
+        <form class="text-center" data-toggle="validator" role="form" autocomplete="off">
+
+          <div class="form-group has-feedback relative">
+            <label class="sr-only" for="emailInput">${__('email')}</label>
+            <input type="email" class="form-control" id="emailInput" placeholder="邮箱 (Email)" data-pattern-error="${__('invalid-email')}" required>
+            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+            <div class="help-block with-errors text-red"></div>
+          </div>
+
+          <div class="form-group has-feedback relative">
+            <label class="sr-only" for="passwordInput">${__('password')}</label>
+            <input type="password" pattern="^[_A-z0-9]{8,}$" class="form-control" id="passwordInput" placeholder="密码 (Password)" data-pattern-error="${__('password-requirement')}" required>
+            <span class="form-control-feedback" aria-hidden="true"></span>
+            <span class="help-block with-errors text-red"></span>
+          </div>
+
+          <div class="form-group has-feedback relative">
+            <label class="sr-only" for="passwordInput">${__('password')}</label>
+            <input type="password" pattern="^[_A-z0-9]{8,}$" class="form-control" id="passwordConfirmInput" data-pattern-error="${__('password-requirement')}" data-match="#passwordInput" data-match-error="${__('unmatched-password')}" placeholder="请再次输入密码 (password confirm)" required>
+            <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+            <div class="help-block with-errors text-red"></div>
+          </div>
+
+          <div class="form-group has-feedback relative">
+            <label class="sr-only" for="firstnameInput">${__('firstname')}</label>
+            <input type="text" pattern="^([A-z\s]{1,15})$" maxlength="15" data-pattern-error="${__('invalid-name')}" class="form-control" id="firstnameInput" placeholder="名字 (Firstname)" required>
+            <span class="form-control-feedback" aria-hidden="true"></span>
+            <div class="help-block with-errors text-red"></div>
+          </div>
+
+          <div class="form-group has-feedback relative">
+            <label class="sr-only" for="lastnameInput">${__('lastname')}</label>
+            <input type="text" pattern="^([A-z\s]{1,15})$" maxlength="15" data-pattern-error="${__('invalid-name')}" class="form-control" id="lastnameInput" placeholder="贵姓 (Lastname)" required>
+            <span class="form-control-feedback" aria-hidden="true"></span>
+            <div class="help-block with-errors text-red"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="sr-only" for="phoneInput" type="tel">${__('phone')}</label>
+            <input type="tel" class="form-control" data-minlength="13" id="phoneInput" placeholder="电话 (Phone)" data-error="${__('enter-phone')}" data-pattern-error="${__('phone-bad-format')}" required>
+            <div class="help-block with-errors"></div>
+          </div>
+
+          <div class="form-group">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="receivedEmailInput">
+                <span>${__('receiveCoupon')}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <button id="register-btn" type="submit" class="btn btn-danger btn-lg red popline">${__('nav-bar-register')}</button>
+          </div>
+        </form>
+
+        <h6 class="text-center"><span>${__('registerAgreement')}</span><a href="/terms#terms">${__('terms')}</a></h6>
+
+      </div>
+
+      <div class="card-footer">
+        <h6><span>${__('user-exist-error')} </span><a toggle="modal" data-target="#myModal" data-model="user" data-action="signin" href="javascript:void(0)" onclick="h.toggleModal(event)"> ${__('nav-bar-login')}</a></h6>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~428820f4.bundle.js"></script>
+<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~c094081c.bundle.js"></script>
+<script src="/assets/zh.signup.bundle.js"></script>

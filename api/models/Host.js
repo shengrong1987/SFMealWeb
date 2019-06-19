@@ -163,7 +163,7 @@ module.exports = {
         if(err){
           return cb(err);
         }
-        sails.log.info("phone valid: " + !!host.phone + "& address valid: " + !!host.full_address + "&dishes valid: " + !!host.dishes.length + "&bank valid: " + !!host.bankId + "&verification valid: " + valid);
+        sails.log.info("Host Requirement Check: Phone valid: " + !!host.phone + "& Address valid: " + !!host.full_address + "&Dishes valid: " + !!host.dishes.length + "&Bank valid: " + !!host.bankId + "&Verification valid: " + valid);
         if(host.phone && host.full_address && host.dishes.length > 0 && host.bankId && valid){
           host.passGuide = true;
         }else{

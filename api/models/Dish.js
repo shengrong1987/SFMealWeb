@@ -136,7 +136,6 @@ module.exports = {
       }
       var price = Math.ceil(this.price - parseInt(orderQty / this.qtyRate) * this.priceRate);
       price = Math.max(price, parseFloat(this.minimalPrice));
-      sails.log.info("original price: " + this.price + ", new price: " + price + " order total: " + orderQty);
       return price;
     },
     isFeature : function(){

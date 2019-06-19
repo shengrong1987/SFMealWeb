@@ -211,7 +211,6 @@ module.exports = {
                   return cb();
                 }
                 var file = files[0];
-                sails.log.info("uploading document: " + file.filename);
                 stripe.uploadFile({
                   purpose : 'identity_document',
                   file : {
@@ -223,7 +222,6 @@ module.exports = {
                   if(err){
                     return cb(err);
                   }
-                  sails.log.info("document uploaded: " + data.id);
                   legal_entity = legal_entity || {};
                   legal_entity.verification = {document : data.id};
                   cb();

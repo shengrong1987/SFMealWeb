@@ -753,6 +753,7 @@ describe('UsersController', function() {
             return done(err);
           }
           res.body.points.should.be.equal(50);
+          res.body.referralBonus.should.be.true();
           done();
         })
     })
@@ -777,6 +778,22 @@ describe('UsersController', function() {
             return done(err);
           }
           res.body.points.should.be.equal(0);
+          done();
+        })
+    })
+
+    it('should get referral data', function(done){
+      agent
+        .get('/join?code=' + referralCode)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.property('referrals').with.length(1);
+          res.body.referrals[0].usedReferralBonus.should.be.false();
           done();
         })
     })
@@ -823,6 +840,7 @@ describe('UsersController', function() {
             return done(err);
           }
           res.body.points.should.be.equal(50);
+          res.body.referralBonus.should.be.true();
           done();
         })
     })

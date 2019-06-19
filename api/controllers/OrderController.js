@@ -132,9 +132,8 @@ module.exports = {
       pickUpInfo.isDateCustomized = true;
     }
     if(!pickUpInfo){
-      sails.log.debug("pickup info not exist, check meal setting");
+      sails.log.error("pickup info not exist, check meal setting");
     }
-    sails.log.info("building pickup data");
     cb({
       pickupInfo : pickUpInfo,
       delivery_fee : delivery_fee
@@ -160,7 +159,6 @@ module.exports = {
 
 	  //sails.log.group("---Order Processing---");
     var _this = this;
-
     var isAdmin = req.session.authenticated && req.session.user.auth.email === "admin@sfmeal.com";
     var orders = req.body.orders;
     if(!orders){
@@ -212,7 +210,7 @@ module.exports = {
         });
 
         if(!dishInMeal){
-          sails.log.warning("Dish(%s) not in meal error, please check your url.", orderedDishId);
+          sails.log.error("Dish(%s) not in meal error, please check your url.", orderedDishId);
           notInMealDish = orderedDishId;
         }
         return dishInMeal;
@@ -229,14 +227,18 @@ module.exports = {
         if(!meals.length){
           return res.badRequest({ code: -52, responseText: req.__('meal-not-found')})
         }
-        var _logisticInfo, _orders = [], _user;
+        var _logisticInfo, _orders = [];
         async.auto({
           /*
            * Check parameters pass from client are correct
            */
           validateParams : function(next){
             _this.validateOption(req.body, meals, req, function(err){
-              //sails.log.assert(!err, "#1/11 - Error in validate params");
+              if(err){
+                sails.log.error("#1/11 - Error in validate params");
+              }else{
+                sails.log.debug("#1/11 - Success in validate params");
+              }
               next(err);
             });
           },
@@ -245,14 +247,16 @@ module.exports = {
               _this.validateMeal(meal, orders, null, req, null, nextIn);
             }, function(err){
               if(err){
-                sails.log.warning("#2/11 - Error in validate orders");
+                sails.log.error("#2/11 - Error in validate orders");
+              }else{
+                sails.log.debug("#2/11 - Success in validate orders");
               }
               next(err);
             })
           }],
           buildOptions : ['validateOrders', function(next){
             _this.buildDeliveryData(req.body, meals[0], meals[0].pickups, req, function(logisticInfo){
-              sails.log.info("#3/11 - building logistic info: " + logisticInfo);
+              sails.log.debug("#3/11 - Success in building logistic info: " + logisticInfo);
               _logisticInfo = logisticInfo;
               next();
             });
@@ -263,7 +267,7 @@ module.exports = {
               meals.forEach(function(meal){
                 subtotal += meal.subtotal;
               });
-              sails.log.info("#4/11 - validate subtotal: " + subtotal + " with a minimal of " + _logisticInfo.pickupInfo.minimalOrder);
+              sails.log.debug("#4/11 - Sucess in validating subtotal: " + subtotal + " with a minimal of " + _logisticInfo.pickupInfo.minimalOrder);
               if(parseFloat(subtotal) < parseFloat(_logisticInfo.pickupInfo.minimalOrder) && !isAdmin){
                 return next({ code: -60, responseText : req.__('order-single-minimal-not-reach', _logisticInfo.pickupInfo.minimalOrder)});
               }
@@ -279,7 +283,6 @@ module.exports = {
             var method = req.body.method;
             var address = req.body.contactInfo.address;
             var phone = req.body.contactInfo.phone;
-            sails.log.info("#5/11 - saving address: " + address + "and phone no.: " + phone);
             if(method !== "delivery" && !address){
               return next();
             }
@@ -292,14 +295,14 @@ module.exports = {
               }
               require('../services/geocode').geocode(address, function (err, result) {
                 if (err) {
-                  sails.log.warning("Error in geocoding user address: " + address);
+                  sails.log.error("#5/11 - Error in geocoding user address: " + address);
                   return next(req.__('meal-error-address'));
                 }
-
                 if (result.length === 0) {
-                  sails.log.warning("Error looking for address: " + address);
+                  sails.log.error("#5/11 - Error looking for address: " + address);
                   return next(req.__('meal-error-address2'));
                 }
+                sails.log.debug("#5/11 - Success in saving address: " + address + " & phone no.: " + phone);
                 var administration = result[0].administrativeLevels;
                 user.county = administration.level2long;
                 user.city = result[0].city;
@@ -359,7 +362,6 @@ module.exports = {
                     if (err) {
                       return nextIn2(err);
                     }
-                    _user = found;
                     var contactInfo = req.body.contactInfo;
                     var paymentInfo = req.body.paymentInfo;
                     if(paymentInfo.method === 'online' && (!found.payment || found.payment.length === 0)){
@@ -388,20 +390,25 @@ module.exports = {
                     //validate Coupon
                     _this.verifyCoupon(req, code, found, meal, function(err, coupon){
                       if(err){
+                        sails.log.error("#6-1/11 - Error in verifing coupon");
                         return nextIn2(err);
                       }
+                      sails.log.debug("#6-1/11 - Success in verifing coupon");
                       var subtotalAfterTax = meal.subtotal + orderParam.tax/100;
                       _this.redeemPoints(req, pointsRedeem, found, subtotalAfterTax, function(err, discount){
                         if(err){
+                          sails.log.error("#6-2/11 - Error in redeeming points");
                           return nextIn2(err);
                         }
+                        sails.log.debug("#6-2/11 - Success in redeeming points");
                         req.body.points -= (discount * 10);
                         orderParam.redeemPoints = pointsRedeem;
-                        //calculate total
                         _this.redeemCoupon(req, code, subtotalAfterTax, coupon, found, discount, function(err, discount){
                           if(err){
+                            sails.log.error("#6-3/11 - Success in redeeming coupon");
                             return nextIn2(err);
                           }
+                          sails.log.debug("#6-3/11 - Success in redeeming coupon");
                           if(coupon){
                             orderParam.coupon = coupon.id;
                           }
@@ -454,12 +461,11 @@ module.exports = {
                 if(err){
                   return nextIn(err);
                 }
-                sails.log.info("#6/11 - Building order");
                 Order.create(orderParam).exec(function (err, order) {
                   if (err) {
                     return nextIn(err);
                   }
-                  sails.log.info("Order id: " + order.id);
+                  sails.log.debug("#6/11 - Building order: " + order.id);
                   order.meal = meal;
                   order.dishes = meal.dishes;
                   _orders.push(order);
@@ -474,7 +480,7 @@ module.exports = {
             })
           }],
           makePayments : [ 'buildOrders', function(next){
-            sails.log.info("#7/11 - Make payment of orders");
+            sails.log.debug("#7/11 - Make payment of orders");
             async.eachSeries(_orders, function(order, nextIn){
               if(order.paymentMethod === "alipay" || order.paymentMethod === "wechatpay"){
                 stripe.newSource({
@@ -582,8 +588,10 @@ module.exports = {
               })
             }, function(err){
               if(err){
+                sails.log.error("#8/11 - Error in updating dish qty");
                 return next(err);
               }
+              sails.log.debug("#8/11 - Success in updating dish qty");
               next();
             });
           }],
@@ -592,51 +600,60 @@ module.exports = {
               _this.addReferrerPoints(order.customer, nextIn);
             }, function(err){
               if(err){
+                sails.log.debug("#9/11 - Error in adding referral points");
                 return next(err);
               }
+              sails.log.debug("#9/11 - Success in adding referral points");
               next();
             })
           }],
-          checkBadges : [ 'addPoints', function(next){
-            if(!_user){
+          checkBadges : ['addPoints', function(next){
+            if(!req.session.authenticated){
               return next();
             }
-            Badge.find().exec(function(err, badges){
+            User.findOne(req.session.user.id).exec(function(err, user){
               if(err){
                 return next(err);
               }
-              badges = badges.filter(function(badge){
-                return !_user.badgeInfo || !_user.badgeInfo.hasOwnProperty(badge.id) || !_user.badgeInfo[badge.id].isAchieved;
-              });
-              async.each(badges, function(badge, nextIn){
-                var model = badge.model;
-                badge.rule.id = badge.rule.id.replace("${userId}",_user.id);
-                _this.sails.models[model].find(badge.rule).exec(function(err, modelData){
-                  if(err){
-                    return nextIn(err);
-                  }
-                  if(!modelData || !modelData.length){
-                    return nextIn();
-                  }
-                  _user.badgeInfo = _user.badgeInfo || {};
-                  _user.badgeInfo[badge.id] = _user.badgeInfo[badge.id] || {};
-                  _user.badgeInfo[badge.id].isAchieved = true;
-                  _user.badgeInfo[badge.id].achievedDate = moment().format("ll");
-                  notification.notificationCenter("Badge", "new", badge, false, false, req);
-                  nextIn();
-                });
-              }, function(err){
+              Badge.find().exec(function(err, badges){
                 if(err){
                   return next(err);
                 }
-                _user.save(function(err, u){
+                badges = badges.filter(function(badge){
+                  return !user.badgeInfo || !user.badgeInfo.hasOwnProperty(badge.id) || !user.badgeInfo[badge.id].isAchieved;
+                });
+                async.each(badges, function(badge, nextIn){
+                  var model = badge.model;
+                  badge.rule.id = badge.rule.id.replace("${userId}",user.id);
+                  _this.sails.models[model].find(badge.rule).exec(function(err, modelData){
+                    if(err){
+                      return nextIn(err);
+                    }
+                    if(!modelData || !modelData.length){
+                      return nextIn();
+                    }
+                    user.badgeInfo = user.badgeInfo || {};
+                    user.badgeInfo[badge.id] = user.badgeInfo[badge.id] || {};
+                    user.badgeInfo[badge.id].isAchieved = true;
+                    user.badgeInfo[badge.id].achievedDate = moment().format("ll");
+                    notification.notificationCenter("Badge", "new", badge, false, false, req);
+                    nextIn();
+                  });
+                }, function(err){
                   if(err){
+                    sails.log.error("#10/11 - Error in updating badge info");
                     return next(err);
                   }
-                  next();
+                  user.save(function(err, u){
+                    if(err){
+                      return next(err);
+                    }
+                    sails.log.debug("#10/11 - Success in updating badge info");
+                    next();
+                  })
                 })
-              })
-            });
+              });
+            })
           }],
           finalizeOrder : ['checkBadges', function(next){
             async.each(_orders, function(order, nextIn){
@@ -655,10 +672,12 @@ module.exports = {
               });
             }, function(err){
               if(err){
+                sails.log.debug("#11/11 - Error in finalizing order");
                 return next(err);
               }
               var combinedOrder = _this.combineOrders(_orders);
               notification.notificationCenter("Order", "new", combinedOrder, false, false, req);
+              sails.log.debug("#11/11 - Success in finalizing order");
               next();
             })
           }]
@@ -673,7 +692,6 @@ module.exports = {
   },
 
   afterSuccessCharge : function(order, m, charge, transfer, req, res){
-    sails.log.info("charge succeed, gathering charging info for order");
     var _this = this;
     this.addReferrerPoints(order.customer, function(err, u){
       if(err){
@@ -815,7 +833,6 @@ module.exports = {
             order.service_fee = order.meal.serviceFee;
             $this.validateMeal(meal, params.orders, order.orders, req, order, function(err){
               if(err){
-                sails.log.error(err.responseText);
                 return cb(err);
               }
               if(hostId === order.host.id){
@@ -829,11 +846,6 @@ module.exports = {
                 var tax = $this.getTax(netDiff, order.host.county, order.meal.isTaxIncluded);
                 netDiff *= 100;
                 adjustAmount += netDiff + tax;
-
-                sails.log.info("adjusting amount: " + netDiff);
-                sails.log.info("original tax amount: " + order.tax);
-                sails.log.info("tax adjusting amount: " + tax);
-
                 async.auto({
                   chargeCustomer : function(next){
                     if(netDiff <= 0){
@@ -884,9 +896,6 @@ module.exports = {
                     if(netDiff >= 0){
                       return next();
                     }
-                    sails.log.info("original tax amount: " + order.tax);
-                    sails.log.info("tax refund amount: " + tax);
-                    sails.log.info("refunding amount plus tax: " + netDiff);
                     async.auto({
                       refundOrders : function(next2) {
                         if (order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal") {
@@ -898,10 +907,7 @@ module.exports = {
                           reverse_transfer : true,
                           refund_application_fee : true,
                           amount : Math.abs(adjustAmount)
-                        };
-                        Object.keys(order.charges).forEach(function(chargeId){
-                          sails.log.info("charge: " + chargeId, " with amount: " + order.charges[chargeId]);
-                        });
+                        };;
                         stripe.batchRefund(order.charges, order.transfer, metadata, function (err) {
                           if (err) {
                             return next2(err);
@@ -1875,13 +1881,11 @@ module.exports = {
       return cb(null, meal);
     }
     var leftQty = meal.leftQty;
-    sails.log.info("meal: " + meal.title + "left qty:" + leftQty);
     Object.keys(lastOrder).forEach(function(dishId){
       if(!order[dishId] || !lastOrder[dishId]){
         return;
       }
       leftQty[dishId] = parseInt(parseInt(lastOrder[dishId].number) - parseInt(order[dishId].number)) + parseInt(leftQty[dishId]);
-      sails.log.info("updating dish " + dishId + " to quantity of " + leftQty[dishId]);
     });
     meal.leftQty = leftQty;
     meal.save(function(err,result){
@@ -2285,11 +2289,6 @@ module.exports = {
             var tax = $this.getTax(netDiff, order.host.county, order.meal.isTaxIncluded);
             netDiff *= 100;
             var adjustAmount = netDiff + tax;
-
-            sails.log.info("adjusting amount: " + netDiff);
-            sails.log.info("original tax amount: " + order.tax);
-            sails.log.info("tax adjusting amount: " + tax);
-
             async.auto({
               chargeCustomer : function(next){
                 if(netDiff <= 0){
@@ -2347,10 +2346,6 @@ module.exports = {
                 if(netDiff >= 0){
                   return next();
                 }
-
-                sails.log.info("original tax amount: " + order.tax);
-                sails.log.info("tax refund amount: " + tax);
-                sails.log.info("refunding amount plus tax: " + netDiff);
                 async.auto({
                   refundOrders : function(next2) {
                     if (order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal") {
@@ -2363,9 +2358,6 @@ module.exports = {
                       refund_application_fee : true,
                       amount : Math.abs(adjustAmount)
                     };
-                    Object.keys(order.charges).forEach(function(chargeId){
-                      sails.log.info("charge: " + chargeId, " with amount: " + order.charges[chargeId]);
-                    });
                     stripe.batchRefund(order.charges, order.transfer, metadata, function (err) {
                       if (err) {
                         return next2(err);
@@ -2479,16 +2471,12 @@ module.exports = {
       }
       var customDate = orderInfo.customInfo.time;
       now = moment();
-      sails.log.info("now: " + now.format() + ", delivery date: " + moment(customDate).format());
       var ms = moment(customDate).diff(now);
       var d = moment.duration(ms);
-      sails.log.info("hours in advanced: " + d.asHours());
       if(d.asHours() < 24){
         return cb({ responseText : req.__('order-party-time-invalid'), code : -34});
       }
     }
-
-    sails.log.debug("meal looks good so far, checking order items...");
 
     var actual_subtotal = 0;
     var validDish = false;
@@ -2521,17 +2509,14 @@ module.exports = {
                   var hasPreference = Object.keys(dish.preference).some(function(preference){
                     var props = dish.preference[preference];
                     var hasPros = props.some(function(p){
-                      sails.log.info(p.property, property.property);
                       if(p.property === property.property){
                         extra += parseInt(p.extra);
                         return true;
                       }
                       return false;
                     });
-                    sails.log.info("dish has property: " + property.property + " : " + hasPros);
                     return hasPros;
                   });
-                  sails.log.info("dish:" + dish.title + " has preference: " + property.property + " : " + hasPreference);
                   return hasPreference;
                 }else{
                   return true;
@@ -2540,21 +2525,16 @@ module.exports = {
               return next2({ responseText : req.__('order-preference-not-exist'), code : -20});
             }
             var diff = qty - lastQty;
-            sails.log.info("meal: " + meal.title + " left qty: " + meal.leftQty);
-            sails.log.info("order qty for the dish: " + dish.id + " is: " + diff, "dish's left qty: " + meal.leftQty[dish.id]);
             if(!isPartyMode && diff > meal.leftQty[dish.id]){
               return next2({responseText : req.__('order-dish-not-enough',dish.title, qty), code : -1});
             }
             var totalQty = meal.getDynamicDishesTotalOrder(qty);
             var price = dish.getPrice(totalQty, meal);
             var listPrice = parseFloat(mealOrder[dishId].price);
-            sails.log.info("price: " + price + " list price: " + listPrice);
             if(price !== listPrice){
-              sails.log.info("listing price updated from " + listPrice + " to " + price);
               mealOrder[dishId].price = price;
               orders[dishId].price = price;
             }
-            sails.log.info("dish:" + dish.title + " price: " + price, ",qty: " + qty + ",extra:" + extra);
             actual_subtotal += (qty * price + extra);
           }
           next2();
@@ -2573,13 +2553,6 @@ module.exports = {
     }, function(err){
       if(err){
         return cb(err);
-      }
-
-      sails.log.debug("dish is valid and enough, checking total price...");
-
-      if(actual_subtotal !== subtotal) {
-        sails.log.debug("subtotal supposed to be " + actual_subtotal + ", but get " + subtotal);
-        // return cb({responseText : req.__('order-total-not-match'), code : -3});
       }
       meal.subtotal = actual_subtotal;
       meal.orders = mealOrder;
@@ -2605,7 +2578,6 @@ module.exports = {
     var pickups = [];
     var existInMeals = meals.forEach(function(meal){
       var pickup = meal.pickups.filter(function(pickup){
-        sails.log.info("pickup index: " + pickup.index + " pickup option: " + pickup.pickupOption);
         return pickup.index === pickupOption && ( !pickupNickname && pickup.nickname === pickupNickname);
       })[0];
       if(pickup){
@@ -2614,8 +2586,6 @@ module.exports = {
     });
     var isSamePickup = pickups.every(function(p){
       var p2 = pickups[0];
-      sails.log.info("from time1: " + moment(p2.pickupFromTime).format("LT") + " from time2:" + moment(p.pickupFromTime).format("LT") + " location1: " + p.location);
-      sails.log.info("till time1: " + moment(p2.pickupTillTime).format("LT") + " till time2:" + moment(p.pickupTillTime).format("LT") + " location2: " + p2.location);
       return moment(p.pickupFromTime).isSame(moment(p2.pickupFromTime), 'minute') && moment(p.pickupTillTime).isSame(moment(p2.pickupTillTime), 'minute') && p.location === p2.location;
     });
     if(!isSamePickup){
@@ -2649,14 +2619,13 @@ module.exports = {
         }
         var pickupInfo;
         meal.pickups.forEach(function(pickup){
-          if(pickup.index == pickupOption){
+          if(pickup.index === pickupOption){
             pickupInfo = Object.assign({}, pickup);
           }
         });
         if(!pickupInfo){
           return next({responseText : req.__('order-pickup-option-invalid-error'), code : -22});
         }
-        sails.log.info("pickup method: " + pickupInfo.method);
         if(!pickupInfo.phone){
           return next({responseText : req.__('order-pickup-option-invalid-error'), code : -28});
         }
@@ -2671,18 +2640,15 @@ module.exports = {
         }
         geocode.distance(full_address, pickupInfo.deliveryCenter, function(err, distance){
           if(err){
-            sails.log.error("verified distance err " + err);
             return next(err);
           }
           range = pickupInfo.deliveryRange || range;
           sails.log.debug("distance:" + distance, range);
           if(distance > range){
             if(!params.isPartyMode){
-              sails.log.error("distance verification failed");
               return next({responseText : req.__('order-invalid-address'), code : -6});
             }else{
               params.delivery_fee = (distance - range) * stripe.MILEAGE_FEE;
-              sails.log.info("charged distance: " + (distance - range) + " in a total of: " + params.delivery_fee);
             }
           }else if(params.isPartyMode){
             params.delivery_fee = 0;
@@ -2696,7 +2662,6 @@ module.exports = {
         //   return next({responseText : req.__('meal-no-shipping'), code : -12});
         // }
         if(subtotal < 60){
-          sails.log.error("order's amount do not reach free shipping policy");
           return next({responseText : req.__('order-not-qualify-shipping', '60'), code : -14});
         }
         return next();
@@ -2752,7 +2717,6 @@ module.exports = {
       return cb(null, discount);
     }
     var diff = total - coupon.amount;
-    sails.log.info("total: " + diff);
     if(diff < 0){ coupon.amount += diff; }
     user.coupons.add(coupon.id);
     user.save(function(err, u){
@@ -2760,7 +2724,6 @@ module.exports = {
         return cb(err);
       }
       req.body.discountAmount = coupon.amount;
-      sails.log.info("redeeming coupon amount:" + coupon.amount + " & order total: " + total);
       cb(null, coupon.amount);
     });
   },
@@ -2817,7 +2780,6 @@ module.exports = {
       }
       u.points = u.points || 0;
       u.points += points;
-      sails.log.info("adding points: " + points + " for ordering");
       u.save(cb);
     })
   },
@@ -2831,7 +2793,7 @@ module.exports = {
       if(err){
         return cb(err);
       }
-      if(!user.referrerCode){
+      if(!user.referrerCode || user.usedReferralBonus){
         return cb();
       }
       User.findOne({ referralCode : user.referrerCode }).exec(function(err, referrer){
@@ -2842,12 +2804,11 @@ module.exports = {
           return cb();
         }
         referrer.points += 50;
-        sails.log.info("adding points to referrer: " + referrer.email);
         referrer.save(function(err, r){
           if(err){
             return cb(err);
           }
-          user.referrerCode = null;
+          user.usedReferralBonus = true;
           user.save(cb);
         });
       })

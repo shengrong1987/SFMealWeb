@@ -25,7 +25,7 @@ module.exports = function(agenda) {
 
     // execute job
     run: function (job, done) {
-      sails.log.info("scheduling host summary report job");
+      sails.log.debug("JOBS Created! - Type: HostPaymentSummaryJob");
       agenda.every('week','HostPaymentSummaryJob');
       done();
     }

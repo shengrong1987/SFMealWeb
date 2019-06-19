@@ -99,7 +99,6 @@ describe('OrderController', function() {
         .expect(200)
         .end(function(err,res){
           if(err){
-            console.log(err);
             return done(err);
           }
           var meal = res.body.meals.filter(function(m){
@@ -291,7 +290,6 @@ describe('OrderController', function() {
           var o = res.body.orders[0];
           var chargesTotal = Math.round(((price1 + price2 * 2 + (price4*2+3)) + SERVICE_FEE + 10) * 100);
           userPoints += Math.floor(chargesTotal / 200);
-          // res.body.tax.should.be.equal(tax);
           o.customerName.should.be.equal('sheng');
           o.customerPhone.should.be.equal(phone);
           o.customer.should.be.equal(guestId);
@@ -3136,11 +3134,7 @@ describe('OrderController', function() {
             }
             var o = res.body.orders[0];
             dynamicDishOrderNumber += 2;
-            console.log(dynamicDishOrderNumber);
-            console.log(parseInt(dynamicDishOrderNumber / qtyRate4));
-            console.log(parseInt(dynamicDishOrderNumber / qtyRate4) * priceRate4);
             var newPrice4 = price4 - parseInt(dynamicDishOrderNumber / qtyRate4) * priceRate4;
-            console.log(newPrice4, minimalPrice4);
             newPrice4 = Math.max(newPrice4, minimalPrice4);
             o.orders[dishId4].price.should.be.equal(newPrice4);
             o.subtotal.should.be.equal(newPrice4 * 2);
@@ -3395,7 +3389,7 @@ describe('OrderController', function() {
             if (err) {
               return done(err);
             }
-            should.equal(res.body.referrerCode, null);
+            res.body.usedReferralBonus.should.be.true();
             done();
           })
       })

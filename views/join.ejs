@@ -18,7 +18,31 @@
         </div>
       </div>
     </div>
-
+  </div>
+  <div class="card blue">
+    <div class="card-body">
+      <div class="card-title">
+        <p><%= __('referrals-list')%></p>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <td><%= __('firstname')%></td>
+            <td><%= __('join-date')%></td>
+            <td><%= __('status')%></td>
+          </tr>
+        </thead>
+        <tbody>
+          <% referrals.forEach(function(referral){%>
+            <tr>
+              <td><%= referral.firstname %></td>
+              <td><%= referral.createdAt %></td>
+              <td><%= !!referral.usedReferralBonus ? __('referral-bonus-paid') : __('signuped-with-your-link')%></td>
+            </tr>
+          <% });%>
+        </tbody>
+      </table>
+    </div>
   </div>
   <%}else{%>
   <div class="card m-auto my-4" style="min-width: 300px;width:40%;">

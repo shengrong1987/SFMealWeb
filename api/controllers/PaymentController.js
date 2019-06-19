@@ -229,7 +229,6 @@ module.exports = {
           });
         },
         updateDefaultSource : function(cb){
-          sails.log.info("is default card: " + isDefaultPayment);
           if(!isDefaultPayment || isDefaultPayment === "false"){
             return cb();
           }

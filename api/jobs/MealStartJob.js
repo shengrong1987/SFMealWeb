@@ -34,9 +34,9 @@ module.exports = function(agenda) {
         if(err || !meal){
           return done();
         }
-        sails.log.info("your meal will be online in 10 minutes");
         meal.status = "on";
         meal.hostEmail = meal.chef.email;
+        sails.log.debug("JOBS - Type: MealStartJob, Model: Meal, Action: Start, To: Host");
         notification.notificationCenter("Meal","start",meal,true,false,null);
         meal.save(function(err, m){
           if(err){

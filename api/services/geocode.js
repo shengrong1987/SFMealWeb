@@ -12,10 +12,9 @@ var geocoder = require('node-geocoder')(geocoderProvider, httpAdapter, extra);
 
 module.exports = {
   geocode : function(address, cb){
-    sails.log.debug("starting geocoding: " + address);
     geocoder.geocode(address, function(err, res) {
-      sails.log.debug("finish geocoding with error: " + err);
       if(err){
+        sails.log.debug("Error in geocoding address:" + address);
         return cb(err);
       }
       cb(null,res);
@@ -39,7 +38,7 @@ module.exports = {
   },
 
   distance : function(address, deliveryCenterAddress, cb){
-    sails.log.debug("calculating distance between " + address + " and " + deliveryCenterAddress);
+    sails.log.debug("Calculating distance between " + address + " and " + deliveryCenterAddress);
     var $this = this;
     geocoder.geocode({ address : address}, function(err, res){
       if (err) {

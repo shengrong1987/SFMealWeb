@@ -174,7 +174,6 @@ module.exports = {
               return next(err);
             }
             transfer = t;
-            sails.log.info("discount transferred as extra: " + t.amount);
             next();
           }
         );
@@ -222,7 +221,6 @@ module.exports = {
           return cb();
         }
         var charge = results.createCharge;
-        sails.log.info("charge: " + charge);
         async.auto({
           calculateChargedFee : function(next){
             if(!charge){
@@ -237,7 +235,6 @@ module.exports = {
           },
           calculateFee : ['calculateChargedFee', function(next, results){
             var chargedFee = results.calculateChargedFee;
-            sails.log.info("charged application fee: " + chargedFee);
             attr.metadata.application_fee = attr.metadata.application_fee - chargedFee;
             next();
           }]
@@ -245,7 +242,6 @@ module.exports = {
           if(err){
             return cb(err)
           }
-          sails.log.info("charge remain application fee: " + attr.metadata.application_fee);
           var total = attr.metadata.discount - attr.metadata.application_fee;
           stripe.transfers.create(
             {
@@ -258,7 +254,6 @@ module.exports = {
                 return cb(err);
               }
               transfer = t;
-              sails.log.info("extra transfer created: " + t.amount);
               cb();
             }
           );
@@ -282,7 +277,6 @@ module.exports = {
 
   chargeOthers : function(attr, cb){
     var _this = this;
-    sails.log.info("charge amount by source: " + attr.amount);
     if(attr.amount === 0){
       return cb(null, null);
     }
@@ -307,7 +301,6 @@ module.exports = {
           }
           var leftFee = attr.metadata.application_fee - fee.amount;
           var total = attr.metadata.discount - leftFee;
-          sails.log.info("charge remain application fee: " + leftFee);
           attr.metadata.application_fee = leftFee;
           stripe.transfers.create(
             {
@@ -322,7 +315,6 @@ module.exports = {
               if(!charge || charge.amount===0 || attr.metadata.userId){
                 return cb(null, charge, transfer);
               }
-              sails.log.info("extra transfer created: " + transfer.amount);
               _this.handlePoint(charge.amount, attr.metadata.userId, function(err, user){
                 if(err){
                   return cb(err);
@@ -392,12 +384,7 @@ module.exports = {
     var tax = attr.tax;
     var tip = (attr.tip || 0) * 100;
 
-    sails.log.info("delivery application fee is: " + delivery_application_fee);
-    sails.log.info("delivery fee is: " + delivery_fee);
-    sails.log.info("discount is: " + discount);
-    sails.log.info("subtotal is: " + attr.amount);
-    sails.log.info("tax is: " + tax);
-    sails.log.info("tip is: " + tip);
+    sails.log.info("System delivery fee: " + delivery_application_fee + " Delivery fee: " + delivery_fee + " Discount: " + discount + " Subtotal: " + attr.amount + " Tax: " + tax + " Tip: " + tip);
 
     //calculate application fee
     if(attr.paymentMethod === "online"){
@@ -406,23 +393,17 @@ module.exports = {
       application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee;
     }
 
-    sails.log.info("application fee is: " + application_fee);
-
     //calculate subtotal after tax
     var subtotalAfterTax = attr.amount + tax + tip;
 
     //calculate other fee
     var originalTotal = subtotalAfterTax + delivery_fee + serviceFee;
 
-    //apply discount
-
     attr.metadata.discount = discount;
     attr.metadata.total = originalTotal - discount;
     attr.metadata.application_fee = application_fee;
     attr.metadata.total = attr.metadata.total < 0 ? 0 : attr.metadata.total;
     attr.metadata.tip = attr.tip || 0;
-
-    sails.log.info("charge total: " + attr.metadata.total);
   },
 
   charge : function(attr, cb){
@@ -449,9 +430,7 @@ module.exports = {
       user.historyPoints = user.historyPoints || points;
       var earnedPoints = Math.floor(amount/200);
       var newPoints = points + earnedPoints;
-      sails.log.info("user old points: " + points);
-      sails.log.info("points difference: " + earnedPoints);
-      sails.log.info("user total points: " + newPoints);
+      sails.log.info("Points difference: " + earnedPoints, " New Points: " + newPoints);
       user.points = newPoints;
       if(earnedPoints > 0){
         user.historyPoints += earnedPoints;
@@ -473,7 +452,6 @@ module.exports = {
         if(err){
           return cb(err);
         }
-        sails.log.info("extra transfer created: " + transfer.amount);
         if(!transfer || transfer.amount===0 || attr.metadata.userId){
           return cb(null, transfer);
         }
@@ -494,10 +472,8 @@ module.exports = {
     var _this = this;
     var chargeIds = Object.keys(charges);
     var amount = metadata.amount || -1;
-    sails.log.info("amount refund: " + amount);
     async.each(chargeIds, function(chargeId, next){
       var thisAmount = charges[chargeId];
-      sails.log.info("amount in transaction: " + chargeId, " is: " + thisAmount);
       var refundAmount;
       if(thisAmount === 0){
         return next();
@@ -553,7 +529,6 @@ module.exports = {
       if(err){
         return cb(err);
       }
-      sails.log.info("user id:" + attr.metadata.userId);
       if(!attr.metadata.userId || !refund || refund.amount === 0){
         return cb(null, refund);
       }
@@ -573,11 +548,9 @@ module.exports = {
     var _this = this;
     var transferIds = Object.keys(transfers);
     var amount = metadata.amount;
-    sails.log.info("total money to transfer: $" + amount/100 + "& transfers: " + transferIds);
     var refundingAmount;
     async.each(transferIds, function(transferId, next){
       var thisAmount = transfers[transferId];
-      sails.log.info("amount left in this transfer: $" + thisAmount/100);
       if(thisAmount === 0){
         return next();
       }else if(amount !== -1){
@@ -600,7 +573,6 @@ module.exports = {
         if(err){
           return next(err);
         }
-        sails.log.info("refunded amount: " + refund.amount, "transfer left: " + transfers[transferId]);
         transfers[transferId] -= refund.amount;
         next();
       });
@@ -614,7 +586,6 @@ module.exports = {
 
   reverse : function(attr, cb){
     var _this = this;
-    sails.log.info("reversing transfer: $" + attr.amount/100);
     stripe.transfers.createReversal(
       attr.id,
       {

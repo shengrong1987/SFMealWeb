@@ -76,7 +76,6 @@ module.exports = {
         return order.status === "review" && order.customer === userId;
       });
       if(orders.length === 0){
-        sails.log.debug("no available orders for review");
         return res.badRequest({ code : -1, responseText : req.__('review-no-available')});
       }
       if(reviews && reviews.length > 0){
@@ -85,7 +84,6 @@ module.exports = {
           var dishId = r.dish;
           var score = r.score;
           var review = r.content;
-          sails.log.info("dishId: " + dishId, " score: " + score, " content: " + review);
           $this.reviewForDish(dishId, mealId, user, orders, score, review, function(err, results){
             if(err){
               return next(err);
@@ -108,7 +106,6 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            sails.log.info("successfully leave a review");
             return res.ok({ host : hostId });
           });
         }, req);
@@ -130,7 +127,6 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            sails.log.info("successfully leave a review");
             return res.ok(results);
           });
         }, req);
@@ -152,7 +148,6 @@ module.exports = {
         });
       },
       getMeal : function(cb){
-        sails.log.info("getting meal");
         Meal.findOne(mealId).populate('chef').exec(function(err, meal){
           if(err){
             return cb(err);
@@ -161,7 +156,6 @@ module.exports = {
         })
       },
       createReview : ['getDish','getMeal', function(cb, results){
-        sails.log.info("creating review");
         var dish = results.getDish;
         var meal = results.getMeal;
         if(score <= 1){
@@ -197,7 +191,8 @@ module.exports = {
           if(!meal && !dish){
             return cb({code : -2, responseText : req.__('review-invalid')})
           }
-          sails.log.info("sending review email");
+          sails.log.debug("Review Created! Score: " + score + " Content: " + content + " For: " + review.title);
+          sails.log.debug("NOTIFICATION - Model: Order, Action: [Review] To: Host: " + review.hostEmail);
           Notification.notificationCenter("Order", "review", review, true, false, req);
           cb(null,review);
         });
@@ -235,17 +230,11 @@ module.exports = {
         }
       },
       checkReviewForDish : function(cb){
-        sails.log.info("checking dish: " + dishId);
         if(!dishId){
           return cb();
         }
-        sails.log.info("orders length: " + orders.length);
         isValidReview = orders.some(function(order){
-          order.reviewing_orders.forEach(function(dishId){
-            sails.log.info("dish: " + dishId + " to be reviewed");
-          });
           if(order.reviewing_orders.indexOf(dishId) !== -1){
-            sails.log.info("removing dish id: " + dishId + "from review.");
             order.reviewing_orders.splice(order.reviewing_orders.indexOf(dishId),1);
             if(order.reviewing_orders.length === 0){
               order.status = "complete";
@@ -271,7 +260,6 @@ module.exports = {
         });
       },
       getMeal : function(cb){
-        sails.log.info("getting meal");
         Meal.findOne(mealId).populate('chef').exec(function(err, meal){
           if(err){
             return cb(err);
@@ -280,7 +268,6 @@ module.exports = {
         })
       },
       createReview : ['getDish','getMeal', function(cb, results){
-        sails.log.info("creating review");
         var dish = results.getDish;
         var meal = results.getMeal;
         if(score <= 1){
@@ -316,7 +303,8 @@ module.exports = {
           if(!meal && !dish){
             return cb({code : -2, responseText : req.__('review-invalid')})
           }
-          sails.log.info("sending review email");
+          sails.log.debug("Review Created! Score: " + score + " Content: " + content + " For: " + review.title);
+          sails.log.debug("NOTIFICATION - Model: Order, Action: [Review] To: Host: " + review.hostEmail);
           Notification.notificationCenter("Order", "review", review, true, false, req);
           cb(null,review);
         });

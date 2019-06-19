@@ -45,7 +45,8 @@ module.exports = function(agenda) {
                   console.log(err);
                   return cb(err);
                 }
-                sails.log.debug(numberRemoved + " order jobs of order : " + order.id +  " removed");
+                sails.log.debug("JOBS - Type: MealScheduleEndJob, Model: Order, Action: Cancel, To: Host");
+                sails.log.debug("JOBS - Cancelled Jobs: " + numberRemoved + " with Order: " + order.id);
                 notification.notificationCenter("Order", "cancel", order, false, true, null);
                 cb();
               })
@@ -55,7 +56,6 @@ module.exports = function(agenda) {
           if(err){
             return done(err);
           }
-          console.log("cancel all orders");
           done();
         });
       });
@@ -100,8 +100,8 @@ module.exports = function(agenda) {
               }
             })
             m.pickups = pickups;
+            sails.log.debug("JOBS - Type: MealScheduleEndJob, Model: Order, Action: MealScheduleEnd, To: Host");
             notification.notificationCenter("Meal","mealScheduleEnd",m,true);
-            console.log("sending guest list to host");
             cb();
           });
         });
@@ -300,7 +300,6 @@ module.exports = function(agenda) {
 
     // execute job
     run: function(job, done) {
-      sails.log.info("preorder end booking, check meal requirement...");
       var mealId = job.attrs.data.mealId;
       var _this = helperMethod;
 
@@ -343,6 +342,7 @@ module.exports = function(agenda) {
               total += order.subtotal;
             });
             if(total < meal.minimalTotal){
+              sails.log.debug("JOBS - Type: MealScheduleEndJob, Model: Meal, Action: Cancel, To: Host");
               notification.notificationCenter("Meal","cancel",meal,true,false,null);
               _this.cancelOrders(mealId, function(err){
                 if(err){

@@ -266,13 +266,13 @@ module.exports = {
             var pickupFromTime = pickup.pickupFromTime;
             var pickupTillTime = pickup.pickupTillTime;
             if(pickupFromTime >= pickupTillTime){
-              console.log("pickup time not valid");
+              sails.log.error("Meal Error: Pickup end time is earlier than pickup start time");
               valid = false;
             }else if(moment.duration(moment(pickupTillTime).diff(moment(pickupFromTime))).asMinutes() < 30){
-              console.log("pickup time too short");
+              sails.log.error("Meal Error: Pickup period is too short");
               valid = false;
             }else if(pickupFromTime <= provideTillTime && params.type === "preorder"){
-              console.log("pickup time too early");
+              sails.log.error("Meal Error: Pickup time is earlier than provide till time");
               valid = false;
             }
           }
@@ -346,7 +346,6 @@ module.exports = {
     async.auto({
       updateCountyAndPickup: function(next){
         if(!values.chef){
-          console.log("meal has no chef");
           return next(Error("meal has no chef"));
         }
         Host.findOne(values.chef).populate("user").exec(function(err, host){
@@ -356,7 +355,6 @@ module.exports = {
           if(values.type !== "order"){
             return next();
           }
-          sails.log.info("updating meal county to host county");
           values.county = host.county;
           var pickupOption = {
             "pickupFromTime": values.pickupFromTime,
@@ -386,7 +384,6 @@ module.exports = {
           }else{
             values.pickups = [pickupOption];
           }
-          sails.log.info("pickups: " + JSON.stringify(values.pickups));
           next();
         });
       },
@@ -424,7 +421,6 @@ module.exports = {
       },
       updateCountyAndPickup: function(next){
         if(!values.chef){
-          console.log("meal has no chef");
           return next(Error("meal has no chef"));
         }
         Host.findOne(values.chef).populate("user").exec(function(err, host){
@@ -434,7 +430,6 @@ module.exports = {
           if(values.type !== "order"){
             return next();
           }
-          sails.log.info("updating meal county to host county");
           values.county = host.county;
           var pickupOption = {
             "pickupFromTime": values.provideFromTime,
@@ -464,7 +459,6 @@ module.exports = {
           }else{
             values.pickups = [pickupOption];
           }
-          sails.log.info("pickups: " + JSON.stringify(values.pickups));
           next();
         });
       }

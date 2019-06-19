@@ -95,7 +95,6 @@ module.exports = require('waterlock').waterlocked({
     var isNewUser = false;
     var openid = attrs.openid;
     var unionid = attrs.unionid;
-    sails.log.info("open id:" + openid);
     if(!openid){
       return res.badRequest({code : -20, responseText : req.__('user-unionid-needed')});
     }
@@ -134,7 +133,6 @@ module.exports = require('waterlock').waterlocked({
             req.session.user = u[0];
             req.session.authenticated = true;
             req.setLocale(attrs.language);
-            sails.log.info("setting language from wechat: " + attrs.language);
 
             var host = process.env.NODE_ENV === 'production' ? process.env.BASE_URL : process.env.LOCAL_HOST;
             attrs.verificationUrl = host + "/user/verify/" + u[0].verifyToken.token;
@@ -162,7 +160,6 @@ module.exports = require('waterlock').waterlocked({
         cb(null, u[0]);
       });
     }
-    sails.log.info("matching code: " + referralCode);
     req.session.referralCode = null;
     User.findOne({ referralCode : referralCode }).exec(function(err, referrer){
       if(err){
@@ -178,7 +175,6 @@ module.exports = require('waterlock').waterlocked({
         if(me.referralBonus){
           return cb();
         }
-        sails.log.info("adding points to referee");
         me.points += 50;
         me.referralBonus = true;
         me.referrerCode = referralCode;
@@ -191,8 +187,6 @@ module.exports = require('waterlock').waterlocked({
     console.log("login success...");
     var auth = req.session.user.auth;
     var county = req.session.user.county;
-
-    sails.log.info("county: " + county);
     if(county && (!req.cookies['county'] || req.cookies['county'] === 'undefined')){
       res.cookie('county',county);
     }
@@ -236,16 +230,12 @@ module.exports = require('waterlock').waterlocked({
   wechatCode : function(req, res){
     var code = req.query.code;
     var state = req.query.state;
-    sails.log.info("wechat code:" + code);
-    sails.log.info("wechat state:" + state);
     this.exchangeToken(code, state, req, res, "mobile");
   },
 
   wechatCodeWeb : function(req, res){
     var code = req.query.code;
     var state = req.query.state;
-    sails.log.info("wechat code:" + code);
-    sails.log.info("wechat state:" + state);
     this.exchangeToken(code, state, req, res, "web");
   },
 
@@ -258,7 +248,6 @@ module.exports = require('waterlock').waterlocked({
         return res.badRequest(err);
       }
       try {
-        sails.log.info("wechat access token:" + response.body);
         var body = JSON.parse(response.body);
         var accessToken = body.access_token;
       } catch (err) {
@@ -307,7 +296,6 @@ module.exports = require('waterlock').waterlocked({
       var userProfileUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$ACCESS_TOKEN&openid=$OPENID&lang=zh_CN";
       userProfileUrl = userProfileUrl.replace('$ACCESS_TOKEN', accessToken);
       userProfileUrl = userProfileUrl.replace('$OPENID',openId);
-      sails.log.info("user profile url:" + userProfileUrl);
       request.get({
         url : userProfileUrl
       }, function(err, userRes){
@@ -342,24 +330,17 @@ module.exports = require('waterlock').waterlocked({
           if(err){
             sails.log.error(err);
           }
-          sails.log.info(result);
         })
       }else{
-        sails.log.info("signature: " + signature, "timestamp: " + timestamp, "nonce: " + nonce, 'echostr: ' + echostr );
-        sails.log.info("token:" + wechatToken);
-
         if(signature && timestamp && nonce){
           var sha1 = crypto.createHash('sha1'),
             sha1Str = sha1.update([wechatToken, timestamp, nonce].sort().join('')).digest('hex');
 
-          sails.log.info(sha1Str, signature);
 
           if (sha1Str === signature) {
             res.set('Content-Type', 'text/plain');
-            sails.log.info('validation success');
             return res.ok(echostr);
           } else {
-            sails.log.info('validation error');
             return res.badRequest({ responseText : "validation error"});
           }
         }else{
@@ -370,7 +351,6 @@ module.exports = require('waterlock').waterlocked({
   },
 
   wechatSignature : function(req, res){
-    sails.log.info(wechatAppId, wechatAppSecret);
     var originalUrl = req.query.url;
     var url = "https://api.wechat.com/cgi-bin/token?grant_type=client_credential&appid=" + wechatAppId + "&secret=" + wechatAppSecret;
     request.get({
@@ -380,7 +360,6 @@ module.exports = require('waterlock').waterlocked({
         return res.badRequest(err);
       }
       try{
-        sails.log.info("wechat access token:" + response.body);
         var body = JSON.parse(response.body);
       }catch(err){
         return res.badRequest(err);
@@ -396,7 +375,6 @@ module.exports = require('waterlock').waterlocked({
           return res.badRequest({code: -12, responseText: "wechat signature no response"});
         }
         try {
-          sails.log.info("wechat ticket:" + response.body);
           body = JSON.parse(response.body);
         } catch (err) {
           return res.badRequest(err);

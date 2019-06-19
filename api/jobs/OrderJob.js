@@ -44,7 +44,7 @@ module.exports = function(agenda) {
             }
             if(order.type === "order"){
               var fifteenMinutesBeforePickup = util.minutesBefore(order.eta, 15);
-              console.log("scheduling pickup reminding Job at: " + fifteenMinutesBeforePickup);
+              sails.log.debug("JOBS Created! - Type: OrderPickupReminderJob on " + moment(fifteenMinutesBeforePickup).format("LLL"));
               Jobs.schedule(fifteenMinutesBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "minute"});
             }else{
               if(!order.isPartyMode){
@@ -53,25 +53,25 @@ module.exports = function(agenda) {
                   var oneDayBeforePickup = new Date(util.oneDayBefore(order.pickupInfo.pickupFromTime));
                   var orderPickupTime = new Date(order.pickupInfo.pickupFromTime);
                   if(now < oneDayBeforePickup){
-                    console.log("scheduling pickup reminding Job at: " + oneDayBeforePickup);
+                    sails.log.debug("JOBS Created! - Type: OrderPickupReminderJob on " + moment(oneDayBeforePickup).format("LLL"));
                     Jobs.schedule(oneDayBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "day"});
                   }
                   if(now < oneHourBeforePickup){
-                    console.log("scheduling pickup reminding Job at: " + oneHourBeforePickup);
+                    sails.log.debug("JOBS Created! - Type: OrderPickupReminderJob on " + moment(oneHourBeforePickup).format("LLL"));
                     Jobs.schedule(oneHourBeforePickup, 'OrderPickupReminderJob', {orderId : order.id, period : "hour"});
                   }
                   if(now < orderPickupTime){
-                    console.log("scheduling order ready Job at: " + orderPickupTime);
+                    sails.log.debug("JOBS Created! - Type: OrderReadyJob on " + moment(orderPickupTime).format("LLL"));
                     Jobs.schedule(orderPickupTime, 'OrderReadyJob', {orderId : order.id});
                   }
                 }else if(order.method === "delivery"){
                   var startDeliveryTime = new Date(order.pickupInfo.pickupFromTime);
-                  console.log("scheduling delivering reminder Job at: " + startDeliveryTime);
+                  sails.log.debug("JOBS Created! - Type: OrderDeliveringReminderJob on " + moment(startDeliveryTime).format("LLL"));
                   Jobs.schedule(startDeliveryTime, 'OrderDeliveringReminderJob', {orderId : order.id, period : "minute"});
                 }
               }else{
                 var orderDeliveryTime = moment(order.pickupInfo.pickupFromTime).subtract(10, 'hours');
-                console.log("scheduling party order start reminder job at: " + orderDeliveryTime.format('LLLL'));
+                sails.log.debug("JOBS Created! - Type: PartyOrderStartReminderJob on " + moment(orderDeliveryTime).format("LLL"));
                 Jobs.schedule(orderDeliveryTime._d, 'PartyOrderStartReminderJob', {orderId : order.id});
               }
             }
@@ -79,7 +79,7 @@ module.exports = function(agenda) {
           })
         },function(err){
           if(err){
-            console.log(err);
+            sails.log.error("Error creating order jobs:" + err);
           }
           done();
         });

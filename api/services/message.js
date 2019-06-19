@@ -11,11 +11,10 @@ module.exports = {
 //require the Twilio module and create a REST client
   sendMessage : function(phone, content, cb){
     if(!phone){
-      console.log("phone is empty");
+      sails.log.error("trying to send message, but no phone no.");
       return;
     }
     phone = "+1" + phone.replace('(','').replace(')','').replace('-','').replace(' ','').trim();
-    sails.log.info("msg: " + content);
     client.messages.create({
       to: phone,
       from: "+14159936325",
@@ -25,7 +24,7 @@ module.exports = {
         sails.log.info("sent text: " + err.message);
         return;
       }
-      sails.log.info("sent text: " + message);
+      sails.log.info("Message:" + content + " sent");
     });
   }
 }
