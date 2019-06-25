@@ -980,10 +980,6 @@ progress {
   font: inherit;
   -webkit-appearance: button; }
 
-summary {
-  display: list-item;
-  cursor: pointer; }
-
 [hidden] {
   display: none !important; }
 
@@ -2839,9 +2835,7 @@ button.bg-light:focus {
   .d-md-table-cell {
     display: table-cell !important; }
   .d-md-flex {
-    display: flex !important; }
-  .d-md-inline-flex {
-    display: inline-flex !important; } }
+    display: flex !important; } }
 
 @media (min-width: 992px) {
   .d-lg-none {
@@ -2878,9 +2872,6 @@ button.bg-light:focus {
 
 .justify-content-around {
   justify-content: space-around !important; }
-
-.align-items-start {
-  align-items: flex-start !important; }
 
 .align-items-center {
   align-items: center !important; }
@@ -2931,9 +2922,6 @@ button.bg-light:focus {
 
 .mh-100 {
   max-height: 100% !important; }
-
-.mt-0 {
-  margin-top: 0 !important; }
 
 .mb-0 {
   margin-bottom: 0 !important; }
@@ -2996,9 +2984,6 @@ button.bg-light:focus {
 .mb-4,
 .my-4 {
   margin-bottom: 1.5rem !important; }
-
-.ml-4 {
-  margin-left: 1.5rem !important; }
 
 .mr-5 {
   margin-right: 3rem !important; }
@@ -3143,12 +3128,6 @@ button.bg-light:focus {
 
 .text-white {
   color: #fff !important; }
-
-.text-primary {
-  color: #007bff !important; }
-
-a.text-primary:hover, a.text-primary:focus {
-  color: #0056b3 !important; }
 
 .text-dark {
   color: #343a40 !important; }
@@ -3911,13 +3890,6 @@ label {
 .btn-group input {
   text-align: left !important; }
 
-.search-btn-group .zipCode {
-  width: 100px;
-  display: inline; }
-
-.search-btn-group .keyword {
-  max-width: 150px; }
-
 /*bootstrap button extension*/
 .btn-grey-green {
   color: white !important;
@@ -4261,14 +4233,6 @@ select.form-control {
 
 .dishItem .photo {
   overflow: hidden; }
-
-#meal-container {
-  margin-bottom: 50px; }
-
-#meal-container .title button {
-  position: relative;
-  top: -50px;
-  left: 120px; }
 
 .meal .photo {
   width: 200px;
@@ -4689,9 +4653,6 @@ select.form-control {
     text-align: center; }
   .catering-gallery .flex-column {
     max-width: 100%; }
-  .search-btn-group .zipCode {
-    width: 70px;
-    display: inline; }
   .dishItem .photo {
     width: 80px;
     height: 80px; }
@@ -4765,10 +4726,6 @@ select.form-control {
     cursor: pointer; }
   .seperator-compact {
     display: none !important; }
-  #meal-container .title button {
-    position: relative;
-    left: 0;
-    top: 0; }
   .img-wrapper img {
     width: auto !important; }
   .compact-banner {

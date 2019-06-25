@@ -3,7 +3,7 @@
 /* normalize
 -------------------*/
 /*! normalize.css v2.0.1 | MIT License | git.io/normalize */
-article, details, figcaption, footer, header, nav, section, summary {
+article, details, figcaption, footer, header, nav, section {
   display: block; }
 
 audio, canvas, video {
