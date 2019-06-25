@@ -2,6 +2,7 @@ import "../../styles/importer.scss";
 import { setupObj } from "../installation";
 setupObj.setupTab();
 setupObj.setupInputMask();
+setupObj.setupBootstrapDialog();
 
 $('.next').click(function(){
   var nextId = $(this).parents('.tab-pane').next().attr("id");

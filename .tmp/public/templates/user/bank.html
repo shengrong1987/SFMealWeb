@@ -1,12 +1,13 @@
 
 <div id="bankView" class="bank">
-  <div class="alert alert-danger d-none" data-toggle="i18n" data-key="error">
+  <div class="alert alert-danger d-none">
+    ${__('error')}
   </div>
   <div class="popup box middle" style="width: 350px;">
 
     <form class="text-center" data-toggle="validator" role="form">
 
-      <h3 class="text-left text-red"><strong data-toggle="i18n" data-key="bankAccount"></strong></h3>
+      <h3 class="text-left text-red">${__('bankAccount')}</strong></h3>
 
       <fieldset>
 
@@ -27,8 +28,8 @@
         <div class="col-12 form-group">
           <div class="control-group">
             <div class="controls">
-              <button type="submit" class="btn btn-danger red" data-toggle="i18n" data-key="save"></button>
-              <button type="button" name="cancel" class="btn btn-disable" data-toggle="i18n" data-key="cancel"></button>
+              <button type="submit" class="btn btn-danger red">${__('save')}</button>
+              <button type="button" name="cancel" class="btn btn-disable">${__('cancel')}</button>
             </div>
           </div>
         </div>
@@ -37,6 +38,7 @@
   </div>
 </div>
 
-<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~428820f4.bundle.js"></script>
-<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~c094081c.bundle.js"></script>
-<script src="/assets/zh.bank.bundle.js"></script>
+<script>
+  appObj.setupObj.setupValidator();
+  new appObj.BankView({ el : $("#bankView"), model : new appObj.Bank()});
+</script>

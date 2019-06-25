@@ -265,7 +265,6 @@ utility.getDistance = function( loc1, loc2, unit ){
   var long1 = loc1.long;
   var lat2 = loc2.lat;
   var long2 = loc2.long;
-  console.log("lat1:" + lat1, "lat2:" + lat2, "long1:" + long1, "long2:" + long2);
   var radlat1 = Math.PI * lat1/180
   var radlat2 = Math.PI * lat2/180
   var theta = long1-long2

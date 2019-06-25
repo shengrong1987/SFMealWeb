@@ -49,6 +49,7 @@ module.exports.waterlock = {
         'firstname': 'given_name',
         'lastname': 'family_name',
         'gender': 'gender',
+        'email' : 'email',
         'googleEmail' : 'email'
       }
     },

@@ -168,15 +168,16 @@ let helperMethod = {
           modal.off('shown.bs.modal');
           modal.modal('show');
           $('body').removeClass("loading");
-          if(cb){cb(target);}
         });
         if(url){
           $(modalId+' .modal-content').load(url);
           modal.modal();
+          if(cb){cb(target);}
         }else{
           const urlContent = await _this.getModalFromUrl(model,action);
           $(modalId+' .modal-content').html(urlContent);
           modal.modal();
+          if(cb){cb(target);}
         }
       });
       modal.modal('hide');
@@ -191,17 +192,18 @@ let helperMethod = {
         });
         $('body').removeClass("loading");
         modal.modal('show');
-        if(cb){cb(target);}
       });
       if(url){
         $(modalId+' .modal-content').load(url);
         modal.modal();
         modal.modal('show');
+        if(cb){cb(target);}
       }else{
         const urlContent = await _this.getModalFromUrl(model,action);
         $(modalId+' .modal-content').html(urlContent);
         modal.modal();
         modal.modal('show');
+        if(cb){cb(target);}
       }
     }
   },

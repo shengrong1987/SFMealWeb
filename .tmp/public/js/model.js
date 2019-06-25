@@ -3647,7 +3647,6 @@ var MealConfirmView = Backbone.View.extend({
         long : customerLoc.lng()
       }
       var distance = utility.getDistance(cusLocation, location, "N");
-      console.log("distance: " + distance, " range:" + range);
       if(distance <= range){
         helperMethod.makeAToast(__('addressValid'),'success');
       }
