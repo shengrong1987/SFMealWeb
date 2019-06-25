@@ -1169,5 +1169,7 @@
   "referrals-list" : "Invited friend list",
   "join-date" : "Join Date",
   "signuped-with-your-link" : "Signuped with your link",
-  "referral-bonus-paid" : "$5 points got！"
+  "referral-bonus-paid" : "$5 points got！",
+  "how-to-use-points" : "Choose in menu and redeem your points at checkout.",
+  "user-alt-login" : "Already a member? Click here: "
 }

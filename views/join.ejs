@@ -4,7 +4,12 @@
   <div class="card m-auto my-4" style="min-width: 300px;width: 40%;">
     <div class="card-body">
       <div class="card-title">
-        <h4><%= __('invite-friend')%></h4>
+        <h4><%= __('invite-friend')%><br/>
+          <small>
+            <%= __('pocket-my-points')%> <%= user.points%>($<%= (user.points/10).toFixed(2)%>)
+            <i class="cursor-pointer fas fa-question-circle" data-toggle="tooltip" title="<%= __('how-to-use-points')%>"></i>
+          </small>
+        </h4>
         <div class="referral-yellow p-2">
           <image class="middle w-100" data-src="../../images/referral@2x.png"></image>
           <h4><%= __('invite-title-1')%><br/><%= __('invite-title-2')%></h4>
@@ -52,21 +57,19 @@
         <div class="alert alert-danger d-none"><%= __('userSignInError')%></div>
         <div class="signin">
 
-          <button id="FBBtn" class="popline btn btn-blue btn-lg light" style="min-width:250px;font-weight: lighter;">
+          <button id="FBBtn" class="popline btn btn-blue btn-lg light d-block middle" style="min-width:250px;font-weight: lighter;">
             <span><i class="fab fa-facebook-f" style="padding-right: 15px;"></i>Facebook <%= __('login')%></span>
           </button>
 
-          <button id="GoogleBtn" class="popline btn btn-google btn-lg outline text-orange white mt-1" style="min-width:250px;font-weight: lighter;">
+          <button id="GoogleBtn" class="popline btn btn-google btn-lg outline text-orange white mt-1 d-block middle" style="min-width:250px;font-weight: lighter;">
             <span><i class="fab fa-google pr-3"></i>Google <%= __('login')%></span>
           </button>
 
-          <button id="wechatBtn" class="popline btn btn-green btn-lg outline white text-orange mt-1" style="min-width:250px;font-weight: lighter;">
+          <button id="wechatBtn" class="popline btn btn-green btn-lg outline white text-orange mt-1 d-block middle" style="min-width:250px;font-weight: lighter;">
             <span><i class="fab fa-weixin fa-lg" style="padding-right: 15px;"></i>微信 <%= __('login')%></span>
           </button>
 
           <div class="divider"></div>
-
-          <h2 data-toggle="i18n" data-key="emailLogin"></h2>
 
           <form class="text-center" data-toggle="validator" role="form">
             <div class="form-group">
@@ -82,15 +85,16 @@
             </div>
 
             <div class="form-group">
-              <button id="signin-btn" type="submit" class="btn btn-danger btn-lg popline"><%= __('login')%></button>
+              <button id="signin-btn" type="submit" class="btn btn-danger btn-lg popline"><%= __('nav-bar-login')%></button>
+              <button type="button" class="btn btn-outline-danger btn-lg popline" onclick="javascript:location.href='/meal'"><%= __('see-menu')%></button>
             </div>
 
           </form>
 
           <span class="divider popline"></span>
 
-          <h6 class="text-center"><%= __('newlyJoin')%><a toggle="modal" data-target="#myModal" data-model="user" data-action="signup" href="javascript:void(0)" onclick="h.toggleModal(event)"><%= __('register')%></a></h6>
-          <h6 class="text-center"><%= __('forgetPassword')%>?<a toggle="modal" data-target="#myModal" data-model="user" data-action="sendEmail" href="javascript:void(0)" onclick="h.toggleModal(event)"><%= __('reset')%></a></h6>
+          <h6 class="text-center"><%= __('newlyJoin')%> <a toggle="modal" data-target="#myModal" data-model="user" data-action="signup" href="javascript:void(0)" onclick="h.toggleModal(event)"><%= __('register')%></a></h6>
+          <h6 class="text-center"><%= __('forgetPassword')%>? <a toggle="modal" data-target="#myModal" data-model="user" data-action="sendEmail" href="javascript:void(0)" onclick="h.toggleModal(event)"><%= __('resetBtn')%></a></h6>
 
         </div>
       </div>

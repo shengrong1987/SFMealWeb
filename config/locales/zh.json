@@ -597,7 +597,7 @@
   "host-lack-of-phone" : "需要填写手机",
   "user-lack-of-email" : "需要补充邮箱资料",
   "user-email-can-not-change" : "用户邮箱不能被修改",
-  "user-email-exist" : "邮箱已存在，请以注册方式登陆账号并绑定微信登陆",
+  "user-email-exist" : "邮箱已存在，请以注册方式登录账号并绑定微信登录",
   "user-not-authenticated" : "尚未注册或登录",
   "user-reward-redeemed" : "新人礼包已领取",
   "enter-website" : "进入网站",
@@ -1041,7 +1041,7 @@
   "orderCancelNotification" : "您的订单已取消, 请查看订单管理页",
   "orderUpdatedNotification" : "您的订单有更新",
   "mealUpdatedNotification" : "您的菜单有更新",
-  "resetPasswordSuccess" : "密码重置成功，请点击链接使用新密码登陆<a href='/'>www.sfmeal.com</a>",
+  "resetPasswordSuccess" : "密码重置成功，请点击链接使用新密码登录<a href='/'>www.sfmeal.com</a>",
   "emailSent" : "邮件已发送，查阅重置密码邮件。",
   "addressOutOfRangeError" : "地址超出送餐范围, 请选择自取。",
   "addressValid" : "地址验证通过!",
@@ -1181,5 +1181,7 @@
   "referrals-list" : "邀请的朋友列表",
   "join-date" : "加入时间",
   "signuped-with-your-link" : "已加入，未下单",
-  "referral-bonus-paid" : "已下单，获得5元奖励！"
+  "referral-bonus-paid" : "已下单，获得5元奖励！",
+  "how-to-use-points" : "在菜单中选择菜式，然后结账时点击'使用积分'即可抵免订单金额",
+  "user-alt-login" : "已有账号？点击这里: "
 }
