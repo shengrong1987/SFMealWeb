@@ -1179,5 +1179,7 @@
   "badge" : "勋章",
   "my-badges" : "我的勋章",
   "referrals-list" : "邀请的朋友列表",
-  "join-date" : "加入时间"
+  "join-date" : "加入时间",
+  "signuped-with-your-link" : "已加入，未下单",
+  "referral-bonus-paid" : "已下单，获得5元奖励！"
 }

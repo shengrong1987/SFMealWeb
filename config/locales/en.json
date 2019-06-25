@@ -1161,11 +1161,13 @@
   "invite-title-1" : "Give your friends $5 points",
   "invite-title-2" : "When they take orders, you get $5 points",
   "invite-main-1" : "Your friend: %s invite you to join SFMeal.com",
-  "invite-main-2" : "Join to now to earn $5 points!",
+  "invite-main-2" : "Join now to earn $5 points!",
   "badge-congrat-title" : "Congratulations, You earn a badge!",
   "view-all-badges" : "View Badges",
   "badge" : "badge",
   "my-badges" : "My Badges",
   "referrals-list" : "Invited friend list",
-  "join-date" : "Join Date"
+  "join-date" : "Join Date",
+  "signuped-with-your-link" : "Signuped with your link",
+  "referral-bonus-paid" : "$5 points got！"
 }
