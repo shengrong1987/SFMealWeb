@@ -120,7 +120,7 @@
                     <div class="photo middle rounded">
                       <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
                         <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
-                          <img data-src="../../images/blank.gif" data-echo="<%= index===0? photo.v : ''%>">
+                          <img data-echo="<%= index===0? photo.v : ''%>">
                         </a>
                       <% }});%>
                     </div>
@@ -178,7 +178,7 @@
                         <div class="photo middle rounded">
                           <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
                             <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
-                              <img data-src="/images/blank.gif" data-echo="<%= index===0? photo.v : ''%>">
+                              <img data-echo="<%= index===0? photo.v : ''%>">
                             </a>
                           <% }});%>
                         </div>

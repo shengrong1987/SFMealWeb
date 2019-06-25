@@ -208,6 +208,9 @@ module.exports = {
   find : function(req,res){
     //find out meals that provide start today or ends today
     // moment.locale(req.getLocale());
+    if(req.session.authenticated){
+      sails.log.info("USER: " + req.session.user ? req.session.user.id : "NONE");
+    }
     var _this = this;
     var pickupNickname = req.param('pickup');
     Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
@@ -254,7 +257,7 @@ module.exports = {
               })){
                 _hosts.push(meal.chef);
               }
-            })
+            });
             next();
           }
         },
@@ -294,12 +297,16 @@ module.exports = {
           return res.ok({ meals : meals, user : _u, tags: _tags });
         }
         meals = _this.composeMealWithDate(meals);
+        // res.set('Cache-Control', 'public, max-age=31557600');
         res.view("dayOfMeal",{ meals : meals, hosts: _hosts, user : _u, tags: _tags, pickupNickname : pickupNickname, locale : req.getLocale()});
       })
     })
   },
 
   feature : function(req, res){
+    if(req.session.authenticated){
+      sails.log.info("USER: " + req.session.user ? req.session.user.id : "NONE");
+    }
     var now = new Date();
     var county = req.cookies['county'] || req.param('county') || "San Francisco County";
     var user = req.session.user;
@@ -1082,8 +1089,6 @@ module.exports = {
           if(!pickup.index){
             pickup.index = index+1;
           }
-          sails.log.info("phone is : " + pickup.phone);
-          sails.log.info("county is : " + pickup.county);
           if(counties.indexOf(pickup.county) === -1){
             counties.push(pickup.county);
           }
@@ -1113,7 +1118,6 @@ module.exports = {
       if(counties.length !== 0){
         params.county = counties.join("+");
       }
-      sails.log.info("counties are: " + counties.join("+"));
       cb(null, params);
     });
   },
@@ -1123,7 +1127,6 @@ module.exports = {
       return leftQty;
     }
     Object.keys(newTotalQty).forEach(function(dishId){
-      sails.log.info("left qty: " + leftQty[dishId], " & new total: " + newTotalQty[dishId], " & old total: " + oldTotalQty[dishId]);
       leftQty[dishId] = parseInt(leftQty[dishId] || 0) + parseInt(newTotalQty[dishId]) - parseInt(oldTotalQty[dishId]);
       if(leftQty[dishId] < 0){
         leftQty = false;
@@ -1199,8 +1202,6 @@ module.exports = {
     var provideTillTime = params.provideTillTime;
     var now = new Date();
 
-    sails.log.info("start: " + provideFromTime, " end: " + provideTillTime);
-
     if(provideFromTime >= provideTillTime){
       return cb({ code : -21, responseText : req.__('provide-from-time-is-later-than-provide-till-time')});
     }else if(new Date(provideTillTime) < now){
@@ -1208,8 +1209,6 @@ module.exports = {
     }else if(moment.duration(moment(provideTillTime).diff(moment(provideFromTime))).asMinutes() < 30){
       return cb({ code : -23, responseText : req.__('provide-time-too-short')});
     }
-
-    sails.log.info("provide time checked");
     async.auto({
       findPickups : function(next){
         if(params.type === "order"){
@@ -1230,7 +1229,6 @@ module.exports = {
               if(!options || !options.length){
                 return next({code: -24, responseText : req.__('meal-nickname-empty')});
               }
-              sails.log.info("pickup options: " + options);
               params.pickups = options;
               next();
             })

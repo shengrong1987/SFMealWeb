@@ -1,6 +1,7 @@
 import "../../styles/importer.scss";
 import { setupObj } from "../installation";
 setupObj.setupTab();
+setupObj.setupInputMask();
 
 $('.next').click(function(){
   var nextId = $(this).parents('.tab-pane').next().attr("id");
@@ -26,4 +27,5 @@ let addressView = new AddressView({ el : $("#applyView"), model : new User()});
 window.appObj = window.appObj || {};
 window.appObj.addressView = addressView;
 window.appObj.utility = utility;
+window.appObj.setupObj = setupObj;
 window.h = helperMethod;

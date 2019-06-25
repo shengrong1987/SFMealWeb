@@ -73,65 +73,62 @@ module.exports = require('waterlock').actions.user({
           if(err){
             return res.badRequest(err);
           }
-          User.findOne(userId).exec(function(err, user){
+          var hostId = host.id;
+          var ip = req.ip;
+          var params = {
+            type : "custom",
+            country : 'US',
+            email : email,
+            legal_entity :{
+              type : 'individual'
+            },
+            tos_acceptance : {
+              date : parseInt(new Date().getTime()/1000),
+              ip : ip
+            },
+            payout_schedule : {
+              interval : "weekly",
+              weekly_anchor : "monday"
+            }
+          }
+          if(user.firstname){
+            params.legal_entity.first_name = user.firstname;
+          }
+          if(user.lastname){
+            params.legal_entity.last_name = user.lastname;
+          }
+          if(user.birthday){
+            params.legal_entity.dob = {
+              day : user.birthday.getDate(),
+              month : user.birthday.getMonth() + 1,
+              year : user.birthday.getFullYear()
+            };
+            var birthdayDate = new Date(user.birthday);
+            var birthday = birthdayDate.getMonth()+1+"/"+birthdayDate.getDate();
+            mailChimp.updateMember({ email : user.email, birthday : birthday }, "member");
+          }
+          stripe.createManagedAccount(params,function(err,account){
             if(err){
               return res.badRequest(err);
             }
-            var hostId = host.id;
-            var ip = req.ip;
-            var params = {
-              type : "custom",
-              country : 'US',
-              email : email,
-              legal_entity :{
-                type : 'individual'
-              },
-              tos_acceptance : {
-                date : parseInt(new Date().getTime()/1000),
-                ip : ip
-              },
-              payout_schedule : {
-                interval : "weekly",
-                weekly_anchor : "monday"
-              }
-            }
-            if(user.firstname){
-              params.legal_entity.first_name = user.firstname;
-            }
-            if(user.lastname){
-              params.legal_entity.last_name = user.lastname;
-            }
-            if(user.birthday){
-              params.legal_entity.dob = {
-                day : user.birthday.getDate(),
-                month : user.birthday.getMonth() + 1,
-                year : user.birthday.getFullYear()
-              };
-              var birthdayDate = new Date(user.birthday);
-              var birthday = birthdayDate.getMonth()+1+"/"+birthdayDate.getDate();
-              mailChimp.updateMember({ email : user.email, birthday : birthday }, "member");
-            }
-            stripe.createManagedAccount(params,function(err,account){
+            host.accountId = account.id;
+            host.save(function(err,host){
               if(err){
                 return res.badRequest(err);
               }
-              host.accountId = account.id;
-              host.save(function(err,host){
+              user.host = hostId;
+              user.phone = phone;
+              user.save(function(err, u){
                 if(err){
                   return res.badRequest(err);
                 }
-                User.update({id : userId},{host: hostId, phone : phone}).exec(function(err, user){
-                  if(err){
-                    res.badRequest(err);
-                  }
-                  mailChimp.addMemberToList({ email : host.email, shopName : shopName, firstname : user[0].firstname, lastname : user[0].lastname, language : req.getLocale() }, "chef");
-                  user[0].host = host;
-                  req.session.user = user[0];
-                  res.ok({user:user[0]});
-                });
+                mailChimp.addMemberToList({ email : host.email, shopName : shopName, firstname : user.firstname, lastname : user.lastname, language : req.getLocale() }, "chef");
+                user.host = host;
+                req.session.user = user;
+                res.ok( {user:user});
               });
             });
-          })
+          });
         })
       });
     });

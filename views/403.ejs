@@ -117,8 +117,8 @@
 
           <% if(!login){%>
           <div class="card-footer">
-            <h6 class="text-center"><span data-toggle="i18n" data-key="newlyJoin">新加入?点这里</span><a toggle="modal" data-target="#myModal" data-href="/templates/user/signup.html" href="javascript:void(0)" onclick="toggleModal(event)" data-toggle="i18n" data-key="register">注册</a></h6>
-            <h6 class="text-center"><span data-toggle="i18n" data-key="forgetPassword">忘记密码</span>?<a toggle="modal" data-target="#myModal" data-href="/templates/user/sendEmail.html" href="javascript:void(0)" onclick="toggleModal(event)" data-toggle="i18n" data-key="reset">点击重置</a></h6>
+            <h6 class="text-center"><span data-toggle="i18n" data-key="newlyJoin">新加入?点这里</span><a toggle="modal" data-target="#myModal" data-model="user" data-action="signup" href="javascript:void(0)" onclick="h.toggleModal(event)" data-toggle="i18n" data-key="register">注册</a></h6>
+            <h6 class="text-center"><span data-toggle="i18n" data-key="forgetPassword">忘记密码</span>?<a toggle="modal" data-target="#myModal" data-model="user" data-action="sendEmail" href="javascript:void(0)" onclick="h.toggleModal(event)" data-toggle="i18n" data-key="reset">点击重置</a></h6>
           </div>
           <% }%>
         </div>
@@ -131,7 +131,6 @@
         </btn>
       </div>
     </div>
-
   </body>
 
   <script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~428820f4.bundle.js"></script>

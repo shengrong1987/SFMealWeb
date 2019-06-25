@@ -59,9 +59,6 @@ module.exports.http = {
 
     setLanguage : function (req, res, next) {
       var gm_ua = req.headers['user-agent'].toLowerCase();
-
-      sails.log.info("ddd:" + sails.hooks.i18n);
-
       if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger") {
         sails.hooks.i18n.setLocale('zh');
       }

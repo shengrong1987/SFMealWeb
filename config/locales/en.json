@@ -1165,5 +1165,7 @@
   "badge-congrat-title" : "Congratulations, You earn a badge!",
   "view-all-badges" : "View Badges",
   "badge" : "badge",
-  "my-badges" : "My Badges"
+  "my-badges" : "My Badges",
+  "referrals-list" : "Invited friend list",
+  "join-date" : "Join Date"
 }

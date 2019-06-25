@@ -141,7 +141,12 @@ module.exports = require('waterlock').waterlocked({
               if(err){
                 return res.badRequest(err);
               }
-              res.redirect(state);
+              var url = require("url");
+              var url_parts = url.parse(state, true);
+              var query = url_parts.query;
+              var redirectUrl = url_parts.pathname + "?code=" + encodeURIComponent(query.code);
+              sails.log.debug("redirect url: " + redirectUrl);
+              res.redirect(redirectUrl);
             })
           });
         })
