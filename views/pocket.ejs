@@ -131,9 +131,9 @@
           <% if(typeof host != 'undefined' && host){%>
           <h4 class="text-left"><%= __('pocket-my-bank')%>: <small class="bank_name"></small>
             <% if (host.bankId){%>
-            <small><a toggle="modal" data-updating="true" data-host="<%= host.id%>" data-target="#myModal" data-href="/templates/user/bank.html" href="javascript:void(0)" onclick="toggleModal(event,transactionView.enterHostInfo)">  <%= __('bank-update')%> </a></small><i class="fas fa-question-circle text-grey cursor-pointer"></i>
+            <small><a toggle="modal" data-updating="true" data-host="<%= host.id%>" data-target="#myModal" data-model="user" data-action="bank" href="javascript:void(0)" onclick="h.toggleModal(event,appObj.transactionView.enterHostInfo)">  <%= __('bank-update')%> </a></small><i class="fas fa-question-circle text-grey cursor-pointer"></i>
             <%}else{%>
-            <small><a toggle="modal" data-updating="false" data-host="<%= host.id%>" data-target="#myModal" data-href="/templates/user/bank.html" href="javascript:void(0)" onclick="toggleModal(event,transactionView.enterHostInfo)">  <%= __('bank-new')%> </a></small><i class="fas fa-question-circle text-grey cursor-pointer"></i>
+            <small><a toggle="modal" data-updating="false" data-host="<%= host.id%>" data-target="#myModal" data-model="user" data-action="bank" href="javascript:void(0)" onclick="h.toggleModal(event,appObj.transactionView.enterHostInfo)">  <%= __('bank-new')%> </a></small><i class="fas fa-question-circle text-grey cursor-pointer"></i>
             <%}%>
           </h4>
           <h4 class="text-left"><%= __('pocket-my-balance')%>:</h4>
@@ -196,6 +196,4 @@
     </div>
   </div>
 </div>
-<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~428820f4.bundle.js"></script>
-<script src="/assets/vendors~admin~apply~badge~bank~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~c094081c.bundle.js"></script>
 <script src="/assets/zh.pocket.bundle.js"></script>
