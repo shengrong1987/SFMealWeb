@@ -5,12 +5,11 @@ import 'bootstrap';
 import { helperMethod, localOrderObj } from "./utils/helper";
 
 let installation = function() {
-  $("document").ready(function () {
-    initData();
-    setup();
-    initEventHandler();
-    initLayout();
-  });
+  console.log("开始初始化...");
+  initData();
+  setup();
+  initEventHandler();
+  initLayout();
 };
 
 function initData(){

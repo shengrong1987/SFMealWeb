@@ -22,6 +22,7 @@ $(document).ready(function(){
   helperMethod.lazyLoadImage("icon_share.png");
   helperMethod.lazyLoadImage("qrcode.jpg");
   helperMethod.lazyLoadImage("profile_man.png");
+  helperMethod.lazyLoadImage("image-loader.gif")
 })
 window.h = helperMethod;
 window.l = localOrderObj;

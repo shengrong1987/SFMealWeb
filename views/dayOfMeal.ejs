@@ -138,7 +138,7 @@
                           $<%= dish.price.toFixed(2)%>
                         </div>
                         <button name="order-btn" style="width: 38px;height: 38px;" class="btn orange rounded-circle text-white font-weight-bold cursor-pointer" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
-                        <div name="input-group" class="input-group input-group-sm amount-input round ml-2" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
+                        <div name="input-group" class="input-group input-group-sm amount-input round ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
                           <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
                             <span class="input-group-text">-</span>
                           </div>
@@ -196,7 +196,7 @@
                               $<%= dish.price.toFixed(2)%>
                             </div>
                             <button name="order-btn" style="width: 38px;height: 38px;" class="btn rounded-circle orange text-white font-weight-bold cursor-pointer" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
-                            <div name="input-group" class="input-group input-group-sm amount-input round ml-2" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
+                            <div name="input-group" class="input-group input-group-sm amount-input round ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
                               <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
                                 <span class="input-group-text">-</span>
                               </div>

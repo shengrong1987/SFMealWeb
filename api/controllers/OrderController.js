@@ -324,6 +324,7 @@ module.exports = {
           buildOrders : ['saveAddress', function(next){
             var index = 0;
             async.eachSeries(meals, function(meal, nextIn){
+              sails.log.debug("#6/11 - Begin To build order");
               var orderParam = {};
               orderParam.subtotal = parseFloat(meal.subtotal) || 0;
               orderParam.orders = meal.orders;
@@ -2748,7 +2749,6 @@ module.exports = {
     //verify how many points need to be redeemed
     if(points > total * 10){ points = total * 10;}
     user.points = user.points || 0;
-    sails.log.info()
     sails.log.info("redeeming points:" + points);
     //verify if user have enough points
     if(points > user.points){
