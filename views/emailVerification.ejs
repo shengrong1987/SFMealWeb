@@ -1,24 +1,25 @@
 
-<div id="emailVerificationView" data-user="<%= user.id%>">
+<div id="emailVerificationView" data-user="<%= user.id %>">
   <div class="popup box middle signin" style="width: 350px;">
-    <h4 data-toggle="i18n" data-key="enterEmail"></h4>
+    <h4><%= __('enterEmail')%></h4>
 
     <form class="text-center" data-toggle="validator" role="form">
       <div class="form-group">
-        <label class="sr-only" for="emailInput" data-toggle="i18n" data-key="email"></label>
-        <input type="email" class="form-control" id="emailInput" placeholder="email" required data-error="bad format" value="<%= user.email ? user.email : ( user.auth ? user.auth.email || '' : '')%>">
+        <label class="sr-only" for="emailInput"><%= __('email')%></label>
+        <input type="email" class="form-control" id="emailInput" placeholder="email" required data-error="Bad format" value="<%= user.email ? user.email : ( user.auth ? user.auth.email || '' : '')%>">
         <div class="help-block with-errors"></div>
       </div>
 
       <div class="form-group">
-        <button class="btn btn-danger btn-lg round red popline"><%= __('email-verification')%></button>
+        <button type="submit" class="btn btn-danger btn-lg round red popline"><%= __('email-verification')%></button>
       </div>
       <div class="alert alert-success d-none"></div>
-      <div class="alert alert-danger d-none" data-toggle="i18n" data-key="emailNotExistError"></div>
+      <div class="alert alert-danger d-none"><%= __('emailNotExistError')%></div>
     </form>
+
   </div>
 </div>
 
-<script>
-  new EmailVerificationView({model : new User(), el: $("#emailVerificationView")});
-</script>
+<script src="/assets/vendors~admin~apply~badge~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMeal~ema~3995f8fe.bundle.js"></script>
+<script src="/assets/vendors~admin~apply~badge~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMeal~ema~1bb62d84.bundle.js"></script>
+<script src="/assets/zh.emailVerification.bundle.js"></script>

@@ -38,7 +38,8 @@ module.exports = {
     badge : "./assets/js/entry/badge.js",
     trust : "./assets/js/entry/trust.js",
     resetPassword : "./assets/js/entry/resetPassword.js",
-    report : "./assets/js/entry/report.js"
+    report : "./assets/js/entry/report.js",
+    emailVerification : "./assets/js/entry/emailVerification.js"
   },
   output: {
     path: path.resolve(__dirname, '.tmp/public/assets/'),

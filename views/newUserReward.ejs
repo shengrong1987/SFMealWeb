@@ -55,7 +55,7 @@
           <%= __('nav-bar-register')%>
         </a>
       <% }else if(!user.emailVerified){%>
-        <a class="btn btn-warning" style="width: 190px;height: 40px;" toggle="modal" data-target="#myModal" data-model="user" data-action="sendEmail" href="javascript:void(0);" onclick="h.toggleModal(event)">
+        <a class="btn btn-warning" style="width: 190px;height: 40px;" toggle="modal" data-target="#myModal" data-model="user" data-action="sendEmail" data-href="/user/emailVerification" href="javascript:void(0);" onclick="h.toggleModal(event)">
           <%= __('verify-email')%>
         </a>
       <% }else if(!user.newUserRewardIsRedeemed){%>
