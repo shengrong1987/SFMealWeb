@@ -752,8 +752,8 @@ let localOrderObj = {
             $(this).find("[data-toggle='amount-input']").on('change', _this.refreshCheckoutMenu);
           })
           $(this).data("left-amount", left);
-          _this.updateMenuView(dishId);
         }
+        _this.updateMenuView(dishId);
       }else{
         _this.localOrders[dishId] = {
           number : parseInt($(this).find(".amount").val()),
