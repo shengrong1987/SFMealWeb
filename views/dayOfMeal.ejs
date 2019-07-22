@@ -135,7 +135,11 @@
                       </h6>
                       <div class="d-flex vertical-align">
                         <div class="text text-price price mr-auto" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
-                          $<%= dish.price.toFixed(2)%>
+                          <% if(dish.discount){%>
+                            <s class='text-grey' style='font-size: small;'>$<%= (parseFloat(dish.price) + parseFloat(dish.discount)).toFixed(2)%></s><br/>$<%= dish.price.toFixed(2)%>
+                          <% }else{%>
+                            $<%= dish.price.toFixed(2)%>
+                          <% }%>
                         </div>
                         <button name="order-btn" style="width: 38px;height: 38px;" class="btn orange rounded-circle text-white font-weight-bold cursor-pointer" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
                         <div name="input-group" class="input-group input-group-sm amount-input round ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
@@ -193,7 +197,11 @@
                           </h6>
                           <div class="d-flex vertical-align">
                             <div class="text text-price price mr-auto" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
+                              <% if(dish.discount){%>
+                                <s class='text-grey' style='font-size: small;'>$<%= (parseFloat(dish.price) + parseFloat(dish.discount)).toFixed(2)%></s><br/>$<%= dish.price.toFixed(2)%>
+                              <% }else{%>
                               $<%= dish.price.toFixed(2)%>
+                              <% }%>
                             </div>
                             <button name="order-btn" style="width: 38px;height: 38px;" class="btn rounded-circle orange text-white font-weight-bold cursor-pointer" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
                             <div name="input-group" class="input-group input-group-sm amount-input round ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
