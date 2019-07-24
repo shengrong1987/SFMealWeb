@@ -191,7 +191,7 @@ let setupObj = {
       const { default: mixitup } = await import(/* webpackChunkName: "mixitup" */ 'mixitup');
       window.mixitup = mixitup;
       const { default: mixitupPagination } = await import(/* webpackChunkName: "mixitup-pagination" */ './library/jquery.mixitup-pagination.min');
-      let dateFilter = $("#dishDatesBar").find("a[data-filter]").first().data('filter');
+      let dateFilter = $("#dishDatesBar").find("[data-filter]").first().data('filter');
       let chefFilter = $("#hostBarView").find("button[data-filter]").first().data('filter');
       if($("#chefDishView").length){
         const { default: mixitupMultifilter } = await import(/* webpackChunkName: "mixitupMultifilter" */ './library/mixitup-multifilter.js');
@@ -250,7 +250,6 @@ let setupObj = {
         });
         appObj.dayOfMealView.initDate();
         initHashTag();
-
       }
       if($("#chefDishView").length){
         console.info("初始化Chef Menu Mixitup组件...");
@@ -275,7 +274,8 @@ let setupObj = {
           },
           animation: {
             enable: false,
-            effects: 'fade translateZ(-100px)'
+            effects: 'fade translateZ(-100px)',
+            queue : false
           }
         });
         chefMixer.setFilterGroupSelectors('date',dateFilter);

@@ -1183,5 +1183,7 @@
   "signuped-with-your-link" : "已加入，未下单",
   "referral-bonus-paid" : "已下单，获得5元奖励！",
   "how-to-use-points" : "在菜单中选择菜式，然后结账时点击'使用积分'即可抵免订单金额",
-  "user-alt-login" : "已有账号？点击这里: "
+  "user-alt-login" : "已有账号？点击这里: ",
+  "delivery-date" : "送餐日：",
+  "current-location" : "当前地址"
 }

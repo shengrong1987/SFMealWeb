@@ -699,11 +699,13 @@ let localOrderObj = {
     Load previous order from cookies
    */
   loadOrder : function (fromCache){
+    console.group("Load local order...");
     this.updateOrderWindow(fromCache);
     this.loadCoupon(fromCache);
     this.loadPoints(fromCache);
     this.refreshCheckoutMenu();
     this.updateOrderPreview();
+    console.groupEnd();
   },
 
   /*
@@ -738,22 +740,20 @@ let localOrderObj = {
         _this.localOrders[dishId] = localDish;
         var left = parseInt($(this).attr("data-left-amount") - parseInt(_this.localOrders[dishId].number));
         var number = _this.localOrders[dishId].number;
-        var dishItems = $("#order").find(".dish[data-id='" + dishId + "']");
-        dishItems.each(function(){
-          if(number===0){
-            $(this).find("[name='input-group']").hide();
-            $(this).find("[name='order-btn']").show();
-          }else{
+        if(number){
+          var dishItems = $("#order").find(".dish[data-id='" + dishId + "']");
+          dishItems.each(function(){
+            $(this).find("[name='input-group']").removeClass("d-none");
             $(this).find("[name='input-group']").show();
             $(this).find("[name='order-btn']").hide();
-          }
-          $(this).find(".amount").val(_this.localOrders[dishId].number);
-          $(this).find(".amount").text(_this.localOrders[dishId].number);
-          _this2.amountInput('update',$(this).find("[data-toggle='amount-input']"));
-          $(this).find("[data-toggle='amount-input']").on('change', _this.refreshCheckoutMenu);
-        })
-        $(this).data("left-amount", left);
-        _this.updateMenuView(dishId);
+            $(this).find(".amount").val(_this.localOrders[dishId].number);
+            $(this).find(".amount").text(_this.localOrders[dishId].number);
+            _this2.amountInput('update',$(this).find("[data-toggle='amount-input']"));
+            $(this).find("[data-toggle='amount-input']").on('change', _this.refreshCheckoutMenu);
+          })
+          $(this).data("left-amount", left);
+          _this.updateMenuView(dishId);
+        }
       }else{
         _this.localOrders[dishId] = {
           number : parseInt($(this).find(".amount").val()),
@@ -782,7 +782,7 @@ let localOrderObj = {
         if(dishItem.hasClass(dateDesc)){
           dishItem.show();
         }
-        $(this).find("[name='input-group']").show();
+        $(this).find("[name='input-group']").removeClass('d-none').show();
         $(this).find("[name='order-btn']").hide();
       }else{
         $(this).find("[name='input-group']").hide();

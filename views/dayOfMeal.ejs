@@ -5,7 +5,7 @@
 
     <% if(meals && meals.meals){%>
     <div class="w-100 sticky-top">
-      <ul id="dishDatesBar" class="nav nav-pills nav-pills-orange white nav-scroll px-2 bg-light" data-filter-group="date">
+      <div class="dropdown white">
         <%
           var dates = Object.keys(meals.meals);
           dates = dates.sort(function(d1,d2){
@@ -43,10 +43,26 @@
               }
             }
           })
-        dates.forEach(function(dateKey,i){ %>
-          <li class="nav-item py-1 mw-28 <%= i===0?'active':''%>"><a class="nav-link <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-mixitup-date data-filter-type="date" data-filter=".<%= dateKey.replace(/\/|\'/g,'')%>" data-toggle="tab"><span class="cursor-pointer"><%= __(dateKey).replace("day",'')%></span></a></li>
-        <% })%>
-      </ul>
+        %>
+        <button id="deliveryDateBtn" class="btn dropdown-toggle text-black" data-toggle="dropdown" data-selected="true">
+          <%= __('delivery-date')%> <%= dates[0] || __('notAvailable')%>
+        </button>
+        <div id="dishDatesBar" class="dropdown-menu w-50 dropdown-menu-center" style="min-width: 300px;" data-filter-group="date">
+          <div class="d-flex justify-content-between vertical-align px-4" style="background: none;">
+            <%= __('current-location')%>:
+            <input name="zipcode" style="width: 96px;" value="<%= zipcode || (user ? user.zipcode  : '94014')%>">
+            <button id="changeZipcodeBtn"><i class="fa fa-check-circle cursor-pointer"></i></button>
+          </div>
+          <div class="dropdown-divider"></div>
+          <% dates.forEach(function(dateKey,i){ %>
+            <label class="d-flex px-4 vertical-align dropdown-item" style="background: none;" value=".<%= dateKey.replace(/\/|\'/g,'')%>">
+              <input data-mixitup-control data-mixitup-date data-filter-type="date" data-filter=".<%= dateKey.replace(/\/|\'/g,'')%>" type="radio" value=".<%= dateKey.replace(/\/|\'/g,'')%>" id="deliveryDateOption-<%= i%>" name="delivery-date-options" data-index="<%= i%>" class="" <%= i===0? "checked=''" : ''%>>
+              <label for="deliveryDateOption-<%= i%>"></label>
+              <span class="cursor-pointer ml-2"><%= __(dateKey).replace("day",'')%></span>
+            </label>
+          <% })%>
+        </div>
+      </div>
       <ul id="hostBarView" class="nav nav-pills nav-scroll justify-content-md-center white" data-filter-group="chef">
         <%
         hosts.forEach(function(host,i){ %>

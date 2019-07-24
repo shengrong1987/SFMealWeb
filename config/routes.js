@@ -80,6 +80,7 @@ module.exports.routes = {
   "/meal/:id/updateDishQty" : "MealController.updateDishQtyAPI",
   "/meal/dish" : "MealController.dish",
   "/meal/pickup" : "MealController.pickup",
+  "/meal/search" : "MealController.search",
   '/dish/:id/verify' : 'DishController.verify',
   '/dish/:id/fail' : 'DishController.fail',
   '/dish/:id/review' : 'DishController.findReview',

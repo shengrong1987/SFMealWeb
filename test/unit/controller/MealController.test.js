@@ -835,6 +835,21 @@ describe('MealController', function() {
           })
     })
 
+    it('should search the meals of zipcode in San Francisco and with a keyword of 菜式 but no records are found', function (done) {
+      agent
+        .get(encodeURI('/meal/search?zip=94124'))
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err,res){
+          if(res.body.meals.summary.orderCount !== 0 || res.body.meals.summary.preOrderCount !==0){
+            return done(Error("error searching for meal"));
+          }
+          res.body.zipcode.should.be.equal("94124");
+          done();
+        })
+    })
+
     it('should login an account', function (done) {
       agent
         .post('/auth/login?type=local')
@@ -1348,7 +1363,15 @@ describe('MealController', function() {
             .expect(200)
             .end(function(err,res){
               res.body.meals.summary.orderCount.should.be.equal(1);
-              done();
+              agent
+                .get(encodeURI('/meal/search?keyword=猪肉馅饼&zip=94124'))
+                .set('Accept', 'application/json')
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end(function(err,res){
+                  res.body.meals.summary.orderCount.should.be.equal(1);
+                  done();
+                })
             })
         })
         .catch(function(err){

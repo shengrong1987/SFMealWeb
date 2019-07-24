@@ -1506,6 +1506,13 @@ label {
 }
 
 /*bootstrap button extension*/
+.dropdown-menu-center {
+  left: 50% !important;
+  right: auto !important;
+  text-align: center !important;
+  transform: translate(-50%, 25%) !important;
+}
+
 @mixin btn-grey($hover-color) {
   @include text-white;
   @include grey;

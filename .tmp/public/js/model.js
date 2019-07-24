@@ -1229,9 +1229,15 @@ var DayOfMealView = Backbone.View.extend({
     "mixClick #dishContentView" : "selectDate",
     "mixClick #chefDishView" : "selectChef",
     "mixEnd #dishContentView" : "renderImage",
-    "mixEnd #chefDishView" : "renderImage"
+    "mixEnd #chefDishView" : "renderImage",
+    "click #changeZipcodeBtn" : "changeZipcode"
   },
   initialize : function() {
+    var zipcode = helperMethod.readCookie("userZipcode");
+    if(zipcode){
+      console.log("初始化用户邮编：" + zipcode);
+      this.$el.find("input[name='zipcode']").val(zipcode);
+    }
     console.group('开始初始化菜单Filter...');
     var dateDesc = decodeURI(helperMethod.readCookie("date"));
     var currentDateControl = this.$el.find("#dishDatesBar [data-filter='." + dateDesc + "']");
@@ -1266,20 +1272,22 @@ var DayOfMealView = Backbone.View.extend({
     var dateFilter,activeFilters;
     if(currentDateControl.length){
       dateFilter = "." + dateDesc;
-      this.$el.find("#dishDatesBar li").removeClass("active");
-      this.$el.find("#dishDatesBar li a").removeClass("active");
-      currentDateControl.parent().addClass("active");
-      currentDateControl.addClass("active");
+      // currentDateControl.trigger('click');
     }else{
-      activeFilters = this.$el.find("#dishDatesBar .mixitup-control-active");
+      activeFilters = this.$el.find("#dishDatesBar [data-mixitup-date]:checked");
       if(activeFilters.length){
         dateFilter = activeFilters.data("filter");
       }else{
-        dateFilter = this.$el.find("#dishDatesBar .nav-link").data("filter");
+        dateFilter = this.$el.find("#dishDatesBar [data-mixitup-date]").first().data("filter");
       }
     }
     console.info("初始化日期:'%s'", dateFilter);
     if(dateMixer){
+      if(this.$el.find("[data-filter='." + dateDesc +"']").length){
+        this.$el.find("#deliveryDateBtn").text(__('delivery-date') + dateDesc);
+      }else{
+        this.$el.find("#deliveryDateBtn").text(__('delivery-date') + this.$el.find("[data-filter]").first().data('filter').replace(".",""));
+      }
       dateMixer.filter(dateFilter);
     }
     console.groupEnd();
@@ -1298,7 +1306,7 @@ var DayOfMealView = Backbone.View.extend({
     var filterValue = currentTarget.data("filter").replace(".","");
     var filterType = currentTarget.data("filter-type");
     helperMethod.createCookie(filterType, encodeURI(filterValue));
-    helperMethod.jumpTo("#chef");
+    helperMethod.jumpTo("chef");
   },
   renderImage : function(){
     echo.render();
@@ -1320,7 +1328,14 @@ var DayOfMealView = Backbone.View.extend({
     }else{
       location.href = "/meal/checkout?dishes=" + orderedDishes.join(",");
     }
-
+  },
+  changeZipcode : function(e){
+    var zipcode = this.$el.find("input[name='zipcode']").val();
+    if(!zipcode){
+      zipcode = "94014";
+    }
+    helperMethod.createCookie("userZipcode", zipcode);
+    location.href = '/meal/search?zip=' + zipcode;
   }
 })
 

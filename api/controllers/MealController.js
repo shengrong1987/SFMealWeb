@@ -206,12 +206,12 @@ module.exports = {
   },
 
   find : function(req,res){
-    //find out meals that provide start today or ends today
     // moment.locale(req.getLocale());
     if(req.session.authenticated){
       sails.log.info("USER: " + req.session.user ? req.session.user.id : "NONE");
     }
     var _this = this;
+    var zipcode = req.query['zip'];
     var pickupNickname = req.param('pickup');
     Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
       if(err){
@@ -226,6 +226,11 @@ module.exports = {
       }
       var _u=null,_tags=['chef'], _hosts = [];
       async.auto({
+        findCounty : function(next){
+          if(!req.query.zipcode){
+            return next();
+          }
+        },
         findUser : function(next){
           if(!req.session.authenticated){
             return next();
@@ -298,7 +303,7 @@ module.exports = {
         }
         meals = _this.composeMealWithDate(meals);
         // res.set('Cache-Control', 'public, max-age=31557600');
-        res.view("dayOfMeal",{ meals : meals, hosts: _hosts, user : _u, tags: _tags, pickupNickname : pickupNickname, locale : req.getLocale()});
+        res.view("dayOfMeal",{ meals : meals, hosts: _hosts, user : _u, tags: _tags, pickupNickname : pickupNickname, zipcode: zipcode, locale : req.getLocale()});
       })
     })
   },
@@ -404,9 +409,10 @@ module.exports = {
     var keyword = query['keyword'];
     var zipcode = query['zip'];
     var method = query['method'];
-    var county = query['county'] || req.cookies['county'] || "San Francisco County";
+    var county = query['county'];
     var type = req.param('type');
     var now = new Date();
+    var pickupNickname = req.param('pickupNickname');
     var params = {
       status : 'on',
       provideFromTime : {'<' : now },
@@ -415,6 +421,7 @@ module.exports = {
     if(type){
       params.type = type;
     }
+    var _hosts = [], _tags = ['chef'];
     Meal.find({ where : params, limit : actionUtil.parseLimit(req), skip : actionUtil.parseSkip(req)}).populate('dishes').populate("dynamicDishes").populate('chef').exec(function(err,found){
       if(err){
         return res.badRequest(err);
@@ -436,10 +443,9 @@ module.exports = {
           }
           //find which county the zip belongs to, exclude it if it does not match the meal's county
           GeoCoder.geocode(zipcode, function(err, result){
-            if(err){
-              return next({ code : -1, responseText : req.__('meal-error-address')})
-            }else if(result.length===0){
-              return next({ code : -2, responseText : req.__('meal-error-address2')})
+            if(err || !result.length){
+              found = [];
+              return next();
             }
             found = found.filter(function(meal){
               return meal.county.split("+").indexOf(result[0].administrativeLevels.level2long) !== -1;
@@ -447,7 +453,7 @@ module.exports = {
             next();
           })
         },
-        matchMethod : function(next){
+        matchMethod : [ 'matchZipCode', function(next){
           if(!method){
             return next();
           }
@@ -457,8 +463,8 @@ module.exports = {
             });
           });
           next();
-        },
-        matchKeyword : function(next){
+        }],
+        matchKeyword : [ 'matchZipCode', function(next){
           if(!keyword){
             return next();
           }
@@ -473,16 +479,67 @@ module.exports = {
             return false;
           });
           next();
-        }
+        }],
+        findHosts : [ 'matchZipCode', function(next){
+          if(!found.length){
+            Host.find({ where : { passGuide : true, intro : { '!' : ''}}, skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("dishes").exec(function(err, hosts) {
+              if (err) {
+                return next(err);
+              }
+              hosts = hosts.filter(function (h) {
+                return !!h.dishes.length;
+              })
+              _hosts = hosts;
+              next();
+            });
+          }else{
+            found.forEach(function(meal){
+              if(!_hosts.some(function(host){
+                return host.id === meal.chef.id;
+              })){
+                _hosts.push(meal.chef);
+              }
+            });
+            next();
+          }
+        }],
+        findDishTags : ['matchZipCode', function(next){
+          found.forEach(function(meal){
+            meal.dishes.forEach(function(dish){
+              if(dish.tags){
+                dish.tags.forEach(function(tag){
+                  if(!_tags.includes(tag) && !_tags.includes(req.__(tag))){
+                    _tags.push(tag);
+                  }
+                })
+              }
+            })
+          })
+          var tagOrder = {
+            "chef" : 201,
+            "select" : 200,
+            "crawfish" : 195,
+            "gift" : 190,
+            "limited" : 180,
+            "frozen" : 170,
+            "dessert" : 150
+          };
+          _tags = _tags.sort(function(a,b){
+            var tagOrderA = tagOrder.hasOwnProperty(a) ? tagOrder[a] : 0;
+            var tagOrderB = tagOrder.hasOwnProperty(b) ? tagOrder[b] : 0;
+            return tagOrderB - tagOrderA;
+          })
+          next();
+        }]
       }, function(err){
         if(err){
           return res.badRequest(err);
         }
         found = _this.composeMealWithDate(found);
         if(req.wantsJSON && process.env.NODE_ENV === "development") {
-          res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, county : county});
+          res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, county : county, hosts : _hosts, tags : _tags});
         }else{
-          res.view("meals",{ meals : found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, county : county });
+          res.view("dayOfMeal",{ meals: found, hosts: _hosts, tags: _tags, search: true, keyword : keyword, user: req.session.user, zipcode : zipcode, county : county, pickupNickname : pickupNickname });
         }
       });
     });

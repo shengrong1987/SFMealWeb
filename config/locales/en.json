@@ -1171,5 +1171,7 @@
   "signuped-with-your-link" : "Signuped with your link",
   "referral-bonus-paid" : "$5 points got！",
   "how-to-use-points" : "Choose in menu and redeem your points at checkout.",
-  "user-alt-login" : "Already a member? Click here: "
+  "user-alt-login" : "Already a member? Click here: ",
+  "delivery-date" : "Delivery on:",
+  "current-location" : "Current Location"
 }
