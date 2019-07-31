@@ -1,0 +1,19 @@
+<%- include ../email_header %>
+
+<div class="green" style="padding: 25px;">
+  <div class="box-email white relative middle text-left">
+    <h4 class="text-green"><%= newmessagetitle %></span></h4>
+    <p>Hi <%= recipientName %>,</p>
+    <table class="table" style="border-style: dotted;">
+      <tr>
+        <td><%= message%></td>
+      </tr>
+    </table>
+    <div class="row mt-2">
+      <a class="btn btn-danger middle" href="http://www.sfmeal.com/meal"><%= seemore%></a>
+    </div>
+  </div>
+
+</div>
+
+<%- include ../email_footer %>

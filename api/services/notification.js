@@ -469,6 +469,9 @@ var notification = {
         case "verification":
           i18ns = i18ns.concat(['email-verification','email-verification-instruction','email-verification-unknown','email-verification-link-expire','verify-email']);
           break;
+        case "message":
+          i18ns = i18ns.concat(['new-message-title','see-more']);
+          break;
       }
     }else if(model === "Badge"){
       switch (action){

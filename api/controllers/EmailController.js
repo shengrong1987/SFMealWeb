@@ -33,11 +33,11 @@ module.exports = {
         notification.transitLocaleTimeZone(params);
         notification.sendEmail(email.model, email.action, params, req);
         res.ok(params);
-      })
+      }, req);
     })
   },
 
-  fetchData : function(model, action, metaData, cb){
+  fetchData : function(model, action, metaData, cb, req){
     switch (model){
       case "Order":
         var orderId = metaData.orderId;
@@ -52,6 +52,25 @@ module.exports = {
           return cb({ code : -1, responseText : "Can not find 'orderId'"});
         }
           break;
+      case "User":
+        switch (action) {
+          case "message":
+            var type = metaData.type;
+            var userId = metaData.userId;
+            if(type === "points" && userId){
+              User.findOne(userId).exec(function(err, user){
+                if(err){
+                  return cb(err);
+                }
+                user.message = req.__('user-points-reminder', user.points, (user.points/10).toFixed(2));
+                cb(null, user);
+              })
+            }else{
+              return cb({ code : -1, responseText : "need 'userId'"});
+            }
+            break;
+        }
+        break;
       case "Badge":
         var badgeId = metaData.badgeId;
         var userId = metaData.userId;
