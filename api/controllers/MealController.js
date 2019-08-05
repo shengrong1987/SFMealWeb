@@ -551,6 +551,7 @@ module.exports = {
     if (!orderedDishes){
       return res.badRequest({code: -19, responseText: req.__('meal-checkout-lack-of-order')});
     }
+    moment.locale('en');
 
     orderedDishes = orderedDishes.split(",");
 
@@ -595,6 +596,14 @@ module.exports = {
         if(!mealHaveAllOrderedDishes){
           meals = meals.filter(function(m){
             var mealNeedToRemove = mealsOnSameDate.some(function(m2){
+              m2.pickups = m2.pickups.filter(function(p2){
+                var pickupDate = moment(p2.pickupFromTime).format('dddd');
+                return pickupDate !== dateDesc;
+              });
+              var mealHasOtherPickupDate = m2.pickups.length;
+              if(mealHasOtherPickupDate){
+                return false;
+              }
               return m2.id === m.id;
             })
             return !mealNeedToRemove;
@@ -605,7 +614,7 @@ module.exports = {
       if(pickupNickname){
         meals = meals.filter(function(meal){
           return meal.pickups.some(function(p){
-            return p.nickname && p.nickname === pickupNickname;
+            return p.nickname && p.nickname.includes(pickupNickname);
           })
         })
       }

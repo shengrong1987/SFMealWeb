@@ -190,11 +190,13 @@ module.exports = {
       }
 
       meals = meals.filter(function (meal) {
-
         if(meal.id === targetMeal.id){
           return true;
         }
-        var hasSameNickname = targetMeal.nickname !== "custom" && targetMeal.nickname.some(function(n){ return meal.nickname.includes(n)});
+        if(!Array.isArray(targetMeal.nickname)){
+          targetMeal.nickname = [targetMeal.nickname];
+        }
+        var hasSameNickname = !targetMeal.nickname.includes("custom") && targetMeal.nickname.some(function(n){ return meal.nickname.includes(n)});
         console.log("target meal nickname:" + targetMeal.nickname + " and searching meal nickname:" + meal.nickname);
         var mealHasDish = meal.dishes.some(function(d) {
           return orderedDishes.includes(d.id);
