@@ -1398,7 +1398,7 @@ module.exports = {
       }
       var host = user.host;
       var hostId = host ? (host.id ? host.id : host) : null;
-      if(!hostId){
+      if(!hostId && !isAdmin){
         return res.forbidden();
       }
     }

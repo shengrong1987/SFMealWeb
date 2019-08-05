@@ -29,7 +29,7 @@ module.exports = {
             params[key] = email.metaData[key];
           });
         }
-        params.isSendToAdmin = true;
+        // params.isSendToAdmin = true;
         notification.transitLocaleTimeZone(params);
         notification.sendEmail(email.model, email.action, params, req);
         res.ok(params);

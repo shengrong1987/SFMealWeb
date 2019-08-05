@@ -106,13 +106,17 @@ async function initHashTag(){
         if(filter && filter.length){
           var filterType = filter.data("filter-type");
           console.info("已找到filter: %s, 类型：%s 准备过滤", h, filterType);
-          if(filterType === "date" && dateMixer){
-            dateMixer.filter(h);
+          if(filterType === "date"){
+            if(dateMixer){
+              dateMixer.filter(h);
+            }
             helperMethod.createCookie("date", h.replace(".",""));
             $("#dishDatesBar [data-filter]").removeClass("active");
             $("#dishDatesBar [data-filter='" + h + "']").addClass("active");
-          }else if(filterType === "chef" && chefMixer){
-            chefMixer.filter(h);
+          }else if(filterType === "chef"){
+            if(chefMixer){
+              chefMixer.filter(h);
+            }
             helperMethod.createCookie("chef", h.replace(".",""));
             $("#hostBarView [data-filter]").removeClass("active");
             $("#hostBarView [data-filter='" + h + "']").addClass("active");
