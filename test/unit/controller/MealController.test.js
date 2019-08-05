@@ -441,7 +441,7 @@ describe('MealController', function() {
           }),
           supportPartyOrder : true,
           isTaxIncluded : true,
-          nickname: "pickupSet2"
+          nickname: "pickupSet3"
         })
         .expect(200)
         .end(function(err,res){
@@ -766,7 +766,24 @@ describe('MealController', function() {
         .expect(200, done)
     })
 
-    it('should be able to update meals with no orders', function(done){
+    it('should be able to get all pickupSets', function(done){
+      var now = new Date();
+      agent
+        .get('/meal/' + preorderMealId + "?edit=true")
+        .set('Accept','application/json')
+        .expect('Content-type',/json/)
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.allPickups.should.have.length(4);
+          res.body.allPickups.should.containEql("pickupSet1+pickupSet2");
+          done();
+        })
+    });
+
+    it('should be able to update meals with no orders and all pickup options should be updated', function(done){
       var now = new Date();
       agent
         .put('/meal/' + preorderMealId)
@@ -782,10 +799,17 @@ describe('MealController', function() {
           }),
           status : 'off',
           type : "preorder",
-          nickname : "pickupSet1"
+          nickname : "pickupSet1+pickupSet2"
         })
         .expect(200)
-        .end(done)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          should(res.body.nickname.sort()).be.eql(["pickupSet1","pickupSet2"].sort());
+          res.body.pickups.should.have.length(6);
+          done();
+        })
     });
 
     it('should get meals page filter by county with no results', function(done){
@@ -1647,7 +1671,7 @@ describe('MealController', function() {
             return done(err);
           }
           res.body.meals.should.have.length(2);
-          res.body.pickups.should.have.length(6);
+          res.body.pickups.should.have.length(7);
           res.body.pickups[0].meal.should.be.equalOneOf([mealId,preorderMealId]);
           res.body.pickups[1].meal.should.be.equalOneOf([mealId,preorderMealId]);
           res.body.pickups[2].meal.should.be.equalOneOf([mealId,preorderMealId]);

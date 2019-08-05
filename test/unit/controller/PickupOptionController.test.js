@@ -145,5 +145,33 @@ describe('PickupOptionController', function() {
           done();
         })
     })
+
+    it('should create different pickup options', function(done) {
+      agent
+        .post('/pickupOption')
+        .send({
+          "pickupFromTime" : new Date(now.getTime() + 1000 * 3600 * 4),
+          "pickupTillTime" : new Date(now.getTime() + 1000 * 3600 * 5),
+          "location" : "665 W Olive Ave, Sunnyvale, CA 94086",
+          "publicLocation" : "Sunnyvale",
+          "pickupInstruction" : "Sunnyvale library",
+          "method" : "pickup",
+          "county" : "Santa Clara County",
+          "area" : "Sunnyvale",
+          "phone" : "(415)444-4444",
+          "nickname" : "pickupSet2",
+          "index" : 5,
+          "minimalOrder" : 50
+        })
+        .expect(201)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.county.should.be.equal("Santa Clara County");
+          res.body.nickname.should.be.equal("pickupSet2");
+          done();
+        })
+    })
   });
 });

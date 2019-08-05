@@ -571,12 +571,15 @@ module.exports = {
         });
       });
 
-      //remove dates of meals which can not have all the ordered dishes
+      //remove meals of certain dates which can not have all the ordered dishes
       var dateDescs = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
       dateDescs.forEach(function(dateDesc){
         var mealsOnSameDate = meals.filter(function(meal){
-          var pickupDate = moment(meal.pickups[0].pickupFromTime).format('dddd');
-          return pickupDate === dateDesc;
+          var hasSamePickupDate = meal.pickups.some(function(pickup){
+            var pickupDate = moment(pickup.pickupFromTime).format('dddd');
+            return pickupDate === dateDesc;
+          })
+          return hasSamePickupDate;
         });
         if(!mealsOnSameDate.length){
           return;
@@ -887,7 +890,6 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      sails.log.info("chef id: " + hostId);
       $this.dateIsValid(req.body, req, function(err){
         if(err){
           return res.badRequest(err);
@@ -919,7 +921,6 @@ module.exports = {
                         if(!req.body.totalQty){
                           return cb();
                         }
-                        sails.log.info("setting left qty: " + req.body.totalQty);
                         req.body.leftQty = req.body.totalQty;
                         cb();
                       }
@@ -1279,7 +1280,8 @@ module.exports = {
               return next(e);
             }
           }else if(params.nickname && params.nickname !== "custom"){
-            PickupOption.find({ nickname: params.nickname}).exec(function(err, options){
+            params.nickname = params.nickname.split("+");
+            PickupOption.find({ nickname: { $in : params.nickname }}).exec(function(err, options){
               if(err){
                 return next(err);
               }
@@ -1465,12 +1467,18 @@ module.exports = {
             if(err){
               return cb(err);
             }
+            var allPickupName = "";
             pickups.forEach(function(p){
               if(!_pickups.includes(p.nickname)){
                 _pickups.push(p.nickname);
+                if(allPickupName){
+                  allPickupName += "+";
+                }
+                allPickupName += p.nickname;
               }
             })
             _pickups.push("custom");
+            _pickups.push(allPickupName);
             cb();
           })
         },
@@ -1498,6 +1506,7 @@ module.exports = {
           return res.badRequest(err);
         }
         if(req.wantsJSON && (process.env.NODE_ENV === "development" || isAdmin)){
+          meal.allPickups = _pickups;
           return res.ok(meal);
         }
         if(isEditMode){
@@ -1539,13 +1548,19 @@ module.exports = {
     var preOrderCount = 0;
     var orderCount = 0;
     meals.forEach(function(meal){
-      var dateDesc = util.humanizeDate(meal.pickups[0].pickupFromTime);
-      if(mealDateObj.meals.hasOwnProperty(dateDesc)){
-        mealDateObj.meals[dateDesc].meals.push(meal);
-      }else{
-        mealDateObj.meals[dateDesc] = {};
-        mealDateObj.meals[dateDesc].meals = [meal];
-      }
+      meal.pickups.forEach(function(pickup){
+        var dateDesc = util.humanizeDate(pickup.pickupFromTime);
+        if(mealDateObj.meals.hasOwnProperty(dateDesc)){
+          if(!mealDateObj.meals[dateDesc].meals.some(function(m){
+            return m.id === meal.id;
+          })){
+            mealDateObj.meals[dateDesc].meals.push(meal);
+          }
+        }else{
+          mealDateObj.meals[dateDesc] = {};
+          mealDateObj.meals[dateDesc].meals = [meal];
+        }
+      })
       if(meal.type==="order"){
         orderCount++;
       }else{

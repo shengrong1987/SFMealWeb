@@ -1786,7 +1786,7 @@ describe('OrderController', function() {
               return done(err);
             }
             var meal = res.body.meals.filter(function(m){
-              return m.type === "preorder" && m.nickname === "pickupSet1" && m.title === "预定订单四点";
+              return m.type === "preorder" && m.nickname.includes("pickupSet1") && m.title === "预定订单四点";
             })[0];
             mealId = meal.id;
             dishId1 = meal.dishes[0].id;
@@ -2870,7 +2870,7 @@ describe('OrderController', function() {
               return done(err);
             }
             var meal = res.body.meals.filter(function(m){
-              return m.type === "preorder" && m.nickname === "pickupSet1" ;
+              return m.type === "preorder" && m.nickname.includes("pickupSet1") ;
             })[0];
             mealId = meal.id;
             dishId1 = meal.dishes[0].id;
