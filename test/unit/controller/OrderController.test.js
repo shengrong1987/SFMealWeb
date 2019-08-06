@@ -23,7 +23,10 @@ describe('OrderController', function() {
   var guestId = "";
   var farAddress = "7116 Tiant way, Elk Grove, CA 95758";
   var phone = "1-415-802-3853";
-  const SERVICE_FEE = 0
+  const SERVICE_FEE = 0;
+  var pickupPickupOptionId;
+  var deliveryPickupOptionId;
+  var highMinimalPickupOptionId;
 
   describe('', function() {
 
@@ -114,7 +117,7 @@ describe('OrderController', function() {
         })
     });
 
-    it('should order the meal with pickup method not match selected method error', function (done) {
+    it('should order the meal with pickup method not found error', function (done) {
       var dishObj = {};
       dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
       dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}], price : price2 };
@@ -129,6 +132,81 @@ describe('OrderController', function() {
           method : "delivery",
           pickupMeal : mealId,
           pickupOption : 1,
+          pickupDate : "today"
+        })
+        .expect(400)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.code.should.be.equal(-22);
+          done();
+        })
+    });
+
+    it('should login admin account', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : adminEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
+    it('should get pickup options', function (done) {
+      agent
+        .get('/pickupOption')
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.length(5);
+          pickupPickupOptionId = res.body.filter(function(p){
+            return p.method === "pickup" && p.minimalOrder !== 50;
+          })[0].id;
+          deliveryPickupOptionId = res.body.filter(function(p){
+            return p.method === "delivery" && p.location === "1974 Palou Ave, San Francisco, CA 94124, USA";
+          })[0].id;
+          highMinimalPickupOptionId = res.body.filter(function(p){
+            return p.minimalOrder === 50;
+          })[0].id;
+          console.log("normal pickup:" + pickupPickupOptionId, " &normal delivery: " + deliveryPickupOptionId + "& hight limit pickup: " +  highMinimalPickupOptionId);
+          done();
+        })
+    });
+
+    it('should log out user', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    });
+
+    it('should login as guest', function (done) {
+      agent
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect("Location","/auth/done")
+        .end(done)
+    });
+
+    it('should order the meal with pickup method not match selected method error', function (done) {
+      var dishObj = {};
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
+      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}], price : price2 };
+      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
+      agent
+        .post('/order')
+        .send({
+          orders : dishObj,
+          subtotal : price1 * 1 + price2 * 2,
+          contactInfo : { address : address, phone : phone },
+          method : "delivery",
+          pickupMeal : mealId,
+          pickupOption : pickupPickupOptionId,
           pickupDate : "today"
         })
         .expect(400)
@@ -182,7 +260,7 @@ describe('OrderController', function() {
           paymentInfo : { method : 'cash'},
           method : "delivery",
           pickupMeal : mealId,
-          pickupOption : 2,
+          pickupOption : deliveryPickupOptionId,
           pickupDate : "today"
         })
         .expect(400)
@@ -213,35 +291,7 @@ describe('OrderController', function() {
           paymentInfo : { method : 'online'},
           method : "delivery",
           pickupMeal : mealId,
-          pickupOption : 2,
-          pickupDate : "today"
-        })
-        .expect(400)
-        .end(function(err,res){
-          if(err){
-            return done(err);
-          }
-          res.body.code.should.be.equal(-31);
-          done();
-        })
-    });
-
-    it('should order the meal with pickup but get lack of phone error', function (done) {
-      var dishObj = {};
-      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
-      dishObj[dishId2] = { number : 2 , preference : [{ property : '', extra : 0}], price : price2 };
-      dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
-      dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
-      agent
-        .post('/order')
-        .send({
-          orders : dishObj,
-          subtotal : price1 * 1 + price2 * 2,
-          contactInfo : { name : "sheng" },
-          paymentInfo : { method : 'online'},
-          method : "pickup",
-          pickupOption : 1,
-          pickupMeal : mealId,
+          pickupOption : deliveryPickupOptionId,
           pickupDate : "today"
         })
         .expect(400)
@@ -268,7 +318,7 @@ describe('OrderController', function() {
         .send({
           orders : dishObj,
           subtotal : subtotal,
-          pickupOption : 1,
+          pickupOption : pickupPickupOptionId,
           method : "pickup",
           pickupMeal : mealId,
           contactInfo : {
@@ -385,7 +435,7 @@ describe('OrderController', function() {
           paymentInfo : { method : 'online'},
           method : "delivery",
           pickupMeal : mealId,
-          pickupOption : 2,
+          pickupOption : deliveryPickupOptionId,
           pickupDate : 'today'
         })
         .expect(400)
@@ -412,7 +462,7 @@ describe('OrderController', function() {
           contactInfo : { address : address, phone : phone },
           paymentInfo : { method : 'online'},
           method : "delivery",
-          pickupOption : 2,
+          pickupOption : deliveryPickupOptionId,
           pickupMeal : mealId,
           pickupDate : 'today',
           tip : 0
@@ -538,7 +588,7 @@ describe('OrderController', function() {
           contactInfo : { name : "sheng", address : address, phone : phone },
           paymentInfo : { method : 'online'},
           method : "delivery",
-          pickupOption : 2,
+          pickupOption : deliveryPickupOptionId,
           pickupMeal : mealId,
           pickupDate : 'today',
           points : 30
@@ -567,7 +617,7 @@ describe('OrderController', function() {
           contactInfo : { name : "sheng", address : address, phone : phone },
           paymentInfo : { method : 'online'},
           method : "delivery",
-          pickupOption : 2,
+          pickupOption : deliveryPickupOptionId,
           pickupMeal : mealId,
           pickupDate : 'today',
           points : 10,
@@ -717,7 +767,7 @@ describe('OrderController', function() {
             paymentInfo : { method : 'online'},
             customInfo : { comment : "hhh"},
             method : "delivery",
-            pickupOption : 2,
+            pickupOption : deliveryPickupOptionId,
             pickupMeal : mealId,
             pickupDate : 'today',
             tip : 0,
@@ -813,7 +863,7 @@ describe('OrderController', function() {
             contactInfo : { name : "sheng", address : address, phone : phone },
             paymentInfo : { method : 'online'},
             method : "delivery",
-            pickupOption : 2,
+            pickupOption : deliveryPickupOptionId,
             pickupMeal : systemDeliveryMealId,
             pickupDate : 'today',
             tip : 0
@@ -849,7 +899,7 @@ describe('OrderController', function() {
             contactInfo : { name : "sheng", address : address, phone : phone },
             paymentInfo : { method : 'cash'},
             method : "delivery",
-            pickupOption : 2,
+            pickupOption : deliveryPickupOptionId,
             pickupMeal : systemDeliveryMealId,
             pickupDate : 'today',
             tip : 0
@@ -882,7 +932,7 @@ describe('OrderController', function() {
             contactInfo : { name : "sheng", address : address, phone : phone },
             paymentInfo : { method : 'cash'},
             method : "pickup",
-            pickupOption : 4,
+            pickupOption : highMinimalPickupOptionId,
             pickupMeal : mealId,
             pickupDate : 'today',
             tip : 0
@@ -914,7 +964,7 @@ describe('OrderController', function() {
             contactInfo : { name : "sheng", address : address, phone : phone },
             paymentInfo : { method : 'cash'},
             method : "delivery",
-            pickupOption : 2,
+            pickupOption : deliveryPickupOptionId,
             pickupMeal : mealId,
             pickupDate : 'today',
             delivery_fee : 0,
@@ -977,7 +1027,7 @@ describe('OrderController', function() {
             contactInfo : { name : "sheng", address : address, phone : phone },
             paymentInfo : { method : 'online'},
             method : "delivery",
-            pickupOption : 2,
+            pickupOption : deliveryPickupOptionId,
             pickupMeal : mealId,
             pickupDate : 'today',
             delivery_fee : 0,
@@ -1499,7 +1549,7 @@ describe('OrderController', function() {
             paymentInfo : { method : 'online'},
             method : "delivery",
             pickupMeal : mealId,
-            pickupOption : 2,
+            pickupOption : deliveryPickupOptionId,
             tip : 0
           })
           .expect(400)
@@ -1661,7 +1711,7 @@ describe('OrderController', function() {
             paymentInfo : { method : 'online'},
             method : "shipping",
             pickupMeal : mealId,
-            pickupOption : 2,
+            pickupOption : deliveryPickupOptionId,
             tip : 0
           })
           .expect(400)
@@ -1686,7 +1736,7 @@ describe('OrderController', function() {
             paymentInfo : { method : 'online'},
             method : "shipping",
             pickupMeal : mealId,
-            pickupOption : 2,
+            pickupOption : deliveryPickupOptionId,
             tip : 0
           })
           .expect(400)
@@ -1709,7 +1759,7 @@ describe('OrderController', function() {
             subtotal : price4 * 4,
             contactInfo : { name : "sheng", address : address, phone : phone },
             paymentInfo : { method : 'online'},
-            pickupOption : 2,
+            pickupOption : deliveryPickupOptionId,
             method : "shipping",
             pickupMeal : mealId,
             address : address,
@@ -1865,7 +1915,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price1 * 1,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             contactInfo : { name : "sheng", address : address, phone : phone },
             paymentInfo : { method : 'online'},
             method : "pickup",
@@ -1946,7 +1996,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price1 * 1,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             contactInfo : { name : "sheng", address : address, phone : phone },
             paymentInfo : { method : 'online'},
             method : "pickup",
@@ -1991,7 +2041,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price1 * 1,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             contactInfo : { name : "sheng", address : address, phone : phone },
             paymentInfo : { method : 'online'},
             method : "pickup",
@@ -2025,7 +2075,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price3 * 1,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             contactInfo : { name : "sheng", address : address, phone : phone },
             paymentInfo : { method : 'online'},
             method : "pickup",
@@ -2221,7 +2271,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price3 * 1,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             contactInfo : {},
             paymentInfo : { method : 'cash'},
             method : "pickup",
@@ -2264,7 +2314,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price3 * 1,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             contactInfo : {},
             paymentInfo : { method : 'cash'},
             method : "pickup",
@@ -2428,7 +2478,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price3 * 1,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             method : "pickup",
             pickupMeal : mealId,
             contactInfo : {},
@@ -2460,7 +2510,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price3 * 1,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             method : "pickup",
             pickupMeal : mealId,
             contactInfo : {},
@@ -2582,7 +2632,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price3 * 1,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             method : "pickup",
             pickupMeal : mealId,
             contactInfo : { phone : "(415)111-1111", name : "abc"},
@@ -3043,7 +3093,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price1 * 10,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             method : "pickup",
             pickupMeal : mealId,
             tip : 0,
@@ -3078,7 +3128,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : 10 + 8 * price4,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             method : "pickup",
             pickupMeal : mealId,
             tip : 0,
@@ -3120,7 +3170,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price4 * 2,
-            pickupOption : 2,
+            pickupOption : deliveryPickupOptionId,
             method : "delivery",
             pickupMeal : mealId,
             tip : 0,
@@ -3190,7 +3240,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price3 ,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             method : "pickup",
             pickupMeal : mealId,
             tip : 0,
@@ -3219,7 +3269,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price3 ,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             method : "pickup",
             pickupMeal : mealId,
             tip : 0,
@@ -3248,7 +3298,7 @@ describe('OrderController', function() {
           .send({
             orders : dishObj,
             subtotal : price3 ,
-            pickupOption : 1,
+            pickupOption : pickupPickupOptionId,
             method : "pickup",
             pickupMeal : mealId,
             tip : 0,

@@ -114,10 +114,10 @@ module.exports = {
         pickupIndex = parseInt(pickupInfos[1]);
         pickupNickname = pickupInfos[0];
       }else{
-        pickupIndex = parseInt(params.pickupOption);
+        pickupIndex = params.pickupOption;
       }
       pickups.forEach(function(pickup){
-        if(pickup.index == pickupIndex && (!pickupNickname || pickup.nickname === pickupNickname)){
+        if(pickup.id == pickupIndex && (!pickupNickname || pickup.nickname === pickupNickname)){
           pickUpInfo = Object.assign({}, pickup);
         }
       });
@@ -259,7 +259,7 @@ module.exports = {
           }],
           buildOptions : ['validateOrders', function(next){
             _this.buildDeliveryData(req.body, meals[0], meals[0].pickups, req, function(logisticInfo){
-              sails.log.debug("#3/11 - Success in building logistic info: " + logisticInfo);
+              sails.log.debug("#3/11 - Success in building logistic info: " + logisticInfo.pickupInfo.id);
               _logisticInfo = logisticInfo;
               next();
             });
@@ -2577,12 +2577,12 @@ module.exports = {
       var pickupOption = parseInt(pickupOptions[1]);
       var pickupNickname = pickupOptions[0];
     }else{
-      pickupOption = parseInt(params.pickupOption);
+      pickupOption = params.pickupOption;
     }
     var pickups = [];
     var existInMeals = meals.forEach(function(meal){
       var pickup = meal.pickups.filter(function(pickup){
-        return pickup.index === pickupOption && ( !pickupNickname && pickup.nickname === pickupNickname);
+        return pickup.id == pickupOption && ( !pickupNickname && pickup.nickname === pickupNickname);
       })[0];
       if(pickup){
         pickups.push(pickup);
@@ -2595,8 +2595,6 @@ module.exports = {
     if(!isSamePickup){
       return cb({ code : -51, responseText : req.__('meal-not-same-pickup-option')});
     }
-
-
 
     async.each(meals, function(meal, next){
       var method = params.method;
@@ -2623,7 +2621,8 @@ module.exports = {
         }
         var pickupInfo;
         meal.pickups.forEach(function(pickup){
-          if(pickup.index === pickupOption){
+          console.log("pickup id of meal: " + pickup.id + " & pickupOption: " + pickupOption);
+          if(pickup.id == pickupOption){
             pickupInfo = Object.assign({}, pickup);
           }
         });

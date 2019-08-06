@@ -244,7 +244,7 @@ module.exports = {
           })
         },
         findHosts : function(next){
-          Host.find({ skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("dishes").exec(function(err, hosts) {
+          Host.find({ passGuide: true, skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("dishes").exec(function(err, hosts) {
             if (err) {
               return next(err);
             }
@@ -494,7 +494,7 @@ module.exports = {
           next();
         }],
         findHosts : [ 'matchZipCode', function(next){
-          Host.find({ skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("dishes").exec(function(err, hosts) {
+          Host.find({ passGuide: true, skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("dishes").exec(function(err, hosts) {
             if (err) {
               return next(err);
             }

@@ -258,7 +258,7 @@
                           pickups.forEach(function(pickup){ if(pickup.method!=='pickup'){return;}
                         %>
                         <label class="btn btn-outline-light vertical-inline option pickupOption mix <%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-meal="<%= pickup.meal%>" data-date="<%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-color="<%= colors[i]%>" data-location="<%= pickup.publicLocation || pickup.location%>">
-                          <input type="radio" id="pickup-1-<%= i%>" data-index="<%= pickup.index%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
+                          <input type="radio" id="pickup-1-<%= i%>" data-index="<%= pickup.id%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
                           <span class="content">
                           <i class="fa fa-hand-paper-o cursor-pointer mr-2 text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i><span><%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%></span><br/>
                             <span class="location" data-value="<%= pickup.location%>"> <%= pickup.location%></span><br/>
@@ -283,7 +283,7 @@
                             if(pickups){ pickups.forEach(function(pickup){ if(pickup.method == 'delivery'){ %>
                             <label class="btn btn-outline-light option deliveryOption mix <%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-meal="<%= pickup.meal%>" data-date="<%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-range="<%= pickup.deliveryRange%>" data-lat="<%= pickup.lat || ''%>" data-long="<%= pickup.long || ''%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-area="<%= pickup.area || '' %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
                               <div class="s"></div>
-                              <input type="radio" id="delivery-2-<%= i%>" data-index="<%= pickup.index%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>
+                              <input type="radio" id="delivery-2-<%= i%>" data-index="<%= pickup.id%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>
                               <span class="content">
                                 <i class="fa fa-truck cursor-pointer mr-2 text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i><%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>
                               </span>

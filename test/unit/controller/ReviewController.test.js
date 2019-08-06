@@ -17,11 +17,52 @@ describe('ReviewController', function() {
 
     var hostId;
     var email = 'aimbebe.r@gmail.com';
+    var adminEmail = 'admin@sfmeal.com';
     var password = '12345678';
     var address = "1455 Market St, San Francisco, CA 94103";
     var phone = "1-415-802-3853";
-
+    var pickupPickupOptionId;
+    var deliveryPickupOptionId;
+    var highMinimalPickupOptionId;
     var guestEmail = 'enjoymyself1987@gmail.com';
+
+    it('should login admin account', function (done){
+      agent
+        .post('/auth/login?type=local')
+        .send({email : adminEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
+    it('should get pickup options', function (done){
+      agent
+        .get('/pickupOption')
+        .expect(200)
+        .end(function(err,res){
+          if(err){
+            return done(err);
+          }
+          res.body.should.have.length(5);
+          pickupPickupOptionId = res.body.filter(function(p){
+            return p.method === "pickup" && p.minimalOrder !== 50;
+          })[0].id;
+          deliveryPickupOptionId = res.body.filter(function(p){
+            return p.method === "delivery" && p.location === "1974 Palou Ave, San Francisco, CA 94124, USA";
+          })[0].id;
+          highMinimalPickupOptionId = res.body.filter(function(p){
+            return p.minimalOrder === 50;
+          })[0].id;
+          done();
+        })
+    });
+
+    it('should log out user', function(done){
+      agent
+        .get('/auth/logout')
+        .expect(302)
+        .end(done)
+    });
 
     it('should login host account', function (done) {
       agent
