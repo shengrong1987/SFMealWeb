@@ -66,8 +66,8 @@
       <ul id="hostBarView" class="nav nav-pills nav-scroll justify-content-md-center white" data-filter-group="chef">
         <%
         hosts.forEach(function(host,i){ %>
-          <li class="nav-item py-1 px-1 <%= i===0?'active':''%>">
-            <button class="nav-link btn-light cursor-pointer <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-filter-type="chef" data-filter=".<%= host.shopName.replace(/ |\'/g,'')%>" data-toggle="tab" data-likes="<%= host.likes || 0%>" data-picture="<%= host.picture%>" data-host="<%= host.id%>" data-follow-text="<%= __('follow')%>" data-followed-text="<%= __('followed')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? true : false%>" data-score="<%= host.averageScore || 5%>" style="max-width:100px;font-size: 8px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;"><%= host.shopName%></>
+          <li class="mix nav-item py-1 px-1 <%= i===0?'active':''%> <%= host.dates%>">
+            <button class="nav-link btn-light cursor-pointer <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-filter-type="chef" data-filter=".<%= host.chef.shopName.replace(/ |\'/g,'')%>" data-toggle="tab" data-likes="<%= host.chef.likes || 0%>" data-picture="<%= host.chef.picture%>" data-host="<%= host.chef.id%>" data-follow-text="<%= __('follow')%>" data-followed-text="<%= __('followed')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].chef.id}))) ? true : false%>" data-score="<%= host.chef.averageScore || 5%>" style="max-width:100px;font-size: 8px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;"><%= host.chef.shopName%></>
           </li>
         <% })%>
       </ul>
@@ -97,10 +97,10 @@
             <div class="d-flex justify-content-around py-3 mix" id="<%= tag%>">
               <div class="d-flex flex-row vertical-align">
                 <div class="mr-2">
-                  <img onclick="location.href='/host/public/<%= hosts[0].id%>'" src="<%= hosts[0].picture%>" class="size-small rounded-circle cursor-pointer">
+                  <img onclick="location.href='/host/public/<%= hosts[0].chef.id%>'" src="<%= hosts[0].chef.picture%>" class="size-small rounded-circle cursor-pointer">
                 </div>
-                <div data-toggle="tooltip" data-placement="right" title="<%= (parseFloat(hosts[0].avgScore) || 5).toFixed(1)%>">
-                  <div class="rating small-rating" data-toggle="star-set" data-rate="<%= (parseFloat(hosts[0].avgScore) || 5).toFixed(1)%>">
+                <div data-toggle="tooltip" data-placement="right" title="<%= (parseFloat(hosts[0].chef.avgScore) || 5).toFixed(1)%>">
+                  <div class="rating small-rating" data-toggle="star-set" data-rate="<%= (parseFloat(hosts[0].chef.avgScore) || 5).toFixed(1)%>">
                     <i class="fa fa-star d-block"></i>
                     <i class="fa fa-star d-block"></i>
                     <i class="fa fa-star d-block"></i>
@@ -110,7 +110,7 @@
                 </div>
               </div>
               <div class="flex-column text-center vertical-align">
-                <h5 class="shopName"><%= hosts[0].shopName%></h5>
+                <h5 class="shopName"><%= hosts[0].chef.shopName%></h5>
                 <div>
                   <button id="likeBtn" class="btn btn-outline-success mr-lg-2" data-action="like" data-host="<%= hosts[0].id%>"><i class="fa fa-thumbs-up"></i> <span data-count="<%= hosts[0].likes%>"><%= hosts[0].likes%></span></button>
                   <button id="followBtn" class="btn btn-outline-success ml-lg-2" data-action="follow" data-host="<%= hosts[0].id%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? true : false%>"><span class="text"><%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? __('followed') : __('follow')%> </span><i class="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? 'fas fa-star' : 'far fa-star'%>"></i></button>

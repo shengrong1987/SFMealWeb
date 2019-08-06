@@ -4,7 +4,7 @@
 import 'backbone';
 import { helperMethod, localOrderObj } from "./utils/helper";
 import { utility } from "./utils/utility";
-import { dateMixer, chefMixer, deliveryMixer, pickupMixer, setupObj } from "./installation";
+import { dateMixer, chefMixer, deliveryMixer, pickupMixer, setupObj, chefThumbnailMixer } from "./installation";
 import VAR from './variable';
 
 var Auth = Backbone.Model.extend({
@@ -1289,6 +1289,9 @@ var DayOfMealView = Backbone.View.extend({
         this.$el.find("#deliveryDateBtn").text(__('delivery-date') + this.$el.find("[data-filter]").first().data('filter').replace(".",""));
       }
       dateMixer.filter(dateFilter);
+    }
+    if(chefThumbnailMixer){
+      chefThumbnailMixer.filter(dateFilter);
     }
     console.groupEnd();
     return dateFilter;

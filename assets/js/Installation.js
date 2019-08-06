@@ -173,7 +173,7 @@ function initLayout(){
 //     );
 //   moment.tz.add('Etc/UTC|UTC|0|0|');
 // }
-let pickupMixer, deliveryMixer, dateMixer, chefMixer;
+let pickupMixer, deliveryMixer, dateMixer, chefMixer, chefThumbnailMixer;
 
 let setupObj = {
   setupTabButtonAnchor : function (){
@@ -191,7 +191,7 @@ let setupObj = {
   setupMixitup : async function () {
 
     console.group("开始安装Mixitup组件");
-    if($("#pickupTab .mix").length || $("#deliveryTab .mix").length || $("#dishContentView .mix").length || $("#chefDishView .mix").length || $("#transaction_container .mix").length){
+    if($("#hostBarView .mix").length || $("#pickupTab .mix").length || $("#deliveryTab .mix").length || $("#dishContentView .mix").length || $("#chefDishView .mix").length || $("#transaction_container .mix").length){
       const { default: mixitup } = await import(/* webpackChunkName: "mixitup" */ 'mixitup');
       window.mixitup = mixitup;
       const { default: mixitupPagination } = await import(/* webpackChunkName: "mixitup-pagination" */ './library/jquery.mixitup-pagination.min');
@@ -235,6 +235,18 @@ let setupObj = {
           }
         });
         appObj.mealConfirmView.initDateFilter();
+      }
+      if($("#hostBarView .mix").length){
+        console.log("初始化Host Thumbnail Mixitup组件...");
+        chefThumbnailMixer = mixitup("#hostBarView", {
+          selectors: {
+            control: '[data-mixitup-control][data-mixitup-date]'
+          },
+          load: {
+            filter : dateFilter
+          }
+        });
+        appObj.dayOfMealView.initDate();
       }
       if($("#dishContentView .mix").length){
         console.info("初始化Main Menu Mixitup组件...");
@@ -746,4 +758,4 @@ function adjustLayout(){
   }
 }
 
-export { pickupMixer, dateMixer, chefMixer, deliveryMixer, installation, setupObj };
+export { pickupMixer, dateMixer, chefMixer, deliveryMixer, chefThumbnailMixer, installation, setupObj };

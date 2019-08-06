@@ -244,27 +244,36 @@ module.exports = {
           })
         },
         findHosts : function(next){
-          if(!meals.length){
-            Host.find({ where : { passGuide : true, intro : { '!' : ''}}, skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("dishes").exec(function(err, hosts) {
-              if (err) {
-                return next(err);
+          Host.find({ skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("dishes").exec(function(err, hosts) {
+            if (err) {
+              return next(err);
+            }
+            hosts = hosts.filter(function (h) {
+              return !!h.dishes.length;
+            })
+            hosts.forEach(function(h){
+              var mealsOfHost = meals.filter(function(m){
+                return m.chef.id === h.id;
+              });
+              if(!mealsOfHost.length){
+                return;
               }
-              hosts = hosts.filter(function (h) {
-                return !!h.dishes.length;
+              var dates = [];
+              mealsOfHost.forEach(function(m){
+                m.pickups.forEach(function(p){
+                  var pickupDate = util.humanizeDate(p.pickupFromTime);
+                  if(!dates.includes(pickupDate)){
+                    dates.push(pickupDate);
+                  }
+                });
               })
-              _hosts = hosts;
-              next();
-            });
-          }else{
-            meals.forEach(function(meal){
-              if(!_hosts.some(function(host){
-                return host.id === meal.chef.id;
-              })){
-                _hosts.push(meal.chef);
-              }
+              var hostObj = {}
+              hostObj.chef = h;
+              hostObj.dates = dates.join(" ");
+              _hosts.push(hostObj);
             });
             next();
-          }
+          });
         },
         findDishTags : function(next){
           meals.forEach(function(meal){
@@ -448,7 +457,11 @@ module.exports = {
               return next();
             }
             found = found.filter(function(meal){
-              return meal.county.split("+").indexOf(result[0].administrativeLevels.level2long) !== -1;
+              var county = result[0].administrativeLevels.level2long;
+              meal.pickups = meal.pickups.filter(function(p){
+                return p.county === county;
+              });
+              return meal.county.split("+").indexOf(county) !== -1;
             });
             next();
           })
@@ -464,7 +477,7 @@ module.exports = {
           });
           next();
         }],
-        matchKeyword : [ 'matchZipCode', function(next){
+        matchKeyword : ['matchZipCode', function(next){
           if(!keyword){
             return next();
           }
@@ -481,27 +494,36 @@ module.exports = {
           next();
         }],
         findHosts : [ 'matchZipCode', function(next){
-          if(!found.length){
-            Host.find({ where : { passGuide : true, intro : { '!' : ''}}, skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("dishes").exec(function(err, hosts) {
-              if (err) {
-                return next(err);
+          Host.find({ skip : 0, limit : actionUtil.parseLimit(req)}).sort('score DESC').populate("dishes").exec(function(err, hosts) {
+            if (err) {
+              return next(err);
+            }
+            hosts = hosts.filter(function (h) {
+              return !!h.dishes.length;
+            })
+            hosts.forEach(function(h){
+              var mealsOfHost = found.filter(function(m){
+                return m.chef.id === h.id;
+              });
+              if(!mealsOfHost.length){
+                return;
               }
-              hosts = hosts.filter(function (h) {
-                return !!h.dishes.length;
+              var dates = [];
+              mealsOfHost.forEach(function(m){
+                m.pickups.forEach(function(p){
+                  var pickupDate = util.humanizeDate(p.pickupFromTime);
+                  if(!dates.includes(pickupDate)){
+                    dates.push(pickupDate);
+                  }
+                });
               })
-              _hosts = hosts;
-              next();
-            });
-          }else{
-            found.forEach(function(meal){
-              if(!_hosts.some(function(host){
-                return host.id === meal.chef.id;
-              })){
-                _hosts.push(meal.chef);
-              }
+              var hostObj = {}
+              hostObj.chef = h;
+              hostObj.dates = dates.join(" ");
+              _hosts.push(hostObj);
             });
             next();
-          }
+          });
         }],
         findDishTags : ['matchZipCode', function(next){
           found.forEach(function(meal){
