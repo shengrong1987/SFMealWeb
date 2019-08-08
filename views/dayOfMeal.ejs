@@ -53,6 +53,7 @@
             <input name="zipcode" style="width: 96px;" value="<%= zipcode || (user ? user.zipcode  : '94014')%>">
             <button id="changeZipcodeBtn"><i class="fa fa-check-circle cursor-pointer"></i></button>
           </div>
+          <h5 class="text-left pl-4"><small class="text-red">您的地区起送费是: $<%= minimalOrder%></small></h5>
           <div class="dropdown-divider"></div>
           <% dates.forEach(function(dateKey,i){ %>
             <label class="d-flex px-4 vertical-align dropdown-item" style="background: none;" value=".<%= dateKey.replace(/\/|\'/g,'')%>">

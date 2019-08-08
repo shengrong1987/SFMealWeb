@@ -13,6 +13,7 @@ var stripe = require("../services/stripe");
 var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUtil.js');
 var async = require('async');
 const DELIVERY_FEE = 0;
+const MINIMAL_ORDER = 25;
 /*
  error
  * -1 : geo service not available
@@ -212,6 +213,7 @@ module.exports = {
     }
     var _this = this;
     var zipcode = req.query['zip'];
+    var minimalOrder = MINIMAL_ORDER;
     var pickupNickname = req.param('pickup');
     Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
       if(err){
@@ -226,11 +228,6 @@ module.exports = {
       }
       var _u=null,_tags=['chef'], _hosts = [];
       async.auto({
-        findCounty : function(next){
-          if(!req.query.zipcode){
-            return next();
-          }
-        },
         findUser : function(next){
           if(!req.session.authenticated){
             return next();
@@ -312,7 +309,7 @@ module.exports = {
         }
         meals = _this.composeMealWithDate(meals);
         // res.set('Cache-Control', 'public, max-age=31557600');
-        res.view("dayOfMeal",{ meals : meals, hosts: _hosts, user : _u, tags: _tags, pickupNickname : pickupNickname, zipcode: zipcode, locale : req.getLocale()});
+        res.view("dayOfMeal",{ meals : meals, hosts: _hosts, user : _u, tags: _tags, pickupNickname : pickupNickname, zipcode: zipcode, minimalOrder : minimalOrder, locale : req.getLocale()});
       })
     })
   },
@@ -422,6 +419,7 @@ module.exports = {
     var type = req.param('type');
     var now = new Date();
     var pickupNickname = req.param('pickupNickname');
+    var minimalOrder = MINIMAL_ORDER;
     var params = {
       status : 'on',
       provideFromTime : {'<' : now },
@@ -441,6 +439,9 @@ module.exports = {
           if(!county){
             return next();
           }
+          if(county !== "San Francisco County" && county !== "San Mateo County"){
+            minimalOrder = 65;
+          }
           found = found.filter(function(meal){
             return meal.county.split("+").indexOf(county) !== -1;
           });
@@ -456,8 +457,11 @@ module.exports = {
               found = [];
               return next();
             }
+            var county = result[0].administrativeLevels.level2long;
+            if(county !== "San Francisco County" && county !== "San Mateo County"){
+              minimalOrder = 65;
+            }
             found = found.filter(function(meal){
-              var county = result[0].administrativeLevels.level2long;
               meal.pickups = meal.pickups.filter(function(p){
                 return p.county === county;
               });
@@ -550,7 +554,7 @@ module.exports = {
             var tagOrderA = tagOrder.hasOwnProperty(a) ? tagOrder[a] : 0;
             var tagOrderB = tagOrder.hasOwnProperty(b) ? tagOrder[b] : 0;
             return tagOrderB - tagOrderA;
-          })
+          });
           next();
         }]
       }, function(err){
@@ -559,9 +563,9 @@ module.exports = {
         }
         found = _this.composeMealWithDate(found);
         if(req.wantsJSON && process.env.NODE_ENV === "development") {
-          res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, county : county, hosts : _hosts, tags : _tags});
+          res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, county : county, minimalOrder : minimalOrder, hosts : _hosts, tags : _tags});
         }else{
-          res.view("dayOfMeal",{ meals: found, hosts: _hosts, tags: _tags, search: true, keyword : keyword, user: req.session.user, zipcode : zipcode, county : county, pickupNickname : pickupNickname });
+          res.view("dayOfMeal",{ meals: found, hosts: _hosts, tags: _tags, search: true, keyword : keyword, user: req.session.user, zipcode: zipcode, minimalOrder: minimalOrder, county : county, pickupNickname : pickupNickname });
         }
       });
     });
