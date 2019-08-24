@@ -39,7 +39,8 @@ module.exports = {
     trust : "./assets/js/entry/trust.js",
     resetPassword : "./assets/js/entry/resetPassword.js",
     report : "./assets/js/entry/report.js",
-    emailVerification : "./assets/js/entry/emailVerification.js"
+    emailVerification : "./assets/js/entry/emailVerification.js",
+    pintuan : "./assets/js/entry/pintuan.js"
   },
   output: {
     path: path.resolve(__dirname, '.tmp/public/assets/'),
@@ -118,7 +119,8 @@ module.exports = {
     }),
     new PurgecssPlugin({
       paths: glob.sync([`${path.resolve(__dirname,'views')}/*.ejs`,`${path.resolve(__dirname,'assets/templates')}/**/*.html`,`${path.resolve(__dirname,'assets/js')}/entry/*.js`,`${path.resolve(__dirname,'assets/js')}/react/**/*.js`], { nodir: true }),
-      whitelist: ['modal-backdrop','/*bootstrap-dialog/','running','btn-primary','btn-outline-primary','btn-sm']
+      whitelist: ['modal-backdrop','/*bootstrap-dialog/','running','btn-primary','btn-outline-primary','btn-sm'],
+      whitelistPatterns : [/^ekko-lightbox/]
     }),
     new HtmlWebpackPlugin({
       inject: true,

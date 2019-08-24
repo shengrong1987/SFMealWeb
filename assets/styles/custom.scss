@@ -2882,6 +2882,20 @@ $lines-to-show: 3;
     opacity: 1;
   }
 
+  .pintuanItem{
+    box-shadow: 0 0 0.375rem 0.05rem rgba(0,0,0,.1);
+    .photo{
+      width: 150px;
+      height: 150px;
+    }
+    img{
+      height : 100%;
+      margin-left: 50%;
+      margin-top: 50%;
+      -webkit-transform: translateY(-50%) translateX(-50%);
+    }
+  }
+
   .dishItem {
     .photo{
       width: 120px;
@@ -3137,13 +3151,27 @@ $lines-to-show: 3;
   }
 
   .dishItem .photo{
-    width: 80px;
-    height: 80px;
-    img{
-      height : 100%;
-      margin-left: 50%;
-      margin-top: 50%;
-      -webkit-transform: translateY(-50%) translateX(-50%);
+     width: 80px;
+     height: 80px;
+     img{
+       height : 100%;
+       margin-left: 50%;
+       margin-top: 50%;
+       -webkit-transform: translateY(-50%) translateX(-50%);
+     }
+   }
+
+  .pintuanItem{
+    box-shadow: 0 0 0.375rem 0.05rem rgba(0,0,0,.1);
+    .photo{
+      width: 120px;
+      height: 120px;
+      img{
+        height : 100%;
+        margin-left: 50%;
+        margin-top: 50%;
+        -webkit-transform: translateY(-50%) translateX(-50%);
+      }
     }
   }
 

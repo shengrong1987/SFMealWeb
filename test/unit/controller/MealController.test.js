@@ -458,7 +458,7 @@ describe('MealController', function() {
           .post('/meal')
           .send({
             provideFromTime: now,
-            provideTillTime: new Date(now.getTime() + 1000 * 7200),
+            provideTillTime: new Date(now.getTime() + 2000 * 7200),
             isDelivery : true,
             leftQty: leftQty,
             totalQty: totalQty,

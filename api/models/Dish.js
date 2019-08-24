@@ -23,15 +23,9 @@ module.exports = {
       type : 'float',
       required : true
     },
-    qtyRate : {
-      type : 'integer'
-    },
-    priceRate : {
-      type : 'integer'
-    },
-    isDynamicPriceOn : {
-      type : 'boolean',
-      defaultsTo : false
+    minimalOrder : {
+      type : 'integer',
+      defaultsTo : 0
     },
     isSupportShipping : {
       type : 'boolean',
@@ -106,9 +100,6 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
-    minimalPrice : {
-      type : 'float'
-    },
     discount : {
       type : 'integer'
     },
@@ -127,16 +118,8 @@ module.exports = {
       type : 'integer',
       defaultsTo : 1
     },
-    getPrice : function(orderQty, meal){
-      var _this = this;
-      if(!meal.isSupportDynamicPrice || !this.isDynamicPriceOn || !meal.dynamicDishes.some(function(dish){
-          return dish.id === _this.id;
-        })){
-        return this.price;
-      }
-      var price = Math.ceil(this.price - parseInt(orderQty / this.qtyRate) * this.priceRate);
-      price = Math.max(price, parseFloat(this.minimalPrice));
-      return price;
+    canPintuan : {
+      type : 'boolean'
     },
     isFeature : function(){
       return this.score >= 4.8 || this.numberOfReviews > 5;

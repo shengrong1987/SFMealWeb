@@ -206,6 +206,38 @@ module.exports = {
     })
   },
 
+  pintuan : function(req, res){
+    let userId = req.session.authenticated ? req.session.user.id : "";
+    Dish.find({ isVerified : true, canPintuan : true }).populate('chef').exec(function(err, dishes) {
+      if (err) {
+        return res.badRequest(err);
+      }
+      async.each(dishes, function(dish, next){
+        Order.find({ status : "schedule" }).exec(function(err, orders){
+          if(err){
+            return next(err);
+          }
+          var dishQty = 0;
+          orders.forEach(function(order){
+            if(order.orders.hasOwnProperty(dish.id)){
+              dishQty += parseInt(order.orders[dish.id].number);
+            }
+          });
+          dish.qty = dishQty;
+          next();
+        });
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        if(req.wantsJSON && process.env.NODE_ENV === "development"){
+          return res.ok({ pinDishes : dishes });
+        }
+        return res.view("pintuan",{ pinDishes : dishes, userId : userId });
+      })
+    });
+  },
+
   find : function(req,res){
     // moment.locale(req.getLocale());
     if(req.session.authenticated){
@@ -221,6 +253,9 @@ module.exports = {
       }
       if(pickupNickname){
         meals = meals.filter(function(meal){
+          meal.pickups = meal.pickups.filter(function(pickup){
+            return pickup.nickname === pickupNickname;
+          });
           return meal.pickups.some(function(p){
             return p.nickname && p.nickname === pickupNickname;
           })
@@ -461,6 +496,7 @@ module.exports = {
             if(county !== "San Francisco County" && county !== "San Mateo County"){
               minimalOrder = 65;
             }
+            console.log("searching county of: " + county);
             found = found.filter(function(meal){
               meal.pickups = meal.pickups.filter(function(p){
                 return p.county === county;
@@ -900,7 +936,6 @@ module.exports = {
     var status = req.body.status;
     var $this = this;
     var hostId;
-    sails.log.info("meal id: " + mealId);
     async.auto({
       findChef : function(next){
         if(!isAdmin){
@@ -1426,7 +1461,7 @@ module.exports = {
       return res.badRequest({ code : -3, responseText : req.__('meal-not-found')})
     }
 
-    var isAdmin = req.session.user.auth.email === 'admin@sfmeal.com' && (req.session.user.emailVerified || process.env.NODE_ENV === "development");
+    var isAdmin = req.session.isAuthenticated ? (req.session.user.auth.email === 'admin@sfmeal.com' && (req.session.user.emailVerified || process.env.NODE_ENV === "development")) : false;
     var isEditMode = req.query["edit"];
     if(isEditMode === 'true'){
       var user = req.session.user;
@@ -1502,18 +1537,36 @@ module.exports = {
             if(err){
               return cb(err);
             }
-            var allPickupName = "";
-            pickups.forEach(function(p){
+            var thisWeekPickups = pickups.filter(function(p){
+              return p.nickname.indexOf("下") === -1;
+            });
+            var thisPickupName = "";
+            thisWeekPickups.forEach(function(p){
               if(!_pickups.includes(p.nickname)){
                 _pickups.push(p.nickname);
-                if(allPickupName){
-                  allPickupName += "+";
+                if(thisPickupName){
+                  thisPickupName += "+";
                 }
-                allPickupName += p.nickname;
+                thisPickupName += p.nickname;
               }
-            })
+            });
+
+            var nextWeekPickups = pickups.filter(function(p){
+              return p.nickname.indexOf("下") !== -1;
+            });
+            var nextPickupName = "";
+            nextWeekPickups.forEach(function(p){
+              if(!_pickups.includes(p.nickname)){
+                _pickups.push(p.nickname);
+                if(nextPickupName){
+                  nextPickupName += "+";
+                }
+                nextPickupName += p.nickname;
+              }
+            });
             _pickups.push("custom");
-            _pickups.push(allPickupName);
+            _pickups.push(thisPickupName);
+            _pickups.push(nextPickupName);
             cb();
           })
         },

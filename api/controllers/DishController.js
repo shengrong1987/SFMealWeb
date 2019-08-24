@@ -96,14 +96,10 @@ module.exports = {
           });
         });
         Dish.findOne(dishId).exec(function(err, d){
-          if(err){
+          if(err) {
             return res.badRequest(err);
           }
-          // if(!dishIsNotActive && parseFloat(req.body.price) !== d.price){
-          //   return res.badRequest({ code : -2, responseText : req.__("meal-active-update-dish")});
-          // }
-          sails.log.info(req.body.minimalPrice, req.body.qtyRate, req.body.priceRate);
-          if(req.body.isDynamicPriceOn && (!req.body.minimalPrice || !req.body.qtyRate || !req.body.priceRate)){
+          if(req.body.canPintuan && !req.body.minimalOrder){
             return res.badRequest({ code : -3, responseText : req.__("dish-update-dynamic-insufficient-info")});
           }
           if(req.body.tags){
@@ -113,7 +109,6 @@ module.exports = {
             if(err){
               return res.badRequest(err);
             }
-            sails.log.info("env:" + process.env.NODE_ENV);
             if(req.wantsJSON && process.env.NODE_ENV === "development"){
               return res.ok(dish[0]);
             }

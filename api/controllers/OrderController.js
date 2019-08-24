@@ -404,9 +404,11 @@ module.exports = {
                           sails.log.error("#6-2/11 - Error in redeeming points");
                           return nextIn2(err);
                         }
-                        sails.log.debug("#6-2/11 - Success in redeeming points");
+                        sails.log.debug("#6-2/11 - Success in redeeming points: " + pointsRedeem);
                         req.body.points -= (discount * 10);
-                        orderParam.redeemPoints = pointsRedeem;
+                        if(pointsRedeem){
+                          orderParam.redeemPoints = parseInt(pointsRedeem);
+                        }
                         _this.redeemCoupon(req, code, subtotalAfterTax, coupon, found, discount, function(err, discount){
                           if(err){
                             sails.log.error("#6-3/11 - Success in redeeming coupon");
@@ -911,7 +913,7 @@ module.exports = {
                           reverse_transfer : true,
                           refund_application_fee : true,
                           amount : Math.abs(adjustAmount)
-                        };;
+                        };
                         stripe.batchRefund(order.charges, order.transfer, metadata, function (err) {
                           if (err) {
                             return next2(err);
@@ -2532,13 +2534,7 @@ module.exports = {
             if(!isPartyMode && diff > meal.leftQty[dish.id]){
               return next2({responseText : req.__('order-dish-not-enough',dish.title, qty), code : -1});
             }
-            var totalQty = meal.getDynamicDishesTotalOrder(qty);
-            var price = dish.getPrice(totalQty, meal);
-            var listPrice = parseFloat(mealOrder[dishId].price);
-            if(price !== listPrice){
-              mealOrder[dishId].price = price;
-              orders[dishId].price = price;
-            }
+            var price = parseFloat(mealOrder[dishId].price);
             actual_subtotal += (qty * price + extra);
           }
           next2();
@@ -2582,7 +2578,7 @@ module.exports = {
     var pickups = [];
     var existInMeals = meals.forEach(function(meal){
       var pickup = meal.pickups.filter(function(pickup){
-        return pickup.id == pickupOption && ( !pickupNickname && pickup.nickname === pickupNickname);
+        return pickup.id === pickupOption && ( !pickupNickname && pickup.nickname === pickupNickname);
       })[0];
       if(pickup){
         pickups.push(pickup);

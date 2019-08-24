@@ -234,7 +234,7 @@ module.exports = {
         dateDesc = 'today';
       }else if(pickupDate.isSame(moment().add(1,'days'),'day')){
         dateDesc = 'tomorrow';
-      }else if(moment.duration(pickupDate.diff(moment())).asDays() <= 7){
+      }else if(moment.duration(pickupDate.diff(moment())).asDays() <= 5){
         dateDesc = pickupDate.format('dddd');
       }else{
         dateDesc = pickupDate.format('[day]M/D');
@@ -321,16 +321,6 @@ module.exports = {
 
     getDateFromDaysAfterNow : function(day){
       return util.getDateFromDaysAfterNow(moment(),day);
-    },
-
-    getDynamicDishesTotalOrder : function(newOrderQty) {
-      var total = 0;
-      var _this = this;
-      _this.dynamicDishes.forEach(function (dish) {
-        total += parseInt(_this.totalQty[dish.id]) - parseInt(_this.leftQty[dish.id]);
-      });
-      total += newOrderQty;
-      return total;
     },
     isExpire : function(){
       var now = moment();

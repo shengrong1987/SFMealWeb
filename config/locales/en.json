@@ -1175,5 +1175,8 @@
   "delivery-date" : "Delivery on:",
   "current-location" : "Current Location",
   "user-points-reminder" : "You still have %d points available to redeem at checkout ($%s)",
-  "new-message-title" : "You have a new message."
+  "new-message-title" : "You have a new message.",
+  "group-amount" : "%d+ Ct",
+  "original-price" : "Retail price",
+  "go-pingtuan" : "Group Buy"
 }

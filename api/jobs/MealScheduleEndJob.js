@@ -8,6 +8,120 @@ module.exports = function(agenda) {
 
   var helperMethod = {
 
+    updateDishes : function(meal, orders, done){
+      var pintuanDishes = meal.dishes.filter(function(dish){
+        return dish.canPintuan;
+      });
+      var _this = this;
+      async.each(pintuanDishes, function(dish, next){
+        var dishQty = 0;
+        orders.forEach(function(order){
+          if(order.orders.hasOwnProperty(dish.id)){
+            dishQty += parseInt(order.orders[dish.id].number);
+          }
+        });
+        console.log("Dish Total:" + dishQty, " &  Dish Minimal Requirement: " + dish.minimalOrder);
+        if(dishQty >= dish.minimalOrder){
+          return next();
+        }
+        _this.adjustOrdersForDish(orders, dish, next);
+      }, function(err){
+        if(err){
+          return done(err);
+        }
+        done();
+      });
+    },
+
+    adjustOrdersForDish : function(orders, dish, done){
+      async.each(orders, function(order, nextOrder){
+        var hasDish = order.orders.hasOwnProperty(dish.id) && order.orders[dish.id].number > 0;
+        if(!hasDish){
+          return nextOrder();
+        }
+        dish.discount = dish.discount || 0;
+        var netDiff = parseFloat(parseInt(order.orders[dish.id].number) * (dish.price - dish.discount)) * 100;
+        console.log("Due to minimal requirement, cancelling dish: " + dish.title + " and refund customer $" + (netDiff/100).toFixed(2));
+        async.auto({
+          refundCustomer : function(next){
+            async.auto({
+              refundOrders : function(next2) {
+                if (order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal") {
+                  return next2();
+                }
+                var metadata = {
+                  userId: !!order.customer ? order.customer.id : null,
+                  paymentMethod: order.paymentMethod,
+                  reverse_transfer : true,
+                  refund_application_fee : true,
+                  amount : Math.abs(netDiff)
+                };
+                stripe.batchRefund(order.charges, order.transfer, metadata, function (err) {
+                  if (err) {
+                    return next2(err);
+                  }
+                  next2();
+                });
+              },
+              refundFeeForCashOrder: function (next2) {
+                if (order.paymentMethod !== "cash" && order.paymentMethod !== "venmo" && order.paymentMethod !== "paypal") {
+                  return next2();
+                }
+                var refundedFee = Math.abs(netDiff * order.meal.commission);
+                var metadata = {
+                  userName: order.customerName,
+                  userPhone: order.customerPhone,
+                  paymentMethod: order.paymentMethod,
+                  reverse_transfer : false,
+                  refund_application_fee : false,
+                  amount : refundedFee
+                };
+                stripe.batchRefund(order.feeCharges, null, metadata, function (err) {
+                  if (err) {
+                    return next2(err);
+                  }
+                  order.application_fees['cash'] -= refundedFee;
+                  order.charges['cash'] += netDiff;
+                  next2();
+                })
+              }
+            }, function(err){
+              if(err){
+                return next(err);
+              }
+              next(err);
+            });
+          },
+          adjustOrder : ['refundCustomer', function(next){
+            order.last_orders = order.orders;
+            order.last_subtotal = order.subtotal;
+            order.adjusting_orders = {};
+            order.adjusting_subtotal = 0;
+            order.subtotal = order.subtotal - order.orders[dish.id].number * (dish.price - dish.discount);
+            order.orders[dish.id].number = 0;
+            order.message = "Cancel dish: " + dish.title + ", reason: not reach minimal requirement(" + dish.minimalOrder + ")";
+            next();
+          }]
+        }, function(err){
+          if(err){
+            return nextOrder(err);
+          }
+          order.save(function(err, result){
+            if(err){
+              return nextOrder(err);
+            }
+            notification.notificationCenter("Order", "adjust", result, false, false, null);
+            nextOrder();
+          })
+        });
+      }, function(err){
+        if(err){
+          return done(err);
+        }
+        done();
+      })
+    },
+
     cancelOrders : function(mealId, done){
       Order.find({ meal : mealId, status : "schedule"}).populate("dishes").populate("meal").populate("host").populate("customer").exec(function(err, orders){
         if(err){
@@ -42,7 +156,6 @@ module.exports = function(agenda) {
               }
               Jobs.cancel({ 'data.orderId' : order.id }, function(err, numberRemoved){
                 if(err){
-                  console.log(err);
                   return cb(err);
                 }
                 sails.log.debug("JOBS - Type: MealScheduleEndJob, Model: Order, Action: Cancel, To: Host");
@@ -61,48 +174,53 @@ module.exports = function(agenda) {
       });
     },
 
-    updateOrders : function(meal, cb){
+    updateOrders : function(meal, orders, cb){
       //update all orders to preparing
-      Order.update({ meal : meal.id, status : "schedule"}, {status : "preparing"}).exec(function(err, orders){
+      this.updateDishes(meal, orders, function(err){
         if(err){
           return cb(err);
         }
-        async.each(orders, function(order, next){
-          if(!order.customer){
-            return next();
-          }
-          User.findOne(order.customer).exec(function(err, user){
-            if(err){
-              return next(err);
-            }
-            order.customer = user;
-            next();
-          });
-        },function(err){
+        Order.update({ meal : meal.id, status : "schedule"}, { status : "preparing" }).exec(function(err, orders){
           if(err){
             return cb(err);
           }
-          meal.leftQty = meal.totalQty;
-          meal.status = "off";
-          meal.save(function(err, m){
+          async.each(orders, function(order, next){
+            if(!order.customer){
+              return next();
+            }
+            User.findOne(order.customer).exec(function(err, user){
+              if(err){
+                return next(err);
+              }
+              order.customer = user;
+              next();
+            });
+          },function(err){
             if(err){
               return cb(err);
             }
-            m.orders = orders;
-            var pickups = [];
-            m.pickups.forEach(function(p){
-              var isOldPickupOption = pickups.some(function(pickupInfo){
-                return (pickupInfo.pickupFromTime === p.pickupFromTime && pickupInfo.pickupTillTime === p.pickupTillTime)
-                  &&  pickupInfo.location === p.location && pickupInfo.method === p.method;
-              })
-              if(!isOldPickupOption){
-                pickups.push(p);
+            meal.leftQty = meal.totalQty;
+            meal.status = "off";
+            meal.save(function(err, m){
+              if(err){
+                return cb(err);
               }
-            })
-            m.pickups = pickups;
-            sails.log.debug("JOBS - Type: MealScheduleEndJob, Model: Order, Action: MealScheduleEnd, To: Host");
-            notification.notificationCenter("Meal","mealScheduleEnd",m,true);
-            cb();
+              m.orders = orders;
+              var pickups = [];
+              m.pickups.forEach(function(p){
+                var isOldPickupOption = pickups.some(function(pickupInfo){
+                  return (pickupInfo.pickupFromTime === p.pickupFromTime && pickupInfo.pickupTillTime === p.pickupTillTime)
+                    &&  pickupInfo.location === p.location && pickupInfo.method === p.method;
+                })
+                if(!isOldPickupOption){
+                  pickups.push(p);
+                }
+              })
+              m.pickups = pickups;
+              sails.log.debug("JOBS - Type: MealScheduleEndJob, Model: Order, Action: MealScheduleEnd, To: Host");
+              notification.notificationCenter("Meal","mealScheduleEnd",m,true);
+              cb();
+            });
           });
         });
       });
@@ -212,68 +330,6 @@ module.exports = function(agenda) {
         }
         cb();
       });
-    },
-
-    adjustOrders : function(orders, meal, cb){
-      var dishes = meal.dishes;
-      var _this = this;
-      async.each(orders, function(order, next2){
-        var currentOrders = order.orders;
-        async.each(Object.keys(currentOrders), function(dishId, next){
-          var dish;
-          dishes.forEach(function(d){
-            if(d.id === dishId){
-              dish = d;
-            }
-          });
-          if(!dish || currentOrders[dishId].number === 0 || !dish.isDynamicPriceOn){
-            return next();
-          }
-          var number = currentOrders[dishId].number;
-          var paidDishPrice = parseFloat(currentOrders[dishId].price);
-          var totalQty = meal.getDynamicDishesTotalOrder(number);
-          var currentPrice = parseFloat(dish.getPrice(totalQty, meal));
-          currentOrders[dishId].price = currentPrice;
-          var difference = (currentPrice - paidDishPrice) * number;
-          sails.log.info("price you paid: $" + paidDishPrice + ", price now: $" + currentPrice, " order amount: " + number, " difference: " + difference);
-          if(difference !== 0){
-            Order.findOne(order.id).populate("meal").populate("host").exec(function (err, order) {
-              if (err) {
-                return next(err);
-              }
-              order.subtotal += difference;
-              order.orders = currentOrders;
-              if(difference > 0){
-                _this.chargeOrder(difference, order, function(err){
-                  if(err){
-                    return next(err);
-                  }
-                  order.save(next);
-                });
-              }else{
-                _this.refundOrder(difference, order, function(err){
-                  if(err){
-                    return next(err);
-                  }
-                  order.save(next);
-                });
-              }
-            });
-          }else{
-            next();
-          }
-        }, function(err){
-          if(err){
-            return next2(err);
-          }
-          next2();
-        });
-      }, function(err){
-        if(err){
-          return cb(err);
-        }
-        cb();
-      });
     }
   };
 
@@ -303,8 +359,8 @@ module.exports = function(agenda) {
       var mealId = job.attrs.data.mealId;
       var _this = helperMethod;
 
-      Meal.findOne(mealId).populate("chef").populate("dishes").populate("dynamicDishes").exec(function(err, meal){
-        if(err || !meal){
+      Meal.findOne(mealId).populate("chef").populate("dishes").exec(function(err, meal){
+        if(err||!meal){
           return done();
         }
         meal.hostEmail = meal.chef.email;
@@ -353,16 +409,7 @@ module.exports = function(agenda) {
                 meal.save(done);
               });
             }else{
-              if(meal.isSupportDynamicPrice){
-                _this.adjustOrders(orders, meal, function(err){
-                  if(err){
-                    return done(err);
-                  }
-                  _this.updateOrders(meal, done);
-                });
-              }else{
-                _this.updateOrders(meal,done);
-              }
+              _this.updateOrders(meal,orders,done);
             }
           });
         });

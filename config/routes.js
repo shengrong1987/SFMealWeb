@@ -81,6 +81,7 @@ module.exports.routes = {
   "/meal/dish" : "MealController.dish",
   "/meal/pickup" : "MealController.pickup",
   "/meal/search" : "MealController.search",
+  "/meal/pintuan" : "MealController.pintuan",
   '/dish/:id/verify' : 'DishController.verify',
   '/dish/:id/fail' : 'DishController.fail',
   '/dish/:id/review' : 'DishController.findReview',

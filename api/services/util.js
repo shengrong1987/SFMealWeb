@@ -124,7 +124,7 @@ module.exports = {
       dateDesc = 'today';
     }else if(date.isSame(moment().add(1,'days'),'day')){
       dateDesc = 'tomorrow';
-    }else if(moment.duration(date.diff(moment())).asDays() <= 7){
+    }else if(moment.duration(date.diff(moment())).asDays() <= 5){
       dateDesc = date.format('dddd');
     }else{
       dateDesc = date.format('[day]M/D');

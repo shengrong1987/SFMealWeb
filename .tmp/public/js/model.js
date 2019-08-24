@@ -1223,6 +1223,15 @@ var HostSectionInMealView = Backbone.View.extend({
   }
 });
 
+var PintuanView = Backbone.View.extend({
+  events : {
+
+  },
+  initialize : function(){
+
+  }
+});
+
 var DayOfMealView = Backbone.View.extend({
   events : {
     "click #gotoCheckoutBtn" : "gotoCheckout",
@@ -1284,9 +1293,9 @@ var DayOfMealView = Backbone.View.extend({
     console.info("初始化日期:'%s'", dateFilter);
     if(dateMixer){
       if(this.$el.find("[data-filter='." + dateDesc +"']").length){
-        this.$el.find("#deliveryDateBtn").text(__('delivery-date') + dateDesc);
+        this.$el.find("#deliveryDateBtn").text(__('delivery-date') + __(dateDesc.replace(".","")));
       }else{
-        this.$el.find("#deliveryDateBtn").text(__('delivery-date') + this.$el.find("[data-filter]").first().data('filter').replace(".",""));
+        this.$el.find("#deliveryDateBtn").text(__('delivery-date') + __(this.$el.find("[data-filter]").first().data('filter').replace(".","")));
       }
       dateMixer.filter(dateFilter);
     }
@@ -4175,7 +4184,7 @@ var OrderView = Backbone.View.extend({
           //pickup option
           var pickupObj = $this.getPickupOption(method);
           if(!pickupObj){
-            helperMethod.jumpTo("pickupOptionsView");
+            helperMethod.jumpTo("pickupOdeliveryDateBtnptionsView");
             return;
           }
           var pickupOption = pickupObj.index;
@@ -4483,5 +4492,5 @@ var BadgeView = Backbone.View.extend({
 });
 
 export { Auth, Payment, Host, User, Checklist, Meal, Dish, Bank, Review, Transaction, Order, Badge }
-export { LoginView, EmailVerificationView, RegisterView, UserBarView, ApplyView, PaymentView, NewUserRewardView, AddressView, CheckListView, HostSectionInMealView, DayOfMealView, MealSelectionView, MealView, DishView, BankView, UserProfileView, MyMealView, HostProfileView, HostPageView, ReviewView, TransactionView, DishPreferenceView, ContactInfoView, MapView, MealConfirmView, ReceiptView, OrderView, BadgeView }
+export { LoginView, EmailVerificationView, RegisterView, UserBarView, ApplyView, PaymentView, NewUserRewardView, AddressView, CheckListView, HostSectionInMealView, DayOfMealView, MealSelectionView, MealView, DishView, BankView, UserProfileView, MyMealView, HostProfileView, HostPageView, ReviewView, TransactionView, DishPreferenceView, ContactInfoView, MapView, MealConfirmView, ReceiptView, OrderView, BadgeView, PintuanView }
 

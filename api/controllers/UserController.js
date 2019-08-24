@@ -356,13 +356,21 @@ module.exports = require('waterlock').actions.user({
               var _isSame = oldOrder.status === order.status && moment(new Date(oldOrder.pickupInfo.pickupFromTime).toISOString()).isSame(moment(new Date(order.pickupInfo.pickupFromTime).toISOString()), 'minute') && moment(new Date(oldOrder.pickupInfo.pickupTillTime).toISOString()).isSame(moment(new Date(order.pickupInfo.pickupTillTime).toISOString()), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
               if(_isSame){
                 Object.keys(order.orders).forEach(function(dishId){
-                  oldOrder.orders[dishId] = order.orders[dishId];
+                  if(oldOrder.orders.hasOwnProperty(dishId)){
+                    oldOrder.orders[dishId].number += order.orders[dishId].number;
+                    oldOrder.orders[dishId].preference.concat(order.orders[dishId].preference);
+                  }else{
+                    oldOrder.orders[dishId] = order.orders[dishId];
+                  }
                 })
                 oldOrder.id += "+" + order.id;
                 oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
                 oldOrder.tip = parseFloat(oldOrder.tip) + parseFloat(order.tip);
                 oldOrder.pickupInfo.comment += order.pickupInfo.comment;
                 oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
+                oldOrder.dishes = oldOrder.dishes.filter(function(item, pos){
+                  return oldOrder.dishes.indexOf(item) === pos;
+                });
                 oldOrder.discount += order.discount;
                 if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
                   oldOrder.charges['cash'] += order.charges['cash'];

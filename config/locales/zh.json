@@ -1187,5 +1187,8 @@
   "delivery-date" : "送餐日：",
   "current-location" : "当前地址",
   "user-points-reminder" : "你还有%dpoints未使用，下单时可以抵扣$%s",
-  "new-message-title" : "你有一条新消息"
+  "new-message-title" : "你有一条新消息",
+  "group-amount" : "%d人团",
+  "original-price" : "原价",
+  "go-pingtuan" : "去拼团"
 }

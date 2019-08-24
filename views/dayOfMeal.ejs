@@ -92,6 +92,7 @@
       <div id="order" class="content container-fluid text-left">
         <div id="chefDishView">
           <% tags.forEach(function(tag){if(tag === "chef"){%>
+            <% if(!hosts || !hosts.length){ return; }%>
             <div class="pl-4 py-2 text-center light-grey border" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag.replace("'","").replace(" ","")%>">
               <h6 class="none" style="min-width: 80px;"><%= __(tag)%></h6>
             </div>

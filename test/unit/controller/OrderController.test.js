@@ -923,7 +923,7 @@ describe('OrderController', function() {
 
       it('should not take order not reach minimal order ', function (done) {
         var dishObj = {};
-        dishObj[dishId1] = { number : 4 , preference : [{ property : '', extra : 0}], price : price7 };
+        dishObj[dishId1] = { number : 4 , preference : [{ property : '', extra : 0}], price : price1 };
         agent
           .post('/order')
           .send({
@@ -2881,7 +2881,7 @@ describe('OrderController', function() {
   //     // });
   //   });
   //
-    describe('order a meal with dynamic price dish', function(){
+    describe('order pintuan dish', function(){
       var mealId;
       var dishId1;
       var dishId2;
@@ -3002,7 +3002,7 @@ describe('OrderController', function() {
           .put('/dish/' + dishId1)
           .set('Accept', 'application/json')
           .send({
-            isDynamicPriceOn : true
+            canPintuan : true
           })
           .expect('Content-Type', /json/)
           .expect(400)
@@ -3020,10 +3020,8 @@ describe('OrderController', function() {
           .put('/dish/' + dishId1)
           .set('Accept', 'application/json')
           .send({
-            isDynamicPriceOn : true,
-            qtyRate : qtyRate1,
-            priceRate : priceRate1,
-            minimalPrice : minimalPrice1
+            canPintuan : true,
+            minimalOrder : 10
           })
           .expect('Content-Type', /json/)
           .expect(200)
@@ -3031,45 +3029,10 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
-            res.body.isDynamicPriceOn.should.be.true();
-            res.body.qtyRate.should.be.equal(qtyRate1);
+            res.body.canPintuan.should.be.true();
+            res.body.minimalOrder.should.be.equal(10);
             done();
           })
-      });
-
-      it('should be able to add dynamic dish to a meal', function(done){
-        agent
-          .post('/dish/' + dishId1 + "/dynamicMeals/" + mealId)
-          .expect(200)
-          .end(done)
-      });
-
-      it('should be able to enable dynamic price on a dish', function(done){
-        agent
-          .put('/dish/' + dishId4)
-          .set('Accept', 'application/json')
-          .send({
-            isDynamicPriceOn : true,
-            qtyRate : qtyRate4,
-            priceRate : priceRate4,
-            minimalPrice : minimalPrice4
-          })
-          .expect('Content-Type', /json/)
-          .expect(200)
-          .end(function(err, res){
-            if(err){
-              return done(err);
-            }
-            res.body.isDynamicPriceOn.should.be.true();
-            done();
-          })
-      });
-
-      it('should be able to add dynamic dish to a meal', function(done){
-        agent
-          .post('/dish/' + dishId4 + "/dynamicMeals/" + mealId)
-          .expect(200)
-          .end(done)
       });
 
       it('should login as guest', function (done) {
@@ -3081,10 +3044,10 @@ describe('OrderController', function() {
           .end(done)
       });
 
-      var newPrice1;
+      var fourDish1OrderId;
       it('should be able to order a meal', function(done){
         var dishObj = {};
-        dishObj[dishId1] = { number : 10 , preference : [{ property : '', extra : 0}], price : price1 };
+        dishObj[dishId1] = { number : 4 , preference : [{ property : '', extra : 0}], price : price1 };
         dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
         dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
         dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
@@ -3092,7 +3055,7 @@ describe('OrderController', function() {
           .post('/order')
           .send({
             orders : dishObj,
-            subtotal : price1 * 10,
+            subtotal : price1 * 4,
             pickupOption : pickupPickupOptionId,
             method : "pickup",
             pickupMeal : mealId,
@@ -3105,29 +3068,137 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
-            dynamicDishOrderNumber += 10;
-            var o = res.body.orders[0];
-            var meal = o.meal;
-            newPrice1 = price1 - parseInt(dynamicDishOrderNumber / qtyRate1) * priceRate1;
-            newPrice1 = Math.max(minimalPrice1, newPrice1);
-            o.orders[dishId1].price.should.be.equal(newPrice1);
-            o.subtotal.should.be.equal(newPrice1 * 10);
-            orderId = o.id;
+            fourDish1OrderId = res.body.orders[0].id;
             done();
           })
       });
 
-      it('should order a meal with outdated dynamic price', function(done){
+      it('should get pintuan dishes', function(done){
+        agent
+          .get('/meal/pintuan')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            var dish1 = res.body.pinDishes.filter(function(d){
+              return d.id === dishId1;
+            })[0];
+            dish1.qty.should.be.equal(5);
+            done();
+          })
+      });
+
+      it('should login admin', function(done){
+        agent
+          .post('/auth/login?type=local')
+          .send({email : adminEmail, password: password})
+          .expect(302)
+          .expect('Location','/auth/done')
+          .end(done)
+      })
+
+      it('should update order to preparing', function(done){
+        agent
+          .put('/order/' + fourDish1OrderId)
+          .send({
+            status : "preparing"
+          })
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            res.body.status.should.be.equal("preparing");
+            done();
+          })
+      })
+
+      it('should get pintuan dishes', function(done){
+        agent
+          .get('/meal/pintuan')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            var dish1 = res.body.pinDishes.filter(function(d){
+              return d.id === dishId1;
+            })[0];
+            dish1.qty.should.be.equal(1);
+            done();
+          })
+      });
+
+      it('should update order to schedule', function(done){
+        agent
+          .put('/order/' + fourDish1OrderId)
+          .send({
+            status : "schedule"
+          })
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            res.body.status.should.be.equal("schedule");
+            done();
+          })
+      })
+
+      it('should run mealScheduleEnd Job and get dish cancel because not reach minimal order', function(done){
+        this.timeout(5000);
+        agent
+          .post('/job/MealScheduleEndJob/run')
+          .send({
+            mealId : mealId
+          })
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            setTimeout(done, 4000);
+          })
+      })
+
+      it('should update meal back online', function(done){
+        var now = new Date();
+        agent
+          .put('/meal/' + mealId)
+          .send({
+            status : "on",
+            provideFromTime: now,
+            provideTillTime: new Date(now.getTime() + 1000 * 3600),
+            nickname : "pickupSet1",
+            isDelivery : true
+          })
+          .expect(200)
+          .end(done)
+      })
+
+      it('should login as guest', function (done) {
+        agent
+          .post('/auth/login?type=local')
+          .send({email : guestEmail, password: password})
+          .expect(302)
+          .expect("Location","/auth/done")
+          .end(done)
+      });
+
+      it('should be able to order a meal', function(done){
         var dishObj = {};
-        dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : 10 };
+        dishObj[dishId1] = { number : 4 , preference : [{ property : '', extra : 0}], price : price1 };
         dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
         dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
-        dishObj[dishId4] = { number : 7 , preference : [{ property : '', extra : 0}], price : price4 };
+        dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
         agent
           .post('/order')
           .send({
             orders : dishObj,
-            subtotal : 10 + 8 * price4,
+            subtotal : price1 * 4,
             pickupOption : pickupPickupOptionId,
             method : "pickup",
             pickupMeal : mealId,
@@ -3140,57 +3211,106 @@ describe('OrderController', function() {
             if(err){
               return done(err);
             }
-            var o = res.body.orders[0];
-            dynamicDishOrderNumber += 8;
-            var newPrice4 = price4 - parseInt(dynamicDishOrderNumber / qtyRate4) * priceRate4;
-            newPrice4 = Math.max(newPrice4, minimalPrice4);
-            console.log(newPrice1, newPrice4)
-            // o.subtotal.should.be.equal(newPrice1+newPrice4*7);
             done();
           })
       });
 
-      it('should logged out current user', function (done) {
+      it('should get pintuan dishes and get dishes in only schedule orders', function(done){
         agent
-          .post('/auth/logout')
-          .expect(200)
-          .end(function(err,res){
+          .get('/meal/pintuan')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            var dish1 = res.body.pinDishes.filter(function(d){
+              return d.id === dishId1;
+            })[0];
+            dish1.qty.should.be.equal(4);
             done();
           })
       });
 
-      it('should order a meal of dynamic price with cash', function(done){
+
+      it('should be able to order a meal', function(done){
         var dishObj = {};
-        dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}], price : price1 };
+        dishObj[dishId1] = { number : 6 , preference : [{ property : '', extra : 0}], price : price1 };
         dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
         dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
-        dishObj[dishId4] = { number : 2 , preference : [{ property : '', extra : 0}], price : price4 };
+        dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
         agent
           .post('/order')
           .send({
             orders : dishObj,
-            subtotal : price4 * 2,
-            pickupOption : deliveryPickupOptionId,
-            method : "delivery",
+            subtotal : price1 * 6,
+            pickupOption : pickupPickupOptionId,
+            method : "pickup",
             pickupMeal : mealId,
             tip : 0,
-            contactInfo : { phone : "(415)111-1111", name : "abc", address : address},
-            paymentInfo : { method : 'cash'}
+            contactInfo : { phone : "(415)111-1111", name : "abc"},
+            paymentInfo : { method : 'online'}
           })
           .expect(200)
           .end(function(err,res){
             if(err){
               return done(err);
             }
-            var o = res.body.orders[0];
-            dynamicDishOrderNumber += 2;
-            var newPrice4 = price4 - parseInt(dynamicDishOrderNumber / qtyRate4) * priceRate4;
-            newPrice4 = Math.max(newPrice4, minimalPrice4);
-            o.orders[dishId4].price.should.be.equal(newPrice4);
-            o.subtotal.should.be.equal(newPrice4 * 2);
             done();
           })
       });
+
+      it('should get pintuan dishes and get dishes in only schedule orders', function(done){
+        agent
+          .get('/meal/pintuan')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            var dish1 = res.body.pinDishes.filter(function(d){
+              return d.id === dishId1;
+            })[0];
+            dish1.qty.should.be.equal(10);
+            done();
+          })
+      });
+
+      it('should login admin', function(done){
+        agent
+          .post('/auth/login?type=local')
+          .send({email : adminEmail, password: password})
+          .expect(302)
+          .expect('Location','/auth/done')
+          .end(done)
+      })
+
+      it('should run mealScheduleEnd Job', function(done){
+        agent
+          .post('/job/MealScheduleEndJob/run')
+          .send({
+            mealId : mealId
+          })
+          .expect(200)
+          .end(done)
+      })
+
+      it('should turn meal on', function(done){
+        var now = new Date();
+        var thirtyMinutesLater = moment().add(30,'minutes')._d;
+        agent
+          .put('/meal/' + mealId)
+          .send({
+            status : "on",
+            provideFromTime : now,
+            provideTillTime : thirtyMinutesLater,
+            nickname : "pickupSet1",
+            isDelivery : true
+          })
+          .expect(200)
+          .end(done)
+      })
     });
 
     describe('order a meal with Alipay,venmo & paypal', function(){
@@ -3198,6 +3318,15 @@ describe('OrderController', function() {
       var orderId;
       var dishId5;
       var mealProvideFrom;
+
+      it('should login as guest', function (done) {
+        agent
+          .post('/auth/login?type=local')
+          .send({email : guestEmail, password: password})
+          .expect(302)
+          .expect("Location","/auth/done")
+          .end(done)
+      });
 
       it('should get meals', function (done) {
         agent
@@ -3207,9 +3336,9 @@ describe('OrderController', function() {
           .expect(200)
           .end(function(err,res){
             if(err){
-              console.log(err);
               return done(err);
             }
+            console.log(res.body.meals);
             var meal = res.body.meals.filter(function(m){
               return m.type === "preorder";
             })[0];
@@ -3352,7 +3481,7 @@ describe('OrderController', function() {
           })
       });
 
-      it('should response to alipay callback waiting payment by default', function(done){
+      it('should response to Alipay callback waiting payment by default', function(done){
         agent
           .get('/order/process?source='+sourceId+"&client_secret="+client_secret)
           .expect(400)

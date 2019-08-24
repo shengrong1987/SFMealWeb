@@ -30,6 +30,7 @@ module.exports = {
 
   run : function(req, res){
     var name = req.params.name;
+    console.log("Run job: " + name);
     Jobs.now(name, req.body, function(err, job){
       if(err){
         return res.badRequest(err);
