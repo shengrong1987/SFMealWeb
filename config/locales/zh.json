@@ -1190,5 +1190,6 @@
   "new-message-title" : "你有一条新消息",
   "group-amount" : "%d人团",
   "original-price" : "原价",
-  "go-pingtuan" : "去拼团"
+  "go-pingtuan" : "去拼团",
+  "in-group-amount" : "已拼%d人"
 }

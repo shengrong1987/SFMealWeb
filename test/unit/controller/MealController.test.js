@@ -1672,12 +1672,6 @@ describe('MealController', function() {
           }
           res.body.meals.should.have.length(2);
           res.body.pickups.should.have.length(7);
-          res.body.pickups[0].meal.should.be.equalOneOf([mealId,preorderMealId]);
-          res.body.pickups[1].meal.should.be.equalOneOf([mealId,preorderMealId]);
-          res.body.pickups[2].meal.should.be.equalOneOf([mealId,preorderMealId]);
-          res.body.pickups[3].meal.should.be.equalOneOf([mealId,preorderMealId]);
-          res.body.pickups[4].meal.should.be.equalOneOf([mealId,preorderMealId]);
-          res.body.pickups[5].meal.should.be.equalOneOf([mealId,preorderMealId]);
           done();
         })
     })

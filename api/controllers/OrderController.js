@@ -165,12 +165,12 @@ module.exports = {
       return res.badRequest({code: -54, responseText: req.__('meal-checkout-lack-of-order')});
     }
 
-    var targetMeal = req.body.pickupMeal;
-    if(!targetMeal){
-      return res.badRequest({code : -56, responseText: req.__('meal-checkout-lack-of-meal')});
+    var targetNickname = req.body.pickupNickname;
+    if(!targetNickname){
+      return res.badRequest({code : -56, responseText: req.__('meal-checkout-lack-of-target-nickname')});
     }
 
-    Meal.find({where: {status: "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime: {'>': moment().toDate()}}}).populate("chef").populate('dishes').populate("dynamicDishes").exec(function(err, meals) {
+    Meal.find({where: {status: "on", nickname : targetNickname, provideFromTime : { '<' : moment().toDate()}, provideTillTime: {'>': moment().toDate()}}}).populate("chef").populate('dishes').populate("dynamicDishes").exec(function(err, meals) {
       if(err){
         return res.badRequest(err);
       }
@@ -181,27 +181,12 @@ module.exports = {
         }
       });
 
-      targetMeal = meals.filter(function(meal){
-        return meal.id === targetMeal;
-      })[0];
-
-      if(!targetMeal){
-        return res.badRequest({ code : -57, responseText : req.__('ordered-dish-not-found')});
-      }
-
       meals = meals.filter(function (meal) {
-        if(meal.id === targetMeal.id){
-          return true;
-        }
-        if(!Array.isArray(targetMeal.nickname)){
-          targetMeal.nickname = [targetMeal.nickname];
-        }
-        var hasSameNickname = !targetMeal.nickname.includes("custom") && targetMeal.nickname.some(function(n){ return meal.nickname.includes(n)});
-        console.log("target meal nickname:" + targetMeal.nickname + " and searching meal nickname:" + meal.nickname);
         var mealHasDish = meal.dishes.some(function(d) {
           return orderedDishes.includes(d.id);
         });
-        return mealHasDish && hasSameNickname;
+        console.log("Meal:" + meal.id + " title: " + meal.title + " has Dish: " + mealHasDish);
+        return mealHasDish;
       });
 
       var notInMealDish;
@@ -2605,7 +2590,6 @@ module.exports = {
           return next({responseText: req.__('order-incomplete-address'), code: -29});
         }
         var full_address = contactInfo.address;
-        sails.log.info("meal: " + meal.title);
         if(!meal.isDelivery && !params.isPartyMode) {
           return next({responseText: req.__('order-invalid-method'), code: -11});
         }
@@ -2617,8 +2601,7 @@ module.exports = {
         }
         var pickupInfo;
         meal.pickups.forEach(function(pickup){
-          console.log("pickup id of meal: " + pickup.id + " & pickupOption: " + pickupOption);
-          if(pickup.id == pickupOption){
+          if(pickup.id === pickupOption){
             pickupInfo = Object.assign({}, pickup);
           }
         });

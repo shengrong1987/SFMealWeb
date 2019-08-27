@@ -4061,8 +4061,8 @@ var OrderView = Backbone.View.extend({
     }
     var index = optionItem.data("index");
     var date = optionItem.parent().data("date");
-    var meal = optionItem.parent().data("meal");
-    return { index : index, date: date, meal: meal};
+    var nickname = optionItem.parent().data("nickname");
+    return { index : index, date: date, nickname: nickname};
   },
   getCustomizedInfo : function(partyMode, cb){
     if(!partyMode){
@@ -4189,7 +4189,7 @@ var OrderView = Backbone.View.extend({
           }
           var pickupOption = pickupObj.index;
           var pickupDate = pickupObj.date;
-          var pickupMeal = pickupObj.meal;
+          var pickupNickname = pickupObj.nickname;
           $this.getCustomizedInfo(partyMode, function(customInfo){
             if(!customInfo){
               helperMethod.jumpTo("pickupInfoView");
@@ -4231,7 +4231,7 @@ var OrderView = Backbone.View.extend({
                 cssClass: 'btn-outline-primary btn-sm mr-1',
                 action : function(dialog){
                   dialog.close();
-                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, subtotal * 0.15, $this, button);
+                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupNickname, method, code, points, isLogin, partyMode, subtotal * 0.15, $this, button);
                 }
               },{
                 label : __('customTip'),
@@ -4242,7 +4242,7 @@ var OrderView = Backbone.View.extend({
                     title : __('customTip'),
                     message : "<div class='input-group'>" +
                       "<div class='input-group-prepend'><span class='input-group-text'>$</span></div>" +
-                      "<input name='tip' type='number' class='form-control' value='5'>" + "</div>" +
+                      "<input name='tips' type='number' class='form-control' value='5'>" + "</div>" +
                       "</div>",
                     buttons: [{
                       label: __('confirm'),
@@ -4250,7 +4250,7 @@ var OrderView = Backbone.View.extend({
                       action: function(dialog) {
                         dialog.close();
                         var tip = $(dialog.getModalBody()).find("[name='tip']").val();
-                        $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, tip, $this, button);
+                        $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupNickname, method, code, points, isLogin, partyMode, tip, $this, button);
                       }
                     }]
                   })
@@ -4261,7 +4261,7 @@ var OrderView = Backbone.View.extend({
                 cssClass: 'btn-outline-dark btn-sm',
                 action : function(dialog){
                   dialog.close();
-                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupMeal, method, code, points, isLogin, partyMode, 0, $this, button);
+                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupNickname, method, code, points, isLogin, partyMode, 0, $this, button);
                 }
               }
               ]
@@ -4333,7 +4333,7 @@ var OrderView = Backbone.View.extend({
     })
   },
 
-  submitOrder : function(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, pickupDate, pickupMeal, method, code, points, isLogin, partyMode, tip, $this, button){
+  submitOrder : function(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, pickupDate, pickupNickname, method, code, points, isLogin, partyMode, tip, $this, button){
     $('body').addClass("loading");
     $this.model.clear();
     $this.model.set({
@@ -4344,7 +4344,7 @@ var OrderView = Backbone.View.extend({
       customInfo : customInfo,
       pickupOption: pickupOption,
       pickupDate : pickupDate,
-      pickupMeal : pickupMeal,
+      pickupNickname : pickupNickname,
       method: method,
       couponCode: code,
       points: points,

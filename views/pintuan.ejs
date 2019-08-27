@@ -4,7 +4,7 @@
   <div id="pintuanContainer" data-user="<%= userId%>" class="mx-auto">
 
     <div class="overflow-hidden w-100 middle relative">
-      <img class="w-100" data-src="../../images/pintuanBanner.jpg">
+      <img class="w-100" style="max-width:1000px;" data-src="../../images/pintuanBanner.jpg">
       <a class="absolute rounded-circle black text-white pt-2" style="top: 25px;right: 5px;width: 65px;height: 65px;opacity: 0.5;">
         活动<br/>说明
       </a>
@@ -12,50 +12,44 @@
 
     <% if(pinDishes && pinDishes.length){%>
       <div class="w-100 d-flex">
-        <div id="order" class="content container-fluid" style="min-height: 300px;">
+        <div id="order" class="content container-fluid" style="max-width: 1000px;min-height: 300px;">
           <div id="pinDishesContentView" class="text-center px-2 py-4">
             <p>拼团商品</p>
             <div class="row">
               <% pinDishes.forEach(function(dish){%>
-                <div class="col-lg-6 col-12 dish pintuanItem py-2 mix item p-2 border" data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-id="<%= dish.id%>" data-left-amount="10">
-                  <div class="row">
-                    <div class="col-6">
-                      <div class="photo middle rounded">
-                        <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
-                          <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
-                            <img data-echo="<%= index===0? photo.v : ''%>">
-                          </a>
-                        <% }});%>
-                      </div>
+                <div class="col-lg-6 col-12 dish pintuanItem mix item border rounded overflow-hidden" style="padding: 0;" data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-id="<%= dish.id%>" data-left-amount="10">
+                  <div class="d-flex">
+                    <div class="photo rounded overflow-hidden">
+                      <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
+                        <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
+                          <img data-echo="<%= index===0? photo.v : ''%>">
+                        </a>
+                      <% }});%>
                     </div>
-                    <div class="col-6">
-                      <div class="d-flex flex-column text-left">
-                        <h5 class="d-flex justify-content-between vertical-align">
-                          <span><%= dish.title%></span>
-                          <small class="ml-auto">已拼5人</small>
-                        </h5>
-                        <h5 class="mb-auto">
-                          <div class="d-flex vertical-align">
-                            <button class="btn btn-sm border border-darkgrey"><%= __('group-amount', (dish.minimalOrder || 1))%></button>
-                            <span class="text-red">$<%= (dish.price - dish.discount).toFixed(2) %></span>
+                    <div class="d-flex flex-grow-1 flex-column p-2 ml-2">
+                      <h5 class="d-flex justify-content-between vertical-align">
+                        <span><%= dish.title%></span>
+                        <small class="ml-auto"><%= __('in-group-amount', dish.qty)%></small>
+                      </h5>
+                      <h5 class="mb-auto">
+                        <div class="d-flex vertical-align">
+                          <button class="btn btn-sm border border-darkgrey"><%= __('group-amount', (dish.minimalOrder || 1))%></button>
+                          <span class="text-red ml-2"><% if(dish.discount){%><s class="text-grey mr-1"><%= dish.price.toFixed(2)%></s><%}%>$<%= (dish.price - dish.discount).toFixed(2) %></span>
+                        </div>
+                        <div class="progress mt-2">
+                          <div class="progress-bar" role="progressbar" style="<%= (dish.qty/dish.minimalOrder)*100 ? ('width:' + (dish.qty/dish.minimalOrder)*100) : 'width:10%;'%>" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"><%= (dish.qty/dish.minimalOrder)*100%>%</div>
+                        </div>
+                        <div></div>
+                      </h5>
+                      <div class="d-flex vertical-align align-self-end">
+                        <button name="order-btn" class="btn btn-danger" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)"><%= __('go-pingtuan')%></button>
+                        <div name="input-group" class="input-group input-group-sm amount-input round ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="10" data-dish="<%= dish.id%>">
+                          <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
+                            <span class="input-group-text">-</span>
                           </div>
-                          <small>
-                            <div class="progress">
-                              <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"><%= dish.qty%>/<%= dish.minimalOrder%></div>
-                            </div>
-                            <br/>
-                          </small>
-                        </h5>
-                        <div class="d-flex vertical-align align-self-end">
-                          <button name="order-btn" class="btn btn-danger" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)"><%= __('go-pingtuan')%></button>
-                          <div name="input-group" class="input-group input-group-sm amount-input round ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="10" data-dish="<%= dish.id%>">
-                            <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
-                              <span class="input-group-text">-</span>
-                            </div>
-                            <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
-                            <div class="input-group-append add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
-                              <span class="input-group-text">+</span>
-                            </div>
+                          <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
+                          <div class="input-group-append add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
+                            <span class="input-group-text">+</span>
                           </div>
                         </div>
                       </div>

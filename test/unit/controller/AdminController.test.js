@@ -148,19 +148,6 @@ describe('AdminController', function() {
 
     it('should NOT be able to turn a meal off', function (done) {
       agent
-        .get(encodeURI('/meal/' + mealId + '/off'))
-        .expect(400)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          res.body.code.should.be.equal(-4);
-          done();
-        })
-    })
-
-    it('should not be able to turn a meal off', function (done) {
-      agent
         .get(encodeURI('/meal/' + offlineMealId + '/off'))
         .expect(400)
         .end(function(err, res){
@@ -171,6 +158,19 @@ describe('AdminController', function() {
           done();
         })
     })
+
+    // it('should not be able to turn a meal off', function (done) {
+    //   agent
+    //     .get(encodeURI('/meal/' + mealId + '/off'))
+    //     .expect(400)
+    //     .end(function(err, res){
+    //       if(err){
+    //         return done(err);
+    //       }
+    //       res.body.code.should.be.equal(-4);
+    //       done();
+    //     })
+    // })
 
     it('should log out user', function(done){
       agent

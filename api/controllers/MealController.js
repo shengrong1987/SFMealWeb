@@ -696,7 +696,6 @@ module.exports = {
               })
             });
             newPickups = newPickups.map(function(pickup){
-              pickup.meal = meal.id;
               return pickup;
             });
             pickups = pickups.concat(newPickups);
@@ -1565,8 +1564,12 @@ module.exports = {
               }
             });
             _pickups.push("custom");
-            _pickups.push(thisPickupName);
-            _pickups.push(nextPickupName);
+            if(thisPickupName){
+              _pickups.push(thisPickupName);
+            }
+            if(nextPickupName){
+              _pickups.push(nextPickupName);
+            }
             cb();
           })
         },

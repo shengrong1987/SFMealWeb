@@ -21,9 +21,9 @@ describe('ReviewController', function() {
     var password = '12345678';
     var address = "1455 Market St, San Francisco, CA 94103";
     var phone = "1-415-802-3853";
-    var pickupPickupOptionId;
-    var deliveryPickupOptionId;
-    var highMinimalPickupOptionId;
+    var pickupPickupOptionId, pickupNickname;
+    var deliveryPickupOptionId, deliveryNickname;
+    var highMinimalPickupOptionId, highMinimalNickname;
     var guestEmail = 'enjoymyself1987@gmail.com';
 
     it('should login admin account', function (done){
@@ -35,7 +35,7 @@ describe('ReviewController', function() {
         .end(done)
     })
 
-    it('should get pickup options', function (done){
+    it('should get pickup options', function (done) {
       agent
         .get('/pickupOption')
         .expect(200)
@@ -47,12 +47,22 @@ describe('ReviewController', function() {
           pickupPickupOptionId = res.body.filter(function(p){
             return p.method === "pickup" && p.minimalOrder !== 50;
           })[0].id;
+          pickupNickname = res.body.filter(function(p){
+            return p.method === "pickup" && p.minimalOrder !== 50;
+          })[0].nickname;
           deliveryPickupOptionId = res.body.filter(function(p){
             return p.method === "delivery" && p.location === "1974 Palou Ave, San Francisco, CA 94124, USA";
           })[0].id;
+          deliveryNickname = res.body.filter(function(p){
+            return p.method === "delivery" && p.location === "1974 Palou Ave, San Francisco, CA 94124, USA";
+          })[0].nickname;
           highMinimalPickupOptionId = res.body.filter(function(p){
             return p.minimalOrder === 50;
           })[0].id;
+          highMinimalNickname = res.body.filter(function(p){
+            return p.minimalOrder === 50;
+          })[0].nickname;
+          console.log("normal pickup:" + pickupPickupOptionId, " &normal delivery: " + deliveryPickupOptionId + "& hight limit pickup: " +  highMinimalPickupOptionId);
           done();
         })
     });
@@ -108,7 +118,7 @@ describe('ReviewController', function() {
               return done(Error("error getting any meal"));
             }
             var meal = res.body.meals.filter(function(m){
-              return m.type === "order";
+              return m.type === "preorder";
             })[0];
             mealId = meal.id;
             dishId1 = meal.dishes[0].id;
@@ -148,7 +158,7 @@ describe('ReviewController', function() {
           guestId = res.body.id;
           done()
         })
-    })
+    });
 
     var orderId;
     it('should order the meal', function (done) {
@@ -165,8 +175,8 @@ describe('ReviewController', function() {
           contactInfo : { name : "sheng", address : address, phone : phone },
           paymentInfo : { method : 'online'},
           method : "pickup",
-          pickupMeal : mealId,
-          pickupOption : 1,
+          pickupNickname : pickupNickname,
+          pickupOption : pickupPickupOptionId,
           tip : 0
         })
         .expect(200)
@@ -180,7 +190,31 @@ describe('ReviewController', function() {
           orderId = res.body.orders[0].id;
           done();
         })
+    });
+
+    it('should login admin account', function (done){
+      agent
+        .post('/auth/login?type=local')
+        .send({email : adminEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
     })
+
+    it('should change the order to preparing', function(done){
+      agent
+        .put("/order/" + orderId)
+        .send({
+          status : "preparing"
+        })
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          done();
+        })
+    });
 
     it('should login or register an account', function (done) {
       agent

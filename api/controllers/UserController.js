@@ -358,7 +358,9 @@ module.exports = require('waterlock').actions.user({
                 Object.keys(order.orders).forEach(function(dishId){
                   if(oldOrder.orders.hasOwnProperty(dishId)){
                     oldOrder.orders[dishId].number += order.orders[dishId].number;
-                    oldOrder.orders[dishId].preference.concat(order.orders[dishId].preference);
+                    if(oldOrder.orders[dishId].preference){
+                      oldOrder.orders[dishId].preference.concat(order.orders[dishId].preference);
+                    }
                   }else{
                     oldOrder.orders[dishId] = order.orders[dishId];
                   }
