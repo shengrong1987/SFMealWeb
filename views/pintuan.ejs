@@ -59,16 +59,16 @@
               <%})%>
             </div>
           </div>
-          <div id="shoppingCartView" class="red text-white p-2 align-middle d-block w-100" style="line-height:50px;position: fixed;bottom: 0;left: 0;z-index:90;" onclick="javascript:location.href='#order'">
-            <div class="row">
-              <div class="col-3"><span style="left: 10px;" class="total-preview relative" data-subtotal=""></span></div>
-              <div class="col-6 middle text-center"><button type="button" class="btn btn-outline-light" id="gotoCheckoutBtn" class="mr-1"><%= __('go-to-check-out-btn')%></button></div>
-              <div class="col-3 text-right"><div id="orderPreviewBtn" style="right: 10px;" class="btn btn-outline-white order-preview relative text-white" data-toggle="tooltip"></div></div>
-            </div>
-          </div>
         </div>
       </div>
     <% }%>
+    <div id="shoppingCartView" class="red text-white p-2 align-middle d-block w-100" style="line-height:50px;position: fixed;bottom: 80px;left: 0;z-index:90;" onclick="javascript:location.href='#order'">
+      <div class="row">
+        <div class="col-3"><span style="left: 10px;" class="total-preview relative" data-subtotal=""></span></div>
+        <div class="col-6 middle text-center"><button type="button" class="btn btn-outline-light" id="gotoCheckoutBtn" class="mr-1"><%= __('go-to-check-out-btn')%></button></div>
+        <div class="col-3 text-right"><div id="orderPreviewBtn" style="right: 10px;" class="btn btn-outline-white order-preview relative text-white" data-toggle="tooltip"></div></div>
+      </div>
+    </div>
   </div>
 </div>
 <script src="/assets/zh.pintuan.bundle.js"></script>

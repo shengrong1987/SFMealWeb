@@ -4,16 +4,6 @@
     <% if(req.session.authenticated){ %>
       <button class="btn btn-outline-light" name="myorder" onclick="location.href='/user/me'"><%= __('nav-bar-order') %><span class="badge badge-light ml-1 pull-right"></span></button>
     <% }%>
-    <!--<button id="citySelector" class="btn nav-item dropdown-toggle" type="button" data-toggle="dropdown" data-selected="true" aria-haspopup="true" aria-expanded="true" value="San Francisco County">-->
-      <!--<span><%= __('location-san-francisco') %></span>-->
-    <!--</button>-->
-    <!--<div class="dropdown-menu" aria-labelledby="navbarDropdown">-->
-      <!--<a class="dropdown-item" href="javascript:void(0);" value="San Francisco County"><%= __('location-san-francisco') %></a>-->
-      <!--<a class="dropdown-item" href="javascript:void(0);" value="San Mateo County"><%= __('location-san-mateo-county') %></a>-->
-      <!--<a class="dropdown-item" href="javascript:void(0);" value="Santa Clara County"><%= __('location-santa-clara-county') %></a>-->
-      <!--<a class="dropdown-item" href="javascript:void(0);" value="Alameda County"><%= __('location-alameda-county') %></a>-->
-      <!--<a class="dropdown-item" href="javascript:void(0);" value="Sacramento County"><%= __('location-sacramento-county') %></a>-->
-    <!--</div>-->
   </div>
 
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavBar" aria-controls="myNavBar" aria-expanded="false" aria-label="Toggle Naviation">
@@ -23,6 +13,8 @@
   <div class="collapse navbar-collapse" id="myNavBar">
 
     <ul class="navbar-nav mr-auto">
+      <li class="nav-item"><a class="nav-link"><i class="fab fa-weixin fa-lg" data-toggle="lightbox" href="../../images/qrcode.jpg"></i></a></li>
+      <li class="nav-item"><a href="javascript:void(0)" class="seperator-compact nav-link"><i class="icon-dot text-red"></i></a> </li>
       <li class="nav-item"><a class="nav-link" href="https://www.facebook.com/SFMeal/"><i class="fab fa-facebook-f fa-lg"></i></a></li>
       <li class="nav-item"><a href="javascript:void(0)" class="seperator-compact nav-link"><i class="icon-dot text-red"></i></a> </li>
       <li class="nav-item"><a class="nav-link" href="https://www.instagram.com/sfmeal/"><i class="fab fa-instagram fa-lg"></i></a></li>

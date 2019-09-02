@@ -4249,7 +4249,7 @@ var OrderView = Backbone.View.extend({
                       cssClass: 'btn-outline-primary mr-1',
                       action: function(dialog) {
                         dialog.close();
-                        var tip = $(dialog.getModalBody()).find("[name='tip']").val();
+                        var tip = $(dialog.getModalBody()).find("[name='tips']").val();
                         $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupNickname, method, code, points, isLogin, partyMode, tip, $this, button);
                       }
                     }]

@@ -2894,6 +2894,9 @@ button.bg-light:focus {
 .position-absolute {
   position: absolute !important; }
 
+.position-fixed {
+  position: fixed !important; }
+
 @supports (position: sticky) {
   .sticky-top {
     position: sticky;
@@ -3084,7 +3087,7 @@ button.bg-light:focus {
 .px-5 {
   padding-right: 3rem !important; }
 
-.pb-5,
+
 .py-5 {
   padding-bottom: 3rem !important; }
 
@@ -3436,13 +3439,6 @@ input:focus {
   margin: auto;
   left: 0;
   right: 0; }
-
-.logo-simple {
-  background-image: url(/assets//images/8c619469b46973dd189831c9f6f9f69f.png);
-  display: block;
-  width: 225px;
-  height: 60px;
-  background-size: 225px 60px; }
 
 .logo-sm {
   left: 0;
@@ -4144,10 +4140,6 @@ fieldset[disabled] .btn-red.active {
   background-color: white; }
 
 /*nav*/
-.navbar .navbar-nav.footer-nav li {
-  float: left; }
-  .navbar .navbar-nav.footer-nav li a {
-    display: inline !important; }
 
 /* text-box*/
 
@@ -4276,7 +4268,7 @@ select.form-control {
 
 .default-container {
   margin: auto;
-  min-height: 400px; }
+  min-height: 700px; }
 
 /*meal-realated*/
 .input-group-prepend,
@@ -4588,6 +4580,12 @@ select.form-control {
     margin-left: 50%;
     margin-top: 50%;
     -webkit-transform: translateY(-50%) translateX(-50%); }
+  .navbar.navbar-bottom a {
+    color: grey !important; }
+  .navbar.navbar-bottom a.active {
+    color: red !important; }
+  .navbar.navbar-bottom a:hover {
+    color: red !important; }
   #checkListView .icon {
     display: none; }
   #checkListView .info {
@@ -4737,10 +4735,6 @@ select.form-control {
       text-align: center; }
   .footer .nav li {
     width: 14%; }
-  .footer .footer-text {
-    margin-left: 0; }
-    .footer .footer-text .nav li {
-      width: 25%; }
   .meal .desc {
     top: 50px;
     line-height: 100px; }

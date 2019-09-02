@@ -2268,7 +2268,7 @@ select.form-control{
   //width: 80%;
   //background-color: #f2f2f2;
   margin: auto;
-  min-height: 400px;
+  min-height: 700px;
 }
 
 .box-wrapper{
@@ -2911,6 +2911,18 @@ $lines-to-show: 3;
 
   .mynavbar .navbar-header{
     margin-left: 100px;
+  }
+
+  .navbar.navbar-bottom{
+    a{
+      color: grey !important;
+    }
+    a.active{
+      color: red !important;
+    }
+    a:hover{
+      color: red !important;
+    }
   }
 
   .footer-container{
