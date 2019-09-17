@@ -6,3 +6,4 @@ $(document).ready(function(){
   $("[data-src='../../images/qrcode.jpg']").attr("src",QRCodeImage);
 })
 window.h = helperMethod;
+window.$ = $;

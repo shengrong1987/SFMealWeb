@@ -156,6 +156,9 @@ module.exports = {
             if(err){
               return next1(err);
             }
+            if(!order.charges){
+              return next1();
+            }
             var charges = Object.keys(order.charges);
             async.each(charges, function (chargeId, next2) {
               stripe.retrieveCharge(chargeId, function(err, charge){

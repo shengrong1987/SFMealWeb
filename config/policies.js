@@ -93,6 +93,7 @@ module.exports.policies = {
     'dish' : 'isAdmin',
     'pickup' : 'isAdmin',
     'pintuan' : true,
+    'cart' : "sessionAuth",
     'update' : 'or(and(sessionAuth,isHost,isOwnerOfMeal,isNotFields("isScheduled","chef","score","numberOfReviews","msg","commission")),isAdmin)'
   },
 

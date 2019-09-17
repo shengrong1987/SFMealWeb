@@ -1232,6 +1232,80 @@ var PintuanView = Backbone.View.extend({
   }
 });
 
+var CartView = Backbone.View.extend({
+  events : {
+    "click #gotoCheckoutBtn" : "gotoCheckout",
+    "click #applyPointsBtn" : "applyPoints",
+    "change [name='tipInputOption']" : "changeTip",
+    "blur #tipInput" : "changeTip"
+  },
+  gotoCheckout : function(e){
+    var orderedDishes = [];
+    Object.keys(localOrderObj.localOrders).forEach(function(dishId){
+      if(localOrderObj.localOrders[dishId].number>0){
+        orderedDishes.push(dishId);
+      }
+    });
+    if(!orderedDishes.length){
+      helperMethod.makeAToast(__('noOrderTaken'));
+      return;
+    }
+    var pickupNickname = this.$el.data("pickup-nickname");
+    if(pickupNickname){
+      location.href = "/meal/" + pickupNickname + "/checkout?dishes=" + orderedDishes.join(",");
+    }else{
+      location.href = "/meal/checkout?dishes=" + orderedDishes.join(",");
+    }
+  },
+  applyPoints : function(e){
+    e.preventDefault();
+    let alertView = this.$el.find(".alert.alert-warning");
+    alertView.removeClass("d-none").hide();
+    var subtotal = this.$el.find(".subtotal").data("value");
+    var tax = this.$el.find(".tax").data("value");
+    var subtotalAfterTax = parseFloat(subtotal + tax);
+    if(subtotalAfterTax === 0){
+      alertView.show();
+      alertView.html(__('orderEmptyError'));
+      return;
+    }
+    var point = parseFloat(this.$el.find(".points").val());
+    if(point===-1){
+      alertView.show();
+      alertView.html(__('notAuthorize'));
+      return;
+    }
+    var pointRedeem;
+    if(point >= subtotalAfterTax * 10){
+      pointRedeem = Math.ceil(subtotalAfterTax * 10);
+    }else{
+      pointRedeem = point;
+    }
+    if(pointRedeem < 10){
+      alertView.show();
+      alertView.html(__('pointsTooLittle'));
+      return;
+    }
+    localOrderObj.applyPoints(true, pointRedeem);
+  },
+  changeTip : function(e){
+    console.log("changing tip");
+    let tipInputOption = $(e.currentTarget);
+    let valueType = tipInputOption.data("value-type");
+    let tipInput = this.$el.find("#tipInput");
+    let tipValue = 0;
+    let subtotal = parseFloat(this.$el.find(".subtotal").text().replace("$",""));
+    if(valueType==="%"){
+      tipValue = (subtotal * tipInputOption.val() / 100).toFixed(2);
+      tipInput.val(tipValue);
+    }else{
+      tipValue = parseFloat(tipInput.val());
+    }
+    helperMethod.createCookie("tip", tipValue, 5);
+    localOrderObj.refreshCheckoutMenu();
+  }
+});
+
 var DayOfMealView = Backbone.View.extend({
   events : {
     "click #gotoCheckoutBtn" : "gotoCheckout",
@@ -4221,51 +4295,8 @@ var OrderView = Backbone.View.extend({
             if (couponValue) {
               var code = Object.keys(couponValue)[0];
             }
-
-            BootstrapDialog.show({
-              title : __("tipTitle"),
-              message : __("selectTip"),
-              buttons : [{
-                label : "15%",
-                title : subtotal * 0.15,
-                cssClass: 'btn-outline-primary btn-sm mr-1',
-                action : function(dialog){
-                  dialog.close();
-                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupNickname, method, code, points, isLogin, partyMode, subtotal * 0.15, $this, button);
-                }
-              },{
-                label : __('customTip'),
-                title : __('customTip'),
-                cssClass: 'btn-primary btn-sm',
-                action : function(dialog){
-                  BootstrapDialog.show({
-                    title : __('customTip'),
-                    message : "<div class='input-group'>" +
-                      "<div class='input-group-prepend'><span class='input-group-text'>$</span></div>" +
-                      "<input name='tips' type='number' class='form-control' value='5'>" + "</div>" +
-                      "</div>",
-                    buttons: [{
-                      label: __('confirm'),
-                      cssClass: 'btn-outline-primary mr-1',
-                      action: function(dialog) {
-                        dialog.close();
-                        var tip = $(dialog.getModalBody()).find("[name='tips']").val();
-                        $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupNickname, method, code, points, isLogin, partyMode, tip, $this, button);
-                      }
-                    }]
-                  })
-                }
-              }, {
-                label : __('noTip'),
-                title : __('noTip'),
-                cssClass: 'btn-outline-dark btn-sm',
-                action : function(dialog){
-                  dialog.close();
-                  $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupNickname, method, code, points, isLogin, partyMode, 0, $this, button);
-                }
-              }
-              ]
-            });
+            var tip = parseFloat(form.find(".tip").text());
+            $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupNickname, method, code, points, isLogin, partyMode, tip, $this, button);
           });
         });
       }, contactInfo.address);
@@ -4492,5 +4523,5 @@ var BadgeView = Backbone.View.extend({
 });
 
 export { Auth, Payment, Host, User, Checklist, Meal, Dish, Bank, Review, Transaction, Order, Badge }
-export { LoginView, EmailVerificationView, RegisterView, UserBarView, ApplyView, PaymentView, NewUserRewardView, AddressView, CheckListView, HostSectionInMealView, DayOfMealView, MealSelectionView, MealView, DishView, BankView, UserProfileView, MyMealView, HostProfileView, HostPageView, ReviewView, TransactionView, DishPreferenceView, ContactInfoView, MapView, MealConfirmView, ReceiptView, OrderView, BadgeView, PintuanView }
+export { LoginView, EmailVerificationView, RegisterView, UserBarView, ApplyView, PaymentView, NewUserRewardView, AddressView, CheckListView, HostSectionInMealView, DayOfMealView, MealSelectionView, MealView, DishView, BankView, UserProfileView, MyMealView, HostProfileView, HostPageView, ReviewView, TransactionView, DishPreferenceView, ContactInfoView, MapView, MealConfirmView, ReceiptView, OrderView, BadgeView, PintuanView, CartView }
 

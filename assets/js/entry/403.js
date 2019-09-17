@@ -13,3 +13,4 @@ if(!isLogin){
 }
 if(helperMethod.browserVersion()==="uiwebview"){$("#GoogleBtn").hide();}
 window.h = helperMethod;
+window.$ = $;

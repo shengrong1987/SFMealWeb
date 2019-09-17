@@ -112,7 +112,7 @@
       </tr>
       <tr class="active">
         <td><%= __('pickup-method')%>: <%= __(orders[0].pickupInfo.method)%></td>
-        <td><%= __('pickup-time')%>: <%= orders[0].pickupInfo.pickupFromTime%> - <%= orders[0].pickupInfo.pickupTillTime%></td>
+        <td><%= __('time')%>: <%= orders[0].pickupInfo.pickupFromTime%> - <%= orders[0].pickupInfo.pickupTillTime%></td>
         <td><%= __('pickup-location')%> : <%= orders[0].pickupInfo.method == 'pickup' ? orders[0].pickupInfo.location : orders[0].contactInfo.address%></td>
         <td class="xs-hide"></td>
       </tr>

@@ -40,7 +40,8 @@ module.exports = {
     resetPassword : "./assets/js/entry/resetPassword.js",
     report : "./assets/js/entry/report.js",
     emailVerification : "./assets/js/entry/emailVerification.js",
-    pintuan : "./assets/js/entry/pintuan.js"
+    pintuan : "./assets/js/entry/pintuan.js",
+    cart : "./assets/js/entry/cart.js"
   },
   output: {
     path: path.resolve(__dirname, '.tmp/public/assets/'),

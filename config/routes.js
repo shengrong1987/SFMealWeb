@@ -139,7 +139,8 @@ module.exports.routes = {
   "/pickupoption/drivers" : "PickupOptionController.drivers",
   "/user/:userId/badge/:id" : "BadgeController.findBadgeWindow",
   "/badge/me/:id" : "BadgeController.updateUserBadge",
-  "/badge/:id/update" : "BadgeController.update"
+  "/badge/:id/update" : "BadgeController.update",
+  "/cart" : "MealController.cart"
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

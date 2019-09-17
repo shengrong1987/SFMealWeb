@@ -2851,6 +2851,20 @@ $lines-to-show: 3;
   text-overflow: ellipsis;
 }
 
+.navbar.navbar-bottom{
+  a{
+    color: grey !important;
+  }
+  a.active{
+    color: red !important;
+    background-color: #f5f4f4;
+  }
+  a:hover{
+    color: red !important;
+    background-color: #f5f4f4;
+  }
+}
+
 /*
  screen width specification
 */
@@ -2911,18 +2925,6 @@ $lines-to-show: 3;
 
   .mynavbar .navbar-header{
     margin-left: 100px;
-  }
-
-  .navbar.navbar-bottom{
-    a{
-      color: grey !important;
-    }
-    a.active{
-      color: red !important;
-    }
-    a:hover{
-      color: red !important;
-    }
   }
 
   .footer-container{

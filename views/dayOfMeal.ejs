@@ -1,7 +1,7 @@
 <link href="/assets/dayOfMeal.css" rel="stylesheet">
 <div class="default-container text-center relative">
 
-  <div id="dayOfMealContainer" style="max-width: 800px;" class="mx-auto" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>" data-pickup-nickname="<%= pickupNickname || ''%>">
+  <div id="dayOfMealContainer" style="max-width: 800px;padding-bottom: 64px;" class="mx-auto" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>" data-pickup-nickname="<%= pickupNickname || ''%>">
 
     <% if(meals && meals.meals){%>
     <div class="w-100 sticky-top">
@@ -239,10 +239,10 @@
                 <% }}})})})}});%>
         </div>
         <div id="shoppingCartView" class="red text-white p-2 align-middle d-block w-100" style="line-height:50px;position: fixed;bottom: 80px;left: 0;z-index:90;" onclick="javascript:location.href='#order'">
-          <div class="row">
-            <div class="col-3"><span style="left: 10px;" class="total-preview relative" data-subtotal=""></span></div>
-            <div class="col-6 middle text-center"><button type="button" class="btn btn-outline-light" id="gotoCheckoutBtn" class="mr-1"><%= __('go-to-check-out-btn')%></button></div>
-            <div class="col-3 text-right"><div id="orderPreviewBtn" style="right: 10px;" class="btn btn-outline-white order-preview relative text-white" data-toggle="tooltip"></div></div>
+          <div class="d-flex justify-content-end vertical-align">
+            <i class="fa fa-2x fa-angle-double-right"></i>
+            <i class="fa fa-2x fa-angle-double-right mr-auto"></i>
+            <button class="btn btn-outline-light mr-2" onclick="javascript:location.href='/cart'"><span class="order-preview mr-1"></span><i class="fa fa-shopping-cart"></i></button>
           </div>
         </div>
       </div>

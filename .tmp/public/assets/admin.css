@@ -1078,7 +1078,7 @@ pre {
   margin-right: -15px;
   margin-left: -15px; }
 
-.col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-10, .col-12, .col,
+.col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-9, .col-10, .col-12, .col,
 .col-auto, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-12, .col-sm, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-10, .col-md-12, .col-lg-2, .col-lg-3, .col-lg-6, .col-lg-8, .col-lg-12 {
   position: relative;
   width: 100%;
@@ -1122,6 +1122,10 @@ pre {
 .col-7 {
   flex: 0 0 58.33333%;
   max-width: 58.33333%; }
+
+.col-9 {
+  flex: 0 0 75%;
+  max-width: 75%; }
 
 .col-10 {
   flex: 0 0 83.33333%;
@@ -1872,6 +1876,17 @@ fieldset:disabled a.btn {
 .btn-group > .btn-group:not(:first-child) > .btn {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0; }
+
+.btn-group-toggle > .btn,
+.btn-group-toggle > .btn-group > .btn {
+  margin-bottom: 0; }
+  .btn-group-toggle > .btn input[type="radio"],
+  .btn-group-toggle > .btn input[type="checkbox"],
+  .btn-group-toggle > .btn-group > .btn input[type="radio"],
+  .btn-group-toggle > .btn-group > .btn input[type="checkbox"] {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    pointer-events: none; }
 
 .input-group {
   position: relative;
@@ -2786,6 +2801,9 @@ button.bg-light:focus {
 .border-left {
   border-left: 1px solid #dee2e6 !important; }
 
+.border-0 {
+  border: 0 !important; }
+
 .border-right-0 {
   border-right: 0 !important; }
 
@@ -2865,6 +2883,9 @@ button.bg-light:focus {
 
 .justify-content-start {
   justify-content: flex-start !important; }
+
+.justify-content-end {
+  justify-content: flex-end !important; }
 
 .justify-content-center {
   justify-content: center !important; }
@@ -3004,9 +3025,6 @@ button.bg-light:focus {
 
 .p-0 {
   padding: 0 !important; }
-
-.pl-0 {
-  padding-left: 0 !important; }
 
 .p-1 {
   padding: 0.25rem !important; }
@@ -4553,6 +4571,17 @@ select.form-control {
 
 /* multiline label*/
 
+.navbar.navbar-bottom a {
+  color: grey !important; }
+
+.navbar.navbar-bottom a.active {
+  color: red !important;
+  background-color: #f5f4f4; }
+
+.navbar.navbar-bottom a:hover {
+  color: red !important;
+  background-color: #f5f4f4; }
+
 /*
  screen width specification
 */
@@ -4580,12 +4609,6 @@ select.form-control {
     margin-left: 50%;
     margin-top: 50%;
     -webkit-transform: translateY(-50%) translateX(-50%); }
-  .navbar.navbar-bottom a {
-    color: grey !important; }
-  .navbar.navbar-bottom a.active {
-    color: red !important; }
-  .navbar.navbar-bottom a:hover {
-    color: red !important; }
   #checkListView .icon {
     display: none; }
   #checkListView .info {

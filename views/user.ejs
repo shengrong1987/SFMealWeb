@@ -20,7 +20,7 @@
       </ul>
 
       <div class="tab-content">
-        <div id="myorder" class="tab-pane middle active pb-4" style="min-height: 400px;">
+        <div id="myorder" class="tab-pane middle active" style="min-height: 400px;">
           <div class="box box-shadow white">
             <div id="myorder" class="tab-pane middle active">
               <% var tabsData = [
@@ -177,7 +177,7 @@
           </div>
         </div>
 
-        <div id="mycollect" class="tab-pane middle pb-4" style="min-height: 400px;">
+        <div id="mycollect" class="tab-pane middle" style="min-height: 400px;">
           <div class="box box-shadow white">
             <%if(!user.collects || user.collects.length == 0){ %>
             <h4 class="text-center mt-2"><small><%= __('no-collect-tip')%><br/><a href="/meal"><%= __('browse')%></a></small></h4>
@@ -243,7 +243,7 @@
           </div>
         </div>
         <!-- collect end -->
-        <div id="myinfo" class="tab-pane middle pb-4" data-id="<%= user.id %>" style="min-height: 400px;">
+        <div id="myinfo" class="tab-pane middle" data-id="<%= user.id %>" style="min-height: 400px;">
           <div class="box box-shadow white">
             <form data-toggle="validator">
               <div class="row">
@@ -377,7 +377,7 @@
         </div>
 
         <!-- info end -->
-        <div id="myaddress" class="tab-pane middle pb-4" data-user="<%= user.id %>" style="min-height: 400px;">
+        <div id="myaddress" class="tab-pane middle" data-user="<%= user.id %>" style="min-height: 400px;">
           <div class="box box-shadow white text-left">
             <div class="row">
               <div class="col-12">
@@ -443,7 +443,7 @@
         </div>
         <!--my address end-->
 
-        <div id="myreview" class="tab-pane middle pb-4" style="min-height: 400px;">
+        <div id="myreview" class="tab-pane middle" style="min-height: 400px;">
           <div class="box box-shadow white">
             <div data-toggle="switch-box">
               <%

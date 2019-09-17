@@ -67,12 +67,39 @@ module.exports = {
             if(!_pickups.includes(p.nickname)){
               _pickups.push(p.nickname);
             }
-          })
+          });
           _pickups.push("custom");
           return res.view("meal_new",{dishes : host.dishes, host : host, drivers : d, pickups : _pickups});
         })
       })
     });
+  },
+
+  cart : function(req, res){
+    var userId = req.session.user.id;
+    moment.locale('en');
+    Meal.find({where: {status: "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime: {'>': moment().toDate()}}}).populate('dishes').exec(function(err, meals){
+      if(err){
+        return res.badRequest(err);
+      }
+      var _dishes = [];
+      meals.forEach(function(meal){
+        meal.dishes.forEach(function(dish){
+          if(!_dishes.some(function(d){ return d.id === dish.id; })){
+            _dishes.push(dish);
+          }
+        });
+      });
+      User.findOne(req.session.user.id).exec(function(err, user){
+        if(err){
+          return res.badRequest(err);
+        }
+        if(req.wantsJSON && process.env.NODE_ENV === "development"){
+          return res.ok({ dishes: _dishes, locale : req.getLocale(), user: user});
+        }
+        return res.view("cart",{ dishes: _dishes, locale : req.getLocale(), user: user});
+      });
+    })
   },
 
   catering : function(req, res){

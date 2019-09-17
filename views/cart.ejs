@@ -1,0 +1,107 @@
+<link href="/assets/cart.css" rel="stylesheet">
+<div id="cartContainer" class="container mt-2 text-center">
+  <div id="order" class="white floater static-floater py-4">
+    <% dishes.forEach(function(dish){ %>
+      <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-id="<%= dish.id%>" class="dish d-none dishItem py-2 mix item text-center
+        <% if(dish.tags){ dish.tags.forEach(function(t){%>
+                      <%= " " + t%>
+                    <%})}%>">
+        <div class="row vertical-align">
+          <div class="col-3">
+            <div class="photo rounded">
+              <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
+                <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
+                  <img data-echo="<%= index===0? photo.v : ''%>">
+                </a>
+              <% }});%>
+            </div>
+          </div>
+          <div class="col-9 px-2">
+            <h6 class="text-left">
+              <%= dish.title%><br/>
+             <small>
+               <%= dish.titleI18n() %>
+             </small>
+
+            </h6>
+            <div class="d-flex flex-row justify-content-around">
+              X<span class="amount mr-2">1</span>
+              <button class="minus rounded-circle border-red text-red mr-2" style="font-weight: 900;width: 28px;height: 28px;" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
+                <span style="padding: 0 2px;">-</span>
+              </button>
+              <button class="minus rounded-circle border-red text-red" style="font-weight: 900;width: 28px;height: 28px;" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
+                <span>+</span>
+              </button>
+              <div class="text text-price price ml-auto mr-4" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
+                <% if(dish.discount){%>
+                  <s class='text-grey' style='font-size: small;'>$<%= (parseFloat(dish.price) + parseFloat(dish.discount)).toFixed(2)%></s>$<%= dish.price.toFixed(2)%>
+                <% }else{%>
+                  $<%= dish.price.toFixed(2)%>
+                <% }%>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+      <table class="table mt-2" data-err-container="#alert-order">
+        <tbody>
+        <tr>
+          <th class="d-flex justify-content-between border-0"><%= __('subtotal')%>:<span class="subtotal pull-right"></span></th>
+        </tr>
+        <% if(user && !user.emailVerified){%>
+          <tr id="emailVerificationView">
+            <th style="vertical-align: middle;"><i class="fas fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i> <%= __('email')%></th>
+            <th><input class="form-control" name="email" style="width:170px;" type="email" value="<%= user.auth ? (user.auth.email || '') : ''%>"></th>
+          </tr>
+          <tr>
+            <th class="text-right"><button id="emailVerifyBtn" class="btn btn-grey-green active"><%= __('verify-email')%></button></th>
+          </tr>
+        <% }if(user && user.id){%>
+        <tr>
+          <th class="d-flex justify-content-between vertical-align">
+            <span class="mr-2"><%= __('discount-amount')%>:</span>
+            <button id="applyPointsBtn" class="btn btn-success"><%= __('apply-code')%></button>
+            <button id="disApplyPointsBtn" class="btn btn-danger" onclick="l.applyPoints(false)"><%= __('cancel')%></button>
+            <input class="points form-control" style="margin:0 5px 0 5px;width: 60px;" readonly value="<%= user?(user.points || 0):-1%>"><i class="fas fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i>
+            <span class="ml-auto">-$ <span class="discount">0</span></span>
+          </th>
+        </tr>
+        <%}%>
+        <tr>
+          <th class="d-flex justify-content-between border-0 vertical-align">
+            <span><%= ('Tip')%>:</span>
+            <div class="btn-group btn-group-toggle vertical-align" id="tipControl" data-toggle="buttons">
+              <label class="btn btn-outline-dark">
+                <input type="radio" name="tipInputOption" autocomplete="off" checked value=15 data-value-type="%">
+                15%
+              </label>
+              <label class="btn btn-outline-dark">
+                <input type="radio" name="tipInputOption" autocomplete="off" value=12 data-value-type="%">
+                12%
+              </label>
+            </div>
+
+            <div class="input-group" style="width: 106px;">
+              <div class="input-group-prepend">
+                <span class="input-group-text">$</span>
+              </div>
+              <input class="form-control tip" id="tipInput" style="width: 70px;">
+            </div>
+          </th>
+        </tr>
+        <tr>
+          <th class="text-right"><%= __('total') %><span class="total"></span></th>
+        </tr>
+        </tbody>
+      </table>
+      <div class="alert alert-warning d-none" style="margin-bottom: 50px;" ></div>
+      <div id="shoppingCartView" class="red text-white p-2 align-middle d-block w-100" style="line-height:50px;position: fixed;bottom: 80px;left: 0;z-index:90;" onclick="javascript:location.href='#order'">
+        <div class="d-flex justify-content-end vertical-align">
+          <button class="btn btn-outline-light mr-auto" onclick="javascript:location.href='/meal'"><i class="fa fa-list"></i> <%= __('Back')%></button>
+          <button type="button" class="btn btn-outline-light" id="gotoCheckoutBtn" class="mr-2"><%= __('go-to-check-out-btn')%></button>
+        </div>
+      </div>
+  </div>
+</div>
+<script src="/assets/zh.cart.bundle.js"></script>
