@@ -1118,7 +1118,7 @@ let localOrderObj = {
       discount = 0;
     }
     total = total.toFixed(2);
-    $order.find(".discount").text(discount);
+    $order.find(".item .discount").text(discount);
     $order.find(".total").html("$" + total);
     $order.find(".total").data("value", total);
     this.refreshCart(total, numberOfItem);

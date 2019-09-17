@@ -216,7 +216,9 @@
                           <div class="d-flex vertical-align">
                             <div class="text text-price price mr-auto" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
                               <% if(dish.discount){%>
-                                <s class='text-grey' style='font-size: small;'>$<%= (parseFloat(dish.price) + parseFloat(dish.discount)).toFixed(2)%></s><br/>$<%= dish.price.toFixed(2)%>
+                                <s class='text-grey' style='font-size: small;'>$<%= (parseFloat(dish.price) + parseFloat(dish.discount)).toFixed(2)%></s>
+                                <br/>
+                                $<%= dish.price.toFixed(2)%>
                               <% }else{%>
                               $<%= dish.price.toFixed(2)%>
                               <% }%>
