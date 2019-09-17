@@ -47,7 +47,7 @@
       <table class="table mt-2" data-err-container="#alert-order">
         <tbody>
         <tr>
-          <th class="d-flex justify-content-between border-0"><%= __('subtotal')%>:<span class="subtotal pull-right"></span></th>
+          <th class="d-flex justify-content-between"><%= __('subtotal')%>:<span class="subtotal pull-right"></span></th>
         </tr>
         <% if(user && !user.emailVerified){%>
           <tr id="emailVerificationView">
@@ -59,7 +59,7 @@
           </tr>
         <% }if(user && user.id){%>
         <tr>
-          <th class="d-flex justify-content-between vertical-align">
+          <th class="d-flex justify-content-between vertical-align border-0">
             <span class="mr-2"><%= __('discount-amount')%>:</span>
             <button id="applyPointsBtn" class="btn btn-success"><%= __('apply-code')%></button>
             <button id="disApplyPointsBtn" class="btn btn-danger" onclick="l.applyPoints(false)"><%= __('cancel')%></button>
@@ -93,6 +93,7 @@
         <tr>
           <th class="text-right"><%= __('total') %><span class="total"></span></th>
         </tr>
+        <tr><th class="border-0"></th></tr>
         </tbody>
       </table>
       <div class="alert alert-warning d-none" style="margin-bottom: 50px;" ></div>

@@ -1239,6 +1239,18 @@ var CartView = Backbone.View.extend({
     "change [name='tipInputOption']" : "changeTip",
     "blur #tipInput" : "changeTip"
   },
+  initialize : function(){
+    var tipValue = parseFloat(helperMethod.readCookie("tip"));
+    console.log("loading tip");
+    if(!tipValue){
+      let tipDefaultOpt = this.$el.find("#tipControl label:first");
+      tipDefaultOpt.addClass('active');
+      let subtotal = parseFloat(this.$el.find(".subtotal").text().replace("$",""));
+      tipValue = (subtotal * tipDefaultOpt.find("input").val() / 100).toFixed(2);
+      helperMethod.createCookie("tip", tipValue, 5);
+      localOrderObj.refreshCheckoutMenu();
+    }
+  },
   gotoCheckout : function(e){
     var orderedDishes = [];
     Object.keys(localOrderObj.localOrders).forEach(function(dishId){
@@ -1289,7 +1301,6 @@ var CartView = Backbone.View.extend({
     localOrderObj.applyPoints(true, pointRedeem);
   },
   changeTip : function(e){
-    console.log("changing tip");
     let tipInputOption = $(e.currentTarget);
     let valueType = tipInputOption.data("value-type");
     let tipInput = this.$el.find("#tipInput");
@@ -4224,6 +4235,7 @@ var OrderView = Backbone.View.extend({
       helperMethod.eraseCookie(dishId);
     });
     helperMethod.eraseCookie('points');
+    helperMethod.eraseCookie('tip');
     localOrderObj.localOrders = {};
     localOrderObj.localPoints = 0;
   },
