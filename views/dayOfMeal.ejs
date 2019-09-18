@@ -1,7 +1,7 @@
 <link href="/assets/dayOfMeal.css" rel="stylesheet">
 <div class="default-container text-center relative">
 
-  <div id="dayOfMealContainer" style="max-width: 800px;padding-bottom: 64px;" class="mx-auto" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>" data-pickup-nickname="<%= pickupNickname || ''%>">
+  <div id="dayOfMealContainer" style="max-width: 800px;" class="mx-auto" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>" data-pickup-nickname="<%= pickupNickname || ''%>">
 
     <% if(meals && meals.meals){%>
     <div class="w-100 sticky-top">
@@ -79,7 +79,7 @@
       <nav id="dishTagsBar" class="sticky-top py-2" style="overflow-y: scroll;min-width: 100px;">
         <ul class="list list-side list-unstyled" data-toggle="btn-set">
           <% tags.forEach(function(tag, index){%>
-            <li class="cursor-pointer border-bottom <%= index===0?'active':''%>"><a style="white-space: nowrap;" data-offset=-94 href="<%= tag.replace("'","").replace(" ","")%>"><%= __(tag)%></a></li>
+            <li class="cursor-pointer border-bottom <%= index===0?'active':''%> <%= tag==="discount"?'yellow':''%>"><a style="white-space: nowrap;" data-offset=-94 href="<%= tag.replace("'","").replace(" ","")%>"><%= __(tag)%></a></li>
           <% })%>
         </ul>
         <% if(!user || (user && !user.newUserRewardIsRedeemed && user.points === 0)){ %>
