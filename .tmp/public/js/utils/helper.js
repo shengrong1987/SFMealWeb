@@ -742,6 +742,7 @@ let localOrderObj = {
         var number = _this.localOrders[dishId].number;
         if(number){
           var dishItems = $("#order").find(".dish[data-id='" + dishId + "']");
+          dishItems.removeClass("d-none");
           dishItems.each(function(){
             $(this).find("[name='input-group']").removeClass("d-none");
             $(this).find("[name='input-group']").show();
@@ -803,13 +804,13 @@ let localOrderObj = {
         priceItem.data("extra", extra);
         if(extra > 0){
           if(discount){
-            priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s><br/>" + "$" + price + " ($" + extra + ")");
+            priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s>" + "$" + price + " ($" + extra + ")");
           }else{
             priceItem.html("$" + price + " ($" + extra + ")");
           }
         }else{
           if(discount){
-            priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s><br/>" + "$" + price);
+            priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s>" + "$" + price);
           }else{
             priceItem.html("$" + price);
           }
@@ -817,7 +818,7 @@ let localOrderObj = {
       }else{
         priceItem.data("extra", 0);
         if(discount){
-          priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s><br/>" + "$" + price);
+          priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s>" + "$" + price);
         }else{
           priceItem.html("$" + price);
         }
@@ -1050,7 +1051,7 @@ let localOrderObj = {
     var method = $("#method").find(".active").attr("value");
     var $order = $("#order");
     var _dishes = [];
-    $order.find(".item").each(function(){
+    $order.find(".item:visible").each(function(){
       var dishId = $(this).data("id");
       if(_dishes.includes(dishId)){
         return;
@@ -1058,12 +1059,13 @@ let localOrderObj = {
         _dishes.push(dishId);
       }
       var unitPrice = parseFloat($(this).find(".price").attr("value"));
-      var amount = parseInt($(this).find(".amount").val());
+      var amount = parseInt($(this).find(".amount").val()||0);
       var dishView = $("#meal-confirm-container").find(".dish[data-id='" + dishId + "']");
       if(amount){
         dishView.addClass("table-success").show();
       }else if(dishView.hasClass("table-success")){
         dishView.removeClass("table-success").hide();
+        return;
       }
       var _subtotal = amount * unitPrice + parseFloat($(this).find(".price").data("extra"))
       if(_subtotal > 0){
@@ -1086,43 +1088,39 @@ let localOrderObj = {
     var taxRate = $order.find("[data-taxrate]").data("taxrate");
     // var tax = parseFloat(subtotal * taxRate);
     var tax = 0;
-    var serviceFee = 0;
     $order.find(".tax").text(" $" + tax.toFixed(2));
     var coupons = Object.keys(this.localCoupon);
     var $orderTotal = $order.find(".total");
+    var tip = parseFloat(helperMethod.readCookie("tip"));
+    $order.find(".tip").text(tip.toFixed(2));
+    $order.find(".tip").val(tip.toFixed(2));
+    var total = subtotal+delivery+tax+tip;
     if(coupons.length > 0){
       $("#applyCouponBtn").hide();
       $("#disApplyCouponBtn").show();
       $order.find(".coupon-code").val(coupons[0]);
       var discount = this.localCoupon[coupons[0]];
-      var total = subtotal+delivery+tax-discount;
-      if(total < 0){total = 0;}
-      total = (total + serviceFee).toFixed(2);
-      $orderTotal.data("value",total);
-      $orderTotal.html(" $" + total + "( -$" + discount.toFixed(2) + " )");
-      $("#meal-confirm-container").find(".total").text(" $" + total + "( -$" + discount.toFixed(2) + " )");
+      total -= discount;
+      if(total < 0){ total = 0;}
     }else{
       $("#applyCouponBtn").show();
       $("#disApplyCouponBtn").hide();
-      total = (subtotal+delivery+tax+serviceFee).toFixed(2);
-      $orderTotal.data("value",(subtotal+delivery+tax+serviceFee).toFixed(2));
-      $orderTotal.html(" $" + (subtotal+delivery+tax+serviceFee).toFixed(2));
-      $("#meal-confirm-container").find(".total").text(total);
     }
     if(this.localPoints){
       discount = this.localPoints/10;
       $("#applyPointsBtn").hide();
       $("#disApplyPointsBtn").show();
-      total = subtotal+delivery+tax-discount;
+      total -= discount;
       if(total < 0){total = 0;}
-      total = (total + serviceFee).toFixed(2);
-      $orderTotal.data("value",total);
-      $orderTotal.html(" $" + total + "( -$" + discount.toFixed(2) + " )");
-      $("#meal-confirm-container").find(".total").text(" $" + total + "( -$" + discount.toFixed(2) + " )");
     }else{
       $("#applyPointsBtn").show();
       $("#disApplyPointsBtn").hide();
+      discount = 0;
     }
+    total = total.toFixed(2);
+    $order.find(".item .discount").text(discount);
+    $order.find(".total").html("$" + total);
+    $order.find(".total").data("value", total);
     this.refreshCart(total, numberOfItem);
   },
   refreshCart : function(subtotal, numberOfItem){

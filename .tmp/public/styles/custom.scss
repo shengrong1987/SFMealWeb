@@ -2268,7 +2268,7 @@ select.form-control{
   //width: 80%;
   //background-color: #f2f2f2;
   margin: auto;
-  min-height: 400px;
+  min-height: 700px;
 }
 
 .box-wrapper{
@@ -2849,6 +2849,20 @@ $lines-to-show: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.navbar.navbar-bottom{
+  a{
+    color: grey !important;
+  }
+  a.active{
+    color: red !important;
+    background-color: #f5f4f4;
+  }
+  a:hover{
+    color: red !important;
+    background-color: #f5f4f4;
+  }
 }
 
 /*

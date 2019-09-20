@@ -2601,7 +2601,7 @@ module.exports = {
         }
         var pickupInfo;
         meal.pickups.forEach(function(pickup){
-          if(pickup.id === pickupOption){
+          if(pickup.id == pickupOption){
             pickupInfo = Object.assign({}, pickup);
           }
         });

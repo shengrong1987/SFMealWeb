@@ -354,7 +354,8 @@ module.exports = {
             "method": "pickup",
             "county" : host.county,
             "area" : '',
-            'id' : 1
+            'id' : 1,
+            "nickname" : "order"
           };
           var deliveryOption = {
             "pickupFromTime": values.provideFromTime,
@@ -367,7 +368,8 @@ module.exports = {
             "method": "delivery",
             "county" : host.county,
             "area" : '',
-            "id" : 2
+            "id" : 2,
+            "nickname" : "order"
           };
           if(values.isDelivery){
             values.pickups = [pickupOption, deliveryOption];
@@ -429,7 +431,8 @@ module.exports = {
             "method": "pickup",
             "county" : host.county,
             "area" : '',
-            "id" : 1
+            "id" : 1,
+            "nickname" : "order"
           };
           var deliveryOption = {
             "pickupFromTime": values.provideFromTime,
@@ -442,7 +445,8 @@ module.exports = {
             "method": "delivery",
             "county" : host.county,
             "area" : '',
-            "id" : 2
+            "id" : 2,
+            "nickname" : "order"
           };
           if(values.isDelivery){
             values.pickups = [pickupOption, deliveryOption];

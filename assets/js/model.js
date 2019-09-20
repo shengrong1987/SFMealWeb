@@ -2084,6 +2084,7 @@ var MealView = Backbone.View.extend({
       type = "preorder";
 
     }else{
+      storeHourNickname = "order";
       startBookingDatePicker = form.find("#order .start-booking [data-toggle='dateTimePicker']");
       startBookingDate = startBookingDatePicker.data("DateTimePicker").date();
       endBookingDatePicker = form.find("#order .end-booking [data-toggle='dateTimePicker']");
