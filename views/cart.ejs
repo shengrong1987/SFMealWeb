@@ -64,7 +64,7 @@
             <button id="applyPointsBtn" class="btn btn-success"><%= __('apply-code')%></button>
             <button id="disApplyPointsBtn" class="btn btn-danger" onclick="l.applyPoints(false)"><%= __('cancel')%></button>
             <input class="points form-control" style="margin:0 5px 0 5px;width: 60px;" readonly value="<%= user?(user.points || 0):-1%>"><i class="fas fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i>
-            <span class="ml-auto">-$ <span class="discount">0</span></span>
+            <span class="ml-auto">-$ <span class="discount-amount">0</span></span>
           </th>
         </tr>
         <%}%>

@@ -205,17 +205,17 @@ body.loading .modal-loading {
   display: block;
 }
 
-::-webkit-scrollbar {
-  -webkit-appearance: none;
-  width: 7px;
-  height: 5px;
-}
-::-webkit-scrollbar-thumb {
-  border-radius: 4px;
-  height: 5px;
-  background-color: rgba(0,0,0,.5);
-  -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
-}
+//::-webkit-scrollbar {
+//  -webkit-appearance: none;
+//  width: 7px;
+//  height: 5px;
+//}
+//::-webkit-scrollbar-thumb {
+//  border-radius: 4px;
+//  height: 5px;
+//  background-color: rgba(0,0,0,.5);
+//  -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+//}
 .container{
   width: 100%;
 }

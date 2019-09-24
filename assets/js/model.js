@@ -4079,22 +4079,6 @@ var OrderView = Backbone.View.extend({
             contactObj.phone = phone;
           }
         }
-        // if (!isLogin) {
-        //
-        // } else {
-
-          // } else {
-          //   contactView = this.$el.find("#contactInfoView");
-          //   name = contactView.find("input[name='name']").val();
-          //   phone = contactView.find("input[name='phone']").val();
-          //   if (!name || !phone) {
-          //     makeAToast(__('nameAndPhoneEmptyError'));
-          //     return cb(false);
-          //   }
-          //   contactObj.name = name;
-          //   contactObj.phone = phone;
-          // }
-        // }
         cb(contactObj);
         break;
       case "delivery":
@@ -4227,6 +4211,7 @@ var OrderView = Backbone.View.extend({
         });
       }else{
         paymentInfo.method = paymentMethod;
+        paymentInfo.paypalOrderId = cards.data("order");
         return cb(paymentInfo);
       }
     }
@@ -4239,6 +4224,78 @@ var OrderView = Backbone.View.extend({
     helperMethod.eraseCookie('tip');
     localOrderObj.localOrders = {};
     localOrderObj.localPoints = 0;
+  },
+  preCheckOrder : function(cb){
+    var $this = this;
+    var userId = this.$el.data("user");
+    var isLogin = !!userId;
+    var params = {};
+    var method = this.$el.find("#method .active").attr("value");
+    this.getContactInfo(method, isLogin, function(contactInfo){
+      if(!contactInfo){
+        helperMethod.jumpTo("pickupInfoView");
+        return cb(false);
+      }
+      appObj.mealConfirmView.verifyAddress(null, false, function (valid) {
+        if(!valid){
+          helperMethod.jumpTo("pickupOptionsView");
+          return cb(false);
+        }
+        $this.getPaymentInfo(isLogin, function(paymentInfo) {
+          if (!paymentInfo) {
+            helperMethod.jumpTo("payment-cards");
+            button.trigger("reset");
+            return cb(false);
+          }
+          var form = $this.$el.find("#order");
+          var partyMode = form.data("party");
+
+          //pickup option
+          var pickupObj = $this.getPickupOption(method);
+          if(!pickupObj){
+            helperMethod.jumpTo("pickupOdeliveryDateBtnptionsView");
+            return cb(false);
+          }
+          var pickupOption = pickupObj.index;
+          var pickupDate = pickupObj.date;
+          var pickupNickname = pickupObj.nickname;
+          $this.getCustomizedInfo(partyMode, function(customInfo){
+            if(!customInfo){
+              helperMethod.jumpTo("pickupInfoView");
+              button.trigger("reset");
+              return cb(false);
+            }
+            var currentOrder = localOrderObj.localOrders;
+
+            //subtotal
+            var subtotal = parseFloat(form.find(".subtotal").data("value"));
+            if (subtotal === 0) {
+              button.trigger("reset");
+              helperMethod.makeAToast(__('orderEmptyError'));
+              return cb(false);
+            }
+
+            if(partyMode){
+              var minimal = form.data("minimal");
+              if(subtotal < minimal){
+                button.trigger("reset");
+                helperMethod.makeAToast(__('orderAmountInsufficient', minimal));
+                return cb(false);
+              }
+            }
+            var points = localOrderObj.localPoints;
+            var couponValue = localOrderObj.localCoupon;
+            if (couponValue) {
+              var code = Object.keys(couponValue)[0];
+            }
+            var tip = parseFloat(form.find(".tip").text());
+            var discount = parseFloat(form.find(".summary .discount").text() || 0);
+            var total = subtotal + tip + VAR.SERVICE_FEE + VAR.SYSTEM_DELIVERY_FEE - discount;
+            cb(true, total);
+          });
+        });
+      }, contactInfo.address);
+    });
   },
   takeOrder : function(e){
     e.preventDefault();
@@ -4255,7 +4312,7 @@ var OrderView = Backbone.View.extend({
         return;
       }
       appObj.mealConfirmView.verifyAddress(null, false, function (valid) {
-        if (!valid) {
+        if(!valid){
           helperMethod.jumpTo("pickupOptionsView");
           return;
         }
@@ -4309,7 +4366,7 @@ var OrderView = Backbone.View.extend({
               var code = Object.keys(couponValue)[0];
             }
             var tip = parseFloat(form.find(".tip").text());
-            $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption,pickupDate,pickupNickname, method, code, points, isLogin, partyMode, tip, $this, button);
+            $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, pickupDate, pickupNickname, method, code, points, isLogin, partyMode, tip, $this, button);
           });
         });
       }, contactInfo.address);

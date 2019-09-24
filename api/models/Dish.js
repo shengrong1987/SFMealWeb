@@ -101,7 +101,7 @@ module.exports = {
       defaultsTo : false
     },
     discount : {
-      type : 'integer'
+      type : 'float'
     },
     cateringMinimalOrder : {
       type : 'integer',

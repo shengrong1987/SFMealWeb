@@ -360,7 +360,7 @@
               <%}%>
               <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable <%= (user.id && user.payment && user.payment.length) ? '' : 'active'%> py-2 col-3 disabled deliveryInput pickupInput" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
               <button data-toggle="tab" data-href="#venmoPayment" class="btn btn-disable  py-2 col-3 disabled" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
-              <button data-toggle="tab" data-href="#paypalPayment" class="btn btn-disable py-2 col-3 disabled" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method') %></button>
+              <button data-toggle="tab" data-href="#paypalPayment" class="btn btn-disable py-2 col-3 disabled" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method')%></button>
               <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg disabled" data-method="alipay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('alipay-method') %></button>-->
               <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg d-none disabled" data-method="wechatpay" style="margin-right: 10px;height: 80px;"><i class="fa fa-wechat fa-2x"></i><br/><%= __('wechatpay-method') %></button>-->
             </div>
@@ -476,23 +476,26 @@
                       <div class="help-block with-errors"></div>
                     </div>
                   </div>
+                  <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
                 </form>
               <%}%>
 
               <div id="cashPayment" class="tab-pane active">
                 <p><%= __('pay-cash-instruction')%></p>
+                <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
               </div>
               <div id="venmoPayment" class="tab-pane">
                 <div>
                   <!--<a class="venmo-qr"></a>-->
                   <p><%= __('venmo-instruction')%></p>
+                  <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
                 </div>
               </div>
               <div id="paypalPayment" class="tab-pane">
                 <p>https://www.paypal.me/sfmeal</p>
                 <p><%= __('paypal-instruction')%></p>
+                <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
               </div>
-
             </div>
           </div>
         </div>
@@ -506,7 +509,7 @@
               <h5 class="d-flex justify-content-end vertical-align">
                 <small>
                   <%= dish.titleI18n() %> X<span class="amount mr-2">1</span>
-                  <span class="text-price price" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>"
+                  <span class="text-price price" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
                   <% if(dish.discount){%>
                     <s class='text-grey' style='font-size: small;'>$<%= (parseFloat(dish.price) + parseFloat(dish.discount)).toFixed(2)%></s>$<%= dish.price.toFixed(2)%>
                   <% }else{%>
@@ -519,11 +522,11 @@
           <% }); %>
           <div class="divider" style="margin:0;"></div>
           <h5><small><%= __('subtotal')%>: <span class="subtotal"></span></small></h5>
-          <h5 class="d-flex justify-content-end">
+          <h5 class="d-flex justify-content-end summary">
               <span>
                 <small>
                   <%= __('delivery-fee')%>: <span class="delivery" data-value="0"></span><br/>
-                  <span class="text-red"><%= __('discount-amount')%>: -$<span class="discount"></span></span><br/>
+                  <span class="text-red"><%= __('discount-amount')%>: -$<span class="discount-amount"></span></span><br/>
                   <%= __('tip')%>: $<span class="tip">0</span><br/>
                 </small>
               </span>
@@ -531,8 +534,6 @@
           <div class="divider" style="margin: 0;"></div>
           <h5><%= __('total')%><span class="total"></span></h5>
         </div>
-
-        <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
         <div id="orderAlertView" class="alert alert-danger d-none mt-2"></div>
 
       </div>
@@ -540,3 +541,4 @@
   </div>
 </div>
 <script src="/assets/zh.checkout.bundle.js"></script>
+
