@@ -495,6 +495,7 @@
                 <p>https://www.paypal.me/sfmeal</p>
                 <p><%= __('paypal-instruction')%></p>
                 <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
+                <!--<div id="paypal-button-container"></div>-->
               </div>
             </div>
           </div>
@@ -522,11 +523,11 @@
           <% }); %>
           <div class="divider" style="margin:0;"></div>
           <h5><small><%= __('subtotal')%>: <span class="subtotal"></span></small></h5>
-          <h5 class="d-flex justify-content-end summary">
+          <h5 class="d-flex justify-content-end">
               <span>
                 <small>
                   <%= __('delivery-fee')%>: <span class="delivery" data-value="0"></span><br/>
-                  <span class="text-red"><%= __('discount-amount')%>: -$<span class="discount-amount"></span></span><br/>
+                  <span class="text-red"><%= __('discount-amount')%>: -$<span class="discount"></span></span><br/>
                   <%= __('tip')%>: $<span class="tip">0</span><br/>
                 </small>
               </span>
@@ -540,5 +541,33 @@
     </div>
   </div>
 </div>
-<script src="/assets/zh.checkout.bundle.js"></script>
 
+<!--<script-->
+  <!--src="https://www.paypal.com/sdk/js?client-id=Aad4dMpm3D0iSgfX5YztOwGMpCyVaIRamm4jAf4RGofPsGc5d_n5uAWedaKcQoAA4SXky0VnsC78NzsS&disable-funding=credit,card">-->
+<!--</script>-->
+<script src="/assets/zh.checkout.bundle.js"></script>
+<!--<script>-->
+  <!--paypal.Buttons({-->
+    <!--createOrder: function(data, actions) {-->
+      <!--appObj.orderView.preCheckOrder(function(valid, subtotal){-->
+        <!--if(!valid){-->
+          <!--return;-->
+        <!--}-->
+        <!--return actions.order.create({-->
+          <!--purchase_units: [{-->
+            <!--amount: {-->
+              <!--value: subtotal.toFixed(2)-->
+            <!--}-->
+          <!--}]-->
+        <!--});-->
+      <!--});-->
+    <!--},-->
+    <!--onApprove: function(data, actions) {-->
+      <!--return actions.order.capture().then(function(details){-->
+        <!--alert('Transaction completed by ' + details.payer.name.given_name);-->
+        <!--this.$el.find("#payment-cards button[data-method='paypal']").data("order", data.orderID);-->
+        <!--appObj.orderView.takeOrder(new Event('click'));-->
+      <!--});-->
+    <!--}-->
+  <!--}).render('#paypal-button-container');-->
+<!--</script>-->

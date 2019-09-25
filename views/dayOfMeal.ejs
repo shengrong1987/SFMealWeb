@@ -115,7 +115,7 @@
                 <h5 class="shopName"><%= hosts[0].chef.shopName%></h5>
                 <div>
                   <button id="likeBtn" class="btn btn-outline-success mr-lg-2" data-action="like" data-host="<%= hosts[0].id%>"><i class="fa fa-thumbs-up"></i> <span data-count="<%= hosts[0].likes%>"><%= hosts[0].likes%></span></button>
-                  <button id="followBtn" class="btn btn-outline-success ml-lg-2" data-action="follow" data-host="<%= hosts[0].id%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? true : false%>"><span class="text"><%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? __('followed') : __('follow')%> </span><i class="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? 'fas fa-star' : 'far fa-star'%>"></i></button>
+                  <!--<button id="followBtn" class="btn btn-outline-success ml-lg-2" data-action="follow" data-host="<%= hosts[0].id%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? true : false%>"><span class="text"><%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? __('followed') : __('follow')%> </span><i class="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].id}))) ? 'fas fa-star' : 'far fa-star'%>"></i></button>-->
                 </div>
               </div>
             </div>

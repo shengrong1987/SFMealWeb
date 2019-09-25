@@ -90,7 +90,7 @@ module.exports = {
           }
         });
       });
-      User.findOne(req.session.user.id).exec(function(err, user){
+      User.findOne(req.session.user.id).populate("auth").exec(function(err, user){
         if(err){
           return res.badRequest(err);
         }

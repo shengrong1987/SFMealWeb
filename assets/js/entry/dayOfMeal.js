@@ -22,8 +22,11 @@ $(document).ready(function(){
   helperMethod.lazyLoadImage("icon_share.png");
   helperMethod.lazyLoadImage("qrcode.jpg");
   helperMethod.lazyLoadImage("profile_man.png");
-  helperMethod.lazyLoadImage("image-loader.gif")
-})
+  helperMethod.lazyLoadImage("image-loader.gif");
+  if($("#newUserRewardIcon").length){
+    helperMethod.toggleModalUrl("/user/reward/newUser", "#myModal", $("#newUserRewardIcon"));
+  }
+});
 window.h = helperMethod;
 window.l = localOrderObj;
 window.$ = $;

@@ -1,5 +1,5 @@
 <link href="/assets/cart.css" rel="stylesheet">
-<div id="cartContainer" class="container mt-2 text-center">
+<div id="cartContainer" class="container mt-2 text-center" data-user="<%= user.id || null%>">
   <div id="order" class="white floater static-floater py-4">
     <% dishes.forEach(function(dish){ %>
       <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-id="<%= dish.id%>" class="dish d-none dishItem py-2 mix item text-center
@@ -51,11 +51,15 @@
         </tr>
         <% if(user && !user.emailVerified){%>
           <tr id="emailVerificationView">
-            <th style="vertical-align: middle;"><i class="fas fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i> <%= __('email')%></th>
-            <th><input class="form-control" name="email" style="width:170px;" type="email" value="<%= user.auth ? (user.auth.email || '') : ''%>"></th>
+            <th class="d-flex justify-content-between vertical-align border-0">
+              <%= __('email')%>
+              <input class="form-control" name="email" style="width:170px;" type="email" value="<%= user.auth ? (user.auth.email || '') : ''%>">
+              <i class="fas fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i>
+              <button id="emailVerifyBtn" class="btn btn-grey-green active"><%= __('verify-email')%></button>
+            </th>
           </tr>
           <tr>
-            <th class="text-right"><button id="emailVerifyBtn" class="btn btn-grey-green active"><%= __('verify-email')%></button></th>
+
           </tr>
         <% }if(user && user.id){%>
         <tr>

@@ -982,10 +982,6 @@ progress {
   font: inherit;
   -webkit-appearance: button; }
 
-summary {
-  display: list-item;
-  cursor: pointer; }
-
 [hidden] {
   display: none !important; }
 
