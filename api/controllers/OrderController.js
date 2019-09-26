@@ -255,7 +255,7 @@ module.exports = {
               meals.forEach(function(meal){
                 subtotal += meal.subtotal;
               });
-              sails.log.debug("#4/11 - Sucess in validating subtotal: " + subtotal + " with a minimal of " + _logisticInfo.pickupInfo.minimalOrder);
+              sails.log.debug("#4/11 - Success in validating subtotal: " + subtotal + " with a minimal of " + _logisticInfo.pickupInfo.minimalOrder);
               if(parseFloat(subtotal) < parseFloat(_logisticInfo.pickupInfo.minimalOrder) && !isAdmin){
                 return next({ code: -60, responseText : req.__('order-single-minimal-not-reach', _logisticInfo.pickupInfo.minimalOrder)});
               }

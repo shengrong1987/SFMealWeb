@@ -114,7 +114,7 @@ class ActionButton extends React.Component{
         }else if(action === "updatePickupInfo"){
           $.get('/meal/pickup', function(pickups){
             postData = {
-              pickupOption : { value : _this.props.data["pickupInfo"]["index"], type : 'select', options : pickups},
+              pickupOption : { value : _this.props.data["pickupInfo"]["id"], type : 'select', options : pickups},
               address : { value : _this.props.data["contactInfo"]["address"]},
               customInfo : { value : _this.props.data["customInfo"], type : 'json'},
               comment : { value : _this.props.data["pickupInfo"]["comment"], type : 'string'},
