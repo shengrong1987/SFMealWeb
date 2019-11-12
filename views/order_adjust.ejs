@@ -4,10 +4,11 @@
       <%= __('dish-out-tips')%>
     </div>
     <div id="order">
-      <table class="table" data-err-container="#adjustAlertView">
+      <table class="table none-margin" data-err-container="#adjustAlertView">
         <thead>
-        <tr>
-          <th><%= __('order-adjust-title')%></th>
+        <tr class="border-less">
+          <th colspan="3"><%= __('order-adjust-title')%></th>
+          <th colspan="2" class="text-right"><span class="cursor-pointer" onclick="h.dismissModal();">X</span></th>
         </tr>
         <tr>
           <th colspan="3"><%= __('name')%></th>
@@ -16,83 +17,82 @@
         </tr>
         </thead>
         <tbody>
-        <% var ids=""; orders.forEach(function(order){
-          if(ids){
-            ids += "+";
-          }
-          ids += order.id;
-          var list = order.orders;
-          order.dishes.forEach(function(dish){
-          var dishId = dish.id;
-          if(list.hasOwnProperty(dishId)) {
-          var number = list[dishId].number;
-          var preference = list[dishId].preference;
-          }else{
-          number = 0;
-          preference = null;
-          }
-          var preferenceTitle = "";
-          var extra = 0;
-          if(preference && preference.length){
-          preference.forEach(function(pref){
-          if(pref.property){
-          preferenceTitle += "(" + pref.property + "x1)";
-          }
-          extra += parseInt(pref.extra);
-          })
-          };
+        <% Object.keys(orderList).forEach(function(orderedDish) {
+            var dish = dishes.filter(function(d){
+              return d.id === orderedDish;
+            })[0];
+            if(!dish){
+              return;
+            }
+            var dishList = orderList[orderedDish];
+            var number = dishList.number || 0;
+            var preference = dishList.preference || null;
+            var preferenceTitle = "";
+            var extra = 0;
+            if(preference && preference.length){
+              preference.forEach(function(pref){
+                var prefText = "";
+                if(pref.property && pref.property.length){
+                  pref.property.forEach(function(prop){
+                    if(prefText){
+                      prefText += ",";
+                    }
+                    prefText += prop.property;
+                  })
+                }
+                if(prefText){
+                  preferenceTitle += "(" + prefText + ")";
+                  extra += parseInt(pref.extra);
+                }
+              });
+            };
         %>
-          <tr class="success item" data-id=<%= dish.id%> data-left-amount=<%= order.meal.leftQty[dish.id] %> data-preference="<%= JSON.stringify(preference)%>">
+          <tr class="item <%= number ? 'table-success' : ''%>" data-id=<%= dish.id%> data-left-amount=<%= dishList.leftQty %> data-preference="<%= JSON.stringify(preference)%>">
             <td colspan="3"><%= dish.title%><br/><span class="preference" data-preference="<%= preferenceTitle%>"><%= preferenceTitle%></span></td>
             <% if(!extra){%>
               <td class="price" data-extra="<%= extra%>" value="<%= dish.price.toFixed(2)%>">$<%= dish.price%></td>
             <%}else{%>
               <td class="price" data-extra="<%= extra%>" value="<%= dish.price.toFixed(2)%>">$<%= dish.price %> <br/>(+$<%= extra + ")"%></td>
             <%}%>
-
             <td>
-              <button type="button" class="btn btn-default btn-xs" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">-</button>
-              <input type="number" class="amount p-1" style="width:50px;" value="<%= number%>">
-              <button type="button" class="btn btn-default btn-xs" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
+              X<span class="amount mr-2"><%= number%></span>
+              <button class="minus rounded-circle border-red text-red mr-2" style="font-weight: 900;width: 28px;height: 28px;" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
+                <span style="padding: 0 2px;">-</span>
+              </button>
+              <button class="minus rounded-circle border-red text-red" style="font-weight: 900;width: 28px;height: 28px;" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
+                <span>+</span>
+              </button>
             </td>
           </tr>
-        <%})})%>
-        <tr></tr>
+        <%})%>
         <tr>
           <th colspan="3"></th>
-          <td></td>
-          <th class="text-right"><%= __('meal-fee')%><span class="subtotal"></span></th>
-        </tr>
-        <tr></tr>
-        <tr>
-          <th colspan="3"><%= __('pickup-method')%></th>
-          <td><%= __('estimated-time')%></td>
-          <td><%= __('delivery-fee')%></td>
-        </tr>
-        <tr></tr>
-        <tr class="info">
-          <td colspan="3"><%= __('self-pickup')%></td>
-          <td>30<%= __('min')%></td>
-          <td><%= __('free')%></td>
-        </tr>
-        <tr>
-          <th colspan="3"></th>
-          <td></td>
-          <th class="text-right"><%= __('meal-delivery-fee')%><span class="delivery" data-value="0"></span></th>
-        </tr>
-        <tr>
-          <th colspan="3"></th>
-          <td></td>
-          <th class="text-right"><%= __('tax')%>:<span class="tax" data-value="0" data-taxrate="<%= orders[0].getTaxRate()%>"> $0.00</span></th>
-        </tr>
-        <tr></tr>
-        <tr>
-          <th colspan="3"></th>
-          <td></td>
-          <th class="text-right"><%= __('total')%><span class="total" data-value="0"></span></th>
+          <th colspan="2" class="text-right font-elegant"><%= __('subtotal')%>: <span class="subtotal"></span></th>
         </tr>
         </tbody>
       </table>
+
+      <div class="d-flex justify-content-between vertical-align px-2">
+        <span><%= ('Tip')%>:</span>
+        <div class="btn-group btn-group-toggle vertical-align" id="tipControl" data-toggle="buttons">
+          <label class="btn btn-outline-dark">
+            <input type="radio" name="tipInputOption" autocomplete="off" checked value=15 data-value-type="%">
+            15%
+          </label>
+          <label class="btn btn-outline-dark">
+            <input type="radio" name="tipInputOption" autocomplete="off" value=12 data-value-type="%">
+            12%
+          </label>
+        </div>
+
+        <div class="input-group" style="width: 106px;">
+          <div class="input-group-prepend">
+            <span class="input-group-text">$</span>
+          </div>
+          <input class="form-control tip" id="tipInput" style="width: 70px;">
+        </div>
+      </div>
+
       <div class="text-center">
         <div id="orderAlertView" class="form alert alert-danger d-none"></div>
         <span class="divider"></span>

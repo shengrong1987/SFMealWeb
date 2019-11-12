@@ -220,7 +220,7 @@ var notification = {
 
     var chef = params.chef || params.host;
     var county = chef ? chef.county : params.county;
-    var isTaxIncluded = params.hasOwnProperty("isTaxIncluded") ? params.isTaxIncluded : ( params.meal ? params.meal.isTaxIncluded : false);
+    var isTaxIncluded = true;
     params.taxRate = isTaxIncluded ? 0 : util.getTaxRate(county);
     params.recipientName = basicInfo.recipientName;
     params.senderName = "SFMeal.com";
@@ -401,7 +401,7 @@ var notification = {
     if(model === "Order"){
       switch(action){
         case "new":
-          i18ns = i18ns.concat(['new-order-title-for-host','new-order-title-for-guest','new-order-context-for-host','new-order-context-for-guest','order-time','ready-time','order','preorder']);
+          i18ns = i18ns.concat(['new-order-title-for-host','new-order-title-for-guest','new-order-context-for-host','new-order-context-for-guest','order-time','ready-time','order','preorder','discount-amount-text']);
           break;
         case "adjust":
           i18ns = i18ns.concat(['adjust-order-context','adjust-order-from-host-context','modify','de-order','order-time','adjust-time','chef']);

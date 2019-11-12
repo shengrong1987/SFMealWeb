@@ -174,7 +174,7 @@
                 </div>
               </form>
             <%}%>
-            <div class="col-12 deliveryInput">
+            <div class="col-12">
               <div class="form-group text-center">
                 <button id="verifyAddressBtn" style="height: 50px;" class="btn btn-lg btn-green form-control"><%= __('calculate-delivery')%></button>
               </div>
@@ -182,7 +182,7 @@
           </div>
         </div>
 
-        <div id="pickupOptionsView">
+        <div id="pickupOptionsView" class="d-none">
 
           <div class="row my-4 text-left">
 
@@ -257,8 +257,8 @@
                           var colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue',];
                         pickups.forEach(function(pickup){ if(pickup.method!=='pickup'){return;}
                         %>
-                        <label class="btn btn-outline-light vertical-inline option pickupOption mix <%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-nickname="<%= pickup.nickname %>" data-meal="<%= pickup.meal%>" data-date="<%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-color="<%= colors[i]%>" data-location="<%= pickup.publicLocation || pickup.location%>">
-                          <input type="radio" id="pickup-1-<%= i%>" data-index="<%= pickup.id%>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
+                        <label class="btn btn-outline-light vertical-inline option pickupOption mix <%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-nickname="<%= pickup.nickname || 'custom' %>" data-meal="<%= pickup.meal%>" data-date="<%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-color="<%= colors[i]%>" data-location="<%= pickup.publicLocation || pickup.location%>" data-minimal="<%= pickup.minimalOrder || 0%>">
+                          <input type="radio" id="pickup-1-<%= i%>" data-index="<%= pickup.id || pickup.index %>" name="pickup-location-set" class="regular-radio" <%= i==0 ? "checked=''" : ''%>><label for="pickup-1-<%= i%>"></label>
                           <span class="content">
                           <i class="fa fa-hand-paper-o cursor-pointer mr-2 text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('pickup')%>"></i><span><%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%></span><br/>
                             <span class="location" data-value="<%= pickup.location%>"> <%= pickup.location%></span><br/>
@@ -281,9 +281,9 @@
                             colors = ['red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue','red', 'blue', 'green','pink','yellow','orange','dark-blue',];
                             i= 0;j = 0;
                             if(pickups){ pickups.forEach(function(pickup){ if(pickup.method == 'delivery'){ %>
-                              <label class="btn btn-outline-light option deliveryOption mix <%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-nickname="<%= pickup.nickname || '' %>" data-date="<%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-range="<%= pickup.deliveryRange%>" data-lat="<%= pickup.lat || ''%>" data-long="<%= pickup.long || ''%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-area="<%= pickup.area || '' %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
+                              <label class="btn btn-outline-light option deliveryOption mix <%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-minimal="<%= pickup.minimalOrder || 0%>" data-nickname="<%= pickup.nickname || 'custom' %>" data-date="<%= meal.getDateDesc(pickup.pickupFromTime).replace(" ",'').replace('/','')%>" data-range="<%= pickup.deliveryRange%>" data-lat="<%= pickup.lat || ''%>" data-long="<%= pickup.long || ''%>" data-time="<%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>" data-area="<%= pickup.area || '' %>" data-color="<%= colors[i]%>" data-center="<%= pickup.deliveryCenter%>">
                                 <div class="s"></div>
-                                <input type="radio" id="delivery-2-<%= i%>" data-index="<%= pickup.id%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>
+                                <input type="radio" id="delivery-2-<%= i%>" data-index="<%= pickup.id || pickup.index%>" name="delivery-contact-set" class="regular-radio" <%= j==0 ? "checked=''" : ''%>><label for="delivery-2-<%= i%>"></label>
                                 <span class="content">
                                 <i class="fa fa-truck cursor-pointer mr-2 text-<%= colors[i]%>" data-toggle="tooltip" title="<%= __('delivery')%>"></i><%= meal.dispatchingHour(pickup.pickupFromTime, pickup.pickupTillTime)%>
                               </span>
@@ -291,11 +291,6 @@
                             <%j++;}i++;})}; %>
                             <h5 class="empty d-none text-center">
                               <small class="text-red"><%= __('delivery-out-of-range-error')%></small><br/><br/>
-                              <small class="text-red"><%= __('other-area-shipping')%></small>
-                              <button id="switchToShippingBtn" class="btn btn-outline-dark"><%= __('shipping')%></button>
-                            </h5>
-                            <h5 class="no-address text-center">
-                              <small><%= __('enter-address-to-see')%></small>
                             </h5>
                           </div>
                         </div>
@@ -329,173 +324,180 @@
 
               </div>
             </div>
-          </div>
-        </div>
 
-        <div class="row my-2">
-          <div class="col-12">
-            <div class="light-grey py-2 text-left">
-              <h5 class="pl-2 mb-0"><%= __('payment-method') %></h5>
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-12">
-            <div id="payment-cards" class="btn-group text-left pt-2 w-100 row" style="margin: 0;">
-              <%
-              var userId = user.id;
-              if(userId){
-                var cards = user.payment;
-              if(cards){
-              for(var j=0; j < cards.length; j++){
-                var card = cards[j];
-                var last4 = card.last4;
-              %>
-              <button class="btn btn-disable py-2 col-3 <%if(card.isDefaultPayment){%> active<%}%> disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="h.toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
-              <%}}%>
-              <button class="btn btn-disable py-2 col-3 disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="h.toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
-              <%}else{%>
-                <button data-toggle="tab" data-href="#cardPayment" class="btn btn-disable py-2 col-3 disabled" data-method="online"><strong><i class="fa fa-credit-card fa-2x"></i></strong><br/><%= __('bank-card') %></button>
-              <%}%>
-              <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable <%= (user.id && user.payment && user.payment.length) ? '' : 'active'%> py-2 col-3 disabled deliveryInput pickupInput" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
-              <button data-toggle="tab" data-href="#venmoPayment" class="btn btn-disable  py-2 col-3 disabled" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
-              <button data-toggle="tab" data-href="#paypalPayment" class="btn btn-disable py-2 col-3 disabled" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method')%></button>
-              <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg disabled" data-method="alipay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('alipay-method') %></button>-->
-              <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg d-none disabled" data-method="wechatpay" style="margin-right: 10px;height: 80px;"><i class="fa fa-wechat fa-2x"></i><br/><%= __('wechatpay-method') %></button>-->
-            </div>
-          </div>
-        </div>
-
-
-
-        <div class="row">
-          <div class="col-12">
-            <div class="tab-content pt-4">
-
-              <% if(!user.id){%>
-                <form id="cardPayment" class="text-left tab-pane">
-
-                  <div class="row">
-                    <div class="col-12 text-left">
-                      <h4 style="display: inline-block;"><strong><%= __('billing-address') %></strong></h4>
-                      <a class="text-orange cursor-pointer" href="javascript:void(0)" onclick="h.toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html"><%= __('login-tips-payment')%></a>
-                    </div>
-                  </div>
-
-                  <div class="row deliveryInput shippingInput d-none">
-                    <div class="col-12 text-left">
-                      <div class="form-check form-group">
-                        <label class="form-check-label">
-                          <input class="form-check-input checkbox-inline" name="billingAddress" type="checkbox">
-                          <%= __('same-as-delivery-address')%>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="control-label"><%= __('street')%> *</label>
-                    <input class="form-control required" name="street">
-                  </div>
-                  <div class="row">
-                    <div class="col-6">
-                      <div class="form-group">
-                        <label class="control-label"><%= __('city')%> *</label>
-                        <input class="form-control required" name="city">
-                      </div>
-                    </div>
-                    <div class="col-6">
-                      <div class="form-group">
-                        <label class="control-label"><%= __('state')%> *</label>
-                        <input class="form-control required" name="state">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-6">
-                      <div class="form-group">
-                        <label class="control-label"><%= __('zipcode')%> *</label>
-                        <input class="form-control required" name="zipcode">
-                      </div>
-                    </div>
-                    <div class="col-6">
-                      <div class="form-group">
-                        <label class="control-label"><%= __('country')%> *</label>
-                        <div class="flagstrap" name="country" data-input-name="country" data-selected-country="US"></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-12 text-left">
-                      <h4><strong><%= __('card-info') %></strong></h4>
-                    </div>
-                  </div>
-
-                  <h3></h3>
-
-                  <div class="form-group">
-                    <label><%= __('card-holder')%> *</label>
-                    <input class="form-control required" name="card-holder">
-                  </div>
-
-                  <div class="form-group">
-                    <label class="control-label" for="textinput"><%= __('card-number')%> *</label>
-                    <input class="form-control required" name="card-number">
-                  </div>
-
-                  <div class="form-group">
-                    <label class="control-label" for="textinput"><%= __('card-exp')%> *</label>
-                    <div class="form-inline">
-                      <select name="month" data-toggle="select" data-stripe="exp-month" class="card-expiry-month stripe-sensitive required form-control" value=<%= typeof payment != 'undefined' ? payment.exp_month : '1'%>>
-                        <option value="1" selected="selected">01</option>
-                        <option value="2">02</option>
-                        <option value="3">03</option>
-                        <option value="4">04</option>
-                        <option value="5">05</option>
-                        <option value="6">06</option>
-                        <option value="7">07</option>
-                        <option value="8">08</option>
-                        <option value="9">09</option>
-                        <option value="10">10</option>
-                        <option value="11">11</option>
-                        <option value="12">12</option>
-                      </select>
-                      <span> / </span>
-                      <select name="year" data-toggle="select" data-stripe="exp-year" class="card-expiry-year stripe-sensitive required form-control" value=<%= typeof payment != 'undefined' ? payment.exp_year : '2017'%>>
-                      </select>
-                    </div>
-                  </div>
-
-                  <!-- CVV -->
-                  <div class="form-group">
-                    <label class="control-label" for="textinput">CVV/CVV2</label>
-                    <div>
-                      <input name="cvv" placeholder="CVV" maxlength="4" class="card-cvc form-control" required data-error="<%= __('cvv-wrong-format')%>">
-                      <div class="help-block with-errors"></div>
-                    </div>
-                  </div>
-                  <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
-                </form>
-              <%}%>
-
-              <div id="cashPayment" class="tab-pane active">
-                <p><%= __('pay-cash-instruction')%></p>
-                <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
+            <div class="col-12 mt-4">
+              <div class="form-group text-center">
+                <button id="confirmDeliveryTimeBtn" style="height: 50px;" class="btn btn-lg btn-green form-control"><%= __('confirm-delivery')%></button>
               </div>
-              <div id="venmoPayment" class="tab-pane">
-                <div>
-                  <!--<a class="venmo-qr"></a>-->
-                  <p><%= __('venmo-instruction')%></p>
+            </div>
+          </div>
+        </div>
+
+        <div id="paymentOptionsView" class="d-none">
+          <div class="row my-2">
+            <div class="col-12">
+              <div class="light-grey py-2 text-left">
+                <h5 class="pl-2 mb-0"><%= __('payment-method') %></h5>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <div id="payment-cards" class="btn-group text-left pt-2 w-100 row" style="margin: 0;">
+                <%
+                var userId = user.id;
+                if(userId){
+                  var cards = user.payment;
+                if(cards){
+                for(var j=0; j < cards.length; j++){
+                  var card = cards[j];
+                  var last4 = card.last4;
+                %>
+                <button class="btn btn-disable py-2 col-3 <%if(card.isDefaultPayment){%> active<%}%> disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/<%=card.id%>" onclick="h.toggleModal(event)"><strong><%= card.brand %><br/><%= last4 %></strong></button>
+                <%}}%>
+                <button class="btn btn-disable py-2 col-3 disabled" data-method="online" toggle="modal" data-target="#myModal" data-href="/payment/new" onclick="h.toggleModal(event)"><strong><i class="fa fa-plus fa-2x"></i></strong><br/><%= __('add-new') %><br/><%= __('payment-method') %></button>
+                <%}else{%>
+                  <button data-toggle="tab" data-href="#cardPayment" class="btn btn-disable py-2 col-3 disabled" data-method="online"><strong><i class="fa fa-credit-card fa-2x"></i></strong><br/><%= __('bank-card') %></button>
+                <%}%>
+                <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable <%= (user.id && user.payment && user.payment.length) ? '' : 'active'%> py-2 col-3 disabled deliveryInput pickupInput" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
+                <button data-toggle="tab" data-href="#venmoPayment" class="btn btn-disable  py-2 col-3 disabled" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
+                <button data-toggle="tab" data-href="#paypalPayment" class="btn btn-disable py-2 col-3 disabled" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method')%></button>
+                <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg disabled" data-method="alipay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('alipay-method') %></button>-->
+                <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg d-none disabled" data-method="wechatpay" style="margin-right: 10px;height: 80px;"><i class="fa fa-wechat fa-2x"></i><br/><%= __('wechatpay-method') %></button>-->
+              </div>
+            </div>
+          </div>
+
+
+
+          <div class="row">
+            <div class="col-12">
+              <div class="tab-content pt-4">
+
+                <% if(!user.id){%>
+                  <form id="cardPayment" class="text-left tab-pane">
+
+                    <p><%= __('transaction-fee-instruction')%></p>
+
+                    <div class="row">
+                      <div class="col-12 text-left">
+                        <h4 style="display: inline-block;"><strong><%= __('billing-address') %></strong></h4>
+                        <a class="text-orange cursor-pointer" href="javascript:void(0)" onclick="h.toggleModal(event)" toggle="modal" data-target="#myModal" data-href="/templates/user/signin.html"><%= __('login-tips-payment')%></a>
+                      </div>
+                    </div>
+
+                    <div class="row deliveryInput shippingInput d-none">
+                      <div class="col-12 text-left">
+                        <div class="form-check form-group">
+                          <label class="form-check-label">
+                            <input class="form-check-input checkbox-inline" name="billingAddress" type="checkbox">
+                            <%= __('same-as-delivery-address')%>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="control-label"><%= __('street')%> *</label>
+                      <input class="form-control required" name="street">
+                    </div>
+                    <div class="row">
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label class="control-label"><%= __('city')%> *</label>
+                          <input class="form-control required" name="city">
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label class="control-label"><%= __('state')%> *</label>
+                          <input class="form-control required" name="state">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label class="control-label"><%= __('zipcode')%> *</label>
+                          <input class="form-control required" name="zipcode">
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label class="control-label"><%= __('country')%> *</label>
+                          <div class="flagstrap" name="country" data-input-name="country" data-selected-country="US"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-12 text-left">
+                        <h4><strong><%= __('card-info') %></strong></h4>
+                      </div>
+                    </div>
+
+                    <h3></h3>
+
+                    <div class="form-group">
+                      <label><%= __('card-holder')%> *</label>
+                      <input class="form-control required" name="card-holder">
+                    </div>
+
+                    <div class="form-group">
+                      <label class="control-label" for="textinput"><%= __('card-number')%> *</label>
+                      <input class="form-control required" name="card-number">
+                    </div>
+
+                    <div class="form-group">
+                      <label class="control-label" for="textinput"><%= __('card-exp')%> *</label>
+                      <div class="form-inline">
+                        <select name="month" data-toggle="select" data-stripe="exp-month" class="card-expiry-month stripe-sensitive required form-control" value=<%= typeof payment != 'undefined' ? payment.exp_month : '1'%>>
+                          <option value="1" selected="selected">01</option>
+                          <option value="2">02</option>
+                          <option value="3">03</option>
+                          <option value="4">04</option>
+                          <option value="5">05</option>
+                          <option value="6">06</option>
+                          <option value="7">07</option>
+                          <option value="8">08</option>
+                          <option value="9">09</option>
+                          <option value="10">10</option>
+                          <option value="11">11</option>
+                          <option value="12">12</option>
+                        </select>
+                        <span> / </span>
+                        <select name="year" data-toggle="select" data-stripe="exp-year" class="card-expiry-year stripe-sensitive required form-control" value=<%= typeof payment != 'undefined' ? payment.exp_year : '2017'%>>
+                        </select>
+                      </div>
+                    </div>
+
+                    <!-- CVV -->
+                    <div class="form-group">
+                      <label class="control-label" for="textinput">CVV/CVV2</label>
+                      <div>
+                        <input name="cvv" placeholder="CVV" maxlength="4" class="card-cvc form-control" required data-error="<%= __('cvv-wrong-format')%>">
+                        <div class="help-block with-errors"></div>
+                      </div>
+                    </div>
+                    <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
+                  </form>
+                <%}%>
+
+                <div id="cashPayment" class="tab-pane active">
+                  <p><%= __('pay-cash-instruction')%></p>
                   <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
                 </div>
-              </div>
-              <div id="paypalPayment" class="tab-pane">
-                <p>https://www.paypal.me/sfmeal</p>
-                <p><%= __('paypal-instruction')%></p>
-                <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
-                <!--<div id="paypal-button-container"></div>-->
+                <div id="venmoPayment" class="tab-pane">
+                  <div>
+                    <p><%= __('venmo-instruction')%></p>
+                    <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
+                  </div>
+                </div>
+                <div id="paypalPayment" class="tab-pane">
+                  <p><%= __('transaction-fee-instruction')%></p>
+                  <div id="paypal-button-container"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -503,7 +505,7 @@
 
         <div id="order" class="text-right">
           <% dishes.forEach(function(dish){ %>
-            <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-id="<%= dish.id%>" class="dish d-none dishItem mix item text-center
+            <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" style="background: white !important;" data-id="<%= dish.id%>" class="dish d-none dishItem mix item text-center
               <% if(dish.tags){ dish.tags.forEach(function(t){%>
                    <%= " " + t%>
               <%})}%>">
@@ -526,8 +528,9 @@
           <h5 class="d-flex justify-content-end">
               <span>
                 <small>
+                  <%= __('transaction-fee')%>: <span class="transaction" data-value="0">$0</span><br/>
                   <%= __('delivery-fee')%>: <span class="delivery" data-value="0"></span><br/>
-                  <span class="text-red"><%= __('discount-amount')%>: -$<span class="discount"></span></span><br/>
+                  <span class="text-red"><%= __('discount-amount')%>: -$<span class="discount-amount"></span></span><br/>
                   <%= __('tip')%>: $<span class="tip">0</span><br/>
                 </small>
               </span>
@@ -542,32 +545,33 @@
   </div>
 </div>
 
-<!--<script-->
-  <!--src="https://www.paypal.com/sdk/js?client-id=Aad4dMpm3D0iSgfX5YztOwGMpCyVaIRamm4jAf4RGofPsGc5d_n5uAWedaKcQoAA4SXky0VnsC78NzsS&disable-funding=credit,card">-->
-<!--</script>-->
+<script src="https://www.paypal.com/sdk/js?client-id=Aad4dMpm3D0iSgfX5YztOwGMpCyVaIRamm4jAf4RGofPsGc5d_n5uAWedaKcQoAA4SXky0VnsC78NzsS&disable-funding=credit,card"></script>
 <script src="/assets/zh.checkout.bundle.js"></script>
-<!--<script>-->
-  <!--paypal.Buttons({-->
-    <!--createOrder: function(data, actions) {-->
-      <!--appObj.orderView.preCheckOrder(function(valid, subtotal){-->
-        <!--if(!valid){-->
-          <!--return;-->
-        <!--}-->
-        <!--return actions.order.create({-->
-          <!--purchase_units: [{-->
-            <!--amount: {-->
-              <!--value: subtotal.toFixed(2)-->
-            <!--}-->
-          <!--}]-->
-        <!--});-->
-      <!--});-->
-    <!--},-->
-    <!--onApprove: function(data, actions) {-->
-      <!--return actions.order.capture().then(function(details){-->
-        <!--alert('Transaction completed by ' + details.payer.name.given_name);-->
-        <!--this.$el.find("#payment-cards button[data-method='paypal']").data("order", data.orderID);-->
-        <!--appObj.orderView.takeOrder(new Event('click'));-->
-      <!--});-->
-    <!--}-->
-  <!--}).render('#paypal-button-container');-->
-<!--</script>-->
+<script>
+  paypal.Buttons({
+    createOrder: function(data, actions) {
+      var total = appObj.orderView.getTotal();
+      if(total===-1){
+        return false;
+      }
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: appObj.orderView.getTotal().toFixed(2)
+          }
+        }]
+      });
+    },
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(details){
+        console.log(details);
+        if (details.error === 'INSTRUMENT_DECLINED') {
+          return actions.restart();
+        }
+        $("#payment-cards button[data-method='paypal']").data("order", data.orderID);
+        $("#payment-cards button[data-method='paypal']").data("capture", details.id);
+        appObj.orderView.takeOrder(new Event('click'));
+      });
+    }
+  }).render('#paypal-button-container');
+</script>

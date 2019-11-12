@@ -2,7 +2,7 @@
 <div id="cartContainer" class="container mt-2 text-center" data-user="<%= user.id || null%>">
   <div id="order" class="white floater static-floater py-4">
     <% dishes.forEach(function(dish){ %>
-      <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-id="<%= dish.id%>" class="dish d-none dishItem py-2 mix item text-center
+      <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" style="background: white !important;" data-id="<%= dish.id%>" class="dish d-none dishItem py-2 mix item text-center
         <% if(dish.tags){ dish.tags.forEach(function(t){%>
                       <%= " " + t%>
                     <%})}%>">

@@ -141,7 +141,7 @@
                             <a href="/order/<%= order.id%>/receipt" target="__blank"><%= __('view-receipt')%></a>
                             <div class="divider none-margin">-</div>
                             <% if(order.status == "schedule" || order.status == "preparing"){ %>
-                              <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>"><%= __('cancel')%></a>
+                              <a href="javascript:void(0)" data-action="cancel" data-order="<%= order.id%>" data-toggle="alert-button" data-title="<%= __('confirm-cancel')%>" data-content="<%= __('reason')%>" data-actionFn="javascript:orderView.cancel" data-argument="<%= order.id%>" data-container="#myorder-preorder"><%= __('cancel')%></a>
                               <div class="divider none-margin">-</div>
                               <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event)" data-href="/order/<%= order.id%>/adjust-form"><%= __('adjust')%></a>
                               <div class="divider none-margin">-</div>
@@ -153,9 +153,10 @@
                               <div class="divider none-margin">-</div>
                               <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                             <%}else if(order.status == "ready"){%>
-                              <a href="https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=<%= orders[0].pickupInfo.tracking || ''%>"><%= __('track-order')%></a>
-                              <div class="divider none-margin">-</div>
-                              <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
+                              <% if(order.method === "shipping"){%>
+                                  <a href="https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=<%= orders[0].pickupInfo.tracking || ''%>"><%= __('track-order')%></a>
+                              <% }%>
+                              <a href="javascript:void(0)" data-toggle="popover" data-title="<%= __('driver')%>" data-placement="bottom" data-content="<%= order.pickupInfo.phone %>"><%= __('contact-driver')%></a>
                             <%}else if(order.status == "review"){%>
                               <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                               <div class="divider none-margin">-</div>

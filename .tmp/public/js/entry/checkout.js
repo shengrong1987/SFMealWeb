@@ -7,17 +7,17 @@ import { amountInput } from "../library/sfmeal-components";
 import { OrderView, Order, AddressView, User, MealConfirmView, Meal, ContactInfoView, Host, UserBarView, Payment, PaymentView, MapView  } from '../model.js';
 import { utility } from "../utils/utility";
 
-new OrderView({ el : $("#meal-confirm-container"), model : new Order()})
+let orderView = new OrderView({ el : $("#meal-confirm-container"), model : new Order()});
 let addressView = new AddressView({ el : $("#meal-confirm-container"), model : new User()});
 let mealConfirmView = new MealConfirmView( { el : $("#meal-confirm-container"), model : new Meal()});
 new ContactInfoView({ el : $("#contactInfoView"), model : new User()});
 let host = new Host();
-let userBarView = new UserBarView({el : $("#myUserBar"), model : host})
+let userBarView = new UserBarView({el : $("#myUserBar"), model : host});
 
 var select = $(".card-expiry-year"), year = new Date().getFullYear();
 
 for(var i = 0; i < 12; i++) {
-  select.append($("<option value='"+(i + year)+"' "+(i === 0 ? "selected" : "")+">"+(i + year)+"</option>"))
+  select.append($("<option value='"+(i + year)+"' "+(i === 0 ? "selected" : "")+">"+(i + year)+"</option>"));
 }
 
 var month = $(".card-expiry-month").attr("value");
@@ -45,3 +45,4 @@ window.appObj.PaymentView = PaymentView;
 window.appObj.Payment = Payment;
 window.appObj.setupObj = setupObj;
 window.appObj.MapView = MapView;
+window.appObj.orderView = orderView;

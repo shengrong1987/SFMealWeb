@@ -24,6 +24,7 @@ describe('OrderController', function() {
   var farAddress = "7116 Tiant way, Elk Grove, CA 95758";
   var phone = "1-415-802-3853";
   const SERVICE_FEE = 0;
+  const TRANSACTION_FEE = 1;
   var pickupPickupOptionId, pickupNickname;
   var deliveryPickupOptionId, deliveryNickname;
   var highMinimalPickupOptionId, highMinimalNickname;
@@ -373,7 +374,7 @@ describe('OrderController', function() {
           }
           res.body.orders.should.have.length(1);
           var o = res.body.orders[0];
-          var chargesTotal = Math.round(((price1 + price2 * 2 + (price4*2+3)) + SERVICE_FEE + 10) * 100);
+          var chargesTotal = Math.round(((price1 + price2 * 2 + (price4*2+3)) + SERVICE_FEE + TRANSACTION_FEE + 10) * 100);
           userPoints += Math.floor(chargesTotal / 200);
           o.customerName.should.be.equal('sheng');
           o.customerPhone.should.be.equal(phone);
@@ -544,16 +545,14 @@ describe('OrderController', function() {
       agent
         .post('/order/' + orderId + "/adjust")
         .set('Accept','application/json')
-        .send({orders : dishObj, subtotal : price1 * 1, mealId : mealId, delivery_fee : 0})
+        .send({orders : dishObj, subtotal : price1 * 1, mealId : mealId, delivery_fee : 0, tip: 8})
         .expect('Content-type',/json/)
         .expect(200)
         .end(function(err,res){
           if(err){
             return done(err);
           }
-          // var tax = Math.round(price1 * 0.085 * 100);
-          // res.body.tax.should.be.equal(tax);
-          userPoints -= (Math.floor((price2*2 + price4*2+3)/2) + 1);
+          userPoints -= (Math.floor((price2*2+price4*2+3+2)/2) + 1);
           res.body.orders[0].leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
@@ -574,24 +573,20 @@ describe('OrderController', function() {
 
     it('should adjust the dish with equal amount successfully', function (done) {
       var dishObj = {};
-      dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}], price : price1 };
-      dishObj[dishId2] = { number : 1 , preference : [{ property : '', extra : 0}], price : price2 };
+      dishObj[dishId1] = { number : 1 , preference : [{ property : '', extra : 0}], price : price1 };
+      dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
       dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
       dishObj[dishId4] = { number : 0 , preference : [{ property : '', extra : 0}], price : price4 };
       agent
         .post('/order/' + orderId + "/adjust")
         .set('Accept', 'application/json')
-        .send({orders : dishObj, subtotal : price2 * 1, mealId : mealId, delivery_fee : 0})
+        .send({orders : dishObj, subtotal : price1 * 1, mealId : mealId, delivery_fee : 0, tip: 8})
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
           if(err){
             return done(err);
           }
-          // var tax = Math.round(price2 * 0.085 * 100);
-          // res.body.tax.should.be.equal(tax);
-          dish1LeftQty++;
-          res.body.orders[0].leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
     })
@@ -677,14 +672,17 @@ describe('OrderController', function() {
       agent
         .post('/order/' + orderId + "/adjust")
         .set('Accept', 'application/json')
-        .send({orders : dishObj, subtotal : price2 + price3, mealId : mealId})
+        .send({orders : dishObj, subtotal : price2 + price3, mealId : mealId, tip: 10})
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function(err,res){
           if(err){
             return done(err);
           }
-          userPoints += Math.round(price3/2);
+          console.log("old user points: " + userPoints);
+          userPoints += Math.round((price2+price3-price1+2)/2);
+          console.log("new user points: " + userPoints);
+          dish1LeftQty++;
           res.body.orders[0].leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
@@ -1079,7 +1077,7 @@ describe('OrderController', function() {
               return done(Error("error making order"));
             }
             o.redeemPoints.should.be.equal("13");
-            var chargesTotal = ((price3 * 1) + SERVICE_FEE) + 3.99 - 1.3;
+            var chargesTotal = ((price3 * 1) + SERVICE_FEE + TRANSACTION_FEE) + 3.99 - 1.3;
             o.charges[Object.keys(o.charges)[0]].should.be.equal(Math.round(chargesTotal * 100));
             o.application_fees[Object.keys(o.application_fees)[0]].should.be.equal(320);
             o.meal.leftQty[dishId1].should.be.equal(dish1LeftQty);
@@ -1211,7 +1209,8 @@ describe('OrderController', function() {
             orders : dishObj,
             subtotal : price3,
             mealId : mealId,
-            delivery_fee : 0
+            delivery_fee : 0,
+            tip : 0
           })
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
@@ -1222,6 +1221,7 @@ describe('OrderController', function() {
             }
             res.body.orders[0].orders[dishId2].number.should.be.equal(1);
             res.body.orders[0].adjusting_orders[dishId3].number.should.be.equal(1);
+            res.body.orders[0].adjusting_tip.should.be.equal(0);
             done();
           })
       })
@@ -2046,7 +2046,7 @@ describe('OrderController', function() {
             o.discountAmount.should.be.equal(1);
             o.discount.should.be.equal(1);
             o.transfer[Object.keys(o.transfer)[0]].should.be.equal(100);
-            o.charges[Object.keys(o.charges)[0]].should.be.equal(Math.round((price1+SERVICE_FEE-1)*100));
+            o.charges[Object.keys(o.charges)[0]].should.be.equal(Math.round((price1+SERVICE_FEE+TRANSACTION_FEE-1)*100));
             o.application_fees[Object.keys(o.application_fees)[0]].should.be.equal(applicationFee);
             dish1LeftQty--;
             o.leftQty[dishId1].should.be.equal(dish1LeftQty);
@@ -3418,34 +3418,34 @@ describe('OrderController', function() {
           })
       })
 
-      it('should be able to submit order with Paypal', function(done){
-        var dishObj = {};
-        dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}], price : price1 };
-        dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
-        dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
-        dishObj[dishId4] = { number : 1 , preference : [{ property : '', extra : 0}], price : price4 };
-        agent
-          .post('/order')
-          .send({
-            orders : dishObj,
-            subtotal : price3 ,
-            pickupOption : pickupPickupOptionId,
-            method : "pickup",
-            pickupNickname : pickupNickname,
-            tip : 0,
-            contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
-            paymentInfo : { method : 'paypal'}
-          })
-          .expect(200)
-          .end(function(err, res){
-            if(err){
-              return done(err);
-            }
-            var o = res.body.orders[0];
-            o.paymentMethod.should.be.equal("paypal");
-            done();
-          })
-      })
+      // it('should be able to submit order with Paypal', function(done){
+      //   var dishObj = {};
+      //   dishObj[dishId1] = { number : 0 , preference : [{ property : '', extra : 0}], price : price1 };
+      //   dishObj[dishId2] = { number : 0 , preference : [{ property : '', extra : 0}], price : price2 };
+      //   dishObj[dishId3] = { number : 0 , preference : [{ property : '', extra : 0}], price : price3 };
+      //   dishObj[dishId4] = { number : 1 , preference : [{ property : '', extra : 0}], price : price4 };
+      //   agent
+      //     .post('/order')
+      //     .send({
+      //       orders : dishObj,
+      //       subtotal : price3 ,
+      //       pickupOption : pickupPickupOptionId,
+      //       method : "pickup",
+      //       pickupNickname : pickupNickname,
+      //       tip : 0,
+      //       contactInfo : { phone : "(415)111-1111", name : "abc", address : "1455 Market St, San Francisco"},
+      //       paymentInfo : { method : 'paypal'}
+      //     })
+      //     .expect(200)
+      //     .end(function(err, res){
+      //       if(err){
+      //         return done(err);
+      //       }
+      //       var o = res.body.orders[0];
+      //       o.paymentMethod.should.be.equal("paypal");
+      //       done();
+      //     })
+      // })
 
       it('should be able to submit order with Alipay', function(done){
         var dishObj = {};

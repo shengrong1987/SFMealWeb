@@ -246,7 +246,7 @@ describe('AdminController', function() {
           if(err){
             return done(err);
           }
-          res.body.should.have.length(3);
+          res.body.should.have.length(2);
           scheduledOrderId = res.body.filter(function(order){
             return Object.keys(order.transfer).length;
           })[0].id;

@@ -1241,7 +1241,6 @@ var CartView = Backbone.View.extend({
   },
   initialize : function(){
     var tipValue = parseFloat(helperMethod.readCookie("tip"));
-    console.log("loading tip");
     if(!tipValue){
       let tipDefaultOpt = this.$el.find("#tipControl label:first");
       tipDefaultOpt.addClass('active');
@@ -2911,7 +2910,8 @@ var UserProfileView = Backbone.View.extend({
 
 var MyMealView = Backbone.View.extend({
   events : {
-    "click button[name='action']" : "go"
+    "click button[name='action']" : "go",
+    "click [data-action='delete']" : "delete"
   },
   go : function(e){
     e.preventDefault();
@@ -2945,14 +2945,25 @@ var MyMealView = Backbone.View.extend({
     })
   },
 
-  deleteMeal : function (event){
-    var options = $(event.target).data();
-    helperMethod.deleteHandler(options["order"], "meal", $(options["errorContainer"]));
-  },
-
-  deleteDish : function (event){
-    var options = $(event.target).data();
-    helperMethod.deleteHandler(options["order"], "dish", $(options["errorContainer"]));
+  delete : function(e){
+    let button = $(e.currentTarget);
+    let data = button.data();
+    let _this = this;
+    BootstrapDialog.show({
+      title: __('confirm-delete'),
+      message : __('confirm-delete-content'),
+      buttons: [{
+        label: __('confirm'),
+        action: function() {
+          helperMethod.deleteHandler(data["id"], data["model"]);
+        }
+      }, {
+        label: __('cancel'),
+        action: function(dialog) {
+          dialog.close();
+        }
+      }]
+    });
   }
 });
 
@@ -3530,7 +3541,9 @@ var MealConfirmView = Backbone.View.extend({
     "click input[name='billingAddress']" : "enterBillingAddress",
     "click [data-action]" : "go",
     "click #switchToShippingBtn" : "switchToShipping",
-    "click #switchToDeliveryBtn" : "switchToDelivery"
+    "click #switchToDeliveryBtn" : "switchToDelivery",
+    "click #confirmDeliveryTimeBtn" : "confirmDeliveryTime",
+    "click #payment-cards [data-toggle='tab']" : "switchPaymentMethod"
   },
   initialize : function(){
     this.initView();
@@ -3573,11 +3586,6 @@ var MealConfirmView = Backbone.View.extend({
       this.$el.find(".deliveryInput").hide();
       this.$el.find(".pickupInput").show();
     }
-    var method = $("#pickupMethodView #method .active").attr("value");
-    if(method === "delivery"){
-      $("#deliveryTab .deliveryOption").hide();
-      $("#deliveryTab .no-address").show();
-    }
   },
 
   switchToShipping : function(e){
@@ -3592,10 +3600,19 @@ var MealConfirmView = Backbone.View.extend({
     var value = $(e.currentTarget).find(".active").attr("value");
     this.methodViewControl(value);
     this.pickupOptionViewControl(value);
-    if(value==="delivery"){
-      this.verifyAddress();
+    this.verifyAddress();
+    localOrderObj.refreshCheckoutMenu();
+  },
+
+  switchPaymentMethod : function(e){
+    var method = $(e.currentTarget).data("method");
+    console.log("[Debug]changing payment method: " + method);
+    if(method === "cash" || method === "venmo" ){
+      this.$el.find(".transaction").text("$0.00");
+      this.$el.find(".transaction").data("value",0);
     }else{
-      helperMethod.jumpTo("pickupOptionsView");
+      this.$el.find(".transaction").text("$1.00");
+      this.$el.find(".transaction").data("value",1);
     }
     localOrderObj.refreshCheckoutMenu();
   },
@@ -3610,46 +3627,95 @@ var MealConfirmView = Backbone.View.extend({
   },
 
   /*
+  Public API: Prompt delivery time confirmation and show payment window
+   */
+  confirmDeliveryTime : function(e){
+    e.preventDefault();
+    let _this = this;
+    let dateDesc = decodeURI(helperMethod.readCookie("date"));
+    let chooseOption = this.getChooseOption(dateDesc);
+    if(!chooseOption.length){
+      helperMethod.makeAToast(__('pickupOptionNotChoose'));
+      return;
+    }
+    var method = _this.$el.find("#method button.active").attr("value");
+    let dateFullDesc = dateDesc + " " + chooseOption.parent().data("time");
+    let messageContent;
+    if(method === "delivery"){
+      messageContent = __('deliveryTimeConfirmationContent');
+    }else{
+      messageContent = __('pickupTimeConfirmationContent');
+    }
+
+    BootstrapDialog.show({
+      title: __('deliveryTimeConfirmationTitle'),
+      message : messageContent + dateFullDesc,
+      buttons: [
+        {
+          label: __('confirm'),
+          action: function(dialog) {
+            dialog.close();
+            var method = _this.$el.find("#method button.active").attr("value");
+            if(method==="delivery"){
+              let subtotal = parseFloat(_this.$el.find(".subtotal").data("value"));
+              let minimalOrder = parseFloat(chooseOption.parent().data("minimal"));
+              if(subtotal < minimalOrder){
+                BootstrapDialog.show({
+                  title: __('deliveryTimeConfirmationTitle'),
+                  message : __('order-single-minimal-not-reach-25'),
+                  buttons: [
+                    {
+                      label: __('continue-to-order'),
+                      action: function(dialog) {
+                        window.location.href = "/meal";
+                      }
+                    },
+                    {
+                      label: __('switch-to-pickup'),
+                      action: function(dialog) {
+                        dialog.close();
+                        helperMethod.jumpTo("pickupMethodView");
+                      }
+                    }
+                  ]
+                });
+              }else{
+                _this.$el.find("#paymentOptionsView").removeClass("d-none").show();
+              }
+            }else{
+              _this.$el.find("#paymentOptionsView").removeClass("d-none").show();
+            }
+          }
+        },
+        {
+          label: __('cancel'),
+          action: function(dialog) {
+            dialog.close();
+          }
+        }
+      ]
+    });
+  },
+
+  /*
   Public API : Verify address and delivery options
   @params
 
    */
-  verifyAddress : function(e, isInitializing, cb){
+  verifyAddress : function(e, cb){
     var _this = this;
     var method = this.$el.find("#method button.active").attr("value");
-    if(method === "pickup" || method === "shipping"){
-      helperMethod.jumpTo("pickupOptionsView");
-      if(cb){
-        return cb(true);
-      }
-      return;
-    }
-    //get current date
-    var dateDesc = decodeURI(helperMethod.readCookie('date'));
+    var isLogin = !!this.$el.data("user");
+    var dateDesc = decodeURI(helperMethod.readCookie("date"));
 
     //get address
-    var yourAddress = this.getAddress(isInitializing);
-    if(!yourAddress){
-      $("#deliveryTab .deliveryOption").hide();
-      $("#deliveryTab .no-address").show();
-      return;
+    var contactInfo = appObj.orderView.getContactInfo(method, isLogin);
+    if(contactInfo){
+      helperMethod.jumpTo("pickupOptionsView");
+      _this.checkOptions(contactInfo.address, dateDesc);
     }else{
-      $("#deliveryTab .deliveryOption." + dateDesc).show();
-      $("#deliveryTab .no-address").hide();
+      this.$el.find("#pickupOptionsView").hide();
     }
-
-    //get selected delivery option
-    var deliveryOption = this.getDeliveryOption(dateDesc);
-
-    //validate address and current delivery option
-    this.validateAddressAndOption(yourAddress, deliveryOption, function(err){
-      if(err){
-        if(cb){cb(false)}
-        return;
-      }
-      //validate other options
-      _this.checkOptions(yourAddress, dateDesc, cb);
-    });
   },
 
   go : function(e){
@@ -3700,89 +3766,24 @@ var MealConfirmView = Backbone.View.extend({
       $("#deliveryTab .no-address").hide();
     }
   },
-  getAddress : function(isInitializing){
-    if(this.$el.find("#contactInfoView").length && !isInitializing){
-      var street = this.$el.find("input[name='street']").val();
-      var city = this.$el.find("input[name='city']").val();
-      var state = this.$el.find("input[name='state']").val();
-      var zipcode = this.$el.find("input[name='zipcode']").val();
-      var form = this.$el.find("#order");
-      var isPartyMode = form.data("party");
-      if(!street || !city || !state || !zipcode){
-        helperMethod.makeAToast(__('addressIncomplete'));
-        helperMethod.jumpTo("pickupInfoView");
-        return;
-      }
-      var range = 5;
-      var yourAddress = street + ", " + city + ", " + state + " " + zipcode;
-    }else{
-      var contactOption = this.$el.find("#pickupInfoView .contactOption:visible .regular-radio:checked");
-      var contactText = contactOption.next().next().text();
-      if(!contactText.split("+").length){
-        helperMethod.makeAToast(__('addressIncomplete'));
-        return;
-      }
-      yourAddress = contactText.split("+")[0];
+  getChooseOption : function(dateDesc){
+    var option = this.$el.find("#pickupOptionsView .option[data-date='" + dateDesc + "'] .regular-radio:checked");
+    if(!option.parent().is(":visible")){
+      return [];
     }
-    return yourAddress;
+    return option;
   },
-  getDeliveryOption : function(dateDesc){
-    var deliveryOption = this.$el.find("#deliveryTab .deliveryOption[data-date='" + dateDesc + "'] .regular-radio:checked");
-    var firstOpt = this.$el.find("#deliveryTab .deliveryOption[data-date='" + dateDesc + "'] .regular-radio").first();
-    if(!deliveryOption.length){
-      firstOpt.prop('checked',true);
-      deliveryOption = firstOpt;
-    }
-    return deliveryOption;
-  },
-  validateAddressAndOption : function(address, option, cb){
-    var optionView = option.parent();
-    var lat = optionView.data('lat');
-    var long = optionView.data('long');
-    if(!long || !lat){
-      $("#deliveryTab .deliveryOption").show();
-      $("#deliveryTab .no-address").show();
-      helperMethod.jumpTo("pickupOptionsView");
-      return;
-    }
-    var location = { lat : lat, long : long};
-    var range = optionView.data("range");
+  checkOptions : function(address, dateDesc){
     if(!utility.geocoder){
-      return;
-    }
-    utility.geocoding(address, function(err, customerLoc) {
-      if (err) {
-        helperMethod.makeAToast(err, 'error');
-        return cb(err);
-      }
-      var cusLocation = {
-        lat : customerLoc.lat(),
-        long : customerLoc.lng()
-      }
-      var distance = utility.getDistance(cusLocation, location, "N");
-      if(distance <= range){
-        helperMethod.makeAToast(__('addressValid'),'success');
-      }
-      cb();
-    });
-  },
-  checkOptions : function(address, dateDesc, cb){
-    if(!utility.geocoder){
-      if(cb){
-        console.log("google geocoder not initialized");
-        return cb(false);
-      }
       return;
     }
     var _this = this;
     var deliveryOptions = this.$el.find("#deliveryTab .deliveryOption .regular-radio");
     $("#deliveryTab .deliveryOption." + dateDesc).show();
-    $("#deliveryTab .no-address").hide();
 
     utility.geocoding(address, function(err, cusLocation) {
       if (err) {
         helperMethod.makeAToast(err, "err");
-        if(cb){ cb(false) }
         return;
       }
       var newCusLocation = {
@@ -3804,15 +3805,11 @@ var MealConfirmView = Backbone.View.extend({
           }
         }
       });
-      var visibleOptions = _this.$el.find("#deliveryTab .deliveryOption:visible");
-      var emptyView = $("#pickupOptionsView #deliveryTab .empty");
-      if(visibleOptions.length){
-        emptyView.hide();
+      if(!_this.$el.find("#deliveryTab .deliveryOption:visible").length){
+        _this.$el.find(".empty").removeClass("d-none").show();
       }else{
-        emptyView.removeClass("d-none").show();
+        _this.$el.find(".empty").removeClass("d-none").hide();
       }
-      helperMethod.jumpTo("pickupOptionsView");
-      if(cb){cb(true)};
     });
   },
   applyCouponCode : function(e) {
@@ -3916,14 +3913,26 @@ var OrderView = Backbone.View.extend({
     "click [data-action='adjust']" : "adjust",
     "click [data-action='deleteOrder']" : "deleteOrder",
     "click [data-action='pay']" : "pay",
-    "click [data-action='takeOrder']" : "takeOrder"
+    "click [data-action='takeOrder']" : "takeOrder",
+    "change [name='tipInputOption']" : "changeTip",
+    "blur #tipInput" : "changeTip"
   },
   initialize : function(){
     helperMethod.loadStripeJS(function(err){
       if(err){
         console.log("error loading stripe.js");
       }
-    })
+    });
+    var tipValue = parseFloat(helperMethod.readCookie("tip"));
+    console.log("tipping value: " + tipValue);
+    if(!tipValue){
+      let tipDefaultOpt = this.$el.find("#tipControl label:first");
+      tipDefaultOpt.addClass('active');
+      let subtotal = parseFloat(this.$el.find(".subtotal").text().replace("$",""));
+      tipValue = (subtotal * tipDefaultOpt.find("input").val() / 100).toFixed(2);
+      helperMethod.createCookie("tip", tipValue, 5);
+      localOrderObj.refreshCheckoutMenu();
+    }
   },
   enterDishPreference : function(target){
     var preference = $(target).data("preference");
@@ -4052,7 +4061,7 @@ var OrderView = Backbone.View.extend({
       }
     })
   },
-  getContactInfo : function(method, isLogin, cb){
+  getContactInfo : function(method, isLogin){
     var contactObj = {};
     var contactView = this.$el.find("#pickupInfoView");
     switch(method) {
@@ -4062,10 +4071,11 @@ var OrderView = Backbone.View.extend({
           var phone = contactView.find("input[name='phone']").val();
           if (!name || !phone) {
             helperMethod.makeAToast(__('nameAndPhoneEmptyError'));
-            return cb(false);
+            contactObj = false;
+          }else{
+            contactObj.name = name;
+            contactObj.phone = phone;
           }
-          contactObj.name = name;
-          contactObj.phone = phone;
         }else {
           var t = contactView.find(".pickupInput .contactOption .regular-radio:checked").next().next().text();
           if (t) {
@@ -4073,13 +4083,13 @@ var OrderView = Backbone.View.extend({
             phone = t.split("+")[1];
             if (!name || !phone) {
               helperMethod.makeAToast(__('nameAndPhoneEmptyError'));
-              return cb(false);
+              contactObj = false;
+            }else{
+              contactObj.name = name;
+              contactObj.phone = phone;
             }
-            contactObj.name = name;
-            contactObj.phone = phone;
           }
         }
-        cb(contactObj);
         break;
       case "delivery":
       case "shipping":
@@ -4092,15 +4102,15 @@ var OrderView = Backbone.View.extend({
           var zipcode = contactView.find("input[name='zipcode']").val();
           if (!street || !city || !state || !zipcode) {
             helperMethod.makeAToast(__('addressIncomplete'));
-            return cb(false);
-          }
-          if (!name || !phone) {
+            contactObj = false;
+          }else if(!name || !phone){
             helperMethod.makeAToast(__('nameAndPhoneEmptyError'));
-            return cb(false);
+            contactObj = false;
+          }else{
+            contactObj.address = street + ", " + city + ", " + state + " " + zipcode;
+            contactObj.name = name;
+            contactObj.phone = phone;
           }
-          contactObj.address = street + ", " + city + ", " + state + " " + zipcode;
-          contactObj.name = name;
-          contactObj.phone = phone;
         } else {
           var optionView = contactView.find(".deliveryInput .contactOption .regular-radio:checked");
           var t = optionView.next().next().text();
@@ -4109,19 +4119,20 @@ var OrderView = Backbone.View.extend({
             phone = t.split("+")[1];
             if (!address || !phone) {
               helperMethod.makeAToast(__('contactAndAddressEmptyError'));
-              return cb(false);
+              contactObj = false;
+            }else{
+              contactObj.address = address;
+              contactObj.phone = phone;
+              contactObj.name = optionView.data("username");
             }
-            contactObj.address = address;
-            contactObj.phone = phone;
-            contactObj.name = optionView.data("username");
           } else {
             helperMethod.makeAToast(__('contactAndAddressEmptyError'));
-            return cb(false);
+            contactObj = false;
           }
         }
-        return cb(contactObj);
         break;
       }
+      return contactObj;
   },
   getPickupOption : function(method){
     var optionItem = this.$el.find("#" + method + "Tab" + " .option:visible." + method +  "Option .regular-radio:checked");
@@ -4152,6 +4163,25 @@ var OrderView = Backbone.View.extend({
     customerInfo.comment = this.$el.find("#pickupInfoView [name='comment']:visible").val();
     return cb(customerInfo);
   },
+  getTotal : function(){
+    var form = this.$el.find("#order");
+    var subtotal = parseFloat(form.find(".subtotal").data("value"));
+    if (subtotal === 0) {
+      helperMethod.makeAToast(__('orderEmptyError'));
+      return -1;
+    }
+
+    var points = localOrderObj.localPoints;
+    var couponValue = localOrderObj.localCoupon;
+    if (couponValue) {
+      var code = Object.keys(couponValue)[0];
+    }
+    var tip = parseFloat(form.find(".tip").text());
+    var discount = parseFloat(form.find(".discount-amount").text());
+    var transactionFee = parseFloat(form.find());
+    var total = subtotal + tip + VAR.SERVICE_FEE + VAR.SYSTEM_DELIVERY_FEE - discount;
+    return total;
+  },
   getPaymentInfo : function(isLogin, cb){
     var $this = this;
     var cards = this.$el.find("#payment-cards button.active");
@@ -4163,6 +4193,8 @@ var OrderView = Backbone.View.extend({
         return cb(false);
       }
       paymentInfo.method = paymentMethod;
+      paymentInfo.paypalOrderId = cards.data("order");
+      paymentInfo.captureId = cards.data("capture");
       cb(paymentInfo);
     }else{
       if(paymentMethod === "online"){
@@ -4212,6 +4244,7 @@ var OrderView = Backbone.View.extend({
       }else{
         paymentInfo.method = paymentMethod;
         paymentInfo.paypalOrderId = cards.data("order");
+        paymentInfo.captureId = cards.data("capture");
         return cb(paymentInfo);
       }
     }
@@ -4225,78 +4258,6 @@ var OrderView = Backbone.View.extend({
     localOrderObj.localOrders = {};
     localOrderObj.localPoints = 0;
   },
-  preCheckOrder : function(cb){
-    var $this = this;
-    var userId = this.$el.data("user");
-    var isLogin = !!userId;
-    var params = {};
-    var method = this.$el.find("#method .active").attr("value");
-    this.getContactInfo(method, isLogin, function(contactInfo){
-      if(!contactInfo){
-        helperMethod.jumpTo("pickupInfoView");
-        return cb(false);
-      }
-      appObj.mealConfirmView.verifyAddress(null, false, function (valid) {
-        if(!valid){
-          helperMethod.jumpTo("pickupOptionsView");
-          return cb(false);
-        }
-        $this.getPaymentInfo(isLogin, function(paymentInfo) {
-          if (!paymentInfo) {
-            helperMethod.jumpTo("payment-cards");
-            button.trigger("reset");
-            return cb(false);
-          }
-          var form = $this.$el.find("#order");
-          var partyMode = form.data("party");
-
-          //pickup option
-          var pickupObj = $this.getPickupOption(method);
-          if(!pickupObj){
-            helperMethod.jumpTo("pickupOdeliveryDateBtnptionsView");
-            return cb(false);
-          }
-          var pickupOption = pickupObj.index;
-          var pickupDate = pickupObj.date;
-          var pickupNickname = pickupObj.nickname;
-          $this.getCustomizedInfo(partyMode, function(customInfo){
-            if(!customInfo){
-              helperMethod.jumpTo("pickupInfoView");
-              button.trigger("reset");
-              return cb(false);
-            }
-            var currentOrder = localOrderObj.localOrders;
-
-            //subtotal
-            var subtotal = parseFloat(form.find(".subtotal").data("value"));
-            if (subtotal === 0) {
-              button.trigger("reset");
-              helperMethod.makeAToast(__('orderEmptyError'));
-              return cb(false);
-            }
-
-            if(partyMode){
-              var minimal = form.data("minimal");
-              if(subtotal < minimal){
-                button.trigger("reset");
-                helperMethod.makeAToast(__('orderAmountInsufficient', minimal));
-                return cb(false);
-              }
-            }
-            var points = localOrderObj.localPoints;
-            var couponValue = localOrderObj.localCoupon;
-            if (couponValue) {
-              var code = Object.keys(couponValue)[0];
-            }
-            var tip = parseFloat(form.find(".tip").text());
-            var discount = parseFloat(form.find(".summary .discount").text() || 0);
-            var total = subtotal + tip + VAR.SERVICE_FEE + VAR.SYSTEM_DELIVERY_FEE - discount;
-            cb(true, total);
-          });
-        });
-      }, contactInfo.address);
-    });
-  },
   takeOrder : function(e){
     e.preventDefault();
     var $this = this;
@@ -4306,70 +4267,63 @@ var OrderView = Backbone.View.extend({
     var params = {};
     var method = this.$el.find("#method .active").attr("value");
 
-    this.getContactInfo(method, isLogin, function(contactInfo){
-      if(!contactInfo){
-        helperMethod.jumpTo("pickupInfoView");
+    let contactInfo = this.getContactInfo(method, isLogin);
+    if(!contactInfo){
+      helperMethod.jumpTo("pickupInfoView");
+      return;
+    }
+    $this.getPaymentInfo(isLogin, function(paymentInfo) {
+      if (!paymentInfo) {
+        helperMethod.jumpTo("payment-cards");
+        button.trigger("reset");
         return;
       }
-      appObj.mealConfirmView.verifyAddress(null, false, function (valid) {
-        if(!valid){
-          helperMethod.jumpTo("pickupOptionsView");
+      var form = $this.$el.find("#order");
+      var partyMode = form.data("party");
+
+      //pickup option
+      var pickupObj = $this.getPickupOption(method);
+      if(!pickupObj){
+        helperMethod.jumpTo("pickupOdeliveryDateBtnptionsView");
+        return;
+      }
+      var pickupOption = pickupObj.index;
+      var pickupDate = pickupObj.date;
+      var pickupNickname = pickupObj.nickname;
+      $this.getCustomizedInfo(partyMode, function(customInfo){
+        if(!customInfo){
+          helperMethod.jumpTo("pickupInfoView");
+          button.trigger("reset");
           return;
         }
-        $this.getPaymentInfo(isLogin, function(paymentInfo) {
-          if (!paymentInfo) {
-            helperMethod.jumpTo("payment-cards");
+        var currentOrder = localOrderObj.localOrders;
+
+        //subtotal
+        var subtotal = parseFloat(form.find(".subtotal").data("value"));
+        if (subtotal === 0) {
+          button.trigger("reset");
+          helperMethod.makeAToast(__('orderEmptyError'));
+          return;
+        }
+
+        if(partyMode){
+          var minimal = form.data("minimal");
+          if(subtotal < minimal){
             button.trigger("reset");
+            helperMethod.makeAToast(__('orderAmountInsufficient', minimal));
             return;
           }
-          var form = $this.$el.find("#order");
-          var partyMode = form.data("party");
+        }
 
-          //pickup option
-          var pickupObj = $this.getPickupOption(method);
-          if(!pickupObj){
-            helperMethod.jumpTo("pickupOdeliveryDateBtnptionsView");
-            return;
-          }
-          var pickupOption = pickupObj.index;
-          var pickupDate = pickupObj.date;
-          var pickupNickname = pickupObj.nickname;
-          $this.getCustomizedInfo(partyMode, function(customInfo){
-            if(!customInfo){
-              helperMethod.jumpTo("pickupInfoView");
-              button.trigger("reset");
-              return;
-            }
-            var currentOrder = localOrderObj.localOrders;
-
-            //subtotal
-            var subtotal = parseFloat(form.find(".subtotal").data("value"));
-            if (subtotal === 0) {
-              button.trigger("reset");
-              helperMethod.makeAToast(__('orderEmptyError'));
-              return;
-            }
-
-            if(partyMode){
-              var minimal = form.data("minimal");
-              if(subtotal < minimal){
-                button.trigger("reset");
-                helperMethod.makeAToast(__('orderAmountInsufficient', minimal));
-                return;
-              }
-            }
-
-            //coupon & points
-            var points = localOrderObj.localPoints;
-            var couponValue = localOrderObj.localCoupon;
-            if (couponValue) {
-              var code = Object.keys(couponValue)[0];
-            }
-            var tip = parseFloat(form.find(".tip").text());
-            $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, pickupDate, pickupNickname, method, code, points, isLogin, partyMode, tip, $this, button);
-          });
-        });
-      }, contactInfo.address);
+        //coupon & points
+        var points = localOrderObj.localPoints;
+        var couponValue = localOrderObj.localCoupon;
+        if (couponValue) {
+          var code = Object.keys(couponValue)[0];
+        }
+        var tip = parseFloat(form.find(".tip").text());
+        $this.submitOrder(currentOrder, subtotal, customInfo, contactInfo, paymentInfo, pickupOption, pickupDate, pickupNickname, method, code, points, isLogin, partyMode, tip, $this, button);
+      });
     });
   },
   adjust : function(e){
@@ -4377,6 +4331,7 @@ var OrderView = Backbone.View.extend({
     var orderIds = button.data("orders");
     var form = this.$el.find("table");
     var delivery_fee = this.$el.find("#order .delivery").data("value");
+    var tip = this.$el.find("#order .tip").val();
     var subtotal = form.find(".subtotal").data("value");
     if(subtotal===0){
       helperMethod.makeAToast(__('orderAdjustZeroError'));
@@ -4386,7 +4341,8 @@ var OrderView = Backbone.View.extend({
       id : orderIds,
       orders : localOrderObj.localOrders,
       subtotal : subtotal,
-      delivery_fee : delivery_fee
+      delivery_fee : delivery_fee,
+      tip : tip
     });
     this.model.action = "adjust";
     this.model.save({},{
@@ -4517,6 +4473,22 @@ var OrderView = Backbone.View.extend({
         });
       }
     })
+  },
+
+  changeTip : function(e){
+    let tipInputOption = $(e.currentTarget);
+    let valueType = tipInputOption.data("value-type");
+    let tipInput = this.$el.find("#tipInput");
+    let tipValue = 0;
+    let subtotal = parseFloat(this.$el.find(".subtotal").text().replace("$",""));
+    if(valueType==="%"){
+      tipValue = (subtotal * tipInputOption.val() / 100).toFixed(2);
+      tipInput.val(tipValue);
+    }else{
+      tipValue = parseFloat(tipInput.val());
+    }
+    helperMethod.createCookie("tip", tipValue, 5);
+    localOrderObj.refreshCheckoutMenu();
   }
 });
 

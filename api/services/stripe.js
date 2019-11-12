@@ -8,6 +8,7 @@ const SERVICE_FEE = 0;
 const SYSTEM_DELIVERY_FEE = 0;
 const MILEAGE_FEE = 1.18;
 const PARTY_ORDER_RANGE_MULTIPLIER = 10;
+const ONLINE_TRANSACTION_FEE = 100;
 const SOURCE_FAIL = "failed";
 const SOURCE_CANCEL = "canceled";
 const SOURCE_PENDING = "pending";
@@ -372,6 +373,39 @@ module.exports = {
     )
   },
 
+  getTotal : function(orders){
+    var _this = this;
+    var total = 0;
+    orders.forEach(function(order){
+      var attr = {
+        paymentMethod : order.paymentMethod,
+        isInitial : true,
+        amount : order.subtotal * 100,
+        tip : order.tip,
+        deliveryFee : parseInt(order.delivery_fee * 100),
+        discount : order.discount * 100,
+        email : order.guestEmail,
+        customerId : order.customerId,
+        destination : order.meal.chef.accountId,
+        meal : order.meal,
+        method : order.method,
+        tax : order.tax,
+        isPartyMode : order.isPartyMode,
+        metadata : {
+          mealId : order.meal.id,
+          hostId : order.meal.chef.id,
+          orderId : order.id,
+          userId : order.customer,
+          deliveryFee : parseInt(order.delivery_fee * 100),
+          tax : order.tax
+        }
+      };
+      _this.calculateTotal(attr);
+      total += attr.metadata.total;
+    });
+    return total;
+  },
+
   calculateTotal : function(attr){
     var meal = attr.meal;
     var isInitial = attr.isInitial;
@@ -384,8 +418,12 @@ module.exports = {
     var tax = attr.tax;
     var tip = (attr.tip || 0) * 100;
 
-    sails.log.info("System delivery fee: " + delivery_application_fee + " Delivery fee: " + delivery_fee + " Discount: " + discount + " Subtotal: " + attr.amount + " Tax: " + tax + " Tip: " + tip);
-
+    //calculate transaction fee
+    if(attr.paymentMethod === "cash"){
+      var transaction_fee = 0;
+    }else{
+      transaction_fee = ONLINE_TRANSACTION_FEE;
+    }
     //calculate application fee
     if(attr.paymentMethod === "online"){
       var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee + tip;
@@ -397,7 +435,7 @@ module.exports = {
     var subtotalAfterTax = attr.amount + tax + tip;
 
     //calculate other fee
-    var originalTotal = subtotalAfterTax + delivery_fee + serviceFee;
+    var originalTotal = subtotalAfterTax + delivery_fee + serviceFee + transaction_fee;
 
     attr.metadata.discount = discount;
     attr.metadata.total = originalTotal - discount;
@@ -519,6 +557,7 @@ module.exports = {
       return cb(null, { amount : attr.amount });
     }
     var $this = this;
+    console.log("refund amount: " + attr.amount);
     stripe.refunds.create({
       charge : attr.id,
       amount : attr.amount,

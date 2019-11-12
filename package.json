@@ -6,6 +6,7 @@
   "keywords": [],
   "dependencies": {
     "@babel/polyfill": "^7.4.3",
+    "@paypal/checkout-server-sdk": "^1.0.1",
     "acorn": "^6.1.1",
     "agenda-ui": "0.0.7",
     "agendash": "^0.4.0",

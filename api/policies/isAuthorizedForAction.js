@@ -29,8 +29,8 @@ module.exports = function(req, res, next) {
         }
       }else if(action === "adjust" || action === "cancel" || action === "adjust-form"){
         if(order.status !== "schedule" && order.status !== "preparing"){
-          sails.log.error("order can only be adjusted at schedule or preparing");
-          return cb('order can only be adjusted at schedule or preparing');
+          sails.log.error("order can only be adjusted/canceled at schedule or preparing");
+          return cb('order can only be adjusted/canceled at schedule or preparing');
         }
         if(order.status === "schedule" && hostId && hostId === order.host.id){
           return cb(req.__('order-adjust-cancel-at-schedule-by-host'));

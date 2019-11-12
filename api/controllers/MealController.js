@@ -726,7 +726,7 @@ module.exports = {
               return pickup;
             });
             pickups = pickups.concat(newPickups);
-          })
+          });
           next();
         },
         getUser : function(next){

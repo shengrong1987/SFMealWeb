@@ -253,16 +253,14 @@ let helperMethod = {
     return flag;
   },
 
-  deleteHandler : function (id, module, alertView){
-    alertView.hide();
+  deleteHandler : function (id, module){
     var url = "/" + module + "/destroy/" + id;
     $.ajax({
       url : url,
       success : function(){
         location.reload();
       },error : function(err){
-        alertView.show();
-        alertView.html(this.getMsgFromError(err));
+        helperMethod.makeAToast(this.getMsgFromError(err));
       }
     })
   },
@@ -599,6 +597,8 @@ let helperMethod = {
     if(!$("#" + id).length){
       return;
     }
+    $("#" + id).removeClass("d-none");
+    $("#" + id).show();
     if($(target).length){
       offset = -$(target).outerHeight();
     }
@@ -726,8 +726,9 @@ let localOrderObj = {
     if(!!isTrigger){
       helperMethod.updateCollapseBtn(false);
     }
-    let _this = this;
-    $("#order").find(".item").each(function(){
+    var _this = this;
+    $("#order").find(".item").each(function(index){
+      console.log("index: " + index);
       let _this2 = $(this);
       let dishId = $(this).data("id");
       if(fromCache){
@@ -751,15 +752,17 @@ let localOrderObj = {
             $(this).find(".amount").text(_this.localOrders[dishId].number);
             _this2.amountInput('update',$(this).find("[data-toggle='amount-input']"));
             $(this).find("[data-toggle='amount-input']").on('change', _this.refreshCheckoutMenu);
-          })
+          });
           $(this).data("left-amount", left);
           _this.updateMenuView(dishId);
         }
       }else{
+        console.log("loading dish:" + dishId + " from order window");
         _this.localOrders[dishId] = {
-          number : parseInt($(this).find(".amount").val()),
+          number : parseInt($(this).find(".amount").val() || $(this).find(".amount").text() || 0),
           preference : $(this).data("preference") || [],
-          price : $(this).find(".price").attr("value")
+          price : $(this).find(".price").attr("value"),
+          index : index
         };
       }
     });
@@ -904,7 +907,7 @@ let localOrderObj = {
     var item = $order.find(".item[data-id=" + id + "]");
     var prefs = item.data('prefs');
     if(prefs>0 && number>0){
-      if(!$("#myModal").hasClass('show')) {
+      if(!$("#myModal").hasClass('show') || !$("#myModal #dishPreferenceView").length) {
         var url = "/dish/" + id + "/preference";
         _this.orderFoodLogic(id, number, initial);
         helperMethod.toggleModalUrl(url, "#myModal");
@@ -919,6 +922,7 @@ let localOrderObj = {
     Order Food Logic
    */
   orderFoodLogic : function(id, number, initial){
+    console.log("Order food: " + id + " of No." + number);
     this.updateAmountInput(id, number);
     this.updateLocalOrders(id, number);
     helperMethod.createCookie(id,JSON.stringify(this.localOrders[id]),1);
@@ -1059,7 +1063,7 @@ let localOrderObj = {
         _dishes.push(dishId);
       }
       var unitPrice = parseFloat($(this).find(".price").attr("value"));
-      var amount = parseInt($(this).find(".amount").val()||0);
+      var amount = parseInt($(this).find(".amount").val()||$(this).find(".amount").text()||0);
       var dishView = $("#meal-confirm-container").find(".dish[data-id='" + dishId + "']");
       if(amount){
         dishView.addClass("table-success").show();
@@ -1074,7 +1078,7 @@ let localOrderObj = {
       subtotal += _subtotal;
     });
     $order.find(".subtotal").html("$" + subtotal.toFixed(2));
-    $order.find(".subtotal").data("value", subtotal.toFixed(2));
+    $order.find(".subtotal").data("value", subtotal);
     if(method === "delivery"){
       var delivery = parseFloat($order.find(".delivery").data("value"));
       $order.find(".deliveryOpt").show();
@@ -1086,6 +1090,7 @@ let localOrderObj = {
     }
     $(".delivery").text("$" + delivery);
     var taxRate = $order.find("[data-taxrate]").data("taxrate");
+    var transactionFee = parseFloat($order.find(".transaction").data("value")) || 0;
     // var tax = parseFloat(subtotal * taxRate);
     var tax = 0;
     $order.find(".tax").text(" $" + tax.toFixed(2));
@@ -1094,7 +1099,7 @@ let localOrderObj = {
     var tip = parseFloat(helperMethod.readCookie("tip"));
     $order.find(".tip").text(tip.toFixed(2));
     $order.find(".tip").val(tip.toFixed(2));
-    var total = subtotal+delivery+tax+tip;
+    var total = subtotal+delivery+tax+tip+transactionFee;
     if(coupons.length > 0){
       $("#applyCouponBtn").hide();
       $("#disApplyCouponBtn").show();

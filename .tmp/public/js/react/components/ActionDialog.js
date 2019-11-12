@@ -247,9 +247,9 @@ class ActionDialog extends React.Component{
         var optionsView = valueObj.options.map(function(option){
           if(action === "updatePickupInfo"){
             if(!!_this.state.data.isPartyMode.value && option.method === "delivery" && !!option.isDateCustomized){
-              return <option value={option.nickname+":"+option.index}>{option.deliveryCenter}</option>
+              return <option value={option.id}>{option.deliveryCenter}</option>
             }else if(!option.isDateCustomized){
-              return <option value={option.nickname+":"+option.index}>{(option.location||option.deliveryCenter) + ":(" + option.method + ")" + new Date(option.pickupFromTime).toLocaleString() + " to " + new Date(option.pickupTillTime).toLocaleString()}</option>
+              return <option value={option.id}>{(option.location||option.deliveryCenter) + ":(" + option.method + ")" + new Date(option.pickupFromTime).toLocaleString() + " to " + new Date(option.pickupTillTime).toLocaleString()}</option>
             }
           }else if(model === "PickupOption"){
             return <option value={option.phone}>{option.driverName}:{option.phone}</option>

@@ -412,7 +412,7 @@
                   <td style="vertical-align: middle;">
                     <!--<a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('update')%></a><br>-->
                     <a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('edit')%></a><br>
-                    <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-container="#mymeal" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:myMealView.deleteMeal" data-argument="<%= meal.id%>"><%= __('delete')%></a><br/>
+                    <a class="text-grey" href="javascript:void(0)" data-action="delete" data-model="meal" data-id="<%= meal.id%>"><%= __('delete')%></a><br/>
                   <td class="align-middle">
                     <button name="action" class="btn btn-outline ld-ext-right text-red <%= meal.status === 'on' ? '' : 'd-none'%>" data-id="<%= meal.id%>" data-action="off">
                       <%= __('off')%>
@@ -493,7 +493,7 @@
                   <td style="vertical-align: middle;">
                     <!--<a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('update')%></a><br>-->
                     <a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('edit')%></a><br>
-                    <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-container="#mymeal" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:myMealView.deleteMeal" data-argument="<%= meal.id%>"><%= __('delete')%></a><br/>
+                    <a class="text-grey" href="javascript:void(0)" data-action="delete" data-model="meal" data-id="<%= meal.id%>"><%= __('delete')%></a><br/>
                   <td style="vertical-align: middle;"><a class="text-red" href="/meal/<%= meal.id%>/off"><%= __('off')%></a></td>
                 </tr>
                 </tbody>
@@ -567,7 +567,7 @@
                   <td style="vertical-align: middle;">
                     <!--<a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('update')%></a><br>-->
                     <a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('edit')%></a><br>
-                    <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-container="#mymeal" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:myMealView.deleteMeal" data-argument="<%= meal.id%>"><%= __('delete')%></a><br/>
+                    <a class="text-grey" href="javascript:void(0)" data-action="delete" data-model="meal" data-id="<%= meal.id%>"><%= __('delete')%></a><br/>
                 </tr>
                 </tbody>
                 <%}}}%>
@@ -641,7 +641,7 @@
                   <td style="vertical-align: middle;">
                     <!--<a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><td><%= __('update')%></a><br>-->
                     <a class="text-grey" href="/meal/<%= meal.id%>?edit=true"><%= __('edit')%></a><br>
-                    <a class="text-grey" href="javascript:void(0)" data-toggle="alert-button" data-container="#mymeal" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:myMealView.deleteMeal" data-argument="<%= meal.id%>"><%= __('delete')%></a></td>
+                    <a class="text-grey" href="javascript:void(0)" data-action="delete" data-model="meal" data-id="<%= meal.id%>"><%= __('delete')%></a></td>
                   <td style="vertical-align: middle;"><button name="action" class="btn btn-outline text-grey" data-id="<%= meal.id%>" data-action="on"><%= __('on')%></button></td>
                 </tr>
                 </tbody>
@@ -699,7 +699,7 @@
                       <td class="align-middle"><%= dish.numberOfReviews%></td>
                       <td class="align-middle">
                         <a href="/dish/<%= dish.id%>?edit=true"><%= __('modify')%></a><br/>
-                        <a href="javascript:void(0)" data-toggle="alert-button" data-container="#mydish" data-title="<%= __('confirm-delete')%>" data-content="" data-actionFn="javascript:myMealView.deleteDish" data-error-container="#dish-error-<%= i%>"  data-argument="<%= dish.id%>"><%= __('delete')%></a><br/>
+                        <a href="javascript:void(0)" data-action="delete" data-model="dish" data-id="<%= dish.id%>"><%= __('delete')%></a><br/>
                       </td>
                     </tr>
                     <tr><td colspan="6" data-toggle="alert" id="dish-error-<%= i%>" class="alert alert-warning"></td></tr>

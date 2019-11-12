@@ -760,8 +760,13 @@ let alertButton = function($){
   $.fn.alertButton.Constructor  = AlertButton;
 
   var template = function(options){
-    var popover = '<div class="popover" role="tooltip"><div class="arrow"></div> <div class="text-center"><h3 class="popover-title">$title</h3> <div style="width: 200px;padding: 5px;"> <input id="popover_msg" class="form-control" type="text" name="msg" maxlength="20"></div> <button class="btn btn-info middle" data-target="#popover_msg" style="margin-bottom: 5px;" onclick="$actionFn(event)" data-error-container="$error-container" data-order=$argument">确认</button></div></div>';
-    popover = popover.replace("$title",options["title"]).replace("$content",options["content"]).replace("$actionFn",options["actionfn"]).replace("$argument","'" + options["argument"] + "'").replace("$error-container", options["errorContainer"]);
+    var popover =
+      '<div class="popover" role="tooltip">' +
+      '<div class="arrow"></div>' +
+      '<h3 class="popover-header">$title</h3>' +
+      '<div class="popover-body">$content' +
+      '</div></div>';
+    popover = popover.replace("$title",options["title"]).replace("$content",options["content"]);
     return popover;
   };
 
