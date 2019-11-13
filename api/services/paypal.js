@@ -26,9 +26,15 @@ function environment() {
   let clientId = process.env.NODE_ENV === 'production' ? process.env.PAYPAL_CLIENT_LIVE_ID : process.env.PAYPAL_CLIENT_TEST_ID;
   let clientSecret = process.env.NODE_ENV === 'production' ? process.env.PAYPAL_CLIENT_LIVE_SECRET : process.env.PAYPAL_CLIENT_TEST_SECRET;
 
-  return new checkoutNodeJssdk.core.SandboxEnvironment(
-    clientId, clientSecret
-  );
+  if(process.env.NODE_ENV === "production"){
+    return new checkoutNodeJssdk.core.LiveEnvironment(
+      clientId, clientSecret
+    );
+  }else{
+    return new checkoutNodeJssdk.core.SandboxEnvironment(
+      clientId, clientSecret
+    );
+  }
 }
 
 async function prettyPrint(jsonData, pre=""){

@@ -744,15 +744,15 @@ module.exports = {
           order.status = "schedule";
         }
 
-        if(order.paymentMethod === "cash" || order.paymentMethod === "venmo" || order.paymentMethod === "paypal"){
+        if(order.paymentMethod === "cash" || order.paymentMethod === "venmo"){
           order.charges['cash'] = order.charges['cash'] || 0;
           order.application_fees['cash'] = order.application_fees['cash'] || 0;
           order.charges['cash'] += charge.amount;
           order.application_fees['cash'] += charge.application_fee;
           order.feeCharges[charge.id] = charge.application_fee;
         }else{
+          order.isPaid = true;
           if(charge){
-            order.isPaid = true;
             order.charges[charge.id] = charge.amount;
             order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
           }
@@ -2060,64 +2060,28 @@ module.exports = {
       if(req.body.comment){
         req.body.customInfo.comment = req.body.comment;
       }
-      Meal.findOne(mealId).populate("dishes").populate("chef").exec(function(err, meal){
+
+      PickupOption.findOne(req.body.pickupOption).exec(function(err, pickupInfo){
         if(err){
           return res.badRequest(err);
         }
-        _this.validateOption(req.body, [meal], req, function(err){
+        req.body.pickupInfo = pickupInfo;
+        req.body.delivery_fee = pickupInfo.delivery_fee;
+        _this.cancelOrderJob(orderId, '', function(err){
           if(err){
             return res.badRequest(err);
           }
-          let _pickups = [];
-          Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').populate('chef').exec(function(err, meals){
+          req.body.pickupOption = pickupInfo.index;
+          req.body.isScheduled = false;
+          Order.update(order.id, req.body).exec(function(err, result){
             if(err){
               return res.badRequest(err);
             }
-            var _dishes=[];
-            async.auto({
-              findPickups : function(next){
-                meals.forEach(function(meal){
-                  if(!_pickups.length){
-                    _pickups = meal.pickups;
-                  }else{
-                    meal.pickups.forEach(function(pickup){
-                      if(!_pickups.some(function(p){
-                        return moment(p.pickupFromTime).isSame(pickup.pickupFromTime, 'minutes') && moment(p.pickupTillTime).isSame(pickup.pickupTillTime, 'minutes') && p.location === pickup.location && p.method === pickup.method;
-                      })){
-                        _pickups.push(pickup);
-                      }
-                    })
-                  }
-                });
-                next();
-              }
-            }, function(err){
-              if(err){
-                return res.badRequest(err);
-              }
-              _this.buildDeliveryData(req.body, meal, _pickups, req, function(_logisticInfo){
-                req.body.pickupInfo = _logisticInfo.pickupInfo;
-                req.body.delivery_fee = _logisticInfo.delivery_fee;
-                _this.cancelOrderJob(orderId, '', function(err){
-                  if(err){
-                    return res.badRequest(err);
-                  }
-                  req.body.pickupOption = _logisticInfo.pickupInfo.index;
-                  req.body.isScheduled = false;
-                  Order.update(order.id, req.body).exec(function(err, result){
-                    if(err){
-                      return res.badRequest(err);
-                    }
-                    result[0].meal = meal;
-                    result[0].host = order.host;
-                    res.ok(result[0]);
-                  });
-                });
-              });
-            })
-          })
+            result[0].host = order.host;
+            res.ok(result[0]);
+          });
         });
-      })
+      });
     });
   },
 
