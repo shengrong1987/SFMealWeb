@@ -4179,7 +4179,7 @@ var OrderView = Backbone.View.extend({
     var tip = parseFloat(form.find(".tip").text());
     var discount = parseFloat(form.find(".discount-amount").text());
     var transactionFee = parseFloat(form.find());
-    var total = subtotal + tip + VAR.SERVICE_FEE + VAR.SYSTEM_DELIVERY_FEE - discount;
+    var total = subtotal + tip + VAR.SERVICE_FEE + VAR.SYSTEM_DELIVERY_FEE + transactionFee - discount;
     return total;
   },
   getPaymentInfo : function(isLogin, cb){
