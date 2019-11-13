@@ -4170,7 +4170,6 @@ var OrderView = Backbone.View.extend({
       helperMethod.makeAToast(__('orderEmptyError'));
       return -1;
     }
-
     var points = localOrderObj.localPoints;
     var couponValue = localOrderObj.localCoupon;
     if (couponValue) {
@@ -4178,7 +4177,7 @@ var OrderView = Backbone.View.extend({
     }
     var tip = parseFloat(form.find(".tip").text());
     var discount = parseFloat(form.find(".discount-amount").text());
-    var transactionFee = parseFloat(form.find());
+    var transactionFee = parseFloat(form.find(".transaction").data("value"));
     var total = subtotal + tip + VAR.SERVICE_FEE + VAR.SYSTEM_DELIVERY_FEE + transactionFee - discount;
     return total;
   },
