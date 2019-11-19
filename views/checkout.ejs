@@ -105,13 +105,6 @@
                     <span style="margin-left: 10px;"><%=  __('enter-new-contact')%></span>
                   </label>
                 </div>
-
-                <div class="col">
-                  <div class="form-group">
-                    <input class="form-control" name="comment" placeholder="<%= __('comment')%>">
-                  </div>
-                </div>
-                <!--<u><a id="createNewContactBtn" class="text-orange cursor-pointer" toggle="modal" data-id="<%= user.id%>" data-target="#myModal" data-href="/templates/user/address.html" href="javascript:void(0)"><%= __('enter-new-contact')%></a></u>-->
               </div>
             <%}else{%>
 
@@ -164,16 +157,30 @@
                     </div>
                   </div>
                 </div>
-
-                <div class="row">
-                  <div class="col">
-                    <div class="form-group">
-                      <input class="form-control" name="comment" placeholder="<%= __('comment')%>">
-                    </div>
-                  </div>
-                </div>
               </form>
             <%}%>
+
+            <div class="col-12 mb-4">
+              <div class="light-grey py-2">
+                <div class="d-flex justify-content-between vertical-align">
+                  <div>
+                    <h5 class="mb-0 pl-2"><%= __('comment') %></h5>
+                  </div>
+                </div>
+              </div>
+              <div class="radio-box flex">
+                <label class="btn btn-default vertical-inline option commentOption">
+                  <input type="radio" id="comment-1" name="comment-option-set" class="regular-radio"><label for="comment-1"></label>
+                  <span style="margin-left: 10px;"><%= __('comment-option-1') %></span>
+                </label>
+                <label class="btn btn-default vertical-inline option commentOption">
+                  <input type="radio" id="comment-2" name="comment-option-set" class="regular-radio"><label for="comment-2"></label>
+                  <span style="margin-left: 10px;"><%= __('comment-option-2') %></span>
+                </label>
+              </div>
+              <input class="form-control" name="comment" placeholder="<%= __('comment-placeholder')%>">
+            </div>
+
             <div class="col-12">
               <div class="form-group text-center">
                 <button id="verifyAddressBtn" style="height: 50px;" class="btn btn-lg btn-green form-control"><%= __('calculate-delivery')%></button>

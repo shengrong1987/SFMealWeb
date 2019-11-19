@@ -1190,5 +1190,7 @@
   "deliveryTimeConfirmationContent" : "Please confirm your delivery time: ",
   "continue-to-order" : "Order More",
   "switch-to-pickup" : "Pickup Instead",
-  "confirm-cancel" : "Confirm cancel"
+  "comment-option-1" : "Please call upon arrival(will meet outside)",
+  "comment-option-2" : "Please delivery to door:",
+  "comment-placeholder" : "Apt No., upstair, 1st floor etc..."
 }

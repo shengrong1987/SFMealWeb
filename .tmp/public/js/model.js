@@ -1240,7 +1240,13 @@ var CartView = Backbone.View.extend({
     "blur #tipInput" : "changeTip"
   },
   initialize : function(){
-    var tipValue = parseFloat(helperMethod.readCookie("tip"));
+    var tipValue = helperMethod.readCookie("tip");
+    if(typeof tipValue === "number"){
+      tipValue = parseFloat(tipValue);
+    }else{
+      tipValue = 0;
+    }
+    console.log("tip: " + tipValue);
     if(!tipValue){
       let tipDefaultOpt = this.$el.find("#tipControl label:first");
       tipDefaultOpt.addClass('active');
@@ -1311,6 +1317,7 @@ var CartView = Backbone.View.extend({
     }else{
       tipValue = parseFloat(tipInput.val());
     }
+    console.log("creating cookie...tip: " + tipValue);
     helperMethod.createCookie("tip", tipValue, 5);
     localOrderObj.refreshCheckoutMenu();
   }
@@ -3923,16 +3930,13 @@ var OrderView = Backbone.View.extend({
         console.log("error loading stripe.js");
       }
     });
-    var tipValue = parseFloat(helperMethod.readCookie("tip"));
-    console.log("tipping value: " + tipValue);
-    if(!tipValue){
-      let tipDefaultOpt = this.$el.find("#tipControl label:first");
-      tipDefaultOpt.addClass('active');
-      let subtotal = parseFloat(this.$el.find(".subtotal").text().replace("$",""));
-      tipValue = (subtotal * tipDefaultOpt.find("input").val() / 100).toFixed(2);
-      helperMethod.createCookie("tip", tipValue, 5);
-      localOrderObj.refreshCheckoutMenu();
+    var tipValue = helperMethod.readCookie("tip");
+    if(typeof tipValue === "number"){
+      tipValue = parseFloat(tipValue);
+    }else{
+      tipValue = 0;
     }
+    localOrderObj.refreshCheckoutMenu();
   },
   enterDishPreference : function(target){
     var preference = $(target).data("preference");
@@ -4143,11 +4147,17 @@ var OrderView = Backbone.View.extend({
     var index = optionItem.data("index");
     var date = optionItem.parent().data("date");
     var nickname = optionItem.parent().data("nickname");
-    return { index : index, date: date, nickname: nickname};
+    return { index : index, date: date, nickname: nickname };
   },
   getCustomizedInfo : function(partyMode, cb){
     if(!partyMode){
-      return cb({ comment : this.$el.find("#pickupInfoView [name='comment']:visible").val()});
+      var commentOption = this.$el.find("#pickupInfoView .commentOption .regular-radio:checked");
+      var commentContent = "";
+      if(commentOption.length){
+        commentContent = commentOption.next().next().text();
+      }
+      commentContent += this.$el.find("#pickupInfoView [name='comment']:visible").val();
+      return cb({ comment : commentContent});
     }
     var customerInfo = {};
     var customDate = this.$el.find(".customDeliveryDate").data("DateTimePicker");
@@ -4170,7 +4180,6 @@ var OrderView = Backbone.View.extend({
       helperMethod.makeAToast(__('orderEmptyError'));
       return -1;
     }
-
     var points = localOrderObj.localPoints;
     var couponValue = localOrderObj.localCoupon;
     if (couponValue) {
@@ -4178,8 +4187,8 @@ var OrderView = Backbone.View.extend({
     }
     var tip = parseFloat(form.find(".tip").text());
     var discount = parseFloat(form.find(".discount-amount").text());
-    var transactionFee = parseFloat(form.find());
-    var total = subtotal + tip + VAR.SERVICE_FEE + VAR.SYSTEM_DELIVERY_FEE - discount;
+    var transactionFee = parseFloat(form.find(".transaction").data("value"));
+    var total = subtotal + tip + VAR.SERVICE_FEE + VAR.SYSTEM_DELIVERY_FEE + transactionFee - discount;
     return total;
   },
   getPaymentInfo : function(isLogin, cb){

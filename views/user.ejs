@@ -156,7 +156,7 @@
                               <% if(order.method === "shipping"){%>
                                   <a href="https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=<%= orders[0].pickupInfo.tracking || ''%>"><%= __('track-order')%></a>
                               <% }%>
-                              <a href="javascript:void(0)" data-toggle="popover" data-title="<%= __('driver')%>" data-placement="bottom" data-content="<%= order.pickupInfo.phone %>"><%= __('contact-driver')%></a>
+                              <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.pickupInfo.phone || __('driver')%>" data-placement="bottom" data-content="<%= order.pickupInfo.phone %>"><%= __('contact-driver')%></a>
                             <%}else if(order.status == "review"){%>
                               <a href="javascript:void(0)" data-toggle="popover" data-title="<%= order.host.shopName || __('chef')%>" data-placement="bottom" data-content="<%= order.phone %>"><%= __('contact-chef')%></a>
                               <div class="divider none-margin">-</div>

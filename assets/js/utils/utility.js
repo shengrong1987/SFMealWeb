@@ -112,24 +112,6 @@ utility.getAutoComplete = function(){
       $(eles).toArray().forEach(function (ele) {
         autocomplete = new google["maps"]["places"].Autocomplete(ele, options);
         helperMethod.geolocate(autocomplete);
-        // $(ele).off("blur");
-        // $(ele).blur(function(e){
-        //   e.preventDefault();
-        //   var locationInput = $(this).val();
-        //   if(locationInput){
-        //     utility.autoCompletePlaceService.getQueryPredictions({ input : locationInput }, function(p, status){
-        //       if(status !== google.maps.places.PlacesServiceStatus.OK){
-        //         alert(status);
-        //         return;
-        //       }
-        //       if(p && p.length > 0){
-        //         utility.getPlaceDetail(p[0].place_id, ele);
-        //       }else{
-        //         console.log("zero results");
-        //       }
-        //     });
-        //   }
-        // });
         autocomplete.addListener('place_changed', function () {
           var place = this["getPlace"]();
           var location = $(ele).val();
@@ -144,7 +126,7 @@ utility.getAutoComplete = function(){
             if(p && p.length > 0){
               utility.getPlaceDetail(p[0].place_id, ele);
             }else{
-              console.log("zero results");
+              helperMethod.makeAToast("No results found on the address, please check and try again.");
             }
           });
         });

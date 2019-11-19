@@ -2066,7 +2066,6 @@ module.exports = {
           return res.badRequest(err);
         }
         req.body.pickupInfo = pickupInfo;
-        req.body.delivery_fee = pickupInfo.delivery_fee;
         _this.cancelOrderJob(orderId, '', function(err){
           if(err){
             return res.badRequest(err);

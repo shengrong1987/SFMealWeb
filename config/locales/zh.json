@@ -1203,5 +1203,7 @@
   "deliveryTimeConfirmationContent" : "请确认你的送餐时间：",
   "continue-to-order" : "继续点餐",
   "switch-to-pickup" : "我要自取",
-  "confirm-cancel" : "确认取消"
+  "comment-option-1" : "请到了打电话(出来拿)",
+  "comment-option-2" : "请到了按门铃/找前台(送上门):",
+  "comment-placeholder" : "公寓房间号码，楼上，楼下等信息..."
 }
