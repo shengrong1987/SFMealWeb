@@ -807,13 +807,13 @@ let localOrderObj = {
         priceItem.data("extra", extra);
         if(extra > 0){
           if(discount){
-            priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s>" + "$" + price + " ($" + extra + ")");
+            priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s><br/>" + "$" + price + " ($" + extra + ")");
           }else{
             priceItem.html("$" + price + " ($" + extra + ")");
           }
         }else{
           if(discount){
-            priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s>" + "$" + price);
+            priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s><br/>" + "$" + price);
           }else{
             priceItem.html("$" + price);
           }
@@ -821,7 +821,7 @@ let localOrderObj = {
       }else{
         priceItem.data("extra", 0);
         if(discount){
-          priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s>" + "$" + price);
+          priceItem.html("<s class='text-grey' style='font-size: small;'>$" + oldPrice + "</s><br/>" + "$" + price);
         }else{
           priceItem.html("$" + price);
         }

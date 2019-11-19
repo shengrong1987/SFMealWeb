@@ -1774,10 +1774,9 @@ fieldset[disabled] .btn-red.active {
 
 .list.list-side{
   li{
-    height: 50px;
-    line-height: 50px;
+    height: 45px;
+    line-height: 45px;
     background-color: $light-grey;
-    margin: 2px 0 2px 0;
     a{
       color: black;
     }
@@ -2826,7 +2825,7 @@ select.form-control{
 }
 
 #dishTagsBar{
-  top: 92px;
+  top: 72px;
   z-index:1;
   background-color: #eeeeee;
 }
@@ -2916,11 +2915,11 @@ $lines-to-show: 3;
 
   .dishItem {
     .photo{
-      width: 150px;
+      width: 120px;
       height: 120px;
     }
     img{
-      height : 100%;
+      width : 100%;
       margin-left: 50%;
       margin-top: 50%;
       -webkit-transform: translateY(-50%) translateX(-50%);

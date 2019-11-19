@@ -64,22 +64,24 @@
           <% })%>
         </div>
       </div>
-      <ul id="hostBarView" class="nav nav-pills nav-scroll justify-content-md-center white" data-filter-group="chef">
+      <ul id="hostBarView" class="nav nav-tabs nav-scroll justify-content-md-center white" data-filter-group="chef">
         <%
         hosts.forEach(function(host,i){ %>
-          <li class="mix nav-item py-1 px-1 <%= i===0?'active':''%> <%= host.dates%>">
-            <button class="nav-link btn-light cursor-pointer <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-filter-type="chef" data-filter=".<%= host.chef.shopName.replace(/ |\'/g,'')%>" data-toggle="tab" data-likes="<%= host.chef.likes || 0%>" data-picture="<%= host.chef.picture%>" data-host="<%= host.chef.id%>" data-follow-text="<%= __('follow')%>" data-followed-text="<%= __('followed')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].chef.id}))) ? true : false%>" data-score="<%= host.chef.averageScore || 5%>" style="max-width:100px;font-size: 8px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;"><%= host.chef.shopName%></>
+          <li class="mix nav-item px-1 <%= i===0?'active':''%> <%= host.dates%>">
+            <a class="nav-link <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-filter-type="chef" data-filter=".<%= host.chef.shopName.replace(/ |\'/g,'')%>" data-toggle="tab" data-likes="<%= host.chef.likes || 0%>" data-picture="<%= host.chef.picture%>" data-host="<%= host.chef.id%>" data-follow-text="<%= __('follow')%>" data-followed-text="<%= __('followed')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].chef.id}))) ? true : false%>" data-score="<%= host.chef.averageScore || 5%>" style="max-width:100px;font-size: 8px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">
+              <%= host.chef.shopName%>
+            </a>
           </li>
         <% })%>
       </ul>
     </div>
     <% }%>
 
-    <div class="w-100 d-flex">
-      <nav id="dishTagsBar" class="sticky-top py-2" style="overflow-y: scroll;min-width: 100px;">
+    <div class="w-100 d-flex border-top-0" style="border: lightgrey solid 1px;">
+      <nav id="dishTagsBar" class="sticky-top" style="overflow-y: scroll;min-width: 100px;">
         <ul class="list list-side list-unstyled" data-toggle="btn-set">
           <% tags.forEach(function(tag, index){%>
-            <li class="cursor-pointer border-bottom <%= index===0?'active':''%> <%= tag==="discount"?'yellow':''%>"><a style="white-space: nowrap;" data-offset=-94 href="<%= tag.replace("'","").replace(" ","")%>"><%= __(tag)%></a></li>
+            <li class="cursor-pointer border-bottom <%= index===0?'active':''%> <%= tag==="discount"?'yellow':''%>"><a style="white-space: nowrap;" data-offset=-74 href="<%= tag.replace("'","").replace(" ","")%>"><%= __(tag)%></a></li>
           <% })%>
         </ul>
         <% if(!user || (user && !user.newUserRewardIsRedeemed && user.points === 0)){ %>
@@ -93,8 +95,8 @@
         <div id="chefDishView">
           <% tags.forEach(function(tag){if(tag === "chef"){%>
             <% if(!hosts || !hosts.length){ return; }%>
-            <div class="pl-4 py-2 text-center light-grey border" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag.replace("'","").replace(" ","")%>">
-              <h6 class="none" style="min-width: 80px;"><%= __(tag)%></h6>
+            <div class="pl-4 text-center light-grey row" style="font-weight: lighter;height: 43px;" id="<%= tag.replace("'","").replace(" ","")%>">
+              <h6 class="middle" style="min-width: 80px;"><%= __(tag)%></h6>
             </div>
             <div class="d-flex justify-content-around py-3 mix" id="<%= tag%>">
               <div class="d-flex flex-row vertical-align">
@@ -129,45 +131,43 @@
             if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
             %>
             <% if(tag === "chef"){%>
-              <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-cover-string="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem py-2 mix item <%= meal.chef.shopName.replace(/ |\'/g,'')%> <%= dateKey.replace(" ",'').replace('/','')%>
-                  <% if(dish.tags){ dish.tags.forEach(function(t){%>
-                    <%= " " + t%>
-                  <%})}%>">
-                <div class="row">
-                  <div class="col-6">
-                    <div class="photo middle rounded">
-                      <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
-                        <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
-                          <img data-echo="<%= index===0? photo.v : ''%>">
-                        </a>
-                      <% }});%>
-                    </div>
+              <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-cover-string="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="row dish dishItem py-2 mix item <%= meal.chef.shopName.replace(/ |\'/g,'')%> <%= dateKey.replace(" ",'').replace('/','')%>
+                <% if(dish.tags){ dish.tags.forEach(function(t){%>
+                  <%= " " + t%>
+                <%})}%>" style="margin-left: -15px;margin-right: -15px;">
+                <div class="col-5">
+                  <div class="middle photo">
+                    <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
+                      <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
+                        <img data-echo="<%= index===0? photo.v : ''%>" class="rounded">
+                      </a>
+                    <% }});%>
                   </div>
-                  <div class="col-6">
-                    <div class="d-flex flex-column">
-                      <h6 class="mb-auto"><%= dish.title%>
-                        <small>
-                          <%= dish.quantity%><br/>
-                          <span class="text-red"><%= __('ends')%> <%= meal.getTimeDiff(meal.provideTillTime, locale)%></span>
-                        </small>
-                      </h6>
-                      <div class="d-flex vertical-align">
-                        <div class="text text-price price mr-auto" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
-                          <% if(dish.discount){%>
-                            <s class='text-grey' style='font-size: small;'>$<%= (parseFloat(dish.price) + parseFloat(dish.discount)).toFixed(2)%></s><br/>$<%= dish.price.toFixed(2)%>
-                          <% }else{%>
-                            $<%= dish.price.toFixed(2)%>
-                          <% }%>
+                </div>
+                <div class="col-7 vertical-align">
+                  <div class="d-flex flex-column">
+                    <h6 class="mb-auto" style="width: 135px;"><%= dish.title%>
+                      <small>
+                        <%= dish.quantity%><br/>
+                        <span class="text-red"><%= __('ends')%> <%= meal.getTimeDiff(meal.provideTillTime, locale)%></span>
+                      </small>
+                    </h6>
+                    <div class="d-flex vertical-align">
+                      <div class="text text-price price mr-auto" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
+                        <% if(dish.discount){ %>
+                          <s class='text-grey' style='font-size: small;'>$<%= (parseFloat(dish.price) + parseFloat(dish.discount)).toFixed(2)%></s><br/>$<%= dish.price.toFixed(2)%>
+                        <% }else{ %>
+                          $<%= dish.price.toFixed(2)%>
+                        <% } %>
+                      </div>
+                      <button name="order-btn" style="width: 38px;height: 38px;" class="btn orange rounded-circle text-white font-weight-bold cursor-pointer" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
+                      <div name="input-group" class="input-group input-group-sm amount-input round ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
+                        <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
+                          <span class="input-group-text">-</span>
                         </div>
-                        <button name="order-btn" style="width: 38px;height: 38px;" class="btn orange rounded-circle text-white font-weight-bold cursor-pointer" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
-                        <div name="input-group" class="input-group input-group-sm amount-input round ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
-                          <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
-                            <span class="input-group-text">-</span>
-                          </div>
-                          <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
-                          <div class="input-group-append add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
-                            <span class="input-group-text">+</span>
-                          </div>
+                        <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
+                        <div class="input-group-append add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
+                          <span class="input-group-text">+</span>
                         </div>
                       </div>
                     </div>
@@ -178,8 +178,8 @@
         </div>
         <div id="dishContentView">
             <% tags.forEach(function(tag){ if(tag !== "chef"){ %>
-              <div class="pl-4 py-2 text-center light-grey border" style="margin: 2px 0 2px 0;font-weight: lighter;" id="<%= tag.replace("'","").replace(" ","")%>">
-                <h6 class="none" style="min-width: 80px;"><%= __(tag)%></h6>
+              <div class="pl-4 text-center light-grey row" style="font-weight: lighter;height: 43px;" id="<%= tag.replace("'","").replace(" ","")%>">
+                <h6 class="middle" style="min-width: 80px;"><%= __(tag)%></h6>
               </div>
               <%
                 var dateList = Object.keys(meals.meals);
@@ -191,47 +191,43 @@
                 if(!_dishes.includes(dish.id)){ _dishes.push(dish.id);
               %>
                 <% if(dish.type === tag || (dish.tags && dish.tags.includes(tag))){ %>
-                  <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="dish dishItem py-2 mix item <%= meal.chef.shopName.replace("'","").replace(" ","")%> <%= dateKey.replace(" ",'').replace('/','')%>
+                  <div data-prefs="<%= dish.preference ? Object.keys(dish.preference).length : 0%>" data-coverstring="<%= meal.coverString%>" data-taxrate="<%= meal.getTaxRate()%>" data-id="<%= dish.id%>" data-left-amount="<%= meal.leftQty[dish.id]%>" class="row dish dishItem py-2 mix item <%= meal.chef.shopName.replace("'","").replace(" ","")%> <%= dateKey.replace(" ",'').replace('/','')%>
                     <% if(dish.tags){ dish.tags.forEach(function(t){%>
                       <%= " " + t%>
                     <%})}%>">
-                    <div class="row">
-                      <div class="col-6">
-                        <div class="photo middle rounded">
-                          <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
-                            <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
-                              <img data-echo="<%= index===0? photo.v : ''%>">
-                            </a>
-                          <% }});%>
-                        </div>
+                    <div class="col-5">
+                      <div class="middle photo">
+                        <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
+                          <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
+                            <img data-echo="<%= index===0? photo.v : ''%>" class="rounded">
+                          </a>
+                        <% }});%>
                       </div>
-                      <div class="col-6">
-                        <div class="d-flex flex-column">
-                          <h6 class="mb-auto"><%= dish.title%>
-                            <small>
-                              <%= dish.quantity%><br/>
-                              <span class="text-red"><%= __('ends')%> <%= meal.getTimeDiff(meal.provideTillTime, locale)%></span>
-                            </small>
-                          </h6>
-                          <div class="d-flex vertical-align">
-                            <div class="text text-price price mr-auto" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
-                              <% if(dish.discount){%>
-                                <s class='text-grey' style='font-size: small;'>$<%= (parseFloat(dish.price) + parseFloat(dish.discount)).toFixed(2)%></s>
-                                <br/>
-                                $<%= dish.price.toFixed(2)%>
-                              <% }else{%>
+                    </div>
+                    <div class="col-7 vertical-align">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-auto" style="width: 135px;"><%= dish.title%>
+                          <small>
+                            <%= dish.quantity%><br/>
+                            <span class="text-red"><%= __('ends')%> <%= meal.getTimeDiff(meal.provideTillTime, locale)%></span>
+                          </small>
+                        </h6>
+                        <div class="d-flex vertical-align">
+                          <div class="text text-price price mr-auto" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
+                            <% if(dish.discount){%>
+                              <s class='text-grey' style='font-size: small;'>$<%= (parseFloat(dish.price) + parseFloat(dish.discount)).toFixed(2)%></s><br/>$<%= dish.price.toFixed(2)%>
+                            <% }else{%>
                               $<%= dish.price.toFixed(2)%>
-                              <% }%>
+                            <% }%>
+                          </div>
+                          <button name="order-btn" style="width: 38px;height: 38px;" class="btn rounded-circle orange text-white font-weight-bold cursor-pointer" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
+                          <div name="input-group" class="input-group input-group-sm amount-input round ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
+                            <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
+                              <span class="input-group-text">-</span>
                             </div>
-                            <button name="order-btn" style="width: 38px;height: 38px;" class="btn rounded-circle orange text-white font-weight-bold cursor-pointer" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
-                            <div name="input-group" class="input-group input-group-sm amount-input round ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
-                              <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
-                                <span class="input-group-text">-</span>
-                              </div>
-                              <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
-                              <div class="input-group-append add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
-                                <span class="input-group-text">+</span>
-                              </div>
+                            <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
+                            <div class="input-group-append add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
+                              <span class="input-group-text">+</span>
                             </div>
                           </div>
                         </div>

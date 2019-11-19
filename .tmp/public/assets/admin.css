@@ -2604,6 +2604,9 @@ button.bg-light:focus {
 .border-0 {
   border: 0 !important; }
 
+.border-top-0 {
+  border-top: 0 !important; }
+
 .border-right-0 {
   border-right: 0 !important; }
 
@@ -2830,16 +2833,8 @@ button.bg-light:focus {
   padding: 0.25rem !important; }
 
 
-.py-1 {
-  padding-top: 0.25rem !important; }
-
-
 .px-1 {
   padding-right: 0.25rem !important; }
-
-
-.py-1 {
-  padding-bottom: 0.25rem !important; }
 
 
 .px-1 {
@@ -3940,10 +3935,9 @@ fieldset[disabled] .btn-red.active {
 
 /* sidebar */
 .list.list-side li {
-  height: 50px;
-  line-height: 50px;
-  background-color: #eee;
-  margin: 2px 0 2px 0; }
+  height: 45px;
+  line-height: 45px;
+  background-color: #eee; }
   .list.list-side li a {
     color: black; }
 
@@ -4348,7 +4342,7 @@ select.form-control {
   overflow-y: hidden; }
 
 #dishTagsBar {
-  top: 92px;
+  top: 72px;
   z-index: 1;
   background-color: #eeeeee; }
 
@@ -4389,10 +4383,10 @@ select.form-control {
       margin-top: 50%;
       -webkit-transform: translateY(-50%) translateX(-50%); }
   .dishItem .photo {
-    width: 150px;
+    width: 120px;
     height: 120px; }
   .dishItem img {
-    height: 100%;
+    width: 100%;
     margin-left: 50%;
     margin-top: 50%;
     -webkit-transform: translateY(-50%) translateX(-50%); }
