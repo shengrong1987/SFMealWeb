@@ -389,7 +389,7 @@ module.exports = {
       let length = orders.length;
       async.eachSeries(orders, function(o, next){
         if(o.contactInfo.lat){
-          locList.push({ long: o.contactInfo.long, lat: o.contactInfo.lat});
+          locList.push({ lng: o.contactInfo.lng, lat: o.contactInfo.lat});
           return next();
         }
         setTimeout(function(){
@@ -403,7 +403,7 @@ module.exports = {
             }
             o.contactInfo.lat = res[0].latitude;
             o.contactInfo.lng = res[0].longitude;
-            locList.push({ long: o.contactInfo.long, lat: o.contactInfo.lat});
+            locList.push({ lng: o.contactInfo.lng, lat: o.contactInfo.lat});
             sails.log.info("geocoding order, progress: " + locList.length * 100 /length + "%");
             o.save(next);
           })
