@@ -376,6 +376,47 @@ module.exports = {
     })
   },
 
+  deliveryMap : function(req, res){
+    return res.view("locatorMap");
+  },
+
+  deliveryData : function(req, res){
+    Order.find({ status : { "!" : "cancel" }, method : "delivery" }).sort({ createdAt : -1}).exec(function(err, orders){
+      if(err){
+        return res.badRequest(err);
+      }
+      var locList = [];
+      let length = orders.length;
+      async.eachSeries(orders, function(o, next){
+        if(o.contactInfo.lat){
+          locList.push({ long: o.contactInfo.long, lat: o.contactInfo.lat});
+          return next();
+        }
+        setTimeout(function(){
+          let location = o.contactInfo.address;
+          if(!location || typeof location === "undefined"){
+            return next();
+          }
+          GeoCoder.geocode(location, function(err, res){
+            if(err){
+              return next(err);
+            }
+            o.contactInfo.lat = res[0].latitude;
+            o.contactInfo.lng = res[0].longitude;
+            locList.push({ long: o.contactInfo.long, lat: o.contactInfo.lat});
+            sails.log.info("geocoding order, progress: " + locList.length * 100 /length + "%");
+            o.save(next);
+          })
+        }, 100);
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(locList);
+      });
+    })
+  },
+
   feature : function(req, res){
     if(req.session.authenticated){
       sails.log.info("USER: " + req.session.user ? req.session.user.id : "NONE");

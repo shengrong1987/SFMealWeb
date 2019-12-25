@@ -41,7 +41,8 @@ module.exports = {
     report : "./assets/js/entry/report.js",
     emailVerification : "./assets/js/entry/emailVerification.js",
     pintuan : "./assets/js/entry/pintuan.js",
-    cart : "./assets/js/entry/cart.js"
+    cart : "./assets/js/entry/cart.js",
+    locatorMap : "./assets/js/entry/locatorMap.js"
   },
   output: {
     path: path.resolve(__dirname, '.tmp/public/assets/'),
@@ -122,7 +123,7 @@ module.exports = {
       paths: glob.sync([`${path.resolve(__dirname,'views')}/*.ejs`,`${path.resolve(__dirname,'assets/templates')}/**/*.html`,`${path.resolve(__dirname,'assets/js')}/entry/*.js`,`${path.resolve(__dirname,'assets/js')}/react/**/*.js`], { nodir: true }),
       whitelist: ['modal-backdrop','running','btn-primary','btn-outline-primary','btn-sm'],
       whitelistPatterns : [/^ekko-lightbox/,/^bootstrap-dialog/,/^popover/],
-      whitelistPatternsChildren: [/type-primary$/]
+      whitelistPatternsChildren: [/type-primary$/, /tooltip$/]
     }),
     new HtmlWebpackPlugin({
       inject: true,

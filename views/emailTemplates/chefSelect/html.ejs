@@ -1,53 +1,34 @@
 <%- include ../email_header %>
 
-<div class="green" style="padding: 25px;">
+<div class="green middle" style="padding: 25px;max-width: 600px;">
 
   <div class="container white relative middle text-center py-5">
-    <h3><%= yourfollowedchef%>"<%= host.shopName%>"<%= menuoftheweek%></h3>
+    <h3><%= yourfollowedchef%>"<%= host.shopName%>"<%= discountoftheweek%></h3>
     <p><%= hometaste1%></p>
     <p class="text-red" style="font-size: larger;">
       <i class="fa-calendar-remote p-4"></i>
-      <%= deliverytime%>:
-      <% meals.forEach(function(meal){%>
-      <%= meal.getDateDesc(meal.pickups[0].pickupFromTime);%>
-      <% });%>
+      <%= deliverytime %>:
+      <%= deliverytimeinfo %>
     </p>
     <div class="divider">-</div>
-    <div>
-      <%
-        var dishes = [];
-        meals.forEach(function(meal){
-            if(!dishes.length){
-              dishes = meal.dishes;
-            }else{
-              meal.dishes.forEach(function(d1){
-                  var hasDish = dishes.some(function(d2){
-                      return d1.id===d2.id;
-                  })
-                if(!hasDish){
-                  dishes.push(d1);
-                }
-              })
-            }
-        })
-      %>
-      <% dishes.forEach(function(dish){%>
-        <div class="text-center margin-auto d-inline-block" style="min-width : 200px;max-width:45%;">
-          <a href="http://www.sfmeal.com/meal" class="mb-2">
-            <img src="<%= dish.photos[0].v %>" class="cursor-pointer w-100">
-          </a>
-          <div class="text-red" style="font-size: large;"><%= dish.title%> <%= dish.quantity%></div>
-          <% if(dish.originalPrice){%>
-            <div class="text-orange" style="font-size:large;">特惠价：$<%= dish.originalPrice%></div>
-            <div class="text-darksgrey" style="font-size:larger;"><s>原价：$<%= dish.price%></s></div>
-            <% }else{%>
-            <div class="text-darkgrey" style="font-size:large;">价格：$<%= dish.price%></div>
-            <% }%>
+    <div class="row">
+      <div class="col-12 middle">
+        <% dishes.forEach(function(dish){ if(!dish.discount){return}%>
+        <div class="d-inline-block text-left mt-2" style="width: 45%;font-size: medium;">
+          <div class="absolute overflow-hidden" style="width:100%;max-width: 220px;max-height:220px;position:absolute;">
+            <a href="http://www.sfmeal.com/meal#<%= host.shopName%>" class="mb-2">
+              <img src="<%= dish.photos[0].v %>" class="cursor-pointer w-100">
+            </a>
           </div>
-      <% });%>
+          <div class="text-red mt-2"><%= dish.title%> <%= dish.quantity%></div>
+          <div class="text-orange">特惠价：$<%= dish.price %></div>
+          <div class="text-darksgrey"><s>原价：$<%= (dish.price + dish.discount).toFixed(2)%></s></div>
+        </div>
+        <% })%>
+      </div>
     </div>
     <div class="mt-4">
-      <a class="btn btn-primary" style="height:40px;" href="http://www.sfmeal.com/meal"><%= seemore%></a>
+      <a class="btn btn-primary" href="http://www.sfmeal.com/meal"><%= seemore%></a>
     </div>
   </div>
 

@@ -1273,12 +1273,40 @@ textarea.form-control {
     margin-right: 0.3125rem;
     margin-left: 0; }
 
+.valid-tooltip {
+  position: absolute;
+  top: 100%;
+  z-index: 5;
+  display: none;
+  max-width: 100%;
+  padding: 0.25rem 0.5rem;
+  margin-top: .1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #fff;
+  background-color: rgba(40, 167, 69, 0.9);
+  border-radius: 0.25rem; }
+
 .invalid-feedback {
   display: none;
   width: 100%;
   margin-top: 0.25rem;
   font-size: 80%;
   color: #dc3545; }
+
+.invalid-tooltip {
+  position: absolute;
+  top: 100%;
+  z-index: 5;
+  display: none;
+  max-width: 100%;
+  padding: 0.25rem 0.5rem;
+  margin-top: .1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #fff;
+  background-color: rgba(220, 53, 69, 0.9);
+  border-radius: 0.25rem; }
 
 .form-inline {
   display: flex;
@@ -2521,6 +2549,16 @@ a.close.disabled {
   opacity: 0; }
   .tooltip.show {
     opacity: 0.9; }
+  .tooltip .arrow {
+    position: absolute;
+    display: block;
+    width: 0.8rem;
+    height: 0.4rem; }
+    .tooltip .arrow::before {
+      position: absolute;
+      content: "";
+      border-color: transparent;
+      border-style: solid; }
 
 .popover {
   position: absolute;
@@ -2751,6 +2789,9 @@ button.bg-light:focus {
 
 .w-100 {
   width: 100% !important; }
+
+.h-100 {
+  height: 100% !important; }
 
 .mw-100 {
   max-width: 100% !important; }
@@ -3012,9 +3053,11 @@ a.text-dark:hover, a.text-dark:focus {
   display: flex;
   align-items: center; }
 
-body {
-  min-height: 550px;
-  overflow: auto; }
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0; }
 
 small {
   font-size: 75%;

@@ -2,6 +2,7 @@
  * Created by shengrong on 3/7/16.
  */
 import 'backbone';
+import async from 'async';
 import { helperMethod, localOrderObj } from "./utils/helper";
 import { utility } from "./utils/utility";
 import { dateMixer, chefMixer, deliveryMixer, pickupMixer, setupObj, chefThumbnailMixer } from "./installation";
@@ -1246,7 +1247,6 @@ var CartView = Backbone.View.extend({
     }else{
       tipValue = 0;
     }
-    console.log("tip: " + tipValue);
     if(!tipValue){
       let tipDefaultOpt = this.$el.find("#tipControl label:first");
       tipDefaultOpt.addClass('active');
@@ -3411,6 +3411,51 @@ var ContactInfoView = Backbone.View.extend({
   }
 });
 
+var DeliveryLocationMapView = Backbone.View.extend({
+  initialize : function(){
+    let _this = this;
+    if(!utility.googleMapLoaded){
+      utility.initGoogleMapService(function(err){
+        if(err){
+          helperMethod.makeAToast(err);
+          return;
+        }
+        _this.initMap();
+      });
+    }
+  },
+  initMap : function(){
+    let _this = this;
+    utility.initMap(this.$el.find("#googlemap")[0], {
+      lng: -122.468830,
+      lat: 37.687960
+    }, function(err, map){
+      if(err){
+        helperMethod.makeAToast(err);
+        return;
+      }
+      _this.loadLocationInfo(map);
+    })
+  },
+  loadLocationInfo : function(map){
+    this.model.action = "deliveryData";
+    this.model.save({}, {
+      success : function(model, result){
+        if(!result || !result.length){
+          return;
+        }
+        result.forEach(function(p){
+          p.lng = p.long;
+          let lMarker = new google.maps.Marker({
+            position: p,
+            map: map
+          });
+        })
+      }
+    })
+  }
+});
+
 var MapView = Backbone.View.extend({
   initialize : function(){
     this.$target = $(this.attributes.target);
@@ -4574,5 +4619,5 @@ var BadgeView = Backbone.View.extend({
 });
 
 export { Auth, Payment, Host, User, Checklist, Meal, Dish, Bank, Review, Transaction, Order, Badge }
-export { LoginView, EmailVerificationView, RegisterView, UserBarView, ApplyView, PaymentView, NewUserRewardView, AddressView, CheckListView, HostSectionInMealView, DayOfMealView, MealSelectionView, MealView, DishView, BankView, UserProfileView, MyMealView, HostProfileView, HostPageView, ReviewView, TransactionView, DishPreferenceView, ContactInfoView, MapView, MealConfirmView, ReceiptView, OrderView, BadgeView, PintuanView, CartView }
+export { LoginView, EmailVerificationView, RegisterView, UserBarView, ApplyView, PaymentView, NewUserRewardView, AddressView, CheckListView, HostSectionInMealView, DayOfMealView, MealSelectionView, MealView, DishView, BankView, UserProfileView, MyMealView, HostProfileView, HostPageView, ReviewView, TransactionView, DishPreferenceView, ContactInfoView, MapView,  MealConfirmView, ReceiptView, OrderView, BadgeView, PintuanView, CartView, DeliveryLocationMapView }
 

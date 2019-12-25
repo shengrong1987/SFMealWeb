@@ -31,6 +31,7 @@ module.exports = function(agenda) {
 
     // execute job
     run: function (job, done) {
+      sails.log.debug("running chef meals pushing job");
       User.find({follow: {'!': null}}).populate("follow").populate("auth").exec(function (err, users) {
         if(err){
           return done();
@@ -43,20 +44,38 @@ module.exports = function(agenda) {
           var nextMon = moment().day(7)._d;
           var hosts = user.follow;
           async.each(hosts, function(host, next){
-            Meal.find({ chef : host.id, status : 'on', provideFromTime : { '>=' : now}, provideTillTime : { '<' : nextMon }}).exec(function(err, meals){
+            Meal.find({ chef : host.id, status : 'on'}).populate("dishes").exec(function(err, meals){
               if(err){
                 return next(err);
               }
               if(meals.length === 0){
                 return next();
               }
+              var meal = meals[0];
+              meal.dateDesc = meal.getDateDesc(meal.pickups[0].pickupFromTime);
+              var dishes = [];
+              meals.forEach(function(meal){
+                if(!dishes.length){
+                  dishes = meal.dishes
+                }else{
+                  meal.dishes.forEach(function(d1){
+                    var hasDish = dishes.some(function(d2){
+                      return d1.id===d2.id
+                    });
+                    if(!hasDish){
+                      dishes.push(d1)
+                    }
+                  })
+                }
+              });
               var params = {
-                meals : meals,
-                host : host.id,
+                meal : meal,
+                host : host,
+                dishes : dishes,
                 guestEmail : user.auth.email,
                 customer : user
-              }
-              sails.log.debug("JOBS - Type: FollowedChefPushingJob, Model: Meal, Action: ChefSelect, For Host: " + host.id + "To: Guest" + user.auth.email);
+              };
+              sails.log.debug("JOBS - Type: FollowedChefPushingJob, Model: Meal, Action: ChefSelect, For Host: " + host.id + "To: " + user.auth.email);
               notification.notificationCenter("Meal","chefSelect", params);
               next();
             });

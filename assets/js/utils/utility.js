@@ -20,7 +20,7 @@ var utility  = {
 
 utility.googleMapLoaded = false;
 
-utility.initGoogleMapService = function(){
+utility.initGoogleMapService = function(cb){
   var $this = this;
   if(!utility.googleMapLoaded){
     utility.googleMapLoaded = true;
@@ -34,16 +34,12 @@ utility.initGoogleMapService = function(){
         $this.directionsService = new google.maps.DirectionsService;
         $this.geocoder = new google.maps.Geocoder();
         $this.getAutoComplete();
-        // console.log(mapView);
-        // if(typeof mapView !== 'undefined' && mapView){
-        //   mapView.initDelivery();
-        //   mapView.initPickups();
-        // }
-        // if(typeof mealConfirmView !== "undefined" && mealConfirmView){
-        //   mealConfirmView.verifyAddress(null, true);
-        // }
+        if(cb){
+          cb();
+        }
       },error : function(err){
         console.log(err.statusText);
+        if(cb){ cb(err); }
       }
     });
   }
@@ -52,6 +48,7 @@ utility.initGoogleMapService = function(){
 utility.initMap = function(ele, center, cb){
   var map = utility.map;
   if(!map){
+    console.log("setting map");
     utility.map = new google.maps.Map(ele, {
       center: center,
       scrollwheel: false,
@@ -188,7 +185,6 @@ utility.fillFromPlace = async function(comps, compsForm, ele){
     }
   }
 };
-
 utility.geocoding = function(address, cb){
   if(!utility.geocoder){
     return cb("geocoder not initialized");
@@ -197,6 +193,7 @@ utility.geocoding = function(address, cb){
     if (status === google.maps.GeocoderStatus.OK) {
       if (data.length > 0) {
         var location = data[0].geometry.location;
+        console.log("geocoding success!");
         cb(null, location, utility.map);
       }
     } else {

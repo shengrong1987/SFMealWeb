@@ -226,10 +226,10 @@ var notification = {
     params.senderName = "SFMeal.com";
 
     //juice it using email-template
-    if(process.env.NODE_ENV==="development"){
-      sails.log.info("Email Sent: " + basicInfo.recipientEmail + " Email template: " + template);
-      return;
-    }
+    // if(process.env.NODE_ENV==="development"){
+    //   sails.log.info("Email Sent: " + basicInfo.recipientEmail + " Email template: " + template);
+    //   return;
+    // }
 
     sails.hooks.email.send(template, params,{
       to : basicInfo.recipientEmail,
@@ -446,7 +446,7 @@ var notification = {
           i18ns = i18ns.concat(['pity','cancel','de-order','cancel-meal-title','meal-create-time','preorder-start-time','preorder-end-time','cancel-meal-context','meal-fail-requirement','open-meal','preorder-end-time','cancel-time','meal-number',"qty","left","cancel-reason"]);
           break;
         case "chefSelect":
-          i18ns = i18ns.concat(['search','searching-tips','delivery-time','yourfollowedchef','menuoftheweek','hometaste1','see-more']);
+          i18ns = i18ns.concat(['search','searching-tips','delivery-time','delivery-time-info','yourfollowedchef','discountoftheweek','hometaste1','see-more']);
           break;
       }
     }else if(model === "Host"){
