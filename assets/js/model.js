@@ -3445,7 +3445,6 @@ var DeliveryLocationMapView = Backbone.View.extend({
           return;
         }
         result.forEach(function(p){
-          p.lng = p.long;
           let lMarker = new google.maps.Marker({
             position: p,
             map: map
