@@ -381,9 +381,24 @@ module.exports = {
   },
 
   deliveryData : function(req, res){
+    var query = req.query;
+    var year = query.year;
+    var month = query.month;
+    sails.log.info("month: " + query.month);
+    sails.log.info("year: " + query.year);
     Order.find({ status : { "!" : "cancel" }, method : "delivery" }).sort({ createdAt : -1}).exec(function(err, orders){
       if(err){
         return res.badRequest(err);
+      }
+      if(year && year != -1){
+        orders = orders.filter(function(o){
+          return moment(o.pickupInfo.pickupFromTime).year() == year;
+        })
+      }
+      if(month && month != -1){
+        orders = orders.filter(function(o){
+          return moment(o.pickupInfo.pickupFromTime).month() == month;
+        })
       }
       var locList = [];
       let length = orders.length;

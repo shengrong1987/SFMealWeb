@@ -1158,6 +1158,7 @@ var CheckListView = Backbone.View.extend({
 var Meal = Backbone.Model.extend({
   urlRoot : "/meal",
   url : function(){
+    var url;
     if(this.type === "coupon"){
       return this.urlRoot + "/" + this.get("id") + "/coupon/" + this.get("code");
     }else if(this.get("id")){
@@ -1168,7 +1169,18 @@ var Meal = Backbone.Model.extend({
       }
     }else{
       if(this.action){
-        return this.urlRoot + "/" + this.action;
+        let _this = this;
+        url = this.urlRoot + "/" + this.action;
+        if(this.query){
+          url += "?";
+          Object.keys(this.query).forEach(function(key, index){
+            if(index>0){
+              url += "&";
+            }
+            url += key + "=" + _this.query[key];
+          });
+        }
+        return url;
       }
       return this.urlRoot;
     }
@@ -3412,6 +3424,9 @@ var ContactInfoView = Backbone.View.extend({
 });
 
 var DeliveryLocationMapView = Backbone.View.extend({
+  events: {
+    "click button" : "dateFilter"
+  },
   initialize : function(){
     let _this = this;
     if(!utility.googleMapLoaded){
@@ -3437,8 +3452,24 @@ var DeliveryLocationMapView = Backbone.View.extend({
       _this.loadLocationInfo(map);
     })
   },
-  loadLocationInfo : function(map){
+  dateFilter: function(e){
+    let btn = $(e.currentTarget);
+    let name = btn.attr('name');
+    this.$el.find("[name='" + name + "']").removeClass("active");
+    btn.addClass("active");
+    let currentMonth = this.$el.find("button[name='month'].active").attr('value');
+    let currentYear = this.$el.find("button[name='year'].active").attr('value');
+    console.log("filtering month: " + currentMonth + " year: " + currentYear);
+    this.loadLocationInfo(utility.map, currentMonth, currentYear);
+  },
+  loadLocationInfo : function(map, month, year){
+    let _this = this;
+    this.clearMarker();
     this.model.action = "deliveryData";
+    this.model.query = {
+      month : month || -1,
+      year: year || -1
+    };
     this.model.save({}, {
       success : function(model, result){
         if(!result || !result.length){
@@ -3449,9 +3480,21 @@ var DeliveryLocationMapView = Backbone.View.extend({
             position: p,
             map: map
           });
+          _this.model.markers.push(lMarker);
         })
       }
     })
+  },
+  clearMarker : function(){
+    if(!this.model.markers){
+      this.model.markers = [];
+    }
+    if(this.model.markers.length){
+      this.model.markers.forEach(function(m){
+        m.setMap(null);
+      })
+    }
+    this.model.markers = [];
   }
 });
 

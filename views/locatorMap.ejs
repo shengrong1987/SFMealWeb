@@ -1,7 +1,29 @@
 <link href="/assets/locatorMap.css" rel="stylesheet">
-<div id="locatorMapContainer" class="relative h-100 w-100">
-  <div id="googlemap" class="relative h-100 w-100">
-
+<div id="locatorMapContainer" class="w-100 h-100">
+  <div class="row h-100">
+    <div class="col-2 h-100 p-4">
+      <button class="btn btn-outline-dark mt-1 active" name="month" value="-1">All</button>
+      <button class="btn btn-outline-dark mt-1" name="month" value="0">1月</button>
+      <button class="btn btn-outline-dark mt-1" name="month" value="1">2月</button>
+      <button class="btn btn-outline-dark mt-1" name="month" value="2">3月</button>
+      <button class="btn btn-outline-dark mt-1" name="month" value="3">4月</button>
+      <button class="btn btn-outline-dark mt-1" name="month" value="4">5月</button>
+      <button class="btn btn-outline-dark mt-1" name="month" value="5">6月</button>
+      <button class="btn btn-outline-dark mt-1" name="month" value="6">7月</button>
+      <button class="btn btn-outline-dark mt-1" name="month" value="7">8月</button>
+      <button class="btn btn-outline-dark mt-1" name="month" value="8">9月</button>
+      <button class="btn btn-outline-dark mt-1" name="month" value="9">10月</button>
+      <button class="btn btn-outline-dark mt-1" name="month" value="10">11月</button>
+      <button class="btn btn-outline-dark mt-1" name="month" value="11">12月</button>
+      <div class="divider">-</div>
+      <button class="btn btn-outline-dark active mt-1" name="year" value="-1">All</button>
+      <button class="btn btn-outline-dark mt-1" name="year" value="2017">2017</button>
+      <button class="btn btn-outline-dark mt-1" name="year" value="2018">2018</button>
+      <button class="btn btn-outline-dark mt-1" name="year" value="2019">2019</button>
+    </div>
+    <div class="col-10 h-100">
+      <div id="googlemap" class="relative h-100 w-100"></div>
+    </div>
   </div>
 </div>
 
