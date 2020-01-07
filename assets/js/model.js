@@ -3754,9 +3754,10 @@ var MealConfirmView = Backbone.View.extend({
               let subtotal = parseFloat(_this.$el.find(".subtotal").data("value"));
               let minimalOrder = parseFloat(chooseOption.parent().data("minimal"));
               if(subtotal < minimalOrder){
+                let minimalRequirementTip = minimalOrder == 25 ? __('order-single-minimal-not-reach-25') : __('order-single-minimal-not-reach-65');
                 BootstrapDialog.show({
                   title: __('deliveryTimeConfirmationTitle'),
-                  message : __('order-single-minimal-not-reach-25'),
+                  message : minimalRequirementTip,
                   buttons: [
                     {
                       label: __('continue-to-order'),

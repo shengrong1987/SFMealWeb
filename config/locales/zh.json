@@ -941,6 +941,7 @@
   "custom" : "自定义营业时间",
   "order-single-minimal-not-reach" : "订单最低金额未达到：$%s",
   "order-single-minimal-not-reach-25" : "订单最低金额未达到$25",
+  "order-single-minimal-not-reach-65" : "订单最低金额未达到$65",
   "ends" : "结束于",
   "already-signup" : "已有账号？登录",
   "question-tip" : "如果你对支付有任何问题，请联系微信：sillyuniversal 或者电话: (415)-8023853",

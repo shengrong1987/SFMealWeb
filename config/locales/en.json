@@ -937,6 +937,7 @@
   "custom" : "Custom Hour",
   "order-single-minimal-not-reach" : "Not reach minimal order amount: $%s",
   "order-single-minimal-not-reach-25" : "Not reach minimal order amount: $25",
+  "order-single-minimal-not-reach-65" : "Not reach minimal order amount: $65",
   "ends" : "ends",
   "already-signup" : "Have an account？Login",
   "question-tip" : "If you have any question about payment, please contact Wechat: sillyuniversal, or by phone: (415)-8023853",
