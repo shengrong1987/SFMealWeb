@@ -271,9 +271,7 @@ module.exports = {
   },
 
   destroy : function(req, res){
-
     var paymentId = req.param("id");
-
     Payment.findOne(paymentId).exec(function(err, payment){
       if(err){
         return res.badRequest(err);

@@ -120,6 +120,11 @@ class TablePanel extends React.Component{
         details =  {id : "ID", title : "title", desc : "desc", model : "model", rule : "rule", largeImage : "largeImage", command : "Command"}
         criterias = ["id","title", "isAchieved"];
         break;
+      case "Combo":
+        headers =  {id : "ID", title : "title", discount : "discount", pickupOptions : "pickupOptions", dishes : "dishes", command : "Command"}
+        details =  {id : "ID", title : "title", discount : "discount", pickupOptions : "pickupOptions", dishes : "dishes", command : "Command"}
+        criterias = ["id","title"];
+        break;
     }
 
     return (

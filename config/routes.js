@@ -35,6 +35,7 @@ module.exports.routes = {
   '/': 'MealController.feature',
   '/auth/resetForm' : "AuthController.resetForm",
   '/auth/done' : "AuthController.loginSuccess",
+  '/auth/login/weixin/:type' : "AuthController.wechatLogin",
   '/join' : 'UserController.join',
   '/user/me' : 'UserController.me',
   '/user/order' : 'UserController.myorder',
@@ -142,7 +143,9 @@ module.exports.routes = {
   "/user/:userId/badge/:id" : "BadgeController.findBadgeWindow",
   "/badge/me/:id" : "BadgeController.updateUserBadge",
   "/badge/:id/update" : "BadgeController.update",
-  "/cart" : "MealController.cart"
+  "/cart" : "MealController.cart",
+  "/combo/:id/updateDishes" : "ComboController.updateDishes",
+  "/combo/:id/updatePickupOptions" : "ComboController.updatePickupOptions"
   /***************************************************************************
   *                                                                          *
   * Custom routes here...                                                    *

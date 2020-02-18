@@ -443,6 +443,35 @@ export default {
     });
   },
 
+  getCombo : function(id){
+    $.ajax({
+      url: '/combo/' + id,
+      type: 'GET',
+      dataType: 'json',
+    }).done(function (data) {
+      ActionCreators.getCombo(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
+  getCombos : function(criteria, value, skip){
+    if(value) {
+      var url = "/combo?sort=createdAt DESC&skip=" + skip + "&" + criteria + "=" + value;
+    }else{
+      url = "/combo?sort=createdAt DESC&skip=" + skip;
+    }
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json'
+    }).done(function (data) {
+      ActionCreators.getCombos(data);
+    }).fail(function(jqXHR, textStatus){
+      ActionCreators.noResult(jqXHR.responseText);
+    });
+  },
+
   clean : function(model){
     var isValid;
     switch(model){
@@ -672,6 +701,7 @@ export default {
       case "Driver":
       case "PickupOption":
       case "Badge":
+      case "Combo":
         isValid = true;
         break;
     }
@@ -782,6 +812,13 @@ export default {
           this.getBadge(content);
         }else{
           this.getBadges(criteria, content, skip);
+        }
+        break;
+      case "Combo":
+        if(criteria === "id" && content){
+          this.getCombo(content);
+        }else{
+          this.getCombos(criteria, content, skip);
         }
         break;
     }

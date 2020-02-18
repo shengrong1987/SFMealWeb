@@ -6,9 +6,40 @@
  * @error       :: -1 coupon already used
  *                 -2 coupon invalid
  *                 -3 coupon expire
+ *                 -4 coupons reward already redeemed
  */
 
 module.exports = {
+
+  redeem : function(req, res){
+    let userId = req.session.user.id;
+    if(req.session.user.couponRewardIsRedeemed){
+      return res.badRequest({ code: -4, responseText: "coupon reward already redeemed"});
+    }
+    Coupon.find({type: 'new_user_reward'}).exec(function(err, coupons) {
+      if (err) {
+        return res.badRequest(err)
+      }
+      let couponIds = coupons.map(function (coupon) {
+        return coupon.id;
+      });
+      User.findOne(userId).exec(function(err, user){
+        if (err) {
+          return res.badRequest(err);
+        }
+        user.coupons.add(couponIds);
+        user.couponRewardIsRedeemed = true;
+        user.numCoupon = couponIds.length;
+        user.save(function (err, u) {
+          if (err) {
+            return res.badRequest(err);
+          }
+          req.session.user = user;
+          res.ok(user)
+        })
+      });
+    })
+  },
 
   applyCoupon : function(req, res){
     var couponCode = req.params.code;

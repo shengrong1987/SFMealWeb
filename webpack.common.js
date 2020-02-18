@@ -42,7 +42,8 @@ module.exports = {
     emailVerification : "./assets/js/entry/emailVerification.js",
     pintuan : "./assets/js/entry/pintuan.js",
     cart : "./assets/js/entry/cart.js",
-    locatorMap : "./assets/js/entry/locatorMap.js"
+    locatorMap : "./assets/js/entry/locatorMap.js",
+    deliveryMap: "./assets/js/entry/deliveryMap.js"
   },
   output: {
     path: path.resolve(__dirname, '.tmp/public/assets/'),

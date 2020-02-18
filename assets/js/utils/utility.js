@@ -34,6 +34,7 @@ utility.initGoogleMapService = function(cb){
         $this.directionsService = new google.maps.DirectionsService;
         $this.geocoder = new google.maps.Geocoder();
         $this.getAutoComplete();
+        console.log("google map service loaded");
         if(cb){
           cb();
         }

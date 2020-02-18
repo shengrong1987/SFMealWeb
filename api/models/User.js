@@ -161,6 +161,10 @@ module.exports = {
       type : 'boolean',
       defaultsTo : false
     },
+    couponRewardIsRedeemed : {
+      type : 'boolean',
+      defaultsTo : false
+    },
     newUserRewardIsRedeemed : {
       type : 'boolean',
       defaultsTo : false

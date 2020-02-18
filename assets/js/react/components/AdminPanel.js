@@ -15,7 +15,7 @@ class AdminPanel extends React.Component{
   }
 
   render() {
-    var tabs = ['User', 'Host', 'Meal','Dish','Order','Transaction', 'Job', 'Checklist', 'Coupon', 'Email','Review','Account','Driver', 'PickupOption','Badge'];
+    var tabs = ['User', 'Host', 'Meal','Dish','Order','Transaction', 'Job', 'Checklist', 'Coupon', 'Email','Review','Account','Driver', 'PickupOption','Badge','Combo'];
 
     return (
       <div className="box">

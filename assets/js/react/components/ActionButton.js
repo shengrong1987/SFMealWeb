@@ -393,6 +393,42 @@ class ActionButton extends React.Component{
             }
           }
           return cb(postData);
+          break;
+        case "Combo":
+          if(action === "create"){
+              postData = {
+                title: { value: this.props.data['title'] || ''},
+                discount: { value: this.props.data['discount'] || 0},
+                dishes: { value: this.props.data['dishes'] || ''},
+                pickupOptions: { value: this.props.data['pickupOptions'] || ''}
+              }
+          }else if(action === "updateDishes"){
+            postData = {};
+            let dishes = this.props.data['dishes'];
+            var ids = '';
+            dishes.forEach(function(d){
+              postData[d.id] = { value: d.title, action: 'delete', submodel: 'dishes'};
+              if(ids){
+                ids += ",";
+              }
+              ids += d.id;
+            });
+            postData["dishes"] = { value: ids};
+          }else if(action === "updatePickupOptions"){
+            postData = {};
+            let pickupOptions = this.props.data['pickupOptions'];
+            ids = '';
+            pickupOptions.forEach(function(p){
+              postData[p.id] = { value: p.location + p.pickupFromTime, action: 'delete', submodel: 'pickupOptions'};
+              if(ids){
+                ids += ",";
+              }
+              ids += p.id;
+            });
+            postData["pickupOptions"] = { value: ids};
+          }
+          cb(postData)
+          break;
         default:
           return cb();
     }
@@ -514,6 +550,12 @@ class ActionButton extends React.Component{
         }else{
           actions.push("update","delete");
         }
+        break;
+      case "Combo":
+        if(!rowData.hasOwnProperty('id')){
+          actions.push("create");
+        }
+        actions.push("updateDishes","updatePickupOptions");
         break;
     }
     if(!this.props.detail){

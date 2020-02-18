@@ -18,7 +18,7 @@ module.exports = {
         return res.badRequest(err);
       }
       var date = moment(charge.created * 1000);
-      charge.application_fee = (charge.amount - charge.amount_refunded) * 0.10;
+      charge.application_fee_amount = (charge.amount - charge.amount_refunded) * 0.10;
       charge.month = moment.months()[date.month()];
       charge.day = date.date();
       return res.ok({transactions : charge});
@@ -166,7 +166,7 @@ module.exports = {
                   return next2(err);
                 }
                 charge = _this.composeCharge(charge, order, host);
-                charge.application_fee = 0;
+                charge.application_fee_amount = 0;
                 charge.type = "type-charge";
                 transactions.push(charge);
                 next2();
@@ -204,7 +204,7 @@ module.exports = {
               })
             }
             if(req.wantsJSON && process.env.NODE_ENV === "development"){
-              return res.ok({pocket : pocket, badges: badges});
+              return res.ok({ pocket : pocket, badges: badges });
             }
             res.view('pocket', {user : user, badges : badges });
           });
@@ -284,15 +284,15 @@ module.exports = {
                     }
                     charge.type = "type-payment";
                     charge = _this.composeCharge(charge, order, host);
-                    stripe.retrieveApplicationFee(charge.application_fee, function(err, fee){
+                    stripe.retrieveApplicationFee(charge.application_fee_amount, function(err, fee){
                       if(err){
                         return next2(err);
                       }
                       order.application_fees =  order.application_fees || {};
                       if(chargeId === "cash"){
-                        charge.application_fee = order.application_fees['cash'];
+                        charge.application_fee_amount = order.application_fees['cash'];
                       }else if(fee){
-                        charge.application_fee = fee.amount - fee.amount_refunded;
+                        charge.application_fee_amount = fee.amount - fee.amount_refunded;
                       }
                       transactions.push(charge);
                       next2();
@@ -315,14 +315,14 @@ module.exports = {
                       return next2(err);
                     }
                     tran = _this.composeTransfer(tran, order, host);
-                    stripe.retrieveApplicationFee(tran.application_fee, function(err, fee){
+                    stripe.retrieveApplicationFee(tran.application_fee_amount, function(err, fee){
                       if(err){
                         return next2(err);
                       }
                       if(fee){
-                        tran.application_fee = fee.application_fee - fee.amount_refunded;
+                        tran.application_fee_amount = fee.application_fee_amount - fee.amount_refunded;
                       }else{
-                        tran.application_fee = 0;
+                        tran.application_fee_amount = 0;
                       }
                       transactions.push(tran);
                       next2();

@@ -53,6 +53,42 @@ module.exports = {
     })
   },
 
+  current: function(req, res){
+	  var day = req.query.day;
+	  var month = req.query.month;
+	  PickupOption.find({ pickupFromTime : { '>' : moment().toDate() }}).sort({ pickupFromTime: 1 }).exec(function(err, options){
+	    if(err){
+	      return res.badRequest(err);
+      }
+	    if(day != -1 && month != -1){
+        options = options.filter(function(opt){
+          let optDay = moment(opt.pickupFromTime).date();
+          let optMonth = moment(opt.pickupFromTime).month() + 1;
+          return optDay == day && optMonth == month;
+        })
+      }
+	    var dates = [];
+	    options.forEach(function(opt){
+	      if(!dates.length || !dates.some(function(date){
+	        return date.date === opt.day && date.weekDate === opt.weekDate
+        })){
+	        let isLast = opt.weekDate === "周六";
+	        let dateOpt = {
+	          date: opt.day,
+            weekDate: opt.weekDate,
+            last : isLast
+          }
+          dates.push(dateOpt)
+        }
+      })
+	    res.ok({ options: options, dates: dates});
+    })
+  },
+
+  map: function(req, res){
+	  res.view("deliveryMap", { layout:'popup', month: req.query.month || -1, day: req.query.day || -1});
+  },
+
   find : function(req, res){
 	  PickupOption.find().exec(function(err, options){
 	    if(err){
@@ -85,8 +121,11 @@ module.exports = {
 	      return res.badRequest(err);
       }
 	    async.each(options, function(option, next){
-	      option.pickupFromTime = moment(option.pickupFromTime).add(1, 'week')._d;
+	      let fromDate = moment(option.pickupFromTime).add(1, 'week');
+	      option.pickupFromTime = fromDate._d;
         option.pickupTillTime = moment(option.pickupTillTime).add(1, 'week')._d;
+        option.day = fromDate.date();
+        option.weekDate = fromDate.format('ddd');
         option.save(next);
       }, function(err){
 	      if(err){

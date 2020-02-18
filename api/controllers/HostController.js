@@ -161,7 +161,7 @@ module.exports = {
             addressObj["state"] = host.state;
           }
           stripe.updateManagedAccount(host.accountId, {
-              legal_entity: {
+              individual: {
                 address: addressObj
               }
             },function(err, result){
@@ -178,10 +178,10 @@ module.exports = {
         });
       });
     }else{
-      var legal_entity;
-      if(params.legal_entity){
-        legal_entity = JSON.parse(params.legal_entity);
-        delete params.legal_entity;
+      var individual;
+      if(params.individual){
+        individual = JSON.parse(params.individual);
+        delete params.individual;
       }
       Host.findOne(hostId).populate('user').exec(function(err,host){
         if(err){
@@ -222,17 +222,17 @@ module.exports = {
                   if(err){
                     return cb(err);
                   }
-                  legal_entity = legal_entity || {};
-                  legal_entity.verification = {document : data.id};
+                  individual = individual || {};
+                  individual.verification = {document : data.id};
                   cb();
                 });
               });
             },
             updateAccount : ['uploadDocument', function(cb){
-              if(!legal_entity){
+              if(!individual){
                 return cb();
               }
-              stripe.updateManagedAccount(host.accountId, {legal_entity : legal_entity},function(err, result){
+              stripe.updateManagedAccount(host.accountId, {individual : individual},function(err, result){
                 if(err){
                   return cb(err)
                 }
@@ -244,14 +244,14 @@ module.exports = {
               return res.badRequest(err);
             }
             var updatingToUser = {};
-            if(!legal_entity){
+            if(!individual){
               return res.ok({});
             }
-            if(legal_entity.dob){
-              updatingToUser.birthday = new Date(legal_entity.dob.year,legal_entity.dob.month-1,legal_entity.dob.day);
-            }if(legal_entity.first_name && legal_entity.last_name){
-              updatingToUser.firstname = legal_entity.first_name;
-              updatingToUser.lastname = legal_entity.last_name;
+            if(individual.dob){
+              updatingToUser.birthday = new Date(individual.dob.year,individual.dob.month-1,individual.dob.day);
+            }if(individual.first_name && individual.last_name){
+              updatingToUser.firstname = individual.first_name;
+              updatingToUser.lastname = individual.last_name;
             }
             User.update(userId,updatingToUser).exec(function(err,user){
               if(err){
@@ -382,6 +382,24 @@ module.exports = {
     });
   },
 
+  setupSuccess: function(req, res){
+
+  },
+
+  setup : function(req, res){
+    User.findOne(req.session.user.id).populate("host").exec(function(err, u){
+      if(err){
+        return res.badRequest(err);
+      }
+      const accountLinks = stripe.getAccountLinks(u.host.accountId,function(err, link){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.redirect(link.url);
+      });
+    })
+  },
+
   apply : function(req, res){
     var user = req.session.user;
     var hasAddress = false;
@@ -413,11 +431,11 @@ module.exports = {
           if(req.wantsJSON && process.env.NODE_ENV === "development"){
             return res.ok(host);
           }
-          return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, verification : host.verification, passGuide: host.passGuide, dishVerifying : host.dishVerifying });
+          return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, individual : host.individual, passGuide: host.passGuide, dishVerifying : host.dishVerifying });
         });
       });
     }else{
-      return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, passGuide: false, verification : null, dishVerifying : null});
+      return res.view("apply", { user : req.session.user, hasAddress : hasAddress, hasDish : hasDish, hasMeal : hasMeal, hasAccount : hasAccount, passGuide: false, individual : { requirements: {}}, dishVerifying : null});
     }
   },
 

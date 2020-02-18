@@ -3,9 +3,15 @@
  */
 var config = {};
 
+// config.StripeKeys = {
+//   publishableKey: process.env.STRIPE_LIVE_ID,
+//   secretKey: process.env.STRIPE_LIVE_KEY
+// };
 config.StripeKeys = {
-  publishableKey: process.env.NODE_ENV === 'production' ? process.env.STRIPE_LIVE_ID : process.env.STRIPE_TEST_ID,
-  secretKey: process.env.NODE_ENV === 'production' ? process.env.STRIPE_LIVE_KEY : process.env.STRIPE_TEST_KEY
+  // publishableKey: process.env.NODE_ENV === 'production' ? process.env.STRIPE_LIVE_ID : process.env.STRIPE_TEST_ID,
+  // secretKey: process.env.NODE_ENV === 'production' ? process.env.STRIPE_LIVE_KEY : process.env.STRIPE_TEST_KEY
+  publishableKey: process.env.STRIPE_TEST_ID,
+  secretKey: process.env.STRIPE_TEST_KEY
 };
 
 config.TwilioKeys = {

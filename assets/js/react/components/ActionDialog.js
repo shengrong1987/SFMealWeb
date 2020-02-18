@@ -175,9 +175,9 @@ class ActionDialog extends React.Component{
         }
       }
     });
-    if(keyValues.hasOwnProperty('dishes')){
-      delete keyValues['dishes'];
-    }
+    // if(keyValues.hasOwnProperty('dishes')){
+    //   delete keyValues['dishes'];
+    // }
     if(addressObj){
       keyValues['address'] = [addressObj];
     }

@@ -17,6 +17,7 @@ import AccountStore from '../stores/AccountStore';
 import DriverStore from '../stores/DriverStore';
 import PickupOptionStore from '../stores/PickupOptionStore';
 import BadgeStore from '../stores/BadgeStore';
+import ComboStore from "../stores/ComboStore";
 import TableItem from './TableItem';
 import PropTypes from 'prop-types';
 import autoBind from 'react-autobind';
@@ -92,6 +93,9 @@ class Table extends React.Component{
       case "Badge":
         return {data: BadgeStore.getAllBadges(), detail : BadgeStore.isShowDetail(), isCreate : BadgeStore.isCreate()};
         break;
+      case "Combo":
+        return {data: ComboStore.getAllCombos(), detail : ComboStore.isShowDetail(), isCreate : ComboStore.isCreate()};
+        break;
     }
   }
 
@@ -115,6 +119,7 @@ class Table extends React.Component{
     DriverStore.addChangeListener(this._onChange);
     PickupOptionStore.addChangeListener(this._onChange);
     BadgeStore.addChangeListener(this._onChange);
+    ComboStore.addChangeListener(this._onChange);
   }
 
   componentWillUnmount() {
@@ -133,6 +138,7 @@ class Table extends React.Component{
     DriverStore.removeChangeListener(this._onChange);
     PickupOptionStore.removeChangeListener(this._onChange);
     BadgeStore.removeChangeListener(this._onChange);
+    ComboStore.removeChangeListener(this._onChange);
   }
 
   _onChange() {

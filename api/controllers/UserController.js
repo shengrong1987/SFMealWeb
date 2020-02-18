@@ -38,13 +38,69 @@ module.exports = require('waterlock').actions.user({
   //   return res.json(req.session.user);
   // },
 
-  becomeHost : function(req, res){
+  coupon : function(req, res){
+    let userId = req.session.user.id;
+    User.findOne(userId).populate("coupons").exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(user.coupons)
+    })
+  },
+
+  transaction: function(req, res){
+    let userId = req.session.user.id;
+    let query = req.query;
+    query.sort = 'createdAt DESC';
+    let _this = this;
+    User.findOne(userId).populate("orders",query).exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      var transactions = [];
+      async.eachSeries(user.orders, function (order, next1) {
+        Host.findOne(order.host).exec(function(err, host){
+          if(err){
+            return next1(err);
+          }
+          if(!order.charges){
+            return next1();
+          }
+          var charges = Object.keys(order.charges);
+          async.each(charges, function (chargeId, next2) {
+            stripe.retrieveCharge(chargeId, function(err, charge){
+              if(err){
+                return next2(err);
+              }
+              charge = _this.composeCharge(charge, order, host);
+              charge.application_fee = 0;
+              charge.type = "type-charge";
+              transactions.push(charge);
+              next2();
+            });
+          }, function (err) {
+            if(err){
+              return next1(err);
+            }
+            next1();
+          });
+        });
+      }, function (err) {
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(transactions)
+      });
+    })
+  },
+
+  becomeHost: function(req, res){
     var userId = req.session.user.id;
     var user = req.session.user;
     var email = req.session.user.auth.email;
     var shopName = req.query.shopName;
     var phone = req.query.phone;
-    var params = {};
+    let _this = this;
     if(!phone && !user.phone){
       return res.badRequest({ code : -2, responseText : req.__('host-lack-of-phone')});
     }
@@ -52,9 +108,6 @@ module.exports = require('waterlock').actions.user({
       return res.badRequest({ code : -5, responseText : req.__('user-lack-of-email')});
     }
     phone = phone || user.phone;
-    params.user = userId;
-    params.email = email;
-    params.shopName = shopName;
     if(req.session.user.host){
       return res.badRequest({ code : -1, responseText : req.__('user-already-host')});
     }
@@ -65,73 +118,78 @@ module.exports = require('waterlock').actions.user({
       if(user.host){
         return res.badRequest({ code : -1, responseText : req.__('user-already-host')});
       }
-      Host.create(params).exec(function(err, host){
+      Host.create({
+        user: userId,
+        email: email,
+        shopName: shopName
+      }).exec(function(err, host){
         if(err){
           return res.badRequest(err);
         }
-        Checklist.create({ host : host.id}).exec(function(err, checklist){
+        let accountAttr = _this.composeBusinessEntity(req, user);
+        stripe.createManagedAccount(accountAttr,function(err,account){
           if(err){
             return res.badRequest(err);
           }
-          var hostId = host.id;
-          var ip = req.ip;
-          var params = {
-            type : "custom",
-            country : 'US',
-            email : email,
-            legal_entity :{
-              type : 'individual'
-            },
-            tos_acceptance : {
-              date : parseInt(new Date().getTime()/1000),
-              ip : ip
-            },
-            payout_schedule : {
-              interval : "weekly",
-              weekly_anchor : "monday"
-            }
-          }
-          if(user.firstname){
-            params.legal_entity.first_name = user.firstname;
-          }
-          if(user.lastname){
-            params.legal_entity.last_name = user.lastname;
-          }
-          if(user.birthday){
-            params.legal_entity.dob = {
-              day : user.birthday.getDate(),
-              month : user.birthday.getMonth() + 1,
-              year : user.birthday.getFullYear()
-            };
-            var birthdayDate = new Date(user.birthday);
-            var birthday = birthdayDate.getMonth()+1+"/"+birthdayDate.getDate();
-            mailChimp.updateMember({ email : user.email, birthday : birthday }, "member");
-          }
-          stripe.createManagedAccount(params,function(err,account){
+          host.accountId = account.id;
+          host.save(function(err,host){
             if(err){
               return res.badRequest(err);
             }
-            host.accountId = account.id;
-            host.save(function(err,host){
+            user.host = host.id;
+            user.phone = phone;
+            user.save(function(err, u){
               if(err){
                 return res.badRequest(err);
               }
-              user.host = hostId;
-              user.phone = phone;
-              user.save(function(err, u){
-                if(err){
-                  return res.badRequest(err);
-                }
-                mailChimp.addMemberToList({ email : host.email, shopName : shopName, firstname : user.firstname, lastname : user.lastname, language : req.getLocale() }, "chef");
-                user.host = host;
-                req.session.user = user;
-                res.ok( {user:user});
-              });
+              if(user.birthday){
+                var birthdayDate = new Date(user.birthday);
+                var birthday = birthdayDate.getMonth()+1+"/"+birthdayDate.getDate();
+                mailChimp.updateMember({ email : user.email, birthday : birthday }, "member");
+              }
+              mailChimp.addMemberToList({ email : host.email, shopName : shopName, firstname : user.firstname, lastname : user.lastname, language : req.getLocale() }, "chef");
+              user.host = host;
+              req.session.user = user;
+              res.ok( {user:user});
             });
           });
-        })
+        });
       });
     });
+  },
+
+  composeBusinessEntity: function(req, user){
+    var params = {
+      type : "custom",
+      country : 'US',
+      email : req.session.user.auth.email,
+      business_type : 'individual',
+      tos_acceptance : {
+        date : parseInt(new Date().getTime()/1000),
+        ip : req.ip
+      },
+      settings: {
+        payouts : {
+          schedule : {
+            interval : "weekly",
+            weekly_anchor : "monday"
+          }
+        }
+      },
+      individual: {
+        first_name: user.firstname,
+        last_name: user.lastname
+      },
+      requested_capabilities: ["transfers",'legacy_payments']
+    }
+    if(user.birthday){
+      params.individual.dob = {
+        day : user.birthday.getDate(),
+        month : user.birthday.getMonth() + 1,
+        year : user.birthday.getFullYear()
+      };
+    }
+    return params;
   },
 
   contactForm : function(req, res){
@@ -292,6 +350,103 @@ module.exports = require('waterlock').actions.user({
         });
       })
     });
+  },
+
+  packOrders : function(orders){
+    orders.forEach(function(order){
+      var orderList = order.orders;
+      var newOrderList = {}
+      if(orderList) {
+        Object.keys(orderList).forEach(function (dishId) {
+          let number = orderList[dishId].number;
+          if (number > 0) {
+            newOrderList[dishId] = orderList[dishId];
+            let dishes = order.dishes.filter(function(d) {
+              return d.id === dishId;
+            });
+            if(dishes.length){
+              newOrderList[dishId].title = dishes[0].title;
+            }
+          }
+        })
+        order.orders = newOrderList;
+        delete order.dishes;
+      }
+    })
+  },
+
+  combineOrders : function(orders){
+    var newOrders = [];
+    orders.forEach(function(order){
+      if(!order.hosts) {
+        order.hosts = [order.host];
+      }
+      var isSamePickup = newOrders.some(function(oldOrder){
+        var _isSame = oldOrder.status === order.status && moment(new Date(oldOrder.pickupInfo.pickupFromTime).toISOString()).isSame(moment(new Date(order.pickupInfo.pickupFromTime).toISOString()), 'minute') && moment(new Date(oldOrder.pickupInfo.pickupTillTime).toISOString()).isSame(moment(new Date(order.pickupInfo.pickupTillTime).toISOString()), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
+        if(_isSame){
+          Object.keys(order.orders).forEach(function(dishId){
+            if(oldOrder.orders.hasOwnProperty(dishId)){
+              oldOrder.orders[dishId].number += order.orders[dishId].number;
+              if(oldOrder.orders[dishId].preference && Array.isArray(oldOrder.orders[dishId].preference)){
+                oldOrder.orders[dishId].preference.concat(order.orders[dishId].preference);
+              }
+            }else{
+              oldOrder.orders[dishId] = order.orders[dishId];
+            }
+          });
+          oldOrder.id += "+" + order.id;
+          oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
+          oldOrder.tip = parseFloat(oldOrder.tip) + parseFloat(order.tip);
+          oldOrder.pickupInfo.comment += order.pickupInfo.comment;
+          oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
+          oldOrder.dishes = oldOrder.dishes.filter(function(item, pos){
+            return oldOrder.dishes.indexOf(item) === pos;
+          });
+          oldOrder.discount += order.discount;
+          if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
+            oldOrder.charges['cash'] += order.charges['cash'];
+          }
+          if(oldOrder.host.id !== order.host.id){
+            oldOrder.hosts.push(order.host);
+          }
+        }
+        return _isSame;
+      });
+      if(!isSamePickup){
+        newOrders.push(order);
+      }
+    });
+    return newOrders;
+  },
+
+  orders : function(req, res){
+    let userId = req.session.user.id;
+    let _this = this;
+    User.findOne(userId).populate("orders", { sort: 'createdAt DESC', skip: req.query.skip, limit: req.query.limit }).exec(function(err, found) {
+      if (err) {
+        return res.badRequest(err)
+      }
+      async.each(found.orders, function(order, next){
+        Order.findOne(order.id).populate("host").populate("dishes").exec(function(err, o){
+          if(err){
+            return next(err);
+          }
+          order.host = {
+            picture: o.host.picture,
+            shopName: o.host.shopName
+          };
+          order.dishes = o.dishes;
+          next();
+        })
+      }, function(err){
+        if(err){
+          return res.badRequest(err)
+        }
+        // var orders = _this.combineOrders(found.orders);
+        // _this.packOrders(orders);
+        return res.ok(found.orders);
+      });
+    })
   },
 
   me : function(req, res){
@@ -936,5 +1091,34 @@ module.exports = require('waterlock').actions.user({
         })
       })
     })
+  },
+  composeCharge : function(charge, order, host){
+    var chargeId = charge.id;
+    if(chargeId === "cash"){
+      charge.amount = order.charges[chargeId];
+      charge.amount_refunded = 0;
+      charge.paymentMethod = "cash";
+      charge.status = "cash";
+      charge.metadata = {
+        orderId : order.id,
+        deliveryFee : order.delivery_fee,
+        tax : order.tax
+      }
+    }else{
+      charge.paymentMethod = "online";
+    }
+    charge.tip = order.tip;
+    charge.deliveryFee = order.delivery_fee;
+    charge.orderStatus = order.status;
+    charge.host = {
+      id : host.id,
+      shopName : host.shopName,
+      picture : host.picture
+    };
+    var date = moment(order.createdAt);
+    charge.month = moment.months()[date.month()];
+    charge.day = date.date();
+    charge.created = parseInt(new Date(order.createdAt).getTime()/1000);
+    return charge;
   }
 });

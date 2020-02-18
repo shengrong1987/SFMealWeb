@@ -136,19 +136,35 @@ module.exports = {
     });
   },
 
+  getAccountLinks: function(accountId, cb){
+    stripe.accountLinks.create({
+      account: accountId,
+      failure_url: 'https://localhost:1337/host/apply',
+      success_url: 'https://localhost:1337/host/apply',
+      type: 'custom_account_verification',
+      collect: 'eventually_due'
+    }, function(err, accountLinks){
+      if(err){
+        return cb(err);
+      }
+      cb(null, accountLinks);
+    });
+  },
+
   chargeCash : function(attr, cb){
     var _this = this;
-    if(attr.metadata.application_fee === 0){
-      return cb(null, { id : 'cash', status : 'succeeded', amount : attr.metadata.total, application_fee : attr.metadata.application_fee}, { amount : 0, application_fee : 0});
+    if(attr.metadata.application_fee_amount === 0){
+      return cb(null, { id : 'cash', status : 'succeeded', amount : attr.metadata.total, application_fee_amount : attr.metadata.application_fee_amount}, { amount : 0, application_fee_amount : 0});
     }
-    if(attr.metadata.application_fee < 50){
-      attr.metadata.application_fee = 50;
+    if(attr.metadata.application_fee_amount < 50){
+      attr.metadata.application_fee_amount = 50;
     }
     var charge, transfer = null;
     async.auto({
+      //----------depreciate----------
       chargeApplicationFee : function(next){
         stripe.charges.create({
-          amount : attr.metadata.application_fee,
+          amount : attr.metadata.application_fee_amount,
           currency : 'usd',
           source : attr.destination,
           metadata : attr.metadata
@@ -187,7 +203,7 @@ module.exports = {
         if(err){
           return cb(err);
         }
-        cb(null, { id : charge.id, status : charge.status, amount : attr.metadata.total, application_fee : charge.amount}, transfer);
+        cb(null, { id : charge.id, status : charge.status, amount : attr.metadata.total, application_fee_amount : charge.amount}, transfer);
       });
     });
   },
@@ -206,9 +222,11 @@ module.exports = {
           currency: "usd",
           receipt_email: attr.email,
           customer: attr.customerId,
-          destination : attr.destination,
+          transfer_data: {
+            destination: attr.destination
+          },
           metadata : attr.metadata,
-          application_fee : attr.metadata.application_fee
+          application_fee_amount : attr.metadata.application_fee_amount
         }, function (err, c) {
           if (err) {
             return cb(err);
@@ -227,7 +245,7 @@ module.exports = {
             if(!charge){
               return next(null, 0);
             }
-            _this.retrieveApplicationFee(charge.application_fee, function(err, fee) {
+            _this.retrieveApplicationFee(charge.application_fee_amount, function(err, fee) {
               if (err) {
                 return next(err);
               }
@@ -236,14 +254,14 @@ module.exports = {
           },
           calculateFee : ['calculateChargedFee', function(next, results){
             var chargedFee = results.calculateChargedFee;
-            attr.metadata.application_fee = attr.metadata.application_fee - chargedFee;
+            attr.metadata.application_fee_amount = attr.metadata.application_fee_amount - chargedFee;
             next();
           }]
         }, function(err){
           if(err){
             return cb(err)
           }
-          var total = attr.metadata.discount - attr.metadata.application_fee;
+          var total = attr.metadata.discount - attr.metadata.application_fee_amount;
           stripe.transfers.create(
             {
               amount: total,
@@ -286,9 +304,11 @@ module.exports = {
       currency: "usd",
       receipt_email: attr.email,
       source: attr.source,
-      destination : attr.destination,
+      transfer_data: {
+        destination : attr.destination
+      },
       metadata : attr.metadata,
-      application_fee : attr.metadata.application_fee
+      application_fee_amount : attr.metadata.application_fee_amount
     }, function (err, charge) {
       if(err){
         return cb(err);
@@ -296,13 +316,13 @@ module.exports = {
 
       if(attr.metadata.discount !== 0){
         attr.metadata.discount = parseInt(attr.metadata.discount);
-        _this.retrieveApplicationFee(charge.application_fee, function(err, fee){
+        _this.retrieveApplicationFee(charge.application_fee_amount, function(err, fee){
           if(err){
             return cb(err);
           }
-          var leftFee = attr.metadata.application_fee - fee.amount;
+          var leftFee = attr.metadata.application_fee_amount - fee.amount;
           var total = attr.metadata.discount - leftFee;
-          attr.metadata.application_fee = leftFee;
+          attr.metadata.application_fee_amount = leftFee;
           stripe.transfers.create(
             {
               amount: total,
@@ -426,9 +446,9 @@ module.exports = {
     }
     //calculate application fee
     if(attr.paymentMethod === "online"){
-      var application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee + tip;
+      var application_fee_amount = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee + tip;
     }else{
-      application_fee = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee;
+      application_fee_amount = Math.floor(attr.amount * meal.commission) + delivery_application_fee + serviceFee;
     }
 
     //calculate subtotal after tax
@@ -439,7 +459,7 @@ module.exports = {
 
     attr.metadata.discount = discount;
     attr.metadata.total = originalTotal - discount;
-    attr.metadata.application_fee = application_fee;
+    attr.metadata.application_fee_amount = application_fee_amount;
     attr.metadata.total = attr.metadata.total < 0 ? 0 : attr.metadata.total;
     attr.metadata.tip = attr.tip || 0;
   },

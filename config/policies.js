@@ -35,15 +35,16 @@ module.exports.policies = {
     'resetForm' : true,
     'facebook_oauth2' : true,
     'google_oauth2' : true,
-    'loginSuccess' : ['sessionAuth'],
+    'loginSuccess' : true,
     'logout' : ['sessionAuth'],
     'admin' : 'isAdmin',
     'wechat' : true,
     'wechatSignature' : true,
-    'wechatCode' : true,
-    'wechatCodeWeb' : true,
+    'wechatLogin' : true,
+    'miniappLogin' : true,
     'getQRCodeTicket' : true,
-    'update' : 'isAdmin'
+    'update' : 'isAdmin',
+    'refreshUserState' : 'sessionAuth'
   },
 
   UserController : {
@@ -68,7 +69,10 @@ module.exports.policies = {
     'join' : true,
     'emailVerificationView' : ['sessionAuth','localize'],
     'redeemReward' : true,
-    'verifyEmail' : 'isAdmin'
+    'verifyEmail' : 'isAdmin',
+    'orders' : 'sessionAuth',
+    'coupon' : 'sessionAuth',
+    'transaction' : 'sessionAuth'
   },
 
   JobController : {
@@ -115,7 +119,8 @@ module.exports.policies = {
     'findReview' : 'isAdmin',
     'findMeal' : 'isAdmin',
     'findDish' : 'isAdmin',
-    'hostPage' : 'localize'
+    'hostPage' : 'localize',
+    'setup' : 'sessionAuth'
   },
 
   PaymentController : {
@@ -153,7 +158,8 @@ module.exports.policies = {
     'destroy' : 'or(and(sessionAuth, isHost, isOwnerOfDish), isAdmin)',
     'update' : 'or(and(sessionAuth, isHost, isOwnerOfDish, isNotFields("sold","numberOfReviews","score","chef", "isFeature", "isVerified","dynamicPrice")), isAdmin)',
     'findReview' : 'isAdmin',
-    'preference' : true
+    'preference' : true,
+    'find': true
   },
 
   NotificationController : {
@@ -191,7 +197,8 @@ module.exports.policies = {
     'create' : 'isAdmin',
     'find' : 'isAdmin',
     'findOne' : 'isAdmin',
-    'delete' : 'isAdmin'
+    'delete' : 'isAdmin',
+    'redeem' : 'sessionAuth'
   },
 
   EmailController : {
@@ -210,7 +217,9 @@ module.exports.policies = {
   PickupOptionController : {
     '*' : 'isAdmin',
     'find' : 'or(isAdmin, and(sessionAuth, isHost))',
-    'updateWeek' : 'isAdmin'
+    'updateWeek' : 'isAdmin',
+    'current' : true,
+    'map' : true
   },
 
   BadgeController : {
@@ -218,6 +227,11 @@ module.exports.policies = {
     'findBadgeWindow' : true,
     'updateUserBadge' : 'and(sessionAuth, sessionSelf)',
     'update' : 'isAdmin'
+  },
+
+  ComboController : {
+    '*' : 'isAdmin',
+    'find' : true
   }
 
   /***************************************************************************

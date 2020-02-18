@@ -492,7 +492,8 @@ var ApplyView = Backbone.View.extend({
   events : {
     "click #applyBtn" : "applyForHost",
     "click #addAddress" : "addAddress",
-    "click #additionalBtn" : "handleAdditional"
+    "click #additionalBtn" : "handleAdditional",
+    "click #openVerifyLink" : "openVerifyLink"
   },
   initialize : function(){
     var alertView = this.$el.find("#additionalAlert");
@@ -541,6 +542,9 @@ var ApplyView = Backbone.View.extend({
         console.log("error loading stripe.js");
       }
     })
+  },
+  openVerifyLink : function(e){
+    location.href="/host/setup";
   },
   handleAdditional : function(e){
     e.preventDefault();
@@ -615,7 +619,7 @@ var ApplyView = Backbone.View.extend({
       legalObj.personal_id_number = idNumber;
     }
     if(legalObj){
-      formData.append('legal_entity', JSON.stringify(legalObj));
+      formData.append('individual', JSON.stringify(legalObj));
     }
     if(document){
       formData.append('image',document[0]);
@@ -1153,6 +1157,28 @@ var CheckListView = Backbone.View.extend({
     },0,name,true);
   }
 })
+
+var PickupOption = Backbone.Model.extend({
+  urlRoot: "/pickupOption",
+  url: function(){
+    var url, _this = this;
+    if(this.action){
+      url = this.urlRoot + "/" + this.action;
+    }else{
+      url = this.urlRoot;
+    }
+    if(this.query){
+      url += "?";
+      Object.keys(this.query).forEach(function(key, index){
+        if(index>0){
+          url += "&";
+        }
+        url += key + "=" + _this.query[key];
+      });
+    }
+    return url;
+  }
+});
 
 
 var Meal = Backbone.Model.extend({
@@ -2719,7 +2745,7 @@ var BankView = Backbone.View.extend({
               });
             }else{
               if(response.passGuide){
-                BootstrapDialog.alert(__('bankCreated'), function(){
+                BootstrapDistripealog.alert(__('bankCreated'), function(){
                   h.reloadUrl("/pocket/user/,e","#mypurse");
                 });
               }else{
@@ -3420,6 +3446,76 @@ var ContactInfoView = Backbone.View.extend({
         helperMethod.makeAToast(__('saveError'))
       }
     });
+  }
+});
+
+var DeliveryMapView = Backbone.View.extend({
+  initialize : function(){
+    let _this = this;
+    if(!utility.googleMapLoaded){
+      utility.initGoogleMapService(function(err){
+        if(err){
+          helperMethod.makeAToast(err);
+          return;
+        }
+        _this.initMap();
+      });
+    }
+  },
+  initMap : function(){
+    let _this = this;
+    utility.initMap(this.$el.find("#googlemap")[0], {
+      lng: -122.468830,
+      lat: 37.687960
+    }, function(err, map){
+      if(err){
+        helperMethod.makeAToast(err);
+        return;
+      }
+      _this.loadDeliveryInfo(map, _this.$el.data('day'), _this.$el.data('month'));
+    })
+  },
+  loadDeliveryInfo : function(map, day, month){
+    let _this = this;
+    this.clearMarker();
+    this.model.action = "current";
+    this.model.query = {
+      day: day,
+      month: month
+    };
+    this.model.save({}, {
+      success : function(model, result){
+        if(!result || !result.length){
+          return;
+        }
+        result.forEach(function(p){
+          if(p.method === "delivery") {
+            let circle = new google.maps.Circle({
+              strokeColor: '#FF0000',
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: '#FF0000',
+              fillOpacity: 0.35,
+              map: map,
+              center: { lat: parseFloat(p.lat), lng: parseFloat(p.long)},
+              radius: p.deliveryRange * 1609
+            });
+            _this.model.circles.push(circle);
+          }
+        })
+      }
+    })
+  },
+  clearMarker : function(){
+    if(!this.model.circles){
+      this.model.circles = [];
+    }
+    if(this.model.circles.length){
+      this.model.circles.forEach(function(c){
+        c.setMap(null);
+      })
+    }
+    this.model.circles = [];
   }
 });
 
@@ -4662,5 +4758,5 @@ var BadgeView = Backbone.View.extend({
 });
 
 export { Auth, Payment, Host, User, Checklist, Meal, Dish, Bank, Review, Transaction, Order, Badge }
-export { LoginView, EmailVerificationView, RegisterView, UserBarView, ApplyView, PaymentView, NewUserRewardView, AddressView, CheckListView, HostSectionInMealView, DayOfMealView, MealSelectionView, MealView, DishView, BankView, UserProfileView, MyMealView, HostProfileView, HostPageView, ReviewView, TransactionView, DishPreferenceView, ContactInfoView, MapView,  MealConfirmView, ReceiptView, OrderView, BadgeView, PintuanView, CartView, DeliveryLocationMapView }
+export { LoginView, EmailVerificationView, RegisterView, UserBarView, ApplyView, PaymentView, NewUserRewardView, AddressView, CheckListView, HostSectionInMealView, DayOfMealView, MealSelectionView, MealView, DishView, BankView, UserProfileView, MyMealView, HostProfileView, HostPageView, ReviewView, TransactionView, DishPreferenceView, ContactInfoView, MapView,  MealConfirmView, ReceiptView, OrderView, BadgeView, PintuanView, CartView, DeliveryLocationMapView, PickupOption, DeliveryMapView }
 

@@ -143,16 +143,9 @@ module.exports = {
       var host = this;
       stripe.getAccount(this.accountId, function(err, account){
         if(err){
-          console.log(err);
           return cb(err);
         }
-        if(account.verification.fields_needed.length !== 0){
-          host.verification = account.verification;
-          return cb(null,false);
-        }else{
-          host.verification = null;
-          return cb(null, true);
-        }
+        host.individual = account.individual;
         return cb(null,true);
       });
     },

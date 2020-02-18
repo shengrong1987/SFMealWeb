@@ -194,6 +194,44 @@ module.exports = {
       }
       res.ok(reviews);
     })
+  },
+
+  find : function(req, res){
+    var _this = this, _meals = [];
+    var pickupNickname = req.param('pickup');
+    Meal.find({ where : { status : "on" }}).populate('dishes').exec(function(err, meals){
+      if(err){
+        return res.badRequest(err);
+      }
+      _meals = meals;
+      if(pickupNickname){
+        _meals = meals.filter(function(meal){
+          return meal.pickups.some(function(p){
+            return p.nickname && p.nickname === pickupNickname;
+          })
+        })
+      }
+      var _dishes=[];
+      async.auto({
+        findDishes : function(next){
+          _meals.forEach(function(meal){
+            meal.dishes.forEach(function(dish){
+              if(!_dishes.some(function(d){
+                return d.id === dish.id;
+              })){
+                _dishes.push(dish);
+              }
+            })
+          });
+          next();
+        }
+      }, function(err){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.ok(_dishes);
+      })
+    })
   }
 };
 

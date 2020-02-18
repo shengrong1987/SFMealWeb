@@ -582,12 +582,12 @@ module.exports = {
                       order.charges['cash'] = order.charges['cash'] || 0;
                       order.application_fees['cash'] = order.application_fees['cash'] || 0;
                       order.charges['cash'] += charge.amount;
-                      order.application_fees['cash'] += charge.application_fee;
-                      order.feeCharges[charge.id] = charge.application_fee;
+                      order.application_fees['cash'] += charge.application_fee_amount;
+                      order.feeCharges[charge.id] = charge.application_fee_amount;
                     }else if(charge){
                       order.isPaid = true;
                       order.charges[charge.id] = charge.amount;
-                      order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
+                      order.application_fees[charge.id] = parseInt(charge.metadata.application_fee_amount);
                     }
                     if(transfer){
                       order.transfer[transfer.id] = transfer.amount;
@@ -748,13 +748,13 @@ module.exports = {
           order.charges['cash'] = order.charges['cash'] || 0;
           order.application_fees['cash'] = order.application_fees['cash'] || 0;
           order.charges['cash'] += charge.amount;
-          order.application_fees['cash'] += charge.application_fee;
-          order.feeCharges[charge.id] = charge.application_fee;
+          order.application_fees['cash'] += charge.application_fee_amount;
+          order.feeCharges[charge.id] = charge.application_fee_amount;
         }else{
           order.isPaid = true;
           if(charge){
             order.charges[charge.id] = charge.amount;
-            order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
+            order.application_fees[charge.id] = parseInt(charge.metadata.application_fee_amount);
           }
         }
         if(transfer){
@@ -911,8 +911,8 @@ module.exports = {
                         order.charges['cash'] = order.charges['cash'] || 0;
                         order.application_fees['cash'] = order.application_fees['cash'] || 0;
                         order.charges['cash'] += charge.amount;
-                        order.application_fees['cash'] += charge.application_fee;
-                        order.feeCharges[charge.id] = charge.application_fee;
+                        order.application_fees['cash'] += charge.application_fee_amount;
+                        order.feeCharges[charge.id] = charge.application_fee_amount;
                       }else{
                         order.charges[charge.id] = charge.amount;
                         if(transfer){
@@ -1303,10 +1303,10 @@ module.exports = {
                   }
                   if(order.application_fees){
                     order.application_fees['cash'] = order.application_fees['cash'] || 0;
-                    order.application_fees['cash'] += charge.application_fee;
+                    order.application_fees['cash'] += charge.application_fee_amount;
                   }
                   if(order.feeCharges){
-                    order.feeCharges[charge.id] = charge.application_fee;
+                    order.feeCharges[charge.id] = charge.application_fee_amount;
                   }
                 }else{
                   if(charge){
@@ -1314,7 +1314,7 @@ module.exports = {
                       order.charges[charge.id] = charge.amount;
                     }
                     if(order.application_fees){
-                      order.application_fees[charge.id] = parseInt(charge.metadata.application_fee);
+                      order.application_fees[charge.id] = parseInt(charge.metadata.application_fee_amount);
                     }
                   }
                   if(transfer){
@@ -1875,7 +1875,7 @@ module.exports = {
           source.metadata.tax = parseInt(source.metadata.tax);
           source.metadata.discount = parseInt(source.metadata.discount);
           source.metadata.total = parseInt(source.metadata.total);
-          source.metadata.application_fee = parseInt(source.metadata.application_fee);
+          source.metadata.application_fee_amount = parseInt(source.metadata.application_fee_amount);
           var attr = {
             amount : source.amount,
             currency : "usd",
@@ -2394,10 +2394,10 @@ module.exports = {
                     }
                     if(order.application_fees){
                       order.application_fees['cash'] = order.application_fees['cash'] || 0;
-                      order.application_fees['cash'] += charge.application_fee;
+                      order.application_fees['cash'] += charge.application_fee_amount;
                     }
                     if(order.feeCharges){
-                      order.feeCharges[charge.id] = charge.application_fee;
+                      order.feeCharges[charge.id] = charge.application_fee_amount;
                     }
                   }else{
                     if(order.charges){
@@ -2957,7 +2957,7 @@ module.exports = {
               order.charge = order.charges[Object.keys(order.charges)[0]];
             }
             if(order.application_fees){
-              order.application_fee = order.application_fees[Object.keys(order.application_fees)[0]];
+              order.application_fee_amount = order.application_fees[Object.keys(order.application_fees)[0]];
             }
             order.pickupFromTime = order.pickupInfo.pickupFromTime;
             order.pickupTillTime = order.pickupInfo.pickupTillTime;

@@ -90,6 +90,13 @@ module.exports = require('waterlock').waterlocked({
     });
   },
 
+  wechatLogin: function(req, res){
+    let type = req.param('type');
+    let code = req.query.code;
+    let state = req.query.state;
+    this.exchangeToken(code, state, req, res, type);
+  },
+
   registerWechat: function(attrs, state, req, res) {
     var _this = this;
     var isNewUser = false;
@@ -97,6 +104,9 @@ module.exports = require('waterlock').waterlocked({
     var unionid = attrs.unionid;
     if(!openid){
       return res.badRequest({code : -20, responseText : req.__('user-unionid-needed')});
+    }
+    if(!unionid){
+      unionid = "-1";
     }
     waterlock.engine.findAuth({ '$or' : [ { openid : openid }, { unionid : unionid }] }, function(err, user) {
       if (!user) {
@@ -107,8 +117,8 @@ module.exports = require('waterlock').waterlocked({
           return res.badRequest(err);
         }
         async.auto({
-          newUser : function(next){
-            if(!isNewUser){
+          createReferralToken : function(next){
+            if(!isNewUser && user.verifyToken){
               return next();
             }
             attrs.verifyToken = notification.generateToken();
@@ -141,17 +151,25 @@ module.exports = require('waterlock').waterlocked({
               if(err){
                 return res.badRequest(err);
               }
-              var url = require("url");
-              var url_parts = url.parse(state, true);
-              var query = url_parts.query;
-              var redirectUrl = url_parts.pathname + "?code=" + encodeURIComponent(query.code);
-              sails.log.debug("redirect url: " + redirectUrl);
-              res.redirect(redirectUrl);
+              if(!state){
+                res.ok(me);
+              }else{
+                var url = require("url");
+                var url_parts = url.parse(state, true);
+                var query = url_parts.query;
+                var redirectUrl = url_parts.pathname + "?code=" + encodeURIComponent(query.code);
+                sails.log.debug("redirect url: " + redirectUrl);
+                res.redirect(redirectUrl);
+              }
             })
           });
         })
       });
     });
+  },
+
+  refreshUserState: function(req, res){
+      return res.ok(req.session.user)
   },
 
   checkReferralProgram : function(req, cb){
@@ -222,26 +240,8 @@ module.exports = require('waterlock').waterlocked({
     });
   },
 
-  admin : function(req, res){
-    return res.view('admin',{
-      layout : 'admin_layout'
-    });
-  },
-
   resetForm : function(req, res){
     return res.view("resetPassword");
-  },
-
-  wechatCode : function(req, res){
-    var code = req.query.code;
-    var state = req.query.state;
-    this.exchangeToken(code, state, req, res, "mobile");
-  },
-
-  wechatCodeWeb : function(req, res){
-    var code = req.query.code;
-    var state = req.query.state;
-    this.exchangeToken(code, state, req, res, "web");
   },
 
   getQRCodeTicket : function(req, res){
@@ -278,42 +278,105 @@ module.exports = require('waterlock').waterlocked({
 
   exchangeToken : function(code, state, req, res, type){
     var _this = this;
-    var appID = type === "mobile" ? process.env.WECHAT_APPID : process.env.WECHAT_APPID_WEB;
-    var appSecret = type === "mobile" ? process.env.WECHAT_SECRET : process.env.WECHAT_SECRET_WEB;
-    var accessTokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$APPID&secret=$SECRET&code=$CODE&grant_type=authorization_code";
-    accessTokenUrl = accessTokenUrl.replace('$APPID', appID);
-    accessTokenUrl = accessTokenUrl.replace('$SECRET',appSecret);
-    accessTokenUrl = accessTokenUrl.replace('$CODE', code);
-    request.get({
-      url : accessTokenUrl
-    }, function(err, response){
+    var appID, appSecret, accessTokenUrl, userData;
+
+    async.auto({
+      getTokenFromMobileWeb: function(next){
+        if(type==="miniapp"){
+          return next();
+        }
+        accessTokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$APPID&secret=$SECRET&code=$CODE&grant_type=authorization_code";
+        if(type === "mobile"){
+          appID = process.env.WECHAT_APPID;
+          appSecret = process.env.WECHAT_SECRET;
+        }else if(type === "web"){
+          appID = process.env.WECHAT_APPID_WEB;
+          appSecret = process.env.WECHAT_SECRET_WEB;
+        }
+        accessTokenUrl = accessTokenUrl.replace('$APPID', appID);
+        accessTokenUrl = accessTokenUrl.replace('$SECRET',appSecret);
+        accessTokenUrl = accessTokenUrl.replace('$CODE', code);
+        request.get({
+            url : accessTokenUrl
+          }, function(err, response) {
+          if (err) {
+            return next(err);
+          }
+          try{
+            var body = JSON.parse(response.body);
+            var accessToken = body.access_token;
+            var refreshToken = body.refresh_token;
+            var openId = body.openid;
+          }catch(e){
+            return next(e);
+          }
+          request.get({
+            url : accessTokenUrl
+          }, function(err, response){
+            if(err){
+              return next(err);
+            }
+            try{
+              var body = JSON.parse(response.body);
+              var accessToken = body.access_token;
+              var refreshToken = body.refresh_token;
+              var openId = body.openid;
+            }catch(e){
+              return next(e);
+            }
+            var userProfileUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$ACCESS_TOKEN&openid=$OPENID&lang=zh_CN";
+            userProfileUrl = userProfileUrl.replace('$ACCESS_TOKEN', accessToken);
+            userProfileUrl = userProfileUrl.replace('$OPENID',openId);
+            request.get({
+              url : userProfileUrl
+            }, function(err, userRes){
+              if(err){
+                return next(err);
+              }
+              try{
+                userData = JSON.parse(userRes.body);
+              }catch(e){
+                return next(e);
+              }
+              next()
+            });
+          });
+        });
+      },
+      getTokenFromMiniapp: function(next){
+        if(type==="mobile"||type==="web"){
+          return next();
+        }
+        accessTokenUrl = "https://api.weixin.qq.com/sns/jscode2session?appid=$APPID&secret=$SECRET&js_code=$CODE&grant_type=authorization_code";
+        appID = process.env.WECHAT_APPID_MINIAPP;
+        appSecret = process.env.WECHAT_APPSECRET_MINIAPP;
+        accessTokenUrl = accessTokenUrl.replace('$APPID', appID);
+        accessTokenUrl = accessTokenUrl.replace('$SECRET',appSecret);
+        accessTokenUrl = accessTokenUrl.replace('$CODE', code);
+        request.get({
+          url : accessTokenUrl
+        }, function(err, response) {
+          if (err) {
+            return next(err);
+          }
+          try {
+            var body = JSON.parse(response.body);
+            userData = {
+              openid: body.openid,
+              unionid: body.unionid,
+              sessionId: body.session_key
+            }
+          } catch (e) {
+            return next(e);
+          }
+          next();
+        });
+      }
+    }, function(err){
       if(err){
         return res.badRequest(err);
       }
-      try{
-        var body = JSON.parse(response.body);
-        var accessToken = body.access_token;
-        var refreshToken = body.refresh_token;
-        var openId = body.openid;
-      }catch(e){
-        return res.badRequest(e);
-      }
-      var userProfileUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$ACCESS_TOKEN&openid=$OPENID&lang=zh_CN";
-      userProfileUrl = userProfileUrl.replace('$ACCESS_TOKEN', accessToken);
-      userProfileUrl = userProfileUrl.replace('$OPENID',openId);
-      request.get({
-        url : userProfileUrl
-      }, function(err, userRes){
-        if(err){
-          return res.badRequest(err);
-        }
-        try{
-          var userData = JSON.parse(userRes.body);
-        }catch(e){
-          return res.badRequest(e);
-        }
-        _this.registerWechat(userData, state, req, res);
-      });
+      _this.registerWechat(userData, state, req, res);
     });
   },
 
@@ -399,7 +462,11 @@ module.exports = require('waterlock').waterlocked({
         });
       })
     })
+  },
+
+  admin : function(req, res){
+    return res.view('admin',{
+      layout : 'admin_layout'
+    });
   }
-
-
 });

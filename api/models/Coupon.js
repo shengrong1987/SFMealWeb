@@ -8,22 +8,21 @@
 module.exports = {
 
   attributes: {
-    type : {
-      type : 'string',
-      enum : ['fix','freeShipping']
+    minimum: {
+      type : 'int',
+      defaultsTo : 0
     },
     amount : {
-      type : 'float'
+      type : 'int'
     },
-    description : {
+    title : {
       type : 'string'
-    },
-    code : {
-      type : 'string',
-      unique : true
     },
     expires_at : {
       type : 'date'
+    },
+    type: {
+      type : 'string'
     }
   }
 };

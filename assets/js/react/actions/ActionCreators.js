@@ -213,6 +213,20 @@ var ActionsCreators = {
     });
   },
 
+  getCombo: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_COMBO,
+      records: records
+    });
+  },
+
+  getCombos: function (records) {
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_COMBOS,
+      records: records
+    });
+  },
+
   switchTab : function(tab){
     AppDispatcher.handleViewAction({
       type : ActionTypes.TAB_CHANGE,
