@@ -91,6 +91,10 @@ module.exports = {
       type : 'string',
       regex : /^\d{5}(?:[-\s]\d{4})?$/
     },
+    numCoupon : {
+      type : 'integer',
+      defaultsTo : 0
+    },
     receivedEmail : {
       type : 'boolean',
       defaultsTo : true
@@ -119,6 +123,9 @@ module.exports = {
       via : 'user'
     },
     coupons : {
+      collection : 'Coupon'
+    },
+    usedCoupons : {
       collection : 'Coupon'
     },
     likes : {
@@ -227,7 +234,7 @@ module.exports = {
           return cb(err);
         }
         var email = auth.email || auth.googleEmail;
-        var emailVerified = !!(auth.googleEmail || (auth.facebookId && auth.email)) ;
+        var emailVerified = !!(auth.googleEmail || (auth.facebookId && auth.email) || user.unionid) ;
         var firstName = auth.firstname || ( auth.name ? auth.name.split(' ')[0] : auth.username) || auth.nickname || 'guest';
         var lastName = auth.lastname || ( auth.name ? auth.name.split(' ')[1] : '') || 'guest';
         var referralCode = firstName + "." + lastName + "." + number;

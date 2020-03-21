@@ -101,8 +101,8 @@ describe('MealController', function() {
                         chef : hostId,
                         isSupportShipping : true,
                         preference : {
-                          sweetness : [ { property : 'super sweet', extra : 1}, { property : 'normal', extra : 0}, { property : 'ultra sweet', extra : 2} ],
-                          spicy : [ { property : 'super spicy', extra : 1}, { property : 'normal', extra : 0}]
+                          sweetness : [ { property : 'normal', extra : 0}, { property : 'super sweet', extra : 1}, { property : 'ultra sweet', extra : 2} ],
+                          spicy : [ { property : 'normal', extra : 0}, { property : 'super spicy', extra : 1}]
                         }
                       })
                       .expect(200)
@@ -174,7 +174,13 @@ describe('MealController', function() {
         .set('Accept', 'application/json')
         .send({
           preference : {
-            "馅料" : ["猪肉","素"]
+            "馅料" : [{
+              property: "猪肉",
+              extra: 1
+            },{
+              property: "素",
+              extra: 0
+            }]
           }
         })
         .expect('Content-Type', /json/)
@@ -303,7 +309,8 @@ describe('MealController', function() {
             status : 'off',
             isDelivery : false,
             preference : preference,
-            isTaxIncluded : true
+            isTaxIncluded : true,
+            nickname: "order"
           })
           .expect(200)
           .end(function(err,res){
@@ -927,7 +934,7 @@ describe('MealController', function() {
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
         // .field('Content-Type', 'multipart/form-data')
-        .field('legal_entity',JSON.stringify(legalObj))
+        .field('individual',JSON.stringify(legalObj))
         .expect(200)
         .end(function(err, res){
           if(err){
@@ -939,13 +946,13 @@ describe('MealController', function() {
 
     it('should update host personal id number', function(done){
       var legalObj = {
-        personal_id_number : "123456789"
+        id_number : "123456789"
       };
       agent
         .put('/host/' + hostId)
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
-        .field('legal_entity',JSON.stringify(legalObj))
+        .field('individual',JSON.stringify(legalObj))
         .expect(200)
         .end(function(err, res){
           if(err){
@@ -1161,11 +1168,12 @@ describe('MealController', function() {
         })
     });
 
-    it('should register as guest', function (done) {
+    it('should login guest account', function(done){
       agent
-        .post('/auth/register')
-        .send({email : guestEmail, password : password})
-        .expect(200)
+        .post('/auth/login?type=local')
+        .send({email : guestEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
         .end(done)
     })
 

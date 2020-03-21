@@ -11,6 +11,16 @@
 
 module.exports = {
 
+  find: function(req, res){
+    let query = req.query;
+    Coupon.find(query).exec(function(err, coupons){
+      if(err){
+        return res.badRequest(err)
+      }
+      res.ok(coupons)
+    })
+  },
+
   redeem : function(req, res){
     let userId = req.session.user.id;
     if(req.session.user.couponRewardIsRedeemed){
@@ -23,11 +33,16 @@ module.exports = {
       let couponIds = coupons.map(function (coupon) {
         return coupon.id;
       });
-      User.findOne(userId).exec(function(err, user){
+      User.findOne(userId).populate("auth").exec(function(err, user){
         if (err) {
           return res.badRequest(err);
         }
-        user.coupons.add(couponIds);
+        if(!user.unionid && !user.emailVerified){
+          return res.badRequest({ code : -8, responseText: req.__('email-unverified') });
+        }
+        couponIds.forEach(function(cId){
+          user.coupons.add(cId);
+        });
         user.couponRewardIsRedeemed = true;
         user.numCoupon = couponIds.length;
         user.save(function (err, u) {
@@ -55,7 +70,7 @@ module.exports = {
       var couponIsValid = true;
       couponIsValid = !user.coupons.some(function(coupon){
         return coupon.code === couponCode;
-      })
+      });
       if(!couponIsValid){
         return res.badRequest({ code : -1, responseText : req.__('coupon-already-redeem-error')});
       }

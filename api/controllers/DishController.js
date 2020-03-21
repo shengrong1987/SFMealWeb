@@ -10,6 +10,8 @@
 
 var notification = require("../services/notification");
 var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUtil.js');
+var moment = require("moment");
+
 module.exports = {
 	new_form : function(req, res){
     var user = req.session.user;
@@ -196,15 +198,16 @@ module.exports = {
     })
   },
 
-  find : function(req, res){
+  findActive : function(req, res){
     var _this = this, _meals = [];
     var pickupNickname = req.param('pickup');
-    Meal.find({ where : { status : "on" }}).populate('dishes').exec(function(err, meals){
+    Meal.find({ where : { status : "on", provideFromTime : { '<' : moment().toDate()}, provideTillTime : { '>' : moment().toDate()}}}).populate('dishes').exec(function(err, meals){
       if(err){
         return res.badRequest(err);
       }
       _meals = meals;
       if(pickupNickname){
+        pickupNickname = decodeURI(pickupNickname)
         _meals = meals.filter(function(meal){
           return meal.pickups.some(function(p){
             return p.nickname && p.nickname === pickupNickname;
@@ -219,6 +222,7 @@ module.exports = {
               if(!_dishes.some(function(d){
                 return d.id === dish.id;
               })){
+                dish.leftQty = meal.leftQty[dish.id];
                 _dishes.push(dish);
               }
             })

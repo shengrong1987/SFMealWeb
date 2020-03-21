@@ -23,6 +23,9 @@ module.exports = {
       type : 'float',
       required : true
     },
+    comboPrice : {
+      type: 'float'
+    },
     minimalOrder : {
       type : 'integer',
       defaultsTo : 0

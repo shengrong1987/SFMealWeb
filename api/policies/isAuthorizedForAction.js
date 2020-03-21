@@ -62,6 +62,11 @@ module.exports = function(req, res, next) {
           return cb("order already paid");
         }
         return cb();
+      }else if(action === "comment"){
+        if(order.status === "schedule" || order.status === "preparing" || order.status === "ready"){
+          return cb()
+        }
+        cb("order is already delivered, can not update comment")
       }else{
         return cb('unauthorized action');
       }

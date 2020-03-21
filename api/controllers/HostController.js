@@ -223,7 +223,11 @@ module.exports = {
                     return cb(err);
                   }
                   individual = individual || {};
-                  individual.verification = {document : data.id};
+                  individual.verification = {
+                    document: {
+                      front: data.id
+                    }
+                  };
                   cb();
                 });
               });
@@ -234,6 +238,7 @@ module.exports = {
               }
               stripe.updateManagedAccount(host.accountId, {individual : individual},function(err, result){
                 if(err){
+                  console.error("update account error: " + err);
                   return cb(err)
                 }
                 cb();
@@ -241,6 +246,7 @@ module.exports = {
             }]
           }, function(err, result){
             if(err){
+              console.log(err);
               return res.badRequest(err);
             }
             var updatingToUser = {};
@@ -382,8 +388,18 @@ module.exports = {
     });
   },
 
-  setupSuccess: function(req, res){
-
+  setupFail: function(req, res){
+    User.findOne(req.session.user.id).populate("host").exec(function(err, u){
+      if(err){
+        return res.badRequest(err);
+      }
+      const accountLinks = stripe.getAccountLinks(u.host.accountId,function(err, link){
+        if(err){
+          return res.badRequest(err);
+        }
+        res.redirect(link.url);
+      });
+    })
   },
 
   setup : function(req, res){

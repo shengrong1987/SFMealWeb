@@ -102,7 +102,7 @@ module.exports = {
                 card.brand = "AE";
                 break;
               case "Diners Club":
-                card.brand = "DC"
+                card.brand = "DC";
                 break;
             }
             params.brand = card.brand;
@@ -185,7 +185,6 @@ module.exports = {
   },
 
   update : function(req, res){
-
     var paymentId = req.param("id");
     var userId = req.session.user.id;
     var email = req.session.user.auth.email;
@@ -278,7 +277,7 @@ module.exports = {
       }
       var customerId = payment.customerId;
       var cardId = payment.cardId;
-      stripe.deleteCard({ id : customerId, cardId : cardId}, function(err, confirmation) {
+      stripe.deleteCard({ id : customerId, cardId : cardId }, function(err, confirmation) {
         if (err) {
           return res.badRequest(err);
         }

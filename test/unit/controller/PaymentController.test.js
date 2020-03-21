@@ -102,7 +102,7 @@ describe('PaymentController', function() {
       var country = "US";
       var cardHolderName = "sheng rong";
       var expMonth = 2;
-      var expYear = 2020;
+      var expYear = 2022;
       var cvv = 123;
       stripe.tokens.create({
         card:{
@@ -118,6 +118,10 @@ describe('PaymentController', function() {
           address_country: country
         }
       }, function(err, token){
+        if(err){
+          console.log(err)
+          return done(err)
+        }
         agent
             .post('/payment')
             .send({
@@ -163,7 +167,7 @@ describe('PaymentController', function() {
       var country = "US";
       var cardHolderName = "sheng rong";
       var expMonth = 2;
-      var expYear = 2020;
+      var expYear = 2022;
       var cvv = 123;
       stripe.tokens.create({
         card:{
@@ -196,7 +200,7 @@ describe('PaymentController', function() {
       var country = "US";
       var cardHolderName = "sheng rong";
       var expMonth = 2;
-      var expYear = 2020;
+      var expYear = 2022;
       var cvv = 123;
       stripe.tokens.create({
         card:{
@@ -261,7 +265,7 @@ describe('PaymentController', function() {
       var postal = "94124";
       var cardHolderName = "sheng rong";
       var expMonth = 2;
-      var expYear = 2020;
+      var expYear = 2022;
       var cvv = 123;
       agent
         .put('/payment/' + cardId)
@@ -296,7 +300,7 @@ describe('PaymentController', function() {
       var postal = "94124";
       var cardHolderName = "sheng rong";
       var expMonth = 2;
-      var expYear = 2020;
+      var expYear = 2022;
       var cvv = 123;
       agent
         .put('/payment/' + cardId)

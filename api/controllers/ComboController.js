@@ -7,7 +7,7 @@
 
 module.exports = {
     find: function(req, res){
-      Combo.find().populate("dishes").populate("chefs").exec(function(err, combos){
+      Combo.find().populate("dishes").populate("chefs").populate("pickupOptions").exec(function(err, combos){
         if(err){
           return res.badRequest(err)
         }
@@ -23,7 +23,7 @@ module.exports = {
         }
         dishes = dishes.split(",");
         async.each(dishes, function(dishId, next){
-          if(combo.dishes.some(function(d){return d.id === dish.id})){
+          if(combo.dishes.some(function(d){return d.id === dishId})){
             return next();
           }
           Dish.findOne(dishId).exec(function(err, dish){
@@ -31,7 +31,11 @@ module.exports = {
               return next(err)
             }
             combo.dishes.add(dishId);
-            combo.chefs.add(dish.chef);
+            if(!combo.chefs.some(function(chef){
+              return chef.id === dish.chef
+            })) {
+              combo.chefs.add(dish.chef);
+            }
             combo.save(next)
           })
         }, function(err){

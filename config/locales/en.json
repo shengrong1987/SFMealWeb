@@ -561,7 +561,7 @@
   "order-abort-complete": "Order has been completed or cancelled, can't abort",
   "order-refund-fail": "Order don’t need a refund or have a full refund,",
   "order-not-qualify-shipping" : "Order amount not reach minimal requirement for shipping: $%s",
-  "order-cash-no-discount" : "No discount can be used with cash checkout.",
+  "order-duplicate-discount" : "Coupon and points can not be used together",
   "order-cash-miss-profile" : "You need name & phone to use cash checkout.",
   "order-lack-of-party-requirement" : "Meal lack of party meal requirement, please contact custom service for help.",
   "order-amount-not-qualify-party" : "Order amount less than: $%s",
@@ -583,6 +583,7 @@
   "coupon-expire-error" : "Coupon code is expired.",
   "coupon-already-redeem-error" : "Coupon has already been used.",
   "coupon-unverified-email" : "Coupon can't be used before email is verified.",
+  "coupon-minimum-not-reach" : "Coupon's minimum requirement not reach",
   "review-no-available": "There isn't meals for review",
   "review-invalid": "Meal/dish for review Error",
   "user-already-host": "You are the chef",
@@ -1195,5 +1196,6 @@
   "switch-to-pickup" : "Pickup Instead",
   "comment-option-1" : "Please call upon arrival(will meet outside)",
   "comment-option-2" : "Please delivery to door:",
-  "comment-placeholder" : "Apt No., upstair, 1st floor etc..."
+  "comment-placeholder" : "Apt No., upstair, 1st floor etc...",
+  "order-combo-price-not-match" : "Order combo price not match"
 }

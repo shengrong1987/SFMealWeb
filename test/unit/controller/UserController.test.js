@@ -42,15 +42,14 @@ describe('UsersController', function() {
         .expect(200)
     })
 
-    it('should create a coupon with $1 off', function(done){
+    it('should create a coupon with $6 off', function(done){
       agent
         .post('/coupon')
         .send({
-          type : "fix",
-          amount : 1.00,
-          description : "Happy Holiday",
-          code : "XMAS",
-          expire_at : nextHour
+          type : "new_user_reward",
+          amount : 6,
+          title : "$6现金优惠券",
+          expires : "2020-2-8"
         })
         .expect(201)
         .end(function(err, res){
@@ -58,7 +57,28 @@ describe('UsersController', function() {
             return done(err);
           }
           should.exist(res.body.id);
-          res.body.amount.should.be.equal(1.00);
+          res.body.amount.should.be.equal("6");
+          done();
+        })
+    });
+
+    it('should create a coupon with $10 off', function(done){
+      agent
+        .post('/coupon')
+        .send({
+          type : "new_user_reward",
+          amount : 10,
+          title : "$10现金优惠券",
+          expires : "2020-2-8",
+          minimum : 65
+        })
+        .expect(201)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          should.exist(res.body.id);
+          res.body.amount.should.be.equal("10");
           done();
         })
     });
@@ -67,11 +87,10 @@ describe('UsersController', function() {
       agent
         .post('/coupon')
         .send({
-          type : "fix",
-          amount : 5.00,
-          description : "Happy Holiday",
-          code : "5Dollar",
-          expire_at : nextHour
+          type : "new_user_reward",
+          amount : 5,
+          title : "$5现金优惠券",
+          expires : "2020-2-8"
         })
         .expect(201)
         .end(function(err, res){
@@ -79,34 +98,29 @@ describe('UsersController', function() {
             return done(err);
           }
           should.exist(res.body.id);
-          res.body.amount.should.be.equal(5.00);
+          res.body.amount.should.be.equal("5");
+          res.body.minimum.should.be.equal("0");
           done();
         })
     });
 
-    it('should create a coupon with free shipping', function(done){
+    it('should create another coupon', function(done){
       agent
         .post('/coupon')
         .send({
-          type : "freeShipping",
-          description : "Happy Holiday",
-          code : "SHIP",
-          expire_at : nextHour
+          type : "other",
+          amount : 5,
+          title : "$5现金优惠券",
+          expires : "2020-2-8"
         })
         .expect(201)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          should.exist(res.body.id);
-          res.body.code.should.be.equal("SHIP");
-          done();
-        })
+        .end(done)
     });
   })
 
   describe('user login', function() {
 
+    var guestEmail = "enjoymyself1987@gmail.com";
     var email = "aimbebe.r@gmail.com";
     var user2Email = "user2@sfmeal.com";
     var user3Email = "user3@sfmeal.com";
@@ -114,6 +128,7 @@ describe('UsersController', function() {
     var user5Email = "user5@sfmeal.com";
     var password2 = "123456789";
     var shortPassword = "1234567";
+    var password = "12345678";
     var invalidPassword = "!1234567";
     var phone = "(415)123-1234";
     var birthday = new Date(1987, 10, 27);
@@ -326,7 +341,7 @@ describe('UsersController', function() {
           }
           done();
         })
-    })
+    });
 
     it('should become a host if logged in', function (done) {
       agent
@@ -337,7 +352,7 @@ describe('UsersController', function() {
           should.exist(res.body.user.host);
           done();
         })
-    })
+    });
 
     it('should register for No.3 user', function (done) {
       agent
@@ -389,6 +404,22 @@ describe('UsersController', function() {
           password: password2,
           birthday: birthday,
           receivedEmail: false
+        })
+        .expect(200)
+        .end(function (err, res) {
+          if (err) {
+            return done(err);
+          }
+          done();
+        })
+    })
+
+    it('should register for guest user', function (done) {
+      agent
+        .post('/auth/register')
+        .send({
+          email: guestEmail,
+          password: password,
         })
         .expect(200)
         .end(function (err, res) {
@@ -743,9 +774,7 @@ describe('UsersController', function() {
         .post('/auth/register')
         .send({
           email: "referraltest@gmail.com",
-          password: "12345678",
-          birthday: null,
-          receivedEmail: false
+          password: "12345678"
         })
         .expect(200)
         .end(function (err, res) {
@@ -846,12 +875,14 @@ describe('UsersController', function() {
     })
   });
 
-  describe("new user should be able to open reward window and take reward", function(){
+  describe("should be able to take coupon reward", function(){
 
-    var email = "aimbebe.r@gmail.com";
-    var adminEmail = "admin@sfmeal.com";
-    var password = "12345678";
-    var userId;
+    let email = "enjoymyself1987@gmail.com";
+    let user2Email = "user2@sfmeal.com";
+    let password2 = "123456789";
+    let adminEmail = "admin@sfmeal.com";
+    let password = "12345678";
+    let userId;
 
     it('should log out user', function(done){
       agent
@@ -860,33 +891,14 @@ describe('UsersController', function() {
         .end(done)
     });
 
-    it('should not get emailverification view if not login', function(done){
-      agent
-        .get('/user/emailVerification')
-        .expect(403)
-        .end(done)
-    });
-
-    it('should be able to get reward view', function(done){
-      agent
-        .get('/user/reward/newUser')
-        .expect(200, done)
-    });
-
     it('should not be able to redeem reward because not login', function(done){
       agent
-        .get('/user/' + userId + "/redeemReward")
-        .expect(400)
-        .end(function(err, res){
-          if(err){
-            return done(err);
-          }
-          res.body.code.should.be.equal(-7);
-          done();
-        })
+        .get('/coupon/redeem')
+        .expect(403)
+        .end(done)
     })
 
-    it('user login in', function(done){
+    it('should login if account exist', function (done) {
       agent
         .post('/auth/login?type=local')
         .send({email : email, password: password})
@@ -910,12 +922,6 @@ describe('UsersController', function() {
         })
     })
 
-    it('should get emailverification view', function(done){
-      agent
-        .get('/user/emailVerification')
-        .expect(200, done)
-    });
-
     it('should not be able to redeem reward because email not verified', function(done){
       agent
         .get('/user/' + userId + "/redeemReward")
@@ -936,7 +942,7 @@ describe('UsersController', function() {
         .end(done)
     });
 
-    it('user login in', function(done){
+    it('admin login', function(done){
       agent
         .post('/auth/login?type=local')
         .send({email : adminEmail, password: password})
@@ -954,31 +960,105 @@ describe('UsersController', function() {
         .expect(200,done)
     })
 
+    it('user1 second login in', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({email : email, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
     it('should be able to redeem reward', function(done){
       agent
-        .get('/user/' + userId + "/redeemReward")
+        .get('/coupon/redeem')
         .expect(200)
         .end(function(err, res){
           if(err){
             return done(err);
           }
-          res.body.newUserRewardIsRedeemed.should.be.true();
-          res.body.points.should.be.equal(100);
+          res.body.couponRewardIsRedeemed.should.be.true();
+          res.body.numCoupon.should.be.equal(3);
           done();
         })
     })
 
     it('should not be able to redeem reward because reward already redeemed', function(done){
       agent
-        .get('/user/' + userId + "/redeemReward")
+        .get('/coupon/redeem')
         .expect(400)
         .end(function(err, res){
           if(err){
             return done(err);
           }
-          res.body.code.should.be.equal(-9);
+          res.body.code.should.be.equal(-4);
           done();
         })
+    })
+
+    it('user2 login in', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({email : user2Email, password: password2})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
+    it('should get user2 id', function(done){
+      agent
+        .get('/user/me')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          userId = res.body.id;
+          done()
+        })
+    })
+
+    it('admin login', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({email : adminEmail, password: password})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
+    it('should set user2 unionid', function (done) {
+      agent
+        .put('/user/' + userId)
+        .send({
+          unionid : "1234567"
+        })
+        .expect(200,done)
+    })
+
+    it('user2 second login in', function(done){
+      agent
+        .post('/auth/login?type=local')
+        .send({email : user2Email, password: password2})
+        .expect(302)
+        .expect('Location','/auth/done')
+        .end(done)
+    })
+
+    it('should be able to redeem reward', function(done){
+      agent
+        .get('/coupon/redeem')
+          .expect(200)
+          .end(function(err, res){
+            if(err){
+              return done(err);
+            }
+            res.body.couponRewardIsRedeemed.should.be.true();
+            res.body.numCoupon.should.be.equal(3);
+            done();
+          })
     })
   })
 });

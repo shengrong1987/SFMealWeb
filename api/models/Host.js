@@ -146,7 +146,9 @@ module.exports = {
           return cb(err);
         }
         host.individual = account.individual;
-        return cb(null,true);
+        let eventually_due = account.individual.requirements.eventually_due;
+        console.log("host requirements items: " + eventually_due.length)
+        return cb(null, eventually_due.length === 0);
       });
     },
     //check all validation as host

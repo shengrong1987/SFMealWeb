@@ -48,6 +48,16 @@ module.exports = require('waterlock').actions.user({
     })
   },
 
+  card: function(req, res){
+    let userId = req.session.user.id;
+    User.findOne(userId).populate("payment").exec(function(err, user){
+      if(err){
+        return res.badRequest(err);
+      }
+      res.ok(user.payment)
+    })
+  },
+
   transaction: function(req, res){
     let userId = req.session.user.id;
     let query = req.query;
@@ -180,7 +190,10 @@ module.exports = require('waterlock').actions.user({
         first_name: user.firstname,
         last_name: user.lastname
       },
-      requested_capabilities: ["transfers",'legacy_payments']
+      business_profile: {
+        url: "http://sfmeal.com"
+      },
+      requested_capabilities: ["transfers"]
     }
     if(user.birthday){
       params.individual.dob = {
@@ -378,9 +391,6 @@ module.exports = require('waterlock').actions.user({
   combineOrders : function(orders){
     var newOrders = [];
     orders.forEach(function(order){
-      if(!order.hosts) {
-        order.hosts = [order.host];
-      }
       var isSamePickup = newOrders.some(function(oldOrder){
         var _isSame = oldOrder.status === order.status && moment(new Date(oldOrder.pickupInfo.pickupFromTime).toISOString()).isSame(moment(new Date(order.pickupInfo.pickupFromTime).toISOString()), 'minute') && moment(new Date(oldOrder.pickupInfo.pickupTillTime).toISOString()).isSame(moment(new Date(order.pickupInfo.pickupTillTime).toISOString()), "minute") && oldOrder.customerName === order.customerName && oldOrder.customerPhone === order.customerPhone && oldOrder.pickupInfo.method === order.pickupInfo.method && ((oldOrder.pickupInfo.method === "delivery" && oldOrder.contactInfo.address === order.contactInfo.address) || (oldOrder.pickupInfo.method === "pickup" && oldOrder.pickupInfo.location === order.pickupInfo.location));
         if(_isSame){
@@ -398,16 +408,15 @@ module.exports = require('waterlock').actions.user({
           oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
           oldOrder.tip = parseFloat(oldOrder.tip) + parseFloat(order.tip);
           oldOrder.pickupInfo.comment += order.pickupInfo.comment;
-          oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
-          oldOrder.dishes = oldOrder.dishes.filter(function(item, pos){
-            return oldOrder.dishes.indexOf(item) === pos;
+          order.dishes = order.dishes.filter(function(d){
+            return !oldOrder.dishes.some(function(d2){
+              return d2.id === d.id
+            })
           });
+          oldOrder.dishes = oldOrder.dishes.concat(order.dishes);
           oldOrder.discount += order.discount;
           if(oldOrder.paymentMethod === "cash" && oldOrder.charges && order.charges){
             oldOrder.charges['cash'] += order.charges['cash'];
-          }
-          if(oldOrder.host.id !== order.host.id){
-            oldOrder.hosts.push(order.host);
           }
         }
         return _isSame;
@@ -422,29 +431,19 @@ module.exports = require('waterlock').actions.user({
   orders : function(req, res){
     let userId = req.session.user.id;
     let _this = this;
-    User.findOne(userId).populate("orders", { sort: 'createdAt DESC', skip: req.query.skip, limit: req.query.limit }).exec(function(err, found) {
-      if (err) {
+    Order.find({
+      customer: userId,
+      sort: 'createdAt DESC',
+      skip: req.query.skip,
+      limit: req.query.limit
+    }).populate("host").populate("dishes").exec(function(err, orders){
+      if(err) {
         return res.badRequest(err)
       }
-      async.each(found.orders, function(order, next){
-        Order.findOne(order.id).populate("host").populate("dishes").exec(function(err, o){
-          if(err){
-            return next(err);
-          }
-          order.host = {
-            picture: o.host.picture,
-            shopName: o.host.shopName
-          };
-          order.dishes = o.dishes;
-          next();
-        })
-      }, function(err){
-        if(err){
-          return res.badRequest(err)
-        }
-        // var orders = _this.combineOrders(found.orders);
-        // _this.packOrders(orders);
-        return res.ok(found.orders);
+      let combinedOrders = _this.combineOrders(orders)
+      return res.ok({
+        orders : combinedOrders,
+        length: orders.length
       });
     })
   },

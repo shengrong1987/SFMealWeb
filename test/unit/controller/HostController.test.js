@@ -239,75 +239,82 @@ describe('Host register', function() {
     var hostId;
     var firstname = "sheng";
     var lastname = "rong";
-    it('should login a host account', function(done){
+    it('should login a host account', function (done) {
       agent
         .post('/auth/login?type=local')
-        .send({email : email, password : password})
+        .send({email: email, password: password})
         .expect(302)
-        .expect("Location","/auth/done")
+        .expect("Location", "/auth/done")
         .end(done)
     });
 
-    it('should be an unverified account', function(done){
+    it('should be an unverified account', function (done) {
       agent
         .get('/apply')
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
         .expect(200)
-        .end(function(err, res){
-          if(err){
+        .end(function (err, res) {
+          if (err) {
             return done(err);
           }
           res.body.passGuide.should.be.false("should be an unverified account");
           hostId = res.body.id;
+          console.log("hostId:" + hostId)
           done();
         })
     });
 
-    it('should update name and save to manged account', function(done){
-        agent
-          .put('/host/' + hostId)
-          .set('Accept', 'application/json')
-          .expect('Content-Type', /json/)
-          .send({legal_entity : JSON.stringify({
-            first_name : "sheng",
-            last_name : "rong",
-            dob : {
-              month : 12,
-              day : 25,
-              year : 1987
+    it('should update name and save to manged account', function (done) {
+      agent
+        .put('/host/' + hostId)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .send({
+          individual: JSON.stringify({
+            first_name: "sheng",
+            last_name: "rong",
+            dob: {
+              month: 12,
+              day: 25,
+              year: 1987
             }
-          })})
-          .expect(200)
-          .end(function(err, res){
-            if(err){
-              return done(err);
-            }
-            res.body.firstname.should.equal('sheng',"error updating firstname from host to user");
-            res.body.lastname.should.equal('rong',"error updating lastname from host to user");
-            new Date(res.body.birthday).should.which.is.a.Date();
-            done();
           })
+        })
+        .expect(200)
+        .end(function (err, res) {
+          if (err) {
+            return done(err);
+          }
+          res.body.firstname.should.equal('sheng', "error updating firstname from host to user");
+          res.body.lastname.should.equal('rong', "error updating lastname from host to user");
+          new Date(res.body.birthday).should.which.is.a.Date();
+          done();
+        })
     });
 
-    it('should get the updated managed account', function(done){
+    it('should get the updated managed account', function (done) {
       agent
         .get("/apply")
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
         .expect(200)
-        .end(function(err, res){
-          if(err){
+        .end(function (err, res) {
+          if (err) {
             return done(err);
           }
-          res.body.should.have.property('verification');
-          should('legal_entity.address.postal_code').be.equalOneOf(res.body.verification.fields_needed);
-          should('legal_entity.ssn_last_4').be.equalOneOf(res.body.verification.fields_needed);
-          should('legal_entity.address.city').be.equalOneOf(res.body.verification.fields_needed);
+          res.body.should.have.property('individual');
+          should('ssn_last_4').be.equalOneOf(res.body.individual.requirements.eventually_due);
           done();
         });
     });
-  });
-    //need manual test for facebook and google login
 
+    it('host should be able to open account link', function (done) {
+      agent
+        .get("/host/setup")
+        .expect(302)
+        .end(done);
+    });
+
+  });
 });

@@ -169,7 +169,7 @@ module.exports = require('waterlock').waterlocked({
   },
 
   refreshUserState: function(req, res){
-      return res.ok(req.session.user)
+    return res.ok(req.session.user)
   },
 
   checkReferralProgram : function(req, cb){
@@ -213,7 +213,6 @@ module.exports = require('waterlock').waterlocked({
     if(county && (!req.cookies['county'] || req.cookies['county'] === 'undefined')){
       res.cookie('county',county);
     }
-
     this.checkReferralProgram(req, function(err, me){
       if(err){
         return res.badRequest(err);

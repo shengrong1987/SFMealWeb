@@ -567,7 +567,7 @@
   "order-abort-complete" : "订单已完成或已取消,无法终止",
   "order-refund-fail" : "订单无须退款或已经全额退款",
   "order-not-qualify-shipping" : "订单金额未达到快递最低要求: $%s",
-  "order-cash-no-discount" : "现金支付无法使用优惠券或积分",
+  "order-duplicate-discount" : "优惠券和积分不能同时使用",
   "order-cash-miss-profile" : "现金支付请先填写名字和联系方式",
   "order-lack-of-party-requirement" : "Meal缺少团餐要求，无法订购团餐，请联系客服。",
   "order-amount-not-qualify-party" : "团餐订购金额不足$%s",
@@ -587,6 +587,7 @@
   "coupon-expire-error" : "折扣码已过期",
   "coupon-already-redeem-error" : "折扣码已经兑换过了",
   "coupon-unverified-email" : "使用折扣码需要先验证邮箱",
+  "coupon-minimum-not-reach" : "优惠券未满足最低金额要求",
   "adjust-with-coupon-error" : "无法自动调整使用折扣码/积分的订单，请联系客服 help@sfmeal.com.",
   "cancel-with-coupon-error" : "无法自动取消使用折扣码/积分的订单，请联系客服 help@sfmeal.com.",
   "review-no-available" : "没有可供评价的Meal",
@@ -1208,5 +1209,6 @@
   "switch-to-pickup" : "我要自取",
   "comment-option-1" : "请到了打电话(出来拿)",
   "comment-option-2" : "请到了按门铃/找前台(送上门):",
-  "comment-placeholder" : "公寓房间号码，楼上，楼下等信息..."
+  "comment-placeholder" : "公寓房间号码，楼上，楼下等信息...",
+  "order-combo-price-not-match" : "套餐价格不一致"
 }

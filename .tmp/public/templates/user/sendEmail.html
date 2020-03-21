@@ -1,0 +1,24 @@
+
+<div id="sendEmailView">
+  <div class="popup box middle signin" style="width: 350px;">
+    <h4>${__('enterEmail')}</h4>
+
+    <form class="text-center" data-toggle="validator" role="form">
+      <div class="form-group">
+        <label class="sr-only" for="emailInput">${__('email')}</label>
+        <input type="email" class="form-control" id="emailInput" placeholder="email" required data-error="bad format">
+        <div class="help-block with-errors text-red"></div>
+      </div>
+
+      <div class="form-group">
+        <button id="sendEmailBtn" type="button" class="btn btn-danger btn-lg round red popline">${__('sendResetEmail')}</button>
+      </div>
+      <div class="alert alert-success d-none"></div>
+      <div class="alert alert-danger d-none">${__('emailNotExistError')}</div>
+    </form>
+  </div>
+</div>
+
+<script src="/assets/vendors~admin~apply~badge~cart~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~5bf05e41.bundle.js"></script>
+<script src="/assets/vendors~admin~apply~badge~cart~checkout~chefProfile~createDish~createMeal~dayOfMeal~editDish~editMea~b88e54df.bundle.js"></script>
+<script src="/assets/zh.sendEmail.bundle.js"></script>

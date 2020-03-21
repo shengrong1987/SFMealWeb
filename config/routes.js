@@ -115,6 +115,8 @@ module.exports.routes = {
   '/order/week/:numberOfWeek' : 'OrderController.findOrdersOfWeek',
   '/order/:id/review' : 'ReviewController.orderReview',
   '/order/:id/newOrder' : 'OrderController.create',
+  '/order/:id/comment' : "OrderController.comment",
+  '/order/wechat/paid' : "OrderController.paidByWechat",
   '/review/popup/:id' : 'ReviewController.reviewPopup',
   '/job/:name/run' : 'JobController.run',
   '/job/:id/delete' : 'JobController.deleteJob',

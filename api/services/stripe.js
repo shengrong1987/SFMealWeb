@@ -3,6 +3,7 @@
  */
 var stripe = require('stripe')(sails.config.StripeKeys.secretKey);
 var async = require('async');
+const got = require('got');
 
 const SERVICE_FEE = 0;
 const SYSTEM_DELIVERY_FEE = 0;
@@ -41,9 +42,7 @@ module.exports = {
   },
 
   uploadFile : function(params, id, cb){
-    stripe.fileUploads.create(params, {
-      stripe_account : id
-    }, cb);
+    stripe.files.create(params, cb);
   },
 
   getAccount : function(id, cb){
@@ -83,7 +82,7 @@ module.exports = {
   },
 
   getBalance : function(attr, cb){
-    stripe.balance.retrieve({stripe_account : attr.id},function(err, balance){
+    stripe.balance.retrieve({stripeAccount : attr.id},function(err, balance){
       if(err){
         return cb(err);
       }
@@ -92,12 +91,12 @@ module.exports = {
   },
 
   listTransactions : function(attr, cb){
-    stripe.balance.listTransactions({},{stripe_account : attr.id},function(err, transactions){
+    stripe.balance.listTransactions({},{stripeAccount : attr.id},function(err, transactions){
       if(err){
         return cb(err);
       }
       async.each(transactions.data, function(tran, next){
-        stripe.charges.retrieve(tran.source,{stripe_account : attr.id}, function(err, charge){
+        stripe.charges.retrieve(tran.source,{stripeAccount : attr.id}, function(err, charge){
           if(err){
             return next(err);
           }
@@ -128,6 +127,10 @@ module.exports = {
     if(!id){
       return cb(null, null);
     }
+    console.log("application_fee: " + id);
+    if(typeof id === "number"){
+      return cb(null, id);
+    }
     stripe.applicationFees.retrieve(id, function(err, applicationFee) {
       if(err){
         return cb(err);
@@ -139,7 +142,7 @@ module.exports = {
   getAccountLinks: function(accountId, cb){
     stripe.accountLinks.create({
       account: accountId,
-      failure_url: 'https://localhost:1337/host/apply',
+      failure_url: 'https://localhost:1337/host/setupFail',
       success_url: 'https://localhost:1337/host/apply',
       type: 'custom_account_verification',
       collect: 'eventually_due'
@@ -151,61 +154,40 @@ module.exports = {
     });
   },
 
-  chargeCash : function(attr, cb){
-    var _this = this;
-    if(attr.metadata.application_fee_amount === 0){
-      return cb(null, { id : 'cash', status : 'succeeded', amount : attr.metadata.total, application_fee_amount : attr.metadata.application_fee_amount}, { amount : 0, application_fee_amount : 0});
-    }
+  chargeOutOfStripe : function(attr, cb){
+    let _this = this;
     if(attr.metadata.application_fee_amount < 50){
       attr.metadata.application_fee_amount = 50;
     }
-    var charge, transfer = null;
-    async.auto({
-      //----------depreciate----------
-      chargeApplicationFee : function(next){
-        stripe.charges.create({
-          amount : attr.metadata.application_fee_amount,
-          currency : 'usd',
-          source : attr.destination,
-          metadata : attr.metadata
-        }, function(err, c){
-          if(err){
-            return next(err);
-          }
-          charge = c;
-          next();
-        });
-      },
-      transferDiscount : function(next){
-        if(attr.metadata.discount === 0){
-          return next();
-        }
-        stripe.transfers.create(
-          {
-            amount: attr.metadata.discount,
-            currency: 'usd',
-            destination: attr.destination,
-            metadata : attr.metadata
-          }, function(err, t){
-            if(err){
-              return next(err);
-            }
-            transfer = t;
-            next();
-          }
-        );
-      }
-    }, function(err){
-      if(err){
-        return cb(err);
-      }
-      _this.handlePoint(attr.metadata.total, attr.metadata.userId, function(err, user){
+    let transfer = {};
+    let totalToChef = attr.metadata.total + attr.metadata.discount - attr.metadata.application_fee_amount;
+    console.log("total: " + attr.metadata.total + " application_fee_amount: " + attr.metadata.application_fee_amount);
+    if(totalToChef <= 0){
+      return cb({ responseText: "order total amount is less than zero" });
+    }
+    stripe.transfers.create({
+        amount: totalToChef,
+        currency: 'usd',
+        destination: attr.destination,
+        metadata : attr.metadata
+      }, function(err, transfer){
         if(err){
           return cb(err);
         }
-        cb(null, { id : charge.id, status : charge.status, amount : attr.metadata.total, application_fee_amount : charge.amount}, transfer);
-      });
-    });
+        _this.handlePoint(attr.metadata.total, attr.metadata.userId, function(err, user){
+          if(err){
+            return cb(err);
+          }
+          cb(null, {
+              id : "cash",
+              status : "succeeded",
+              amount : attr.metadata.total,
+              application_fee_amount : attr.metadata.application_fee_amount
+            },
+            transfer)
+        });
+      }
+    );
   },
 
   chargeCreditCard : function(attr, final){
@@ -239,13 +221,13 @@ module.exports = {
         if(attr.metadata.discount === 0){
           return cb();
         }
-        var charge = results.createCharge;
+        let charge = results.createCharge;
         async.auto({
           calculateChargedFee : function(next){
             if(!charge){
               return next(null, 0);
             }
-            _this.retrieveApplicationFee(charge.application_fee_amount, function(err, fee) {
+            _this.retrieveApplicationFee(charge.application_fee, function(err, fee) {
               if (err) {
                 return next(err);
               }
@@ -253,7 +235,7 @@ module.exports = {
             });
           },
           calculateFee : ['calculateChargedFee', function(next, results){
-            var chargedFee = results.calculateChargedFee;
+            let chargedFee = results.calculateChargedFee;
             attr.metadata.application_fee_amount = attr.metadata.application_fee_amount - chargedFee;
             next();
           }]
@@ -261,7 +243,7 @@ module.exports = {
           if(err){
             return cb(err)
           }
-          var total = attr.metadata.discount - attr.metadata.application_fee_amount;
+          let total = attr.metadata.discount - attr.metadata.application_fee_amount;
           stripe.transfers.create(
             {
               amount: total,
@@ -294,68 +276,37 @@ module.exports = {
     });
   },
 
-  chargeOthers : function(attr, cb){
-    var _this = this;
-    if(attr.amount === 0){
-      return cb(null, null);
-    }
-    stripe.charges.create({
-      amount: attr.amount,
-      currency: "usd",
-      receipt_email: attr.email,
-      source: attr.source,
-      transfer_data: {
-        destination : attr.destination
-      },
-      metadata : attr.metadata,
-      application_fee_amount : attr.metadata.application_fee_amount
-    }, function (err, charge) {
-      if(err){
-        return cb(err);
+  wechatMiniAppPrepay: function(req, user, orders, cb){
+    let total = this.getTotal(orders);
+    let ids = "";
+    orders.forEach(function(order){
+      if(ids){
+        ids += "+";
       }
-
-      if(attr.metadata.discount !== 0){
-        attr.metadata.discount = parseInt(attr.metadata.discount);
-        _this.retrieveApplicationFee(charge.application_fee_amount, function(err, fee){
-          if(err){
-            return cb(err);
-          }
-          var leftFee = attr.metadata.application_fee_amount - fee.amount;
-          var total = attr.metadata.discount - leftFee;
-          attr.metadata.application_fee_amount = leftFee;
-          stripe.transfers.create(
-            {
-              amount: total,
-              currency: 'usd',
-              destination: attr.destination,
-              metadata : attr.metadata
-            }, function(err, transfer){
-              if(err){
-                return cb(err);
-              }
-              if(!charge || charge.amount===0 || attr.metadata.userId){
-                return cb(null, charge, transfer);
-              }
-              _this.handlePoint(charge.amount, attr.metadata.userId, function(err, user){
-                if(err){
-                  return cb(err);
-                }
-                cb(null, charge, transfer);
-              });
-            }
-          );
-        });
-      }else{
-        if(!charge || charge.amount===0 || attr.metadata.userId){
-          return cb(null, charge);
-        }
-        _this.handlePoint(charge.amount, attr.metadata.userId, function(err, user){
-          if(err){
-            return cb(err);
-          }
-          cb(null, charge);
-        });
+      ids += order.id;
+    });
+    let data = {
+      amount: total,
+      currency: "USD",
+      reference: orders[0].id,
+      appId: process.env.WECHAT_APPID_MINIAPP,
+      ipn_url: "https://sfmeal.com/order/wechat/paid",
+      client_ip: "99.34.227.217",
+      open_id: user.openid,
+      note: ids
+    };
+    got.post("https://api.nihaopay.com/v1.2/transactions/micropay",{
+      json: data,
+      responseType: 'json',
+      headers: {
+        'Authorization' : 'Bearer ' + process.env.NIHAOPAY_TOKEN
       }
+    }).then(function(res){
+      console.log(res.data);
+      cb(null, res.data)
+    }).catch(function(err){
+      console.log(err);
+      cb(err)
     });
   },
 
@@ -439,7 +390,7 @@ module.exports = {
     var tip = (attr.tip || 0) * 100;
 
     //calculate transaction fee
-    if(attr.paymentMethod === "cash"){
+    if(attr.paymentMethod === "cash" || attr.paymentMethod === "wechatpay" || attr.paymentMethod === "alipay"){
       var transaction_fee = 0;
     }else{
       transaction_fee = ONLINE_TRANSACTION_FEE;
@@ -465,14 +416,12 @@ module.exports = {
   },
 
   charge : function(attr, cb){
-    if(attr.paymentMethod === "cash" || attr.paymentMethod === "venmo" || attr.paymentMethod === "paypal"){
-      this.calculateTotal(attr);
-      this.chargeCash(attr, cb);
-    }else if(attr.paymentMethod === "online"){
+    if(attr.paymentMethod === "online"){
       this.calculateTotal(attr);
       this.chargeCreditCard(attr, cb);
     }else{
-      this.chargeOthers(attr, cb);
+      this.calculateTotal(attr);
+      this.chargeOutOfStripe(attr, cb);
     }
   },
 
@@ -528,7 +477,10 @@ module.exports = {
       return cb();
     }
     var _this = this;
-    var chargeIds = Object.keys(charges);
+    var chargeIds = [];
+    if(charges){
+      chargeIds = Object.keys(charges);
+    }
     var amount = metadata.amount || -1;
     async.each(chargeIds, function(chargeId, next){
       var thisAmount = charges[chargeId];
@@ -562,6 +514,7 @@ module.exports = {
       if(err){
         return cb(err);
       }
+      console.log("refund amount: " + amount + " transfers: " + transfers)
       if((amount === -1 || amount > 0) && transfers){
         //if refund amount still left or need fully refund, then check transfer.
         metadata.amount = amount;
@@ -691,12 +644,16 @@ module.exports = {
   },
 
   updateCard : function(attr, cb){
-    stripe.customers.updateCard(attr.id, attr.cardId, attr.params, function(err, card){
-      if(err){
-        return cb(err);
-      }
-      cb(null, card);
-    });
+    stripe.customers.updateSource(
+      attr.id,
+      attr.cardId,
+      attr.params,
+      function(err, card){
+        if(err){
+          return cb(err);
+        }
+        cb(null, card);
+      });
   },
 
   updateDefaultSource : function(attr, cb){
@@ -759,7 +716,7 @@ module.exports = {
   },
 
   deleteCard : function(attr, cb){
-    stripe.customers.deleteCard(attr.id, attr.cardId, function(err,confirmation){
+    stripe.customers.deleteSource(attr.id, attr.cardId, function(err,confirmation){
       if(err){
         return cb(err);
       }

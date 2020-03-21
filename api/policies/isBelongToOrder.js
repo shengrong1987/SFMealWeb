@@ -18,7 +18,7 @@ module.exports = function(req, res, next) {
     orderIds = [req.body.order];
   }
   if(orderIds){
-    require('async').eachSeries(function(orderId, cb){
+    require('async').eachSeries(orderIds, function(orderId, cb){
       Order.findOne(orderId).populate("customer").populate("host").exec(function(err,order){
         if(err){
           return cb(err);
