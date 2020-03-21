@@ -159,7 +159,7 @@ module.exports = {
             if(!order.charges){
               return next1();
             }
-            var charges = Object.keys(order.charges);
+            let charges = Object.keys(order.charges);
             async.each(charges, function (chargeId, next2) {
               stripe.retrieveCharge(chargeId, function(err, charge){
                 if(err){
@@ -173,7 +173,7 @@ module.exports = {
               });
             }, function (err) {
               if(err){
-                return next2(err);
+                return next1(err);
               }
               next1();
             });
@@ -196,8 +196,8 @@ module.exports = {
                 if(!badges.length){
                   return;
                 }
-                var badge = badges[0];
-                var userBadgeInfo = user.badgeInfo[key];
+                let badge = badges[0];
+                let userBadgeInfo = user.badgeInfo[key];
                 badge.isAchieved = userBadgeInfo.isAchieved;
                 badge.achievedDate = userBadgeInfo.achievedDate;
                 badge.customImage = userBadgeInfo.customImage;

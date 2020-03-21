@@ -1478,264 +1478,6 @@ var DayOfMealView = Backbone.View.extend({
     helperMethod.createCookie("userZipcode", zipcode);
     location.href = '/meal/search?zip=' + zipcode;
   }
-})
-
-var MealSelectionView = Backbone.View.extend({
-  events : {
-    "click .calculateBtn" : "calculateDelivery",
-    "change .variation a" : "changePreference",
-    "click #applyCouponBtn" : "applyCouponCode",
-    "click #applyPointsBtn" : "addPointsToOrder",
-    "switchChange.bootstrapSwitch #cateringModeBtn" : "toggleCatering"
-  },
-  initialize : function(){
-    this.alertView = this.$el.find("#orderAlertView");
-    this.alertView.removeClass("d-none");
-    this.alertView.hide();
-    utility.initGoogleMapService();
-  },
-  initDelivery : function(){
-    var $this = this;
-    if(!this.$el.find(".deliveryOption").length){
-      return;
-    }
-    var map;
-    this.$el.find(".deliveryOption").each(function () {
-      var location = $(this).data("location");
-      var color = $(this).data("color");
-      var area = $(this).data("area");
-      var time = $(this).data("time");
-      var range = $(this).data("range");
-      utility.geocoding(location, function(err, center){
-        if(err){
-          helperMethod.makeAToast(err, 'error');
-          return;
-        }
-        utility.initMap($this.$el.find("#googlemap")[0], center, function(err, map){
-          if(err){
-            helperMethod.makeAToast(err, 'error');
-            return;
-          }
-          var colors = { red : '#ff4001', blue : '#3fa9f5', green : '#22b571', pink : '#ff7bac', yellow : '#ffd65a', orange : '#ff931e', 'dark-blue' : '#3f80f5'};
-          var deliveryCircle = new google.maps.Circle({
-            strokeColor: "#000000",
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: colors[color],
-            fillOpacity: 0.35,
-            map: map,
-            center: center,
-            radius: range * 1600
-          });
-          var image = {
-            url : '/images/car-icon-' + color + '.png',
-            size : new google.maps.Size(36, 36),
-            origin: new google.maps.Point(0, 0),
-            anchor: new google.maps.Point(18, 18)
-          }
-          var deliveryMarker = new google.maps.Marker({
-            position: center,
-            map: map,
-            icon: image
-          });
-          var deliveryInfo = new google.maps.InfoWindow({
-            content : "<h4><small>" + __("deliveryRange") + ":" + area + "<br/>" + __("deliveryTime") + ":" + time + "</small></h4>"
-          })
-          deliveryMarker.addListener('click', function(){
-            deliveryInfo.open(map, deliveryMarker);
-          })
-        });
-      })
-    });
-  },
-  initPickups : function(){
-    var mapCenter = '';
-    var $this = this;
-    if(this.$el.find(".pickupOption").length === 0){
-      mapCenter = "25 Washington St, Daly City";
-    }else{
-      mapCenter = $(this.$el.find(".pickupOption")[0]).data('location');
-    }
-    utility.geocoding(mapCenter, function(err, center){
-      if(err){
-        helperMethod.makeAToast(err);
-        return;
-      }
-      $this.$el.find(".pickupOption").each(function () {
-        var location = $(this).data("location");
-        var title = '<div><h4><small>' + __("pickup") + ':' + location + '</small></h4></div>';
-        var infowindow = new google.maps.InfoWindow({
-          content: title
-        });
-        utility.initMap($this.$el.find("#googlemap")[0], center, function(err, map) {
-          if (err) {
-            helperMethod.makeAToast(err, 'error');
-            return;
-          }
-          utility.geocoding(location, function(err, center){
-            if(err){
-              helperMethod.makeAToast(err);
-              return;
-            }
-            var marker = new google.maps.Marker({
-              position: center,
-              title: title
-            });
-            marker.addListener('click', function () {
-              infowindow.open(map, marker);
-            })
-            marker.setMap(map);
-          });
-        });
-      })
-    })
-  },
-  changePreference : function(e){
-    var target = $(e.currentTarget);
-    var mySubmenu = target.closest('.dropdown-submenu[data-layer=0]');
-    var orderIndex = mySubmenu.parent().children().index(mySubmenu);
-    var preference = '';
-    var extra = 0;
-    var allVariations = target.closest('.variation').parent().children();
-    allVariations.each(function(){
-      var value = $(this).find("a").attr("value");
-      var itemExtra = $(this).find("a").data("extra") || 0;
-      if(preference && value){ preference += ",";}
-      if(value){ preference += value;}
-      extra += itemExtra;
-    });
-    var option = {
-      property : preference,
-      extra : extra
-    };
-    var dishId = $(e.currentTarget).data("dish");
-    this.saveOption(orderIndex, option, dishId);
-    localOrderObj.updateMenuView(dishId);
-    localOrderObj.refreshCheckoutMenu();
-  },
-  saveOption : function(index, option, dishId){
-    var localDish = helperMethod.readCookie(dishId);
-    if(localDish){
-      var localDishObj = JSON.parse(localDish);
-      var options = localDishObj.preference;
-    }else{
-      options = [];
-    }
-    options[index] = option;
-    localOrderObj.localOrders[dishId] = localDishObj;
-    helperMethod.createCookie(dishId, JSON.stringify(localDishObj), 1);
-  },
-  calculateDelivery : function(e){
-    var $this = this;
-    var target = $(e.currentTarget);
-    this.$el.find("#addressAlertView").removeClass('hide');
-    this.$el.find("#addressAlertView").hide();
-    var originAddress = target.data("location");
-    var uLat = $this.$el.data("user-lat");
-    var uLong = $this.$el.data("user-long");
-    if(!uLat || uLat === 'undefined' || !uLong || uLong === 'undefined'){
-      return;
-    }
-    var method = target.data("method");
-    var range = $this.$el.data("range");
-    var readyIn = $this.$el.data("meal-prepareTime");
-    var destination = {lat : uLat, lng: uLong};
-    $this.googlemapService.route({
-      origin : destination,
-      destination : originAddress,
-      travelMode: google.maps.TravelMode.DRIVING,
-      drivingOptions: {
-        departureTime: new Date(Date.now() + readyIn * 60 * 1000),  // for the time N milliseconds from now.
-        trafficModel: "optimistic"
-      }
-    }, function(response, status){
-      if (status === google.maps.DirectionsStatus.OK) {
-        $this.googlemapDisplay.setDirections(response);
-        var travelTime = response.routes[0].legs[0].duration.text;
-        var distance = response.routes[0].legs[0].distance.value * 0.0006;
-        $(e.currentTarget).find("+ label").text(travelTime + " " + response.routes[0].legs[0].distance.text);
-        if(method && method === 'pickup'){
-          return;
-        }
-        if(distance > range){
-          $this.$el.find("#addressAlertView").show();
-        }
-      } else {
-        window.alert('Directions request failed due to ' + status);
-      }
-    })
-  },
-  toggleCatering : function(e){
-    e.preventDefault();
-    var button = $(e.currentTarget);
-    var isCatering = button.prop("checked");
-    var mealId = button.data("meal");
-    setTimeout(function(){
-      if(isCatering){
-        location.href = "/meal/" + mealId + "?party=true";
-      }else{
-        location.href = "/meal/" + mealId;
-      }
-    },500);
-  },
-  applyCouponCode : function(e){
-    e.preventDefault();
-    this.alertView.hide();
-    var code = this.$el.find(".coupon-code").val();
-    if(!code){
-      this.alertView.show();
-      this.alertView.html(__('couponCodeEmpty'));
-      return;
-    }
-    var mealId = this.$el.data("meal");
-    this.model.set("id", mealId);
-    this.model.set("code", code);
-    this.model.type = "coupon";
-    var $this = this;
-    this.model.save({},{
-    success : function( model, res){
-      var discount = res.amount;
-      var code = res.code;
-      localOrderObj.applyCoupon(true, discount, code);
-    },
-    error : function(model, err){
-      if(err['responseJSON'].code === -48){
-        helperMethod.jumpTo("emailVerificationView");
-      }
-      $this.alertView.show();
-      $this.alertView.html(helperMethod.getMsgFromError(err));
-    }});
-  },
-  addPointsToOrder : function(e){
-    e.preventDefault();
-    this.alertView.hide();
-    var subtotal = this.$el.find(".subtotal").data("value");
-    var tax = this.$el.find(".tax").data("value");
-    var subtotalAfterTax = parseFloat(subtotal + tax);
-    if(subtotalAfterTax === 0){
-      this.alertView.show();
-      this.alertView.html(__('orderEmptyError'));
-      return;
-    }
-    var point = parseFloat(this.$el.find(".points").val());
-    if(point===-1){
-      this.alertView.show();
-      this.alertView.html(__('notAuthorize'));
-      return;
-    }
-    var pointRedeem;
-    if(point >= subtotalAfterTax * 10){
-      pointRedeem = Math.ceil(subtotalAfterTax * 10);
-    }else{
-      pointRedeem = point;
-    }
-    if(pointRedeem < 10){
-      this.alertView.show();
-      this.alertView.html(__('pointsTooLittle'));
-      return;
-    }
-    localOrderObj.applyPoints(true, pointRedeem);
-  }
 });
 
 var MealView = Backbone.View.extend({
@@ -3381,28 +3123,50 @@ var DishPreferenceView = Backbone.View.extend({
   },
   initialize : function(){
     localOrderObj.loadPreference();
+    let amount = parseInt(this.$el.find(".amount").text());
+    if(amount>1){
+      let dishId = this.$el.data("id");
+      let preferences = localOrderObj.localOrders[dishId].preference;
+      let lastPref = preferences[amount-2];
+      let btnsets = this.$el.find("[data-preftype]");
+      btnsets.each(function(){
+        let hasPreference = false;
+        $(this).find("button").removeClass("active");
+        $(this).find("button").each(function(){
+          if(lastPref.property.indexOf($(this).data("property"))!==-1){
+            $(this).addClass("active");
+            hasPreference = true;
+          }
+        });
+        if(!hasPreference){
+          $(this).find("button").first().addClass("active");
+        }
+      })
+    }
   },
   updatePreferences : function(e){
-    var dishId = this.$el.data("id");
-    var prefList = localOrderObj.localOrders[dishId].preference;
-    var btnsets = this.$el.find("[data-preftype]");
-    var amount = parseInt(this.$el.find(".amount").text());
-    var properties = [], extra = 0;
+    let dishId = this.$el.data("id");
+    let preferences = localOrderObj.localOrders[dishId].preference;
+    let btnsets = this.$el.find("[data-preftype]");
+    let amount = parseInt(this.$el.find(".amount").text());
+    let prefs = [], extra = 0;
     btnsets.each(function(){
-      var btnSet = $(this);
-      var property = btnSet.find("button.active").data("property");
-      var e = btnSet.find("button.active").data("extra");
-      var index = btnSet.find("button.active").data("index");
-      var prefType = btnSet.data('preftype');
+      let btnSet = $(this);
+      let property = btnSet.find("button.active").data("property");
+      let index = btnSet.find("button.active").data("index");
       if(index){
-        properties.push({ preftype : prefType, property : property});
-        extra += e;
+        prefs.push(property);
+        extra += btnSet.find("button.active").data("extra");
       }
-    })
-    prefList[amount-1] = { property : properties, extra : extra };
+    });
+    preferences[amount-1] = {
+      property: prefs,
+      extra : extra
+    };
     localOrderObj.refreshPreference(dishId);
     localOrderObj.updateMenuView(dishId);
     localOrderObj.updateOrderPreview();
+    localOrderObj.refreshCheckoutMenu();
     helperMethod.createCookie(dishId,JSON.stringify(localOrderObj.localOrders[dishId]),1);
   },
   savePreference : function(e){
@@ -3850,7 +3614,7 @@ var MealConfirmView = Backbone.View.extend({
               let subtotal = parseFloat(_this.$el.find(".subtotal").data("value"));
               let minimalOrder = parseFloat(chooseOption.parent().data("minimal"));
               if(subtotal < minimalOrder){
-                let minimalRequirementTip = minimalOrder == 25 ? __('order-single-minimal-not-reach-25') : __('order-single-minimal-not-reach-65');
+                let minimalRequirementTip = minimalOrder == 35 ? __('order-single-minimal-not-reach-25') : __('order-single-minimal-not-reach-65');
                 BootstrapDialog.show({
                   title: __('deliveryTimeConfirmationTitle'),
                   message : minimalRequirementTip,
@@ -4123,23 +3887,16 @@ var OrderView = Backbone.View.extend({
     localOrderObj.refreshCheckoutMenu();
   },
   enterDishPreference : function(target){
-    var preference = $(target).data("preference");
-    var container = $("#preferenceTable").find("tbody");
+    let preference = $(target).data("preference");
+    let container = $("#preferenceTable").find("tbody");
     container.empty();
     if(Array.isArray(preference) && preference.length){
-      preference.forEach(function(pref, index){
-        if(pref.property && Array.isArray(pref.property)){
-          var props = "";
-          pref.property.forEach(function(prop, index){
-            if(props){
-              props += ",";
-            }
-            props += prop.property;
-          });
-          var element = "<tr><th>$index</th><td>$extra</td><td>$preference</td></tr>";
-          element = element.replace("$index", index+1).replace("$extra", "$" + pref.extra.toFixed(2)).replace("$preference",props);
-          container.append(element);
-        }
+      preference.forEach(function(prefObj,index){
+        let props = prefObj.property.join(",");
+        let extra = prefObj.extra;
+        let element = "<tr><th>$index</th><td>$extra</td><td>$preference</td></tr>";
+        element = element.replace("$index", index+1).replace("$extra", "$" + extra).replace("$preference",props);
+        container.append(element);
       });
     }
   },
@@ -4607,9 +4364,7 @@ var OrderView = Backbone.View.extend({
       success: function (model, result) {
         $('body').removeClass("loading");
         button.trigger("reset");
-        var orderIds = result.orders.map(function(order){
-          return order.id;
-        }).join("+");
+        var orderIds = result.id;
         if(paymentInfo.method === "alipay" || paymentInfo.method === "wechatpay"){
           var order = result[0];
           var source = order.source;
@@ -4758,5 +4513,5 @@ var BadgeView = Backbone.View.extend({
 });
 
 export { Auth, Payment, Host, User, Checklist, Meal, Dish, Bank, Review, Transaction, Order, Badge }
-export { LoginView, EmailVerificationView, RegisterView, UserBarView, ApplyView, PaymentView, NewUserRewardView, AddressView, CheckListView, HostSectionInMealView, DayOfMealView, MealSelectionView, MealView, DishView, BankView, UserProfileView, MyMealView, HostProfileView, HostPageView, ReviewView, TransactionView, DishPreferenceView, ContactInfoView, MapView,  MealConfirmView, ReceiptView, OrderView, BadgeView, PintuanView, CartView, DeliveryLocationMapView, PickupOption, DeliveryMapView }
+export { LoginView, EmailVerificationView, RegisterView, UserBarView, ApplyView, PaymentView, NewUserRewardView, AddressView, CheckListView, HostSectionInMealView, DayOfMealView, MealView, DishView, BankView, UserProfileView, MyMealView, HostProfileView, HostPageView, ReviewView, TransactionView, DishPreferenceView, ContactInfoView, MapView,  MealConfirmView, ReceiptView, OrderView, BadgeView, PintuanView, CartView, DeliveryLocationMapView, PickupOption, DeliveryMapView }
 

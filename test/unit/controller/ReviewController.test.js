@@ -164,7 +164,7 @@ describe('ReviewController', function() {
     it('should order the meal', function (done) {
       var dishObj = {};
       dishObj[dishId1] = { number : 1, preference : [{ property : '', extra : 0}], price : price1};
-      dishObj[dishId2] = { number : 0, preference : [{ property : '', extra : 0}], price : price2};
+      dishObj[dishId2] = { number : 0, preference : [], price : price2};
       dishObj[dishId3] = { number : 1, preference : [{ property : '', extra : 0}], price : price3};
       dishObj[dishId4] = { number : 1, preference : [{ property : '', extra : 0}], price : price4};
       agent
@@ -184,10 +184,10 @@ describe('ReviewController', function() {
           if(err){
             return done(err);
           }
-          if(res.body.orders[0].customer !== guestId){
+          if(res.body.customer !== guestId){
             return done(Error("error making order"));
           }
-          orderId = res.body.orders[0].id;
+          orderId = res.body.id;
           done();
         })
     });

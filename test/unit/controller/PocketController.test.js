@@ -48,16 +48,16 @@ describe('PocketController', function() {
           var compensations = trans.filter(function(tran){
             return tran.type === "type-compensation";
           });
-          compensations.should.have.length(4);
+          compensations.should.have.length(6);
           var incomes = trans.filter(function(tran){
             return tran.type === "type-payment";
           })
-          incomes.should.have.length(13);
+          incomes.should.have.length(10);
           var fees = trans.filter(function(tran){
             return tran.type === "type-fee";
           });
-          fees.should.have.length(3);
-          res.body.pocket.transactions.should.have.length(20, 'transactions number not match');
+          fees.should.have.length(0);
+          res.body.pocket.transactions.should.have.length(16, 'transactions number not match');
           done()
         })
     })
@@ -89,7 +89,7 @@ describe('PocketController', function() {
             return done(err);
           }
           should.exist(res.body.pocket.transactions);
-          res.body.pocket.transactions.should.have.length(20, 'all transactions number not match');
+          res.body.pocket.transactions.should.have.length(16, 'all transactions number not match');
           done()
         })
     })
@@ -113,7 +113,7 @@ describe('PocketController', function() {
             return done(err);
           }
           should.exist(res.body.pocket.transactions);
-          res.body.pocket.transactions.should.have.length(16, 'user transactions number not match');
+          res.body.pocket.transactions.should.have.length(13, 'user transactions number not match');
           done()
         })
     })

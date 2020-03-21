@@ -664,8 +664,8 @@ let helperMethod = {
         defer : true,
         success : function(){
           $('body').removeClass("loading");
-          // Stripe.setPublishableKey('pk_live_AUWn3rb2SLc92lXsocPCDUcw');
-          Stripe.setPublishableKey('pk_test_ztZDHzxIInBmBRrkuEKBee8G');
+          Stripe.setPublishableKey('pk_live_AUWn3rb2SLc92lXsocPCDUcw');
+          // Stripe.setPublishableKey('pk_test_ztZDHzxIInBmBRrkuEKBee8G');
           cb();
         },error : function(err){
           $('body').removeClass("loading");
@@ -982,12 +982,10 @@ let localOrderObj = {
           var optionBtns = preferenceView.find("[data-prefType]");
           optionBtns.each(function(){
             var activeBtn = $(this).find("button.active");
-            var prefType = $(this).data("preftype");
             var index = activeBtn.data("index");
             var p = activeBtn.data("property");
             var e = parseFloat(activeBtn.data("extra"));
-            var t = prefType;
-            properties.push({ property : p, preftype : t});
+            properties.push(p);
             extra += e;
           })
           prefObj.property = properties;

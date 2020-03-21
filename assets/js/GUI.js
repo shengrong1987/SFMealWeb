@@ -304,6 +304,7 @@ function updateOrderWindow(fromCache, isTrigger){
       localOrders[dishId] = {
         number : parseInt($(this).find(".amount").data("value")),
         preference : $(this).data("preference"),
+        extra : $(this).data("extra"),
         price : $(this).find(".price").attr("value")
       };
     }
@@ -432,7 +433,6 @@ function loadPoints(fromCache){
 
 //order food
 function orderFood(id,number,initial){
-
   var dishItem = $("#meal-detail-container").find(".dish[data-id='" + id + "']");
   if(!!initial){
     if(number > 0){
@@ -447,7 +447,7 @@ function orderFood(id,number,initial){
   alertView.hide();
   var item = $order.find(".item[data-id=" + id + "]");
   var price = parseInt(item.find(".price").attr("value"));
-  localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : [{ property : '', extra : 0}], price : price};
+  localOrders[id] = localOrders[id] ? localOrders[id] : { number : 0, preference : [], price : price, extra: 0};
   localOrders[id].number += number;
   var preferenceBtn = $('[data-submenu][data-dish="' + id + '"]');
   preferenceBtn.data('value', jQuery.i18n.prop('the') + localOrders[id].number + jQuery.i18n.prop('fen'));
@@ -475,7 +475,7 @@ function orderFood(id,number,initial){
     item.data("left-amount",left);
     var preferences = localOrders[id].preference;
     if(!preferences.length){
-      preferences.push({ extra : 0, property : ""});
+      preferences.push([]);
     }else{
       preferences.push(preferences[0]);
     }

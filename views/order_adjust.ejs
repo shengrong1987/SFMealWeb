@@ -17,7 +17,8 @@
         </tr>
         </thead>
         <tbody>
-        <% Object.keys(orderList).forEach(function(orderedDish) {
+        <%
+          Object.keys(orderList).forEach(function(orderedDish) {
             var dish = dishes.filter(function(d){
               return d.id === orderedDish;
             })[0];
@@ -26,28 +27,20 @@
             }
             var dishList = orderList[orderedDish];
             var number = dishList.number || 0;
-            var preference = dishList.preference || null;
+            var preference = dishList.preference || [];
             var preferenceTitle = "";
             var extra = 0;
-            if(preference && preference.length){
-              preference.forEach(function(pref){
-                var prefText = "";
-                if(pref.property && pref.property.length){
-                  pref.property.forEach(function(prop){
-                    if(prefText){
-                      prefText += ",";
-                    }
-                    prefText += prop.property;
-                  })
-                }
-                if(prefText){
-                  preferenceTitle += "(" + prefText + ")";
-                  extra += parseInt(pref.extra);
+            if(preference && Array.isArray(preference)){
+              preference.forEach(function(prefObject){
+                let prefs = prefObject.property;
+                extra += parseInt(prefObject.extra);
+                if(prefs && Array.isArray(prefs)){
+                  preferenceTitle += "(" + prefs.join(",") + ")";
                 }
               });
-            };
+            }
         %>
-          <tr class="item <%= number ? 'table-success' : ''%>" data-id=<%= dish.id%> data-left-amount=<%= dishList.leftQty %> data-preference="<%= JSON.stringify(preference)%>">
+          <tr class="item <%= number ? 'table-success' : ''%>" data-id=<%= dish.id%> data-left-amount=<%= dishList.leftQty %> data-preference="<%= JSON.stringify(preference)%>" data-extra="<%= extra%>">
             <td colspan="3"><%= dish.title%><br/><span class="preference" data-preference="<%= preferenceTitle%>"><%= preferenceTitle%></span></td>
             <% if(!extra){%>
               <td class="price" data-extra="<%= extra%>" value="<%= dish.price.toFixed(2)%>">$<%= dish.price%></td>

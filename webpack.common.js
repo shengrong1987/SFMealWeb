@@ -123,7 +123,7 @@ module.exports = {
     new PurgecssPlugin({
       paths: glob.sync([`${path.resolve(__dirname,'views')}/*.ejs`,`${path.resolve(__dirname,'assets/templates')}/**/*.html`,`${path.resolve(__dirname,'assets/js')}/entry/*.js`,`${path.resolve(__dirname,'assets/js')}/react/**/*.js`], { nodir: true }),
       whitelist: ['modal-backdrop','running','btn-primary','btn-outline-primary','btn-sm'],
-      whitelistPatterns : [/^ekko-lightbox/,/^bootstrap-dialog/,/^popover/],
+      whitelistPatterns : [/^ekko-lightbox/,/^bootstrap-dialog/,/^popover/,/^tooltip/],
       whitelistPatternsChildren: [/type-primary$/, /tooltip$/]
     }),
     new HtmlWebpackPlugin({

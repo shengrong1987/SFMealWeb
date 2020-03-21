@@ -95,11 +95,17 @@
                       var dishOrdered = order.orders[key];
                       var price = parseFloat(dishOrdered.price);
                       var number = dishOrdered.number;
-                      var preference = dishOrdered.preference || [];
-                      if(!preference.length){preference = [preference];}
-                      var extra = preference.reduce(function(total,next){
-                        return total + parseInt(next.extra);
-                      },0);
+                      let preferenceLabel = "";
+                      let preference = dishOrdered.preference || [];
+                      let extra = 0;
+                      preference.forEach(function(prefObj){
+                        let prefs = prefObj.property;
+                        if(prefs && Array.isArray(prefs)){
+                          preferenceLabel += "(" + prefs.join(",") + ")";
+                        }
+                        extra += parseInt(prefObj.extra);
+                      })
+
                       if(order.status=="adjust") {
                         if(!order.adjusting_orders[key]){
                           return;
@@ -124,7 +130,7 @@
                         (+$<%= extra.toFixed(2)%>)<br/>
                         <% }%>
                         <% if(preference && preference.length && preference[0].property && preference[0].property.length){%>
-                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event, appObj.orderView.enterDishPreference)" data-preference="<%= JSON.stringify(preference)%>" data-model="dish" data-action="preference"><%= __('preference')%></a>
+                          <a data-target="#myModal" toggle="modal" href="javascript:void(0)" onclick="javascript:h.toggleModal(event, appObj.orderView.enterDishPreference)" data-extra="<%= extra%>" data-preference="<%= JSON.stringify(preference)%>" data-extra="<%= extra%>" data-model="dish" data-action="preference"><%= __('preference')%></a>
                         <% }%>
                       </td>
                       <td><% if(order.status=="adjust"){
@@ -138,7 +144,7 @@
                         <%= number%>
                         <%}}else{%>
                         <%= number%>
-                        <%}%><br/><span class="preference"><%= preference.property || ''%></span></td>
+                        <%}%><br/><span class="preference"><%= preferenceLabel %></span></td>
                       <%if(index==0){%>
                       <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal + order.tax/100 + order.delivery_fee - order.discount + order.serviceFee).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.serviceFee%> + <%= __('tax')%>: $<%= order.tax/100%> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                       <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
@@ -247,10 +253,16 @@
                       var price = parseFloat(dishOrdered.price);
                       var number = dishOrdered.number;
                       var preference = dishOrdered.preference || [];
-                      if(!preference.length){preference = [preference];}
-                      var extra = preference.reduce(function(total,next){
-                        return total + parseInt(next.extra);
-                      },0);
+                      let extra = 0;
+                      let preferenceLabel = "";
+                      preference.forEach(function(prefObj){
+                        let subPreferenceLabel = "";
+                        let prefs = prefObj.property;
+                        if(prefs && Array.isArray(prefs)){
+                          preferenceLabel += "(" + prefs.join(",") + ")";
+                        }
+                        extra += parseInt(prefObj.extra);
+                      });
                       if(order.status=="adjust") {
                         if(!order.adjusting_orders[key]){
                           return;
@@ -287,7 +299,7 @@
                         <%= number%>
                         <%}}else{%>
                         <%= number%>
-                        <%}%><br/><span class="preference"><%= preference.property || ""%></span></td>
+                        <%}%><br/><span class="preference"><%= preferenceLabel %></span></td>
                       <%if(index==0){%>
                       <td rowspan="<%= list.length%>" style="vertical-align: middle;"><b style="text-decoration: <%= order.status == "cancel" ? "line-through" : "none"%>">$<%= (order.subtotal + order.tax/100 + order.delivery_fee - order.discount + order.serviceFee).toFixed(2)%></b> (<%= __('service-fee')%>: $<%= order.serviceFee%> + <%= __('tax')%>: $<%= order.tax/100 %> + <%= __('delivery-fee')%>: $<%= order.delivery_fee.toFixed(2)%> - <%= __('discount-amount')%>: $<%= order.discount.toFixed(2)%>)</td>
                       <td rowspan="<%= list.length%>" style="vertical-align: middle;"><%= __(order.status)%></td>
