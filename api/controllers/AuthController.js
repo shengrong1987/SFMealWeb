@@ -309,36 +309,21 @@ module.exports = require('waterlock').waterlocked({
           }catch(e){
             return next(e);
           }
+          var userProfileUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$ACCESS_TOKEN&openid=$OPENID&lang=zh_CN";
+          userProfileUrl = userProfileUrl.replace('$ACCESS_TOKEN', accessToken);
+          userProfileUrl = userProfileUrl.replace('$OPENID',openId);
           request.get({
-            url : accessTokenUrl
-          }, function(err, response){
+            url : userProfileUrl
+          }, function(err, userRes){
             if(err){
               return next(err);
             }
             try{
-              var body = JSON.parse(response.body);
-              var accessToken = body.access_token;
-              var refreshToken = body.refresh_token;
-              var openId = body.openid;
+              userData = JSON.parse(userRes.body);
             }catch(e){
               return next(e);
             }
-            var userProfileUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$ACCESS_TOKEN&openid=$OPENID&lang=zh_CN";
-            userProfileUrl = userProfileUrl.replace('$ACCESS_TOKEN', accessToken);
-            userProfileUrl = userProfileUrl.replace('$OPENID',openId);
-            request.get({
-              url : userProfileUrl
-            }, function(err, userRes){
-              if(err){
-                return next(err);
-              }
-              try{
-                userData = JSON.parse(userRes.body);
-              }catch(e){
-                return next(e);
-              }
-              next()
-            });
+            next()
           });
         });
       },

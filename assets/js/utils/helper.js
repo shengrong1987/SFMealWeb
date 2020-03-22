@@ -400,7 +400,7 @@ let helperMethod = {
   wechatLogin : function(userInit, button){
     var gm_ua = navigator.userAgent.toLowerCase();
     if(gm_ua.match(/MicroMessenger/i) && gm_ua.match(/MicroMessenger/i)[0]==="micromessenger"){
-      let redirectUrl = VAR.BASE_URL + '/auth/login/weixin/web';
+      let redirectUrl = VAR.BASE_URL + '/auth/login/weixin/mobile';
       let scope = "snsapi_userinfo";
       let appId = VAR.WECHAT_APPID;
       let state = location.href;
@@ -412,7 +412,7 @@ let helperMethod = {
       location.href = wechatUrl;
     }else if(userInit){
       if(helperMethod.isPc()){
-        let redirectUrl = encodeURIComponent(VAR.BASE_URL + '/auth/login/weixin/mobile');
+        let redirectUrl = encodeURIComponent(VAR.BASE_URL + '/auth/login/weixin/web');
         let scope = "snsapi_login";
         let appId = VAR.WECHAT_APPID2;
         let state = encodeURIComponent(location.href);
@@ -423,7 +423,7 @@ let helperMethod = {
         wechatUrl = wechatUrl.replace('$STATE',state);
         location.href = wechatUrl;
       }else{
-        let redirectUrl = VAR.BASE_URL + '/auth/login/weixin/web';
+        let redirectUrl = VAR.BASE_URL + '/auth/login/weixin/mobile';
         let scope = "snsapi_userinfo";
         let appId = VAR.WECHAT_APPID;
         let state = location.href;
