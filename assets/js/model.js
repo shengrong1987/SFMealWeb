@@ -803,7 +803,7 @@ var PaymentView = Backbone.View.extend({
         }
       }, error: function (model, err) {
         $('body').removeClass("loading");
-        $this.alertView.html(helperMethod.getMsgFromError(err));
+        $this.alertView.html(err.code);
         $this.alertView.show();
       }
     });
@@ -3497,12 +3497,13 @@ var MealConfirmView = Backbone.View.extend({
     "click #switchToShippingBtn" : "switchToShipping",
     "click #switchToDeliveryBtn" : "switchToDelivery",
     "click #confirmDeliveryTimeBtn" : "confirmDeliveryTime",
-    "click #payment-cards [data-toggle='tab']" : "switchPaymentMethod"
+    "click #payment-cards [data-method]" : "switchPaymentMethod"
   },
   initialize : function(){
     this.initView();
     this.initMethodView();
     this.initDateFilter();
+    this.initPaymentMethod();
     utility.initGoogleMapService();
   },
   initView : function(){
@@ -3530,6 +3531,17 @@ var MealConfirmView = Backbone.View.extend({
     }
     console.info("日期是%s", dateDesc);
     console.groupEnd();
+  },
+  initPaymentMethod: function(){
+    var method = this.$el.find("#payment-cards [data-method].active").data("method");
+    if(method === "online" || method === "paypal" ){
+      this.$el.find(".transaction").text("$1.00");
+      this.$el.find(".transaction").data("value",1);
+    }else{
+      this.$el.find(".transaction").text("$0.00");
+      this.$el.find(".transaction").data("value",0);
+    }
+    localOrderObj.refreshCheckoutMenu();
   },
   initMethodView : function(){
     var hasDelivery = this.$el.find("#pickupInfoView").data("hasdelivery");
@@ -3561,12 +3573,12 @@ var MealConfirmView = Backbone.View.extend({
   switchPaymentMethod : function(e){
     var method = $(e.currentTarget).data("method");
     console.log("[Debug]changing payment method: " + method);
-    if(method === "cash" || method === "venmo" ){
-      this.$el.find(".transaction").text("$0.00");
-      this.$el.find(".transaction").data("value",0);
-    }else{
+    if(method === "online" || method === "paypal" ){
       this.$el.find(".transaction").text("$1.00");
       this.$el.find(".transaction").data("value",1);
+    }else{
+      this.$el.find(".transaction").text("$0.00");
+      this.$el.find(".transaction").data("value",0);
     }
     localOrderObj.refreshCheckoutMenu();
   },
@@ -3614,7 +3626,7 @@ var MealConfirmView = Backbone.View.extend({
               let subtotal = parseFloat(_this.$el.find(".subtotal").data("value"));
               let minimalOrder = parseFloat(chooseOption.parent().data("minimal"));
               if(subtotal < minimalOrder){
-                let minimalRequirementTip = minimalOrder == 35 ? __('order-single-minimal-not-reach-25') : __('order-single-minimal-not-reach-65');
+                let minimalRequirementTip = minimalOrder == 25 ? __('order-single-minimal-not-reach-25') : __('order-single-minimal-not-reach-65');
                 BootstrapDialog.show({
                   title: __('deliveryTimeConfirmationTitle'),
                   message : minimalRequirementTip,

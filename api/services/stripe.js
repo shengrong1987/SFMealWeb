@@ -390,10 +390,10 @@ module.exports = {
     var tip = (attr.tip || 0) * 100;
 
     //calculate transaction fee
-    if(attr.paymentMethod === "cash" || attr.paymentMethod === "wechatpay" || attr.paymentMethod === "alipay"){
-      var transaction_fee = 0;
+    if(attr.paymentMethod === "online" || attr.paymentMethod === "paypal"){
+      var transaction_fee = ONLINE_TRANSACTION_FEE;
     }else{
-      transaction_fee = ONLINE_TRANSACTION_FEE;
+      transaction_fee = 0;
     }
     //calculate application fee
     if(attr.paymentMethod === "online"){
@@ -665,7 +665,7 @@ module.exports = {
   },
 
   retrieveCard : function(attr, cb){
-    stripe.customers.retrieveCard(attr.id, attr.cardId, function(err, card){
+    stripe.customers.retrieveSource(attr.id, attr.cardId, function(err, card){
       return cb(err, card);
     });
   },

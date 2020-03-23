@@ -498,8 +498,8 @@ var notification = {
     if(params.pickupInfo){
       // params.pickupInfo.pickupFromTime = moment.tz(params.pickupInfo.pickupFromTime, "America/Los_Angeles").format('ddd, L, LT');
       // params.pickupInfo.pickupTillTime = moment.tz(params.pickupInfo.pickupTillTime, "America/Los_Angeles").format('ddd, L, LT');
-      // params.pickupInfo.pickupFromTime = moment(params.pickupInfo.pickupFromTime).local().format('ddd, L, LT');
-      // params.pickupInfo.pickupTillTime = moment(params.pickupInfo.pickupTillTime).local().format('ddd, L, LT');
+      params.pickupInfo.pickupFromTime = moment(params.pickupInfo.pickupFromTime).local().format('ddd, L, LT');
+      params.pickupInfo.pickupTillTime = moment(params.pickupInfo.pickupTillTime).local().format('ddd, L, LT');
     }
     if(params.eta){
       params.eta = moment(params.eta).local().format('ddd, L, LT');

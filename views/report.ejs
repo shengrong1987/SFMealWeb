@@ -66,14 +66,8 @@
                 preference.forEach(function(pref){
                   var dishProps = "";
                   if(pref.property && Array.isArray(pref.property)){
-                    pref.property.forEach(function(pro){
-                      if(dishProps){
-                        dishProps += ",";
-                      }
-                      dishProps += pro.property;
-                    })
+                    title += "(" + pref.property.join(",") + ')';
                   }
-                  title += "(" + dishProps + ')';
                 });
               %>
               <%= dish.title%>(<%= amount%>)<%= title%>
