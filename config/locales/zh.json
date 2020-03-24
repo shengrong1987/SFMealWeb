@@ -1209,6 +1209,7 @@
   "switch-to-pickup" : "我要自取",
   "comment-option-1" : "请到了打电话(出来拿)",
   "comment-option-2" : "请到了按门铃/找前台(送上门):",
+  "comment-option-3" : "无接触配送，放好之后请电话/发短信给我，请放在：",
   "comment-placeholder" : "公寓房间号码，楼上，楼下等信息...",
   "order-combo-price-not-match" : "套餐价格不一致"
 }

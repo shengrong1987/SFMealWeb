@@ -1196,6 +1196,7 @@
   "switch-to-pickup" : "Pickup Instead",
   "comment-option-1" : "Please call upon arrival(will meet outside)",
   "comment-option-2" : "Please delivery to door:",
+  "comment-option-3" : "No contact delivery, call or text me after you leave at:",
   "comment-placeholder" : "Apt No., upstair, 1st floor etc...",
   "order-combo-price-not-match" : "Order combo price not match"
 }

@@ -171,10 +171,14 @@
               <div class="radio-box flex">
                 <label class="btn btn-default vertical-inline option commentOption">
                   <input type="radio" id="comment-1" name="comment-option-set" class="regular-radio"><label for="comment-1"></label>
-                  <span style="margin-left: 10px;"><%= __('comment-option-1') %></span>
+                  <span style="margin-left: 10px;"><%= __('comment-option-3') %></span>
                 </label>
                 <label class="btn btn-default vertical-inline option commentOption">
                   <input type="radio" id="comment-2" name="comment-option-set" class="regular-radio"><label for="comment-2"></label>
+                  <span style="margin-left: 10px;"><%= __('comment-option-1') %></span>
+                </label>
+                <label class="btn btn-default vertical-inline option commentOption">
+                  <input type="radio" id="comment-3" name="comment-option-set" class="regular-radio"><label for="comment-3"></label>
                   <span style="margin-left: 10px;"><%= __('comment-option-2') %></span>
                 </label>
               </div>
@@ -566,7 +570,6 @@
     },
     onApprove: function(data, actions) {
       return actions.order.capture().then(function(details){
-        console.log(details);
         if (details.error === 'INSTRUMENT_DECLINED') {
           return actions.restart();
         }
