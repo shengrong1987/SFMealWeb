@@ -26,7 +26,7 @@ module.exports = {
     },
     paymentMethod : {
       type : 'string',
-      enum : ['cash','online','venmo','paypal','alipay','wechatpay'],
+      enum : ['cash','online','venmo','paypal','alipay','wechatpay','weixin','zelle'],
       defaultsTo : 'online'
     },
     dishes: {

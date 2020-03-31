@@ -369,9 +369,11 @@
                 <%}else{%>
                   <button data-toggle="tab" data-href="#cardPayment" class="btn btn-disable py-2 col-3 disabled" data-method="online"><strong><i class="fa fa-credit-card fa-2x"></i></strong><br/><%= __('bank-card') %></button>
                 <%}%>
-                <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable <%= (user.id && user.payment && user.payment.length) ? '' : 'active'%> py-2 col-3 disabled deliveryInput pickupInput" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
-                <button data-toggle="tab" data-href="#venmoPayment" class="btn btn-disable  py-2 col-3 disabled" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
+                <button data-toggle="tab" data-href="#venmoPayment" class="btn btn-disable  py-2 col-3 <%= (user.id && user.payment && user.payment.length) ? '' : 'active'%>" data-method="venmo"><i class="fab fa-vimeo fa-2x"></i><br/><%= __('venmo-method') %></button>
+                <button data-toggle="tab" data-href="#cashPayment" class="btn btn-disable py-2 col-3 disabled deliveryInput pickupInput disabled" data-method="cash"><i class="far fa-money-bill-alt fa-2x"></i><br/><%= __('cash-method') %></button>
                 <button data-toggle="tab" data-href="#paypalPayment" class="btn btn-disable py-2 col-3 disabled" data-method="paypal"><i class="fab fa-paypal fa-2x"></i><br/><%= __('paypal-method')%></button>
+                <button data-toggle="tab" data-href="#zellePayment" class="btn btn-disable py-2 col-3 disabled" data-method="zelle"><i class="fa fa-money-bill fa-2x"></i><br/><%= __('zelle-method')%></button>
+                <button data-toggle="tab" data-href="#weixinPayment" class="btn btn-disable py-2 col-3 disabled" data-method="weixin"><i class="fab fa-weixin fa-2x"></i><br/><%= __('weixin-method')%></button>
                 <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg disabled" data-method="alipay" style="margin-right: 10px;height: 80px;"><i class="fa fa-money fa-2x"></i><br/><%= __('alipay-method') %></button>-->
                 <!--<button data-toggle="tab" data-href="paymentInfoView" class="btn btn-disable btn-fat btn-lg d-none disabled" data-method="wechatpay" style="margin-right: 10px;height: 80px;"><i class="fa fa-wechat fa-2x"></i><br/><%= __('wechatpay-method') %></button>-->
               </div>
@@ -490,11 +492,11 @@
                   </form>
                 <%}%>
 
-                <div id="cashPayment" class="tab-pane active">
+                <div id="cashPayment" class="tab-pane">
                   <p><%= __('pay-cash-instruction')%></p>
                   <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
                 </div>
-                <div id="venmoPayment" class="tab-pane">
+                <div id="venmoPayment" class="tab-pane active">
                   <div>
                     <p><%= __('venmo-instruction')%></p>
                     <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
@@ -504,6 +506,14 @@
                   <p><%= __('transaction-fee-instruction')%></p>
                   <div id="paypal-button-container"></div>
                 </div>
+                  <div id="zellePayment" class="tab-pane">
+                    <p><%= __('pay-zelle-instruction')%></p>
+                    <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
+                  </div>
+                  <div id="weixinPayment" class="tab-pane">
+                    <p><%= __('pay-weixin-instruction')%></p>
+                    <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
+                  </div>
               </div>
             </div>
           </div>

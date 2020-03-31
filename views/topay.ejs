@@ -10,6 +10,12 @@
       <p>https://www.paypal.me/sfmeal</p>
       <p><%= __('paypal-instruction')%></p>
       <p><%= __('name')%>: <%= order.customerName%></p>
+    <% }else if(order.paymentMethod === "weixin"){ %>
+      <p><%= __('weixin-instruction')%></p>
+      <p><%= __('name')%>: <%= order.customerName%></p>
+    <% }else if(order.paymentMethod === "zelle"){ %>
+      <p><%= __('zelle-instruction')%></p>
+      <p><%= __('name')%>: <%= order.customerName%></p>
     <% } %>
     <span class="divider popline"></span>
     <p><%= __('meal-fee')%> $<label class="subtotal"><%= (order.subtotal - order.discount).toFixed(2)%></label></p>

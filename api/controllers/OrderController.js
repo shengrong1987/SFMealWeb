@@ -1166,7 +1166,7 @@ module.exports = {
                 }
               },
               reversTransferForCashOrder : function(next){
-                if (order.paymentMethod !== "cash") {
+                if (order.paymentMethod === "online") {
                   return next();
                 }
                 stripe.batchRefund(null, order.transfer, metadata, function (err) {

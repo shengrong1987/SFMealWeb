@@ -482,7 +482,7 @@ module.exports = {
       chargeIds = Object.keys(charges);
     }
     var amount = metadata.amount || -1;
-    async.each(chargeIds, function(chargeId, next){
+    async.eachSeries(chargeIds, function(chargeId, next){
       var thisAmount = charges[chargeId];
       var refundAmount;
       if(thisAmount === 0){
@@ -526,29 +526,47 @@ module.exports = {
   },
 
   refund : function(attr, cb){
-    if(attr.id === "cash"){
-      return cb(null, { amount : attr.amount });
-    }
-    var $this = this;
-    console.log("refund amount: " + attr.amount);
-    stripe.refunds.create({
-      charge : attr.id,
-      amount : attr.amount,
-      metadata : attr.metadata,
-      reverse_transfer : attr.metadata.reverse_transfer || false,
-      refund_application_fee : attr.metadata.refund_application_fee || false
-    },function(err,refund) {
+    let $this = this;
+    let _refund = {};
+    async.auto({
+      refundCash : function(next){
+        if(attr.id !== "cash"){
+          return next();
+        }
+        _refund.amount = attr.amount;
+        next();
+      },
+      refundOthers: function(next){
+        if(attr.id === "cash"){
+          return next();
+        }
+        stripe.refunds.create({
+          charge : attr.id,
+          amount : attr.amount,
+          metadata : attr.metadata,
+          reverse_transfer : attr.metadata.reverse_transfer || false,
+          refund_application_fee : attr.metadata.refund_application_fee || false
+        },function(err,refund) {
+          if(err){
+            return next(err);
+          }
+          _refund = refund;
+          next();
+        })
+      }
+    }, function(err){
       if(err){
         return cb(err);
       }
-      if(!attr.metadata.userId || !refund || refund.amount === 0){
-        return cb(null, refund);
+      console.log("refund amount: " + _refund.amount);
+      if(!attr.metadata.userId || !_refund || _refund.amount === 0){
+        return cb(null, _refund);
       }
-      $this.handlePoint(-refund.amount, attr.metadata.userId, function(err, user){
+      $this.handlePoint(-_refund.amount, attr.metadata.userId, function(err, user){
         if(err){
           return cb(err);
         }
-        cb(null,refund);
+        cb(null,_refund);
       });
     });
   },

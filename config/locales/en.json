@@ -452,7 +452,7 @@
   "my-intro": "Introduce yourself in a paragraph (max 280 chars)",
   "intro-instruction": "What's your favourite dish or dish type?",
   "color-instruction": "We will generate your page based on your choice of color.",
-  "photo-restrition": "Supports JPG,PNG or GIF, max 5Mb",
+  "photo-restriction": "Supports JPG,PNG or GIF, max 5Mb",
   "photo-wrong-format": "Only support file type of JPG,PNG or GIF",
   "upload-instruction": "Click thumbnail or 'Upload' to upload thumbnail, support JPG,PNG or GIF, max 5Mb.",
   "name-instruction": "We use the real name system, please fill out the legal name on the certificate (Chinese name please fill in the pinyin, the wrong name may cause your payment account verification failure).",
@@ -926,6 +926,8 @@
   "select": "Selection",
   "pay-cash-instruction" : "Please pay cash to driver at pickup, tips appreciated :)",
   "venmo-instruction" : "Venmo Id: @SFMeal, leave your name as comment.",
+  "weixin-instruction" : "Wechat Id: sillyuniversal, leave your name as comment",
+  "zelle-instruction" : "Zelle Email: Aimbebe.r@gmail.com, name: Sheng Rong, leave your name as comment",
   "transaction-fee-instruction" : "Paypal: Add an additional $1.00 for Paypal fee.",
   "dish-tag-default" : "Street food",
   "dish-tag" : "Tag(Multiple tags separate with comma)",
@@ -1198,5 +1200,9 @@
   "comment-option-2" : "Please delivery to door:",
   "comment-option-3" : "No contact delivery, call or text me after you leave at:",
   "comment-placeholder" : "Apt No., upstair, 1st floor etc...",
-  "order-combo-price-not-match" : "Order combo price not match"
+  "order-combo-price-not-match" : "Order combo price not match",
+  "zelle-method" : "Zelle Payment",
+  "weixin-method" : "Wechat transfer",
+  "pay-zelle-instruction" : "Email: Aimbebe.r@gmail.com Name: Sheng Rong (leave your name at comment)",
+  "pay-weixin-instruction" : "Add Wechat Id: sillyuniversal, transfer amount to this account"
 }

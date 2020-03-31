@@ -930,6 +930,8 @@
   "select": "精选",
   "pay-cash-instruction" : "请领取单的时候支付给司机现金",
   "venmo-instruction" : "Venmo号: @SFMeal,付款时请附言下单的姓名",
+  "weixin-instruction" : "微信号: sillyuniversal, 付款时请附言下单的姓名",
+  "zelle-instruction" : "Zelle: Aimbebe.r@gmail.com, 姓名: Sheng Rong, 付款时请附言下单的姓名",
   "transaction-fee-instruction" : "Paypa：每笔需要额外支付$1.00元手续费",
   "dish-tag-default" : "街头小吃",
   "dish-tag" : "标签(多个用逗号分隔)",
@@ -1211,5 +1213,9 @@
   "comment-option-2" : "请到了按门铃/找前台(送上门):",
   "comment-option-3" : "无接触配送，放好之后请电话/发短信给我，请放在：",
   "comment-placeholder" : "公寓房间号码，楼上，楼下等信息...",
-  "order-combo-price-not-match" : "套餐价格不一致"
+  "order-combo-price-not-match" : "套餐价格不一致",
+  "zelle-method" : "Zelle支付",
+  "weixin-method" : "微信转账",
+  "pay-zelle-instruction" : "邮箱: aimbebe.r@gmail.com 名字:Sheng Rong（留言下单姓名）",
+  "pay-weixin-instruction" : "请加微信: sillyuniversal,并转账相应金额至此微信"
 }

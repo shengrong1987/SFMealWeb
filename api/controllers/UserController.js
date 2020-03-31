@@ -518,7 +518,7 @@ module.exports = require('waterlock').actions.user({
                   }else{
                     oldOrder.orders[dishId] = order.orders[dishId];
                   }
-                })
+                });
                 oldOrder.id += "+" + order.id;
                 oldOrder.subtotal = parseFloat(oldOrder.subtotal) + parseFloat(order.subtotal);
                 oldOrder.tip = parseFloat(oldOrder.tip) + parseFloat(order.tip);

@@ -510,7 +510,7 @@ describe('OrderController', function() {
           res.body.code.should.be.equal(-1);
           done();
         })
-    })
+    });
 
     it('should adjust the full dish and get not enough quantity error', function (done) {
       var dishObj = {};
@@ -551,7 +551,9 @@ describe('OrderController', function() {
           if(err){
             return done(err);
           }
+          console.log("old points:" + userPoints);
           userPoints -= (Math.floor((price2*2+price4*2+3+2)/2) + 1);
+          console.log("new points:" + userPoints);
           res.body.orders[0].leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
@@ -711,9 +713,24 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body[0].leftQty[dishId1].should.be.equal(dish1LeftQty);
+          userPoints -= Math.round((price2+price3+10+1)/2);
           done();
         })
     });
+
+    it('user should get certain reward points', function(done){
+      agent
+        .get('/user/me')
+        .expect(200)
+        .end(function(err, res){
+          if(err){
+            return done(err);
+          }
+          res.body.points.should.be.equal(userPoints);
+          done()
+        })
+    });
+
 
     it('should not adjust the cancelled order', function (done) {
       agent
@@ -738,7 +755,7 @@ describe('OrderController', function() {
     });
 
     var _multipleOrderId;
-    var _multipleOrderId2
+    var _multipleOrderId2;
 
     describe("take order with multiple meals", function(){
 

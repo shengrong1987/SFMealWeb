@@ -83,14 +83,16 @@
                             let preferenceLabel = "";
                             let preference = dishOrdered.preference || [];
                             let extra = 0;
-                            var oldTotal = (order.subtotal * (1 + order.getTaxRate()) + order.tip + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
-                            preference.forEach(function(prefObj){
-                              let prefs = prefObj.property;
-                              if(prefs && Array.isArray(prefs)){
-                                preferenceLabel += "(" + prefs.join(",") + ")";
-                              }
-                              extra += parseInt(prefObj.extra);
-                            })
+                            var oldTotal = (order.subtotal * (1 + order.getTaxRate()) + order.tip + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0)).toFixed(2)
+                            if(preference && Array.isArray(preference)){
+                              preference.forEach(function(prefObj){
+                                let prefs = prefObj.property;
+                                if(prefs && Array.isArray(prefs)){
+                                  preferenceLabel += "(" + prefs.join(",") + ")";
+                                }
+                                extra += parseInt(prefObj.extra);
+                              })
+                            }
                             if(order.status=="adjust") {
                               var adjustingNumber = order.adjusting_orders[key].number;
                               var newTotal = (order.adjusting_subtotal * (1 + order.getTaxRate()) + order.tip + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
