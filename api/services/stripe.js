@@ -409,7 +409,7 @@ module.exports = {
     var originalTotal = subtotalAfterTax + delivery_fee + serviceFee + transaction_fee;
 
     attr.metadata.discount = discount;
-    attr.metadata.total = originalTotal - discount;
+    attr.metadata.total = parseInt(originalTotal - discount);
     attr.metadata.application_fee_amount = application_fee_amount;
     attr.metadata.total = attr.metadata.total < 0 ? 0 : attr.metadata.total;
     attr.metadata.tip = attr.tip || 0;

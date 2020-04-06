@@ -194,6 +194,7 @@ module.exports = {
           orderedDishes.push(dishId);
         }
       });
+      console.log("ordered dish: " + orderedDishes.join(","));
 
       meals = meals.filter(function(meal){
         let hasNickname = meal.nickname === targetNickname;
@@ -207,7 +208,6 @@ module.exports = {
         var mealHasDish = meal.dishes.some(function(d) {
           return orderedDishes.includes(d.id);
         });
-        console.log("Meal:" + meal.id + " title: " + meal.title + " has Dish: " + mealHasDish);
         return mealHasDish;
       });
 
@@ -234,6 +234,7 @@ module.exports = {
           return res.badRequest({ code : -57, responseText : req.__('ordered-dish-not-found', dish.title)});
         })
       }else{
+        console.log("order meal length:" + meals.length);
         if(!meals.length){
           return res.badRequest({ code: -52, responseText: req.__('meal-not-found')})
         }
@@ -529,73 +530,79 @@ module.exports = {
                 _orders[0].status = "pending-payment";
                 next();
               })
-            }
-            async.eachSeries(_orders,async function(order, nextIn){
-              if(order.paymentMethod === "paypal"){
-                order.isPaid = true;
-                nextIn();
-              }else{
-                stripe.charge({
-                  paymentMethod : order.paymentMethod,
-                  isInitial : true,
-                  amount : order.subtotal * 100,
-                  tip : order.tip,
-                  deliveryFee : parseInt(order.delivery_fee * 100),
-                  discount : order.discount * 100,
-                  email : order.guestEmail,
-                  customerId : order.customerId,
-                  destination : order.host.accountId,
-                  meal : order.meal,
-                  method : order.method,
-                  tax : 0,
-                  isPartyMode : order.isPartyMode,
-                  metadata : {
-                    mealId : order.meal.id,
-                    hostId : order.host.id,
-                    orderId : order.id,
-                    userId : order.customer,
+            }else{
+              async.eachSeries(_orders,async function(order, nextIn){
+                if(order.paymentMethod === "paypal"){
+                  order.isPaid = true;
+                  nextIn();
+                }else{
+                  stripe.charge({
+                    paymentMethod : order.paymentMethod,
+                    isInitial : true,
+                    amount : order.subtotal * 100,
+                    tip : order.tip,
                     deliveryFee : parseInt(order.delivery_fee * 100),
-                    tax : 0
-                  }
-                },function(err, charge, transfer){
-                  if(err){
-                    Order.destroy(order.id).exec(function(err2){
-                      if(err2){
-                        return nextIn(err2);
-                      }
-                      return nextIn({ code : -39, responseText : err.message });
-                    });
-                  }else{
-                    order.source = "charged";
-                    order.charges = {};
-                    order.transfer = {};
-                    order.feeCharges = {};
-                    order.application_fees = {};
-                    if(order.paymentMethod === "online"){
-                      if(charge){
-                        order.isPaid = true;
-                        order.charges[charge.id] = charge.amount;
-                        order.application_fees[charge.id] = parseInt(charge.metadata.application_fee_amount);
-                      }
+                    discount : order.discount * 100,
+                    email : order.guestEmail,
+                    customerId : order.customerId,
+                    destination : order.host.accountId,
+                    meal : order.meal,
+                    method : order.method,
+                    tax : 0,
+                    isPartyMode : order.isPartyMode,
+                    metadata : {
+                      mealId : order.meal.id,
+                      hostId : order.host.id,
+                      orderId : order.id,
+                      userId : order.customer,
+                      deliveryFee : parseInt(order.delivery_fee * 100),
+                      tax : 0
+                    }
+                  },function(err, charge, transfer){
+                    if(err){
+                      Order.destroy(order.id).exec(function(err2){
+                        if(err2){
+                          return nextIn(err2);
+                        }
+                        order.source = "cancel";
+                        order.msg = err.message;
+                        return nextIn({ code : -39, responseText : err.message });
+                      });
                     }else{
-                      order.charges['cash'] = order.charges['cash'] || 0;
-                      order.application_fees['cash'] = order.application_fees['cash'] || 0;
-                      order.charges['cash'] += charge.amount;
-                      order.application_fees['cash'] += charge.application_fee_amount;
+                      order.source = "charged";
+                      order.charges = {};
+                      order.transfer = {};
+                      order.feeCharges = {};
+                      order.application_fees = {};
+                      if(order.paymentMethod === "online"){
+                        if(charge){
+                          order.isPaid = true;
+                          order.charges[charge.id] = charge.amount;
+                          order.application_fees[charge.id] = parseInt(charge.metadata.application_fee_amount);
+                        }
+                      }else{
+                        order.charges['cash'] = order.charges['cash'] || 0;
+                        order.application_fees['cash'] = order.application_fees['cash'] || 0;
+                        order.charges['cash'] += charge.amount;
+                        order.application_fees['cash'] += charge.application_fee_amount;
+                      }
+                      if(transfer){
+                        order.transfer[transfer.id] = transfer.amount;
+                      }
+                      nextIn();
                     }
-                    if(transfer){
-                      order.transfer[transfer.id] = transfer.amount;
-                    }
-                    nextIn();
-                  }
-                });
-              }
-            }, function(err){
-              if(err){
-                return next(err);
-              }
-              next();
-            })
+                  });
+                }
+              }, function(err){
+                if(err){
+                  return next(err);
+                }
+               _orders = _orders.filter(function(order){
+                 return order.source !== "cancel"
+               });
+                next();
+              })
+            }
           }],
           updateMeal : [ 'makePayments', function(next){
             async.each(_orders, function(order, nextIn){
@@ -2533,7 +2540,6 @@ module.exports = {
                   order.adjusting_subtotal = 0;
                   order.orders = params.orders;
                   order.subtotal = params.subtotal;
-                  order.tax += tax;
                   order.meal = m.id;
                   next();
                 });
