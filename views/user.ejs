@@ -116,7 +116,7 @@
                           <td><%
                             if(order.status=="adjust"){
                               adjustingNumber = order.adjusting_orders[key].number;
-                              newTotal = (order.adjusting_subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0)).toFixed(2);
+                              newTotal = (order.adjusting_subtotal * (1 + order.getTaxRate()) + order.delivery_fee - order.discount + (order.meal ? order.meal.serviceFee : 0) + order.tran).toFixed(2);
                             if(adjustingNumber != number){%>
 
                               <%= number%> to <strong><%= adjustingNumber%></strong>

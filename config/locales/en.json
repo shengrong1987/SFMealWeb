@@ -1204,5 +1204,6 @@
   "zelle-method" : "Zelle Payment",
   "weixin-method" : "Wechat transfer",
   "pay-zelle-instruction" : "Email: Aimbebe.r@gmail.com Name: Sheng Rong (leave your name at comment)",
-  "pay-weixin-instruction" : "Add Wechat Id: sillyuniversal, transfer amount to this account"
+  "pay-weixin-instruction" : "Add Wechat Id: sillyuniversal, transfer amount to this account",
+  "transaction_fee" : "Transaction fee"
 }

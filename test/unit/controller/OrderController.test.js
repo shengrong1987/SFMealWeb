@@ -24,7 +24,7 @@ describe('OrderController', function() {
   var farAddress = "7116 Tiant way, Elk Grove, CA 95758";
   var phone = "1-415-802-3853";
   const SERVICE_FEE = 0;
-  const TRANSACTION_FEE = 1;
+  const TRANSACTION_FEE = 1.02;
   var pickupPickupOptionId, pickupNickname;
   var deliveryPickupOptionId, deliveryNickname;
   var highMinimalPickupOptionId, highMinimalNickname;
@@ -373,7 +373,7 @@ describe('OrderController', function() {
             return done(err);
           }
           var o = res.body;
-          var chargesTotal = Math.round(((price1 + price2 * 2 + (price4*2+3)) + SERVICE_FEE + TRANSACTION_FEE + 10) * 100);
+          var chargesTotal = Math.round(((price1 + price2 * 2 + (price4*2+3)) * TRANSACTION_FEE + SERVICE_FEE + 10) * 100);
           userPoints += Math.floor(chargesTotal / 200);
           o.contactInfo.name.should.be.equal('sheng');
           o.contactInfo.phone.should.be.equal(phone);
@@ -552,12 +552,12 @@ describe('OrderController', function() {
             return done(err);
           }
           console.log("old points:" + userPoints);
-          userPoints -= (Math.floor((price2*2+price4*2+3+2)/2) + 1);
+          userPoints -= (Math.floor((price2*2+price4*2+3+2)*TRANSACTION_FEE/2));
           console.log("new points:" + userPoints);
           res.body.orders[0].leftQty[dishId1].should.be.equal(dish1LeftQty);
           done();
         })
-    })
+    });
 
     it('user should get certain reward points', function(done){
       agent
@@ -681,7 +681,7 @@ describe('OrderController', function() {
             return done(err);
           }
           console.log("old user points: " + userPoints);
-          userPoints += Math.round((price2+price3-price1+2)/2);
+          userPoints += Math.floor((price2+price3-price1+2)*TRANSACTION_FEE/2);
           console.log("new user points: " + userPoints);
           dish1LeftQty++;
           res.body.orders[0].leftQty[dishId1].should.be.equal(dish1LeftQty);
@@ -713,7 +713,7 @@ describe('OrderController', function() {
             return done(err);
           }
           res.body[0].leftQty[dishId1].should.be.equal(dish1LeftQty);
-          userPoints -= Math.round((price2+price3+10+1)/2);
+          userPoints -= Math.round((price2+price3+10)*TRANSACTION_FEE/2);
           done();
         })
     });
@@ -1063,7 +1063,7 @@ describe('OrderController', function() {
               return done(Error("error making order"));
             }
             o.redeemPoints.should.be.equal("13");
-            var chargesTotal = ((price3 * 1) + SERVICE_FEE + TRANSACTION_FEE) + 3.99 - 1.3;
+            var chargesTotal = ((price3 * 1) * TRANSACTION_FEE + SERVICE_FEE) + 3.99 - 1.3;
             o.charges[Object.keys(o.charges)[0]].should.be.equal(Math.round(chargesTotal * 100));
             o.application_fees[Object.keys(o.application_fees)[0]].should.be.equal(320);
             o.meal.leftQty[dishId1].should.be.equal(dish1LeftQty);
@@ -2011,7 +2011,7 @@ describe('OrderController', function() {
             o.guestEmail.should.be.equal(guestEmail);
             o.discount.should.be.equal(10);
             o.transfer[Object.keys(o.transfer)[0]].should.be.equal(1000);
-            o.charges[Object.keys(o.charges)[0]].should.be.equal(Math.round((price3*5+SERVICE_FEE+TRANSACTION_FEE-10)*100));
+            o.charges[Object.keys(o.charges)[0]].should.be.equal(Math.round((price3*5*TRANSACTION_FEE+SERVICE_FEE-10)*100));
             o.application_fees[Object.keys(o.application_fees)[0]].should.be.equal(applicationFee);
             orderId = o.id;
             done();

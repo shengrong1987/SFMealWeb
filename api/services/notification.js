@@ -226,10 +226,10 @@ var notification = {
     params.senderName = "SFMeal.com";
 
     //juice it using email-template
-    if(process.env.NODE_ENV==="development"){
-      sails.log.info("Email Sent: " + basicInfo.recipientEmail + " Email template: " + template);
-      return;
-    }
+    // if(process.env.NODE_ENV==="development"){
+    //   sails.log.info("Email Sent: " + basicInfo.recipientEmail + " Email template: " + template);
+    //   return;
+    // }
 
     sails.hooks.email.send(template, params,{
       to : basicInfo.recipientEmail,
@@ -401,7 +401,7 @@ var notification = {
     if(model === "Order"){
       switch(action){
         case "new":
-          i18ns = i18ns.concat(['new-order-title-for-host','new-order-title-for-guest','new-order-context-for-host','new-order-context-for-guest','order-time','ready-time','order','preorder','discount-amount-text']);
+          i18ns = i18ns.concat(['new-order-title-for-host','new-order-title-for-guest','new-order-context-for-host','new-order-context-for-guest','order-time','ready-time','order','preorder','discount-amount-text','transaction-fee']);
           break;
         case "adjust":
           i18ns = i18ns.concat(['adjust-order-context','adjust-order-from-host-context','modify','de-order','order-time','adjust-time','chef']);

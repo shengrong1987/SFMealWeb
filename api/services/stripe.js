@@ -9,7 +9,7 @@ const SERVICE_FEE = 0;
 const SYSTEM_DELIVERY_FEE = 0;
 const MILEAGE_FEE = 1.18;
 const PARTY_ORDER_RANGE_MULTIPLIER = 10;
-const ONLINE_TRANSACTION_FEE = 100;
+const ONLINE_TRANSACTION_FEE = 0.02;
 const SOURCE_FAIL = "failed";
 const SOURCE_CANCEL = "canceled";
 const SOURCE_PENDING = "pending";
@@ -27,6 +27,7 @@ module.exports = {
   SOURCE_PENDING : SOURCE_PENDING,
   SOURCE_CHARGEABLE : SOURCE_CHARGEABLE,
   SOURCE_CONSUMED : SOURCE_CONSUMED,
+  ONLINE_TRANSACTION_FEE : ONLINE_TRANSACTION_FEE,
 
   createManagedAccount : function(attr,cb){
     stripe.accounts.create(attr,function(err, account) {
@@ -194,9 +195,11 @@ module.exports = {
     var _this = this;
     var charge = null, transfer = null;
 
+    console.log("total: " + attr.metadata.total + " application_fee_amount: " + attr.metadata.application_fee_amount);
+
     async.auto({
       createCharge : function(cb){
-        if(attr.metadata.total === 0){
+        if(attr.metadata.total < 50){
           return cb();
         }
         stripe.charges.create({
@@ -403,10 +406,10 @@ module.exports = {
     }
 
     //calculate subtotal after tax
-    var subtotalAfterTax = attr.amount + tax + tip;
+    var subtotalAfterTax = attr.amount * (1 + transaction_fee) + tax + tip;
 
     //calculate other fee
-    var originalTotal = subtotalAfterTax + delivery_fee + serviceFee + transaction_fee;
+    var originalTotal = subtotalAfterTax + delivery_fee + serviceFee;
 
     attr.metadata.discount = discount;
     attr.metadata.total = parseInt(originalTotal - discount);
@@ -435,9 +438,14 @@ module.exports = {
       }
       var points = user.points || 0;
       user.historyPoints = user.historyPoints || points;
-      var earnedPoints = Math.floor(amount/200);
+      let earnedPoints = 0;
+      if(amount>0){
+        earnedPoints = Math.floor(amount/200);
+      }else{
+        earnedPoints = Math.ceil(amount/200);
+      }
       var newPoints = points + earnedPoints;
-      sails.log.info("Points difference: " + earnedPoints, " New Points: " + newPoints);
+      sails.log.info("Old Points: " + points, " New Points: " + newPoints);
       user.points = newPoints;
       if(earnedPoints > 0){
         user.historyPoints += earnedPoints;

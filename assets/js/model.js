@@ -3533,10 +3533,11 @@ var MealConfirmView = Backbone.View.extend({
     console.groupEnd();
   },
   initPaymentMethod: function(){
-    var method = this.$el.find("#payment-cards [data-method].active").data("method");
+    let method = this.$el.find("#payment-cards [data-method].active").data("method");
+    let subtotal = parseFloat(this.$el.find(".subtotal").data("value"));
     if(method === "online" || method === "paypal" ){
-      this.$el.find(".transaction").text("$1.00");
-      this.$el.find(".transaction").data("value",1);
+      this.$el.find(".transaction").text((subtotal*0.02).toFixed(2));
+      this.$el.find(".transaction").data("value",(subtotal*0.02).toFixed(2));
     }else{
       this.$el.find(".transaction").text("$0.00");
       this.$el.find(".transaction").data("value",0);
@@ -3571,11 +3572,12 @@ var MealConfirmView = Backbone.View.extend({
   },
 
   switchPaymentMethod : function(e){
-    var method = $(e.currentTarget).data("method");
+    let method = $(e.currentTarget).data("method");
+    let subtotal = parseFloat(this.$el.find(".subtotal").data("value"));
     console.log("[Debug]changing payment method: " + method);
     if(method === "online" || method === "paypal" ){
-      this.$el.find(".transaction").text("$1.00");
-      this.$el.find(".transaction").data("value",1);
+      this.$el.find(".transaction").text((subtotal*0.02).toFixed(2));
+      this.$el.find(".transaction").data("value",(subtotal*0.02).toFixed(2));
     }else{
       this.$el.find(".transaction").text("$0.00");
       this.$el.find(".transaction").data("value",0);

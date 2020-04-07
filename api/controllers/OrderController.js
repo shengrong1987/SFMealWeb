@@ -200,7 +200,7 @@ module.exports = {
         let hasNickname = meal.nickname === targetNickname;
         let hasPickupOption = meal.pickups.some(function(pickup){
           return pickup.nickname === targetNickname;
-        })
+        });
         return hasNickname || hasPickupOption;
       });
 
@@ -465,8 +465,10 @@ module.exports = {
                     }
                     _this.redeemPoints(req, found, meal.subtotal, function(err, points){
                       if(err){
-                        return nextIn2()
+                        sails.log.error("#6-2/12 - Error in redeeming points");
+                        return nextIn2(err);
                       }
+                      sails.log.debug("#6-2/12 - Success in redeeming points");
                       orderParam.redeemPoints = points;
                       orderParam.discount += points/10;
                       nextIn2()
@@ -579,8 +581,14 @@ module.exports = {
                           order.isPaid = true;
                           order.charges[charge.id] = charge.amount;
                           order.application_fees[charge.id] = parseInt(charge.metadata.application_fee_amount);
+                          order.transaction_fee = order.subtotal * stripe.ONLINE_TRANSACTION_FEE;
                         }
                       }else{
+                        if(order.paymentMethod === "paypal"){
+                          order.transaction_fee = order.subtotal * stripe.ONLINE_TRANSACTION_FEE;
+                        }else{
+                          order.transaction_fee = 0;
+                        }
                         order.charges['cash'] = order.charges['cash'] || 0;
                         order.application_fees['cash'] = order.application_fees['cash'] || 0;
                         order.charges['cash'] += charge.amount;
@@ -1798,7 +1806,7 @@ module.exports = {
       if(err){
         return res.badRequest(err);
       }
-      res.view('receipt', { orders: _orders});
+      res.view('receipt', { orders: _orders });
     })
   },
 

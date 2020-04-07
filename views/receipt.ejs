@@ -12,11 +12,12 @@
     </p>
     <table class="table table-email">
       <%
-        var subtotal = 0,discount = 0,delivery_fee = 0,tip = 0;
+        var subtotal = 0,discount = 0,delivery_fee = 0,tip = 0, transaction_fee = 0;
         orders.forEach(function(o){
           subtotal += parseFloat(o.subtotal);
           discount += parseFloat(o.discount);
           delivery_fee += parseFloat(o.delivery_fee);
+          transaction_fee += parseFloat(o.transaction_fee);
           tip += parseFloat(o.tip);
           Object.keys(o.orders).forEach(function(dishId){
             var orderedDish = o.orders[dishId];
@@ -75,6 +76,12 @@
         <td class="xs-hide"></td>
         <td></td>
         <td></td>
+        <td style="text-align: right;"><%= __('transaction-fee')%>: $<%= transaction_fee.toFixed(2)%></td>
+      </tr>
+      <tr class="border-less">
+        <td class="xs-hide"></td>
+        <td></td>
+        <td></td>
         <td style="text-align: right;"><%= __('delivery-fee')%>: $<%= delivery_fee.toFixed(2)%></td>
       </tr>
       <tr class="border-less">
@@ -93,7 +100,7 @@
         <td class="xs-hide"></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= __('total')%> $<%= (parseFloat((subtotal - discount) * (1 + orders[0].getTaxRate())) + parseFloat(delivery_fee) + parseFloat(tip)).toFixed(2)%></td>
+        <td style="text-align: right;"><%= __('total')%> $<%= (parseFloat((subtotal - discount) * (1 + orders[0].getTaxRate())) + parseFloat(transaction_fee) + parseFloat(delivery_fee) + parseFloat(tip)).toFixed(2)%></td>
       </tr>
       <tr>
         <td><%= __('payment-method')%>: <%= __(orders[0].paymentInfo.method)%></td>
