@@ -536,6 +536,7 @@ module.exports = {
               async.eachSeries(_orders,async function(order, nextIn){
                 if(order.paymentMethod === "paypal"){
                   order.isPaid = true;
+                  order.transaction_fee = order.subtotal * stripe.ONLINE_TRANSACTION_FEE;
                   nextIn();
                 }else{
                   stripe.charge({
@@ -584,11 +585,7 @@ module.exports = {
                           order.transaction_fee = order.subtotal * stripe.ONLINE_TRANSACTION_FEE;
                         }
                       }else{
-                        if(order.paymentMethod === "paypal"){
-                          order.transaction_fee = order.subtotal * stripe.ONLINE_TRANSACTION_FEE;
-                        }else{
-                          order.transaction_fee = 0;
-                        }
+                        order.transaction_fee = 0;
                         order.charges['cash'] = order.charges['cash'] || 0;
                         order.application_fees['cash'] = order.application_fees['cash'] || 0;
                         order.charges['cash'] += charge.amount;

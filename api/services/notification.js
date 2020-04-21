@@ -226,10 +226,10 @@ var notification = {
     params.senderName = "SFMeal.com";
 
     //juice it using email-template
-    // if(process.env.NODE_ENV==="development"){
-    //   sails.log.info("Email Sent: " + basicInfo.recipientEmail + " Email template: " + template);
-    //   return;
-    // }
+    if(process.env.NODE_ENV==="development"){
+      sails.log.info("Email Sent: " + basicInfo.recipientEmail + " Email template: " + template);
+      return;
+    }
 
     sails.hooks.email.send(template, params,{
       to : basicInfo.recipientEmail,

@@ -3597,11 +3597,13 @@ var MealConfirmView = Backbone.View.extend({
   /*
   Public API: Prompt delivery time confirmation and show payment window
    */
-  confirmDeliveryTime : function(e){
+  confirmDeliveryTime: function(e){
     e.preventDefault();
     let _this = this;
     let dateDesc = decodeURI(helperMethod.readCookie("date"));
     let chooseOption = this.getChooseOption(dateDesc);
+    let email = this.$el.data("email");
+    let isAdmin = email === "admin@sfmeal.com";
     if(!chooseOption.length){
       helperMethod.makeAToast(__('pickupOptionNotChoose'));
       return;
@@ -3627,7 +3629,7 @@ var MealConfirmView = Backbone.View.extend({
             if(method==="delivery"){
               let subtotal = parseFloat(_this.$el.find(".subtotal").data("value"));
               let minimalOrder = parseFloat(chooseOption.parent().data("minimal"));
-              if(subtotal < minimalOrder){
+              if(subtotal < minimalOrder && !isAdmin){
                 let minimalRequirementTip = minimalOrder == 25 ? __('order-single-minimal-not-reach-25') : __('order-single-minimal-not-reach-65');
                 BootstrapDialog.show({
                   title: __('deliveryTimeConfirmationTitle'),
@@ -4248,7 +4250,7 @@ var OrderView = Backbone.View.extend({
       //pickup option
       var pickupObj = $this.getPickupOption(method);
       if(!pickupObj){
-        helperMethod.jumpTo("pickupOdeliveryDateBtnptionsView");
+        helperMethod.jumpTo("pickupOrderDeliveryDateBtnOptionsView");
         return;
       }
       var pickupOption = pickupObj.index;
