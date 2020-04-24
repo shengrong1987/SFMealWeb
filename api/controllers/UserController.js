@@ -726,9 +726,6 @@ module.exports = require('waterlock').actions.user({
       if(!user){
         return res.forbidden({ code : -2, responseText : req.__('email-token-invalid')});
       }
-      if(user.emailVerified){
-        return res.redirect("/user/me#myinfo");
-      }
       var expire = new Date(user.verifyToken.expires);
       if(expire.getTime() < new Date().getTime()){
         return res.forbidden({ code : -3, responseText : req.__('email-verification-link-expire')});

@@ -1218,5 +1218,6 @@
   "weixin-method" : "微信转账",
   "pay-zelle-instruction" : "邮箱: aimbebe.r@gmail.com 名字:Sheng Rong（留言下单姓名）",
   "pay-weixin-instruction" : "请加微信: sillyuniversal,并转账相应金额至此微信",
-  "transaction_fee" : "支付手续费"
+  "transaction_fee" : "支付手续费",
+  "useWechatToLogin" : "链接已拷贝，请在微信中打开（粘贴至聊天框并点击）"
 }

@@ -1278,22 +1278,6 @@ var CartView = Backbone.View.extend({
     "change [name='tipInputOption']" : "changeTip",
     "blur #tipInput" : "changeTip"
   },
-  initialize : function(){
-    var tipValue = helperMethod.readCookie("tip");
-    if(typeof tipValue === "number"){
-      tipValue = parseFloat(tipValue);
-    }else{
-      tipValue = 0;
-    }
-    if(!tipValue){
-      let tipDefaultOpt = this.$el.find("#tipControl label:first");
-      tipDefaultOpt.addClass('active');
-      let subtotal = parseFloat(this.$el.find(".subtotal").text().replace("$",""));
-      tipValue = (subtotal * tipDefaultOpt.find("input").val() / 100).toFixed(2);
-      helperMethod.createCookie("tip", tipValue, 5);
-      localOrderObj.refreshCheckoutMenu();
-    }
-  },
   gotoCheckout : function(e){
     var orderedDishes = [];
     Object.keys(localOrderObj.localOrders).forEach(function(dishId){
@@ -3504,6 +3488,7 @@ var MealConfirmView = Backbone.View.extend({
     this.initMethodView();
     this.initDateFilter();
     this.initPaymentMethod();
+    this.initTipView();
     utility.initGoogleMapService();
   },
   initView : function(){
@@ -3545,13 +3530,30 @@ var MealConfirmView = Backbone.View.extend({
     localOrderObj.refreshCheckoutMenu();
   },
   initMethodView : function(){
-    var hasDelivery = this.$el.find("#pickupInfoView").data("hasdelivery");
+    let hasDelivery = this.$el.find("#pickupInfoView").data("hasdelivery");
     if(hasDelivery){
       this.$el.find(".pickupInput").hide();
       this.$el.find(".deliveryInput").show();
     }else{
       this.$el.find(".deliveryInput").hide();
       this.$el.find(".pickupInput").show();
+    }
+  },
+
+  initTipView: function(){
+    let tipValue = helperMethod.readCookie("tip");
+    if(typeof tipValue === "number"){
+      tipValue = parseFloat(tipValue);
+    }else{
+      tipValue = 0;
+    }
+    if(!tipValue){
+      let tipDefaultOpt = this.$el.find("#tipControl label:first");
+      tipDefaultOpt.addClass('active');
+      let subtotal = parseFloat(this.$el.find(".subtotal").text().replace("$",""));
+      tipValue = (subtotal * tipDefaultOpt.find("input").val() / 100).toFixed(2);
+      helperMethod.createCookie("tip", tipValue);
+      localOrderObj.refreshCheckoutMenu();
     }
   },
 

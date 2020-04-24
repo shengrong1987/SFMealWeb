@@ -423,16 +423,12 @@ let helperMethod = {
         wechatUrl = wechatUrl.replace('$STATE',state);
         location.href = wechatUrl;
       }else{
-        let redirectUrl = VAR.BASE_URL + '/auth/login/weixin/mobile';
-        let scope = "snsapi_userinfo";
-        let appId = VAR.WECHAT_APPID;
-        let state = location.href;
-        let wechatUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$APPID&redirect_uri=$REDIRECT_URI&response_type=code&scope=$SCOPE&state=$STATE#wechat_redirect";
-        wechatUrl = wechatUrl.replace('$APPID', appId);
-        wechatUrl = wechatUrl.replace('$REDIRECT_URI',redirectUrl);
-        wechatUrl = wechatUrl.replace('$SCOPE',scope);
-        wechatUrl = wechatUrl.replace('$STATE',state);
-        location.href = wechatUrl;
+        let copyTextInout = document.getElementById("copyingTextInput");
+        copyTextInout.value(location.href);
+        copyTextInout.select();
+        copyTextInout.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        alert.show(__('useWechatToLogin'));
       }
     }
   },
@@ -890,9 +886,9 @@ let localOrderObj = {
   },
   loadPoints : function(fromCache){
     let hasPoints = false;
-    if(!!fromCache){
-      hasPoints = helperMethod.readCookie('points');
-    }
+    // if(!!fromCache){
+    //   hasPoints = helperMethod.readCookie('points');
+    // }
     this.localPoints = hasPoints;
   },
   /*

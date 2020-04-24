@@ -1,5 +1,5 @@
 <link href="/assets/checkout.css" rel="stylesheet">
-<div id="meal-confirm-container" data-user="<%= user.id || null%>" data-email="<%= user.email || ''%>" class="container mt-2 text-center">
+<div id="meal-confirm-container" data-user="<%= user.id || null%>" data-email="<%= user.email || ''%>" data-name="<%= user.firstname || ''%>" class="container mt-2 text-center">
   <% var meal = meals.meals[Object.keys(meals.meals)[0]].meals[0]; %>
   <div class="row">
     <div class="col-12">
@@ -90,7 +90,7 @@
                   var address = addressObj.street + ", " + addressObj.city + ", CA " + addressObj.zip + ", +" + addressObj.phone;
                 %>
                 <label class="btn btn-default vertical-inline option contactOption">
-                  <input type="radio" id="delivery-1-<%= i%>" data-username="<%= firstname%>" name="delivery-location-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="delivery-1-<%= i%>"></label>
+                  <input type="radio" id="delivery-1-<%= i%>" data-username="<%= addressObj.name%>" name="delivery-location-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="delivery-1-<%= i%>"></label>
                   <span style="margin-left: 10px;"><%= address %></span>
                 </label>
                 <%i++;})}; %>
@@ -539,20 +539,57 @@
               </h5>
             </div>
           <% }); %>
-          <div class="divider" style="margin:0;"></div>
-          <h5><small><%= __('subtotal')%>: <span class="subtotal"></span></small></h5>
-          <h5 class="d-flex justify-content-end">
-              <span>
-                <small>
+            <div class="divider" style="margin:0;"></div>
+            <h5><small><%= __('subtotal')%>: <span class="subtotal"></span></small></h5>
+            <h5 class="d-flex justify-content-end">
+                <span><small>
                   <%= __('transaction-fee')%>: <span class="transaction" data-value="0">$0</span><br/>
                   <%= __('delivery-fee')%>: <span class="delivery" data-value="0"></span><br/>
-                  <span class="text-red"><%= __('discount-amount')%>: -$<span class="discount-amount"></span></span><br/>
-                  <%= __('tip')%>: $<span class="tip">0</span><br/>
-                </small>
-              </span>
-          </h5>
-          <div class="divider" style="margin: 0;"></div>
-          <h5><%= __('total')%><span class="total"></span></h5>
+                </small></span>
+            </h5>
+
+            <% if(user && !user.emailVerified){%>
+              <div id="emailVerificationView">
+                <div class="d-flex justify-content-end vertical-align border-0">
+                  <%= __('email')%>
+                  <input class="form-control" name="email" style="width:170px;" type="email" value="<%= user.auth ? (user.auth.email || '') : ''%>">
+                  <i class="fas fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('email-verification-tips')%>"></i>
+                  <button id="emailVerifyBtn" class="btn btn-grey-green active"><%= __('verify-email')%></button>
+                </div>
+              </div>
+            <% }%>
+            <% if(user && user.id){%>
+              <div class="d-flex justify-content-end vertical-align">
+                <button id="applyPointsBtn" class="btn btn-success"><%= __('apply-code')%></button>
+                <button id="disApplyPointsBtn" class="btn btn-danger" onclick="l.applyPoints(false)"><%= __('cancel')%></button>
+                <input class="points form-control" style="margin:0 5px 0 5px;width: 60px;" readonly value="<%= user?(user.points || 0):-1%>"><i class="fas fa-question-circle text-lightgrey cursor-pointer" data-toggle="tooltip" title="<%= __('points-tips')%>"></i>
+                <h5 class="ml-auto text-red"><small><%= __('discount-amount')%>: -$<span class="discount-amount">0</span></small></h5>
+              </div>
+            <% }%>
+
+            <div class="d-flex justify-content-between vertical-align mt-2">
+              <div class="btn-group btn-group-toggle vertical-align" id="tipControl" data-toggle="buttons">
+                <label class="btn btn-outline-dark">
+                  <input type="radio" name="tipInputOption" autocomplete="off" value=15 checked data-value-type="%">
+                  15%
+                </label>
+                <label class="btn btn-outline-dark">
+                  <input type="radio" name="tipInputOption" autocomplete="off" value=12 data-value-type="%">
+                  12%
+                </label>
+                <label class="btn btn-outline-dark">
+                  <input type="radio" name="tipInputOption" autocomplete="off" value=10 data-value-type="%">
+                  10%
+                </label>
+                <label class="btn btn-outline-dark">
+                  <input type="radio" name="tipInputOption" autocomplete="off" value=0 data-value-type="%">
+                  No Tip
+                </label>
+              </div>
+              <h5 class="ml-auto"><small><%= ('Tip')%>: $<span class="tip"></span></small></h5>
+            </div>
+            <div class="divider" style="margin: 0;"></div>
+            <h5><%= __('total')%><span class="total"></span></h5>
         </div>
         <div id="orderAlertView" class="alert alert-danger d-none mt-2"></div>
 

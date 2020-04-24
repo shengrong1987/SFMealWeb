@@ -1,15 +1,10 @@
 <link href="/assets/dayOfMeal.css" rel="stylesheet">
 <div class="default-container text-center relative">
-  <div class="sticky-top">
-    <div class="w-100" style="height:50px;background-color: black;">
-      <h4></h4>
-    </div>
-  </div>
+
   <div id="dayOfMealContainer" style="max-width: 800px;" class="mx-auto" data-user-lat="<%= user?user.lat:''%>" data-user-long="<%= user?user.long:''%>" data-user="<%= user ? user.id : ''%>" data-pickup-nickname="<%= pickupNickname || ''%>">
+
     <% if(meals && meals.meals){%>
     <div class="w-100 sticky-top">
-        <h4></h4>
-      </div>
       <div class="dropdown white">
         <%
           var dates = Object.keys(meals.meals);
