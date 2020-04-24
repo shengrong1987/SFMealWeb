@@ -423,12 +423,10 @@ let helperMethod = {
         wechatUrl = wechatUrl.replace('$STATE',state);
         location.href = wechatUrl;
       }else{
-        let copyTextInout = document.getElementById("copyingTextInput");
-        copyTextInout.value(location.href);
-        copyTextInout.select();
-        copyTextInout.setSelectionRange(0, 99999);
-        document.execCommand("copy");
-        alert.show(__('useWechatToLogin'));
+        let copyTextInput = $("#copyingTextInput");
+        copyTextInput.select();
+        document.execCommand("Copy");
+        alert(__('useWechatToLogin'));
       }
     }
   },
