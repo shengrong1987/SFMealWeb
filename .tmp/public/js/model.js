@@ -1278,22 +1278,6 @@ var CartView = Backbone.View.extend({
     "change [name='tipInputOption']" : "changeTip",
     "blur #tipInput" : "changeTip"
   },
-  initialize : function(){
-    var tipValue = helperMethod.readCookie("tip");
-    if(typeof tipValue === "number"){
-      tipValue = parseFloat(tipValue);
-    }else{
-      tipValue = 0;
-    }
-    if(!tipValue){
-      let tipDefaultOpt = this.$el.find("#tipControl label:first");
-      tipDefaultOpt.addClass('active');
-      let subtotal = parseFloat(this.$el.find(".subtotal").text().replace("$",""));
-      tipValue = (subtotal * tipDefaultOpt.find("input").val() / 100).toFixed(2);
-      helperMethod.createCookie("tip", tipValue, 5);
-      localOrderObj.refreshCheckoutMenu();
-    }
-  },
   gotoCheckout : function(e){
     var orderedDishes = [];
     Object.keys(localOrderObj.localOrders).forEach(function(dishId){
@@ -3504,6 +3488,7 @@ var MealConfirmView = Backbone.View.extend({
     this.initMethodView();
     this.initDateFilter();
     this.initPaymentMethod();
+    this.initTipView();
     utility.initGoogleMapService();
   },
   initView : function(){
@@ -3545,13 +3530,30 @@ var MealConfirmView = Backbone.View.extend({
     localOrderObj.refreshCheckoutMenu();
   },
   initMethodView : function(){
-    var hasDelivery = this.$el.find("#pickupInfoView").data("hasdelivery");
+    let hasDelivery = this.$el.find("#pickupInfoView").data("hasdelivery");
     if(hasDelivery){
       this.$el.find(".pickupInput").hide();
       this.$el.find(".deliveryInput").show();
     }else{
       this.$el.find(".deliveryInput").hide();
       this.$el.find(".pickupInput").show();
+    }
+  },
+
+  initTipView: function(){
+    let tipValue = helperMethod.readCookie("tip");
+    if(typeof tipValue === "number"){
+      tipValue = parseFloat(tipValue);
+    }else{
+      tipValue = 0;
+    }
+    if(!tipValue){
+      let tipDefaultOpt = this.$el.find("#tipControl label:first");
+      tipDefaultOpt.addClass('active');
+      let subtotal = parseFloat(this.$el.find(".subtotal").text().replace("$",""));
+      tipValue = (subtotal * tipDefaultOpt.find("input").val() / 100).toFixed(2);
+      helperMethod.createCookie("tip", tipValue);
+      localOrderObj.refreshCheckoutMenu();
     }
   },
 
@@ -3597,11 +3599,13 @@ var MealConfirmView = Backbone.View.extend({
   /*
   Public API: Prompt delivery time confirmation and show payment window
    */
-  confirmDeliveryTime : function(e){
+  confirmDeliveryTime: function(e){
     e.preventDefault();
     let _this = this;
     let dateDesc = decodeURI(helperMethod.readCookie("date"));
     let chooseOption = this.getChooseOption(dateDesc);
+    let email = this.$el.data("email");
+    let isAdmin = email === "admin@sfmeal.com";
     if(!chooseOption.length){
       helperMethod.makeAToast(__('pickupOptionNotChoose'));
       return;
@@ -3627,7 +3631,7 @@ var MealConfirmView = Backbone.View.extend({
             if(method==="delivery"){
               let subtotal = parseFloat(_this.$el.find(".subtotal").data("value"));
               let minimalOrder = parseFloat(chooseOption.parent().data("minimal"));
-              if(subtotal < minimalOrder){
+              if(subtotal < minimalOrder && !isAdmin){
                 let minimalRequirementTip = minimalOrder == 25 ? __('order-single-minimal-not-reach-25') : __('order-single-minimal-not-reach-65');
                 BootstrapDialog.show({
                   title: __('deliveryTimeConfirmationTitle'),
@@ -4082,7 +4086,7 @@ var OrderView = Backbone.View.extend({
             }else{
               contactObj.address = address;
               contactObj.phone = phone;
-              contactObj.name = optionView.data("username") || this.$el.data("name");
+              contactObj.name = optionView.data("username") || this.$el.find("name");
             }
           } else {
             helperMethod.makeAToast(__('contactAndAddressEmptyError'));
@@ -4248,7 +4252,7 @@ var OrderView = Backbone.View.extend({
       //pickup option
       var pickupObj = $this.getPickupOption(method);
       if(!pickupObj){
-        helperMethod.jumpTo("pickupOdeliveryDateBtnptionsView");
+        helperMethod.jumpTo("pickupOrderDeliveryDateBtnOptionsView");
         return;
       }
       var pickupOption = pickupObj.index;

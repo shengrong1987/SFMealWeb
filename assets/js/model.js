@@ -4086,7 +4086,7 @@ var OrderView = Backbone.View.extend({
             }else{
               contactObj.address = address;
               contactObj.phone = phone;
-              contactObj.name = optionView.data("username");
+              contactObj.name = optionView.data("username") || this.$el.find("name");
             }
           } else {
             helperMethod.makeAToast(__('contactAndAddressEmptyError'));

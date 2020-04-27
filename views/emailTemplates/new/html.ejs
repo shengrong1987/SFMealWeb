@@ -69,6 +69,12 @@
         <td></td>
         <td></td>
         <td></td>
+        <td style="text-align: right;"><%= tipamount%>: $<%= tip.toFixed(2)%></td>
+      </tr>
+      <tr class="border-less">
+        <td></td>
+        <td></td>
+        <td></td>
         <td style="text-align: right;"><%= tax%>: $<%= (subtotal * taxRate).toFixed(2)%></td>
       </tr>
       <tr class="border-less">
@@ -81,7 +87,7 @@
         <td></td>
         <td></td>
         <td></td>
-        <td style="text-align: right;"><%= total%> $<%= (subtotal * (1 + taxRate) + delivery_fee + service_fee + transaction_fee - discount).toFixed(2)%></td>
+        <td style="text-align: right;"><%= total%> $<%= (subtotal * (1 + taxRate) + tip + delivery_fee + service_fee + transaction_fee - discount).toFixed(2)%></td>
       </tr>
       <tr>
         <td><%= ordertime%>: <%= createdAt%></td>

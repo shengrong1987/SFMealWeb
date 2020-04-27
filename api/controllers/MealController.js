@@ -371,7 +371,7 @@ module.exports = {
         }
         meals = _this.composeMealWithDate(meals);
         // res.set('Cache-Control', 'public, max-age=31557600');
-        res.view("dayOfMeal",{ meals : meals, hosts: _hosts, user : _u, tags: _tags, pickupNickname : pickupNickname, zipcode: zipcode, minimalOrder : minimalOrder, locale : req.getLocale()});
+        res.view("dayOfMeal",{ funds: 100, meals : meals, hosts: _hosts, user : _u, tags: _tags, pickupNickname : pickupNickname, zipcode: zipcode, minimalOrder : minimalOrder, locale : req.getLocale()});
       })
     })
   },
@@ -684,7 +684,7 @@ module.exports = {
         if(req.wantsJSON && process.env.NODE_ENV === "development") {
           res.ok({meals: found, search : true, keyword : keyword, user: req.session.user, zipcode : zipcode, county : county, minimalOrder : minimalOrder, hosts : _hosts, tags : _tags});
         }else{
-          res.view("dayOfMeal",{ meals: found, hosts: _hosts, tags: _tags, search: true, keyword : keyword, user: req.session.user, zipcode: zipcode, minimalOrder: minimalOrder, county : county, pickupNickname : pickupNickname });
+          res.view("dayOfMeal",{ funds: 100, meals: found, hosts: _hosts, tags: _tags, search: true, keyword : keyword, user: req.session.user, zipcode: zipcode, minimalOrder: minimalOrder, county : county, pickupNickname : pickupNickname });
         }
       });
     });

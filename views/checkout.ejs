@@ -1,5 +1,5 @@
 <link href="/assets/checkout.css" rel="stylesheet">
-<div id="meal-confirm-container" data-user="<%= user.id || null%>" data-email="<%= user.email || ''%>" data-name="<%= user.firstname || ''%>" class="container mt-2 text-center">
+<div id="meal-confirm-container" data-user="<%= user.id || null%>" data-email="<%= user.email || ''%>" data-name="<%= user.firstname || 'guest'%>" class="container mt-2 text-center">
   <% var meal = meals.meals[Object.keys(meals.meals)[0]].meals[0]; %>
   <div class="row">
     <div class="col-12">
