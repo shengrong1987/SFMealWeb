@@ -527,7 +527,7 @@
               <%})}%>">
               <h5 class="d-flex justify-content-end vertical-align">
                 <small>
-                  <%= dish.titleI18n() %> X<span class="amount mr-2">1</span>
+                  <%= dish.titleI18n() %> X<span class="amount mr-2">1</span><span class="preference"></span>
                   <span class="text-price price" data-extra=0 value="<%= dish.price%>" data-discount="<%= dish.discount || 0%>">
                   <% if(dish.discount){%>
                     <s class='text-grey' style='font-size: small;'>$<%= (parseFloat(dish.price) + parseFloat(dish.discount)).toFixed(2)%></s>$<%= dish.price.toFixed(2)%>
