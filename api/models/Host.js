@@ -140,15 +140,21 @@ module.exports = {
     },
     //check stripe verification, return verification object if not there's field_needed
     checkVerification : function(cb){
-      var host = this;
+      let host = this;
       stripe.getAccount(this.accountId, function(err, account){
         if(err){
           return cb(err);
         }
-        host.individual = account.individual;
-        let eventually_due = account.individual.requirements.eventually_due;
-        console.log("host requirements items: " + eventually_due.length)
-        return cb(null, eventually_due.length === 0);
+        let isPass = false;
+        if(account.business_type === "individual"){
+          host.individual = account.individual;
+          isPass = account.individual.requirements.eventually_due.length === 0;
+        }else if(account.business_type === "llc"){
+          host.company = account.company;
+          console.log(account.company.address.city, account.company.name, account.company.owners_provided, account.company.phone, account.company.tax_id_provided);
+          isPass = !!account.company.address.city && !!account.company.name && account.company.owners_provided && account.company.phone && account.company.tax_id_provided;
+        }
+        return cb(null, isPass);
       });
     },
     //check all validation as host

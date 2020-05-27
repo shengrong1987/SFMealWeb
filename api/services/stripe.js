@@ -143,8 +143,8 @@ module.exports = {
   getAccountLinks: function(accountId, cb){
     stripe.accountLinks.create({
       account: accountId,
-      failure_url: 'https://localhost:1337/host/setupFail',
-      success_url: 'https://localhost:1337/host/apply',
+      failure_url: 'http://sfmeal.com/host/setupFail',
+      success_url: 'http://sfmeal.com/host/apply',
       type: 'custom_account_verification',
       collect: 'eventually_due'
     }, function(err, accountLinks){
@@ -165,6 +165,14 @@ module.exports = {
     console.log("total: " + attr.metadata.total + " application_fee_amount: " + attr.metadata.application_fee_amount);
     if(totalToChef <= 0){
       return cb({ responseText: "order total amount is less than zero" });
+    }
+    if(attr.metadata.hostId === "587dcd81dd35fab4091bcc74"){
+      return cb(null, {
+          id : "cash",
+          status : "succeeded",
+          amount : attr.metadata.total,
+          application_fee_amount : attr.metadata.application_fee_amount
+        }, null)
     }
     stripe.transfers.create({
         amount: totalToChef,
