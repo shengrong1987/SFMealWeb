@@ -13,7 +13,7 @@ var stripe = require("../services/stripe");
 var actionUtil = require('../../node_modules/sails/lib/hooks/blueprints/actionUtil.js');
 var async = require('async');
 const DELIVERY_FEE = 0;
-const MINIMAL_ORDER = 25;
+const MINIMAL_ORDER = 30;
 /*
  error
  * -1 : geo service not available

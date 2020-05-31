@@ -944,7 +944,7 @@
   "store-hours" : "营业时间",
   "custom" : "自定义营业时间",
   "order-single-minimal-not-reach" : "订单最低金额未达到：$%s",
-  "order-single-minimal-not-reach-25" : "订单最低金额未达到$25",
+  "order-single-minimal-not-reach-30" : "订单最低金额未达到$30",
   "order-single-minimal-not-reach-65" : "订单最低金额未达到$65",
   "ends" : "结束于",
   "already-signup" : "已有账号？登录",

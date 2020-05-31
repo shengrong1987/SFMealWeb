@@ -940,7 +940,7 @@
   "store-hours" : "Store Hour",
   "custom" : "Custom Hour",
   "order-single-minimal-not-reach" : "Not reach minimal order amount: $%s",
-  "order-single-minimal-not-reach-25" : "Not reach minimal order amount: $25",
+  "order-single-minimal-not-reach-30" : "Not reach minimal order amount: $30",
   "order-single-minimal-not-reach-65" : "Not reach minimal order amount: $65",
   "ends" : "ends",
   "already-signup" : "Have an account？Login",
