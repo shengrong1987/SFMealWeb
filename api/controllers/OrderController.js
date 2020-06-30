@@ -534,70 +534,71 @@ module.exports = {
               })
             }else{
               async.eachSeries(_orders,async function(order, nextIn){
-                if(order.paymentMethod === "paypal"){
-                  order.isPaid = true;
-                  order.transaction_fee = order.subtotal * stripe.ONLINE_TRANSACTION_FEE;
-                  nextIn();
-                }else{
-                  stripe.charge({
-                    paymentMethod : order.paymentMethod,
-                    isInitial : true,
-                    amount : order.subtotal * 100,
-                    tip : order.tip,
+                stripe.charge({
+                  paymentMethod : order.paymentMethod,
+                  isInitial : true,
+                  amount : order.subtotal * 100,
+                  tip : order.tip,
+                  deliveryFee : parseInt(order.delivery_fee * 100),
+                  discount : order.discount * 100,
+                  email : order.guestEmail,
+                  customerId : order.customerId,
+                  destination : order.host.accountId,
+                  meal : order.meal,
+                  method : order.method,
+                  tax : 0,
+                  isPartyMode : order.isPartyMode,
+                  metadata : {
+                    mealId : order.meal.id,
+                    hostId : order.host.id,
+                    orderId : order.id,
+                    userId : order.customer,
                     deliveryFee : parseInt(order.delivery_fee * 100),
-                    discount : order.discount * 100,
-                    email : order.guestEmail,
-                    customerId : order.customerId,
-                    destination : order.host.accountId,
-                    meal : order.meal,
-                    method : order.method,
-                    tax : 0,
-                    isPartyMode : order.isPartyMode,
-                    metadata : {
-                      mealId : order.meal.id,
-                      hostId : order.host.id,
-                      orderId : order.id,
-                      userId : order.customer,
-                      deliveryFee : parseInt(order.delivery_fee * 100),
-                      tax : 0
-                    }
-                  },function(err, charge, transfer){
-                    if(err){
-                      Order.destroy(order.id).exec(function(err2){
-                        if(err2){
-                          return nextIn(err2);
-                        }
-                        order.source = "cancel";
-                        order.msg = err.message;
-                        return nextIn({ code : -39, responseText : err.message });
-                      });
+                    tax : 0
+                  }
+                },function(err, charge, transfer){
+                  if(err){
+                    Order.destroy(order.id).exec(function(err2){
+                      if(err2){
+                        return nextIn(err2);
+                      }
+                      order.source = "cancel";
+                      order.msg = err.message;
+                      return nextIn({ code : -39, responseText : err.message });
+                    });
+                  }else{
+                    order.source = "charged";
+                    order.charges = {};
+                    order.transfer = {};
+                    order.feeCharges = {};
+                    order.application_fees = {};
+                    if(order.paymentMethod === "online"){
+                      if(charge){
+                        order.isPaid = true;
+                        order.charges[charge.id] = charge.amount;
+                        order.application_fees[charge.id] = parseInt(charge.metadata.application_fee_amount);
+                        order.transaction_fee = order.subtotal * stripe.ONLINE_TRANSACTION_FEE;
+                      }
+                    }else if(order.paymentMethod === "paypal"){
+                      order.isPaid = true;
+                      order.transaction_fee = order.subtotal * stripe.ONLINE_TRANSACTION_FEE;
+                      order.charges['paypal'] = order.charges['paypal'] || 0;
+                      order.application_fees['paypal'] = order.application_fees['paypal'] || 0;
+                      order.charges['paypal'] += charge.amount;
+                      order.application_fees['paypal'] += charge.application_fee_amount;
                     }else{
-                      order.source = "charged";
-                      order.charges = {};
-                      order.transfer = {};
-                      order.feeCharges = {};
-                      order.application_fees = {};
-                      if(order.paymentMethod === "online"){
-                        if(charge){
-                          order.isPaid = true;
-                          order.charges[charge.id] = charge.amount;
-                          order.application_fees[charge.id] = parseInt(charge.metadata.application_fee_amount);
-                          order.transaction_fee = order.subtotal * stripe.ONLINE_TRANSACTION_FEE;
-                        }
-                      }else{
-                        order.transaction_fee = 0;
-                        order.charges['cash'] = order.charges['cash'] || 0;
-                        order.application_fees['cash'] = order.application_fees['cash'] || 0;
-                        order.charges['cash'] += charge.amount;
-                        order.application_fees['cash'] += charge.application_fee_amount;
-                      }
-                      if(transfer){
-                        order.transfer[transfer.id] = transfer.amount;
-                      }
-                      nextIn();
+                      order.transaction_fee = 0;
+                      order.charges['cash'] = order.charges['cash'] || 0;
+                      order.application_fees['cash'] = order.application_fees['cash'] || 0;
+                      order.charges['cash'] += charge.amount;
+                      order.application_fees['cash'] += charge.application_fee_amount;
                     }
-                  });
-                }
+                    if(transfer){
+                      order.transfer[transfer.id] = transfer.amount;
+                    }
+                    nextIn();
+                  }
+                });
               }, function(err){
                 if(err){
                   return next(err);

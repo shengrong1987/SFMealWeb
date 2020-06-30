@@ -1622,12 +1622,19 @@ module.exports = {
             var thisWeekPickups = pickups.filter(function(p){
               return p.nickname.indexOf("下") === -1;
             });
-            var thisPickupName = "";
+            let thisPickupName = "";
+            let preOrderPickupName = "";
             thisWeekPickups.forEach(function(p){
               if(!_pickups.includes(p.nickname)){
                 _pickups.push(p.nickname);
                 if(thisPickupName){
                   thisPickupName += "+";
+                }
+                if(preOrderPickupName){
+                  preOrderPickupName += "+";
+                }
+                if(p.nickname !== "周三晚上"){
+                  preOrderPickupName += p.nickname;
                 }
                 thisPickupName += p.nickname;
               }
@@ -1649,6 +1656,9 @@ module.exports = {
             _pickups.push("custom");
             if(thisPickupName){
               _pickups.push(thisPickupName);
+            }
+            if(preOrderPickupName){
+              _pickups.push(preOrderPickupName);
             }
             if(nextPickupName){
               _pickups.push(nextPickupName);

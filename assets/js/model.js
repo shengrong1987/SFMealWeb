@@ -3770,6 +3770,7 @@ var MealConfirmView = Backbone.View.extend({
         var location = { lat : lat, long : long};
         var range = deliveryOption.parent().data("range");
         var distance = utility.getDistance(newCusLocation, location, "N");
+        console.log("dateDesc: " + dateDesc + "&distance:" + distance + "&range:" + range);
         if(dateDesc === deliveryOption.parent().data("date")){
           if(distance > range){
             deliveryOption.parent().hide();
