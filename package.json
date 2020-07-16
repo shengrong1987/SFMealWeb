@@ -62,7 +62,7 @@
     "kerberos": "^1.1.2",
     "keymirror": "~0.1.0",
     "less": "~v2.6.1",
-    "lodash": "^3.10.1",
+    "lodash": "^4.17.19",
     "lodash.isarray": "^4.0.0",
     "lodash.isobject": "^3.0.2",
     "lodash.isstring": "^4.0.1",
