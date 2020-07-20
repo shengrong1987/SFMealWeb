@@ -784,8 +784,9 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          res.body.allPickups.should.have.length(4);
+          res.body.allPickups.should.have.length(5);
           res.body.allPickups.should.containEql("pickupSet1+pickupSet2");
+          res.body.allPickups.should.containEql("custom");
           done();
         })
     });
@@ -970,7 +971,7 @@ describe('MealController', function() {
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .field('hasImage',"true")
-          .attach('image','/Users/shengrong/Documents/SFMeal/SFMealWeb/assets/images/dumplings.jpg')
+          .attach('image','/Users/shengrong/Documents/SFMeal/SFMealWeb/assets/images/success.png')
           .expect(200)
           .end(function(err, res){
             if(err){

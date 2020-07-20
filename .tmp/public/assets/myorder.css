@@ -3080,6 +3080,18 @@ small {
 .nav-link:hover {
   color: white; }
 
+.nav-link-top {
+  border-bottom: orange 0px solid !important; }
+
+.nav-link-top.active {
+  border-bottom: orange 5px solid !important; }
+
+.nav-link-top:hover {
+  border-color: orange !important; }
+
+.nav-link-top:focus {
+  border-color: orange !important; }
+
 .nav.bg-light .nav-link.active:hover {
   color: rgba(0, 0, 0, 0.75); }
 

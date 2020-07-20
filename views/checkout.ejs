@@ -67,12 +67,12 @@
                 %>
                 <label class="btn btn-default fixed-label vertical-align option contactOption">
                   <input type="radio" id="pickup-2-<%= i%>" name="pickup-contact-set" data-color="red" data-index="<%= i%>" class="regular-radio" <%= phone == user.phone ? "checked=''" : ''%>><label for="pickup-2-<%= i%>"></label>
-                  <span style="margin-left: 10px;"><%= (addressObj ? addressObj.name : firstname) + "+" + phone %></span>
+                  <span style="margin-left: 10px;"><%= ((addressObj && addressObj.name) ? addressObj.name : firstname) + "+" + phone %></span>
                 </label>
                 <%}}else{phone = user.phone;if(phone){ %>
                   <label class="btn btn-default fixed-label vertical-align option contactOption">
                     <input type="radio" id="pickup-2-<%= i%>" name="pickup-contact-set" data-index="<%= i%>" class="regular-radio" checked=''><label for="pickup-2-<%= i%>"></label>
-                    <span style="margin-left: 10px;"><%= (addressObj ? addressObj.name : firstname) + "+" + phone %></span>
+                    <span style="margin-left: 10px;"><%= ((addressObj && addressObj.name) ? addressObj.name : firstname) + "+" + phone %></span>
                   </label>
                 <%}} %>
               </div>
@@ -90,7 +90,7 @@
                   var address = addressObj.street + ", " + addressObj.city + ", CA " + addressObj.zip + ", +" + addressObj.phone;
                 %>
                 <label class="btn btn-default vertical-inline option contactOption">
-                  <input type="radio" id="delivery-1-<%= i%>" data-username="<%= addressObj ? addressObj.name : firstname%>" name="delivery-location-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="delivery-1-<%= i%>"></label>
+                  <input type="radio" id="delivery-1-<%= i%>" data-username="<%= ((addressObj && addressObj.name) ? addressObj.name : firstname) %>" name="delivery-location-set" class="regular-radio" <%= addressObj.isDefault ? "checked=''" : ''%>><label for="delivery-1-<%= i%>"></label>
                   <span style="margin-left: 10px;"><%= address %></span>
                 </label>
                 <%i++;})}; %>
@@ -581,6 +581,10 @@
                 <label class="btn btn-outline-dark">
                   <input type="radio" name="tipInputOption" autocomplete="off" value=10 data-value-type="%">
                   10%
+                </label>
+                <label class="btn btn-outline-dark">
+                  <input type="radio" name="tipInputOption" autocomplete="off" value=5 data-value-type="fix">
+                  $5
                 </label>
                 <label class="btn btn-outline-dark">
                   <input type="radio" name="tipInputOption" autocomplete="off" value=0 data-value-type="%">

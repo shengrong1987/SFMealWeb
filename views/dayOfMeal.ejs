@@ -53,7 +53,7 @@
             <input name="zipcode" style="width: 96px;" value="<%= zipcode || (user ? user.zipcode  : '94014')%>">
             <button id="changeZipcodeBtn"><i class="fa fa-check-circle cursor-pointer"></i></button>
           </div>
-          <h5 class="text-left pl-4"><small class="text-red">您的地区起送费是: $<%= minimalOrder%></small></h5>
+          <h5 class="text-lft pl-4"><small class="text-red">您的地区起送费是: $<%= minimalOrder%></small></h5>
           <div class="dropdown-divider"></div>
           <% dates.forEach(function(dateKey,i){ %>
             <label class="d-flex px-4 vertical-align dropdown-item" style="background: none;" value=".<%= dateKey.replace(/\/|\'/g,'')%>">
@@ -68,7 +68,7 @@
         <%
         hosts.forEach(function(host,i){ %>
           <li class="mix nav-item px-1 <%= i===0?'active':''%> <%= host.dates.replace(/\/|\'/g,'')%>">
-            <a class="nav-link <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-filter-type="chef" data-filter=".<%= host.chef.shopName.replace(/ |\'/g,'')%>" data-toggle="tab" data-likes="<%= host.chef.likes || 0%>" data-picture="<%= host.chef.picture%>" data-host="<%= host.chef.id%>" data-follow-text="<%= __('follow')%>" data-followed-text="<%= __('followed')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].chef.id}))) ? true : false%>" data-score="<%= host.chef.averageScore || 5%>" style="max-width:100px;font-size: 8px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">
+            <a class="nav-link nav-link-top <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-filter-type="chef" data-filter=".<%= host.chef.shopName.replace(/ |\'/g,'')%>" data-toggle="tab" data-likes="<%= host.chef.likes || 0%>" data-picture="<%= host.chef.picture%>" data-host="<%= host.chef.id%>" data-follow-text="<%= __('follow')%>" data-followed-text="<%= __('followed')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].chef.id}))) ? true : false%>" data-score="<%= host.chef.averageScore || 5%>" style="max-width:150px;font-size: 15px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;border-top:none;border-left:none;border-right: none;">
               <%= host.chef.shopName%>
             </a>
           </li>

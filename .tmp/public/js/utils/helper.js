@@ -722,7 +722,6 @@ let localOrderObj = {
     }
     var _this = this;
     $("#order").find(".item").each(function(index){
-      console.log("index: " + index);
       let _this2 = $(this);
       let dishId = $(this).data("id");
       if(fromCache){
@@ -744,6 +743,13 @@ let localOrderObj = {
             $(this).find("[name='order-btn']").hide();
             $(this).find(".amount").val(_this.localOrders[dishId].number);
             $(this).find(".amount").text(_this.localOrders[dishId].number);
+            if(_this.localOrders[dishId].preference){
+              let prefText = "";
+              _this.localOrders[dishId].preference.forEach(function(prefObj){
+                prefText += "(" + prefObj.property.join(",") + ")";
+              });
+              $(this).find(".preference").text(prefText);
+            }
             _this2.amountInput('update',$(this).find("[data-toggle='amount-input']"));
             $(this).find("[data-toggle='amount-input']").on('change', _this.refreshCheckoutMenu);
           });

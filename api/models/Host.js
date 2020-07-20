@@ -148,6 +148,8 @@ module.exports = {
         let isPass = false;
         if(account.business_type === "individual"){
           host.individual = account.individual;
+          console.log("account info: ");
+          console.dir(host.individual);
           isPass = account.individual.requirements.eventually_due.length === 0;
         }else if(account.business_type === "llc"){
           host.company = account.company;

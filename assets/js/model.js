@@ -4443,6 +4443,7 @@ var OrderView = Backbone.View.extend({
   },
 
   changeTip : function(e){
+    console.log("change tip option");
     let tipInputOption = $(e.currentTarget);
     let valueType = tipInputOption.data("value-type");
     let tipInput = this.$el.find("#tipInput");
@@ -4450,9 +4451,8 @@ var OrderView = Backbone.View.extend({
     let subtotal = parseFloat(this.$el.find(".subtotal").text().replace("$",""));
     if(valueType==="%"){
       tipValue = (subtotal * tipInputOption.val() / 100).toFixed(2);
-      tipInput.val(tipValue);
     }else{
-      tipValue = parseFloat(tipInput.val());
+      tipValue = tipInputOption.val();
     }
     helperMethod.createCookie("tip", tipValue, 5);
     localOrderObj.refreshCheckoutMenu();

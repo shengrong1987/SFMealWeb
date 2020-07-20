@@ -3632,7 +3632,7 @@ var MealConfirmView = Backbone.View.extend({
               let subtotal = parseFloat(_this.$el.find(".subtotal").data("value"));
               let minimalOrder = parseFloat(chooseOption.parent().data("minimal"));
               if(subtotal < minimalOrder && !isAdmin){
-                let minimalRequirementTip = minimalOrder == 25 ? __('order-single-minimal-not-reach-25') : __('order-single-minimal-not-reach-65');
+                let minimalRequirementTip = minimalOrder == 30 ? __('order-single-minimal-not-reach-30') : __('order-single-minimal-not-reach-65');
                 BootstrapDialog.show({
                   title: __('deliveryTimeConfirmationTitle'),
                   message : minimalRequirementTip,
@@ -3770,6 +3770,7 @@ var MealConfirmView = Backbone.View.extend({
         var location = { lat : lat, long : long};
         var range = deliveryOption.parent().data("range");
         var distance = utility.getDistance(newCusLocation, location, "N");
+        console.log("dateDesc: " + dateDesc + "&distance:" + distance + "&range:" + range);
         if(dateDesc === deliveryOption.parent().data("date")){
           if(distance > range){
             deliveryOption.parent().hide();
