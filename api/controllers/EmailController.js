@@ -177,9 +177,7 @@ module.exports = {
                                   if(orderSummary[dishId].preference){
                                     orderSummary[dishId].preference += ",";
                                   }
-                                  if(prop.property && prop.property !== "undefined"){
-                                    orderSummary[dishId].preference += prop.property;
-                                  }
+                                  orderSummary[dishId].preference += prop;
                                 })
                               }
                             })
@@ -201,9 +199,7 @@ module.exports = {
                                 if(dishObj.preference){
                                   dishObj.preference += ",";
                                 }
-                                if(prop.property && prop.property !== "undefined"){
-                                  dishObj.preference += prop.property;
-                                }
+                                dishObj.preference += prop;
                               })
                             }
                           })
@@ -214,10 +210,11 @@ module.exports = {
                         orderSummary[dishId] = dishObj;
                       }
                     })
-                  })
+                  });
                   meal.orders = orders;
                   meal.orderSummary = orderSummary;
                   meal.hostEmail = meal.chef.email;
+                  meal.isSendToHost = true;
                   cb(null, meal);
                 })
               })

@@ -105,6 +105,22 @@ small{
   color : rgba(255, 255, 255, 1);
 }
 
+.nav-link-top{
+  border-bottom: orange 0px solid !important;
+}
+
+.nav-link-top.active{
+  border-bottom: orange 5px solid !important;
+}
+
+.nav-link-top:hover{
+  border-color: orange !important;
+}
+
+.nav-link-top:focus{
+  border-color: orange !important;
+}
+
 .nav-pills-orange .nav-link.active,
 .nav-pills-orange .show > .nav-link {
   color: #fff;

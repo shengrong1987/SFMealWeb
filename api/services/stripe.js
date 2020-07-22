@@ -161,8 +161,8 @@ module.exports = {
       attr.metadata.application_fee_amount = 50;
     }
     let transfer = {};
-    let totalToChef = attr.metadata.total + attr.metadata.discount - attr.metadata.application_fee_amount;
-    console.log("total: " + attr.metadata.total + " application_fee_amount: " + attr.metadata.application_fee_amount);
+    let totalToChef = attr.metadata.total - attr.metadata.tip + attr.metadata.discount - attr.metadata.application_fee_amount;
+    console.log("total: " + attr.metadata.total + "minus tip: " + attr.metadata.tip + " application_fee_amount: " + attr.metadata.application_fee_amount);
     if(totalToChef <= 0){
       return cb({ responseText: "order total amount is less than zero" });
     }
