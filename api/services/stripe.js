@@ -423,7 +423,7 @@ module.exports = {
     attr.metadata.total = parseInt(originalTotal - discount);
     attr.metadata.application_fee_amount = application_fee_amount;
     attr.metadata.total = attr.metadata.total < 0 ? 0 : attr.metadata.total;
-    attr.metadata.tip = attr.tip || 0;
+    attr.metadata.tip = tip || 0;
   },
 
   charge : function(attr, cb){
