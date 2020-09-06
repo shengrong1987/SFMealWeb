@@ -1,4 +1,4 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[62],{922:function(module,exports){
+(window.webpackJsonp=window.webpackJsonp||[]).push([[62],{924:function(module,exports){
 /*!
  * fullpage 1.4.0
  * Author: 抹桥 <yq12315@gmail.com>(http://www.kisnows.com)

@@ -784,7 +784,7 @@ describe('MealController', function() {
           if(err){
             return done(err);
           }
-          res.body.allPickups.should.have.length(5);
+          res.body.allPickups.should.have.length(6);
           res.body.allPickups.should.containEql("pickupSet1+pickupSet2");
           res.body.allPickups.should.containEql("custom");
           done();

@@ -348,7 +348,7 @@ module.exports = {
           })
           var tagOrder = {
             "chef" : 201,
-            "select" : 200,
+            "chefSpecial" : 200,
             "crawfish" : 195,
             "gift" : 190,
             "limited" : 180,
@@ -1623,6 +1623,7 @@ module.exports = {
               return p.nickname.indexOf("下") === -1;
             });
             let thisPickupName = "";
+            let secondPreorderPickupName = "";
             let preOrderPickupName = "";
             thisWeekPickups.forEach(function(p){
               if(!_pickups.includes(p.nickname)){
@@ -1633,8 +1634,14 @@ module.exports = {
                 if(preOrderPickupName){
                   preOrderPickupName += "+";
                 }
+                if(secondPreorderPickupName){
+                  secondPreorderPickupName += "+";
+                }
                 if(p.nickname !== "周三晚上"){
                   preOrderPickupName += p.nickname;
+                }
+                if(p.nickname !== "周三晚上" && p.nickname !== "周四晚上"){
+                  secondPreorderPickupName += p.nickname;
                 }
                 thisPickupName += p.nickname;
               }
@@ -1659,6 +1666,9 @@ module.exports = {
             }
             if(preOrderPickupName){
               _pickups.push(preOrderPickupName);
+            }
+            if(secondPreorderPickupName){
+              _pickups.push(secondPreorderPickupName);
             }
             if(nextPickupName){
               _pickups.push(nextPickupName);

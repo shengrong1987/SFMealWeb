@@ -174,6 +174,14 @@ module.exports = {
           application_fee_amount : attr.metadata.application_fee_amount
         }, null)
     }
+
+    return cb(null, {
+      id : "cash",
+      status : "succeeded",
+      amount : attr.metadata.total,
+      application_fee_amount : attr.metadata.application_fee_amount
+    }, null)
+
     stripe.transfers.create({
         amount: totalToChef,
         currency: 'usd',
