@@ -1365,7 +1365,7 @@ var DayOfMealView = Backbone.View.extend({
     var currentDateControl = this.$el.find("#dishDatesBar [data-filter='." + dateDesc + "']");
     var dateFilter = this.initDate(currentDateControl);
     var chefFilter;
-    var chefDesc = decodeURI(helperMethod.readCookie("chef"));
+    let chefDesc = decodeURI(helperMethod.readCookie("chef"));
     currentDateControl = this.$el.find("#hostBarView [data-filter='." + chefDesc + "']");
     if(currentDateControl.length){
       chefFilter = "." + chefDesc;

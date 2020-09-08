@@ -81,7 +81,7 @@
       <nav id="dishTagsBar" class="sticky-top" style="overflow-y: scroll;min-width: 100px;">
         <ul class="list list-side list-unstyled" data-toggle="btn-set">
           <% tags.forEach(function(tag, index){%>
-            <li class="cursor-pointer border-bottom <%= index===0?'active':''%> <%= tag==="discount"?'yellow':''%>"><a style="white-space: nowrap;" data-offset=-74 href="<%= tag.replace("'","").replace(" ","")%>"><%= __(tag)%></a></li>
+            <li class="cursor-pointer border-bottom <%= index===0?'active':''%> <%= tag==="discount"?'yellow':''%>"><a data-filter=".<%= tag.replace("'","").replace(" ","")%>" data-filter-type="category" style="white-space: nowrap;" data-offset=-74 href="<%= tag.replace("'","").replace(" ","")%>"><%= __(tag)%></a></li>
           <% })%>
         </ul>
         <% if(!user || (user && !user.newUserRewardIsRedeemed && user.points === 0)){ %>

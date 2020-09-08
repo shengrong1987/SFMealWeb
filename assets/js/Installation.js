@@ -118,8 +118,12 @@ async function initHashTag(){
               chefMixer.filter(h);
             }
             helperMethod.createCookie("chef", h.replace(".",""));
+            helperMethod.eraseCookie("category");
             $("#hostBarView [data-filter]").removeClass("active");
             $("#hostBarView [data-filter='" + h + "']").addClass("active");
+          }else if(filterType === "category"){
+            helperMethod.createCookie("category", h.replace(".",""));
+            helperMethod.eraseCookie("chef");
           }
         }
       })
@@ -283,6 +287,12 @@ let setupObj = {
             onMixStart: function (state, futureState) {
               helperMethod.changeSelectChefUI(futureState.activeFilter.selector);
               helperMethod.jumpTo("chef", -144);
+            },
+            onMixEnd: function (state) {
+              let categoryDesc = decodeURI(helperMethod.readCookie("category"));
+              if(categoryDesc){
+                helperMethod.jumpTo(categoryDesc, -74);
+              }
             }
           },
           multifilter: {
