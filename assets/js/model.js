@@ -1406,9 +1406,9 @@ var DayOfMealView = Backbone.View.extend({
     console.info("初始化日期:'%s'", dateFilter);
     if(dateMixer){
       if(this.$el.find("[data-filter='." + dateDesc +"']").length){
-        this.$el.find("#deliveryDateBtn").text(__('delivery-date') + dateDesc.replace(".",""));
+        this.$el.find("#deliveryDateBtn").text(__('change-delivery-date') + dateDesc.replace(".",""));
       }else{
-        this.$el.find("#deliveryDateBtn").text(__('delivery-date') + this.$el.find("[data-filter]").first().data('filter').replace(".",""));
+        this.$el.find("#deliveryDateBtn").text(__('change-delivery-date') + this.$el.find("[data-filter]").first().data('filter').replace(".",""));
       }
       dateMixer.filter(dateFilter);
     }

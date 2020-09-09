@@ -292,6 +292,7 @@ let setupObj = {
               let categoryDesc = decodeURI(helperMethod.readCookie("category"));
               if(categoryDesc){
                 helperMethod.jumpTo(categoryDesc, -74);
+                helperMethod.eraseCookie("category")
               }
             }
           },

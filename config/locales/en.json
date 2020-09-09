@@ -1185,6 +1185,7 @@
   "how-to-use-points" : "Choose in menu and redeem your points at checkout.",
   "user-alt-login" : "Already a member? Click here: ",
   "delivery-date" : "Delivery on:",
+  "change-delivery-date" : "Change Delivery Date:",
   "current-location" : "Current Location",
   "user-points-reminder" : "You still have %d points available to redeem at checkout ($%s)",
   "new-message-title" : "You have a new message.",
