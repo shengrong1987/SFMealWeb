@@ -3467,7 +3467,7 @@ var MealConfirmView = Backbone.View.extend({
   events : {
     "change #method" : "switchMethod",
     "mixEnd #deliveryTab" : "switchDate",
-    // "mixEnd #pickupTab" : "switchDate",
+    "mixEnd #pickupTab" : "switchDate",
     "click #verifyAddressBtn" : "verifyAddress",
     "change #deliveryTab .regular-radio" : "verifyAddress",
     "change #pickupInfoView .deliveryInput .contactOption .regular-radio" : "switchAddress",
@@ -3741,6 +3741,7 @@ var MealConfirmView = Backbone.View.extend({
   },
   getChooseOption : function(dateDesc){
     var option = this.$el.find("#pickupOptionsView .option[data-date='" + dateDesc + "'] .regular-radio:checked");
+    console.log("find pickup option: " + option);
     if(!option.parent().is(":visible")){
       return [];
     }
@@ -4100,6 +4101,7 @@ var OrderView = Backbone.View.extend({
   },
   getPickupOption : function(method){
     var optionItem = this.$el.find("#" + method + "Tab" + " .option:visible." + method +  "Option .regular-radio:checked");
+    console.log("find pickup option:" + optionItem);
     if(!optionItem.length) {
       helperMethod.makeAToast(__('pickupOptionNotChoose'));
       return null;
