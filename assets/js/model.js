@@ -2726,6 +2726,7 @@ var MyMealView = Backbone.View.extend({
       buttons: [{
         label: __('confirm'),
         action: function() {
+          console.log("confirm deletion");
           helperMethod.deleteHandler(data["id"], data["model"]);
         }
       }, {

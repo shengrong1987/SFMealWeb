@@ -498,6 +498,16 @@ module.exports = {
     }
   },
 
+  destroy : function(req, res){
+    var mealId = req.params.id;
+    Meal.destroy(mealId).exec(function(err, meal){
+      if(err){
+        return res.badRequest(err);
+      }
+      return res.ok({mealId : meal.id});
+    })
+  },
+
   searchAll : function(req, res){
     var keyword = req.query.keyword;
     delete req.query.keyword;

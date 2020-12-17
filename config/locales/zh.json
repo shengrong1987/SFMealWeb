@@ -91,6 +91,7 @@
   "reject-reason" : "拒绝原因",
   "confirm-pickup" : "确认取货",
   "confirm-delete" : "确认删除?",
+  "confirm-delete-content" : "如果选择是，您的菜单将会无法恢复",
   "confirm-order" : "确认订单",
   "transaction-complete" : "交易完成",
   "edit" : "编辑",

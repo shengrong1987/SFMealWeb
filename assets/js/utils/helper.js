@@ -260,7 +260,7 @@ let helperMethod = {
       success : function(){
         location.reload();
       },error : function(err){
-        helperMethod.makeAToast(this.getMsgFromError(err));
+        helperMethod.makeAToast(helperMethod.getMsgFromError(err));
       }
     })
   },

@@ -1023,7 +1023,7 @@ module.exports = require('waterlock').actions.user({
   },
 
   clean : function(req, res){
-    var s3 = new AWS.S3({ Bucket : sails.config.aws.bucket});
+    var s3 = new AWS.S3({ Bucket : sails.config.aws.bucket });
     var bucket = sails.config.aws.bucket;
     s3.listObjects({
       Prefix : "users/",
@@ -1088,6 +1088,7 @@ module.exports = require('waterlock').actions.user({
       })
     })
   },
+
   composeCharge : function(charge, order, host){
     var chargeId = charge.id;
     if(chargeId === "cash"){

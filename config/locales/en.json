@@ -92,6 +92,7 @@
   "reject-reason": "The reason for reject",
   "confirm-pickup": "Confirm pickup?",
   "confirm-delete": "Confirm delete?",
+  "confirm-delete-content" : "If Yes, your meal will not be able to recovered.",
   "confirm-order": "Confirm order",
   "transaction-complete": "Transaction completed",
   "edit": "Edit",
