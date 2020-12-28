@@ -236,6 +236,9 @@ let setupObj = {
           },
           selectors: {
             control: '[data-mixitup-control]'
+          },
+          animation: {
+            enable: false
           }
         });
         appObj.mealConfirmView.initDateFilter();

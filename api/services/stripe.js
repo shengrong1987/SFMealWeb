@@ -143,8 +143,8 @@ module.exports = {
   getAccountLinks: function(accountId, cb){
     stripe.accountLinks.create({
       account: accountId,
-      failure_url: 'http://sfmeal.com/host/setupFail',
-      success_url: 'http://sfmeal.com/host/apply',
+      failure_url: 'https://sfmeal.com/host/setupFail',
+      success_url: 'https://sfmeal.com/host/apply',
       type: 'custom_account_verification',
       collect: 'eventually_due'
     }, function(err, accountLinks){
