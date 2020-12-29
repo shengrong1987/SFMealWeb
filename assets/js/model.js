@@ -3764,7 +3764,8 @@ var MealConfirmView = Backbone.View.extend({
       var newCusLocation = {
         lat: cusLocation.lat(),
         long: cusLocation.lng()
-      }
+      };
+
       deliveryOptions.each(function(index){
         var deliveryOption = $(this);
         var lat = deliveryOption.parent().data('lat');
@@ -3772,8 +3773,8 @@ var MealConfirmView = Backbone.View.extend({
         var location = { lat : lat, long : long};
         var range = deliveryOption.parent().data("range");
         var distance = utility.getDistance(newCusLocation, location, "N");
-        console.log("dateDesc: " + dateDesc + "&distance:" + distance + "&range:" + range);
-        if(dateDesc === deliveryOption.parent().data("date")){
+        
+        if(dateDesc === deliveryOption.data("date")){
           if(distance > range){
             deliveryOption.parent().hide();
           }else{
