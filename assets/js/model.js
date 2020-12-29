@@ -3468,7 +3468,7 @@ var MealConfirmView = Backbone.View.extend({
   events : {
     "change #method" : "switchMethod",
     "mixEnd #deliveryTab" : "switchDate",
-    "mixEnd #pickupTab" : "switchDate",
+    // "mixEnd #pickupTab" : "switchDate",
     "click #verifyAddressBtn" : "verifyAddress",
     "change #deliveryTab .regular-radio" : "verifyAddress",
     "change #pickupInfoView .deliveryInput .contactOption .regular-radio" : "switchAddress",
@@ -3773,11 +3773,15 @@ var MealConfirmView = Backbone.View.extend({
         var location = { lat : lat, long : long};
         var range = deliveryOption.parent().data("range");
         var distance = utility.getDistance(newCusLocation, location, "N");
-        
-        if(dateDesc === deliveryOption.data("date")){
+
+        console.log("dateDesc: " + dateDesc + ",option date:" + deliveryOption.parent().data("date"));
+
+        if(dateDesc === deliveryOption.parent().data("date")){
           if(distance > range){
+            console.log("hiding");
             deliveryOption.parent().hide();
           }else{
+            console.log("showing");
             deliveryOption.parent().show();
           }
         }
