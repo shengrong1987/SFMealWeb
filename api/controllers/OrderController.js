@@ -2949,7 +2949,7 @@ module.exports = {
       }
       orders = orders.filter(function(order){
         var numberOfWeek = util.getWeekOfYear(order.pickupInfo.pickupFromTime);
-        var year = new Date(order.pickupInfo.pickupFromTime).getFullYear();
+        var year = moment(order.pickupInfo.pickupFromTime).startOf('week').year();
         var isYearMatch = yearWanted ? (parseInt(yearWanted) === year) : true;
         return numberOfWeek === parseInt(weekWanted) && isYearMatch;
       });
