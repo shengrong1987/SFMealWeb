@@ -2932,7 +2932,7 @@ module.exports = {
     moment.locale('en');
     var _this = this;
     var weekWanted = req.params['numberOfWeek'];
-    var date = parseInt(weekWanted) *  7;
+    var date = parseInt(weekWanted) *  6;
     var yearWanted = req.query.year;
     var beginDate = moment().set('year',yearWanted).set('dayOfYear',date-6).set('hour',0);
     var endDate = moment().set('year',yearWanted).set('dayOfYear',date).set('hour',0);
@@ -2948,7 +2948,7 @@ module.exports = {
         return res.badRequest(err);
       }
       orders = orders.filter(function(order){
-        var numberOfWeek = util.getWeekOfYear(order.pickupInfo.pickupFromTime);
+        var numberOfWeek = util.getWeekOfYear(order.pickupInfo.pickupFromTime) + 1;
         var year = moment(order.pickupInfo.pickupFromTime).startOf('week').year();
         var isYearMatch = yearWanted ? (parseInt(yearWanted) === year) : true;
         return numberOfWeek === parseInt(weekWanted) && isYearMatch;

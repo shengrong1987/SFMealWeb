@@ -138,6 +138,10 @@ module.exports.routes = {
   '/help' : { view : 'help'},
   '/trust' : { view : 'trust'},
   '/terms' : {view : 'terms'},
+  '/ordernow' : {
+    view: 'ordernow',
+    locals: { layout: 'popup'}
+    },
   "/apply" : "HostController.apply",
   "/pickup/:pickup" : "MealController.find",
   "/pickupoption/:id/update" : "PickupOptionController.update",
