@@ -140,7 +140,7 @@ module.exports.routes = {
   '/terms' : {view : 'terms'},
   '/ordernow' : {
     view: 'ordernow',
-    locals: { layout: 'popup'}
+    locals: { layout: 's'}
     },
   "/apply" : "HostController.apply",
   "/pickup/:pickup" : "MealController.find",
