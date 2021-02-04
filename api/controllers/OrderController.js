@@ -2931,11 +2931,10 @@ module.exports = {
   findOrdersOfWeek : function(req, res){
     moment.locale('en');
     var _this = this;
-    var weekWanted = req.params['numberOfWeek'];
-    var date = parseInt(weekWanted) *  6;
+    var weekWanted = parseInt(req.params['numberOfWeek']);
     var yearWanted = req.query.year;
-    var beginDate = moment().set('year',yearWanted).set('dayOfYear',date-6).set('hour',0);
-    var endDate = moment().set('year',yearWanted).set('dayOfYear',date).set('hour',0);
+    var beginDate = moment().set('year',yearWanted).week(weekWanted).set('hour',0).startOf('week');
+    var endDate = moment().set('year',yearWanted).week(weekWanted).set('hour',23).endOf('week');
     var type = req.query.type;
     var status = req.query.status || { '!' : ['cancel','pending-payment']};
     var numberOfWeekNow = util.getWeekOfYear(new Date());
