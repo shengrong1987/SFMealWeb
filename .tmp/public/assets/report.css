@@ -3864,23 +3864,28 @@ fieldset[disabled] .btn-red.active {
   border-color: #adadad; }
 
 .btn-google:active,
-.btn-google.active {
+.btn-google.active,
+.open > .dropdown-toggle.btn-google {
   color: white !important;
   background-color: #96e2c0 !important;
   border-color: #adadad; }
 
 .btn-google:active:hover,
 .btn-google.active:hover,
+.open > .dropdown-toggle.btn-google:hover,
 .btn-google:active:focus,
 .btn-google.active:focus,
+.open > .dropdown-toggle.btn-google:focus,
 .btn-google:active.focus,
-.btn-google.active.focus {
+.btn-google.active.focus,
+.open > .dropdown-toggle.btn-google.focus {
   color: white !important;
   background-color: #96e2c0 !important;
   border-color: #8c8c8c; }
 
 .btn-google:active,
-.btn-google.active {
+.btn-google.active,
+.open > .dropdown-toggle.btn-google {
   background-image: none; }
 
 .btn-blue {
@@ -3900,23 +3905,28 @@ fieldset[disabled] .btn-red.active {
   border-color: #adadad; }
 
 .btn-blue:active,
-.btn-blue.active {
+.btn-blue.active,
+.open > .dropdown-toggle.btn-blue {
   color: white !important;
   background-color: #96e2c0 !important;
   border-color: #adadad; }
 
 .btn-blue:active:hover,
 .btn-blue.active:hover,
+.open > .dropdown-toggle.btn-blue:hover,
 .btn-blue:active:focus,
 .btn-blue.active:focus,
+.open > .dropdown-toggle.btn-blue:focus,
 .btn-blue:active.focus,
-.btn-blue.active.focus {
+.btn-blue.active.focus,
+.open > .dropdown-toggle.btn-blue.focus {
   color: white !important;
   background-color: #96e2c0 !important;
   border-color: #8c8c8c; }
 
 .btn-blue:active,
-.btn-blue.active {
+.btn-blue.active,
+.open > .dropdown-toggle.btn-blue {
   background-image: none; }
 
 .btn-green {
@@ -3936,23 +3946,28 @@ fieldset[disabled] .btn-red.active {
   border-color: #adadad; }
 
 .btn-green:active,
-.btn-green.active {
+.btn-green.active,
+.open > .dropdown-toggle.btn-green {
   color: white !important;
   background-color: #a9cf68 !important;
   border-color: #adadad; }
 
 .btn-green:active:hover,
 .btn-green.active:hover,
+.open > .dropdown-toggle.btn-green:hover,
 .btn-green:active:focus,
 .btn-green.active:focus,
+.open > .dropdown-toggle.btn-green:focus,
 .btn-green:active.focus,
-.btn-green.active.focus {
+.btn-green.active.focus,
+.open > .dropdown-toggle.btn-green.focus {
   color: white !important;
   background-color: #a9cf68 !important;
   border-color: #8c8c8c; }
 
 .btn-green:active,
-.btn-green.active {
+.btn-green.active,
+.open > .dropdown-toggle.btn-green {
   background-image: none; }
 
 /*border*/

@@ -288,7 +288,7 @@ module.exports = {
           })
         })
       }
-      var _u=null,_tags=['chef'], _hosts = [];
+      var _u=null,_tags=['chef'], _hosts = [], _bonusDish = null;
       async.auto({
         findUser : function(next){
           if(!req.session.authenticated){
@@ -334,9 +334,12 @@ module.exports = {
             next();
           });
         },
-        findDishTags : function(next){
+        findDishTagsAndBonusDish : function(next){
           meals.forEach(function(meal){
             meal.dishes.forEach(function(dish){
+              if(dish.isBonus){
+                _bonusDish = dish;
+              }
               if(dish.tags){
                 dish.tags.forEach(function(tag){
                   if(!_tags.includes(tag) && !_tags.includes(req.__(tag))){
@@ -359,7 +362,7 @@ module.exports = {
             var tagOrderA = tagOrder.hasOwnProperty(a) ? tagOrder[a] : 0;
             var tagOrderB = tagOrder.hasOwnProperty(b) ? tagOrder[b] : 0;
             return tagOrderB - tagOrderA;
-          })
+          });
           next();
         }
       }, function(err){
@@ -371,7 +374,7 @@ module.exports = {
         }
         meals = _this.composeMealWithDate(meals);
         // res.set('Cache-Control', 'public, max-age=31557600');
-        res.view("dayOfMeal",{ funds: 100, meals : meals, hosts: _hosts, user : _u, tags: _tags, pickupNickname : pickupNickname, zipcode: zipcode, minimalOrder : minimalOrder, locale : req.getLocale()});
+        res.view("dayOfMeal",{ bonusDish : _bonusDish, meals : meals, hosts: _hosts, user : _u, tags: _tags, pickupNickname : pickupNickname, zipcode: zipcode, minimalOrder : minimalOrder, locale : req.getLocale()});
       })
     })
   },
