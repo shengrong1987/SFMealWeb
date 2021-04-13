@@ -101,7 +101,7 @@
               <div class="middle photo">
                 <% dish.photos.forEach(function(photo, index){ if(photo.v){%>
                   <a href="<%= photo.v %>" data-toggle="lightbox" data-title="<%= dish.titleI18n(locale)%>" data-footer="<%= dish.descriptionI18n(locale)%>" data-gallery="<%= dish.id%>" data-type="image">
-                    <img data-echo="<%= index===0? dish.photos[1].v : ''%>" class="rounded">
+                    <img data-echo="<%= index===0? dish.thumbnail : ''%>" class="rounded">
                   </a>
                 <% }});%>
               </div>

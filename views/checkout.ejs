@@ -492,11 +492,15 @@
                   </form>
                 <%}%>
 
+                  <div id="cardPayment" class="tab-pane <%if(card.isDefaultPayment){%> active<%}%>">
+                    <p><%= __('card-transaction-fee-instruction')%></p>
+                  </div>
+
                 <div id="cashPayment" class="tab-pane">
                   <p><%= __('pay-cash-instruction')%></p>
                   <button type="button" class="btn btn-danger btn-lg my-4 form-control" data-action="takeOrder"><strong><%= __('order-and-pay') %></strong></button>
                 </div>
-                <div id="venmoPayment" class="tab-pane active">
+                <div id="venmoPayment" class="tab-pane <%if(!card || !card.isDefaultPayment){%> active<%}%>">
                   <div>
                     <p><%= __('venmo-instruction')%></p>
                     <a href="https://venmo.com/sfmeal" target="_blank">https://venmo.com/sfmeal</a>
