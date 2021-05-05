@@ -492,7 +492,7 @@
                   </form>
                 <%}%>
 
-                  <div id="cardPayment" class="tab-pane <%if(card.isDefaultPayment){%> active<%}%>">
+                  <div id="cardPayment" class="tab-pane <%if(card && card.isDefaultPayment){%> active<%}%>">
                     <p><%= __('card-transaction-fee-instruction')%></p>
                   </div>
 

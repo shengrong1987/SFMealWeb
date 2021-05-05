@@ -782,7 +782,6 @@ let localOrderObj = {
       dishItem.find(".amount").val(number);
       dishItem.amountInput('update',dishItem.find("[data-toggle='amount-input']"));
       if(number>0){
-        dishItem.addClass("table-success");
         if(dishItem.hasClass(dateDesc)){
           dishItem.show();
         }
@@ -791,7 +790,6 @@ let localOrderObj = {
       }else{
         $(this).find("[name='input-group']").hide();
         $(this).find("[name='order-btn']").show();
-        dishItem.removeClass("table-success");
       }
       dishItem.find(".left-amount span").attr("value",left);
       dishItem.find(".left-amount span").html(left);

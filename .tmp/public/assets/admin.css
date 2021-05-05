@@ -2834,14 +2834,16 @@ button.bg-light:focus {
 .my-2 {
   margin-top: 0.5rem !important; }
 
-.mr-2 {
+.mr-2,
+.mx-2 {
   margin-right: 0.5rem !important; }
 
 .mb-2,
 .my-2 {
   margin-bottom: 0.5rem !important; }
 
-.ml-2 {
+.ml-2,
+.mx-2 {
   margin-left: 0.5rem !important; }
 
 .m-3 {
@@ -2880,14 +2882,6 @@ button.bg-light:focus {
 
 .p-1 {
   padding: 0.25rem !important; }
-
-
-.px-1 {
-  padding-right: 0.25rem !important; }
-
-
-.px-1 {
-  padding-left: 0.25rem !important; }
 
 .p-2 {
   padding: 0.5rem !important; }
@@ -2996,8 +2990,8 @@ button.bg-light:focus {
 .text-center {
   text-align: center !important; }
 
-.font-weight-bold {
-  font-weight: 700 !important; }
+.font-weight-light {
+  font-weight: 300 !important; }
 
 .text-white {
   color: #fff !important; }
@@ -3081,16 +3075,16 @@ small {
   color: white; }
 
 .nav-link-top {
-  border-bottom: orange 0px solid !important; }
+  border-bottom: #eb5c29 0px solid !important; }
 
 .nav-link-top.active {
-  border-bottom: orange 5px solid !important; }
+  border-bottom: #eb5c29 8px solid !important; }
 
 .nav-link-top:hover {
-  border-color: orange !important; }
+  border-color: #eb5c29 !important; }
 
 .nav-link-top:focus {
-  border-color: orange !important; }
+  border-color: #eb5c29 !important; }
 
 .nav.bg-light .nav-link.active:hover {
   color: rgba(0, 0, 0, 0.75); }
@@ -3171,10 +3165,10 @@ body.loading .modal-loading {
   outline: 0 !important; }
 
 input:hover {
-  border: solid 1px #ff7601 !important; }
+  border: solid 1px #eb5c29 !important; }
 
 input:focus {
-  border: solid 1px #ff7601 !important; }
+  border: solid 1px #eb5c29 !important; }
 
 .inline-block {
   display: inline-block; }
@@ -3358,7 +3352,7 @@ input:focus {
   background-color: white !important; }
 
 .orange {
-  background-color: #ff7601 !important; }
+  background-color: #eb5c29 !important; }
 
 .background-color {
   background-color: #f2f2f2 !important; }
@@ -3367,7 +3361,7 @@ input:focus {
   background-color: #999999 !important; }
 
 .light-grey {
-  background-color: #eee !important; }
+  background-color: #f9f7f2 !important; }
 
 .dark {
   background-color: #4d4049 !important; }
@@ -3395,7 +3389,7 @@ input:focus {
   color: white !important; }
 
 .text-lightgrey {
-  color: #eee !important; }
+  color: #f9f7f2 !important; }
 
 .text-grey {
   color: #999999 !important; }
@@ -3410,7 +3404,7 @@ input:focus {
   color: black !important; }
 
 .text-orange {
-  color: #ff7601 !important; }
+  color: #eb5c29 !important; }
 
 .text-dark {
   color: #4d4049 !important; }
@@ -3422,7 +3416,7 @@ input:focus {
   color: #151f45 !important; }
 
 .text-price {
-  color: #ff7601 !important;
+  color: #eb5c29 !important;
   font-size: large; }
 
 .text-preference {
@@ -3568,7 +3562,7 @@ label {
   border-radius: 50px;
   position: absolute;
   top: 3px;
-  background: #ff7601;
+  background: #eb5c29;
   box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.3);
   text-shadow: 0px;
   left: 3px;
@@ -3606,7 +3600,7 @@ label {
   color: #dcb97d; }
 
 .regular-radio[data-color='orange']:checked + label + span {
-  color: #ff7601; }
+  color: #eb5c29; }
 
 .regular-radio[data-color='dark-blue']:checked + label + span {
   color: #3f80f5; }
@@ -3719,7 +3713,7 @@ label {
   height: 50px; }
 
 .btn-disable {
-  background-color: #eee;
+  background-color: #f9f7f2;
   color: #999999; }
 
 .btn.active {
@@ -3734,6 +3728,12 @@ label {
 
 .btn.btn-fat.active {
   border: none !important; }
+
+.btn-order {
+  line-height: 0.6;
+  width: 24px;
+  height: 24px;
+  padding: 0; }
 
 /*sharp*/
 
@@ -3978,7 +3978,7 @@ fieldset[disabled] .btn-red.active {
   border-color: white !important; }
 
 .border-lightgrey {
-  border: solid 1px #eee !important; }
+  border: solid 1px #f9f7f2 !important; }
 
 .border-darkgrey {
   border: solid 1px #4d4049 !important; }
@@ -3988,6 +3988,9 @@ fieldset[disabled] .btn-red.active {
 
 .border-blue {
   border-color: #151f45 !important; }
+
+.border-orange {
+  border-color: #eb5c29 !important; }
 
 .border-white {
   border: solid 1px white !important; }
@@ -4019,12 +4022,12 @@ fieldset[disabled] .btn-red.active {
 .list.list-side li {
   height: 45px;
   line-height: 45px;
-  background-color: #eee; }
+  background-color: #f9f7f2; }
   .list.list-side li a {
     color: black; }
 
 .list.list-side li.active {
-  border-left: 5px solid #ff7601;
+  border-left: 5px solid #eb5c29;
   background-color: white; }
 
 /*nav*/
@@ -4180,7 +4183,7 @@ select.form-control {
   border: none; }
 
 .table-email tr {
-  border-bottom: 1px solid #eee; }
+  border-bottom: 1px solid #f9f7f2; }
 
 .table-email td {
   padding-top: 0.5em;
@@ -4239,7 +4242,7 @@ select.form-control {
         margin: 16px 20px 0 0;
         display: none; }
     .selectable-list li :hover {
-      background-color: #eee; }
+      background-color: #f9f7f2; }
   .selectable-list li.select {
     background-color: #63B446; }
     .selectable-list li.select a {
@@ -4431,6 +4434,9 @@ select.form-control {
 #hostBarView, #dishDatesBar {
   flex-wrap: nowrap;
   -ms-flex-wrap: nowrap; }
+
+#hostBarView {
+  border-bottom: solid 1px #eb5c29; }
 
 /* multiline label*/
 

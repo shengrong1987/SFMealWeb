@@ -16,9 +16,9 @@ $blue : #151f45;
 $dark-blue : #3f80f5;
 $red : #d60e0e;
 $white : white;
-$orange : #ff7601;
+$orange : #eb5c29;
 $grey : #999999;
-$light-grey : #eee;
+$light-grey : #f9f7f2;
 $medium-grey : #999999;
 $dark-grey : #4d4049;
 $black : black;
@@ -106,19 +106,19 @@ small{
 }
 
 .nav-link-top{
-  border-bottom: orange 0px solid !important;
+  border-bottom: $orange 0px solid !important;
 }
 
 .nav-link-top.active{
-  border-bottom: orange 5px solid !important;
+  border-bottom: $orange 8px solid !important;
 }
 
 .nav-link-top:hover{
-  border-color: orange !important;
+  border-color: $orange !important;
 }
 
 .nav-link-top:focus{
-  border-color: orange !important;
+  border-color: $orange !important;
 }
 
 .nav-pills-orange .nav-link.active,
@@ -1446,6 +1446,13 @@ label {
   border : none !important;
 }
 
+.btn-order{
+  line-height: 0.6;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+}
+
 /*sharp*/
 .btn.sharp {
   border-radius:0;
@@ -1737,6 +1744,10 @@ fieldset[disabled] .btn-red.active {
 
 .border-blue{
   border-color: $blue !important;
+}
+
+.border-orange{
+  border-color: $orange !important;
 }
 
 .border-round{
@@ -2851,6 +2862,10 @@ select.form-control{
 #hostBarView, #dishDatesBar{
   flex-wrap: nowrap;
   -ms-flex-wrap: nowrap;
+}
+
+#hostBarView{
+  border-bottom: solid 1px $orange;
 }
 
 $font-size: 15px;

@@ -334,21 +334,21 @@ let amountInput = function($){
   };
 
   AmountInput.prototype.update = function(){
-    this.$value = parseInt(this.$element.find("input").val());
+    this.$value = parseInt(this.$element.find(".amount").text());
   };
 
   AmountInput.prototype.add = function(node){
     if(this.$value < this.$options.max){
       this.$value = this.$value + 1;
     }
-    node.prev().val(this.$value);
+    node.prev().text(this.$value);
   };
 
   AmountInput.prototype.minus = function(node){
     if(this.$value > 0){
       this.$value = this.$value - 1;
     }
-    node.next().val(this.$value);
+    node.next().text(this.$value);
   };
 
   var addHandler = function(e){

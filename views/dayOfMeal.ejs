@@ -67,7 +67,7 @@
       <ul id="hostBarView" class="nav nav-tabs nav-scroll justify-content-md-center white" data-filter-group="chef">
         <%
         hosts.forEach(function(host,i){ %>
-          <li class="mix nav-item px-1 <%= i===0?'active':''%> <%= host.dates.replace(/\/|\'/g,'')%>">
+          <li class="mix nav-item <%= i===0?'active':''%> <%= host.dates.replace(/\/|\'/g,'')%>" style="width: 104px;max-width: 104px;">
             <a class="nav-link nav-link-top <%= i===0?'active':''%>" href="javascript:void(0);" data-mixitup-control data-filter-type="chef" data-filter=".<%= host.chef.shopName.replace(/ |\'/g,'')%>" data-toggle="tab" data-likes="<%= host.chef.likes || 0%>" data-picture="<%= host.chef.picture%>" data-host="<%= host.chef.id%>" data-follow-text="<%= __('follow')%>" data-followed-text="<%= __('followed')%>" data-followed="<%= (user && (user.follow && user.follow.some(function(f){ f.id === hosts[0].chef.id}))) ? true : false%>" data-score="<%= host.chef.averageScore || 5%>" style="max-width:150px;font-size: 15px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;border-top:none;border-left:none;border-right: none;">
               <%= host.chef.shopName%>
             </a>
@@ -78,7 +78,7 @@
     <% }%>
 
     <div class="w-100 d-flex border-top-0" style="border: lightgrey solid 1px;">
-      <nav id="dishTagsBar" class="sticky-top" style="overflow-y: scroll;min-width: 100px;">
+      <nav id="dishTagsBar" class="sticky-top" style="overflow-y: scroll;min-width: 103px;">
         <ul class="list list-side list-unstyled" data-toggle="btn-set">
           <% tags.forEach(function(tag, index){%>
             <li class="cursor-pointer border-bottom <%= index===0?'active':''%> <%= tag==="discount"?'yellow':''%>"><a data-filter=".<%= tag.replace("'","").replace(" ","")%>" data-filter-type="category" style="white-space: nowrap;" data-offset=-74 href="<%= tag.replace("'","").replace(" ","")%>"><%= __(tag)%></a></li>
@@ -121,15 +121,11 @@
                       $<%= dish.price.toFixed(2)%>
                     <% }%>
                   </div>
-                  <button name="order-btn" style="width: 38px;height: 38px;" class="btn rounded-circle white text-orange font-weight-bold cursor-pointer" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
-                  <div name="input-group" class="input-group input-group-sm amount-input round ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-dish="<%= dish.id%>">
-                    <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
-                      <span class="input-group-text">-</span>
-                    </div>
-                    <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
-                    <div class="input-group-append add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
-                      <span class="input-group-text">+</span>
-                    </div>
+                  <button name="order-btn" class="btn btn-order orange text-white cursor-pointer none-padding" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
+                  <div name="input-group" class="amount-input ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
+                    <button class="btn btn-order btn-inline border-orange text-orange white cursor-pointer none-padding minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">-</button>
+                    <span class="text-center amount mx-2"></span>
+                    <button class="btn btn-order btn-inline orange text-white cursor-pointer none-padding add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
                   </div>
                 </div>
               </div>
@@ -195,7 +191,7 @@
                     <h6 class="mb-auto" style="width: 135px;"><%= dish.title%>
                       <small>
                         <%= dish.quantity%><br/>
-                        <span class="text-red"><%= __('ends')%> <%= meal.getTimeDiff(meal.provideTillTime, locale)%></span>
+                        <span class="text-orange"><%= __('ends')%> <%= meal.getTimeDiff(meal.provideTillTime, locale)%></span>
                       </small>
                     </h6>
                     <div class="d-flex vertical-align">
@@ -206,15 +202,11 @@
                           $<%= dish.price.toFixed(2)%>
                         <% } %>
                       </div>
-                      <button name="order-btn" style="width: 38px;height: 38px;" class="btn orange rounded-circle text-white font-weight-bold cursor-pointer" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
-                      <div name="input-group" class="input-group input-group-sm amount-input round ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
-                        <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
-                          <span class="input-group-text">-</span>
-                        </div>
-                        <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
-                        <div class="input-group-append add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
-                          <span class="input-group-text">+</span>
-                        </div>
+                      <button name="order-btn" class="btn btn-order orange text-white cursor-pointer none-padding" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
+                      <div name="input-group" class="amount-input ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
+                        <button class="btn btn-order btn-inline border-orange text-orange white cursor-pointer none-padding minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">-</button>
+                        <span class="text-center amount mx-2"></span>
+                        <button class="btn btn-order btn-inline orange text-white cursor-pointer none-padding add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
                       </div>
                     </div>
                   </div>
@@ -255,7 +247,7 @@
                         <h6 class="mb-auto" style="width: 135px;"><%= dish.title%>
                           <small>
                             <%= dish.quantity%><br/>
-                            <span class="text-red"><%= __('ends')%> <%= meal.getTimeDiff(meal.provideTillTime, locale)%></span>
+                            <span class="text-orange"><%= __('ends')%> <%= meal.getTimeDiff(meal.provideTillTime, locale)%></span>
                           </small>
                         </h6>
                         <div class="d-flex vertical-align">
@@ -266,15 +258,11 @@
                               $<%= dish.price.toFixed(2)%>
                             <% }%>
                           </div>
-                          <button name="order-btn" style="width: 38px;height: 38px;" class="btn rounded-circle orange text-white font-weight-bold cursor-pointer" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
-                          <div name="input-group" class="input-group input-group-sm amount-input round ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
-                            <div class="input-group-prepend minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">
-                              <span class="input-group-text">-</span>
-                            </div>
-                            <input class="form-control text-center amount" type="number" pattern="[0-9]*" inputmode="numeric" value="0" readonly>
-                            <div class="input-group-append add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">
-                              <span class="input-group-text">+</span>
-                            </div>
+                          <button name="order-btn" class="btn btn-order orange text-white cursor-pointer none-padding" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
+                          <div name="input-group" class="amount-input ml-2 d-none" style="max-width:200px;" data-toggle="amount-input" data-customClickHandle="true" data-max="<%= meal.leftQty[dish.id]%>" data-dish="<%= dish.id%>">
+                            <button class="btn btn-order btn-inline border-orange text-orange white cursor-pointer none-padding minus" onclick="javascript:l.orderFood('<%= dish.id %>',-1,true)">-</button>
+                            <span class="text-center amount mx-2"></span>
+                            <button class="btn btn-order btn-inline orange text-white cursor-pointer none-padding add" onclick="javascript:l.orderFood('<%= dish.id %>',1,true)">+</button>
                           </div>
                         </div>
                       </div>
@@ -282,11 +270,10 @@
                   </div>
                 <% }}})})})}});%>
         </div>
-        <div id="shoppingCartView" class="red text-white p-2 align-middle d-block w-100" style="line-height:50px;position: fixed;bottom: 0;left: 0;z-index:90;" onclick="javascript:location.href='#order'">
+        <div id="shoppingCartView" class="p-2 align-middle d-block w-100 white border-top" style="line-height:40px;position: fixed;bottom: 0;left: 0;z-index:90;" onclick="javascript:location.href='#order'">
           <div class="d-flex justify-content-end vertical-align">
-            <i class="fa fa-2x fa-angle-double-right"></i>
-            <i class="fa fa-2x fa-angle-double-right mr-auto"></i>
-            <button class="btn btn-outline-light mr-2" onclick="javascript:location.href='/cart'"><span class="order-preview mr-1"></span><i class="fa fa-shopping-cart"></i></button>
+            <span><%= __('total')%> <span class="subtotal text-orange mr-2"></span></span>
+            <button class="btn orange mr-2 text-white" onclick="javascript:location.href='/cart'"><span class="font-weight-light"><%= __('checkout')%></span> <span class="order-preview mr-1"></span></button>
           </div>
         </div>
       </div>
