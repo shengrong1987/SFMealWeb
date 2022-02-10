@@ -157,7 +157,7 @@
     "less-loader": "^4.1.0",
     "mini-css-extract-plugin": "^0.6.0",
     "mocha": "^2.3.4",
-    "node-sass": "^4.13.0",
+    "node-sass": "^7.0.0",
     "papaparse": "^4.6.3",
     "postcss-loader": "^3.0.0",
     "precss": "^4.0.0",
