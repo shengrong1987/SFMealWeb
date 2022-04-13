@@ -11,7 +11,7 @@
     "agenda-ui": "0.0.7",
     "agendash": "^0.4.0",
     "ajv": "^6.10.0",
-    "async": "~1.5.2",
+    "async": "~3.2.2",
     "aws-sdk": "^2.441.0",
     "babel-polyfill": "^6.26.0",
     "backbone": "^1.4.0",
